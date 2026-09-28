@@ -1,5 +1,15 @@
 export type RegionId = 'new-york' | 'london' | 'berlin' | 'tashkent' | 'bucharest' | 'tokyo';
-export type Mood = 'calm' | 'impatient' | 'sad' | 'vip' | 'wealthy' | 'friendly';
+export type Mood =
+  | 'calm'
+  | 'friendly'
+  | 'impatient'
+  | 'angry'
+  | 'sad'
+  | 'tired'
+  | 'shy'
+  | 'confused'
+  | 'wealthy'
+  | 'vip';
 export type PaymentMethod = 'cash' | 'card';
 
 export interface Region {

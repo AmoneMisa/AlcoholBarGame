@@ -15,7 +15,7 @@
     "vue": "latest"
   },
   "devDependencies": {
-    "typescript": "latest",
-    "vue-tsc": "latest"
+    "typescript": "5.9.3",
+    "vue-tsc": "3.3.11"
   }
 }

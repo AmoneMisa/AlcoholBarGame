@@ -3,6 +3,7 @@ import { createPinia } from 'pinia';
 import App from './App.vue';
 import './style.css';
 import './dashboard.css';
+import './game.css';
 import { initTelegram } from './telegram/webapp';
 
 initTelegram();
