@@ -29,9 +29,5 @@ const castStyle = computed(() => art.value.castIndex === undefined ? {} : ({
   <div class="art-character" :class="[`role-${role}`, `expression-${expression}`, `motion-${animation}`, `body-${look.body}`, `skin-${look.skin}`, `hair-${look.hair}`, `face-${look.face}`, `outfit-${outfit}`, `accessory-${accessory}`, `glasses-${look.glasses}`, `hat-${look.hat}`, `vip-${look.vip}`, mood]" :aria-label="`${art.name}, ${expression}`">
     <img v-if="art.asset" class="bartender-art" :src="art.asset" :alt="art.name" draggable="false" />
     <div v-else class="customer-art" :style="castStyle" role="img" :aria-label="art.name"></div>
-    <span class="expression-mark" aria-hidden="true"><i></i><b></b></span>
-    <span class="look-layer look-glasses" aria-hidden="true"></span>
-    <span class="look-layer look-vip" aria-hidden="true"></span>
-    <span v-if="accessory !== 'none'" class="character-accessory" aria-hidden="true"></span>
   </div>
 </template>

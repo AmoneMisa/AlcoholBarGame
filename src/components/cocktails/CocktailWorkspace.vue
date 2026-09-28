@@ -19,6 +19,7 @@ const liquidColor = computed(() => {
   return '#d9f0b1';
 });
 const ice = computed(() => game.currentMix.find((item) => item.ingredientId === 'ice')?.amount ?? 0);
+const selected = computed(() => INGREDIENTS.find((item) => item.id === selectedIngredient.value));
 const currentStep = computed(() => !game.currentMix.length ? 1 : !game.shaken && game.recipe.needsShake ? 2 : 3);
 
 function pour(id: string) {
@@ -58,6 +59,10 @@ function serve() {
         </button>
       </div>
       <div class="mixing-board">
+        <div class="action-prop" :class="[`action-${action}`, { visible: selected && action !== 'idle' }]">
+          <BottleModel v-if="selected" :ingredient="selected" />
+        </div>
+        <div class="shaker-prop" :class="{ active: action === 'shaking' }"><i></i></div>
         <div class="pour-stream" :class="{ active: action === 'pouring' }"></div>
         <GlassModel type="highball" :fill="fill" :color="liquidColor" :ice="ice" :garnish="game.currentMix.some((item) => item.ingredientId === 'mint') ? 'mint' : ''" :bubbles="game.currentMix.some((item) => item.ingredientId === 'soda')" :animation="action" />
         <div class="amount-readout"><b>{{ totalAmount }}</b><span>ml + garnish</span></div>

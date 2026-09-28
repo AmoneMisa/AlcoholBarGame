@@ -42,7 +42,7 @@ const colors = ['#dbe8b8', '#e87d64', '#b8e5df', '#efb84b', '#d84962'];
       <header class="panel-heading"><div><small>RECIPE BOOK</small><h2>House drinks</h2></div><span>{{ RECIPES.length }} learned</span></header>
       <div class="recipe-cards">
         <button v-for="(recipe, index) in RECIPES" :key="recipe.id" type="button">
-          <GlassModel :type="index % 3 === 0 ? 'highball' : index % 3 === 1 ? 'coupe' : 'rocks'" :fill="74" :color="colors[index % colors.length]" :ice="index % 2 ? 3 : 0" :garnish="index % 2 ? 'citrus' : 'mint'" />
+          <GlassModel :type="index % 3 === 0 ? 'highball' : index % 3 === 1 ? 'coupe' : 'rocks'" :art-index="index % 10" />
           <div><small>{{ recipe.category }}</small><b>{{ recipe.name }}</b><span>{{ recipe.ingredients.length }} ingredients · {{ recipe.needsShake ? 'Shake' : 'Build' }}</span></div>
         </button>
       </div>
