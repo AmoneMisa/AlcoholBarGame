@@ -12,6 +12,9 @@ Telegram Mini App bar-management game for practical English from absolute beginn
 - Nine recipes: Mojito, Daiquiri, Margarita, Piña Colada, Cosmopolitan, Old Fashioned, Martini, Whiskey Sour and Long Island.
 - Spirits, mixers, fruits, herbs and garnish inventory.
 - Suppliers, regional market prices and quick restock.
+- Pairing knowledge base v2: 106 beverage profiles, alcoholic and non-alcoholic recommendations, 340 beverage-food pairings, 64 beverage-beverage pairings, 10 context pairings and 24 cigar pairings.
+- Interactive Pairing Advisor for food, drink-to-drink, context/mood and cigar recommendations.
+- Mood-safe recommendation rule: sadness, anger, stress and loneliness never boost alcohol scoring; a non-alcoholic option is surfaced alongside recommendations.
 - Regions: New York, London, Berlin, Tashkent, Bucharest and Tokyo.
 - Bar customization, bartender customization and service-English scenario cards.
 - Responsive desktop/mobile layout.

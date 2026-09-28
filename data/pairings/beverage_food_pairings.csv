@@ -1,0 +1,341 @@
+beverage,food,score,relationship,why
+cabernet_sauvignon,ribeye steak,98,classic,"High tannin and intensity fit rich, fatty beef."
+cabernet_sauvignon,grilled beef,96,classic,Tannin and dark fruit match char and beef.
+cabernet_sauvignon,lamb chops,92,complement,Structure and herbs suit savory lamb.
+cabernet_sauvignon,aged cheddar,94,classic,Fat and salt soften tannin; intensity is balanced.
+cabernet_sauvignon,aged gouda,92,classic,Nutty aged cheese matches oak and dark fruit.
+cabernet_sauvignon,mushroom ragout,82,earthy complement,Savory mushrooms echo earthy wine notes.
+cabernet_sauvignon,delicate white fish,30,challenging,Tannin and intensity can overwhelm delicate fish.
+merlot,roast beef,92,classic,Round fruit and moderate tannin suit roasted beef.
+merlot,roast chicken,85,complement,Softer tannin works with browned poultry.
+merlot,mushroom pasta,90,earthy complement,Plum and earth notes fit mushrooms.
+merlot,medium-aged cheese,88,classic,Moderate intensity matches semi-hard cheese.
+merlot,pork tenderloin,84,complement,Soft fruit and moderate body suit lean pork.
+pinot_noir,duck,97,classic,Bright acidity and red fruit suit rich duck.
+pinot_noir,salmon,90,classic exception,Light tannin and acidity can work with richer fish.
+pinot_noir,mushrooms,97,earthy complement,Earthy aromas strongly echo mushrooms.
+pinot_noir,brie,88,classic,Low tannin and bright fruit fit soft cheese.
+pinot_noir,roast chicken,92,classic,Elegant body and acidity suit poultry.
+pinot_noir,tuna,84,complement,Meaty fish can handle a light red.
+syrah_shiraz,grilled lamb,97,classic,"Pepper, smoke and dark fruit match lamb and char."
+syrah_shiraz,barbecue ribs,94,complement,Bold fruit and spice stand up to smoky-sweet sauce.
+syrah_shiraz,smoked cheese,90,flavor echo,Smoky notes align.
+syrah_shiraz,pepper steak,96,flavor echo,Peppery wine matches black-pepper seasoning.
+syrah_shiraz,game meat,92,classic,Intensity fits venison and other game.
+malbec,grilled steak,97,classic,"Dark fruit, moderate-high tannin and smoke fit beef."
+malbec,beef empanadas,94,regional,Savory beef and pastry suit ripe fruit and structure.
+malbec,blue cheese,82,contrast,Fruit can offset salt and pungency.
+malbec,grilled mushrooms,86,earthy complement,Dark savory flavors align.
+sangiovese_chianti,tomato pasta,99,regional/classic,High acidity is excellent with tomato sauce.
+sangiovese_chianti,pizza margherita,97,regional/classic,Acidity and savory herbs match tomato and cheese.
+sangiovese_chianti,lasagna,95,classic,Acidity cuts cheese and matches tomato.
+sangiovese_chianti,charcuterie,90,regional,Acidity refreshes salty cured meat.
+sangiovese_chianti,parmigiano-reggiano,91,regional,"Salt, umami and firm texture work with acidity."
+tempranillo_rioja,roast lamb,98,regional/classic,"Savory red fruit, oak and lamb are a traditional match."
+tempranillo_rioja,jamón / cured ham,95,regional,Salt and fat complement acidity and oak.
+tempranillo_rioja,manchego,96,regional/classic,Nutty sheep cheese matches oak-aged red wine.
+tempranillo_rioja,grilled pork,90,complement,Savory oak and red fruit suit browned pork.
+zinfandel,barbecue pork,96,classic,Ripe fruit and spice suit sweet-smoky barbecue.
+zinfandel,burger,90,classic,Bold fruit stands up to beef and toppings.
+zinfandel,spicy sausage,88,complement,Fruit and spice fit robust sausage; avoid very hot chili.
+zinfandel,aged cheddar,87,classic,Intensity and fruit balance aged cheese.
+gamay_beaujolais,charcuterie,95,classic,Low tannin and juicy acidity refresh salty meats.
+gamay_beaujolais,roast chicken,91,classic,Light body and fruit suit poultry.
+gamay_beaujolais,soft cheese,86,complement,Low tannin works with creamy cheese.
+gamay_beaujolais,grilled vegetables,90,complement,Fresh fruit and acidity fit vegetables.
+sauvignon_blanc,goat cheese,99,classic/regional,High acidity and herbal notes suit tangy goat cheese.
+sauvignon_blanc,oysters,96,classic,Crisp acidity and minerality fit briny shellfish.
+sauvignon_blanc,green salad,94,complement,Herbal citrus profile matches fresh greens.
+sauvignon_blanc,asparagus,91,classic,Herbaceous character handles a difficult vegetable.
+sauvignon_blanc,grilled fish,92,classic,Acidity and freshness suit light fish.
+sauvignon_blanc,herb chicken,88,flavor echo,Herbal aromas match fresh herbs.
+chardonnay_unoaked,white fish,94,classic,Fresh acidity and moderate body suit delicate fish.
+chardonnay_unoaked,shellfish,92,classic,Citrus/apple notes complement sweet shellfish.
+chardonnay_unoaked,chicken salad,88,complement,Freshness fits light poultry dishes.
+chardonnay_unoaked,fresh cheese,86,complement,Moderate acidity works with mild creamy cheese.
+chardonnay_oaked,lobster with butter,98,classic,Rich body and oak complement butter and sweet lobster.
+chardonnay_oaked,roast chicken,94,classic,Body and savory oak fit browned poultry.
+chardonnay_oaked,creamy pasta,96,congruent,Creamy texture and oak mirror rich sauce.
+chardonnay_oaked,salmon,91,classic,Body can handle rich fish.
+chardonnay_oaked,comté / gruyère,90,classic,Nutty cheese and oak integrate well.
+riesling_dry,sushi,96,classic,"Acidity and low tannin suit rice, fish and soy."
+riesling_dry,pork,92,classic,Apple-citrus acidity suits slightly sweet pork.
+riesling_dry,spicy noodles,86,contrast,"Aromatic fruit helps, though off-dry Riesling is safer for high heat."
+riesling_dry,smoked fish,90,contrast,Acidity refreshes smoke and oil.
+riesling_off_dry,thai curry,98,classic,Slight sweetness and aromatics soften chili heat.
+riesling_off_dry,spicy asian food,97,classic,Lower perceived dryness balances heat.
+riesling_off_dry,pork belly,94,contrast,Acidity and sweetness cut rich fat.
+riesling_off_dry,blue cheese,88,contrast,Sweetness balances salt and pungency.
+riesling_off_dry,fruit-based dishes,92,congruent,Fruit aromas echo the dish.
+pinot_grigio,light seafood,95,classic,"Crisp, light style does not overpower delicate seafood."
+pinot_grigio,salad,92,classic,Fresh acidity fits raw vegetables.
+pinot_grigio,antipasti,90,regional,Light salty starters suit a crisp white.
+pinot_grigio,fresh mozzarella,88,complement,Mild cheese matches delicate wine.
+chenin_blanc,pork,91,classic,Acidity and apple/quince notes suit pork.
+chenin_blanc,goat cheese,92,classic,Acidity matches tangy cheese.
+chenin_blanc,roast chicken,89,complement,Body and acidity fit poultry.
+chenin_blanc,mild curry,88,aromatic complement,Fruit and acidity fit gentle spice.
+gewurztraminer,thai food,96,classic,Aromatic fruit and slight sweetness suit fragrant spice.
+gewurztraminer,indian curry,94,classic,Floral spice profile complements aromatic curries.
+gewurztraminer,munster cheese,92,regional/classic,Aromatic intensity handles pungent cheese.
+gewurztraminer,duck with fruit sauce,90,congruent,Lychee/rose-like aromas suit sweet-savory sauce.
+albarino,oysters,98,regional/classic,High acidity and saline character suit oysters.
+albarino,shrimp,95,classic,Citrus freshness complements sweet shellfish.
+albarino,grilled octopus,93,regional,Minerality and acidity suit charred seafood.
+albarino,fish tacos,91,contrast,Acidity works with lime and fried/grilled fish.
+rose_dry,charcuterie,94,classic,Freshness handles salt and fat.
+rose_dry,grilled vegetables,92,classic,Red-fruit freshness suits char and vegetables.
+rose_dry,salmon,90,classic,Enough body for richer fish without heavy tannin.
+rose_dry,mediterranean salads,93,regional,"Acidity and fruit fit herbs, olives and tomatoes."
+champagne_brut,oysters,99,classic,Acidity and bubbles suit briny shellfish.
+champagne_brut,fried chicken,98,contrast,Bubbles and acidity cut fried richness.
+champagne_brut,french fries,96,contrast,Salt and fat are refreshed by bubbles.
+champagne_brut,brie / camembert,94,classic,Acidity cleanses creamy soft cheese.
+champagne_brut,sushi,94,classic,"Low tannin, bubbles and acidity suit fish and rice."
+champagne_brut,caviar,98,classic,"Salt, fat and delicate texture pair with dry bubbles."
+prosecco,prosciutto,94,classic,Fruit and bubbles balance salt.
+prosecco,light appetizers,92,classic,Low-to-moderate intensity fits starters.
+prosecco,fruit,90,congruent,Fresh pear/apple notes echo fruit.
+prosecco,salty snacks,91,contrast,Bubbles refresh the palate.
+moscato,fruit tart,96,classic,Aromatic sweetness matches fruit desserts.
+moscato,light cake,90,classic,Sweetness and low intensity suit delicate desserts.
+moscato,spicy food,91,contrast,Low alcohol and sweetness can soften heat.
+moscato,fresh berries,94,congruent,Fruit-forward aromas align.
+sauternes,foie gras,99,classic,Sweetness and acidity balance extreme richness.
+sauternes,roquefort,99,classic,Sweetness contrasts salt and blue-cheese intensity.
+sauternes,fruit dessert,95,classic,Sweet wine matches dessert sweetness.
+sauternes,creme brulee,93,congruent,Honeyed richness suits caramel custard.
+port_ruby,stilton / blue cheese,99,classic,Sweet dark fruit balances salt and pungency.
+port_ruby,dark chocolate dessert,94,classic,Dense fruit and sweetness can match intense chocolate.
+port_ruby,berry dessert,95,congruent,Dark berry flavors echo the dessert.
+port_tawny,walnut tart,98,congruent,Nutty oxidative notes mirror walnuts.
+port_tawny,caramel dessert,96,congruent,Toffee and dried-fruit notes fit caramel.
+port_tawny,aged cheese,92,classic,Sweetness contrasts salt and nuttiness.
+port_tawny,milk chocolate,90,congruent,Softer chocolate fits mellow tawny character.
+sherry_fino,olives,99,regional/classic,"Saline, dry style matches briny olives."
+sherry_fino,almonds,97,regional/classic,Nutty savory notes align.
+sherry_fino,jamón,98,regional/classic,Dry saline wine refreshes cured ham.
+sherry_fino,fried fish,94,regional,Freshness cuts oil.
+sherry_fino,sushi,90,savory complement,Salinity and low fruit can fit umami and seafood.
+sherry_amontillado,mushrooms,96,congruent,Nutty oxidative notes echo earthy umami.
+sherry_amontillado,roast chicken,93,classic,Savory depth fits browned poultry.
+sherry_amontillado,hard cheese,92,classic,Nutty wine works with aged cheese.
+sherry_amontillado,jamón,95,regional,Salt and savory oxidation align.
+sherry_oloroso,braised beef,94,classic,Powerful nutty body suits rich meat.
+sherry_oloroso,aged cheese,96,classic,Intensity and nuttiness match.
+sherry_oloroso,nuts,98,congruent,Walnut-like oxidative flavors echo nuts.
+madeira,mushroom dishes,91,congruent,Oxidative savory notes suit mushrooms.
+madeira,roast meat,90,classic,Acidity keeps rich meat lively.
+madeira,caramelized nuts,95,congruent,Toffee-nut flavors align.
+madeira,hard cheese,92,classic,Acidity and oxidative complexity suit aged cheese.
+pilsner,fried chicken,97,contrast,Crisp carbonation and bitterness cut fried fat.
+pilsner,pizza,93,classic,Crisp malt and bitterness refresh cheese and crust.
+pilsner,sausages,94,classic,Carbonation and malt fit savory sausage.
+pilsner,salty snacks,96,classic,Clean bitterness and bubbles refresh salt.
+pilsner,sushi,88,complement,Light body does not overpower fish.
+wheat_beer,salad,90,complement,Light body and citrus/spice fit fresh vegetables.
+wheat_beer,seafood,91,classic,Citrus-like notes suit shellfish and fish.
+wheat_beer,goat cheese,88,complement,Fresh acidity and yeast character fit tangy cheese.
+wheat_beer,banana bread,84,flavor echo,Hefeweizen banana/clove notes can mirror baking flavors.
+pale_ale,burger,93,classic,Malt and hops stand up to beef and toppings.
+pale_ale,grilled chicken,90,classic,Caramel malt and hop bitterness fit char.
+pale_ale,cheddar,92,classic,Hop bitterness and malt work with sharp cheese.
+pale_ale,roasted vegetables,88,complement,Toast and hops suit caramelized vegetables.
+ipa,spicy tacos,91,contrast/complement,"Hop citrus can fit tacos, though bitterness may amplify extreme chili."
+ipa,blue cheese,90,contrast,Bold hops match intense cheese.
+ipa,burger,94,classic,Bitterness cuts fat and intensity matches beef.
+ipa,fried food,92,contrast,Carbonation and bitterness refresh oil.
+ipa,carrot cake,80,aromatic complement,Citrus/pine hops can play against spice and sweetness.
+amber_ale,roast pork,92,classic,Caramel malt suits browned pork.
+amber_ale,grilled sausage,94,classic,Toasty malt complements savory char.
+amber_ale,medium cheddar,90,classic,Malt sweetness balances salt.
+amber_ale,roasted root vegetables,89,congruent,Caramelized flavors echo malt.
+stout_porter,oysters,95,classic,Roast and briny minerality are a traditional contrast.
+stout_porter,beef stew,96,classic,Roast and body suit deep savory flavors.
+stout_porter,chocolate cake,98,congruent,Coffee/cocoa malt echoes chocolate.
+stout_porter,blue cheese,91,contrast,Roast sweetness and body handle pungent cheese.
+stout_porter,barbecue,92,flavor echo,Smoke and roast fit charred meat.
+saison,mussels,97,classic,"Dryness, pepper and carbonation suit shellfish."
+saison,goat cheese,93,classic,Earthy spice matches tangy cheese.
+saison,herb chicken,92,flavor echo,Peppery/herbal yeast notes suit herbs.
+saison,salad,90,complement,Dry refreshing profile fits vegetables.
+sour_beer,goat cheese,95,contrast,Acidity matches tang and refreshes fat.
+sour_beer,fruit dessert,92,congruent,Fruit acidity echoes berries and stone fruit.
+sour_beer,rich pork,90,contrast,Acidity cuts fat.
+sour_beer,fried food,90,contrast,Tartness refreshes oil.
+belgian_dubbel,braised beef,94,classic,Dark fruit and malt suit caramelized meat.
+belgian_dubbel,duck,91,complement,Rich fruit works with fatty poultry.
+belgian_dubbel,aged gouda,94,classic,Caramel malt fits nutty aged cheese.
+belgian_tripel,mussels,92,classic,High carbonation and spice suit shellfish.
+belgian_tripel,washed-rind cheese,91,intensity match,Strong aromas and carbonation handle pungent cheese.
+belgian_tripel,roast chicken,90,classic,Spice and body fit browned poultry.
+dry_cider,pork chops,97,classic,Apple acidity naturally suits pork.
+dry_cider,cheddar,95,classic,Acidity and fruit balance sharp cheese.
+dry_cider,roast chicken,90,classic,Fresh apple works with poultry.
+dry_cider,crepes / savory pastry,88,regional-style,Acidity balances butter and pastry.
+sweet_cider,apple pie,96,congruent,Apple-on-apple pairing; sweetness must match dessert.
+sweet_cider,blue cheese,89,contrast,Sweetness balances salt.
+sweet_cider,spicy pork,88,contrast,Sweetness softens spice and acidity cuts fat.
+mead,roast pork,90,classic,Honeyed notes suit pork's sweetness.
+mead,blue cheese,88,contrast,Honey sweetness balances pungency.
+mead,nuts,91,congruent,Honey and nuts form a natural flavor family.
+mead,spiced desserts,92,congruent,Honey fits baking spices.
+vodka,caviar,96,classic,Clean chilled spirit does not obscure delicate salt and fat.
+vodka,smoked fish,92,classic,Neutral spirit refreshes oily smoky fish.
+vodka,pickles,94,regional/classic,Sharp acidity and salt pair with a clean spirit.
+vodka,blini,88,regional,Neutrality works with sour cream and savory toppings.
+gin,oysters,92,classic,Juniper and citrus botanicals complement briny shellfish.
+gin,smoked salmon,90,complement,Botanicals and citrus lift rich smoked fish.
+gin,goat cheese,85,aromatic complement,Herbal notes suit tangy cheese.
+gin,cucumber salad,92,flavor echo,Fresh botanicals align with cucumber and herbs.
+bourbon,barbecue ribs,96,classic,"Vanilla, caramel and char echo barbecue."
+bourbon,pecan pie,97,congruent,"Caramel, vanilla and nut flavors align."
+bourbon,dark chocolate,92,classic,"Oak, caramel and cocoa form a rich pairing."
+bourbon,smoked meat,94,flavor echo,Barrel char complements smoke.
+bourbon,aged cheddar,90,classic,Salt and fat balance oak and sweetness.
+rye_whiskey,pastrami,95,classic,Peppery rye mirrors spice and cuts fat.
+rye_whiskey,smoked sausage,92,classic,Spice and grain fit savory smoke.
+rye_whiskey,aged cheese,90,classic,Bold spice handles mature cheese.
+rye_whiskey,dark chocolate,86,contrast,Dry spice prevents the pairing becoming too sweet.
+irish_whiskey,smoked salmon,88,classic,Soft malt and light fruit fit smoke.
+irish_whiskey,apple tart,91,congruent,Fruit and vanilla suit apple pastry.
+irish_whiskey,milk chocolate,90,congruent,Smooth whiskey works with creamy chocolate.
+irish_whiskey,mild cheddar,87,classic,Gentler intensity matches medium cheese.
+scotch_unpeated,aged cheddar,94,classic,"Malt, oak and salt-rich cheese align."
+scotch_unpeated,roast beef,90,classic,Malt and oak suit browned meat.
+scotch_unpeated,nuts,91,congruent,Nutty malt/oak notes echo roasted nuts.
+scotch_unpeated,dark chocolate,89,classic,Cocoa and oak complement one another.
+scotch_peated,smoked salmon,98,flavor echo,Smoke-on-smoke pairing with oily fish.
+scotch_peated,blue cheese,93,intensity match,Strong peat can stand up to pungent cheese.
+scotch_peated,barbecue,94,flavor echo,Smoke and char align.
+scotch_peated,oysters,90,coastal contrast,Saline shellfish can complement maritime peat.
+cognac,foie gras,93,classic,Rich fruit and oak fit luxurious fatty texture.
+cognac,aged cheese,94,classic,Dried fruit and oak suit mature cheese.
+cognac,dark chocolate,96,classic,"Cocoa, fruit and oak form a deep pairing."
+cognac,duck,91,classic,Fruit and richness complement duck.
+brandy,fruit tart,91,congruent,Fruit spirit echoes baked fruit.
+brandy,hard cheese,89,classic,Oak and fruit pair with nutty cheese.
+brandy,roast pork,88,complement,Fruit notes suit pork.
+brandy,nuts,90,congruent,Oak-aged brandy works with roasted nuts.
+white_rum,ceviche,96,classic,Clean cane and citrus-friendly profile suit lime and raw fish.
+white_rum,grilled shrimp,92,classic,Light sweetness complements shellfish.
+white_rum,tropical fruit,94,congruent,Cane and fruit flavors align.
+white_rum,coconut dessert,90,congruent,Tropical flavors reinforce each other.
+aged_rum,jerk pork,96,classic,"Molasses and spice suit caramelized, spicy meat."
+aged_rum,banana dessert,96,congruent,Caramel and tropical fruit align.
+aged_rum,dark chocolate,94,classic,"Molasses, oak and cocoa integrate."
+aged_rum,grilled pineapple,97,congruent,Caramelized tropical fruit mirrors rum.
+aged_rum,aged cheese,88,classic,Richness and spice fit mature cheese.
+tequila_blanco,ceviche,99,classic,"Agave and citrus character fit lime, chili and seafood."
+tequila_blanco,fish tacos,98,classic,Peppery agave and citrus suit tacos.
+tequila_blanco,guacamole,95,classic,"Fresh agave, lime and herbs match avocado."
+tequila_blanco,grilled shrimp,94,classic,Clean agave lifts sweet shellfish.
+tequila_reposado,carnitas,97,classic,Oak-softened agave suits rich pork.
+tequila_reposado,grilled chicken tacos,94,classic,Roasted agave fits char.
+tequila_reposado,aged cheese,87,complement,Oak and savory cheese can work well.
+tequila_reposado,roasted corn,92,flavor echo,Roasted sweetness suits reposado.
+tequila_anejo,grilled steak,93,classic,Oak-aged agave has enough body for beef.
+tequila_anejo,dark chocolate,94,classic,"Vanilla, oak and cocoa align."
+tequila_anejo,mole sauce,95,regional/classic,"Agave, spice and cocoa notes complement mole."
+tequila_anejo,aged cheese,91,classic,Intensity and oak match mature cheese.
+mezcal,grilled octopus,97,classic,Smoke and char align with seafood.
+mezcal,mole,98,classic,"Smoke, chile and cocoa-like complexity fit mezcal."
+mezcal,barbecue,95,flavor echo,Smoke-on-char pairing.
+mezcal,roasted vegetables,94,flavor echo,Earthy roast matches mezcal.
+sake_junmai,sushi,98,classic,Umami and moderate body complement rice and fish.
+sake_junmai,mushrooms,96,umami complement,Sake reinforces savory umami.
+sake_junmai,grilled chicken,92,classic,Rice umami and gentle acidity fit savory chicken.
+sake_junmai,hard cheese,88,umami complement,Sake can pair surprisingly well with aged cheese.
+sake_ginjo,sashimi,99,classic,Delicate fruit and clean texture preserve subtle fish.
+sake_ginjo,light seafood,97,classic,Aromatic freshness suits seafood.
+sake_ginjo,salad,90,complement,Clean aromatics fit fresh vegetables.
+sake_ginjo,fresh cheese,86,complement,Delicate profile matches mild cheese.
+sake_nigori,spicy food,92,contrast,Creamy sweetness can soften chili.
+sake_nigori,fruit dessert,90,congruent,Sweet rice and fruit work together.
+sake_nigori,coconut dessert,91,congruent,Creamy texture and tropical sweetness align.
+shochu,yakitori,95,classic,Clean grain/sweet-potato character fits grilled skewers.
+shochu,sashimi,90,classic,Light styles can accompany delicate fish.
+shochu,grilled vegetables,89,complement,Earthy notes suit char.
+shochu,pickles,88,contrast,Clean spirit works with sharp salty flavors.
+soju,korean barbecue,99,classic,"Clean, lightly sweet spirit cuts fatty grilled meat."
+soju,fried chicken,96,classic,Refreshing neutral spirit suits crispy rich food.
+soju,spicy korean dishes,90,classic,Clean profile handles bold seasoning.
+soju,grilled pork belly,98,classic,Spirit refreshes between fatty bites.
+campari,olives,90,aperitivo,Salt and bitterness work as a pre-dinner pairing.
+campari,charcuterie,88,aperitivo,Bitter citrus refreshes fatty cured meat.
+campari,orange-based appetizers,86,flavor echo,Orange notes align.
+campari,rich cheese,82,contrast,Bitterness can cut fat.
+aperol,prosciutto,92,aperitivo,Gentler bittersweet orange suits salty ham.
+aperol,light antipasti,93,aperitivo,Low intensity matches starters.
+aperol,olives,88,aperitivo,Salt balances sweetness and bitterness.
+orange_liqueur,dark chocolate,95,classic,Orange and chocolate are a strong flavor match.
+orange_liqueur,crepes,92,classic,Citrus sweetness suits buttery pastry.
+orange_liqueur,fruit tart,90,congruent,Citrus amplifies fruit.
+orange_liqueur,duck à l'orange,88,flavor echo,Orange component directly matches.
+coffee_liqueur,tiramisu,98,congruent,Coffee-on-coffee pairing.
+coffee_liqueur,chocolate cake,95,classic,Coffee deepens cocoa flavor.
+coffee_liqueur,vanilla ice cream,94,contrast/congruent,Roast and sweetness complement cream and vanilla.
+amaretto,almond cake,99,congruent,Almond flavors directly match.
+amaretto,tiramisu,92,congruent,Nutty sweetness suits coffee and cream.
+amaretto,stone-fruit dessert,91,congruent,Almond aroma naturally fits peach/apricot/cherry.
+elderflower_liqueur,fresh berries,94,congruent,Floral sweetness lifts berry aromas.
+elderflower_liqueur,goat cheese crostini,87,contrast,Floral sweetness balances tang.
+elderflower_liqueur,light fruit dessert,92,congruent,Delicate floral profile suits fruit.
+herbal_liqueur,dark chocolate,90,classic,Bitter herbs and cocoa create digestif depth.
+herbal_liqueur,aged cheese,89,classic,Herbal bitterness contrasts fat and salt.
+herbal_liqueur,roasted nuts,88,congruent,Roasted and herbal bitterness align.
+creme_de_cacao,chocolate dessert,99,congruent,Direct cocoa match.
+creme_de_cacao,vanilla ice cream,94,classic,Chocolate and vanilla complement one another.
+creme_de_cacao,berries,88,contrast,Berry acidity brightens chocolate sweetness.
+cabernet_sauvignon,gouda,90,classic,"Established style-level pairing based on intensity, acidity/sweetness, salt and fat."
+pinot_noir,gruyère,92,classic,"Established style-level pairing based on intensity, acidity/sweetness, salt and fat."
+champagne_brut,brie,94,classic,"Established style-level pairing based on intensity, acidity/sweetness, salt and fat."
+champagne_brut,camembert,93,classic,"Established style-level pairing based on intensity, acidity/sweetness, salt and fat."
+port_ruby,stilton,99,classic,"Established style-level pairing based on intensity, acidity/sweetness, salt and fat."
+sparkling_water,fried food,95,palate cleanser,Carbonation refreshes the palate without adding sweetness.
+sparkling_water,rich cheese,88,palate cleanser,Bubbles and neutrality cut richness.
+sprite_style_soda,spicy food,84,contrast,"Sweet citrus can soften moderate heat, though sweetness may dominate delicate dishes."
+sprite_style_soda,salty snacks,88,classic soft-drink match,Citrus sweetness contrasts salt.
+cola,burger,91,classic soft-drink match,"Caramel, spice and acidity suit grilled beef."
+cola,barbecue,93,classic soft-drink match,Caramel and spice echo sweet-smoky sauces.
+tonic_water,fried food,86,contrast,Bitterness and carbonation refresh oily food.
+tonic_water,citrus appetizers,90,flavor echo,Bitter citrus aligns with citrus-led dishes.
+ginger_ale,roast chicken,88,complement,Gentle ginger and sweetness fit browned poultry.
+ginger_ale,apple dessert,89,congruent,Soft spice suits baked apple.
+ginger_beer_na,spicy food,90,contrast,Bold ginger and carbonation stand up to spice.
+ginger_beer_na,barbecue,89,complement,Spicy ginger fits smoky-sweet flavors.
+lemonade,fried fish,94,classic,Acidic citrus cuts oil and suits fish.
+lemonade,salad,90,complement,Fresh citrus fits vegetables and herbs.
+orange_juice,brunch dishes,92,classic,"Fruit acidity and sweetness fit eggs, pastries and breakfast foods."
+apple_juice,pork,93,classic flavor match,Apple is a classic partner for pork.
+cranberry_juice,turkey,92,classic flavor match,Tart berry flavors suit poultry.
+pineapple_juice,grilled pork,91,tropical complement,Sweet acidity works with browned pork.
+tomato_juice,savory brunch,94,savory complement,Tomato umami works with eggs and savory breakfast foods.
+cold_brew,chocolate dessert,96,congruent,Coffee roast deepens cocoa.
+cold_brew,smoked meat,88,roast-smoke complement,Roasted coffee notes can suit smoke and char.
+espresso,tiramisu,99,congruent,Direct coffee match.
+espresso,dark chocolate,96,classic,Bitterness and roast align with cocoa.
+black_tea,aged cheese,89,tannin-fat contrast,Tea tannin refreshes rich cheese.
+black_tea,pastries,91,classic,Tannin balances butter and sweetness.
+green_tea,sushi,97,classic,Fresh grassy bitterness and low sweetness fit fish and rice.
+green_tea,light seafood,92,classic,Delicate tea preserves subtle seafood.
+earl_grey,lemon cake,94,flavor echo,Bergamot and citrus align.
+mint_tea,middle eastern sweets,93,regional-style,"Fresh mint balances sweet, nutty desserts."
+chamomile_tea,light biscuits,90,gentle complement,Soft floral notes fit delicate baked goods.
+kombucha,rich pork,90,acid contrast,Acidity cuts fat.
+kombucha,fermented foods,88,fermented complement,Tart fermented flavors can echo pickled or fermented dishes.
+na_lager,pizza,92,classic beer-style pairing,Crisp bitterness refreshes cheese and crust.
+na_lager,fried chicken,94,contrast,Carbonation and bitterness cut fat.
+na_wheat_beer,seafood,91,beer-style complement,Citrus-like wheat character suits seafood.
+na_sparkling_wine,oysters,95,wine-style classic,Acidity and bubbles suit briny shellfish.
+na_sparkling_wine,fried food,96,contrast,Bubbles and acidity refresh richness.
+na_white_wine,white fish,90,wine-style classic,Fresh acidity and light body fit delicate fish.
+na_red_wine,roast beef,82,wine-style complement,"Red-fruit and tannin-like structure can suit roasted beef, depending on product quality."
+virgin_mojito,ceviche,95,flavor echo,Lime and mint suit citrus-cured seafood.
+virgin_mojito,salad,91,fresh complement,Mint and citrus match fresh herbs and vegetables.
+virgin_colada,spicy food,88,contrast,Creamy coconut and fruit can soften moderate heat.
+shirley_temple,salty snacks,84,contrast,Sweet fruit and bubbles contrast salt.
+citrus_spritz_na,charcuterie,91,aperitivo-style,Bitter citrus and bubbles refresh salt and fat.
+berry_spritz_na,soft cheese,88,contrast,Berry acidity and fruit suit creamy cheese.
+spiced_apple_fizz,pork,94,classic flavor match,Apple and spice are natural partners for pork.
+coffee_tonic,chocolate dessert,89,contrast,Coffee roast plus tonic bitterness keeps chocolate from feeling overly sweet.

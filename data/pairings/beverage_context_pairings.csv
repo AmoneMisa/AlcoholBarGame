@@ -1,0 +1,11 @@
+setting,activity,time_of_day,weather,company,beverage,score,why
+balcony,cigar,evening,,,cognac,90,"Slow-sipping, aromatic and compatible with many medium/full cigar profiles."
+balcony,cigar,evening,,,cold_brew,88,Roasted profile works with tobacco and keeps the scenario non-alcoholic.
+balcony,cigar,evening,,,black_tea,84,Tannin and warmth suit tobacco without alcohol.
+balcony,cigar,evening,,,sparkling_water,80,Neutral palate cleanser; useful when the cigar itself should remain dominant.
+terrace,,,hot,,citrus_spritz_na,94,"Cold, sparkling and citrus-forward."
+terrace,,,hot,,virgin_mojito,95,"Mint, lime and ice fit hot-weather refreshment."
+,reading,evening,,,earl_grey,93,Aromatic but calm and easy to sip slowly.
+,gaming,,,friend,na_lager,90,"Casual, food-friendly and easy to serve over a long session."
+,dessert,,,,espresso,92,Classic after-dessert roast and bitterness.
+,gift_buying,,,,na_sparkling_wine,84,Useful celebratory option when alcohol preferences or restrictions are unknown.

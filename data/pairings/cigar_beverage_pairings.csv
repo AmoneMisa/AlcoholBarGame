@@ -1,0 +1,25 @@
+cigar_body,cigar_note,beverage,score,why,alcoholic
+mild,cedar,earl_grey,92,Bergamot and gentle tannin complement cedar without overpowering a mild cigar.,False
+mild,cedar,cognac,86,Elegant fruit and oak can support cedar if the spirit is not too aggressive.,True
+mild,nuts,black_tea,91,"Tea tannin and nutty notes create a dry, restrained match.",False
+mild,nuts,sherry_amontillado,94,Nutty oxidative sherry closely echoes nut flavors.,True
+mild,cream,cold_brew,84,Soft roast gives contrast while staying lower in aromatic intensity than many spirits.,False
+medium,coffee,cold_brew,97,Direct roast-on-roast pairing with no alcohol.,False
+medium,coffee,bourbon,92,"Vanilla, caramel and char support coffee notes.",True
+medium,cocoa,cognac,94,Dried fruit and oak complement cocoa richness.,True
+medium,cocoa,espresso,95,Intense coffee bitterness deepens cocoa.,False
+medium,pepper,rye_whiskey,95,Peppery rye mirrors spicy cigar notes.,True
+medium,pepper,ginger_beer_na,88,Spicy ginger provides a lively non-alcoholic echo.,False
+medium,earth,scotch_unpeated,91,Malt and oak suit earthy tobacco.,True
+medium,earth,black_tea,89,Dry tannin and earthy tea tones fit tobacco.,False
+full,smoke,scotch_peated,99,Peat smoke and full-bodied tobacco are an intensity match.,True
+full,smoke,mezcal,94,Roasted agave and smoke complement smoky tobacco.,True
+full,smoke,coffee_tonic,86,Roast and bitterness give a non-alcoholic counterpoint with carbonation.,False
+full,coffee,aged_rum,95,"Molasses, caramel and oak fit deep coffee notes.",True
+full,coffee,espresso,98,High-intensity roast matches a full cigar without alcohol.,False
+full,cocoa,port_tawny,94,Nutty dried-fruit sweetness complements cocoa and rich tobacco.,True
+full,cocoa,cold_brew,90,Coffee roast supports cocoa and full tobacco.,False
+full,leather,cognac,96,"Oak, dried fruit and mature spirit character fit leathery tobacco.",True
+full,leather,black_tea,87,Firm tannin gives a dry non-alcoholic match.,False
+full,sweet,aged_rum,97,Caramel and molasses echo sweet tobacco notes.,True
+full,sweet,spiced_apple_fizz,84,Apple spice offers a softer non-alcoholic complement.,False
