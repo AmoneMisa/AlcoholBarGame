@@ -18,6 +18,9 @@ export const INGREDIENTS: Ingredient[] = [
   { id: 'whiskey', name: 'Whiskey', unit: 'ml', basePrice: 0.052, pourStep: 15, category: 'spirit' },
   { id: 'orange-liqueur', name: 'Orange liqueur', unit: 'ml', basePrice: 0.048, pourStep: 10, category: 'spirit' },
   { id: 'vermouth', name: 'Vermouth', unit: 'ml', basePrice: 0.030, pourStep: 10, category: 'spirit' },
+  { id: 'bitter-aperitif', name: 'Bitter aperitif', unit: 'ml', basePrice: 0.046, pourStep: 15, category: 'spirit' },
+  { id: 'sparkling-wine', name: 'Sparkling wine', unit: 'ml', basePrice: 0.042, pourStep: 30, category: 'spirit' },
+  { id: 'coffee-liqueur', name: 'Coffee liqueur', unit: 'ml', basePrice: 0.044, pourStep: 15, category: 'spirit' },
   { id: 'lime-juice', name: 'Lime', unit: 'ml', basePrice: 0.012, pourStep: 5, category: 'fruit' },
   { id: 'lemon-juice', name: 'Lemon', unit: 'ml', basePrice: 0.012, pourStep: 5, category: 'fruit' },
   { id: 'pineapple-juice', name: 'Pineapple', unit: 'ml', basePrice: 0.008, pourStep: 30, category: 'fruit' },
@@ -27,6 +30,8 @@ export const INGREDIENTS: Ingredient[] = [
   { id: 'tonic', name: 'Tonic', unit: 'ml', basePrice: 0.006, pourStep: 30, category: 'mixer' },
   { id: 'soda', name: 'Soda water', unit: 'ml', basePrice: 0.004, pourStep: 30, category: 'mixer' },
   { id: 'cola', name: 'Cola', unit: 'ml', basePrice: 0.005, pourStep: 30, category: 'mixer' },
+  { id: 'ginger-beer', name: 'Ginger beer', unit: 'ml', basePrice: 0.008, pourStep: 30, category: 'mixer' },
+  { id: 'grapefruit-soda', name: 'Grapefruit soda', unit: 'ml', basePrice: 0.008, pourStep: 30, category: 'mixer' },
   { id: 'mint', name: 'Mint', unit: 'piece', basePrice: 0.030, pourStep: 2, category: 'herb' },
   { id: 'ice', name: 'Ice', unit: 'piece', basePrice: 0.010, pourStep: 1, category: 'garnish' },
   { id: 'lime-wedge', name: 'Fresh lime', unit: 'piece', basePrice: 0.18, pourStep: 1, category: 'fruit' },
@@ -107,6 +112,48 @@ export const RECIPES: Recipe[] = [
     { ingredientId: 'vodka', amount: 15 }, { ingredientId: 'gin', amount: 15 }, { ingredientId: 'white-rum', amount: 15 },
     { ingredientId: 'tequila', amount: 15 }, { ingredientId: 'orange-liqueur', amount: 10 },
     { ingredientId: 'lemon-juice', amount: 20 }, { ingredientId: 'cola', amount: 60 }, { ingredientId: 'ice', amount: 5 }
+  ]},
+  { id: 'gin-tonic', name: 'Gin & Tonic', price: 9, needsShake: false, category: 'classic',
+    origin: 'British India · 19th century', story: 'A crisp highball built around botanical gin and bitter tonic, lengthened over ice for a bright and uncomplicated serve.',
+    tastingNotes: ['botanical', 'bitter', 'refreshing'], occasions: ['Easy order', 'Warm evening', 'Aperitif', 'Long conversation'],
+    method: ['Fill a highball with ice.', 'Add gin.', 'Top slowly with tonic.', 'Garnish with fresh lime.'], ingredients: [
+      { ingredientId: 'gin', amount: 45 }, { ingredientId: 'tonic', amount: 90 }, { ingredientId: 'ice', amount: 5 }, { ingredientId: 'lime-wedge', amount: 1 }
+  ]},
+  { id: 'negroni', name: 'Negroni', price: 13, needsShake: false, category: 'classic',
+    origin: 'Florence, Italy · early 20th century', story: 'An equal-parts Italian aperitivo balancing gin, bitter aperitif and vermouth. Bold bitterness and orange aromatics make it unmistakable.',
+    tastingNotes: ['bitter', 'botanical', 'orange'], occasions: ['Aperitivo', 'Experienced guest', 'Slow sip', 'Before dinner'],
+    method: ['Add gin, bitter aperitif and vermouth to a mixing glass.', 'Stir with ice until chilled.', 'Strain over a large cube.', 'Finish with orange.'], ingredients: [
+      { ingredientId: 'gin', amount: 30 }, { ingredientId: 'bitter-aperitif', amount: 30 }, { ingredientId: 'vermouth', amount: 30 }, { ingredientId: 'ice', amount: 3 }, { ingredientId: 'orange', amount: 1 }
+  ]},
+  { id: 'mai-tai', name: 'Mai Tai', price: 14, needsShake: true, category: 'cocktail',
+    origin: 'California · 1940s', story: 'A layered rum sour from the golden age of tiki, designed to showcase rum through lime, orange and almond-like sweetness.',
+    tastingNotes: ['tropical', 'nutty', 'rum-forward'], occasions: ['Tiki night', 'Celebration', 'Adventurous guest', 'Summer party'],
+    method: ['Add rums, orange liqueur, lime and syrup to a shaker.', 'Shake with ice.', 'Pour over crushed ice.', 'Crown with mint and lime.'], ingredients: [
+      { ingredientId: 'white-rum', amount: 30 }, { ingredientId: 'dark-rum', amount: 30 }, { ingredientId: 'orange-liqueur', amount: 15 }, { ingredientId: 'lime-juice', amount: 25 }, { ingredientId: 'sugar-syrup', amount: 10 }, { ingredientId: 'ice', amount: 5 }, { ingredientId: 'mint', amount: 2 }
+  ]},
+  { id: 'french-75', name: 'French 75', price: 14, needsShake: true, category: 'classic',
+    origin: 'France · early 20th century', story: 'A sparkling gin sour with celebratory energy: brisk citrus underneath a lively crown of bubbles.',
+    tastingNotes: ['sparkling', 'dry', 'citrusy'], occasions: ['Celebration', 'Brunch', 'Elegant guest', 'Welcome drink'],
+    method: ['Shake gin, lemon and syrup with ice.', 'Strain into a flute.', 'Top with sparkling wine.', 'Garnish lightly with citrus.'], ingredients: [
+      { ingredientId: 'gin', amount: 30 }, { ingredientId: 'lemon-juice', amount: 15 }, { ingredientId: 'sugar-syrup', amount: 10 }, { ingredientId: 'sparkling-wine', amount: 60 }, { ingredientId: 'ice', amount: 3 }
+  ]},
+  { id: 'moscow-mule', name: 'Moscow Mule', price: 11, needsShake: false, category: 'cocktail',
+    origin: 'Los Angeles · 1940s', story: 'A snappy vodka highball famous for ginger heat, lime brightness and its cold copper-mug presentation.',
+    tastingNotes: ['gingery', 'zesty', 'sparkling'], occasions: ['Casual group', 'Warm day', 'Vodka fan', 'Food pairing'],
+    method: ['Fill a mug or highball with ice.', 'Add vodka and lime.', 'Top with ginger beer.', 'Stir briefly and garnish with lime.'], ingredients: [
+      { ingredientId: 'vodka', amount: 45 }, { ingredientId: 'lime-juice', amount: 15 }, { ingredientId: 'ginger-beer', amount: 90 }, { ingredientId: 'ice', amount: 5 }, { ingredientId: 'lime-wedge', amount: 1 }
+  ]},
+  { id: 'espresso-martini', name: 'Espresso Martini', price: 14, needsShake: true, category: 'cocktail',
+    origin: 'London · 1980s', story: 'A modern after-dinner cocktail combining vodka, coffee liqueur and sweetness beneath a dense aromatic foam.',
+    tastingNotes: ['coffee', 'rich', 'energizing'], occasions: ['After dinner', 'Late night', 'Coffee lover', 'Dessert alternative'],
+    method: ['Add vodka, coffee liqueur and syrup to a shaker.', 'Fill with ice and shake very hard.', 'Fine-strain into a chilled coupe.', 'Allow the foam to settle before serving.'], ingredients: [
+      { ingredientId: 'vodka', amount: 45 }, { ingredientId: 'coffee-liqueur', amount: 30 }, { ingredientId: 'sugar-syrup', amount: 10 }, { ingredientId: 'ice', amount: 5 }
+  ]},
+  { id: 'paloma', name: 'Paloma', price: 11.5, needsShake: false, category: 'cocktail',
+    origin: 'Mexico · mid-20th century', story: 'A relaxed tequila highball where grapefruit bitterness and citrus acidity make the spirit feel bright and refreshing.',
+    tastingNotes: ['grapefruit', 'tart', 'refreshing'], occasions: ['Hot afternoon', 'Spicy food', 'Casual guest', 'Outdoor table'],
+    method: ['Salt part of the rim if requested.', 'Fill a highball with ice.', 'Add tequila and lime.', 'Top with grapefruit soda and stir once.'], ingredients: [
+      { ingredientId: 'tequila', amount: 45 }, { ingredientId: 'lime-juice', amount: 15 }, { ingredientId: 'grapefruit-soda', amount: 90 }, { ingredientId: 'ice', amount: 5 }, { ingredientId: 'salt', amount: 1 }
   ]}
 ];
 

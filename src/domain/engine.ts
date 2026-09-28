@@ -1,12 +1,12 @@
 import { INGREDIENTS, MODIFIERS, RECIPES } from './catalog';
-import type { Customer, InventoryItem, Mood, Region, SupplierOffer } from './types';
+import type { Customer, InventoryItem, Mood, Recipe, Region, SupplierOffer } from './types';
 
 const NAMES = ['Alex', 'Sam', 'Jamie', 'Robin', 'Casey', 'Morgan', 'Taylor', 'Jordan', 'Chris', 'Nina'];
 const MOODS: Mood[] = ['calm', 'impatient', 'sad', 'vip', 'wealthy', 'friendly'];
 const pick = <T>(list: T[]) => list[Math.floor(Math.random() * list.length)]!;
 
-export function generateCustomer(level = 0): Customer {
-  const recipe = pick(RECIPES);
+export function generateCustomer(level = 0, recipePool: Recipe[] = RECIPES): Customer {
+  const recipe = pick(recipePool.length ? recipePool : RECIPES);
   const mood = pick(MOODS);
   const modifier = level > 1 && Math.random() > 0.65 ? pick(MODIFIERS) : undefined;
   const patience = mood === 'impatient' ? 38 : mood === 'calm' ? 82 : mood === 'sad' ? 54 : 68;

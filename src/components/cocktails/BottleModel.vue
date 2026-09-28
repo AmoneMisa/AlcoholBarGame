@@ -13,6 +13,10 @@ const ingredientIndex = computed(() => ingredientArt[props.ingredient.id] ?? -1)
 const bottleIndex = computed(() => {
   const direct = bottleOrder.indexOf(props.ingredient.id);
   if (direct >= 0) return direct;
+  if (props.ingredient.id === 'bitter-aperitif') return 6;
+  if (props.ingredient.id === 'coffee-liqueur') return 1;
+  if (props.ingredient.id === 'sparkling-wine') return 11;
+  if (props.ingredient.id === 'ginger-beer' || props.ingredient.id === 'grapefruit-soda') return 10;
   if (props.ingredient.id === 'cola') return 10;
   return 11;
 });

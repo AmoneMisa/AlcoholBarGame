@@ -68,6 +68,7 @@ export interface Customer {
   greeting: string;
   request: string;
   paymentMethod: PaymentMethod;
+  specialRecipeRewardId?: string;
 }
 
 export interface InventoryItem {

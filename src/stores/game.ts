@@ -2,9 +2,18 @@ import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
 import { INGREDIENTS, RECIPES, REGIONS, STARTING_INVENTORY } from '../domain/catalog';
 import { canMake, consumeMix, createMarket, generateCustomer, judgeMix } from '../domain/engine';
-import type { InventoryItem, RegionId, SupplierOffer } from '../domain/types';
+import type { InventoryItem, Recipe, RegionId, SupplierOffer } from '../domain/types';
 
-const makeQueue = (level = 0) => Array.from({ length: 5 }, () => generateCustomer(level));
+const BASIC_RECIPE_COUNT = 10;
+const makeQueue = (level = 0, recipes: Recipe[] = RECIPES) => Array.from({ length: 5 }, () => generateCustomer(level, recipes));
+const makeSpecialCustomer = (recipe: Recipe, level = 0) => ({
+  ...generateCustomer(level, [recipe]),
+  name: 'Celeste',
+  mood: 'vip' as const,
+  greeting: 'I collect forgotten recipes.',
+  request: `Make me a ${recipe.name}. Impress me and I will teach you the recipe.`,
+  specialRecipeRewardId: recipe.id
+});
 const makeBarInventory = (barIndex: number) => STARTING_INVENTORY.map((item, ingredientIndex) => {
   const ingredient = INGREDIENTS.find((entry) => entry.id === item.ingredientId)!;
   const factor = .48 + ((barIndex * 3 + ingredientIndex) % 6) * .11;
@@ -24,6 +33,12 @@ export const useGameStore = defineStore('game', () => {
   const streak = ref(0);
   const serving = ref(false);
   const decor = ref({ wall: 'neon', counter: 'classic', bartender: 'vest' });
+  const knownRecipeIds = ref<string[]>(RECIPES.slice(0, BASIC_RECIPE_COUNT).map((recipe) => recipe.id));
+  const recipeUnlockSources = ref<Record<string, 'starter' | 'shop' | 'special-client' | 'daily-gift'>>(
+    Object.fromEntries(knownRecipeIds.value.map((id) => [id, 'starter']))
+  );
+  const dailyGiftClaimedKey = ref('');
+  const dailyGiftResult = ref('A new gift is available today.');
   const inventories = ref<Record<RegionId, InventoryItem[]>>(structuredClone(initialInventories));
   const inventory = computed<InventoryItem[]>({
     get: () => inventories.value[regionId.value],
@@ -31,7 +46,9 @@ export const useGameStore = defineStore('game', () => {
   });
   const currentMix = ref<InventoryItem[]>([]);
   const shaken = ref(false);
-  const customers = ref(makeQueue(2));
+  const initialCustomers = makeQueue(2, RECIPES.slice(0, BASIC_RECIPE_COUNT));
+  if (RECIPES[BASIC_RECIPE_COUNT]) initialCustomers[initialCustomers.length - 1] = makeSpecialCustomer(RECIPES[BASIC_RECIPE_COUNT]!, 2);
+  const customers = ref(initialCustomers);
   const activeCustomerId = ref(customers.value[0]!.id);
   const message = ref('Choose a customer, read the request and build the cocktail.');
   const selectedSupplier = ref('global');
@@ -43,10 +60,53 @@ export const useGameStore = defineStore('game', () => {
   const level = computed(() => Math.max(1, Math.floor(xp.value / 60)));
   const region = computed(() => REGIONS.find((item) => item.id === regionId.value)!);
   const market = computed(() => createMarket(region.value, day.value));
+  const knownRecipes = computed(() => RECIPES.filter((recipe) => knownRecipeIds.value.includes(recipe.id)));
+  const lockedRecipes = computed(() => RECIPES.filter((recipe) => !knownRecipeIds.value.includes(recipe.id)));
+  const dailyGiftAvailable = computed(() => dailyGiftClaimedKey.value !== `${week.value}-${day.value}`);
   const customer = computed(() => customers.value.find((item) => item.id === activeCustomerId.value) ?? customers.value[0]!);
   const recipe = computed(() => judgeMix(currentMix.value, customer.value, shaken.value).recipe);
   const mixJudge = computed(() => judgeMix(currentMix.value, customer.value, shaken.value));
-  const filteredRecipes = computed(() => recipeCategory.value === 'all' ? RECIPES : RECIPES.filter((item) => item.category === recipeCategory.value));
+  const filteredRecipes = computed(() => recipeCategory.value === 'all' ? knownRecipes.value : knownRecipes.value.filter((item) => item.category === recipeCategory.value));
+
+  function unlockRecipe(recipeId: string, source: 'shop' | 'special-client' | 'daily-gift') {
+    if (knownRecipeIds.value.includes(recipeId)) return false;
+    knownRecipeIds.value.push(recipeId);
+    recipeUnlockSources.value[recipeId] = source;
+    return true;
+  }
+
+  function buyRecipe(recipeId: string) {
+    const recipe = RECIPES.find((item) => item.id === recipeId);
+    if (!recipe || knownRecipeIds.value.includes(recipeId)) return;
+    const price = Math.round(recipe.price * 18);
+    if (money.value < price) {
+      message.value = `You need ${region.value.currencySymbol}${price} to buy this recipe.`;
+      return;
+    }
+    money.value = Number((money.value - price).toFixed(2));
+    unlockRecipe(recipeId, 'shop');
+    message.value = `${recipe.name} added to your recipe book.`;
+  }
+
+  function claimDailyGift() {
+    if (!dailyGiftAvailable.value) {
+      dailyGiftResult.value = 'Today’s gift has already been claimed.';
+      return;
+    }
+    dailyGiftClaimedKey.value = `${week.value}-${day.value}`;
+    const candidates = lockedRecipes.value;
+    if (candidates.length && Math.random() < .12) {
+      const recipe = candidates[Math.floor(Math.random() * candidates.length)]!;
+      unlockRecipe(recipe.id, 'daily-gift');
+      dailyGiftResult.value = `Lucky find: ${recipe.name} recipe unlocked!`;
+      message.value = dailyGiftResult.value;
+      return;
+    }
+    const coins = 25;
+    money.value += coins;
+    dailyGiftResult.value = `No recipe this time. You received ${coins} coins.`;
+    message.value = dailyGiftResult.value;
+  }
 
   function resetMix() {
     currentMix.value = [];
@@ -62,7 +122,7 @@ export const useGameStore = defineStore('game', () => {
   function replaceCustomer(id: string) {
     const index = customers.value.findIndex((item) => item.id === id);
     if (index < 0) return;
-    customers.value.splice(index, 1, generateCustomer(level.value));
+    customers.value.splice(index, 1, generateCustomer(level.value, knownRecipes.value));
     if (activeCustomerId.value === id) activeCustomerId.value = customers.value[index]!.id;
     resetMix();
   }
@@ -112,7 +172,11 @@ export const useGameStore = defineStore('game', () => {
       xp.value += 22 + Math.min(streak.value * 2, 14);
       energy.value = Math.max(0, energy.value - 2);
       streak.value += 1;
-      message.value = 'Perfect service. Tip +' + region.value.currencySymbol + tip + '.';
+      const rewardId = customer.value.specialRecipeRewardId;
+      const unlocked = rewardId ? unlockRecipe(rewardId, 'special-client') : false;
+      message.value = unlocked
+        ? `Perfect service. ${verdict.recipe.name} was added to your recipe book!`
+        : 'Perfect service. Tip +' + region.value.currencySymbol + tip + '.';
       const servedId = customer.value.id;
       window.setTimeout(() => {
         replaceCustomer(servedId);
@@ -202,7 +266,10 @@ export const useGameStore = defineStore('game', () => {
     day.value += 1;
     if (day.value > 7) { day.value = 1; week.value += 1; }
     energy.value = 100;
-    customers.value = makeQueue(level.value);
+    customers.value = makeQueue(level.value, knownRecipes.value);
+    if (lockedRecipes.value.length && Math.random() < .35) {
+      customers.value[customers.value.length - 1] = makeSpecialCustomer(lockedRecipes.value[0]!, level.value);
+    }
     activeCustomerId.value = customers.value[0]!.id;
     resetMix();
     message.value = 'New shift started.';
@@ -211,7 +278,9 @@ export const useGameStore = defineStore('game', () => {
   return {
     regionId, region, day, week, money, gems, energy, xp, streak, level, serving, decor,
     inventories, inventory, currentMix, shaken, customers, activeCustomerId, customer, recipe, mixJudge,
+    knownRecipeIds, recipeUnlockSources, knownRecipes, lockedRecipes, dailyGiftAvailable, dailyGiftResult,
     message, market, selectedSupplier, transferTargetId, tradeLog, recipeCategory, filteredRecipes, bartenderGender,
-    selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, buy, sell, switchBar, transferStock, nextDay
+    selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, buy, sell, switchBar, transferStock,
+    buyRecipe, claimDailyGift, nextDay
   };
 });

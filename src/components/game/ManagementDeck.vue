@@ -13,6 +13,7 @@ const game = useGameStore();
 const stockCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh'>('all');
 const marketCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh'>('all');
 const selectedRecipeId = ref<string | null>(null);
+const recipeMode = ref<'library' | 'shop'>('library');
 const transferIngredientId = ref(INGREDIENTS[0]!.id);
 const colors = ['#dbe8b8', '#e87d64', '#b8e5df', '#efb84b'];
 
@@ -79,12 +80,26 @@ const stockAmount = (ingredientId: string) => game.inventory.find((stock) => sto
 
     <article v-show="activeView === 'recipes'" class="game-panel recipes-deck">
       <template v-if="!selectedRecipe">
-        <header class="panel-heading"><div><small>RECIPE BOOK</small><h2>Stories, methods & moments</h2></div><span>{{ RECIPES.length }} learned</span></header>
-        <div class="recipe-cards">
-          <button v-for="(recipe, index) in RECIPES" :key="recipe.id" type="button" @click="selectedRecipeId = recipe.id">
-            <GlassModel :type="index % 3 === 0 ? 'highball' : index % 3 === 1 ? 'coupe' : 'rocks'" :art-index="index % 10" />
-            <div class="recipe-card-copy"><small>{{ recipe.origin }}</small><b>{{ recipe.name }}</b><p>{{ recipe.story }}</p><span>{{ recipe.ingredients.length }} ingredients · {{ recipe.needsShake ? 'Shake' : 'Build / stir' }}</span><em>Open recipe →</em></div>
+        <header class="panel-heading"><div><small>RECIPE ACADEMY</small><h2>Learn, collect & master</h2></div><span>{{ game.knownRecipes.length }} / {{ RECIPES.length }} learned</span></header>
+        <section class="unlock-guide">
+          <div class="unlock-intro"><small>HOW THE RECIPE BOOK GROWS</small><h3>Ten classics start your journey</h3><p>Advanced cocktails stay hidden until you discover them. Every unlock adds its complete story, ideal guest profile, ingredients and cooking path.</p></div>
+          <div><b>1</b><strong>Recipe shop</strong><span>Spend service earnings on a recipe you want next.</span></div>
+          <div><b>2</b><strong>Special client</strong><span>Serve their secret order correctly and they teach it to you.</span></div>
+          <div><b>3</b><strong>Daily gift</strong><span>Claim once per day. A recipe has a rare 12% drop chance.</span><button type="button" :disabled="!game.dailyGiftAvailable" @click="game.claimDailyGift()">{{ game.dailyGiftAvailable ? 'Claim today’s gift' : 'Gift claimed' }}</button><em>{{ game.dailyGiftResult }}</em></div>
+        </section>
+        <div class="recipe-mode-tabs"><button :class="{ active: recipeMode === 'library' }" type="button" @click="recipeMode = 'library'">My recipes · {{ game.knownRecipes.length }}</button><button :class="{ active: recipeMode === 'shop' }" type="button" @click="recipeMode = 'shop'">Recipe shop · {{ game.lockedRecipes.length }}</button></div>
+        <div v-if="recipeMode === 'library'" class="recipe-cards">
+          <button v-for="recipe in game.knownRecipes" :key="recipe.id" type="button" @click="selectedRecipeId = recipe.id">
+            <GlassModel :type="RECIPES.indexOf(recipe) % 3 === 0 ? 'highball' : RECIPES.indexOf(recipe) % 3 === 1 ? 'coupe' : 'rocks'" :art-index="RECIPES.indexOf(recipe) % 10" />
+            <div class="recipe-card-copy"><small>{{ recipe.origin }}</small><b>{{ recipe.name }}</b><p>{{ recipe.story }}</p><span>{{ recipe.ingredients.length }} ingredients · {{ recipe.needsShake ? 'Shake' : 'Build / stir' }}</span><em>Open lesson →</em></div>
           </button>
+        </div>
+        <div v-else class="recipe-shop-grid">
+          <article v-for="recipe in game.lockedRecipes" :key="recipe.id" class="locked-recipe-card">
+            <div class="locked-art"><GlassModel :art-index="RECIPES.indexOf(recipe) % 10" type="coupe" /><span>LOCKED</span></div>
+            <div><small>ADVANCED RECIPE</small><h3>{{ recipe.name }}</h3><p>{{ recipe.tastingNotes.join(' · ') }}</p><span>Unlock the full history, guest profile and method.</span></div>
+            <button type="button" @click="game.buyRecipe(recipe.id)">Buy for {{ game.region.currencySymbol }}{{ Math.round(recipe.price * 18) }}</button>
+          </article>
         </div>
       </template>
       <template v-else>
