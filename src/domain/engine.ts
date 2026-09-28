@@ -1,4 +1,6 @@
 import { INGREDIENTS, MODIFIERS, RECIPES } from './catalog';
+import { withArticle } from './english/articles';
+import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import type { Customer, InventoryItem, Mood, Recipe, Region, SupplierOffer } from './types';
 
 const NAMES = ['Alex', 'Sam', 'Jamie', 'Robin', 'Casey', 'Morgan', 'Taylor', 'Jordan', 'Chris', 'Nina'];
@@ -16,6 +18,7 @@ export function generateCustomer(level = 0, recipePool: Recipe[] = RECIPES): Cus
 
   return {
     id: crypto.randomUUID(),
+    characterId: pick(CUSTOMER_ART_BY_SLOT),
     name: pick(NAMES),
     mood,
     patience,
@@ -24,7 +27,7 @@ export function generateCustomer(level = 0, recipePool: Recipe[] = RECIPES): Cus
     orderRecipeId: recipe.id,
     modifierId: modifier?.id,
     greeting,
-    request: modifier ? 'I’ll have a ' + recipe.name + '. ' + modifier.label + '.' : 'I’ll have a ' + recipe.name + ', please.',
+    request: modifier ? 'I’ll have ' + withArticle(recipe.name) + '. ' + modifier.label + '.' : 'I’ll have ' + withArticle(recipe.name) + ', please.',
     paymentMethod: Math.random() > 0.45 ? 'card' : 'cash'
   };
 }
@@ -87,13 +90,19 @@ export function createMarket(region: Region, day: number): SupplierOffer[] {
     const wholesale = ingredient.basePrice * pack * region.marketFactor * wave;
     return suppliers
       .filter((supplier) => supplier.accepts.includes(ingredient.category))
-      .map((supplier) => ({
-        supplierId: supplier.id,
-        supplier: supplier.name,
-        ingredientId: ingredient.id,
-        quantity: pack,
-        price: Number((wholesale * supplier.multiplier * (0.96 + ((day + index) % 4) * 0.025)).toFixed(2)),
-        quality: supplier.quality
-      }));
+      .map((supplier) => {
+        const listPrice = Number((wholesale * supplier.multiplier * (0.96 + ((day + index) % 4) * 0.025)).toFixed(2));
+        const discountPercent = (day + index * 3) % 7 === 0 ? 15 : 0;
+        return {
+          supplierId: supplier.id,
+          supplier: supplier.name,
+          ingredientId: ingredient.id,
+          quantity: pack,
+          listPrice,
+          discountPercent,
+          price: Number((listPrice * (1 - discountPercent / 100)).toFixed(2)),
+          quality: supplier.quality
+        };
+      });
   });
 }

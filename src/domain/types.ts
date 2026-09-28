@@ -58,6 +58,7 @@ export interface Modifier {
 
 export interface Customer {
   id: string;
+  characterId?: string;
   name: string;
   mood: Mood;
   patience: number;
@@ -69,6 +70,7 @@ export interface Customer {
   request: string;
   paymentMethod: PaymentMethod;
   specialRecipeRewardId?: string;
+  orderRevealed?: boolean;
 }
 
 export interface InventoryItem {
@@ -82,6 +84,8 @@ export interface SupplierOffer {
   ingredientId: string;
   quantity: number;
   price: number;
+  listPrice: number;
+  discountPercent: number;
   quality: 'standard' | 'premium';
 }
 
@@ -91,4 +95,7 @@ export interface Supplier {
   description: string;
   deliveryDays: number;
   reputation: number;
+  deliveryFee: number;
+  freeDeliveryAt: number;
+  icon: 'truck' | 'basket' | 'bottle' | 'leaf';
 }

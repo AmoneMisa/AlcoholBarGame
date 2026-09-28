@@ -6,15 +6,19 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --import ./tests/register.mjs --test tests/game.test.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-vue": "latest",
+    "dictionary-en": "^4.0.0",
+    "nspell": "^2.1.5",
     "pinia": "latest",
     "vite": "latest",
     "vue": "latest"
   },
   "devDependencies": {
+    "@types/nspell": "^2.1.6",
     "typescript": "5.9.3",
     "vue-tsc": "3.3.11"
   }

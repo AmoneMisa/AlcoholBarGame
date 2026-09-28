@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { INGREDIENTS } from '../../domain/catalog';
 import { useGameStore } from '../../stores/game';
 import { haptic } from '../../telegram/webapp';
@@ -8,65 +8,203 @@ import GlassModel from './GlassModel.vue';
 
 const game = useGameStore();
 const selectedIngredient = ref<string>();
+const ingredientCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh'>('all');
 const action = ref<'idle' | 'pouring' | 'shaking' | 'garnishing' | 'serving'>('idle');
-const ingredients = computed(() => INGREDIENTS);
-const totalAmount = computed(() => game.currentMix.reduce((sum, item) => sum + item.amount, 0));
-const fill = computed(() => Math.min(88, (totalAmount.value / 190) * 88));
+const tray = ref<HTMLElement>();
+const glassTarget = ref<HTMLElement>();
+const glassStage = ref<HTMLElement>();
+const pourGeometry = ref<Record<string, string>>({});
+const draggingIngredientId = ref<string>();
+const dragOverGlass = ref(false);
+const dragAdded = ref(false);
+let activePointerId: number | undefined;
+let pourInterval: number | undefined;
+let actionTimer: number | undefined;
+
+const categoryOf = (id: string) => {
+  const ingredient = INGREDIENTS.find((item) => item.id === id)!;
+  if (ingredient.category === 'spirit') return 'spirit';
+  if (ingredient.category === 'mixer' && !['sugar-syrup', 'coconut-cream'].includes(id)) return 'mixer';
+  return 'fresh';
+};
+const ingredients = computed(() => INGREDIENTS.filter((item) => ingredientCategory.value === 'all' || categoryOf(item.id) === ingredientCategory.value));
+const totalAmount = computed(() => game.currentMix.reduce((sum, item) => {
+  const ingredient = INGREDIENTS.find((entry) => entry.id === item.ingredientId);
+  return sum + (ingredient?.unit === 'ml' ? item.amount : 0);
+}, 0));
+const itemCount = computed(() => game.currentMix.reduce((sum, item) => {
+  const ingredient = INGREDIENTS.find((entry) => entry.id === item.ingredientId);
+  return sum + (ingredient?.unit === 'piece' ? item.amount : 0);
+}, 0));
+const fill = computed(() => Math.min(91, (totalAmount.value / 240) * 91));
+const colorMap: Record<string, string> = {
+  'white-rum': '#e9e1b5', 'dark-rum': '#8a3e1f', gin: '#dce8d7', vodka: '#dce7ed', tequila: '#e5c675', whiskey: '#a94e21',
+  'orange-liqueur': '#ed8c28', vermouth: '#d9b071', 'bitter-aperitif': '#cb3740', 'sparkling-wine': '#f1d784', 'coffee-liqueur': '#4a2119',
+  'lime-juice': '#a9cf54', 'lemon-juice': '#ead45a', 'pineapple-juice': '#edbd3c', 'cranberry-juice': '#cc3152', 'sugar-syrup': '#f2e6c0',
+  'coconut-cream': '#efe6d4', tonic: '#d8e8dc', soda: '#dbe9e8', cola: '#572a1e', 'ginger-beer': '#d59535', 'grapefruit-soda': '#e88779'
+};
 const liquidColor = computed(() => {
-  if (game.currentMix.some((item) => item.ingredientId === 'cranberry-juice')) return '#d84962';
-  if (game.currentMix.some((item) => item.ingredientId === 'cola')) return '#6f301d';
-  if (game.currentMix.some((item) => item.ingredientId === 'pineapple-juice')) return '#f1b83d';
-  return '#d9f0b1';
+  const liquids = game.currentMix.filter((item) => INGREDIENTS.find((ingredient) => ingredient.id === item.ingredientId)?.unit === 'ml');
+  if (!liquids.length) return '#b86b36';
+  const total = liquids.reduce((sum, item) => sum + item.amount, 0) || 1;
+  const rgb = liquids.reduce((channels, item) => {
+    const hex = colorMap[item.ingredientId] ?? '#d7c88c';
+    channels[0] += parseInt(hex.slice(1, 3), 16) * item.amount;
+    channels[1] += parseInt(hex.slice(3, 5), 16) * item.amount;
+    channels[2] += parseInt(hex.slice(5, 7), 16) * item.amount;
+    return channels;
+  }, [0, 0, 0]);
+  return `rgb(${rgb.map((channel) => Math.round(channel / total)).join(',')})`;
 });
 const ice = computed(() => game.currentMix.find((item) => item.ingredientId === 'ice')?.amount ?? 0);
 const selected = computed(() => INGREDIENTS.find((item) => item.id === selectedIngredient.value));
 const currentStep = computed(() => !game.currentMix.length ? 1 : !game.shaken && game.recipe.needsShake ? 2 : 3);
+const hasBubbles = computed(() => game.currentMix.some((item) => ['soda', 'tonic', 'ginger-beer', 'grapefruit-soda', 'sparkling-wine'].includes(item.ingredientId)));
+const garnish = computed(() => game.currentMix.some((item) => item.ingredientId === 'mint') ? 'mint' : game.currentMix.some((item) => ['lime-wedge', 'orange', 'pineapple-wedge'].includes(item.ingredientId)) ? 'citrus' : '');
 
-function pour(id: string) {
+// One timer for every station action, so a new tap never gets cut off by an older reset.
+function setAction(next: typeof action.value, resetAfter?: number) {
+  window.clearTimeout(actionTimer);
+  action.value = next;
+  if (resetAfter) actionTimer = window.setTimeout(() => action.value = 'idle', resetAfter);
+}
+
+// Anchor the bottle neck over the rim and end the stream exactly on the liquid surface.
+function measurePour() {
+  const stage = glassStage.value;
+  const bowl = stage?.querySelector<HTMLElement>('.glass-bowl');
+  const liquid = stage?.querySelector<HTMLElement>('.glass-liquid');
+  if (!stage || !bowl || !liquid) return;
+  const stageRect = stage.getBoundingClientRect();
+  const bowlRect = bowl.getBoundingClientRect();
+  const surface = liquid.getBoundingClientRect().bottom - bowl.clientHeight * Math.min(92, fill.value) / 100 - stageRect.top;
+  const tipX = bowlRect.left + bowlRect.width * .4 - stageRect.left;
+  const tipY = bowlRect.top - stageRect.top - 16;
+  pourGeometry.value = {
+    '--pour-x': `${Math.round(tipX)}px`,
+    '--pour-y': `${Math.round(tipY)}px`,
+    '--stream-height': `${Math.round(Math.max(14, surface - tipY))}px`
+  };
+}
+
+function incrementFor(id: string) {
+  return INGREDIENTS.find((item) => item.id === id)?.unit === 'ml' ? 5 : 1;
+}
+
+function addOne(id: string) {
   selectedIngredient.value = id;
-  action.value = id === 'mint' || id === 'ice' ? 'garnishing' : 'pouring';
+  const ingredient = INGREDIENTS.find((item) => item.id === id)!;
+  const next = ingredient.unit === 'piece' ? 'garnishing' : 'pouring';
+  // Keep an ongoing pour running; restart the drop animation for each garnish.
+  if (next !== action.value || next === 'garnishing') {
+    window.clearTimeout(actionTimer);
+    action.value = 'idle';
+    void glassStage.value?.offsetWidth;
+  }
+  setAction(next, activePointerId === undefined ? 420 : undefined);
+  game.addIngredient(id, incrementFor(id));
+  nextTick(measurePour);
+  dragAdded.value = true;
   haptic('light');
-  game.addIngredient(id);
-  window.setTimeout(() => action.value = 'idle', 420);
+}
+
+function beginIngredientGesture(id: string, event: PointerEvent) {
+  if (event.button !== 0) return;
+  selectedIngredient.value = id;
+  draggingIngredientId.value = id;
+  activePointerId = event.pointerId;
+  dragAdded.value = false;
+  dragOverGlass.value = false;
+  (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
+  window.clearInterval(pourInterval);
+  pourInterval = window.setInterval(() => {
+    if (dragOverGlass.value && draggingIngredientId.value) addOne(draggingIngredientId.value);
+  }, 130);
+}
+
+function moveIngredientGesture(event: PointerEvent) {
+  if (activePointerId !== event.pointerId || !glassTarget.value) return;
+  const rect = glassTarget.value.getBoundingClientRect();
+  dragOverGlass.value = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+}
+
+function endIngredientGesture(event: PointerEvent) {
+  if (activePointerId !== event.pointerId) return;
+  window.clearInterval(pourInterval);
+  if (event.type !== 'pointercancel' && !dragAdded.value && draggingIngredientId.value) addOne(draggingIngredientId.value);
+  draggingIngredientId.value = undefined;
+  dragOverGlass.value = false;
+  activePointerId = undefined;
+  if (action.value !== 'idle') setAction(action.value, 420);
+}
+
+function scrollIngredients(direction: number) {
+  tray.value?.scrollBy({ left: direction * Math.max(320, tray.value.clientWidth * .72), behavior: 'smooth' });
 }
 
 function shake() {
-  action.value = 'shaking';
+  setAction('shaking', 640);
   haptic('medium');
   game.shakeCurrentMix();
-  window.setTimeout(() => action.value = 'idle', 580);
 }
 
 function serve() {
-  action.value = 'serving';
+  setAction('serving', 620);
   haptic('medium');
   game.serveMix();
-  window.setTimeout(() => action.value = 'idle', 620);
 }
+
+onMounted(() => {
+  measurePour();
+  window.addEventListener('resize', measurePour);
+  window.addEventListener('pointermove', moveIngredientGesture);
+  window.addEventListener('pointerup', endIngredientGesture);
+  window.addEventListener('pointercancel', endIngredientGesture);
+});
+onBeforeUnmount(() => {
+  window.clearInterval(pourInterval);
+  window.clearTimeout(actionTimer);
+  window.removeEventListener('resize', measurePour);
+  window.removeEventListener('pointermove', moveIngredientGesture);
+  window.removeEventListener('pointerup', endIngredientGesture);
+  window.removeEventListener('pointercancel', endIngredientGesture);
+});
 </script>
 
 <template>
   <section class="cocktail-workspace game-panel">
     <header class="panel-heading ornate-heading">
-      <div><small>ORDER STATION</small><h2>Craft {{ game.recipe.name }}</h2></div>
+      <div><small>ORDER STATION</small><h2>{{ game.customer.orderRevealed ? `Craft ${game.recipe.name}` : 'Mystery order' }}</h2></div>
       <span>Step {{ currentStep }} / 3</span>
     </header>
+    <div class="ingredient-shelf-toolbar">
+      <div class="shelf-caption"><small>INGREDIENT SHELF</small><span>Tap or drag · liquids +5 ml · items +1</span></div>
+      <nav aria-label="Ingredient filters"><button v-for="category in ['all','spirit','mixer','fresh'] as const" :key="category" :class="{ active: ingredientCategory === category }" type="button" @click="ingredientCategory = category">{{ category === 'all' ? 'All' : category === 'fresh' ? 'Fresh & food' : category + 's' }}</button></nav>
+      <div class="shelf-arrows"><button type="button" aria-label="Previous ingredients" @click="scrollIngredients(-1)">←</button><button type="button" aria-label="Next ingredients" @click="scrollIngredients(1)">→</button></div>
+    </div>
+    <div ref="tray" class="ingredient-tray" aria-label="Ingredients">
+      <button v-for="ingredient in ingredients" :key="ingredient.id" class="ingredient-button" :class="{ selected: selectedIngredient === ingredient.id, dragging: draggingIngredientId === ingredient.id }" type="button" @pointerdown="beginIngredientGesture(ingredient.id, $event)" @click="($event.detail === 0) && addOne(ingredient.id)">
+        <BottleModel :ingredient="ingredient" :active="selectedIngredient === ingredient.id" :amount="game.currentMix.find((item) => item.ingredientId === ingredient.id)?.amount" />
+        <span>{{ ingredient.name }}</span><small>+{{ incrementFor(ingredient.id) }} {{ ingredient.unit }}</small>
+      </button>
+    </div>
     <div class="workspace-main">
-      <div class="ingredient-tray" aria-label="Ingredients">
-        <button v-for="ingredient in ingredients" :key="ingredient.id" class="ingredient-button" :class="{ selected: selectedIngredient === ingredient.id }" type="button" @pointerdown.prevent="pour(ingredient.id)">
-          <BottleModel :ingredient="ingredient" :active="selectedIngredient === ingredient.id" :amount="game.currentMix.find((item) => item.ingredientId === ingredient.id)?.amount" />
-          <span>{{ ingredient.name }}</span><small>+{{ ingredient.pourStep }} {{ ingredient.unit }}</small>
-        </button>
-      </div>
-      <div class="mixing-board">
-        <div class="action-prop" :class="[`action-${action}`, { visible: selected && action !== 'idle' }]">
-          <BottleModel v-if="selected" :ingredient="selected" />
+      <div ref="glassTarget" class="mixing-board" :class="{ 'drag-ready': draggingIngredientId, 'drag-over': dragOverGlass }">
+        <div class="drop-instruction"><b>{{ dragOverGlass ? 'Pouring — release to stop' : draggingIngredientId ? 'Move over the glass' : 'Drag an ingredient here' }}</b><span>The glass calculates every measure</span></div>
+        <div ref="glassStage" class="glass-stage" :style="pourGeometry">
+          <div class="action-prop" :class="[`action-${action}`, { visible: selected && (action === 'pouring' || action === 'garnishing') }]">
+            <BottleModel v-if="selected" :ingredient="selected" />
+          </div>
+          <div class="shaker-prop" :class="{ active: action === 'shaking' }"><i></i><i></i><i></i></div>
+          <div class="pour-stream" :class="{ active: action === 'pouring' }" :style="{ '--stream-color': selected ? colorMap[selected.id] ?? '#d7c88c' : liquidColor }"></div>
+          <GlassModel type="highball" :fill="fill" :color="liquidColor" :ice="ice" :garnish="garnish" :bubbles="hasBubbles" :animation="action" />
+          <div class="amount-readout"><b>{{ totalAmount }}</b><span>ml</span><em v-if="itemCount">+ {{ itemCount }} item{{ itemCount === 1 ? '' : 's' }}</em></div>
         </div>
-        <div class="shaker-prop" :class="{ active: action === 'shaking' }"><i></i></div>
-        <div class="pour-stream" :class="{ active: action === 'pouring' }"></div>
-        <GlassModel type="highball" :fill="fill" :color="liquidColor" :ice="ice" :garnish="game.currentMix.some((item) => item.ingredientId === 'mint') ? 'mint' : ''" :bubbles="game.currentMix.some((item) => item.ingredientId === 'soda')" :animation="action" />
-        <div class="amount-readout"><b>{{ totalAmount }}</b><span>ml + garnish</span></div>
-        <div class="recipe-progress">
+        <div v-if="!game.customer.orderRevealed" class="recipe-progress recipe-locked">
+          <p>Talk to <b>{{ game.customer.name }}</b> in English to find out what they want.</p>
+          <button class="primary-button compact" type="button" @click="game.openConversation(game.customer.id)">Talk to {{ game.customer.name }}</button>
+        </div>
+        <div v-else class="recipe-progress">
           <div v-for="part in game.recipe.ingredients" :key="part.ingredientId" :class="{ done: game.currentMix.find((item) => item.ingredientId === part.ingredientId)?.amount === part.amount, wrong: (game.currentMix.find((item) => item.ingredientId === part.ingredientId)?.amount ?? 0) > part.amount }">
             <span>{{ INGREDIENTS.find((item) => item.id === part.ingredientId)?.name }}</span>
             <b>{{ game.currentMix.find((item) => item.ingredientId === part.ingredientId)?.amount ?? 0 }} / {{ part.amount }}</b>
@@ -76,8 +214,8 @@ function serve() {
     </div>
     <footer class="workspace-actions">
       <button class="secondary-button" type="button" @click="game.resetMix">Clear</button>
-      <button class="secondary-button" type="button" :class="{ active: action === 'shaking' }" @pointerdown.prevent="shake">Shake</button>
-      <button class="primary-button" type="button" :disabled="game.serving" @pointerdown.prevent="serve">Serve drink <span>→</span></button>
+      <button class="secondary-button" type="button" :class="{ active: action === 'shaking' }" @click="shake">Shake</button>
+      <button class="primary-button" type="button" :disabled="game.serving" @click="serve">Serve drink <span>→</span></button>
     </footer>
   </section>
 </template>

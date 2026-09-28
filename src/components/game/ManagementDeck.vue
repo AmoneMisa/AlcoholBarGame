@@ -1,31 +1,33 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { INGREDIENTS, RECIPES, REGIONS, SUPPLIERS } from '../../domain/catalog';
+import { computed, ref, watch } from 'vue';
+import { INGREDIENTS, RECIPES, REGIONS } from '../../domain/catalog';
+import { INTERIORS } from '../../data/cosmetics/bars';
+import { DAILY_COINS } from '../../domain/economy';
 import type { Ingredient, RegionId } from '../../domain/types';
 import { useGameStore } from '../../stores/game';
 import BottleModel from '../cocktails/BottleModel.vue';
 import GlassModel from '../cocktails/GlassModel.vue';
 import CharacterModel from '../characters/CharacterModel.vue';
 import PairingAdvisor from '../PairingAdvisor.vue';
+import MarketPanel from './MarketPanel.vue';
+import WorldMap from './WorldMap.vue';
 
 withDefaults(defineProps<{ activeView?: string }>(), { activeView: 'inventory' });
 const game = useGameStore();
 const stockCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh'>('all');
-const marketCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh'>('all');
 const selectedRecipeId = ref<string | null>(null);
 const recipeMode = ref<'library' | 'shop'>('library');
 const transferIngredientId = ref(INGREDIENTS[0]!.id);
-const colors = ['#dbe8b8', '#e87d64', '#b8e5df', '#efb84b'];
+const barName = ref(game.decor.name);
+watch(() => game.regionId, () => barName.value = game.decor.name);
 
 const ingredientById = (id: string) => INGREDIENTS.find((item) => item.id === id)!;
 const uiCategory = (ingredient: Ingredient) => ingredient.category === 'spirit' ? 'spirit' : ingredient.category === 'mixer' && !['sugar-syrup', 'coconut-cream'].includes(ingredient.id) ? 'mixer' : 'fresh';
 const visibleStock = computed(() => game.inventory.filter((stock) => stockCategory.value === 'all' || uiCategory(ingredientById(stock.ingredientId)) === stockCategory.value));
-const supplierOffers = computed(() => game.market.filter((offer) => offer.supplierId === game.selectedSupplier && (marketCategory.value === 'all' || uiCategory(ingredientById(offer.ingredientId)) === marketCategory.value)));
 const selectedRecipe = computed(() => RECIPES.find((recipe) => recipe.id === selectedRecipeId.value) ?? null);
 const selectedRecipeIndex = computed(() => Math.max(0, RECIPES.findIndex((recipe) => recipe.id === selectedRecipeId.value)));
 const targetRegions = computed(() => REGIONS.filter((region) => region.id !== game.regionId));
 const barUnits = (id: RegionId) => game.inventories[id].reduce((sum, stock) => sum + stock.amount, 0);
-const stockAmount = (ingredientId: string) => game.inventory.find((stock) => stock.ingredientId === ingredientId)?.amount ?? 0;
 </script>
 
 <template>
@@ -56,27 +58,7 @@ const stockAmount = (ingredientId: string) => game.inventory.find((stock) => sto
       </div>
     </article>
 
-    <article v-show="activeView === 'market'" class="game-panel suppliers-deck">
-      <header class="panel-heading"><div><small>TRADE FLOOR · {{ game.region.name }}</small><h2>Buy and sell stock</h2></div><span>{{ game.region.currencySymbol }}{{ game.money.toFixed(2) }}</span></header>
-      <div class="supplier-picker">
-        <button v-for="(supplier, index) in SUPPLIERS" :key="supplier.id" :class="{ active: game.selectedSupplier === supplier.id }" type="button" @click="game.selectedSupplier = supplier.id">
-          <span class="supplier-scene" :style="{ '--supplier-color': colors[index] }"><i></i><b>{{ index + 1 }}</b></span>
-          <div><small>{{ supplier.deliveryDays }} DAY ROUTE</small><h3>{{ supplier.name }}</h3><p>{{ supplier.description }}</p><em>{{ '★'.repeat(supplier.reputation) }}{{ '☆'.repeat(5 - supplier.reputation) }}</em></div>
-        </button>
-      </div>
-      <div class="category-tabs market-filter">
-        <button v-for="category in ['all','spirit','mixer','fresh'] as const" :key="category" :class="{ active: marketCategory === category }" type="button" @click="marketCategory = category">{{ category === 'spirit' ? 'Spirits' : category === 'mixer' ? 'Mixers' : category === 'fresh' ? 'Fresh & food' : 'All offers' }}</button>
-      </div>
-      <div class="market-offer-grid">
-        <article v-for="offer in supplierOffers" :key="offer.supplierId + offer.ingredientId" class="market-offer-card">
-          <BottleModel :ingredient="ingredientById(offer.ingredientId)" />
-          <div class="offer-copy"><small>{{ offer.quality }} · pack of {{ offer.quantity }} {{ ingredientById(offer.ingredientId).unit }}</small><h3>{{ ingredientById(offer.ingredientId).name }}</h3><span>In {{ game.region.name }}: {{ stockAmount(offer.ingredientId) }} {{ ingredientById(offer.ingredientId).unit }}</span></div>
-          <strong>{{ game.region.currencySymbol }}{{ offer.price.toFixed(2) }}</strong>
-          <div class="trade-actions"><button type="button" @click="game.buy(offer)">Buy pack</button><button type="button" class="sell-button" :disabled="stockAmount(offer.ingredientId) <= 0" @click="game.sell(offer.ingredientId)">Sell some</button></div>
-        </article>
-      </div>
-      <div class="trade-log"><small>RECENT TRADES</small><span v-for="entry in game.tradeLog.slice(0, 3)" :key="entry">{{ entry }}</span></div>
-    </article>
+    <MarketPanel v-show="activeView === 'market'" />
 
     <article v-show="activeView === 'recipes'" class="game-panel recipes-deck">
       <template v-if="!selectedRecipe">
@@ -85,8 +67,9 @@ const stockAmount = (ingredientId: string) => game.inventory.find((stock) => sto
           <div class="unlock-intro"><small>HOW THE RECIPE BOOK GROWS</small><h3>Ten classics start your journey</h3><p>Advanced cocktails stay hidden until you discover them. Every unlock adds its complete story, ideal guest profile, ingredients and cooking path.</p></div>
           <div><b>1</b><strong>Recipe shop</strong><span>Spend service earnings on a recipe you want next.</span></div>
           <div><b>2</b><strong>Special client</strong><span>Serve their secret order correctly and they teach it to you.</span></div>
-          <div><b>3</b><strong>Daily gift</strong><span>Claim once per day. A recipe has a rare 12% drop chance.</span><button type="button" :disabled="!game.dailyGiftAvailable" @click="game.claimDailyGift()">{{ game.dailyGiftAvailable ? 'Claim today’s gift' : 'Gift claimed' }}</button><em>{{ game.dailyGiftResult }}</em></div>
+          <div class="daily-gift-card"><b>3</b><strong>Daily gift · day {{ game.upcomingLoginDay }}</strong><span>150–1,000 coins for consecutive logins. A recipe may drop as an extra gift (12% chance). Missing a day resets the streak.</span><button type="button" :disabled="!game.dailyGiftAvailable" @click="game.claimDailyGift()">{{ game.dailyGiftAvailable ? `Claim ${game.dailyCoinReward} coins` : 'Gift claimed today' }}</button><em>{{ game.dailyGiftResult }}</em></div>
         </section>
+        <div class="login-reward-track"><span v-for="(reward,index) in DAILY_COINS" :key="reward" :class="{active:Math.min(7,game.upcomingLoginDay) === index + 1,claimed:game.loginStreak > index}"><small>DAY {{ index + 1 }}{{ index === 6 ? '+' : '' }}</small><b>{{ reward }}</b><em>coins</em></span></div>
         <div class="recipe-mode-tabs"><button :class="{ active: recipeMode === 'library' }" type="button" @click="recipeMode = 'library'">My recipes · {{ game.knownRecipes.length }}</button><button :class="{ active: recipeMode === 'shop' }" type="button" @click="recipeMode = 'shop'">Recipe shop · {{ game.lockedRecipes.length }}</button></div>
         <div v-if="recipeMode === 'library'" class="recipe-cards">
           <button v-for="recipe in game.knownRecipes" :key="recipe.id" type="button" @click="selectedRecipeId = recipe.id">
@@ -98,12 +81,12 @@ const stockAmount = (ingredientId: string) => game.inventory.find((stock) => sto
           <article v-for="recipe in game.lockedRecipes" :key="recipe.id" class="locked-recipe-card">
             <div class="locked-art"><GlassModel :art-index="RECIPES.indexOf(recipe) % 10" type="coupe" /><span>LOCKED</span></div>
             <div><small>ADVANCED RECIPE</small><h3>{{ recipe.name }}</h3><p>{{ recipe.tastingNotes.join(' · ') }}</p><span>Unlock the full history, guest profile and method.</span></div>
-            <button type="button" @click="game.buyRecipe(recipe.id)">Buy for {{ game.region.currencySymbol }}{{ Math.round(recipe.price * 18) }}</button>
+            <button type="button" @click="game.buyRecipe(recipe.id)">Buy for {{ Math.round(recipe.price * 18) }} coins</button>
           </article>
         </div>
       </template>
       <template v-else>
-        <header class="panel-heading recipe-detail-heading"><button type="button" @click="selectedRecipeId = null">← All recipes</button><div><small>{{ selectedRecipe.category }} · {{ selectedRecipe.origin }}</small><h2>{{ selectedRecipe.name }}</h2></div><span>{{ game.region.currencySymbol }}{{ (selectedRecipe.price * game.region.marketFactor).toFixed(2) }}</span></header>
+        <header class="panel-heading recipe-detail-heading"><button type="button" @click="selectedRecipeId = null">← All recipes</button><div><small>{{ selectedRecipe.category }} · {{ selectedRecipe.origin }}</small><h2>{{ selectedRecipe.name }}</h2></div><span>{{ (selectedRecipe.price * game.region.marketFactor).toFixed(2) }} coins</span></header>
         <div class="recipe-detail-page">
           <aside class="recipe-hero-art"><GlassModel :art-index="selectedRecipeIndex" type="coupe" /><div><small>TASTING PROFILE</small><span v-for="note in selectedRecipe.tastingNotes" :key="note">{{ note }}</span></div></aside>
           <section class="recipe-story"><small>THE STORY</small><h3>A drink with a past</h3><p>{{ selectedRecipe.story }}</p><div class="occasion-block"><small>WHEN IT IS A GOOD CHOICE</small><div><span v-for="occasion in selectedRecipe.occasions" :key="occasion">{{ occasion }}</span></div></div></section>
@@ -115,17 +98,24 @@ const stockAmount = (ingredientId: string) => game.inventory.find((stock) => sto
 
     <article v-show="activeView === 'design'" class="game-panel design-deck">
       <header class="panel-heading"><div><small>PERSONALIZE</small><h2>Bar & bartender</h2></div><span>Live preview</span></header>
+      <div class="design-location-tabs"><button v-for="region in REGIONS" :key="region.id" :class="{active:region.id === game.regionId}" type="button" @click="game.switchBar(region.id)">{{ region.name }}</button></div>
+      <form class="bar-name-editor" @submit.prevent="game.renameBar(barName)"><label :for="'bar-name'">Bar name in {{ game.region.name }}<input id="bar-name" v-model="barName" maxlength="32" required placeholder="Name your bar" /></label><button type="submit">Save name</button><span aria-live="polite">{{ game.message }}</span></form>
       <div class="design-grid-new">
-        <div class="mini-interior" :data-wall="game.decor.wall"><span></span><b>THE VELVET HOUR</b><i></i></div>
-        <div class="bartender-custom"><CharacterModel role="bartender" character-id="noa" :outfit="game.decor.bartender" /><div><button v-for="outfit in ['vest','shirt','apron']" :key="outfit" :class="{ active: game.decor.bartender === outfit }" @click="game.decor.bartender = outfit">{{ outfit }}</button></div></div>
-        <div class="design-options"><small>WALL MOOD</small><button v-for="wall in ['neon','burgundy','emerald']" :key="wall" :class="{ active: game.decor.wall === wall }" @click="game.decor.wall = wall"><i :data-color="wall"></i>{{ wall }}</button></div>
+        <div class="mini-interior" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-lighting="game.decor.lighting" :style="{backgroundImage:`url('${game.barBackground}')`}"><span></span><b>{{ game.decor.name }}</b><i></i><em>{{ game.region.name }} · Saved automatically</em></div>
+        <div class="bartender-custom"><CharacterModel role="bartender" character-id="noa" :outfit="game.decor.bartender" /><div><button v-for="outfit in ['vest','shirt','apron']" :key="outfit" :class="{ active: game.decor.bartender === outfit }" type="button" @click="game.decor.bartender = outfit">{{ outfit }}</button></div></div>
+        <div class="design-options">
+          <section><small>INTERIOR</small><button v-for="interior in INTERIORS" :key="interior.id" :class="{active:game.decor.interior === interior.id}" type="button" @click="game.decor.interior = interior.id">{{ interior.name }}</button></section>
+          <section><small>WALL MOOD</small><button v-for="wall in ['neon','burgundy','emerald']" :key="wall" :class="{ active: game.decor.wall === wall }" type="button" @click="game.decor.wall = wall"><i :data-color="wall"></i>{{ wall }}</button></section>
+          <section><small>COUNTER</small><button v-for="counter in ['classic','marble','brass']" :key="counter" :class="{ active: game.decor.counter === counter }" type="button" @click="game.decor.counter = counter">{{ counter }}</button></section>
+          <section><small>LIGHTING</small><button v-for="lighting in ['amber','rose','blue']" :key="lighting" :class="{ active: game.decor.lighting === lighting }" type="button" @click="game.decor.lighting = lighting">{{ lighting }}</button></section>
+        </div>
       </div>
     </article>
 
     <article v-show="activeView === 'regions'" class="game-panel regions-deck">
       <header class="panel-heading"><div><small>WORLD TOUR</small><h2>Choose your active bar</h2></div><span>{{ game.region.tagline }}</span></header>
-      <div class="world-map-art"><span v-for="(region, index) in REGIONS" :key="region.id" :class="{ active: region.id === game.regionId }" :style="{ '--x': 10 + index * 15 + '%', '--y': 30 + (index % 3) * 19 + '%' }"></span></div>
-      <div class="region-cards"><button v-for="region in REGIONS" :key="region.id" :class="{ active: region.id === game.regionId }" @click="game.switchBar(region.id)"><b>{{ region.name }}</b><small>{{ region.tagline }}</small><span>{{ region.currencySymbol }} · {{ region.marketFactor }}× · {{ barUnits(region.id).toLocaleString() }} stock</span></button></div>
+      <WorldMap />
+      <div class="region-cards"><button v-for="region in REGIONS" :key="region.id" :class="{ active: region.id === game.regionId }" type="button" @click="game.switchBar(region.id)"><img :src="INTERIORS.find(item => item.id === game.bars[region.id].interior)?.asset" alt="" /><small>{{ region.name }}</small><b>{{ game.bars[region.id].name }}</b><small>{{ region.tagline }}</small><span>{{ region.marketFactor }}× prices · {{ barUnits(region.id).toLocaleString() }} stock</span></button></div>
     </article>
 
     <PairingAdvisor v-show="activeView === 'advisor'" />

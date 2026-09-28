@@ -184,3 +184,338 @@ button { touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important; }
 }
+
+/* Interactive order station: a real shelf, measured pouring and readable glass. */
+.cocktail-workspace { overflow: hidden; }
+.ingredient-shelf-toolbar {
+  display: grid;
+  grid-template-columns: minmax(210px,1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 13px;
+  border-bottom: 1px solid #35455d;
+  background: linear-gradient(180deg,#17253a,#101a2a);
+}
+.ingredient-shelf-toolbar > div:first-child { display: grid; gap: 2px; }
+.ingredient-shelf-toolbar small { color: var(--gold); font-size: 8px; font-weight: 900; letter-spacing: .12em; }
+.ingredient-shelf-toolbar b { color: #b9c6d5; font-size: 9px; font-weight: 500; }
+.ingredient-shelf-toolbar nav { display: flex; gap: 5px; }
+.ingredient-shelf-toolbar button {
+  min-height: 32px;
+  border: 1px solid #3c4c64;
+  border-radius: 8px;
+  background: #111c2d;
+  color: #b8c2d0;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 8px;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+.ingredient-shelf-toolbar button:hover,
+.ingredient-shelf-toolbar button.active { border-color: #d6a54d; background: #45301e; color: #ffe3a4; }
+.shelf-arrows { display: flex; gap: 5px; }
+.shelf-arrows button { width: 34px; padding: 0; font-size: 16px; }
+.workspace-main { display: block; min-height: 0; }
+.ingredient-tray {
+  display: flex;
+  grid-template-columns: none;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 11px 12px 15px;
+  border-right: 0;
+  border-bottom: 1px solid #35455d;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  scrollbar-color: #c89242 #0b1421;
+  scrollbar-width: thin;
+  touch-action: pan-x;
+}
+.ingredient-tray::-webkit-scrollbar { display: block; height: 8px; }
+.ingredient-tray::-webkit-scrollbar-track { border-radius: 99px; background: #0b1421; }
+.ingredient-tray::-webkit-scrollbar-thumb { border: 2px solid #0b1421; border-radius: 99px; background: #c89242; }
+.ingredient-button {
+  flex: 0 0 126px;
+  min-width: 126px;
+  min-height: 154px;
+  scroll-snap-align: start;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.ingredient-button.dragging { border-color: #ffd36e; box-shadow: 0 0 0 2px #f3b84244,0 0 24px #f1a93d3b; transform: translateY(-3px); }
+.mixing-board {
+  min-height: 430px;
+  grid-template-columns: minmax(260px,1fr) 180px;
+  padding: 38px 26px 70px;
+  isolation: isolate;
+  transition: box-shadow .18s ease, background .18s ease;
+}
+.mixing-board.drag-ready { box-shadow: inset 0 0 0 2px #d4a44d55; }
+.mixing-board.drag-over { background: radial-gradient(circle at 35% 38%,#674a30,#2d211e 55%,#111521); box-shadow: inset 0 0 0 3px #ffd166, inset 0 0 80px #f3b54520; }
+.drop-instruction {
+  position: absolute;
+  z-index: 7;
+  top: 15px;
+  left: 18px;
+  display: grid;
+  gap: 2px;
+  padding: 7px 9px;
+  border: 1px solid #8a653d;
+  border-radius: 8px;
+  background: #151923c9;
+  pointer-events: none;
+}
+.drop-instruction b { color: #ffda86; font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+.drop-instruction span { color: #aeb8c4; font-size: 8px; }
+.glass-model:not(.glass-painted) { width: 194px; height: 272px; transform: none; filter: drop-shadow(0 18px 14px #0009); }
+.glass-model:not(.glass-painted) .glass-bowl {
+  right: 20px;
+  bottom: 24px;
+  left: 20px;
+  height: 218px;
+  border: 2px solid #eafaffb8;
+  border-top-color: #ffffffed;
+  border-radius: 12px 12px 34px 34px;
+  background: linear-gradient(103deg,#fff5 0 5%,#fff1 7% 62%,#bcecff2d 64% 72%,transparent 74%);
+  box-shadow: inset 7px 0 12px #fff3,inset -7px 0 13px #79cee622,0 0 0 1px #7a9aa633;
+  backdrop-filter: blur(2px);
+}
+.glass-model:not(.glass-painted) .glass-rim {
+  position: absolute;
+  z-index: 8;
+  top: -7px;
+  right: -5px;
+  left: -5px;
+  height: 12px;
+  border: 2px solid #effdffdc;
+  border-radius: 50%;
+  background: linear-gradient(180deg,#ffffff80,#8cc6d322 55%,#11202c77);
+  box-shadow: 0 2px 6px #0008,inset 0 2px 2px #fff9;
+}
+.glass-model:not(.glass-painted) .glass-liquid {
+  right: 4px;
+  bottom: 4px;
+  left: 4px;
+  border-radius: 4px 4px 27px 27px;
+  background: linear-gradient(105deg,#ffffff35 0 8%,transparent 10% 70%,#0002 72%),var(--liquid-color);
+  opacity: .96;
+  box-shadow: inset 0 9px 18px #fff1,inset 0 -15px 20px #240d0d35;
+  transition: height .13s linear,background .2s ease;
+}
+.glass-model:not(.glass-painted) .glass-liquid::before,
+.liquid-surface {
+  position: absolute;
+  top: -4px;
+  right: 0;
+  left: 0;
+  height: 10px;
+  border-radius: 50%;
+  background: color-mix(in srgb,var(--liquid-color) 72%,white 28%);
+  box-shadow: inset 0 2px 3px #fff8,0 3px 8px #0004;
+  content: '';
+}
+.liquid-shine { position: absolute; top: 9px; bottom: 12px; left: 10px; width: 8px; border-radius: 99px; background: linear-gradient(#fff6,#fff0); transform: skewX(-8deg); }
+.glass-measures { position: absolute; z-index: 7; top: 64px; right: 7px; display: grid; gap: 37px; opacity: .42; }
+.glass-measures i { display: block; width: 16px; border-top: 1px solid #dff8ff; }
+.glass-shadow { position: absolute; right: 27px; bottom: 8px; left: 27px; height: 18px; border-radius: 50%; background: #05070ba8; filter: blur(7px); }
+.glass-model:not(.glass-painted) .ice-cube { left: calc(16px + (var(--n) % 3) * 34px); bottom: calc(12px + (var(--n) % 2) * 29px); width: 32px; height: 30px; }
+.bubbles { position: absolute; inset: 0; }
+.bubbles i { position: absolute; bottom: 7px; width: 6px; height: 6px; border: 1px solid #fff9; border-radius: 50%; animation: bubbles 2s linear infinite; }
+.bubbles i:nth-child(1) { left: 25%; }
+.bubbles i:nth-child(2) { left: 53%; width: 4px; height: 4px; animation-delay: .7s; }
+.bubbles i:nth-child(3) { right: 18%; width: 8px; height: 8px; animation-delay: 1.3s; }
+.action-prop { top: 16px; left: calc(50% - 145px); width: 104px; height: 150px; transform-origin: 75% 84%; }
+.action-prop .bottle-visual { width: 104px; height: 150px; filter: drop-shadow(0 13px 9px #0009); }
+.action-prop.action-pouring { animation: measuredPour .25s cubic-bezier(.2,.75,.25,1) both; }
+.action-prop.action-garnishing { animation: measuredDrop .36s cubic-bezier(.2,.75,.25,1) both; }
+.pour-stream { top: 124px; left: calc(50% - 50px); width: 7px; height: 112px; transform: rotate(-7deg); transform-origin: top; }
+.pour-stream.active { animation: measuredStream .38s ease-out infinite; }
+.amount-readout { z-index: 8; }
+.amount-readout em { display: block; color: #d9be84; font-size: 8px; font-style: normal; }
+@keyframes measuredPour { from{opacity:0;transform:translate(-26px,-20px) rotate(18deg)} to{opacity:1;transform:translate(34px,26px) rotate(67deg)} }
+@keyframes measuredDrop { from{opacity:0;transform:translate(-15px,-10px) scale(.9)} 55%{opacity:1} to{opacity:0;transform:translate(40px,150px) scale(.45)} }
+@keyframes measuredStream { 0%,100%{opacity:.35;transform:scaleY(.85) rotate(-7deg)} 50%{opacity:.95;transform:scaleY(1.04) rotate(-7deg)} }
+
+/* Customization changes the live bar and its compact preview visibly. */
+.bar-scene[data-wall='burgundy']::after,.mini-interior[data-wall='burgundy']::before { background: linear-gradient(110deg,#651f3a80,#170e17aa 50%,#5b1b3270); }
+.bar-scene[data-wall='emerald']::after,.mini-interior[data-wall='emerald']::before { background: linear-gradient(110deg,#123d3480,#0716119c 50%,#1c5c4970); }
+.bar-scene[data-wall='neon']::after,.mini-interior[data-wall='neon']::before { background: radial-gradient(circle at 50% 35%,#d82e7138,transparent 42%),linear-gradient(90deg,#17113035,#3a102035); }
+.bar-scene[data-lighting='rose'] .scene-light { background: linear-gradient(180deg,#ff769777,transparent 72%); }
+.bar-scene[data-lighting='blue'] .scene-light { background: linear-gradient(180deg,#72baff77,transparent 72%); }
+.bar-scene[data-lighting='amber'] .scene-light { background: linear-gradient(180deg,#ffd26f66,transparent 72%); }
+.bar-scene[data-counter='marble'] .counter-glow,.mini-interior[data-counter='marble'] i { border-top-color:#f6eef1;background:linear-gradient(#b9b1bd,#4e4a55);box-shadow:0 -8px 22px #ffffff2e; }
+.bar-scene[data-counter='brass'] .counter-glow,.mini-interior[data-counter='brass'] i { border-top-color:#ffd16c;background:linear-gradient(#a66c21,#33200f);box-shadow:0 -8px 22px #ffb93838; }
+.bar-scene[data-counter='classic'] .counter-glow,.mini-interior[data-counter='classic'] i { border-top-color:#f0aa58;background:linear-gradient(#542e28,#190f14); }
+.mini-interior::before { content:'';position:absolute;z-index:1;inset:0;pointer-events:none; }
+.mini-interior::after { z-index:2; }
+.mini-interior > span { position:absolute;z-index:3;inset:0;background:linear-gradient(180deg,transparent 30%,#ffcf8230,transparent 72%);pointer-events:none; }
+.mini-interior[data-lighting='rose'] > span { background:linear-gradient(180deg,#ff6d8b2c,transparent 70%); }
+.mini-interior[data-lighting='blue'] > span { background:linear-gradient(180deg,#69b8ff32,transparent 70%); }
+.mini-interior > i { position:absolute;z-index:3;right:0;bottom:0;left:0;height:38px;border-top:2px solid; }
+.mini-interior b { z-index:4; }
+.mini-interior em { position:absolute;z-index:5;right:10px;bottom:10px;padding:6px 8px;border:1px solid #d7a952;border-radius:7px;background:#101724d9;color:#ffdb8c;font-size:8px;font-style:normal;text-transform:uppercase; }
+.design-options { display:grid;gap:9px;align-content:start; }
+.design-options section { display:grid;gap:5px;padding:8px;border:1px solid #354761;border-radius:10px;background:#121e30; }
+.design-options section > small { color:var(--gold);font-size:7px;font-weight:900;letter-spacing:.11em; }
+.design-options section button { min-height:32px;padding:5px 8px;font-size:8px; }
+.bartender-custom .art-character.outfit-shirt::after,.bartender-custom .art-character.outfit-apron::after {
+  content:'';position:absolute;z-index:3;right:20%;bottom:0;left:20%;height:48%;border-radius:45% 45% 8% 8%;mix-blend-mode:color;pointer-events:none;
+}
+.bartender-custom .art-character.outfit-shirt::after { background:#e7e8e5; }
+.bartender-custom .art-character.outfit-apron::after { background:#6d2941; }
+
+/* Keep all five guests available on small screens instead of hiding four. */
+@media (max-width:760px) {
+  .ingredient-shelf-toolbar { grid-template-columns:1fr auto;padding:8px; }
+  .ingredient-shelf-toolbar > div:first-child { grid-column:1/-1; }
+  .ingredient-shelf-toolbar nav { min-width:0;overflow-x:auto; }
+  .ingredient-shelf-toolbar nav button { flex:0 0 auto; }
+  .shelf-arrows button { width:31px; }
+  .ingredient-button { flex-basis:106px;min-width:106px; }
+  .mixing-board { grid-template-columns:minmax(190px,1fr) 105px;min-height:375px;padding:52px 9px 64px; }
+  .glass-model:not(.glass-painted) { width:160px;height:235px;transform:none; }
+  .glass-model:not(.glass-painted) .glass-bowl { right:17px;bottom:22px;left:17px;height:184px; }
+  .action-prop { left:calc(50% - 126px);transform:scale(.85); }
+  .pour-stream { left:calc(50% - 47px); }
+  .drop-instruction { top:8px;left:8px; }
+  .bar-scene { min-height:445px; }
+  .bar-cast { inset:0 2px 43px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:end;gap:1px; }
+  .scene-customer { display:block;width:auto;min-width:0;height:335px;transform:none!important; }
+  .scene-customer .art-character { inset:auto -13px 34px;height:225px; }
+  .scene-customer.active .art-character { transform:scale(1.09); }
+  .scene-customer .speech-bubble { display:none;top:4px;left:50%;width:154px; }
+  .scene-customer.active .speech-bubble { display:block; }
+  .scene-customer:nth-child(1) .speech-bubble { left:15px;transform:none; }
+  .scene-customer:nth-child(5) .speech-bubble { right:15px;left:auto;transform:none; }
+  .customer-plate { right:1px;bottom:5px;left:1px;display:block;padding:5px 3px;text-align:center; }
+  .customer-plate b { overflow:hidden;font-size:8px;text-overflow:ellipsis;white-space:nowrap; }
+  .customer-plate small { font-size:6px; }
+  .mini-patience { width:100%;height:4px;margin-top:3px; }
+  .design-options { flex-direction:initial; }
+}
+
+/* Panel-sized responsiveness (the game may be narrow inside a wide desktop window). */
+.cocktail-workspace { container-type:inline-size; }
+.shelf-caption { display:grid;gap:2px;min-width:0; }
+.shelf-caption span { overflow:hidden;color:#aebbc9;font-size:8px;text-overflow:ellipsis;white-space:nowrap; }
+.glass-stage { position:relative;z-index:2;display:grid;min-width:0;min-height:310px;place-items:center; }
+.mixing-board { grid-template-columns:minmax(280px,1fr) minmax(150px,190px);grid-template-rows:auto 1fr;align-items:stretch;gap:12px;padding:14px 22px 62px; }
+.mixing-board::after { z-index:0; }
+.drop-instruction { position:static;grid-column:1/-1;justify-self:center;min-width:220px;text-align:center; }
+.glass-stage .amount-readout { left:calc(50% - 126px);bottom:34px;display:grid;grid-template-columns:auto auto;align-items:end;column-gap:4px;min-width:55px; }
+.glass-stage .amount-readout b { font-size:30px;line-height:.85; }
+.glass-stage .amount-readout span { font-size:9px; }
+.glass-stage .amount-readout em { grid-column:1/-1;margin-top:4px; }
+.mixing-board > .recipe-progress { align-self:center;max-height:280px;overflow:auto;padding-right:2px; }
+.recipe-progress div { min-height:34px;align-items:center; }
+
+@container (max-width:700px) {
+  .ingredient-shelf-toolbar { grid-template-columns:minmax(0,1fr) auto;gap:7px;padding:8px 9px; }
+  .ingredient-shelf-toolbar .shelf-caption { grid-column:1/-1; }
+  .ingredient-shelf-toolbar nav { display:flex;min-width:0;overflow-x:auto;scrollbar-width:none; }
+  .ingredient-shelf-toolbar nav::-webkit-scrollbar { display:none; }
+  .ingredient-shelf-toolbar nav button { flex:0 0 auto;min-height:29px;padding:5px 8px; }
+  .shelf-arrows button { width:30px;min-height:29px; }
+  .ingredient-tray { padding:8px 9px 12px; }
+  .ingredient-button { flex-basis:118px;min-width:118px;min-height:145px; }
+  .mixing-board { grid-template-columns:1fr;grid-template-rows:auto auto auto;gap:7px;min-height:0;padding:10px 10px 64px; }
+  .drop-instruction { grid-column:1;min-width:0;width:calc(100% - 12px);box-sizing:border-box; }
+  .glass-stage { min-height:276px; }
+  .glass-model:not(.glass-painted) { width:166px;height:239px; }
+  .glass-model:not(.glass-painted) .glass-bowl { right:17px;bottom:22px;left:17px;height:188px; }
+  .glass-stage .amount-readout { left:calc(50% - 132px);bottom:40px; }
+  .mixing-board > .recipe-progress { display:grid;grid-template-columns:1fr 1fr;align-self:auto;max-height:none;overflow:visible;gap:5px; }
+  .recipe-progress div { min-height:32px;box-sizing:border-box; }
+  .recipe-progress div:last-child:nth-child(odd) { grid-column:1/-1; }
+}
+
+@container (max-width:430px) {
+  .ingredient-shelf-toolbar { grid-template-columns:1fr; }
+  .shelf-arrows { display:none; }
+  .ingredient-button { flex-basis:104px;min-width:104px; }
+  .mixing-board > .recipe-progress { grid-template-columns:1fr; }
+  .recipe-progress div:last-child:nth-child(odd) { grid-column:auto; }
+}
+
+/* Station motion: bottle neck, stream and splash share one measured anchor (--pour-x / --pour-y). */
+.glass-stage { overflow:visible; }
+.glass-stage > .glass-model:not(.glass-painted) { margin-top:42px; }
+.glass-stage .action-prop {
+  top:calc(var(--pour-y,40px) - 5px);
+  left:calc(var(--pour-x,50%) - 70px);
+  width:140px;
+  height:140px;
+  opacity:0;
+  transform:none;
+  transform-origin:50% 5px;
+  transition:opacity .16s ease;
+}
+.glass-stage .action-prop .bottle-visual { width:140px;height:140px;margin:0; }
+.glass-stage .action-prop.visible { opacity:1; }
+.glass-stage .action-prop.action-pouring { transform:rotate(120deg);animation:bottleTilt .3s cubic-bezier(.2,.8,.25,1) both, bottleGlug .5s .3s ease-in-out infinite alternate; }
+.glass-stage .action-prop.action-garnishing { left:calc(50% - 70px);top:calc(var(--pour-y,40px) - 110px);transform:scale(.5);animation:garnishDrop .42s cubic-bezier(.45,0,.8,.5) both; }
+.glass-stage .pour-stream {
+  top:var(--pour-y,40px);
+  left:calc(var(--pour-x,50%) - 3px);
+  width:6px;
+  height:var(--stream-height,120px);
+  border:0;
+  border-radius:3px 3px 40% 40%;
+  background:linear-gradient(90deg,#fff8 0 15%,var(--stream-color,#e6b452) 35% 80%,#0003 100%);
+  box-shadow:0 0 6px color-mix(in srgb,var(--stream-color,#e6b452) 70%,white 30%);
+  opacity:0;
+  transform:none;
+  transform-origin:top;
+  transition:opacity .12s ease;
+}
+.glass-stage .pour-stream::before { content:none; }
+.glass-stage .pour-stream::after {
+  content:'';
+  position:absolute;
+  left:50%;
+  bottom:-4px;
+  width:30px;
+  height:8px;
+  border:2px solid color-mix(in srgb,var(--stream-color,#e6b452) 55%,white 45%);
+  border-radius:50%;
+  transform:translateX(-50%);
+  animation:pourSplash .36s ease-out infinite;
+}
+.glass-stage .pour-stream.active { opacity:1;animation:streamFall .16s .14s cubic-bezier(.5,0,.9,.6) both, streamWobble .24s .3s ease-in-out infinite alternate; }
+.glass-pouring .liquid-surface { animation:liquidRipple .34s ease-in-out infinite alternate; }
+.glass-stage .shaker-prop { top:40px;left:calc(50% + 96px);width:50px;height:118px;filter:drop-shadow(0 10px 9px #0009);transform-origin:50% 60%; }
+.glass-stage .shaker-prop i { position:absolute;display:block;width:auto;height:auto;border-radius:0;border:0;box-shadow:inset 0 -2px 0 #0003;background:linear-gradient(90deg,#56636d,#f4f7f8 38%,#b7c1c7 62%,#46525b); }
+.glass-stage .shaker-prop i:nth-child(1) { left:36%;right:36%;top:0;height:11%;border-radius:6px 6px 2px 2px; }
+.glass-stage .shaker-prop i:nth-child(2) { left:12%;right:12%;top:10%;height:25%;clip-path:polygon(22% 0,78% 0,100% 100%,0 100%); }
+.glass-stage .shaker-prop i:nth-child(3) { left:0;right:0;top:34%;bottom:0;border-radius:3px 3px 12px 12px;clip-path:polygon(0 0,100% 0,86% 100%,14% 100%); }
+.glass-stage .shaker-prop.active { opacity:1;animation:shakerRattle .64s ease-in-out both; }
+.glass-stage .glass-shaking { animation:none; }
+.glass-shaking .liquid-surface { animation:liquidRipple .12s ease-in-out 5 alternate; }
+@keyframes bottleTilt {
+  0% { opacity:0;transform:translate(-30px,-24px) rotate(35deg); }
+  35% { opacity:1; }
+  100% { opacity:1;transform:rotate(120deg); }
+}
+@keyframes bottleGlug { from { transform:rotate(118deg); } to { transform:rotate(124deg); } }
+@keyframes garnishDrop {
+  0% { opacity:0;transform:translateY(-24px) scale(.5) rotate(-12deg); }
+  25% { opacity:1; }
+  80% { opacity:1; }
+  100% { opacity:0;transform:translateY(125px) scale(.36) rotate(14deg); }
+}
+@keyframes streamFall { from { transform:scaleY(0); } to { transform:scaleY(1); } }
+@keyframes streamWobble { from { transform:scaleX(.8); } to { transform:scaleX(1.12); } }
+@keyframes pourSplash { from { opacity:.9;transform:translateX(-50%) scale(.5); } to { opacity:0;transform:translateX(-50%) scale(1.3); } }
+@keyframes shakerRattle {
+  0% { opacity:0;transform:translateY(20px); }
+  12% { opacity:1;transform:translateY(0) rotate(0); }
+  25%,55% { transform:translate(-6px,-14px) rotate(-16deg); }
+  40%,70% { transform:translate(6px,8px) rotate(12deg); }
+  88% { opacity:1;transform:none; }
+  100% { opacity:0;transform:translateY(10px); }
+}
+@keyframes liquidRipple {
+  from { transform:scaleX(.88) translateY(0); }
+  to { transform:scaleX(1.04) translateY(2px); }
+}

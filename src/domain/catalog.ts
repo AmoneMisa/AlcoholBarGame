@@ -163,10 +163,10 @@ export const MODIFIERS: Modifier[] = [
 ];
 
 export const SUPPLIERS: Supplier[] = [
-  { id: 'global', name: 'Global Drinks Co.', description: 'Reliable, medium prices', deliveryDays: 3, reputation: 4 },
-  { id: 'local', name: 'Local Market', description: 'Best prices, slower delivery', deliveryDays: 5, reputation: 3 },
-  { id: 'premium', name: 'Premium Spirits', description: 'High-end brands', deliveryDays: 2, reputation: 5 },
-  { id: 'fresh', name: 'Fresh & Green', description: 'Fruits, herbs, mixers', deliveryDays: 2, reputation: 4 }
+  { id: 'global', name: 'Global Drinks Co.', description: 'Reliable spirits & mixers', deliveryDays: 3, reputation: 4, deliveryFee: 8, freeDeliveryAt: 100, icon: 'truck' },
+  { id: 'local', name: 'Local Market', description: 'Budget produce & mixers', deliveryDays: 5, reputation: 3, deliveryFee: 4, freeDeliveryAt: 45, icon: 'basket' },
+  { id: 'premium', name: 'Premium Spirits', description: 'Premium bottles, fast route', deliveryDays: 2, reputation: 5, deliveryFee: 12, freeDeliveryAt: 150, icon: 'bottle' },
+  { id: 'fresh', name: 'Fresh & Green', description: 'Fresh fruit, herbs & mixers', deliveryDays: 2, reputation: 4, deliveryFee: 5, freeDeliveryAt: 60, icon: 'leaf' }
 ];
 
 export const STARTING_INVENTORY = INGREDIENTS.map((item) => ({
