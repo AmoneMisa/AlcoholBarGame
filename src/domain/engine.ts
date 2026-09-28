@@ -76,14 +76,24 @@ export function canMake(inventory: InventoryItem[], customer: Customer) {
 
 export function createMarket(region: Region, day: number): SupplierOffer[] {
   const wave = 1 + Math.sin(day * 1.7) * 0.06;
+  const suppliers = [
+    { id: 'global', name: 'Global Drinks Co.', multiplier: 1, quality: 'standard' as const, accepts: ['spirit', 'mixer'] },
+    { id: 'local', name: 'Local Market', multiplier: .88, quality: 'standard' as const, accepts: ['mixer', 'fruit', 'herb', 'garnish'] },
+    { id: 'premium', name: 'Premium Spirits', multiplier: 1.17, quality: 'premium' as const, accepts: ['spirit'] },
+    { id: 'fresh', name: 'Fresh & Green', multiplier: 1.03, quality: 'premium' as const, accepts: ['fruit', 'herb', 'garnish', 'mixer'] }
+  ];
   return INGREDIENTS.flatMap((ingredient, index) => {
-    const pack = ingredient.unit === 'ml' ? 500 : 20;
+    const pack = ingredient.unit === 'ml' ? 500 : 12;
     const wholesale = ingredient.basePrice * pack * region.marketFactor * wave;
-    return [
-      { supplier: 'Global Drinks Co.', ingredientId: ingredient.id, quantity: pack,
-        price: Number((wholesale * (0.92 + ((day + index) % 4) * 0.03)).toFixed(2)), quality: 'standard' as const },
-      { supplier: 'Premium Spirits', ingredientId: ingredient.id, quantity: pack,
-        price: Number((wholesale * 1.09).toFixed(2)), quality: 'premium' as const }
-    ];
+    return suppliers
+      .filter((supplier) => supplier.accepts.includes(ingredient.category))
+      .map((supplier) => ({
+        supplierId: supplier.id,
+        supplier: supplier.name,
+        ingredientId: ingredient.id,
+        quantity: pack,
+        price: Number((wholesale * supplier.multiplier * (0.96 + ((day + index) % 4) * 0.025)).toFixed(2)),
+        quality: supplier.quality
+      }));
   });
 }

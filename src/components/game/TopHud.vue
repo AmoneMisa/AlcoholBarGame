@@ -10,7 +10,7 @@ const xpPercent = computed(() => game.xp % 60 / 60 * 100);
   <header class="top-hud">
     <div class="venue-card">
       <div class="venue-mark"><span></span></div>
-      <div><small>YOUR BAR</small><b>The Velvet Hour</b><div class="xp-line"><span :style="{ width: xpPercent + '%' }"></span></div></div>
+      <div><small>YOUR BAR · {{ game.region.name }}</small><b>The Velvet Hour</b><div class="xp-line"><span :style="{ width: xpPercent + '%' }"></span></div></div>
       <em>LV. {{ game.level }}</em>
     </div>
     <div class="hud-resources">

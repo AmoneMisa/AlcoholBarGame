@@ -28,42 +28,82 @@ export const INGREDIENTS: Ingredient[] = [
   { id: 'soda', name: 'Soda water', unit: 'ml', basePrice: 0.004, pourStep: 30, category: 'mixer' },
   { id: 'cola', name: 'Cola', unit: 'ml', basePrice: 0.005, pourStep: 30, category: 'mixer' },
   { id: 'mint', name: 'Mint', unit: 'piece', basePrice: 0.030, pourStep: 2, category: 'herb' },
-  { id: 'ice', name: 'Ice', unit: 'piece', basePrice: 0.010, pourStep: 1, category: 'garnish' }
+  { id: 'ice', name: 'Ice', unit: 'piece', basePrice: 0.010, pourStep: 1, category: 'garnish' },
+  { id: 'lime-wedge', name: 'Fresh lime', unit: 'piece', basePrice: 0.18, pourStep: 1, category: 'fruit' },
+  { id: 'orange', name: 'Fresh orange', unit: 'piece', basePrice: 0.22, pourStep: 1, category: 'fruit' },
+  { id: 'pineapple-wedge', name: 'Pineapple wedge', unit: 'piece', basePrice: 0.24, pourStep: 1, category: 'fruit' },
+  { id: 'salt', name: 'Bar salt', unit: 'piece', basePrice: 0.04, pourStep: 1, category: 'garnish' }
 ];
 
 export const RECIPES: Recipe[] = [
-  { id: 'mojito', name: 'Mojito', price: 9.5, needsShake: false, category: 'classic', ingredients: [
+  { id: 'mojito', name: 'Mojito', price: 9.5, needsShake: false, category: 'classic',
+    origin: 'Havana, Cuba · early 20th century',
+    story: 'A bright Cuban highball descended from rum, lime and mint punches. Its long, icy build made it a natural warm-weather favorite.',
+    tastingNotes: ['fresh', 'citrusy', 'herbal', 'sparkling'], occasions: ['Hot evening', 'Easy conversation', 'First-time guest', 'Long session'],
+    method: ['Gently press the mint with lime and syrup.', 'Add rum and fill the glass with ice.', 'Top with soda and lift the mint through the drink.', 'Garnish with a fresh lime wedge.'], ingredients: [
     { ingredientId: 'white-rum', amount: 45 }, { ingredientId: 'lime-juice', amount: 20 },
     { ingredientId: 'mint', amount: 6 }, { ingredientId: 'sugar-syrup', amount: 10 },
-    { ingredientId: 'soda', amount: 90 }, { ingredientId: 'ice', amount: 5 }
+    { ingredientId: 'soda', amount: 90 }, { ingredientId: 'ice', amount: 5 }, { ingredientId: 'lime-wedge', amount: 1 }
   ]},
-  { id: 'daiquiri', name: 'Daiquiri', price: 8.5, needsShake: true, category: 'classic', ingredients: [
+  { id: 'daiquiri', name: 'Daiquiri', price: 8.5, needsShake: true, category: 'classic',
+    origin: 'Cuba · turn of the 20th century',
+    story: 'A compact rum sour named for the Cuban town of Daiquirí. The classic version is clean and restrained rather than frozen or oversized.',
+    tastingNotes: ['sharp', 'clean', 'rum-forward'], occasions: ['Aperitif', 'Classic drinker', 'Quick round', 'Warm night'],
+    method: ['Chill a coupe glass.', 'Add rum, lime and syrup to a shaker with ice.', 'Shake hard until cold.', 'Fine-strain into the chilled glass.'], ingredients: [
     { ingredientId: 'white-rum', amount: 45 }, { ingredientId: 'lime-juice', amount: 25 },
     { ingredientId: 'sugar-syrup', amount: 15 }, { ingredientId: 'ice', amount: 4 }
   ]},
-  { id: 'margarita', name: 'Margarita', price: 10, needsShake: true, category: 'classic', ingredients: [
+  { id: 'margarita', name: 'Margarita', price: 10, needsShake: true, category: 'classic',
+    origin: 'Mexico / United States · 1930s–1940s',
+    story: 'The tequila member of the sour family balances agave, orange liqueur and lime. Several origin stories compete, but the structure became a modern classic.',
+    tastingNotes: ['tart', 'agave', 'citrus', 'saline'], occasions: ['Celebration', 'Spicy food', 'Lively group', 'Aperitif'],
+    method: ['Run lime around half the rim and apply salt.', 'Add tequila, orange liqueur and lime to a shaker with ice.', 'Shake until well chilled.', 'Strain over fresh ice or serve up.'], ingredients: [
     { ingredientId: 'tequila', amount: 45 }, { ingredientId: 'orange-liqueur', amount: 20 },
-    { ingredientId: 'lime-juice', amount: 20 }, { ingredientId: 'ice', amount: 4 }
+    { ingredientId: 'lime-juice', amount: 20 }, { ingredientId: 'ice', amount: 4 }, { ingredientId: 'salt', amount: 1 }
   ]},
-  { id: 'pina-colada', name: 'Piña Colada', price: 11, needsShake: true, category: 'cocktail', ingredients: [
+  { id: 'pina-colada', name: 'Piña Colada', price: 11, needsShake: true, category: 'cocktail',
+    origin: 'Puerto Rico · mid-20th century',
+    story: 'Puerto Rico’s celebrated tropical drink brings rum together with pineapple and coconut for a rich, transportive serve.',
+    tastingNotes: ['creamy', 'tropical', 'sweet'], occasions: ['Vacation mood', 'Dessert drink', 'Relaxed guest', 'Celebration'],
+    method: ['Add rum, pineapple, coconut cream and ice to the shaker.', 'Shake longer than usual to integrate the cream.', 'Pour into a chilled hurricane glass.', 'Finish with a pineapple wedge.'], ingredients: [
     { ingredientId: 'white-rum', amount: 45 }, { ingredientId: 'pineapple-juice', amount: 90 },
-    { ingredientId: 'coconut-cream', amount: 30 }, { ingredientId: 'ice', amount: 5 }
+    { ingredientId: 'coconut-cream', amount: 30 }, { ingredientId: 'ice', amount: 5 }, { ingredientId: 'pineapple-wedge', amount: 1 }
   ]},
-  { id: 'cosmopolitan', name: 'Cosmopolitan', price: 10.5, needsShake: true, category: 'cocktail', ingredients: [
+  { id: 'cosmopolitan', name: 'Cosmopolitan', price: 10.5, needsShake: true, category: 'cocktail',
+    origin: 'United States · 1980s',
+    story: 'A modern pink sour that became a late-20th-century icon. Cranberry softens the citrus while keeping the serve crisp and elegant.',
+    tastingNotes: ['crisp', 'berry', 'citrusy'], occasions: ['Stylish night out', 'Celebration', 'Photo-friendly serve', 'Aperitif'],
+    method: ['Chill a cocktail glass.', 'Add vodka, orange liqueur, cranberry, lime and ice.', 'Shake briskly until cold.', 'Fine-strain and express orange over the surface.'], ingredients: [
     { ingredientId: 'vodka', amount: 45 }, { ingredientId: 'orange-liqueur', amount: 15 },
-    { ingredientId: 'cranberry-juice', amount: 30 }, { ingredientId: 'lime-juice', amount: 10 }, { ingredientId: 'ice', amount: 4 }
+    { ingredientId: 'cranberry-juice', amount: 30 }, { ingredientId: 'lime-juice', amount: 10 }, { ingredientId: 'ice', amount: 4 }, { ingredientId: 'orange', amount: 1 }
   ]},
-  { id: 'old-fashioned', name: 'Old Fashioned', price: 12, needsShake: false, category: 'classic', ingredients: [
-    { ingredientId: 'whiskey', amount: 45 }, { ingredientId: 'sugar-syrup', amount: 10 }, { ingredientId: 'ice', amount: 3 }
+  { id: 'old-fashioned', name: 'Old Fashioned', price: 12, needsShake: false, category: 'classic',
+    origin: 'United States · 19th century',
+    story: 'The name asks for a cocktail made in the old manner: spirit, sugar, bitters and water. It is a patient, spirit-led drink rather than a sweet one.',
+    tastingNotes: ['rich', 'spirit-forward', 'aromatic'], occasions: ['After dinner', 'Slow conversation', 'Whiskey fan', 'Quiet evening'],
+    method: ['Add syrup and whiskey to a rocks glass.', 'Add a large piece of ice.', 'Stir slowly until chilled and diluted.', 'Express an orange peel and place it in the glass.'], ingredients: [
+    { ingredientId: 'whiskey', amount: 45 }, { ingredientId: 'sugar-syrup', amount: 10 }, { ingredientId: 'ice', amount: 3 }, { ingredientId: 'orange', amount: 1 }
   ]},
-  { id: 'martini', name: 'Martini', price: 11.5, needsShake: false, category: 'classic', ingredients: [
+  { id: 'martini', name: 'Martini', price: 11.5, needsShake: false, category: 'classic',
+    origin: 'United States · late 19th century',
+    story: 'Few drinks are as adaptable or debated. At its core, the Martini is a cold, precise conversation between gin and dry vermouth.',
+    tastingNotes: ['dry', 'botanical', 'silky'], occasions: ['Formal evening', 'Aperitif', 'Classic drinker', 'Focused conversation'],
+    method: ['Chill a martini glass.', 'Add gin, vermouth and ice to a mixing glass.', 'Stir until very cold and properly diluted.', 'Strain and garnish according to the guest’s preference.'], ingredients: [
     { ingredientId: 'gin', amount: 60 }, { ingredientId: 'vermouth', amount: 20 }, { ingredientId: 'ice', amount: 4 }
   ]},
-  { id: 'whiskey-sour', name: 'Whiskey Sour', price: 10.5, needsShake: true, category: 'classic', ingredients: [
+  { id: 'whiskey-sour', name: 'Whiskey Sour', price: 10.5, needsShake: true, category: 'classic',
+    origin: 'United States · 19th century',
+    story: 'A foundational sour: whiskey, citrus and sugar. It keeps the warmth of the spirit while adding lift and approachability.',
+    tastingNotes: ['balanced', 'citrusy', 'warming'], occasions: ['Unsure guest', 'Comfort drink', 'Food pairing', 'Cool evening'],
+    method: ['Add whiskey, lemon, syrup and ice to a shaker.', 'Shake firmly until chilled.', 'Strain over fresh ice.', 'Garnish with an orange slice.'], ingredients: [
     { ingredientId: 'whiskey', amount: 45 }, { ingredientId: 'lemon-juice', amount: 25 },
-    { ingredientId: 'sugar-syrup', amount: 15 }, { ingredientId: 'ice', amount: 4 }
+    { ingredientId: 'sugar-syrup', amount: 15 }, { ingredientId: 'ice', amount: 4 }, { ingredientId: 'orange', amount: 1 }
   ]},
-  { id: 'long-island', name: 'Long Island', price: 13, needsShake: true, category: 'cocktail', ingredients: [
+  { id: 'long-island', name: 'Long Island', price: 13, needsShake: true, category: 'cocktail',
+    origin: 'Long Island, New York · 1970s',
+    story: 'A high-energy multi-spirit highball whose color recalls iced tea. Despite the name, no tea is required.',
+    tastingNotes: ['strong', 'citrusy', 'cola'], occasions: ['Experienced guest', 'One-drink order', 'Late night', 'High-energy group'],
+    method: ['Add the spirits, liqueur, lemon and ice to a shaker.', 'Shake briefly to chill.', 'Strain into an ice-filled highball.', 'Top with cola and stir once.'], ingredients: [
     { ingredientId: 'vodka', amount: 15 }, { ingredientId: 'gin', amount: 15 }, { ingredientId: 'white-rum', amount: 15 },
     { ingredientId: 'tequila', amount: 15 }, { ingredientId: 'orange-liqueur', amount: 10 },
     { ingredientId: 'lemon-juice', amount: 20 }, { ingredientId: 'cola', amount: 60 }, { ingredientId: 'ice', amount: 5 }

@@ -5,6 +5,13 @@ import { canMake, consumeMix, createMarket, generateCustomer, judgeMix } from '.
 import type { InventoryItem, RegionId, SupplierOffer } from '../domain/types';
 
 const makeQueue = (level = 0) => Array.from({ length: 5 }, () => generateCustomer(level));
+const makeBarInventory = (barIndex: number) => STARTING_INVENTORY.map((item, ingredientIndex) => {
+  const ingredient = INGREDIENTS.find((entry) => entry.id === item.ingredientId)!;
+  const factor = .48 + ((barIndex * 3 + ingredientIndex) % 6) * .11;
+  const floor = ingredient.unit === 'ml' ? 90 : 4;
+  return { ...item, amount: Math.max(floor, Math.round(item.amount * factor)) };
+});
+const initialInventories = Object.fromEntries(REGIONS.map((region, index) => [region.id, makeBarInventory(index)])) as Record<RegionId, InventoryItem[]>;
 
 export const useGameStore = defineStore('game', () => {
   const regionId = ref<RegionId>('new-york');
@@ -17,13 +24,19 @@ export const useGameStore = defineStore('game', () => {
   const streak = ref(0);
   const serving = ref(false);
   const decor = ref({ wall: 'neon', counter: 'classic', bartender: 'vest' });
-  const inventory = ref<InventoryItem[]>(structuredClone(STARTING_INVENTORY));
+  const inventories = ref<Record<RegionId, InventoryItem[]>>(structuredClone(initialInventories));
+  const inventory = computed<InventoryItem[]>({
+    get: () => inventories.value[regionId.value],
+    set: (value) => { inventories.value[regionId.value] = value; }
+  });
   const currentMix = ref<InventoryItem[]>([]);
   const shaken = ref(false);
   const customers = ref(makeQueue(2));
   const activeCustomerId = ref(customers.value[0]!.id);
   const message = ref('Choose a customer, read the request and build the cocktail.');
   const selectedSupplier = ref('global');
+  const transferTargetId = ref<RegionId>('london');
+  const tradeLog = ref<string[]>(['Each city bar now keeps its own stock.']);
   const recipeCategory = ref<'all' | 'classic' | 'cocktail'>('all');
   const bartenderGender = ref<'female' | 'male'>('female');
 
@@ -134,7 +147,54 @@ export const useGameStore = defineStore('game', () => {
     money.value = Number((money.value - offer.price).toFixed(2));
     const stock = inventory.value.find((item) => item.ingredientId === offer.ingredientId);
     if (stock) stock.amount += offer.quantity;
-    message.value = 'Stock updated.';
+    const ingredient = INGREDIENTS.find((item) => item.id === offer.ingredientId)!;
+    const note = `Bought ${offer.quantity} ${ingredient.unit} ${ingredient.name} from ${offer.supplier}.`;
+    tradeLog.value.unshift(note);
+    message.value = note;
+  }
+
+  function sell(ingredientId: string) {
+    const ingredient = INGREDIENTS.find((item) => item.id === ingredientId);
+    const stock = inventory.value.find((item) => item.ingredientId === ingredientId);
+    if (!ingredient || !stock) return;
+    const quantity = ingredient.unit === 'ml' ? Math.min(250, stock.amount) : Math.min(6, stock.amount);
+    if (quantity <= 0) {
+      message.value = `No ${ingredient.name} available to sell.`;
+      return;
+    }
+    const revenue = Number((ingredient.basePrice * quantity * region.value.marketFactor * .55).toFixed(2));
+    stock.amount -= quantity;
+    money.value = Number((money.value + revenue).toFixed(2));
+    const note = `Sold ${quantity} ${ingredient.unit} ${ingredient.name} for ${region.value.currencySymbol}${revenue.toFixed(2)}.`;
+    tradeLog.value.unshift(note);
+    message.value = note;
+  }
+
+  function switchBar(id: RegionId) {
+    if (id === regionId.value) return;
+    regionId.value = id;
+    transferTargetId.value = REGIONS.find((item) => item.id !== id)?.id ?? 'london';
+    resetMix();
+    message.value = `Now managing the ${region.value.name} bar.`;
+  }
+
+  function transferStock(ingredientId: string, targetId: RegionId) {
+    if (targetId === regionId.value) return;
+    const ingredient = INGREDIENTS.find((item) => item.id === ingredientId);
+    const source = inventory.value.find((item) => item.ingredientId === ingredientId);
+    const target = inventories.value[targetId].find((item) => item.ingredientId === ingredientId);
+    if (!ingredient || !source || !target) return;
+    const quantity = ingredient.unit === 'ml' ? Math.min(100, source.amount) : Math.min(3, source.amount);
+    if (quantity <= 0) {
+      message.value = `No ${ingredient.name} available to transfer.`;
+      return;
+    }
+    source.amount -= quantity;
+    target.amount += quantity;
+    const destination = REGIONS.find((item) => item.id === targetId)!;
+    const note = `Transferred ${quantity} ${ingredient.unit} ${ingredient.name} to ${destination.name}.`;
+    tradeLog.value.unshift(note);
+    message.value = note;
   }
 
   function nextDay() {
@@ -150,8 +210,8 @@ export const useGameStore = defineStore('game', () => {
 
   return {
     regionId, region, day, week, money, gems, energy, xp, streak, level, serving, decor,
-    inventory, currentMix, shaken, customers, activeCustomerId, customer, recipe, mixJudge,
-    message, market, selectedSupplier, recipeCategory, filteredRecipes, bartenderGender,
-    selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, buy, nextDay
+    inventories, inventory, currentMix, shaken, customers, activeCustomerId, customer, recipe, mixJudge,
+    message, market, selectedSupplier, transferTargetId, tradeLog, recipeCategory, filteredRecipes, bartenderGender,
+    selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, buy, sell, switchBar, transferStock, nextDay
   };
 });

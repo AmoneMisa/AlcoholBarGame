@@ -42,6 +42,11 @@ export interface Recipe {
   needsShake: boolean;
   category: 'classic' | 'cocktail';
   ingredients: RecipeItem[];
+  origin: string;
+  story: string;
+  tastingNotes: string[];
+  occasions: string[];
+  method: string[];
 }
 
 export interface Modifier {
@@ -71,6 +76,7 @@ export interface InventoryItem {
 }
 
 export interface SupplierOffer {
+  supplierId: string;
   supplier: string;
   ingredientId: string;
   quantity: number;

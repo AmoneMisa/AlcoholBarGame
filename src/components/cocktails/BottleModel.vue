@@ -4,8 +4,12 @@ import type { Ingredient } from '../../domain/types';
 
 const props = defineProps<{ ingredient: Ingredient; active?: boolean; amount?: number }>();
 const bottleOrder = ['white-rum', 'dark-rum', 'gin', 'vodka', 'tequila', 'whiskey', 'orange-liqueur', 'vermouth', 'lime-juice', 'cranberry-juice', 'soda', 'tonic'];
-const ingredientOrder = ['lime-juice', 'lemon-juice', 'pineapple-juice', 'cranberry-juice', 'sugar-syrup', 'mint', 'ice', 'coconut-cream'];
-const ingredientIndex = computed(() => ingredientOrder.indexOf(props.ingredient.id));
+const ingredientArt: Record<string, number> = {
+  'lime-juice': 0, 'lime-wedge': 0, 'lemon-juice': 1, orange: 1,
+  'pineapple-juice': 2, 'pineapple-wedge': 2, 'cranberry-juice': 3,
+  'sugar-syrup': 4, salt: 4, mint: 5, ice: 6, 'coconut-cream': 7
+};
+const ingredientIndex = computed(() => ingredientArt[props.ingredient.id] ?? -1);
 const bottleIndex = computed(() => {
   const direct = bottleOrder.indexOf(props.ingredient.id);
   if (direct >= 0) return direct;
@@ -22,7 +26,8 @@ const gridPosition = (index: number, columns: number, rows: number) => {
 const spriteStyle = computed(() => ingredientIndex.value >= 0 ? ({
   backgroundImage: "url('/assets/drinks/ingredients/velvet-ingredients-v2.png')",
   backgroundSize: '400% 200%',
-  backgroundPosition: gridPosition(ingredientIndex.value, 4, 2)
+  backgroundPosition: gridPosition(ingredientIndex.value, 4, 2),
+  filter: props.ingredient.id === 'orange' ? 'hue-rotate(-28deg) saturate(1.35)' : undefined
 }) : ({
   backgroundImage: "url('/assets/drinks/bottles/velvet-bottles-v2.png')",
   backgroundSize: '400% 300%',
