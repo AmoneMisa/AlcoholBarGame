@@ -1,3 +1,6 @@
 AlcoholBarGame.iml
 .idea
 /.idea/
+node_modules
+dist
+.env
