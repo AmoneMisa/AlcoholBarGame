@@ -1,5 +1,6 @@
-export type RegionId = 'london' | 'bucharest' | 'tashkent' | 'new-york';
+export type RegionId = 'new-york' | 'london' | 'berlin' | 'tashkent' | 'bucharest' | 'tokyo';
 export type Mood = 'calm' | 'impatient' | 'sad' | 'vip' | 'wealthy' | 'friendly';
+export type PaymentMethod = 'cash' | 'card';
 
 export interface Region {
   id: RegionId;
@@ -7,6 +8,7 @@ export interface Region {
   currencySymbol: string;
   marketFactor: number;
   rentPerDay: number;
+  tagline: string;
 }
 
 export interface Ingredient {
@@ -14,29 +16,62 @@ export interface Ingredient {
   name: string;
   unit: 'ml' | 'piece';
   basePrice: number;
+  pourStep: number;
+  category: 'spirit' | 'mixer' | 'fruit' | 'herb' | 'garnish';
 }
 
-export interface RecipeItem { ingredientId: string; amount: number }
-export interface Recipe { id: string; name: string; price: number; ingredients: RecipeItem[] }
-export interface Modifier { id: string; label: string; add?: RecipeItem; removeIngredientId?: string }
+export interface RecipeItem {
+  ingredientId: string;
+  amount: number;
+}
+
+export interface Recipe {
+  id: string;
+  name: string;
+  price: number;
+  needsShake: boolean;
+  category: 'classic' | 'cocktail';
+  ingredients: RecipeItem[];
+}
+
+export interface Modifier {
+  id: string;
+  label: string;
+  add?: RecipeItem;
+  removeIngredientId?: string;
+}
 
 export interface Customer {
   id: string;
   name: string;
   mood: Mood;
   patience: number;
+  patienceRemaining: number;
   budget: number;
   orderRecipeId: string;
   modifierId?: string;
   greeting: string;
   request: string;
+  paymentMethod: PaymentMethod;
 }
 
-export interface InventoryItem { ingredientId: string; amount: number }
+export interface InventoryItem {
+  ingredientId: string;
+  amount: number;
+}
+
 export interface SupplierOffer {
   supplier: string;
   ingredientId: string;
   quantity: number;
   price: number;
   quality: 'standard' | 'premium';
+}
+
+export interface Supplier {
+  id: string;
+  name: string;
+  description: string;
+  deliveryDays: number;
+  reputation: number;
 }
