@@ -1,0 +1,65 @@
+a,b,score,relationship,why,examples,tags
+gin,dry_vermouth,98,classic cocktail,"Botanical gin and herbal dry vermouth form a dry, aromatic structure.",Dry Martini,dry; herbal
+gin,campari,97,classic cocktail,Juniper and citrus botanicals stand up to bitter orange-herbal notes.,Negroni,bitter; botanical
+gin,sweet_vermouth,92,classic cocktail,"Botanicals are rounded by sweet, spiced vermouth.",Negroni,herbal; sweet-bitter
+gin,elderflower_liqueur,93,complement,Floral elderflower amplifies aromatic gin without hiding it.,Elderflower Gin Sour; French-style spritz,floral; fresh
+gin,orange_liqueur,88,complement,Citrus liqueur reinforces citrus-forward gin botanicals.,White Lady,citrus
+gin,aperol,87,contrast,Bitter-sweet orange adds fruit and softer bitterness to gin.,Gin Aperol Sour,citrus; bitter
+gin,champagne_brut,91,classic cocktail,Dry bubbles lift gin botanicals and add acidity.,French 75,sparkling; citrus
+gin,sherry_fino,82,savory complement,"Dry saline sherry adds nutty, savory complexity.",Bamboo-style gin variation,dry; savory
+vodka,dry_vermouth,92,classic cocktail,Neutral vodka lets herbal dry vermouth define the aroma.,Vodka Martini,dry
+vodka,coffee_liqueur,96,classic cocktail,Neutral spirit carries roasted coffee and sweetness cleanly.,Black Russian; White Russian,coffee; sweet
+vodka,orange_liqueur,88,complement,"Clean vodka gives citrus liqueur a simple, bright base.",Cosmopolitan-family drinks,citrus
+vodka,elderflower_liqueur,85,complement,Neutral base highlights floral sweetness.,Elderflower Vodka Collins,floral
+vodka,aperol,80,contrast,Neutral vodka supports bittersweet citrus without extra botanicals.,Vodka Spritz,bitter; citrus
+rye_whiskey,sweet_vermouth,98,classic cocktail,"Spicy rye balances rich, herbal sweetness.",Manhattan,spiced; herbal
+bourbon,sweet_vermouth,96,classic cocktail,Caramel and vanilla notes integrate with spiced vermouth.,Bourbon Manhattan,oak; sweet-spice
+rye_whiskey,herbal_liqueur,88,complement,Peppery rye works with bitter herbal depth.,Black Manhattan-style drinks,bitter; spice
+bourbon,orange_liqueur,85,complement,"Orange brightens bourbon's vanilla, caramel and oak.",Bourbon Sidecar variations,oak; citrus
+bourbon,amaretto,90,classic pairing,Almond sweetness rounds vanilla and oak.,Godfather-style bourbon variation,nutty; sweet
+scotch_unpeated,amaretto,94,classic cocktail,Malt and gentle smoke/oak pair with almond sweetness.,Godfather,nutty; malt
+scotch_peated,sweet_vermouth,80,contrast,Sweet herbs can soften smoky peat while keeping intensity.,Rob Roy variations,smoky; herbal
+scotch_unpeated,sweet_vermouth,93,classic cocktail,"Malt, oak and herbal sweetness balance naturally.",Rob Roy,malt; herbal
+irish_whiskey,coffee_liqueur,88,complement,Soft grain and vanilla notes echo roasted coffee.,Irish coffee-inspired cocktails,coffee; smooth
+bourbon,coffee_liqueur,89,complement,Caramel and char notes reinforce coffee roast.,Bourbon Coffee Cocktail,coffee; oak
+cognac,orange_liqueur,98,classic cocktail,"Orange lifts grape, oak and dried-fruit notes.",Sidecar,citrus; oak
+brandy,creme_de_cacao,95,classic cocktail,Fruit-and-oak brandy complements cocoa richness.,Brandy Alexander,chocolate; dessert
+cognac,champagne_brut,90,classic cocktail,Bubbles and acidity brighten rich cognac.,Champagne Cocktail variations,sparkling; luxury
+cognac,amaretto,86,complement,Almond sweetness matches dried fruit and oak.,French Connection-style drinks,nutty; oak
+brandy,sweet_vermouth,87,classic cocktail,Fruit-led brandy and herbal sweetness form a rounded aperitif profile.,Metropolitan-style drinks,herbal; fruit
+white_rum,orange_liqueur,93,classic cocktail,Citrus supports clean cane sweetness.,Mai Tai family; Rum Sidecar,tropical; citrus
+aged_rum,orange_liqueur,92,complement,"Orange links rum's dried-fruit, caramel and spice notes.",Mai Tai family,oak; citrus
+aged_rum,coffee_liqueur,91,complement,"Molasses, caramel and coffee create a deep roasted profile.",Rum Espresso Martini variations,coffee; caramel
+aged_rum,amaretto,87,complement,Nutty sweetness fits vanilla and baking-spice notes.,Rum Old Fashioned variations,nutty; spice
+white_rum,campari,82,contrast,Clean cane spirit gives bitter aperitif a sharper tropical edge.,Jungle Bird variations,bitter; tropical
+aged_rum,campari,91,classic cocktail,Rich rum sweetness balances assertive bitterness.,Jungle Bird,bitter; tropical
+white_rum,champagne_brut,85,contrast,Bubbles dry out and lift light rum.,Airmail variations,sparkling; fresh
+tequila_blanco,orange_liqueur,99,classic cocktail,"Agave, lime-like brightness and orange are a canonical match.",Margarita,agave; citrus
+tequila_reposado,orange_liqueur,96,classic cocktail,Oak-softened agave gains brightness from orange.,Reposado Margarita,agave; citrus; oak
+mezcal,orange_liqueur,93,classic cocktail,Orange fruit balances smoke and roasted agave.,Mezcal Margarita,smoky; citrus
+mezcal,campari,91,contrast,Smoky agave and bitter orange create a powerful bittersweet pairing.,Mezcal Negroni,smoky; bitter
+tequila_blanco,campari,84,contrast,Peppery agave cuts through herbal bitterness.,Tequila Negroni,agave; bitter
+tequila_anejo,sweet_vermouth,87,complement,Oak-aged agave works with vanilla-spice and herbs.,Añejo Manhattan,oak; herbal
+tequila_reposado,herbal_liqueur,84,complement,Roasted agave and herbs create earthy depth.,Agave-amaro cocktails,earthy; herbal
+prosecco,aperol,99,classic cocktail,"Fresh bubbles, moderate sweetness and bittersweet orange are built for each other.",Aperol Spritz,sparkling; bitter
+champagne_brut,orange_liqueur,92,classic cocktail,Dry sparkling wine gains aromatic citrus without losing freshness.,Mimosa-family / French 75 variations,sparkling; citrus
+champagne_brut,campari,80,contrast,High acidity and bubbles tame dense bitterness.,Campari Royale,sparkling; bitter
+prosecco,elderflower_liqueur,94,classic pairing,Floral sweetness is refreshed by light bubbles.,Hugo Spritz,floral; sparkling
+dry_vermouth,campari,87,aperitif pairing,Herbal dryness and bitter citrus form the backbone of low-proof aperitivo drinks.,Americano-family variations,herbal; bitter
+sweet_vermouth,campari,96,classic cocktail,Sweet herbs soften and extend the bitter aperitif.,Americano; Negroni,herbal; bitter
+sherry_fino,dry_vermouth,85,low-proof pairing,"Both are dry, savory and aromatic, producing a crisp aperitif.",Bamboo,dry; savory
+sherry_amontillado,sweet_vermouth,83,complement,Nutty oxidative notes work with spiced sweetness.,Adonis variations,nutty; herbal
+sake_junmai,dry_vermouth,80,savory complement,"Umami-rich sake and herbal vermouth can create a dry, savory aperitif.",Sake Martini variations,umami; herbal
+sake_ginjo,gin,84,aromatic complement,Delicate fruit and floral sake can soften juniper and citrus botanicals.,Sake Martini variations,floral; botanical
+sake_nigori,amaretto,72,dessert complement,Creamy rice sweetness can work with almond notes in small amounts.,Dessert cocktail variations,creamy; nutty
+pilsner,soju,88,traditional mixed serve,Clean lager and neutral-light soju combine without competing aromatics.,Somaek,korean; crisp
+stout_porter,irish_whiskey,88,flavor complement,"Roast, coffee and grain notes echo whiskey malt and oak.",Boilermaker-style pairing,roast; malt
+pilsner,bourbon,75,contrast,Crisp lager refreshes after sweet oak and vanilla.,Boilermaker-style pairing,crisp; oak
+dry_cider,bourbon,84,seasonal complement,Apple acidity and fruit suit bourbon vanilla and caramel.,Stone Fence variations,apple; oak
+dry_cider,aged_rum,82,complement,Apple and acidity lift dark rum molasses and spice.,Cider Rum Punch,apple; spice
+sweet_cider,brandy,80,fruit echo,Fruit brandy and cider share orchard-fruit notes.,Cider brandy punch,apple; fruit
+coffee_liqueur,creme_de_cacao,82,dessert complement,Coffee roast and cocoa reinforce one another.,Dessert cocktails,coffee; chocolate
+amaretto,coffee_liqueur,88,dessert complement,Almond and coffee create a familiar café-dessert profile.,Toasted Almond family,coffee; nutty
+orange_liqueur,creme_de_cacao,80,dessert contrast,Orange zest brightens chocolate sweetness.,Chocolate-orange cocktails,citrus; chocolate
+herbal_liqueur,sweet_vermouth,90,aperitif/digestif complement,"Layered herbs, roots and spice create depth.",Amaro Manhattan variations,herbal; bitter
+herbal_liqueur,champagne_brut,79,contrast,Dry bubbles lighten dense herbal sweetness.,Amaro spritz,sparkling; herbal

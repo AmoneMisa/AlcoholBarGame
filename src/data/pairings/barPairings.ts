@@ -1,0 +1,3669 @@
+// Auto-generated seed for the bar-management / English-learning game.
+// Pairing scores are sensory/gameplay compatibility, not medical safety.
+
+export type PairingBand = 'excellent' | 'good' | 'situational' | 'weak' | 'challenging';
+
+export interface AlcoholProfile {
+  id: string;
+  name: string;
+  family: string;
+  style: string;
+}
+
+export interface AlcoholAlcoholPairing {
+  a: string;
+  b: string;
+  score: number;
+  relationship: string;
+  why: string;
+  examples: string[];
+  tags: string[];
+}
+
+export interface AlcoholFoodPairing {
+  alcohol: string;
+  food: string;
+  score: number;
+  relationship: string;
+  why: string;
+}
+
+export const BAR_PAIRINGS = {
+  "metadata": {
+    "name": "Whisker Bar Pairing Knowledge Base",
+    "version": "1.0.0",
+    "scope": "Game-oriented sensory pairing knowledge at drink-style and food-category level.",
+    "important_note": "Pairing scores describe flavor compatibility, not medical safety. Intoxication risk depends mainly on total ethanol consumed, pace, body factors and context; mixing different beverage types does not make consumption safe.",
+    "design_note": "Use scores as recommendation priors, then modify by customer taste, budget, occasion, region, inventory and explicit restrictions.",
+    "sources_basis": [
+      "WSET food-and-wine pairing principles",
+      "Wine Folly pairing principles and cheese/wine examples",
+      "Brewers Association beer-and-food pairing framework",
+      "Japan Sake and Shochu Makers Association sake pairing guidance"
+    ]
+  },
+  "principles": [
+    {
+      "id": "match_intensity",
+      "title": "Match intensity",
+      "rule": "Delicate food generally works with lighter drinks; rich or strongly flavored food generally needs a more intense drink."
+    },
+    {
+      "id": "acid_cuts_richness",
+      "title": "Acidity cuts richness",
+      "rule": "High-acid wine, cider, beer or cocktails can refresh the palate alongside fatty, creamy or fried food."
+    },
+    {
+      "id": "sweetness_rule",
+      "title": "Drink should not be drier than a sweet dessert",
+      "rule": "For desserts, choose a drink at least as sweet as the food; otherwise the drink can taste thin or sour."
+    },
+    {
+      "id": "tannin_and_fat",
+      "title": "Tannin and fat",
+      "rule": "Tannic red wines often work well with fatty or protein-rich foods such as steak and aged cheese."
+    },
+    {
+      "id": "spice_and_alcohol",
+      "title": "Be careful with heat",
+      "rule": "High alcohol and high tannin can amplify chili heat; aromatic, lower-alcohol or slightly sweet drinks are often easier with spicy food."
+    },
+    {
+      "id": "salt_and_bubbles",
+      "title": "Salt likes acidity and bubbles",
+      "rule": "Sparkling wine, crisp beer and acidic drinks are reliable with salty or fried food."
+    },
+    {
+      "id": "umami",
+      "title": "Umami needs care",
+      "rule": "Umami-heavy foods can make tannic wine seem more bitter; sake, sparkling wine, lighter reds and crisp whites are often safer choices."
+    },
+    {
+      "id": "sauce_over_protein",
+      "title": "Pair to the sauce",
+      "rule": "The dominant sauce, spice or preparation can matter more than the base protein."
+    },
+    {
+      "id": "regional_pairing",
+      "title": "Regional pairing",
+      "rule": "Traditional drinks and foods from the same region are often useful starting points, but they are not absolute rules."
+    }
+  ],
+  "score_bands": [
+    {
+      "min": 90,
+      "max": 100,
+      "label": "excellent",
+      "ui": "green"
+    },
+    {
+      "min": 80,
+      "max": 89,
+      "label": "good",
+      "ui": "light_green"
+    },
+    {
+      "min": 65,
+      "max": 79,
+      "label": "situational",
+      "ui": "yellow"
+    },
+    {
+      "min": 45,
+      "max": 64,
+      "label": "weak",
+      "ui": "orange"
+    },
+    {
+      "min": 0,
+      "max": 44,
+      "label": "challenging",
+      "ui": "red"
+    }
+  ],
+  "alcohol_profiles": [
+    {
+      "id": "cabernet_sauvignon",
+      "name": "Cabernet Sauvignon",
+      "family": "wine",
+      "style": "red"
+    },
+    {
+      "id": "merlot",
+      "name": "Merlot",
+      "family": "wine",
+      "style": "red"
+    },
+    {
+      "id": "pinot_noir",
+      "name": "Pinot Noir",
+      "family": "wine",
+      "style": "red"
+    },
+    {
+      "id": "syrah_shiraz",
+      "name": "Syrah / Shiraz",
+      "family": "wine",
+      "style": "red"
+    },
+    {
+      "id": "malbec",
+      "name": "Malbec",
+      "family": "wine",
+      "style": "red"
+    },
+    {
+      "id": "sangiovese_chianti",
+      "name": "Sangiovese / Chianti",
+      "family": "wine",
+      "style": "red"
+    },
+    {
+      "id": "tempranillo_rioja",
+      "name": "Tempranillo / Rioja",
+      "family": "wine",
+      "style": "red"
+    },
+    {
+      "id": "zinfandel",
+      "name": "Zinfandel",
+      "family": "wine",
+      "style": "red"
+    },
+    {
+      "id": "gamay_beaujolais",
+      "name": "Gamay / Beaujolais",
+      "family": "wine",
+      "style": "red"
+    },
+    {
+      "id": "sauvignon_blanc",
+      "name": "Sauvignon Blanc",
+      "family": "wine",
+      "style": "white"
+    },
+    {
+      "id": "chardonnay_unoaked",
+      "name": "Chardonnay (unoaked)",
+      "family": "wine",
+      "style": "white"
+    },
+    {
+      "id": "chardonnay_oaked",
+      "name": "Chardonnay (oaked)",
+      "family": "wine",
+      "style": "white"
+    },
+    {
+      "id": "riesling_dry",
+      "name": "Riesling (dry)",
+      "family": "wine",
+      "style": "white"
+    },
+    {
+      "id": "riesling_off_dry",
+      "name": "Riesling (off-dry)",
+      "family": "wine",
+      "style": "white"
+    },
+    {
+      "id": "pinot_grigio",
+      "name": "Pinot Grigio / Pinot Gris",
+      "family": "wine",
+      "style": "white"
+    },
+    {
+      "id": "chenin_blanc",
+      "name": "Chenin Blanc",
+      "family": "wine",
+      "style": "white"
+    },
+    {
+      "id": "gewurztraminer",
+      "name": "Gewürztraminer",
+      "family": "wine",
+      "style": "white"
+    },
+    {
+      "id": "albarino",
+      "name": "Albariño",
+      "family": "wine",
+      "style": "white"
+    },
+    {
+      "id": "rose_dry",
+      "name": "Dry Rosé",
+      "family": "wine",
+      "style": "rosé"
+    },
+    {
+      "id": "champagne_brut",
+      "name": "Brut Champagne / Sparkling Wine",
+      "family": "wine",
+      "style": "sparkling"
+    },
+    {
+      "id": "prosecco",
+      "name": "Prosecco",
+      "family": "wine",
+      "style": "sparkling"
+    },
+    {
+      "id": "moscato",
+      "name": "Moscato",
+      "family": "wine",
+      "style": "sweet"
+    },
+    {
+      "id": "sauternes",
+      "name": "Sauternes / Botrytized Dessert Wine",
+      "family": "wine",
+      "style": "sweet"
+    },
+    {
+      "id": "port_ruby",
+      "name": "Ruby Port",
+      "family": "fortified_wine",
+      "style": "sweet"
+    },
+    {
+      "id": "port_tawny",
+      "name": "Tawny Port",
+      "family": "fortified_wine",
+      "style": "sweet"
+    },
+    {
+      "id": "sherry_fino",
+      "name": "Fino / Manzanilla Sherry",
+      "family": "fortified_wine",
+      "style": "dry"
+    },
+    {
+      "id": "sherry_amontillado",
+      "name": "Amontillado Sherry",
+      "family": "fortified_wine",
+      "style": "dry"
+    },
+    {
+      "id": "sherry_oloroso",
+      "name": "Oloroso Sherry",
+      "family": "fortified_wine",
+      "style": "dry"
+    },
+    {
+      "id": "madeira",
+      "name": "Madeira",
+      "family": "fortified_wine",
+      "style": "fortified"
+    },
+    {
+      "id": "dry_vermouth",
+      "name": "Dry Vermouth",
+      "family": "fortified_wine",
+      "style": "aperitif"
+    },
+    {
+      "id": "sweet_vermouth",
+      "name": "Sweet Vermouth",
+      "family": "fortified_wine",
+      "style": "aperitif"
+    },
+    {
+      "id": "pilsner",
+      "name": "Pilsner / Crisp Lager",
+      "family": "beer",
+      "style": "lager"
+    },
+    {
+      "id": "wheat_beer",
+      "name": "Wheat Beer / Hefeweizen",
+      "family": "beer",
+      "style": "wheat"
+    },
+    {
+      "id": "pale_ale",
+      "name": "Pale Ale",
+      "family": "beer",
+      "style": "ale"
+    },
+    {
+      "id": "ipa",
+      "name": "IPA",
+      "family": "beer",
+      "style": "ale"
+    },
+    {
+      "id": "amber_ale",
+      "name": "Amber / Brown Ale",
+      "family": "beer",
+      "style": "ale"
+    },
+    {
+      "id": "stout_porter",
+      "name": "Stout / Porter",
+      "family": "beer",
+      "style": "dark"
+    },
+    {
+      "id": "saison",
+      "name": "Saison",
+      "family": "beer",
+      "style": "farmhouse"
+    },
+    {
+      "id": "sour_beer",
+      "name": "Sour Beer / Lambic",
+      "family": "beer",
+      "style": "sour"
+    },
+    {
+      "id": "belgian_dubbel",
+      "name": "Belgian Dubbel",
+      "family": "beer",
+      "style": "belgian"
+    },
+    {
+      "id": "belgian_tripel",
+      "name": "Belgian Tripel",
+      "family": "beer",
+      "style": "belgian"
+    },
+    {
+      "id": "dry_cider",
+      "name": "Dry Cider",
+      "family": "cider",
+      "style": "dry"
+    },
+    {
+      "id": "sweet_cider",
+      "name": "Sweet Cider",
+      "family": "cider",
+      "style": "sweet"
+    },
+    {
+      "id": "mead",
+      "name": "Mead",
+      "family": "mead",
+      "style": "honey"
+    },
+    {
+      "id": "vodka",
+      "name": "Vodka",
+      "family": "spirit",
+      "style": "neutral"
+    },
+    {
+      "id": "gin",
+      "name": "Gin",
+      "family": "spirit",
+      "style": "botanical"
+    },
+    {
+      "id": "bourbon",
+      "name": "Bourbon",
+      "family": "spirit",
+      "style": "whiskey"
+    },
+    {
+      "id": "rye_whiskey",
+      "name": "Rye Whiskey",
+      "family": "spirit",
+      "style": "whiskey"
+    },
+    {
+      "id": "irish_whiskey",
+      "name": "Irish Whiskey",
+      "family": "spirit",
+      "style": "whiskey"
+    },
+    {
+      "id": "scotch_unpeated",
+      "name": "Scotch Whisky (unpeated)",
+      "family": "spirit",
+      "style": "whisky"
+    },
+    {
+      "id": "scotch_peated",
+      "name": "Scotch Whisky (peated)",
+      "family": "spirit",
+      "style": "whisky"
+    },
+    {
+      "id": "cognac",
+      "name": "Cognac",
+      "family": "spirit",
+      "style": "brandy"
+    },
+    {
+      "id": "brandy",
+      "name": "Brandy",
+      "family": "spirit",
+      "style": "brandy"
+    },
+    {
+      "id": "white_rum",
+      "name": "White Rum",
+      "family": "spirit",
+      "style": "rum"
+    },
+    {
+      "id": "aged_rum",
+      "name": "Aged / Dark Rum",
+      "family": "spirit",
+      "style": "rum"
+    },
+    {
+      "id": "tequila_blanco",
+      "name": "Tequila Blanco",
+      "family": "spirit",
+      "style": "agave"
+    },
+    {
+      "id": "tequila_reposado",
+      "name": "Tequila Reposado",
+      "family": "spirit",
+      "style": "agave"
+    },
+    {
+      "id": "tequila_anejo",
+      "name": "Tequila Añejo",
+      "family": "spirit",
+      "style": "agave"
+    },
+    {
+      "id": "mezcal",
+      "name": "Mezcal",
+      "family": "spirit",
+      "style": "agave"
+    },
+    {
+      "id": "sake_junmai",
+      "name": "Junmai Sake",
+      "family": "sake",
+      "style": "junmai"
+    },
+    {
+      "id": "sake_ginjo",
+      "name": "Ginjo / Daiginjo Sake",
+      "family": "sake",
+      "style": "ginjo"
+    },
+    {
+      "id": "sake_nigori",
+      "name": "Nigori Sake",
+      "family": "sake",
+      "style": "nigori"
+    },
+    {
+      "id": "shochu",
+      "name": "Shochu",
+      "family": "spirit",
+      "style": "shochu"
+    },
+    {
+      "id": "soju",
+      "name": "Soju",
+      "family": "spirit",
+      "style": "soju"
+    },
+    {
+      "id": "campari",
+      "name": "Campari-style Bitter Aperitif",
+      "family": "liqueur",
+      "style": "bitter"
+    },
+    {
+      "id": "aperol",
+      "name": "Aperol-style Aperitif",
+      "family": "liqueur",
+      "style": "bitter"
+    },
+    {
+      "id": "orange_liqueur",
+      "name": "Orange Liqueur / Triple Sec",
+      "family": "liqueur",
+      "style": "citrus"
+    },
+    {
+      "id": "coffee_liqueur",
+      "name": "Coffee Liqueur",
+      "family": "liqueur",
+      "style": "coffee"
+    },
+    {
+      "id": "amaretto",
+      "name": "Amaretto",
+      "family": "liqueur",
+      "style": "nutty"
+    },
+    {
+      "id": "elderflower_liqueur",
+      "name": "Elderflower Liqueur",
+      "family": "liqueur",
+      "style": "floral"
+    },
+    {
+      "id": "herbal_liqueur",
+      "name": "Herbal Liqueur / Amaro",
+      "family": "liqueur",
+      "style": "herbal"
+    },
+    {
+      "id": "creme_de_cacao",
+      "name": "Crème de Cacao",
+      "family": "liqueur",
+      "style": "chocolate"
+    }
+  ],
+  "alcohol_alcohol_pairings": [
+    {
+      "a": "gin",
+      "b": "dry_vermouth",
+      "score": 98,
+      "relationship": "classic cocktail",
+      "why": "Botanical gin and herbal dry vermouth form a dry, aromatic structure.",
+      "examples": [
+        "Dry Martini"
+      ],
+      "tags": [
+        "dry",
+        "herbal"
+      ]
+    },
+    {
+      "a": "gin",
+      "b": "campari",
+      "score": 97,
+      "relationship": "classic cocktail",
+      "why": "Juniper and citrus botanicals stand up to bitter orange-herbal notes.",
+      "examples": [
+        "Negroni"
+      ],
+      "tags": [
+        "bitter",
+        "botanical"
+      ]
+    },
+    {
+      "a": "gin",
+      "b": "sweet_vermouth",
+      "score": 92,
+      "relationship": "classic cocktail",
+      "why": "Botanicals are rounded by sweet, spiced vermouth.",
+      "examples": [
+        "Negroni"
+      ],
+      "tags": [
+        "herbal",
+        "sweet-bitter"
+      ]
+    },
+    {
+      "a": "gin",
+      "b": "elderflower_liqueur",
+      "score": 93,
+      "relationship": "complement",
+      "why": "Floral elderflower amplifies aromatic gin without hiding it.",
+      "examples": [
+        "Elderflower Gin Sour",
+        "French-style spritz"
+      ],
+      "tags": [
+        "floral",
+        "fresh"
+      ]
+    },
+    {
+      "a": "gin",
+      "b": "orange_liqueur",
+      "score": 88,
+      "relationship": "complement",
+      "why": "Citrus liqueur reinforces citrus-forward gin botanicals.",
+      "examples": [
+        "White Lady"
+      ],
+      "tags": [
+        "citrus"
+      ]
+    },
+    {
+      "a": "gin",
+      "b": "aperol",
+      "score": 87,
+      "relationship": "contrast",
+      "why": "Bitter-sweet orange adds fruit and softer bitterness to gin.",
+      "examples": [
+        "Gin Aperol Sour"
+      ],
+      "tags": [
+        "citrus",
+        "bitter"
+      ]
+    },
+    {
+      "a": "gin",
+      "b": "champagne_brut",
+      "score": 91,
+      "relationship": "classic cocktail",
+      "why": "Dry bubbles lift gin botanicals and add acidity.",
+      "examples": [
+        "French 75"
+      ],
+      "tags": [
+        "sparkling",
+        "citrus"
+      ]
+    },
+    {
+      "a": "gin",
+      "b": "sherry_fino",
+      "score": 82,
+      "relationship": "savory complement",
+      "why": "Dry saline sherry adds nutty, savory complexity.",
+      "examples": [
+        "Bamboo-style gin variation"
+      ],
+      "tags": [
+        "dry",
+        "savory"
+      ]
+    },
+    {
+      "a": "vodka",
+      "b": "dry_vermouth",
+      "score": 92,
+      "relationship": "classic cocktail",
+      "why": "Neutral vodka lets herbal dry vermouth define the aroma.",
+      "examples": [
+        "Vodka Martini"
+      ],
+      "tags": [
+        "dry"
+      ]
+    },
+    {
+      "a": "vodka",
+      "b": "coffee_liqueur",
+      "score": 96,
+      "relationship": "classic cocktail",
+      "why": "Neutral spirit carries roasted coffee and sweetness cleanly.",
+      "examples": [
+        "Black Russian",
+        "White Russian"
+      ],
+      "tags": [
+        "coffee",
+        "sweet"
+      ]
+    },
+    {
+      "a": "vodka",
+      "b": "orange_liqueur",
+      "score": 88,
+      "relationship": "complement",
+      "why": "Clean vodka gives citrus liqueur a simple, bright base.",
+      "examples": [
+        "Cosmopolitan-family drinks"
+      ],
+      "tags": [
+        "citrus"
+      ]
+    },
+    {
+      "a": "vodka",
+      "b": "elderflower_liqueur",
+      "score": 85,
+      "relationship": "complement",
+      "why": "Neutral base highlights floral sweetness.",
+      "examples": [
+        "Elderflower Vodka Collins"
+      ],
+      "tags": [
+        "floral"
+      ]
+    },
+    {
+      "a": "vodka",
+      "b": "aperol",
+      "score": 80,
+      "relationship": "contrast",
+      "why": "Neutral vodka supports bittersweet citrus without extra botanicals.",
+      "examples": [
+        "Vodka Spritz"
+      ],
+      "tags": [
+        "bitter",
+        "citrus"
+      ]
+    },
+    {
+      "a": "rye_whiskey",
+      "b": "sweet_vermouth",
+      "score": 98,
+      "relationship": "classic cocktail",
+      "why": "Spicy rye balances rich, herbal sweetness.",
+      "examples": [
+        "Manhattan"
+      ],
+      "tags": [
+        "spiced",
+        "herbal"
+      ]
+    },
+    {
+      "a": "bourbon",
+      "b": "sweet_vermouth",
+      "score": 96,
+      "relationship": "classic cocktail",
+      "why": "Caramel and vanilla notes integrate with spiced vermouth.",
+      "examples": [
+        "Bourbon Manhattan"
+      ],
+      "tags": [
+        "oak",
+        "sweet-spice"
+      ]
+    },
+    {
+      "a": "rye_whiskey",
+      "b": "herbal_liqueur",
+      "score": 88,
+      "relationship": "complement",
+      "why": "Peppery rye works with bitter herbal depth.",
+      "examples": [
+        "Black Manhattan-style drinks"
+      ],
+      "tags": [
+        "bitter",
+        "spice"
+      ]
+    },
+    {
+      "a": "bourbon",
+      "b": "orange_liqueur",
+      "score": 85,
+      "relationship": "complement",
+      "why": "Orange brightens bourbon's vanilla, caramel and oak.",
+      "examples": [
+        "Bourbon Sidecar variations"
+      ],
+      "tags": [
+        "oak",
+        "citrus"
+      ]
+    },
+    {
+      "a": "bourbon",
+      "b": "amaretto",
+      "score": 90,
+      "relationship": "classic pairing",
+      "why": "Almond sweetness rounds vanilla and oak.",
+      "examples": [
+        "Godfather-style bourbon variation"
+      ],
+      "tags": [
+        "nutty",
+        "sweet"
+      ]
+    },
+    {
+      "a": "scotch_unpeated",
+      "b": "amaretto",
+      "score": 94,
+      "relationship": "classic cocktail",
+      "why": "Malt and gentle smoke/oak pair with almond sweetness.",
+      "examples": [
+        "Godfather"
+      ],
+      "tags": [
+        "nutty",
+        "malt"
+      ]
+    },
+    {
+      "a": "scotch_peated",
+      "b": "sweet_vermouth",
+      "score": 80,
+      "relationship": "contrast",
+      "why": "Sweet herbs can soften smoky peat while keeping intensity.",
+      "examples": [
+        "Rob Roy variations"
+      ],
+      "tags": [
+        "smoky",
+        "herbal"
+      ]
+    },
+    {
+      "a": "scotch_unpeated",
+      "b": "sweet_vermouth",
+      "score": 93,
+      "relationship": "classic cocktail",
+      "why": "Malt, oak and herbal sweetness balance naturally.",
+      "examples": [
+        "Rob Roy"
+      ],
+      "tags": [
+        "malt",
+        "herbal"
+      ]
+    },
+    {
+      "a": "irish_whiskey",
+      "b": "coffee_liqueur",
+      "score": 88,
+      "relationship": "complement",
+      "why": "Soft grain and vanilla notes echo roasted coffee.",
+      "examples": [
+        "Irish coffee-inspired cocktails"
+      ],
+      "tags": [
+        "coffee",
+        "smooth"
+      ]
+    },
+    {
+      "a": "bourbon",
+      "b": "coffee_liqueur",
+      "score": 89,
+      "relationship": "complement",
+      "why": "Caramel and char notes reinforce coffee roast.",
+      "examples": [
+        "Bourbon Coffee Cocktail"
+      ],
+      "tags": [
+        "coffee",
+        "oak"
+      ]
+    },
+    {
+      "a": "cognac",
+      "b": "orange_liqueur",
+      "score": 98,
+      "relationship": "classic cocktail",
+      "why": "Orange lifts grape, oak and dried-fruit notes.",
+      "examples": [
+        "Sidecar"
+      ],
+      "tags": [
+        "citrus",
+        "oak"
+      ]
+    },
+    {
+      "a": "brandy",
+      "b": "creme_de_cacao",
+      "score": 95,
+      "relationship": "classic cocktail",
+      "why": "Fruit-and-oak brandy complements cocoa richness.",
+      "examples": [
+        "Brandy Alexander"
+      ],
+      "tags": [
+        "chocolate",
+        "dessert"
+      ]
+    },
+    {
+      "a": "cognac",
+      "b": "champagne_brut",
+      "score": 90,
+      "relationship": "classic cocktail",
+      "why": "Bubbles and acidity brighten rich cognac.",
+      "examples": [
+        "Champagne Cocktail variations"
+      ],
+      "tags": [
+        "sparkling",
+        "luxury"
+      ]
+    },
+    {
+      "a": "cognac",
+      "b": "amaretto",
+      "score": 86,
+      "relationship": "complement",
+      "why": "Almond sweetness matches dried fruit and oak.",
+      "examples": [
+        "French Connection-style drinks"
+      ],
+      "tags": [
+        "nutty",
+        "oak"
+      ]
+    },
+    {
+      "a": "brandy",
+      "b": "sweet_vermouth",
+      "score": 87,
+      "relationship": "classic cocktail",
+      "why": "Fruit-led brandy and herbal sweetness form a rounded aperitif profile.",
+      "examples": [
+        "Metropolitan-style drinks"
+      ],
+      "tags": [
+        "herbal",
+        "fruit"
+      ]
+    },
+    {
+      "a": "white_rum",
+      "b": "orange_liqueur",
+      "score": 93,
+      "relationship": "classic cocktail",
+      "why": "Citrus supports clean cane sweetness.",
+      "examples": [
+        "Mai Tai family",
+        "Rum Sidecar"
+      ],
+      "tags": [
+        "tropical",
+        "citrus"
+      ]
+    },
+    {
+      "a": "aged_rum",
+      "b": "orange_liqueur",
+      "score": 92,
+      "relationship": "complement",
+      "why": "Orange links rum's dried-fruit, caramel and spice notes.",
+      "examples": [
+        "Mai Tai family"
+      ],
+      "tags": [
+        "oak",
+        "citrus"
+      ]
+    },
+    {
+      "a": "aged_rum",
+      "b": "coffee_liqueur",
+      "score": 91,
+      "relationship": "complement",
+      "why": "Molasses, caramel and coffee create a deep roasted profile.",
+      "examples": [
+        "Rum Espresso Martini variations"
+      ],
+      "tags": [
+        "coffee",
+        "caramel"
+      ]
+    },
+    {
+      "a": "aged_rum",
+      "b": "amaretto",
+      "score": 87,
+      "relationship": "complement",
+      "why": "Nutty sweetness fits vanilla and baking-spice notes.",
+      "examples": [
+        "Rum Old Fashioned variations"
+      ],
+      "tags": [
+        "nutty",
+        "spice"
+      ]
+    },
+    {
+      "a": "white_rum",
+      "b": "campari",
+      "score": 82,
+      "relationship": "contrast",
+      "why": "Clean cane spirit gives bitter aperitif a sharper tropical edge.",
+      "examples": [
+        "Jungle Bird variations"
+      ],
+      "tags": [
+        "bitter",
+        "tropical"
+      ]
+    },
+    {
+      "a": "aged_rum",
+      "b": "campari",
+      "score": 91,
+      "relationship": "classic cocktail",
+      "why": "Rich rum sweetness balances assertive bitterness.",
+      "examples": [
+        "Jungle Bird"
+      ],
+      "tags": [
+        "bitter",
+        "tropical"
+      ]
+    },
+    {
+      "a": "white_rum",
+      "b": "champagne_brut",
+      "score": 85,
+      "relationship": "contrast",
+      "why": "Bubbles dry out and lift light rum.",
+      "examples": [
+        "Airmail variations"
+      ],
+      "tags": [
+        "sparkling",
+        "fresh"
+      ]
+    },
+    {
+      "a": "tequila_blanco",
+      "b": "orange_liqueur",
+      "score": 99,
+      "relationship": "classic cocktail",
+      "why": "Agave, lime-like brightness and orange are a canonical match.",
+      "examples": [
+        "Margarita"
+      ],
+      "tags": [
+        "agave",
+        "citrus"
+      ]
+    },
+    {
+      "a": "tequila_reposado",
+      "b": "orange_liqueur",
+      "score": 96,
+      "relationship": "classic cocktail",
+      "why": "Oak-softened agave gains brightness from orange.",
+      "examples": [
+        "Reposado Margarita"
+      ],
+      "tags": [
+        "agave",
+        "citrus",
+        "oak"
+      ]
+    },
+    {
+      "a": "mezcal",
+      "b": "orange_liqueur",
+      "score": 93,
+      "relationship": "classic cocktail",
+      "why": "Orange fruit balances smoke and roasted agave.",
+      "examples": [
+        "Mezcal Margarita"
+      ],
+      "tags": [
+        "smoky",
+        "citrus"
+      ]
+    },
+    {
+      "a": "mezcal",
+      "b": "campari",
+      "score": 91,
+      "relationship": "contrast",
+      "why": "Smoky agave and bitter orange create a powerful bittersweet pairing.",
+      "examples": [
+        "Mezcal Negroni"
+      ],
+      "tags": [
+        "smoky",
+        "bitter"
+      ]
+    },
+    {
+      "a": "tequila_blanco",
+      "b": "campari",
+      "score": 84,
+      "relationship": "contrast",
+      "why": "Peppery agave cuts through herbal bitterness.",
+      "examples": [
+        "Tequila Negroni"
+      ],
+      "tags": [
+        "agave",
+        "bitter"
+      ]
+    },
+    {
+      "a": "tequila_anejo",
+      "b": "sweet_vermouth",
+      "score": 87,
+      "relationship": "complement",
+      "why": "Oak-aged agave works with vanilla-spice and herbs.",
+      "examples": [
+        "Añejo Manhattan"
+      ],
+      "tags": [
+        "oak",
+        "herbal"
+      ]
+    },
+    {
+      "a": "tequila_reposado",
+      "b": "herbal_liqueur",
+      "score": 84,
+      "relationship": "complement",
+      "why": "Roasted agave and herbs create earthy depth.",
+      "examples": [
+        "Agave-amaro cocktails"
+      ],
+      "tags": [
+        "earthy",
+        "herbal"
+      ]
+    },
+    {
+      "a": "prosecco",
+      "b": "aperol",
+      "score": 99,
+      "relationship": "classic cocktail",
+      "why": "Fresh bubbles, moderate sweetness and bittersweet orange are built for each other.",
+      "examples": [
+        "Aperol Spritz"
+      ],
+      "tags": [
+        "sparkling",
+        "bitter"
+      ]
+    },
+    {
+      "a": "champagne_brut",
+      "b": "orange_liqueur",
+      "score": 92,
+      "relationship": "classic cocktail",
+      "why": "Dry sparkling wine gains aromatic citrus without losing freshness.",
+      "examples": [
+        "Mimosa-family / French 75 variations"
+      ],
+      "tags": [
+        "sparkling",
+        "citrus"
+      ]
+    },
+    {
+      "a": "champagne_brut",
+      "b": "campari",
+      "score": 80,
+      "relationship": "contrast",
+      "why": "High acidity and bubbles tame dense bitterness.",
+      "examples": [
+        "Campari Royale"
+      ],
+      "tags": [
+        "sparkling",
+        "bitter"
+      ]
+    },
+    {
+      "a": "prosecco",
+      "b": "elderflower_liqueur",
+      "score": 94,
+      "relationship": "classic pairing",
+      "why": "Floral sweetness is refreshed by light bubbles.",
+      "examples": [
+        "Hugo Spritz"
+      ],
+      "tags": [
+        "floral",
+        "sparkling"
+      ]
+    },
+    {
+      "a": "dry_vermouth",
+      "b": "campari",
+      "score": 87,
+      "relationship": "aperitif pairing",
+      "why": "Herbal dryness and bitter citrus form the backbone of low-proof aperitivo drinks.",
+      "examples": [
+        "Americano-family variations"
+      ],
+      "tags": [
+        "herbal",
+        "bitter"
+      ]
+    },
+    {
+      "a": "sweet_vermouth",
+      "b": "campari",
+      "score": 96,
+      "relationship": "classic cocktail",
+      "why": "Sweet herbs soften and extend the bitter aperitif.",
+      "examples": [
+        "Americano",
+        "Negroni"
+      ],
+      "tags": [
+        "herbal",
+        "bitter"
+      ]
+    },
+    {
+      "a": "sherry_fino",
+      "b": "dry_vermouth",
+      "score": 85,
+      "relationship": "low-proof pairing",
+      "why": "Both are dry, savory and aromatic, producing a crisp aperitif.",
+      "examples": [
+        "Bamboo"
+      ],
+      "tags": [
+        "dry",
+        "savory"
+      ]
+    },
+    {
+      "a": "sherry_amontillado",
+      "b": "sweet_vermouth",
+      "score": 83,
+      "relationship": "complement",
+      "why": "Nutty oxidative notes work with spiced sweetness.",
+      "examples": [
+        "Adonis variations"
+      ],
+      "tags": [
+        "nutty",
+        "herbal"
+      ]
+    },
+    {
+      "a": "sake_junmai",
+      "b": "dry_vermouth",
+      "score": 80,
+      "relationship": "savory complement",
+      "why": "Umami-rich sake and herbal vermouth can create a dry, savory aperitif.",
+      "examples": [
+        "Sake Martini variations"
+      ],
+      "tags": [
+        "umami",
+        "herbal"
+      ]
+    },
+    {
+      "a": "sake_ginjo",
+      "b": "gin",
+      "score": 84,
+      "relationship": "aromatic complement",
+      "why": "Delicate fruit and floral sake can soften juniper and citrus botanicals.",
+      "examples": [
+        "Sake Martini variations"
+      ],
+      "tags": [
+        "floral",
+        "botanical"
+      ]
+    },
+    {
+      "a": "sake_nigori",
+      "b": "amaretto",
+      "score": 72,
+      "relationship": "dessert complement",
+      "why": "Creamy rice sweetness can work with almond notes in small amounts.",
+      "examples": [
+        "Dessert cocktail variations"
+      ],
+      "tags": [
+        "creamy",
+        "nutty"
+      ]
+    },
+    {
+      "a": "pilsner",
+      "b": "soju",
+      "score": 88,
+      "relationship": "traditional mixed serve",
+      "why": "Clean lager and neutral-light soju combine without competing aromatics.",
+      "examples": [
+        "Somaek"
+      ],
+      "tags": [
+        "korean",
+        "crisp"
+      ]
+    },
+    {
+      "a": "stout_porter",
+      "b": "irish_whiskey",
+      "score": 88,
+      "relationship": "flavor complement",
+      "why": "Roast, coffee and grain notes echo whiskey malt and oak.",
+      "examples": [
+        "Boilermaker-style pairing"
+      ],
+      "tags": [
+        "roast",
+        "malt"
+      ]
+    },
+    {
+      "a": "pilsner",
+      "b": "bourbon",
+      "score": 75,
+      "relationship": "contrast",
+      "why": "Crisp lager refreshes after sweet oak and vanilla.",
+      "examples": [
+        "Boilermaker-style pairing"
+      ],
+      "tags": [
+        "crisp",
+        "oak"
+      ]
+    },
+    {
+      "a": "dry_cider",
+      "b": "bourbon",
+      "score": 84,
+      "relationship": "seasonal complement",
+      "why": "Apple acidity and fruit suit bourbon vanilla and caramel.",
+      "examples": [
+        "Stone Fence variations"
+      ],
+      "tags": [
+        "apple",
+        "oak"
+      ]
+    },
+    {
+      "a": "dry_cider",
+      "b": "aged_rum",
+      "score": 82,
+      "relationship": "complement",
+      "why": "Apple and acidity lift dark rum molasses and spice.",
+      "examples": [
+        "Cider Rum Punch"
+      ],
+      "tags": [
+        "apple",
+        "spice"
+      ]
+    },
+    {
+      "a": "sweet_cider",
+      "b": "brandy",
+      "score": 80,
+      "relationship": "fruit echo",
+      "why": "Fruit brandy and cider share orchard-fruit notes.",
+      "examples": [
+        "Cider brandy punch"
+      ],
+      "tags": [
+        "apple",
+        "fruit"
+      ]
+    },
+    {
+      "a": "coffee_liqueur",
+      "b": "creme_de_cacao",
+      "score": 82,
+      "relationship": "dessert complement",
+      "why": "Coffee roast and cocoa reinforce one another.",
+      "examples": [
+        "Dessert cocktails"
+      ],
+      "tags": [
+        "coffee",
+        "chocolate"
+      ]
+    },
+    {
+      "a": "amaretto",
+      "b": "coffee_liqueur",
+      "score": 88,
+      "relationship": "dessert complement",
+      "why": "Almond and coffee create a familiar café-dessert profile.",
+      "examples": [
+        "Toasted Almond family"
+      ],
+      "tags": [
+        "coffee",
+        "nutty"
+      ]
+    },
+    {
+      "a": "orange_liqueur",
+      "b": "creme_de_cacao",
+      "score": 80,
+      "relationship": "dessert contrast",
+      "why": "Orange zest brightens chocolate sweetness.",
+      "examples": [
+        "Chocolate-orange cocktails"
+      ],
+      "tags": [
+        "citrus",
+        "chocolate"
+      ]
+    },
+    {
+      "a": "herbal_liqueur",
+      "b": "sweet_vermouth",
+      "score": 90,
+      "relationship": "aperitif/digestif complement",
+      "why": "Layered herbs, roots and spice create depth.",
+      "examples": [
+        "Amaro Manhattan variations"
+      ],
+      "tags": [
+        "herbal",
+        "bitter"
+      ]
+    },
+    {
+      "a": "herbal_liqueur",
+      "b": "champagne_brut",
+      "score": 79,
+      "relationship": "contrast",
+      "why": "Dry bubbles lighten dense herbal sweetness.",
+      "examples": [
+        "Amaro spritz"
+      ],
+      "tags": [
+        "sparkling",
+        "herbal"
+      ]
+    }
+  ],
+  "alcohol_food_pairings": [
+    {
+      "alcohol": "cabernet_sauvignon",
+      "food": "ribeye steak",
+      "score": 98,
+      "relationship": "classic",
+      "why": "High tannin and intensity fit rich, fatty beef."
+    },
+    {
+      "alcohol": "cabernet_sauvignon",
+      "food": "grilled beef",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Tannin and dark fruit match char and beef."
+    },
+    {
+      "alcohol": "cabernet_sauvignon",
+      "food": "lamb chops",
+      "score": 92,
+      "relationship": "complement",
+      "why": "Structure and herbs suit savory lamb."
+    },
+    {
+      "alcohol": "cabernet_sauvignon",
+      "food": "aged cheddar",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Fat and salt soften tannin; intensity is balanced."
+    },
+    {
+      "alcohol": "cabernet_sauvignon",
+      "food": "aged gouda",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Nutty aged cheese matches oak and dark fruit."
+    },
+    {
+      "alcohol": "cabernet_sauvignon",
+      "food": "mushroom ragout",
+      "score": 82,
+      "relationship": "earthy complement",
+      "why": "Savory mushrooms echo earthy wine notes."
+    },
+    {
+      "alcohol": "cabernet_sauvignon",
+      "food": "delicate white fish",
+      "score": 30,
+      "relationship": "challenging",
+      "why": "Tannin and intensity can overwhelm delicate fish."
+    },
+    {
+      "alcohol": "merlot",
+      "food": "roast beef",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Round fruit and moderate tannin suit roasted beef."
+    },
+    {
+      "alcohol": "merlot",
+      "food": "roast chicken",
+      "score": 85,
+      "relationship": "complement",
+      "why": "Softer tannin works with browned poultry."
+    },
+    {
+      "alcohol": "merlot",
+      "food": "mushroom pasta",
+      "score": 90,
+      "relationship": "earthy complement",
+      "why": "Plum and earth notes fit mushrooms."
+    },
+    {
+      "alcohol": "merlot",
+      "food": "medium-aged cheese",
+      "score": 88,
+      "relationship": "classic",
+      "why": "Moderate intensity matches semi-hard cheese."
+    },
+    {
+      "alcohol": "merlot",
+      "food": "pork tenderloin",
+      "score": 84,
+      "relationship": "complement",
+      "why": "Soft fruit and moderate body suit lean pork."
+    },
+    {
+      "alcohol": "pinot_noir",
+      "food": "duck",
+      "score": 97,
+      "relationship": "classic",
+      "why": "Bright acidity and red fruit suit rich duck."
+    },
+    {
+      "alcohol": "pinot_noir",
+      "food": "salmon",
+      "score": 90,
+      "relationship": "classic exception",
+      "why": "Light tannin and acidity can work with richer fish."
+    },
+    {
+      "alcohol": "pinot_noir",
+      "food": "mushrooms",
+      "score": 97,
+      "relationship": "earthy complement",
+      "why": "Earthy aromas strongly echo mushrooms."
+    },
+    {
+      "alcohol": "pinot_noir",
+      "food": "brie",
+      "score": 88,
+      "relationship": "classic",
+      "why": "Low tannin and bright fruit fit soft cheese."
+    },
+    {
+      "alcohol": "pinot_noir",
+      "food": "roast chicken",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Elegant body and acidity suit poultry."
+    },
+    {
+      "alcohol": "pinot_noir",
+      "food": "tuna",
+      "score": 84,
+      "relationship": "complement",
+      "why": "Meaty fish can handle a light red."
+    },
+    {
+      "alcohol": "syrah_shiraz",
+      "food": "grilled lamb",
+      "score": 97,
+      "relationship": "classic",
+      "why": "Pepper, smoke and dark fruit match lamb and char."
+    },
+    {
+      "alcohol": "syrah_shiraz",
+      "food": "barbecue ribs",
+      "score": 94,
+      "relationship": "complement",
+      "why": "Bold fruit and spice stand up to smoky-sweet sauce."
+    },
+    {
+      "alcohol": "syrah_shiraz",
+      "food": "smoked cheese",
+      "score": 90,
+      "relationship": "flavor echo",
+      "why": "Smoky notes align."
+    },
+    {
+      "alcohol": "syrah_shiraz",
+      "food": "pepper steak",
+      "score": 96,
+      "relationship": "flavor echo",
+      "why": "Peppery wine matches black-pepper seasoning."
+    },
+    {
+      "alcohol": "syrah_shiraz",
+      "food": "game meat",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Intensity fits venison and other game."
+    },
+    {
+      "alcohol": "malbec",
+      "food": "grilled steak",
+      "score": 97,
+      "relationship": "classic",
+      "why": "Dark fruit, moderate-high tannin and smoke fit beef."
+    },
+    {
+      "alcohol": "malbec",
+      "food": "beef empanadas",
+      "score": 94,
+      "relationship": "regional",
+      "why": "Savory beef and pastry suit ripe fruit and structure."
+    },
+    {
+      "alcohol": "malbec",
+      "food": "blue cheese",
+      "score": 82,
+      "relationship": "contrast",
+      "why": "Fruit can offset salt and pungency."
+    },
+    {
+      "alcohol": "malbec",
+      "food": "grilled mushrooms",
+      "score": 86,
+      "relationship": "earthy complement",
+      "why": "Dark savory flavors align."
+    },
+    {
+      "alcohol": "sangiovese_chianti",
+      "food": "tomato pasta",
+      "score": 99,
+      "relationship": "regional/classic",
+      "why": "High acidity is excellent with tomato sauce."
+    },
+    {
+      "alcohol": "sangiovese_chianti",
+      "food": "pizza margherita",
+      "score": 97,
+      "relationship": "regional/classic",
+      "why": "Acidity and savory herbs match tomato and cheese."
+    },
+    {
+      "alcohol": "sangiovese_chianti",
+      "food": "lasagna",
+      "score": 95,
+      "relationship": "classic",
+      "why": "Acidity cuts cheese and matches tomato."
+    },
+    {
+      "alcohol": "sangiovese_chianti",
+      "food": "charcuterie",
+      "score": 90,
+      "relationship": "regional",
+      "why": "Acidity refreshes salty cured meat."
+    },
+    {
+      "alcohol": "sangiovese_chianti",
+      "food": "parmigiano-reggiano",
+      "score": 91,
+      "relationship": "regional",
+      "why": "Salt, umami and firm texture work with acidity."
+    },
+    {
+      "alcohol": "tempranillo_rioja",
+      "food": "roast lamb",
+      "score": 98,
+      "relationship": "regional/classic",
+      "why": "Savory red fruit, oak and lamb are a traditional match."
+    },
+    {
+      "alcohol": "tempranillo_rioja",
+      "food": "jamón / cured ham",
+      "score": 95,
+      "relationship": "regional",
+      "why": "Salt and fat complement acidity and oak."
+    },
+    {
+      "alcohol": "tempranillo_rioja",
+      "food": "manchego",
+      "score": 96,
+      "relationship": "regional/classic",
+      "why": "Nutty sheep cheese matches oak-aged red wine."
+    },
+    {
+      "alcohol": "tempranillo_rioja",
+      "food": "grilled pork",
+      "score": 90,
+      "relationship": "complement",
+      "why": "Savory oak and red fruit suit browned pork."
+    },
+    {
+      "alcohol": "zinfandel",
+      "food": "barbecue pork",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Ripe fruit and spice suit sweet-smoky barbecue."
+    },
+    {
+      "alcohol": "zinfandel",
+      "food": "burger",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Bold fruit stands up to beef and toppings."
+    },
+    {
+      "alcohol": "zinfandel",
+      "food": "spicy sausage",
+      "score": 88,
+      "relationship": "complement",
+      "why": "Fruit and spice fit robust sausage; avoid very hot chili."
+    },
+    {
+      "alcohol": "zinfandel",
+      "food": "aged cheddar",
+      "score": 87,
+      "relationship": "classic",
+      "why": "Intensity and fruit balance aged cheese."
+    },
+    {
+      "alcohol": "gamay_beaujolais",
+      "food": "charcuterie",
+      "score": 95,
+      "relationship": "classic",
+      "why": "Low tannin and juicy acidity refresh salty meats."
+    },
+    {
+      "alcohol": "gamay_beaujolais",
+      "food": "roast chicken",
+      "score": 91,
+      "relationship": "classic",
+      "why": "Light body and fruit suit poultry."
+    },
+    {
+      "alcohol": "gamay_beaujolais",
+      "food": "soft cheese",
+      "score": 86,
+      "relationship": "complement",
+      "why": "Low tannin works with creamy cheese."
+    },
+    {
+      "alcohol": "gamay_beaujolais",
+      "food": "grilled vegetables",
+      "score": 90,
+      "relationship": "complement",
+      "why": "Fresh fruit and acidity fit vegetables."
+    },
+    {
+      "alcohol": "sauvignon_blanc",
+      "food": "goat cheese",
+      "score": 99,
+      "relationship": "classic/regional",
+      "why": "High acidity and herbal notes suit tangy goat cheese."
+    },
+    {
+      "alcohol": "sauvignon_blanc",
+      "food": "oysters",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Crisp acidity and minerality fit briny shellfish."
+    },
+    {
+      "alcohol": "sauvignon_blanc",
+      "food": "green salad",
+      "score": 94,
+      "relationship": "complement",
+      "why": "Herbal citrus profile matches fresh greens."
+    },
+    {
+      "alcohol": "sauvignon_blanc",
+      "food": "asparagus",
+      "score": 91,
+      "relationship": "classic",
+      "why": "Herbaceous character handles a difficult vegetable."
+    },
+    {
+      "alcohol": "sauvignon_blanc",
+      "food": "grilled fish",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Acidity and freshness suit light fish."
+    },
+    {
+      "alcohol": "sauvignon_blanc",
+      "food": "herb chicken",
+      "score": 88,
+      "relationship": "flavor echo",
+      "why": "Herbal aromas match fresh herbs."
+    },
+    {
+      "alcohol": "chardonnay_unoaked",
+      "food": "white fish",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Fresh acidity and moderate body suit delicate fish."
+    },
+    {
+      "alcohol": "chardonnay_unoaked",
+      "food": "shellfish",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Citrus/apple notes complement sweet shellfish."
+    },
+    {
+      "alcohol": "chardonnay_unoaked",
+      "food": "chicken salad",
+      "score": 88,
+      "relationship": "complement",
+      "why": "Freshness fits light poultry dishes."
+    },
+    {
+      "alcohol": "chardonnay_unoaked",
+      "food": "fresh cheese",
+      "score": 86,
+      "relationship": "complement",
+      "why": "Moderate acidity works with mild creamy cheese."
+    },
+    {
+      "alcohol": "chardonnay_oaked",
+      "food": "lobster with butter",
+      "score": 98,
+      "relationship": "classic",
+      "why": "Rich body and oak complement butter and sweet lobster."
+    },
+    {
+      "alcohol": "chardonnay_oaked",
+      "food": "roast chicken",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Body and savory oak fit browned poultry."
+    },
+    {
+      "alcohol": "chardonnay_oaked",
+      "food": "creamy pasta",
+      "score": 96,
+      "relationship": "congruent",
+      "why": "Creamy texture and oak mirror rich sauce."
+    },
+    {
+      "alcohol": "chardonnay_oaked",
+      "food": "salmon",
+      "score": 91,
+      "relationship": "classic",
+      "why": "Body can handle rich fish."
+    },
+    {
+      "alcohol": "chardonnay_oaked",
+      "food": "comté / gruyère",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Nutty cheese and oak integrate well."
+    },
+    {
+      "alcohol": "riesling_dry",
+      "food": "sushi",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Acidity and low tannin suit rice, fish and soy."
+    },
+    {
+      "alcohol": "riesling_dry",
+      "food": "pork",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Apple-citrus acidity suits slightly sweet pork."
+    },
+    {
+      "alcohol": "riesling_dry",
+      "food": "spicy noodles",
+      "score": 86,
+      "relationship": "contrast",
+      "why": "Aromatic fruit helps, though off-dry Riesling is safer for high heat."
+    },
+    {
+      "alcohol": "riesling_dry",
+      "food": "smoked fish",
+      "score": 90,
+      "relationship": "contrast",
+      "why": "Acidity refreshes smoke and oil."
+    },
+    {
+      "alcohol": "riesling_off_dry",
+      "food": "thai curry",
+      "score": 98,
+      "relationship": "classic",
+      "why": "Slight sweetness and aromatics soften chili heat."
+    },
+    {
+      "alcohol": "riesling_off_dry",
+      "food": "spicy asian food",
+      "score": 97,
+      "relationship": "classic",
+      "why": "Lower perceived dryness balances heat."
+    },
+    {
+      "alcohol": "riesling_off_dry",
+      "food": "pork belly",
+      "score": 94,
+      "relationship": "contrast",
+      "why": "Acidity and sweetness cut rich fat."
+    },
+    {
+      "alcohol": "riesling_off_dry",
+      "food": "blue cheese",
+      "score": 88,
+      "relationship": "contrast",
+      "why": "Sweetness balances salt and pungency."
+    },
+    {
+      "alcohol": "riesling_off_dry",
+      "food": "fruit-based dishes",
+      "score": 92,
+      "relationship": "congruent",
+      "why": "Fruit aromas echo the dish."
+    },
+    {
+      "alcohol": "pinot_grigio",
+      "food": "light seafood",
+      "score": 95,
+      "relationship": "classic",
+      "why": "Crisp, light style does not overpower delicate seafood."
+    },
+    {
+      "alcohol": "pinot_grigio",
+      "food": "salad",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Fresh acidity fits raw vegetables."
+    },
+    {
+      "alcohol": "pinot_grigio",
+      "food": "antipasti",
+      "score": 90,
+      "relationship": "regional",
+      "why": "Light salty starters suit a crisp white."
+    },
+    {
+      "alcohol": "pinot_grigio",
+      "food": "fresh mozzarella",
+      "score": 88,
+      "relationship": "complement",
+      "why": "Mild cheese matches delicate wine."
+    },
+    {
+      "alcohol": "chenin_blanc",
+      "food": "pork",
+      "score": 91,
+      "relationship": "classic",
+      "why": "Acidity and apple/quince notes suit pork."
+    },
+    {
+      "alcohol": "chenin_blanc",
+      "food": "goat cheese",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Acidity matches tangy cheese."
+    },
+    {
+      "alcohol": "chenin_blanc",
+      "food": "roast chicken",
+      "score": 89,
+      "relationship": "complement",
+      "why": "Body and acidity fit poultry."
+    },
+    {
+      "alcohol": "chenin_blanc",
+      "food": "mild curry",
+      "score": 88,
+      "relationship": "aromatic complement",
+      "why": "Fruit and acidity fit gentle spice."
+    },
+    {
+      "alcohol": "gewurztraminer",
+      "food": "thai food",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Aromatic fruit and slight sweetness suit fragrant spice."
+    },
+    {
+      "alcohol": "gewurztraminer",
+      "food": "indian curry",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Floral spice profile complements aromatic curries."
+    },
+    {
+      "alcohol": "gewurztraminer",
+      "food": "munster cheese",
+      "score": 92,
+      "relationship": "regional/classic",
+      "why": "Aromatic intensity handles pungent cheese."
+    },
+    {
+      "alcohol": "gewurztraminer",
+      "food": "duck with fruit sauce",
+      "score": 90,
+      "relationship": "congruent",
+      "why": "Lychee/rose-like aromas suit sweet-savory sauce."
+    },
+    {
+      "alcohol": "albarino",
+      "food": "oysters",
+      "score": 98,
+      "relationship": "regional/classic",
+      "why": "High acidity and saline character suit oysters."
+    },
+    {
+      "alcohol": "albarino",
+      "food": "shrimp",
+      "score": 95,
+      "relationship": "classic",
+      "why": "Citrus freshness complements sweet shellfish."
+    },
+    {
+      "alcohol": "albarino",
+      "food": "grilled octopus",
+      "score": 93,
+      "relationship": "regional",
+      "why": "Minerality and acidity suit charred seafood."
+    },
+    {
+      "alcohol": "albarino",
+      "food": "fish tacos",
+      "score": 91,
+      "relationship": "contrast",
+      "why": "Acidity works with lime and fried/grilled fish."
+    },
+    {
+      "alcohol": "rose_dry",
+      "food": "charcuterie",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Freshness handles salt and fat."
+    },
+    {
+      "alcohol": "rose_dry",
+      "food": "grilled vegetables",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Red-fruit freshness suits char and vegetables."
+    },
+    {
+      "alcohol": "rose_dry",
+      "food": "salmon",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Enough body for richer fish without heavy tannin."
+    },
+    {
+      "alcohol": "rose_dry",
+      "food": "mediterranean salads",
+      "score": 93,
+      "relationship": "regional",
+      "why": "Acidity and fruit fit herbs, olives and tomatoes."
+    },
+    {
+      "alcohol": "champagne_brut",
+      "food": "oysters",
+      "score": 99,
+      "relationship": "classic",
+      "why": "Acidity and bubbles suit briny shellfish."
+    },
+    {
+      "alcohol": "champagne_brut",
+      "food": "fried chicken",
+      "score": 98,
+      "relationship": "contrast",
+      "why": "Bubbles and acidity cut fried richness."
+    },
+    {
+      "alcohol": "champagne_brut",
+      "food": "french fries",
+      "score": 96,
+      "relationship": "contrast",
+      "why": "Salt and fat are refreshed by bubbles."
+    },
+    {
+      "alcohol": "champagne_brut",
+      "food": "brie / camembert",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Acidity cleanses creamy soft cheese."
+    },
+    {
+      "alcohol": "champagne_brut",
+      "food": "sushi",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Low tannin, bubbles and acidity suit fish and rice."
+    },
+    {
+      "alcohol": "champagne_brut",
+      "food": "caviar",
+      "score": 98,
+      "relationship": "classic",
+      "why": "Salt, fat and delicate texture pair with dry bubbles."
+    },
+    {
+      "alcohol": "prosecco",
+      "food": "prosciutto",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Fruit and bubbles balance salt."
+    },
+    {
+      "alcohol": "prosecco",
+      "food": "light appetizers",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Low-to-moderate intensity fits starters."
+    },
+    {
+      "alcohol": "prosecco",
+      "food": "fruit",
+      "score": 90,
+      "relationship": "congruent",
+      "why": "Fresh pear/apple notes echo fruit."
+    },
+    {
+      "alcohol": "prosecco",
+      "food": "salty snacks",
+      "score": 91,
+      "relationship": "contrast",
+      "why": "Bubbles refresh the palate."
+    },
+    {
+      "alcohol": "moscato",
+      "food": "fruit tart",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Aromatic sweetness matches fruit desserts."
+    },
+    {
+      "alcohol": "moscato",
+      "food": "light cake",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Sweetness and low intensity suit delicate desserts."
+    },
+    {
+      "alcohol": "moscato",
+      "food": "spicy food",
+      "score": 91,
+      "relationship": "contrast",
+      "why": "Low alcohol and sweetness can soften heat."
+    },
+    {
+      "alcohol": "moscato",
+      "food": "fresh berries",
+      "score": 94,
+      "relationship": "congruent",
+      "why": "Fruit-forward aromas align."
+    },
+    {
+      "alcohol": "sauternes",
+      "food": "foie gras",
+      "score": 99,
+      "relationship": "classic",
+      "why": "Sweetness and acidity balance extreme richness."
+    },
+    {
+      "alcohol": "sauternes",
+      "food": "roquefort",
+      "score": 99,
+      "relationship": "classic",
+      "why": "Sweetness contrasts salt and blue-cheese intensity."
+    },
+    {
+      "alcohol": "sauternes",
+      "food": "fruit dessert",
+      "score": 95,
+      "relationship": "classic",
+      "why": "Sweet wine matches dessert sweetness."
+    },
+    {
+      "alcohol": "sauternes",
+      "food": "creme brulee",
+      "score": 93,
+      "relationship": "congruent",
+      "why": "Honeyed richness suits caramel custard."
+    },
+    {
+      "alcohol": "port_ruby",
+      "food": "stilton / blue cheese",
+      "score": 99,
+      "relationship": "classic",
+      "why": "Sweet dark fruit balances salt and pungency."
+    },
+    {
+      "alcohol": "port_ruby",
+      "food": "dark chocolate dessert",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Dense fruit and sweetness can match intense chocolate."
+    },
+    {
+      "alcohol": "port_ruby",
+      "food": "berry dessert",
+      "score": 95,
+      "relationship": "congruent",
+      "why": "Dark berry flavors echo the dessert."
+    },
+    {
+      "alcohol": "port_tawny",
+      "food": "walnut tart",
+      "score": 98,
+      "relationship": "congruent",
+      "why": "Nutty oxidative notes mirror walnuts."
+    },
+    {
+      "alcohol": "port_tawny",
+      "food": "caramel dessert",
+      "score": 96,
+      "relationship": "congruent",
+      "why": "Toffee and dried-fruit notes fit caramel."
+    },
+    {
+      "alcohol": "port_tawny",
+      "food": "aged cheese",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Sweetness contrasts salt and nuttiness."
+    },
+    {
+      "alcohol": "port_tawny",
+      "food": "milk chocolate",
+      "score": 90,
+      "relationship": "congruent",
+      "why": "Softer chocolate fits mellow tawny character."
+    },
+    {
+      "alcohol": "sherry_fino",
+      "food": "olives",
+      "score": 99,
+      "relationship": "regional/classic",
+      "why": "Saline, dry style matches briny olives."
+    },
+    {
+      "alcohol": "sherry_fino",
+      "food": "almonds",
+      "score": 97,
+      "relationship": "regional/classic",
+      "why": "Nutty savory notes align."
+    },
+    {
+      "alcohol": "sherry_fino",
+      "food": "jamón",
+      "score": 98,
+      "relationship": "regional/classic",
+      "why": "Dry saline wine refreshes cured ham."
+    },
+    {
+      "alcohol": "sherry_fino",
+      "food": "fried fish",
+      "score": 94,
+      "relationship": "regional",
+      "why": "Freshness cuts oil."
+    },
+    {
+      "alcohol": "sherry_fino",
+      "food": "sushi",
+      "score": 90,
+      "relationship": "savory complement",
+      "why": "Salinity and low fruit can fit umami and seafood."
+    },
+    {
+      "alcohol": "sherry_amontillado",
+      "food": "mushrooms",
+      "score": 96,
+      "relationship": "congruent",
+      "why": "Nutty oxidative notes echo earthy umami."
+    },
+    {
+      "alcohol": "sherry_amontillado",
+      "food": "roast chicken",
+      "score": 93,
+      "relationship": "classic",
+      "why": "Savory depth fits browned poultry."
+    },
+    {
+      "alcohol": "sherry_amontillado",
+      "food": "hard cheese",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Nutty wine works with aged cheese."
+    },
+    {
+      "alcohol": "sherry_amontillado",
+      "food": "jamón",
+      "score": 95,
+      "relationship": "regional",
+      "why": "Salt and savory oxidation align."
+    },
+    {
+      "alcohol": "sherry_oloroso",
+      "food": "braised beef",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Powerful nutty body suits rich meat."
+    },
+    {
+      "alcohol": "sherry_oloroso",
+      "food": "aged cheese",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Intensity and nuttiness match."
+    },
+    {
+      "alcohol": "sherry_oloroso",
+      "food": "nuts",
+      "score": 98,
+      "relationship": "congruent",
+      "why": "Walnut-like oxidative flavors echo nuts."
+    },
+    {
+      "alcohol": "madeira",
+      "food": "mushroom dishes",
+      "score": 91,
+      "relationship": "congruent",
+      "why": "Oxidative savory notes suit mushrooms."
+    },
+    {
+      "alcohol": "madeira",
+      "food": "roast meat",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Acidity keeps rich meat lively."
+    },
+    {
+      "alcohol": "madeira",
+      "food": "caramelized nuts",
+      "score": 95,
+      "relationship": "congruent",
+      "why": "Toffee-nut flavors align."
+    },
+    {
+      "alcohol": "madeira",
+      "food": "hard cheese",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Acidity and oxidative complexity suit aged cheese."
+    },
+    {
+      "alcohol": "pilsner",
+      "food": "fried chicken",
+      "score": 97,
+      "relationship": "contrast",
+      "why": "Crisp carbonation and bitterness cut fried fat."
+    },
+    {
+      "alcohol": "pilsner",
+      "food": "pizza",
+      "score": 93,
+      "relationship": "classic",
+      "why": "Crisp malt and bitterness refresh cheese and crust."
+    },
+    {
+      "alcohol": "pilsner",
+      "food": "sausages",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Carbonation and malt fit savory sausage."
+    },
+    {
+      "alcohol": "pilsner",
+      "food": "salty snacks",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Clean bitterness and bubbles refresh salt."
+    },
+    {
+      "alcohol": "pilsner",
+      "food": "sushi",
+      "score": 88,
+      "relationship": "complement",
+      "why": "Light body does not overpower fish."
+    },
+    {
+      "alcohol": "wheat_beer",
+      "food": "salad",
+      "score": 90,
+      "relationship": "complement",
+      "why": "Light body and citrus/spice fit fresh vegetables."
+    },
+    {
+      "alcohol": "wheat_beer",
+      "food": "seafood",
+      "score": 91,
+      "relationship": "classic",
+      "why": "Citrus-like notes suit shellfish and fish."
+    },
+    {
+      "alcohol": "wheat_beer",
+      "food": "goat cheese",
+      "score": 88,
+      "relationship": "complement",
+      "why": "Fresh acidity and yeast character fit tangy cheese."
+    },
+    {
+      "alcohol": "wheat_beer",
+      "food": "banana bread",
+      "score": 84,
+      "relationship": "flavor echo",
+      "why": "Hefeweizen banana/clove notes can mirror baking flavors."
+    },
+    {
+      "alcohol": "pale_ale",
+      "food": "burger",
+      "score": 93,
+      "relationship": "classic",
+      "why": "Malt and hops stand up to beef and toppings."
+    },
+    {
+      "alcohol": "pale_ale",
+      "food": "grilled chicken",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Caramel malt and hop bitterness fit char."
+    },
+    {
+      "alcohol": "pale_ale",
+      "food": "cheddar",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Hop bitterness and malt work with sharp cheese."
+    },
+    {
+      "alcohol": "pale_ale",
+      "food": "roasted vegetables",
+      "score": 88,
+      "relationship": "complement",
+      "why": "Toast and hops suit caramelized vegetables."
+    },
+    {
+      "alcohol": "ipa",
+      "food": "spicy tacos",
+      "score": 91,
+      "relationship": "contrast/complement",
+      "why": "Hop citrus can fit tacos, though bitterness may amplify extreme chili."
+    },
+    {
+      "alcohol": "ipa",
+      "food": "blue cheese",
+      "score": 90,
+      "relationship": "contrast",
+      "why": "Bold hops match intense cheese."
+    },
+    {
+      "alcohol": "ipa",
+      "food": "burger",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Bitterness cuts fat and intensity matches beef."
+    },
+    {
+      "alcohol": "ipa",
+      "food": "fried food",
+      "score": 92,
+      "relationship": "contrast",
+      "why": "Carbonation and bitterness refresh oil."
+    },
+    {
+      "alcohol": "ipa",
+      "food": "carrot cake",
+      "score": 80,
+      "relationship": "aromatic complement",
+      "why": "Citrus/pine hops can play against spice and sweetness."
+    },
+    {
+      "alcohol": "amber_ale",
+      "food": "roast pork",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Caramel malt suits browned pork."
+    },
+    {
+      "alcohol": "amber_ale",
+      "food": "grilled sausage",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Toasty malt complements savory char."
+    },
+    {
+      "alcohol": "amber_ale",
+      "food": "medium cheddar",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Malt sweetness balances salt."
+    },
+    {
+      "alcohol": "amber_ale",
+      "food": "roasted root vegetables",
+      "score": 89,
+      "relationship": "congruent",
+      "why": "Caramelized flavors echo malt."
+    },
+    {
+      "alcohol": "stout_porter",
+      "food": "oysters",
+      "score": 95,
+      "relationship": "classic",
+      "why": "Roast and briny minerality are a traditional contrast."
+    },
+    {
+      "alcohol": "stout_porter",
+      "food": "beef stew",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Roast and body suit deep savory flavors."
+    },
+    {
+      "alcohol": "stout_porter",
+      "food": "chocolate cake",
+      "score": 98,
+      "relationship": "congruent",
+      "why": "Coffee/cocoa malt echoes chocolate."
+    },
+    {
+      "alcohol": "stout_porter",
+      "food": "blue cheese",
+      "score": 91,
+      "relationship": "contrast",
+      "why": "Roast sweetness and body handle pungent cheese."
+    },
+    {
+      "alcohol": "stout_porter",
+      "food": "barbecue",
+      "score": 92,
+      "relationship": "flavor echo",
+      "why": "Smoke and roast fit charred meat."
+    },
+    {
+      "alcohol": "saison",
+      "food": "mussels",
+      "score": 97,
+      "relationship": "classic",
+      "why": "Dryness, pepper and carbonation suit shellfish."
+    },
+    {
+      "alcohol": "saison",
+      "food": "goat cheese",
+      "score": 93,
+      "relationship": "classic",
+      "why": "Earthy spice matches tangy cheese."
+    },
+    {
+      "alcohol": "saison",
+      "food": "herb chicken",
+      "score": 92,
+      "relationship": "flavor echo",
+      "why": "Peppery/herbal yeast notes suit herbs."
+    },
+    {
+      "alcohol": "saison",
+      "food": "salad",
+      "score": 90,
+      "relationship": "complement",
+      "why": "Dry refreshing profile fits vegetables."
+    },
+    {
+      "alcohol": "sour_beer",
+      "food": "goat cheese",
+      "score": 95,
+      "relationship": "contrast",
+      "why": "Acidity matches tang and refreshes fat."
+    },
+    {
+      "alcohol": "sour_beer",
+      "food": "fruit dessert",
+      "score": 92,
+      "relationship": "congruent",
+      "why": "Fruit acidity echoes berries and stone fruit."
+    },
+    {
+      "alcohol": "sour_beer",
+      "food": "rich pork",
+      "score": 90,
+      "relationship": "contrast",
+      "why": "Acidity cuts fat."
+    },
+    {
+      "alcohol": "sour_beer",
+      "food": "fried food",
+      "score": 90,
+      "relationship": "contrast",
+      "why": "Tartness refreshes oil."
+    },
+    {
+      "alcohol": "belgian_dubbel",
+      "food": "braised beef",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Dark fruit and malt suit caramelized meat."
+    },
+    {
+      "alcohol": "belgian_dubbel",
+      "food": "duck",
+      "score": 91,
+      "relationship": "complement",
+      "why": "Rich fruit works with fatty poultry."
+    },
+    {
+      "alcohol": "belgian_dubbel",
+      "food": "aged gouda",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Caramel malt fits nutty aged cheese."
+    },
+    {
+      "alcohol": "belgian_tripel",
+      "food": "mussels",
+      "score": 92,
+      "relationship": "classic",
+      "why": "High carbonation and spice suit shellfish."
+    },
+    {
+      "alcohol": "belgian_tripel",
+      "food": "washed-rind cheese",
+      "score": 91,
+      "relationship": "intensity match",
+      "why": "Strong aromas and carbonation handle pungent cheese."
+    },
+    {
+      "alcohol": "belgian_tripel",
+      "food": "roast chicken",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Spice and body fit browned poultry."
+    },
+    {
+      "alcohol": "dry_cider",
+      "food": "pork chops",
+      "score": 97,
+      "relationship": "classic",
+      "why": "Apple acidity naturally suits pork."
+    },
+    {
+      "alcohol": "dry_cider",
+      "food": "cheddar",
+      "score": 95,
+      "relationship": "classic",
+      "why": "Acidity and fruit balance sharp cheese."
+    },
+    {
+      "alcohol": "dry_cider",
+      "food": "roast chicken",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Fresh apple works with poultry."
+    },
+    {
+      "alcohol": "dry_cider",
+      "food": "crepes / savory pastry",
+      "score": 88,
+      "relationship": "regional-style",
+      "why": "Acidity balances butter and pastry."
+    },
+    {
+      "alcohol": "sweet_cider",
+      "food": "apple pie",
+      "score": 96,
+      "relationship": "congruent",
+      "why": "Apple-on-apple pairing; sweetness must match dessert."
+    },
+    {
+      "alcohol": "sweet_cider",
+      "food": "blue cheese",
+      "score": 89,
+      "relationship": "contrast",
+      "why": "Sweetness balances salt."
+    },
+    {
+      "alcohol": "sweet_cider",
+      "food": "spicy pork",
+      "score": 88,
+      "relationship": "contrast",
+      "why": "Sweetness softens spice and acidity cuts fat."
+    },
+    {
+      "alcohol": "mead",
+      "food": "roast pork",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Honeyed notes suit pork's sweetness."
+    },
+    {
+      "alcohol": "mead",
+      "food": "blue cheese",
+      "score": 88,
+      "relationship": "contrast",
+      "why": "Honey sweetness balances pungency."
+    },
+    {
+      "alcohol": "mead",
+      "food": "nuts",
+      "score": 91,
+      "relationship": "congruent",
+      "why": "Honey and nuts form a natural flavor family."
+    },
+    {
+      "alcohol": "mead",
+      "food": "spiced desserts",
+      "score": 92,
+      "relationship": "congruent",
+      "why": "Honey fits baking spices."
+    },
+    {
+      "alcohol": "vodka",
+      "food": "caviar",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Clean chilled spirit does not obscure delicate salt and fat."
+    },
+    {
+      "alcohol": "vodka",
+      "food": "smoked fish",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Neutral spirit refreshes oily smoky fish."
+    },
+    {
+      "alcohol": "vodka",
+      "food": "pickles",
+      "score": 94,
+      "relationship": "regional/classic",
+      "why": "Sharp acidity and salt pair with a clean spirit."
+    },
+    {
+      "alcohol": "vodka",
+      "food": "blini",
+      "score": 88,
+      "relationship": "regional",
+      "why": "Neutrality works with sour cream and savory toppings."
+    },
+    {
+      "alcohol": "gin",
+      "food": "oysters",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Juniper and citrus botanicals complement briny shellfish."
+    },
+    {
+      "alcohol": "gin",
+      "food": "smoked salmon",
+      "score": 90,
+      "relationship": "complement",
+      "why": "Botanicals and citrus lift rich smoked fish."
+    },
+    {
+      "alcohol": "gin",
+      "food": "goat cheese",
+      "score": 85,
+      "relationship": "aromatic complement",
+      "why": "Herbal notes suit tangy cheese."
+    },
+    {
+      "alcohol": "gin",
+      "food": "cucumber salad",
+      "score": 92,
+      "relationship": "flavor echo",
+      "why": "Fresh botanicals align with cucumber and herbs."
+    },
+    {
+      "alcohol": "bourbon",
+      "food": "barbecue ribs",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Vanilla, caramel and char echo barbecue."
+    },
+    {
+      "alcohol": "bourbon",
+      "food": "pecan pie",
+      "score": 97,
+      "relationship": "congruent",
+      "why": "Caramel, vanilla and nut flavors align."
+    },
+    {
+      "alcohol": "bourbon",
+      "food": "dark chocolate",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Oak, caramel and cocoa form a rich pairing."
+    },
+    {
+      "alcohol": "bourbon",
+      "food": "smoked meat",
+      "score": 94,
+      "relationship": "flavor echo",
+      "why": "Barrel char complements smoke."
+    },
+    {
+      "alcohol": "bourbon",
+      "food": "aged cheddar",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Salt and fat balance oak and sweetness."
+    },
+    {
+      "alcohol": "rye_whiskey",
+      "food": "pastrami",
+      "score": 95,
+      "relationship": "classic",
+      "why": "Peppery rye mirrors spice and cuts fat."
+    },
+    {
+      "alcohol": "rye_whiskey",
+      "food": "smoked sausage",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Spice and grain fit savory smoke."
+    },
+    {
+      "alcohol": "rye_whiskey",
+      "food": "aged cheese",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Bold spice handles mature cheese."
+    },
+    {
+      "alcohol": "rye_whiskey",
+      "food": "dark chocolate",
+      "score": 86,
+      "relationship": "contrast",
+      "why": "Dry spice prevents the pairing becoming too sweet."
+    },
+    {
+      "alcohol": "irish_whiskey",
+      "food": "smoked salmon",
+      "score": 88,
+      "relationship": "classic",
+      "why": "Soft malt and light fruit fit smoke."
+    },
+    {
+      "alcohol": "irish_whiskey",
+      "food": "apple tart",
+      "score": 91,
+      "relationship": "congruent",
+      "why": "Fruit and vanilla suit apple pastry."
+    },
+    {
+      "alcohol": "irish_whiskey",
+      "food": "milk chocolate",
+      "score": 90,
+      "relationship": "congruent",
+      "why": "Smooth whiskey works with creamy chocolate."
+    },
+    {
+      "alcohol": "irish_whiskey",
+      "food": "mild cheddar",
+      "score": 87,
+      "relationship": "classic",
+      "why": "Gentler intensity matches medium cheese."
+    },
+    {
+      "alcohol": "scotch_unpeated",
+      "food": "aged cheddar",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Malt, oak and salt-rich cheese align."
+    },
+    {
+      "alcohol": "scotch_unpeated",
+      "food": "roast beef",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Malt and oak suit browned meat."
+    },
+    {
+      "alcohol": "scotch_unpeated",
+      "food": "nuts",
+      "score": 91,
+      "relationship": "congruent",
+      "why": "Nutty malt/oak notes echo roasted nuts."
+    },
+    {
+      "alcohol": "scotch_unpeated",
+      "food": "dark chocolate",
+      "score": 89,
+      "relationship": "classic",
+      "why": "Cocoa and oak complement one another."
+    },
+    {
+      "alcohol": "scotch_peated",
+      "food": "smoked salmon",
+      "score": 98,
+      "relationship": "flavor echo",
+      "why": "Smoke-on-smoke pairing with oily fish."
+    },
+    {
+      "alcohol": "scotch_peated",
+      "food": "blue cheese",
+      "score": 93,
+      "relationship": "intensity match",
+      "why": "Strong peat can stand up to pungent cheese."
+    },
+    {
+      "alcohol": "scotch_peated",
+      "food": "barbecue",
+      "score": 94,
+      "relationship": "flavor echo",
+      "why": "Smoke and char align."
+    },
+    {
+      "alcohol": "scotch_peated",
+      "food": "oysters",
+      "score": 90,
+      "relationship": "coastal contrast",
+      "why": "Saline shellfish can complement maritime peat."
+    },
+    {
+      "alcohol": "cognac",
+      "food": "foie gras",
+      "score": 93,
+      "relationship": "classic",
+      "why": "Rich fruit and oak fit luxurious fatty texture."
+    },
+    {
+      "alcohol": "cognac",
+      "food": "aged cheese",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Dried fruit and oak suit mature cheese."
+    },
+    {
+      "alcohol": "cognac",
+      "food": "dark chocolate",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Cocoa, fruit and oak form a deep pairing."
+    },
+    {
+      "alcohol": "cognac",
+      "food": "duck",
+      "score": 91,
+      "relationship": "classic",
+      "why": "Fruit and richness complement duck."
+    },
+    {
+      "alcohol": "brandy",
+      "food": "fruit tart",
+      "score": 91,
+      "relationship": "congruent",
+      "why": "Fruit spirit echoes baked fruit."
+    },
+    {
+      "alcohol": "brandy",
+      "food": "hard cheese",
+      "score": 89,
+      "relationship": "classic",
+      "why": "Oak and fruit pair with nutty cheese."
+    },
+    {
+      "alcohol": "brandy",
+      "food": "roast pork",
+      "score": 88,
+      "relationship": "complement",
+      "why": "Fruit notes suit pork."
+    },
+    {
+      "alcohol": "brandy",
+      "food": "nuts",
+      "score": 90,
+      "relationship": "congruent",
+      "why": "Oak-aged brandy works with roasted nuts."
+    },
+    {
+      "alcohol": "white_rum",
+      "food": "ceviche",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Clean cane and citrus-friendly profile suit lime and raw fish."
+    },
+    {
+      "alcohol": "white_rum",
+      "food": "grilled shrimp",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Light sweetness complements shellfish."
+    },
+    {
+      "alcohol": "white_rum",
+      "food": "tropical fruit",
+      "score": 94,
+      "relationship": "congruent",
+      "why": "Cane and fruit flavors align."
+    },
+    {
+      "alcohol": "white_rum",
+      "food": "coconut dessert",
+      "score": 90,
+      "relationship": "congruent",
+      "why": "Tropical flavors reinforce each other."
+    },
+    {
+      "alcohol": "aged_rum",
+      "food": "jerk pork",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Molasses and spice suit caramelized, spicy meat."
+    },
+    {
+      "alcohol": "aged_rum",
+      "food": "banana dessert",
+      "score": 96,
+      "relationship": "congruent",
+      "why": "Caramel and tropical fruit align."
+    },
+    {
+      "alcohol": "aged_rum",
+      "food": "dark chocolate",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Molasses, oak and cocoa integrate."
+    },
+    {
+      "alcohol": "aged_rum",
+      "food": "grilled pineapple",
+      "score": 97,
+      "relationship": "congruent",
+      "why": "Caramelized tropical fruit mirrors rum."
+    },
+    {
+      "alcohol": "aged_rum",
+      "food": "aged cheese",
+      "score": 88,
+      "relationship": "classic",
+      "why": "Richness and spice fit mature cheese."
+    },
+    {
+      "alcohol": "tequila_blanco",
+      "food": "ceviche",
+      "score": 99,
+      "relationship": "classic",
+      "why": "Agave and citrus character fit lime, chili and seafood."
+    },
+    {
+      "alcohol": "tequila_blanco",
+      "food": "fish tacos",
+      "score": 98,
+      "relationship": "classic",
+      "why": "Peppery agave and citrus suit tacos."
+    },
+    {
+      "alcohol": "tequila_blanco",
+      "food": "guacamole",
+      "score": 95,
+      "relationship": "classic",
+      "why": "Fresh agave, lime and herbs match avocado."
+    },
+    {
+      "alcohol": "tequila_blanco",
+      "food": "grilled shrimp",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Clean agave lifts sweet shellfish."
+    },
+    {
+      "alcohol": "tequila_reposado",
+      "food": "carnitas",
+      "score": 97,
+      "relationship": "classic",
+      "why": "Oak-softened agave suits rich pork."
+    },
+    {
+      "alcohol": "tequila_reposado",
+      "food": "grilled chicken tacos",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Roasted agave fits char."
+    },
+    {
+      "alcohol": "tequila_reposado",
+      "food": "aged cheese",
+      "score": 87,
+      "relationship": "complement",
+      "why": "Oak and savory cheese can work well."
+    },
+    {
+      "alcohol": "tequila_reposado",
+      "food": "roasted corn",
+      "score": 92,
+      "relationship": "flavor echo",
+      "why": "Roasted sweetness suits reposado."
+    },
+    {
+      "alcohol": "tequila_anejo",
+      "food": "grilled steak",
+      "score": 93,
+      "relationship": "classic",
+      "why": "Oak-aged agave has enough body for beef."
+    },
+    {
+      "alcohol": "tequila_anejo",
+      "food": "dark chocolate",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Vanilla, oak and cocoa align."
+    },
+    {
+      "alcohol": "tequila_anejo",
+      "food": "mole sauce",
+      "score": 95,
+      "relationship": "regional/classic",
+      "why": "Agave, spice and cocoa notes complement mole."
+    },
+    {
+      "alcohol": "tequila_anejo",
+      "food": "aged cheese",
+      "score": 91,
+      "relationship": "classic",
+      "why": "Intensity and oak match mature cheese."
+    },
+    {
+      "alcohol": "mezcal",
+      "food": "grilled octopus",
+      "score": 97,
+      "relationship": "classic",
+      "why": "Smoke and char align with seafood."
+    },
+    {
+      "alcohol": "mezcal",
+      "food": "mole",
+      "score": 98,
+      "relationship": "classic",
+      "why": "Smoke, chile and cocoa-like complexity fit mezcal."
+    },
+    {
+      "alcohol": "mezcal",
+      "food": "barbecue",
+      "score": 95,
+      "relationship": "flavor echo",
+      "why": "Smoke-on-char pairing."
+    },
+    {
+      "alcohol": "mezcal",
+      "food": "roasted vegetables",
+      "score": 94,
+      "relationship": "flavor echo",
+      "why": "Earthy roast matches mezcal."
+    },
+    {
+      "alcohol": "sake_junmai",
+      "food": "sushi",
+      "score": 98,
+      "relationship": "classic",
+      "why": "Umami and moderate body complement rice and fish."
+    },
+    {
+      "alcohol": "sake_junmai",
+      "food": "mushrooms",
+      "score": 96,
+      "relationship": "umami complement",
+      "why": "Sake reinforces savory umami."
+    },
+    {
+      "alcohol": "sake_junmai",
+      "food": "grilled chicken",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Rice umami and gentle acidity fit savory chicken."
+    },
+    {
+      "alcohol": "sake_junmai",
+      "food": "hard cheese",
+      "score": 88,
+      "relationship": "umami complement",
+      "why": "Sake can pair surprisingly well with aged cheese."
+    },
+    {
+      "alcohol": "sake_ginjo",
+      "food": "sashimi",
+      "score": 99,
+      "relationship": "classic",
+      "why": "Delicate fruit and clean texture preserve subtle fish."
+    },
+    {
+      "alcohol": "sake_ginjo",
+      "food": "light seafood",
+      "score": 97,
+      "relationship": "classic",
+      "why": "Aromatic freshness suits seafood."
+    },
+    {
+      "alcohol": "sake_ginjo",
+      "food": "salad",
+      "score": 90,
+      "relationship": "complement",
+      "why": "Clean aromatics fit fresh vegetables."
+    },
+    {
+      "alcohol": "sake_ginjo",
+      "food": "fresh cheese",
+      "score": 86,
+      "relationship": "complement",
+      "why": "Delicate profile matches mild cheese."
+    },
+    {
+      "alcohol": "sake_nigori",
+      "food": "spicy food",
+      "score": 92,
+      "relationship": "contrast",
+      "why": "Creamy sweetness can soften chili."
+    },
+    {
+      "alcohol": "sake_nigori",
+      "food": "fruit dessert",
+      "score": 90,
+      "relationship": "congruent",
+      "why": "Sweet rice and fruit work together."
+    },
+    {
+      "alcohol": "sake_nigori",
+      "food": "coconut dessert",
+      "score": 91,
+      "relationship": "congruent",
+      "why": "Creamy texture and tropical sweetness align."
+    },
+    {
+      "alcohol": "shochu",
+      "food": "yakitori",
+      "score": 95,
+      "relationship": "classic",
+      "why": "Clean grain/sweet-potato character fits grilled skewers."
+    },
+    {
+      "alcohol": "shochu",
+      "food": "sashimi",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Light styles can accompany delicate fish."
+    },
+    {
+      "alcohol": "shochu",
+      "food": "grilled vegetables",
+      "score": 89,
+      "relationship": "complement",
+      "why": "Earthy notes suit char."
+    },
+    {
+      "alcohol": "shochu",
+      "food": "pickles",
+      "score": 88,
+      "relationship": "contrast",
+      "why": "Clean spirit works with sharp salty flavors."
+    },
+    {
+      "alcohol": "soju",
+      "food": "korean barbecue",
+      "score": 99,
+      "relationship": "classic",
+      "why": "Clean, lightly sweet spirit cuts fatty grilled meat."
+    },
+    {
+      "alcohol": "soju",
+      "food": "fried chicken",
+      "score": 96,
+      "relationship": "classic",
+      "why": "Refreshing neutral spirit suits crispy rich food."
+    },
+    {
+      "alcohol": "soju",
+      "food": "spicy korean dishes",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Clean profile handles bold seasoning."
+    },
+    {
+      "alcohol": "soju",
+      "food": "grilled pork belly",
+      "score": 98,
+      "relationship": "classic",
+      "why": "Spirit refreshes between fatty bites."
+    },
+    {
+      "alcohol": "campari",
+      "food": "olives",
+      "score": 90,
+      "relationship": "aperitivo",
+      "why": "Salt and bitterness work as a pre-dinner pairing."
+    },
+    {
+      "alcohol": "campari",
+      "food": "charcuterie",
+      "score": 88,
+      "relationship": "aperitivo",
+      "why": "Bitter citrus refreshes fatty cured meat."
+    },
+    {
+      "alcohol": "campari",
+      "food": "orange-based appetizers",
+      "score": 86,
+      "relationship": "flavor echo",
+      "why": "Orange notes align."
+    },
+    {
+      "alcohol": "campari",
+      "food": "rich cheese",
+      "score": 82,
+      "relationship": "contrast",
+      "why": "Bitterness can cut fat."
+    },
+    {
+      "alcohol": "aperol",
+      "food": "prosciutto",
+      "score": 92,
+      "relationship": "aperitivo",
+      "why": "Gentler bittersweet orange suits salty ham."
+    },
+    {
+      "alcohol": "aperol",
+      "food": "light antipasti",
+      "score": 93,
+      "relationship": "aperitivo",
+      "why": "Low intensity matches starters."
+    },
+    {
+      "alcohol": "aperol",
+      "food": "olives",
+      "score": 88,
+      "relationship": "aperitivo",
+      "why": "Salt balances sweetness and bitterness."
+    },
+    {
+      "alcohol": "orange_liqueur",
+      "food": "dark chocolate",
+      "score": 95,
+      "relationship": "classic",
+      "why": "Orange and chocolate are a strong flavor match."
+    },
+    {
+      "alcohol": "orange_liqueur",
+      "food": "crepes",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Citrus sweetness suits buttery pastry."
+    },
+    {
+      "alcohol": "orange_liqueur",
+      "food": "fruit tart",
+      "score": 90,
+      "relationship": "congruent",
+      "why": "Citrus amplifies fruit."
+    },
+    {
+      "alcohol": "orange_liqueur",
+      "food": "duck à l'orange",
+      "score": 88,
+      "relationship": "flavor echo",
+      "why": "Orange component directly matches."
+    },
+    {
+      "alcohol": "coffee_liqueur",
+      "food": "tiramisu",
+      "score": 98,
+      "relationship": "congruent",
+      "why": "Coffee-on-coffee pairing."
+    },
+    {
+      "alcohol": "coffee_liqueur",
+      "food": "chocolate cake",
+      "score": 95,
+      "relationship": "classic",
+      "why": "Coffee deepens cocoa flavor."
+    },
+    {
+      "alcohol": "coffee_liqueur",
+      "food": "vanilla ice cream",
+      "score": 94,
+      "relationship": "contrast/congruent",
+      "why": "Roast and sweetness complement cream and vanilla."
+    },
+    {
+      "alcohol": "amaretto",
+      "food": "almond cake",
+      "score": 99,
+      "relationship": "congruent",
+      "why": "Almond flavors directly match."
+    },
+    {
+      "alcohol": "amaretto",
+      "food": "tiramisu",
+      "score": 92,
+      "relationship": "congruent",
+      "why": "Nutty sweetness suits coffee and cream."
+    },
+    {
+      "alcohol": "amaretto",
+      "food": "stone-fruit dessert",
+      "score": 91,
+      "relationship": "congruent",
+      "why": "Almond aroma naturally fits peach/apricot/cherry."
+    },
+    {
+      "alcohol": "elderflower_liqueur",
+      "food": "fresh berries",
+      "score": 94,
+      "relationship": "congruent",
+      "why": "Floral sweetness lifts berry aromas."
+    },
+    {
+      "alcohol": "elderflower_liqueur",
+      "food": "goat cheese crostini",
+      "score": 87,
+      "relationship": "contrast",
+      "why": "Floral sweetness balances tang."
+    },
+    {
+      "alcohol": "elderflower_liqueur",
+      "food": "light fruit dessert",
+      "score": 92,
+      "relationship": "congruent",
+      "why": "Delicate floral profile suits fruit."
+    },
+    {
+      "alcohol": "herbal_liqueur",
+      "food": "dark chocolate",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Bitter herbs and cocoa create digestif depth."
+    },
+    {
+      "alcohol": "herbal_liqueur",
+      "food": "aged cheese",
+      "score": 89,
+      "relationship": "classic",
+      "why": "Herbal bitterness contrasts fat and salt."
+    },
+    {
+      "alcohol": "herbal_liqueur",
+      "food": "roasted nuts",
+      "score": 88,
+      "relationship": "congruent",
+      "why": "Roasted and herbal bitterness align."
+    },
+    {
+      "alcohol": "creme_de_cacao",
+      "food": "chocolate dessert",
+      "score": 99,
+      "relationship": "congruent",
+      "why": "Direct cocoa match."
+    },
+    {
+      "alcohol": "creme_de_cacao",
+      "food": "vanilla ice cream",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Chocolate and vanilla complement one another."
+    },
+    {
+      "alcohol": "creme_de_cacao",
+      "food": "berries",
+      "score": 88,
+      "relationship": "contrast",
+      "why": "Berry acidity brightens chocolate sweetness."
+    },
+    {
+      "alcohol": "cabernet_sauvignon",
+      "food": "gouda",
+      "score": 90,
+      "relationship": "classic",
+      "why": "Established style-level pairing based on intensity, acidity/sweetness, salt and fat."
+    },
+    {
+      "alcohol": "pinot_noir",
+      "food": "gruyère",
+      "score": 92,
+      "relationship": "classic",
+      "why": "Established style-level pairing based on intensity, acidity/sweetness, salt and fat."
+    },
+    {
+      "alcohol": "champagne_brut",
+      "food": "brie",
+      "score": 94,
+      "relationship": "classic",
+      "why": "Established style-level pairing based on intensity, acidity/sweetness, salt and fat."
+    },
+    {
+      "alcohol": "champagne_brut",
+      "food": "camembert",
+      "score": 93,
+      "relationship": "classic",
+      "why": "Established style-level pairing based on intensity, acidity/sweetness, salt and fat."
+    },
+    {
+      "alcohol": "port_ruby",
+      "food": "stilton",
+      "score": 99,
+      "relationship": "classic",
+      "why": "Established style-level pairing based on intensity, acidity/sweetness, salt and fat."
+    }
+  ],
+  "food_taxonomy": {
+    "cheese": [
+      "fresh cheese",
+      "goat cheese",
+      "brie",
+      "camembert",
+      "gruyère",
+      "comté",
+      "cheddar",
+      "gouda",
+      "manchego",
+      "parmigiano-reggiano",
+      "blue cheese",
+      "stilton",
+      "roquefort",
+      "washed-rind cheese"
+    ],
+    "meat": [
+      "beef",
+      "steak",
+      "lamb",
+      "pork",
+      "duck",
+      "chicken",
+      "game",
+      "charcuterie",
+      "sausages",
+      "barbecue"
+    ],
+    "seafood": [
+      "oysters",
+      "shellfish",
+      "shrimp",
+      "lobster",
+      "white fish",
+      "salmon",
+      "tuna",
+      "sushi",
+      "sashimi",
+      "octopus",
+      "ceviche"
+    ],
+    "vegetables": [
+      "green salad",
+      "asparagus",
+      "mushrooms",
+      "grilled vegetables",
+      "roasted vegetables",
+      "tomato dishes"
+    ],
+    "dessert": [
+      "dark chocolate",
+      "milk chocolate",
+      "fruit tart",
+      "apple pie",
+      "caramel dessert",
+      "creme brulee",
+      "tiramisu",
+      "ice cream",
+      "nut desserts"
+    ],
+    "snacks": [
+      "olives",
+      "nuts",
+      "salty snacks",
+      "french fries",
+      "fried food",
+      "pickles"
+    ],
+    "spicy": [
+      "thai curry",
+      "indian curry",
+      "spicy noodles",
+      "spicy tacos",
+      "korean spicy dishes"
+    ],
+    "starch": [
+      "pizza",
+      "pasta",
+      "risotto",
+      "bread",
+      "rice dishes"
+    ]
+  },
+  "a0_dialogue_prompts": [
+    {
+      "slot": "recipient",
+      "a0": [
+        "Is it for you?",
+        "Is it a gift?",
+        "Who is it for?"
+      ]
+    },
+    {
+      "slot": "occasion",
+      "a0": [
+        "Is it for a party?",
+        "Is it for dinner?",
+        "Is it for a birthday?"
+      ]
+    },
+    {
+      "slot": "food",
+      "a0": [
+        "What food will you have?",
+        "Meat, fish, or cheese?",
+        "Is the food spicy?"
+      ]
+    },
+    {
+      "slot": "taste",
+      "a0": [
+        "Sweet or dry?",
+        "Do you like fruit?",
+        "Do you like bitter drinks?"
+      ]
+    },
+    {
+      "slot": "strength",
+      "a0": [
+        "Strong or light?",
+        "Do you want a strong drink?"
+      ]
+    },
+    {
+      "slot": "budget",
+      "a0": [
+        "What is your budget?",
+        "About $20? $50? More?"
+      ]
+    },
+    {
+      "slot": "knowledge",
+      "a0": [
+        "Do you know what they like?",
+        "Do you know the drink?"
+      ]
+    }
+  ]
+} as const;
+
+export function pairingBand(score: number): PairingBand {
+  if (score >= 90) return 'excellent';
+  if (score >= 80) return 'good';
+  if (score >= 65) return 'situational';
+  if (score >= 45) return 'weak';
+  return 'challenging';
+}
+
+export function findAlcoholFoodPairings(alcoholId: string) {
+  return BAR_PAIRINGS.alcohol_food_pairings
+    .filter((x) => x.alcohol === alcoholId)
+    .sort((a, b) => b.score - a.score);
+}
+
+export function findAlcoholAlcoholPairings(alcoholId: string) {
+  return BAR_PAIRINGS.alcohol_alcohol_pairings
+    .filter((x) => x.a === alcoholId || x.b === alcoholId)
+    .sort((a, b) => b.score - a.score);
+}

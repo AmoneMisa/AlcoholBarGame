@@ -3,6 +3,7 @@ import { INGREDIENTS, REGIONS, SUPPLIERS } from './domain/catalog';
 import { useGameStore } from './stores/game';
 import BarScene from './components/BarScene.vue';
 import CharacterModel from './components/CharacterModel.vue';
+import PairingAdvisor from './components/PairingAdvisor.vue';
 import { haptic } from './telegram/webapp';
 
 const game = useGameStore();
@@ -58,9 +59,7 @@ const scenarios = [
             <button :class="{ active: game.recipeCategory === 'classic' }" @click="game.recipeCategory = 'classic'">Classic</button>
             <button :class="{ active: game.recipeCategory === 'cocktail' }" @click="game.recipeCategory = 'cocktail'">Cocktails</button>
           </div>
-          <div class="recipe-grid">
-            <button v-for="recipe in game.filteredRecipes" :key="recipe.id" class="recipe-tile"><span>🍸</span><b>{{ recipe.name }}</b></button>
-          </div>
+          <div class="recipe-grid"><button v-for="recipe in game.filteredRecipes" :key="recipe.id" class="recipe-tile"><span>🍸</span><b>{{ recipe.name }}</b></button></div>
         </article>
       </section>
 
@@ -68,11 +67,7 @@ const scenarios = [
         <article class="panel customization-panel">
           <div class="panel-title-row"><h2>Bar Customization</h2><span>Interior</span></div>
           <div class="custom-preview" :data-wall="game.decor.wall"><div>BAR</div><i></i></div>
-          <div class="choice-row">
-            <button :class="{ active: game.decor.wall === 'neon' }" @click="game.decor.wall = 'neon'">Neon</button>
-            <button :class="{ active: game.decor.wall === 'burgundy' }" @click="game.decor.wall = 'burgundy'">Classic</button>
-            <button :class="{ active: game.decor.wall === 'emerald' }" @click="game.decor.wall = 'emerald'">Green</button>
-          </div>
+          <div class="choice-row"><button :class="{ active: game.decor.wall === 'neon' }" @click="game.decor.wall = 'neon'">Neon</button><button :class="{ active: game.decor.wall === 'burgundy' }" @click="game.decor.wall = 'burgundy'">Classic</button><button :class="{ active: game.decor.wall === 'emerald' }" @click="game.decor.wall = 'emerald'">Green</button></div>
         </article>
 
         <article class="panel bartender-panel">
@@ -92,6 +87,8 @@ const scenarios = [
           <div class="scenario-list"><div v-for="scenario in scenarios" :key="scenario[0]" class="scenario-row"><span>🙂</span><div><b>{{ scenario[0] }}</b><button>{{ scenario[1] }}</button></div></div></div>
         </article>
       </section>
+
+      <PairingAdvisor />
 
       <section class="market-strip panel">
         <div class="panel-title-row"><h2>Quick restock</h2><span>Regional market prices</span></div>
