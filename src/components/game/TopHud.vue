@@ -23,7 +23,7 @@ onUnmounted(() => {
   <header class="top-hud">
     <div class="venue-card">
       <div class="venue-mark"><UiIcon name="glass" /></div>
-      <div><small>YOUR BAR · {{ game.region.name }}</small><b>{{ game.decor.name }}</b><div class="xp-line"><span :style="{ width: xpPercent + '%' }"></span></div></div>
+      <div><small>YOUR BAR · {{ game.region.name }}<em v-if="game.mode !== 'online'" class="sync-badge" :class="game.mode" :title="game.mode === 'offline' ? 'No connection to the game server: progress is saved on this device only and is not added to your account.' : 'Connecting to your account…'">{{ game.mode === 'offline' ? 'Offline practice' : 'Connecting…' }}</em></small><b>{{ game.decor.name }}</b><div class="xp-line"><span :style="{ width: xpPercent + '%' }"></span></div></div>
       <em>LV. {{ game.level }}</em>
     </div>
     <div class="hud-resources">

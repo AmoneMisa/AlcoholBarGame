@@ -183,7 +183,7 @@ function send(text: string, force = false) {
     haptic('light');
     return;
   }
-  game.recordSentence(result.ok);
+  game.recordSentence(sentence);
   if (result.ok) {
     learning.recordCorrect(sentence);
     learning.markPhraseUsed(sentence);

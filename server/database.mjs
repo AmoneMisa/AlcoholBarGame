@@ -34,10 +34,10 @@ export async function migrate() {
   }
 }
 
-export async function seedCocktailsIfEmpty() {
+// Seeds the catalog from the game's own recipe list (passed in by the server entry).
+export async function seedCocktailsIfEmpty(recipes) {
   const { rows: [{ count }] } = await pool.query('SELECT count(*)::int AS count FROM cocktails');
   if (count > 0) return { inserted: 0 };
-  const recipes = JSON.parse(await readFile(path.resolve('database/seed/cocktails.json'), 'utf8'));
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
