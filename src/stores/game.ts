@@ -6,6 +6,8 @@ import { arrivalSkipCrystalCost, calendarDate, coins, consecutiveDays, dailyCoin
 import { BAR_PROFILE_OPTIONS, INTERIORS, interiorStyle, type BarProfile } from '../data/cosmetics/bars';
 import { judgeMix } from '../domain/engine';
 import { economyAt, levelProgress, marketFor } from '../domain/progression';
+import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
+import { dailyLessonsFor, learningStreakBonus } from '../domain/dailyLessons';
 import { negotiatedQuote } from '../sim/trade';
 import type { Customer, InventoryItem, RegionId, SupplierOffer } from '../domain/types';
 import { pourableBrand } from '../domain/brandServe';
@@ -55,6 +57,8 @@ function migrateLegacySave(saved: Record<string, any>): PlayerState {
     bar.bartenderNickname = nickname || (bar.bartenderCharacter === 'leo' ? 'Leo' : 'Noa');
   }
   if (Array.isArray(saved.knownRecipeIds)) state.knownRecipeIds = [...new Set([...state.knownRecipeIds, ...saved.knownRecipeIds.filter((id: string) => RECIPES.some((recipe) => recipe.id === id))])];
+  state.ownedBarIds = [state.regionId];
+  state.startingBarChosen = true;
   return state;
 }
 
@@ -86,6 +90,8 @@ export const useGameStore = defineStore('game', () => {
   const streak = computed(() => state.value.streak);
   const level = computed(() => levelFor(state.value.xp));
   const bars = computed(() => state.value.bars);
+  const ownedBarIds = computed(() => state.value.ownedBarIds);
+  const startingBarChosen = computed(() => state.value.startingBarChosen);
   const ownedInteriorIds = computed(() => state.value.ownedInteriorIds ?? ['velvet']);
   const inventories = computed(() => state.value.inventories);
   const inventory = computed(() => state.value.inventories[state.value.regionId]);
@@ -98,6 +104,8 @@ export const useGameStore = defineStore('game', () => {
   const recipeUnlockSources = computed(() => state.value.recipeUnlockSources);
   const dailyGiftResult = computed(() => state.value.dailyGiftResult);
   const loginStreak = computed(() => state.value.loginStreak);
+  const dailyLessonResult = computed(() => state.value.dailyLessonResult);
+  const learningStreak = computed(() => state.value.learningStreak);
   const languageStats = computed(() => state.value.languageStats);
   const deliveryOrders = computed(() => state.value.deliveryOrders);
   const tradeLog = computed(() => state.value.tradeLog);
@@ -122,6 +130,11 @@ export const useGameStore = defineStore('game', () => {
   const knownRecipes = computed(() => RECIPES.filter((recipe) => state.value.knownRecipeIds.includes(recipe.id)));
   const lockedRecipes = computed(() => RECIPES.filter((recipe) => !state.value.knownRecipeIds.includes(recipe.id)));
   const today = computed(() => calendarDate(new Date(nowMs.value)));
+  const dailyLessons = computed(() => dailyLessonsFor(today.value));
+  const dailyLessonCompletedIds = computed(() => state.value.dailyLessonKey === today.value ? state.value.dailyLessonCompletedIds : []);
+  const learningStreakForToday = computed(() => consecutiveDays(state.value.lastLearningDayKey, state.value.learningStreak, new Date(nowMs.value)));
+  const learningBonusPercent = computed(() => Math.round(learningStreakBonus(learningStreakForToday.value) * 100));
+  const dailyLessonsComplete = computed(() => dailyLessonCompletedIds.value.length >= dailyLessons.value.length);
   const dailyGiftAvailable = computed(() => state.value.dailyGiftClaimedKey !== today.value);
   const upcomingLoginDay = computed(() => consecutiveDays(state.value.dailyGiftClaimedKey, state.value.loginStreak, new Date(nowMs.value)));
   const dailyCoinReward = computed(() => dailyCoinsFor(upcomingLoginDay.value));
@@ -149,7 +162,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: mode.value !== 'online' });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson']);
 
   function saveOffline() {
     if (mode.value === 'online') return;
@@ -387,6 +400,7 @@ export const useGameStore = defineStore('game', () => {
   const buyBottleStock = (productId: string, quantity = 1) => dispatch({ type: 'buyBottleStock', productId, quantity });
   const expediteCustomer = () => dispatch({ type: 'expediteCustomer' });
   const claimDailyGift = () => dispatch({ type: 'claimDaily' });
+  const completeDailyLesson = (lessonId: string, answer: string) => dispatch({ type: 'completeDailyLesson', lessonId, answer });
   const exchangeCrystals = (crystals: number) => dispatch({ type: 'exchangeCrystals', crystals });
   const refreshDailyGift = () => { nowMs.value = clientNow(); };
   const renameBar = (name: string) => dispatch({ type: 'renameBar', name });
@@ -394,12 +408,19 @@ export const useGameStore = defineStore('game', () => {
   function switchBar(id: RegionId) {
     if (id === state.value.regionId) return;
     if (dispatch({ type: 'switchBar', regionId: id })) {
-      purchaseCart.value = {};
-      saleCart.value = {};
-      transferTargetId.value = REGIONS.find((item) => item.id !== id)?.id ?? 'london';
-      resetMix();
+      clearBarWorkspace();
     }
   }
+  const isBarOwned = (id: RegionId) => state.value.ownedBarIds.includes(id);
+  const nextBarPrice = computed(() => barUnlockPrice(state.value.ownedBarIds));
+  function clearBarWorkspace() {
+    purchaseCart.value = {};
+    saleCart.value = {};
+    transferTargetId.value = REGIONS.find((item) => item.id !== state.value.regionId && state.value.ownedBarIds.includes(item.id))?.id ?? state.value.regionId;
+    resetMix();
+  }
+  function chooseStartingBar(id: RegionId) { const ok = dispatch({ type: 'chooseStartingBar', regionId: id }); if (ok) clearBarWorkspace(); return ok; }
+  function buyBar(id: RegionId) { const ok = dispatch({ type: 'buyBar', regionId: id }); if (ok) clearBarWorkspace(); return ok; }
 
   void connect();
 
@@ -408,13 +429,14 @@ export const useGameStore = defineStore('game', () => {
     economy, xpProgress, guestPriceFactor,
     upgradeRecipe, recipeLevels, recipeCopies,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
-    regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedInteriorIds, barBackground, barInteriorStyle,
+    regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, ownedInteriorIds, barBackground, barInteriorStyle,
     inventories, inventory, bottleInventories, bottleInventory, currentMix, shaken, customers, activeCustomerId, customer, hasCustomer, recipe, mixJudge,
     knownRecipeIds, recipeUnlockSources, knownRecipes, lockedRecipes, dailyGiftAvailable, dailyGiftResult, loginStreak, upcomingLoginDay, dailyCoinReward, dailyCrystalReward,
+    dailyLessons, dailyLessonCompletedIds, dailyLessonsComplete, dailyLessonResult, learningStreak, learningStreakForToday, learningBonusPercent, completeDailyLesson,
     conversationCustomerId, languageStats, nextCustomerAt, nextCustomerInSeconds, nextCustomerCountdown, nextCustomerCrystalCost, vipCooldownUntil, orderCountdown, orderTimerPaused,
     message, market, selectedSupplier, transferTargetId, tradeLog, recipeCategory, filteredRecipes,
     pourBrands, brandOnShelf, shelfBrandsFor, setPourBrand,
-    selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, tickGameClock, welcomeNextCustomer, offerSimilarOrder, rejectCustomer, buy, sell, switchBar, transferStock,
+    selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, tickGameClock, welcomeNextCustomer, offerSimilarOrder, rejectCustomer, buy, sell, switchBar, isBarOwned, nextBarPrice, barPurchaseLevel:BAR_PURCHASE_LEVEL, chooseStartingBar, buyBar, transferStock,
     supplier, purchaseCart, saleCart, purchaseQuote, saleQuote, saleRevenue, deliveryOrders, deliveryCountdown, selectSupplier, checkoutPurchase, checkoutSale, renameBar, renameBartender,
     buyRecipe, recipePrice, buyInterior, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
   };

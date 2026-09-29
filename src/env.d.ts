@@ -8,6 +8,7 @@ declare global {
         initData?: string;
         ready?: () => void;
         expand?: () => void;
+        showAlert?: (message: string) => void;
         HapticFeedback?: { impactOccurred?: (style: string) => void };
       };
     };

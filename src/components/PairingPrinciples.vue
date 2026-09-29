@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { explainPairing } from '../domain/pairingExplain';
-import { canSpeak, speak } from '../domain/english/speak';
+import { speak } from '../domain/english/speak';
+import UiIcon from './ui/UiIcon.vue';
 
 const props = defineProps<{ item: { why?: string; relationship?: string }; kind: 'food' | 'drink' | 'context' | 'cigar' }>();
 const principles = computed(() => explainPairing(props.item, props.kind));
@@ -19,7 +20,7 @@ const open = ref<string>();
         <p class="principle-rule">{{ principle.rule }}</p>
         <p>{{ principle.explain }}</p>
         <p class="principle-example"><span>Example</span>{{ principle.example }}</p>
-        <p class="principle-say"><span>Say it to the guest</span>“{{ principle.sayIt }}” <button v-if="canSpeak()" type="button" aria-label="Listen" @click="speak(principle.sayIt)">🔊</button></p>
+        <p class="principle-say"><span>Say it to the guest</span>“{{ principle.sayIt }}” <button type="button" class="inline-speak-button" aria-label="Listen" @click="speak(principle.sayIt)"><UiIcon name="speaker" /></button></p>
       </div>
     </template>
   </div>
@@ -36,5 +37,5 @@ const open = ref<string>();
 .principle-rule { color: #eef2f8; font-weight: 700; }
 .principle-example span, .principle-say span { display: block; color: #e4b75b; font-size: 8px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
 .principle-say { color: #9fe6b2; font-style: italic; }
-.principle-say button { padding: 0; border: 0; background: none; cursor: pointer; font-style: normal; }
+.principle-say button { cursor: pointer; font-style: normal; }
 </style>

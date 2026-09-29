@@ -21,6 +21,38 @@ html { background: #080d16; }
 body { min-width: 320px; min-height: 100vh; margin: 0; background: radial-gradient(circle at 50% -20%, #432235 0, #111827 36%, #080d16 75%); color: var(--cream); }
 button, input, select { font: inherit; }
 button { touch-action: manipulation; }
+.velvet-app select {
+  min-height:44px;
+  appearance:none;
+  -webkit-appearance:none;
+  border:1px solid #42536d;
+  border-radius:9px;
+  background-color:#17263a;
+  background-image:linear-gradient(45deg,transparent 50%,#f2bd58 50%),linear-gradient(135deg,#f2bd58 50%,transparent 50%);
+  background-position:calc(100% - 17px) 50%,calc(100% - 11px) 50%;
+  background-repeat:no-repeat;
+  background-size:6px 6px,6px 6px;
+  color:#f6efe3;
+  color-scheme:dark;
+  padding:0 38px 0 12px;
+  cursor:pointer;
+}
+.velvet-app select option { background:#17263a;color:#f6efe3; }
+.velvet-app select option:checked { background:#735127;color:#fff4df; }
+.velvet-app select:focus-visible,
+.velvet-app input[type='number']:focus-visible { border-color:var(--gold);outline:2px solid #f2bd5840;outline-offset:1px; }
+.velvet-app input[type='number'] {
+  appearance:textfield;
+  -moz-appearance:textfield;
+  border:1px solid #405470;
+  border-radius:8px;
+  background:#0d1828;
+  color:#f5ead7;
+  font-variant-numeric:tabular-nums;
+  text-align:center;
+}
+.velvet-app input[type='number']::-webkit-inner-spin-button,
+.velvet-app input[type='number']::-webkit-outer-spin-button { margin:0;-webkit-appearance:none; }
 .velvet-app { min-height: 100vh; padding-bottom: calc(78px + var(--safe-bottom)); }
 .velvet-app main { max-width: 1600px; margin: auto; padding: 12px; }
 
@@ -180,10 +212,10 @@ button { touch-action: manipulation; }
 .recipe-progress { position: relative; z-index: 4; display: grid; gap: 5px; }.recipe-progress div { display: flex; justify-content: space-between; gap: 10px; padding: 6px 7px; border: 1px solid #6a4b3b; border-radius: 7px; background: #1e1818cc; color: #c6b9b0; font-size: 8px; }.recipe-progress div.done { border-color: #3b8c62; color: #91dbad; }.recipe-progress div.wrong { border-color: #b94c56; color: #ff9d9f; }.recipe-progress b { color: inherit; }
 .workspace-actions { display: grid; grid-template-columns: 120px 120px minmax(160px, 1fr); gap: 8px; padding: 10px 12px; border-top: 1px solid #35465f; background: #0c1523; }.secondary-button, .primary-button { min-height: 46px; border-radius: 10px; padding: 9px 14px; font-weight: 900; cursor: pointer; }.secondary-button { border: 1px solid #475a74; background: #1b2940; color: #dce4ef; }.secondary-button.active { border-color: var(--gold); }.primary-button { border: 1px solid #f0d57c; background: linear-gradient(#f6cc66,#d99a35); color: #281b0e; box-shadow: inset 0 1px #fff8, 0 5px 14px #0006; }.primary-button span { margin-left: 10px; }.primary-button.compact { min-height: 42px; align-self: flex-start; }
 
-.game-nav { position: fixed; z-index: 120; right: 12px; bottom: calc(10px + var(--safe-bottom)); left: 12px; display: flex; max-width: 820px; margin: auto; gap: 4px; padding: 6px; border: 1px solid #43536b; border-radius: 17px; background: #0c1421ee; box-shadow: 0 13px 35px #000b; backdrop-filter: blur(18px); }.game-nav button { flex: 1; min-width: 68px; min-height: 50px; border: 0; border-radius: 11px; background: transparent; color: #909cac; cursor: pointer; }.game-nav span, .game-nav b { display: block; }.game-nav span { color: #c2a668; font-size: 15px; }.game-nav b { margin-top: 2px; font-size: 8px; letter-spacing: .04em; }.game-nav button.active { background: linear-gradient(#3d2f27,#251d1d); color: #fff5e4; box-shadow: inset 0 0 0 1px #b78649; }.game-nav button.active span { color: var(--gold); }
+.game-nav { position: fixed; z-index: 120; right: 12px; bottom: calc(10px + var(--safe-bottom)); left: 12px; display: flex; max-width: 820px; margin: auto; gap: 4px; padding: 6px; border: 1px solid #43536b; border-radius: 17px; background: #0c1421ee; box-shadow: 0 13px 35px #000b; backdrop-filter: blur(18px); }.game-nav button { display:grid;grid-template-rows:22px auto;align-content:center;justify-items:center;gap:2px;flex: 1; min-width: 68px; min-height: 50px;padding:4px; border: 0; border-radius: 11px; background: transparent; color: #909cac;text-align:center; cursor: pointer; }.game-nav span, .game-nav b { display: block; }.game-nav span { color: #c2a668; font-size: 15px; }.game-nav b { max-width:100%;margin-top:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size: 8px;line-height:1.2; letter-spacing: .04em; }.game-nav button.active { background: linear-gradient(#3d2f27,#251d1d); color: #fff5e4; box-shadow: inset 0 0 0 1px #b78649; }.game-nav button.active span { color: var(--gold); }
 
 .management-deck { min-height: 680px; }.management-deck > .game-panel, .management-deck > .panel { min-height: 650px; margin: 0; }.category-tabs { display: flex; gap: 6px; padding: 10px 12px; border-bottom: 1px solid #293a52; }.category-tabs button, .design-options button, .bartender-custom button { min-height: 36px; border: 1px solid #3c4c64; border-radius: 8px; background: #152237; color: #b8c2d0; padding: 7px 13px; cursor: pointer; }.category-tabs button.active, .design-options button.active, .bartender-custom button.active { border-color: #d6a54d; background: #45301e; color: #ffe3a4; }
-.inventory-cards { display: grid; grid-template-columns: repeat(6,1fr); gap: 9px; padding: 12px; }.inventory-card { position: relative; display: grid; min-height: 180px; place-items: center; padding: 12px 8px; border: 1px solid #35465e; border-radius: 12px; background: radial-gradient(circle at 50% 35%,#2a405a,#101a2b 72%); text-align: center; }.inventory-card .bottle-visual { transform: scale(1.18); }.inventory-card b, .inventory-card small { display: block; }.inventory-card b { font-size: 11px; }.inventory-card small { color: #8f9daf; font-size: 8px; }.inventory-card > span { position: absolute; top: 8px; right: 8px; padding: 3px 6px; border-radius: 9px; background: #0a111d; color: var(--gold); font-size: 8px; }
+.inventory-cards { display: grid; grid-template-columns: repeat(6,1fr); gap: 9px; padding: 12px; }.inventory-card { position: relative; display: grid; min-height: 180px; place-items: center; padding: 12px 8px; border: 1px solid #35465e; border-radius: 12px; background: radial-gradient(circle at 50% 35%,#2a405a,#101a2b 72%); text-align: center; }.inventory-card .bottle-visual { transform: scale(1.18); }.inventory-card b, .inventory-card small { display: block; }.inventory-card b { font-size: 11px; }.inventory-card small { color: #8f9daf; font-size: 8px; }.inventory-card > span { position: absolute; top: 8px; right: 8px;display:inline-flex;min-height:22px;align-items:center;justify-content:center;padding: 3px 8px;border:1px solid #765c2e; border-radius:999px; background: #0a111de8; color: var(--gold); font-size:7px;font-weight:900;line-height:1;text-transform:uppercase; }
 .sealed-stock-section { margin:0 12px 12px;overflow:hidden;border:1px solid #3d4d63;border-radius:14px;background:#0d1726; }
 .sealed-stock-section > header { display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #33435a;background:linear-gradient(90deg,#251b27,#152237); }
 .sealed-stock-section > header small { color:var(--gold);font-size:8px;font-weight:900;letter-spacing:.12em; }.sealed-stock-section > header h3 { margin:2px 0 0;font:700 19px Georgia,serif; }.sealed-stock-section > header span { color:#adbed1;font-size:10px; }
@@ -199,7 +231,7 @@ button { touch-action: manipulation; }
 .world-map-art { position:relative; min-height:330px; margin:12px; overflow:hidden; border:1px solid #36506a; border-radius:13px; background:radial-gradient(ellipse at 50% 50%,#28506b,#10243a 55%,#0c1727); }.world-map-art::before { content:''; position:absolute; inset:12% 8%; background:#476a69; opacity:.6; clip-path:polygon(1% 27%,17% 11%,31% 22%,41% 8%,63% 16%,72% 8%,98% 19%,88% 38%,72% 42%,69% 67%,55% 81%,43% 58%,32% 70%,17% 54%,5% 60%); }.world-map-art span { position:absolute; z-index:2; left:var(--x); top:var(--y); width:13px; height:13px; border:3px solid #ffe081; border-radius:50% 50% 50% 0; background:#d64168; box-shadow:0 0 13px #ffdf7166; transform:rotate(-45deg); }.world-map-art span.active { width:19px; height:19px; background:#4bd181; box-shadow:0 0 18px #4bd181; }.region-cards { display:grid; grid-template-columns:repeat(6,1fr); gap:7px; padding:0 12px 12px; }.region-cards button { min-height:90px; border:1px solid #354861; border-radius:9px; background:#142238; color:#f1f3f6; padding:9px; text-align:left; }.region-cards button.active { border-color:var(--gold); background:#3c2b24; }.region-cards b,.region-cards small,.region-cards span { display:block; }.region-cards b { font:700 13px Georgia,serif; }.region-cards small { margin:3px 0;color:#94a2b4;font-size:8px; }.region-cards span { color:var(--gold);font-size:8px; }
 
 .bar-switcher { display:grid;grid-template-columns:repeat(6,1fr);gap:7px;padding:10px 12px;border-bottom:1px solid #293a52;background:#0d1726; }.bar-switcher button { display:grid;gap:3px;min-height:54px;border:1px solid #354760;border-radius:9px;background:#152236;color:#dbe3ec;padding:8px;text-align:left;cursor:pointer; }.bar-switcher button.active { border-color:var(--gold);background:linear-gradient(135deg,#51351e,#242035);box-shadow:inset 3px 0 var(--gold); }.bar-switcher b { font:700 12px Georgia,serif; }.bar-switcher small { color:#8f9fb2;font-size:8px; }
-.inventory-tools { display:grid;grid-template-columns:auto 1fr;align-items:center;border-bottom:1px solid #293a52; }.inventory-tools .category-tabs { border:0; }.transfer-console { display:grid;grid-template-columns:minmax(112px,.8fr) minmax(130px,1fr) auto minmax(110px,.8fr) auto;align-items:center;gap:7px;padding:8px 12px;border-left:1px solid #293a52;background:#111c2c; }.transfer-console small,.trade-log small,.recipe-detail-page > * > small,.occasion-block > small { display:block;color:var(--gold);font-size:8px;font-weight:900;letter-spacing:.11em; }.transfer-console b { display:block;margin-top:2px;font:700 13px Georgia,serif; }.transfer-console select { min-width:0;height:38px;border:1px solid #42536d;border-radius:8px;background:#17263a;color:#ecf0f4;padding:0 8px; }.transfer-console > button,.trade-actions button,.recipe-detail-heading > button { min-height:38px;border:1px solid #397f5e;border-radius:8px;background:#247a56;color:white;padding:7px 10px;font-weight:800;cursor:pointer; }
+.inventory-tools { display:grid;grid-template-columns:auto 1fr;align-items:center;border-bottom:1px solid #293a52; }.inventory-tools .category-tabs { border:0; }.transfer-console { display:grid;grid-template-columns:minmax(112px,.8fr) minmax(130px,1fr) auto minmax(110px,.8fr) auto;align-items:center;gap:7px;padding:8px 12px;border-left:1px solid #293a52;background:#111c2c; }.transfer-console small,.trade-log small,.recipe-detail-page > * > small,.occasion-block > small { display:block;color:var(--gold);font-size:8px;font-weight:900;letter-spacing:.11em; }.transfer-console b { display:block;margin-top:2px;font:700 13px Georgia,serif; }.transfer-console select { min-width:0;height:44px;background-color:#17263a;color:#ecf0f4;padding-left:12px; }.transfer-console > button,.trade-actions button,.recipe-detail-heading > button { min-height:38px;border:1px solid #397f5e;border-radius:8px;background:#247a56;color:white;padding:7px 10px;font-weight:800;cursor:pointer; }
 .supplier-picker { display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 12px;border-bottom:1px solid #293a52; }.supplier-picker > button { display:grid;grid-template-columns:68px 1fr;align-items:center;gap:9px;min-height:88px;border:1px solid #354761;border-radius:11px;background:#111d2e;color:#eef2f7;padding:8px;text-align:left;cursor:pointer; }.supplier-picker > button.active { border-color:var(--gold);box-shadow:inset 3px 0 var(--gold); }.supplier-picker .supplier-scene { height:68px; }.supplier-picker .supplier-scene::before { right:6px;bottom:9px;width:46px;height:28px; }.supplier-picker .supplier-scene i { right:10px;bottom:3px;transform:scale(.72); }.supplier-picker h3,.supplier-picker p { margin:1px 0; }.supplier-picker h3 { font:700 13px Georgia,serif; }.supplier-picker p { color:#9dabbc;font-size:8px; }.supplier-picker small { color:var(--gold);font-size:7px; }.supplier-picker em { color:#f4c45b;font-style:normal;font-size:9px; }
 .market-filter { justify-content:center; }.market-offer-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:12px; }.market-offer-card { display:grid;grid-template-columns:92px 1fr auto;grid-template-rows:1fr auto;align-items:center;gap:6px 10px;min-height:158px;border:1px solid #354761;border-radius:12px;background:radial-gradient(circle at 15% 40%,#263c52,#111b2c 68%);padding:10px; }.market-offer-card > .bottle-visual { grid-row:1/3; }.offer-copy small { color:var(--gold);font-size:7px;text-transform:uppercase; }.offer-copy h3 { margin:3px 0;font:700 16px Georgia,serif; }.offer-copy span { color:#9aa8ba;font-size:8px; }.market-offer-card > strong { align-self:start;color:#ffd57a;font:700 16px Georgia,serif;white-space:nowrap; }.trade-actions { grid-column:2/4;display:grid;grid-template-columns:1fr 1fr;gap:6px; }.trade-actions .sell-button { border-color:#69536c;background:#30243a; }.trade-actions button:disabled { cursor:not-allowed;opacity:.4; }.trade-log { display:flex;flex-wrap:wrap;gap:7px;padding:0 12px 14px; }.trade-log small { flex:0 0 100%; }.trade-log span { padding:6px 9px;border:1px solid #35465d;border-radius:999px;background:#111c2c;color:#aab6c6;font-size:8px; }
 .recipe-cards { grid-template-columns:repeat(2,1fr);gap:12px; }.recipe-cards button { display:grid;grid-template-columns:190px minmax(0,1fr);min-height:230px;align-items:center;justify-content:stretch;gap:14px;padding:14px;text-align:left; }.recipe-cards .glass-model.glass-painted { width:190px;height:158px;flex:none; }.recipe-card-copy { min-width:0; }.recipe-card-copy small { color:var(--gold);font-size:8px;line-height:1.35; }.recipe-card-copy b { margin:7px 0;font:700 23px Georgia,serif; }.recipe-card-copy p { display:-webkit-box;overflow:hidden;margin:0 0 10px;color:#bcc5d1;font-size:10px;line-height:1.5;-webkit-box-orient:vertical;-webkit-line-clamp:3; }.recipe-card-copy span { color:#8fa0b3;font-size:9px; }.recipe-card-copy em { display:block;margin-top:12px;color:#ffd47a;font-size:9px;font-style:normal;font-weight:900;text-transform:uppercase;letter-spacing:.09em; }
@@ -207,7 +239,7 @@ button { touch-action: manipulation; }
 .unlock-guide { display:grid;grid-template-columns:1.5fr repeat(3,1fr);gap:8px;padding:12px;border-bottom:1px solid #293a52;background:linear-gradient(135deg,#101b2b,#1b2134); }.unlock-guide > div { position:relative;min-height:128px;border:1px solid #354962;border-radius:11px;background:#142238;padding:13px; }.unlock-guide .unlock-intro { background:radial-gradient(circle at 15% 20%,#503649,#172237 70%); }.unlock-guide small { color:var(--gold);font-size:8px;font-weight:900;letter-spacing:.11em; }.unlock-guide h3 { margin:7px 0;font:700 21px Georgia,serif; }.unlock-guide p,.unlock-guide span { color:#aeb9c7;font-size:9px;line-height:1.5; }.unlock-guide > div > b { display:grid;width:27px;height:27px;margin-bottom:8px;place-items:center;border-radius:50%;background:#d6a84f;color:#20170b;font:700 14px Georgia,serif; }.unlock-guide strong,.unlock-guide span,.unlock-guide em { display:block; }.unlock-guide strong { margin-bottom:4px;font:700 15px Georgia,serif; }.unlock-guide button { margin-top:9px;border:1px solid #4bb77f;border-radius:7px;background:#22744f;color:white;padding:7px 9px;font-size:8px;font-weight:900;cursor:pointer; }.unlock-guide button:disabled { border-color:#465268;background:#263247;color:#8995a6;cursor:default; }.unlock-guide em { margin-top:5px;color:#e7c778;font-size:7px;font-style:normal; }
 .recipe-mode-tabs { display:flex;justify-content:center;gap:7px;padding:10px 12px;border-bottom:1px solid #293a52; }.recipe-mode-tabs button { min-width:170px;border:1px solid #41536c;border-radius:8px;background:#17253a;color:#b9c5d2;padding:9px 14px;font-weight:800;cursor:pointer; }.recipe-mode-tabs button.active { border-color:var(--gold);background:#47321f;color:#ffe5a8; }
 .recipe-shop-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px; }.locked-recipe-card { display:grid;grid-template-columns:120px 1fr;grid-template-rows:1fr auto;gap:9px;min-height:205px;border:1px solid #3b4960;border-radius:12px;background:linear-gradient(145deg,#192438,#111a2a);padding:12px; }.locked-art { position:relative;grid-row:1/3;display:grid;place-items:center;overflow:hidden;border-radius:9px;background:radial-gradient(circle,#423446,#111927 70%); }.locked-art .glass-model.glass-painted { width:120px;height:100px;filter:grayscale(.65) brightness(.7); }.locked-art > span { position:absolute;right:7px;bottom:7px;padding:4px 6px;border:1px solid #b88949;border-radius:6px;background:#17131bcc;color:#ffd17f;font-size:7px;font-weight:900;letter-spacing:.1em; }.locked-recipe-card small { color:var(--gold);font-size:7px;font-weight:900;letter-spacing:.1em; }.locked-recipe-card h3 { margin:5px 0;font:700 18px Georgia,serif; }.locked-recipe-card p { margin:0 0 5px;color:#d5be82;font-size:8px;text-transform:capitalize; }.locked-recipe-card span { color:#94a3b5;font-size:8px;line-height:1.4; }.locked-recipe-card > button { grid-column:2;min-height:36px;border:1px solid #4db77e;border-radius:8px;background:#247853;color:white;font-weight:900;cursor:pointer; }
-.recipe-formula .model-sprite { inset:0;height:auto;align-self:stretch; }
+.recipe-formula .model-sprite { inset:auto;top:50%;left:50%;height:100%;align-self:auto; }
 .drink-art-sprite { background-size:500% 200%; }
 .glass-model.glass-painted { width:180px;height:150px; }
 .recipe-cards .glass-model.glass-painted { width:180px;height:150px;flex:0 0 150px; }
@@ -995,3 +1027,225 @@ button { touch-action: manipulation; }
 @media (max-width: 760px) { .bar-scene.is-building { min-height: 780px; } .bar-scene .live-glass-wrap { transform: scale(.42); } }
 .customer-stool { height: calc(var(--seat) - 6px); }
 @media (max-width: 760px) { .bar-scene .live-glass-station { height: 120px !important; } }
+
+/* ==== Mobile-first scene contract =========================================
+   BarScene.vue measures the actual painted background and exposes all useful
+   coordinates as CSS variables. These final rules are the single authority
+   for the current pshelf scene and intentionally supersede the retired
+   live-backbar experiments above. */
+html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
+.character-composite{position:absolute;inset:0;overflow:visible}
+.role-bartender .character-composite,.role-bartender .bartender-customization{transform:translate(var(--pose-x,0),var(--pose-y,0)) rotate(var(--pose-rotate,0deg)) scaleX(var(--body-custom-scale,1));transform-origin:50% 100%;transition:transform .28s ease,filter .28s ease}
+.role-bartender .base-art,.role-bartender .wardrobe-art{position:absolute;inset:0;width:100%;height:100%;background-repeat:no-repeat}
+.role-bartender .base-art,.role-bartender .wardrobe-art{transform:none!important}
+.role-bartender .character-composite.showing-base .base-art{filter:drop-shadow(0 12px 10px #0009)}
+.role-bartender:has(.character-composite.showing-base).custom-skin-tattoo-light .custom-skin-detail,.role-bartender:has(.character-composite.showing-base).custom-skin-tattoo-bold .custom-skin-detail{display:block;left:14%;top:35%;width:16%;height:22%}
+
+.bar-scene,.bar-scene.is-building{min-height:680px;--bar-line:var(--back,478px);--seat-line:var(--seat-top,570px)}
+.bar-scene .counter-glow{display:none}
+.bar-line-tint{bottom:calc(100% - var(--bar-line) - 3px);height:max(62px,calc(100% - var(--bar-line) + 3px))}
+.bar-scene .bartender-layer{z-index:3!important;right:auto!important;bottom:calc(100% - var(--bar-line) - var(--bt-h) * .42)!important;left:var(--bt-x)!important;width:calc(var(--bt-h) * .572)!important;height:var(--bt-h)!important;opacity:1!important;clip-path:inset(-12% -12% 42% -12%);transform:translateX(-50%)!important}
+.bar-scene .bartender-layer:has(>.character-leo .character-composite.showing-base){width:calc(var(--bt-h) * .667)!important}
+.bar-scene .bartender-layer:has(>.character-noa .character-composite.showing-base){width:calc(var(--bt-h) * .5)!important}
+.bar-scene .bartender-layer .name-ribbon{top:3%;right:50%;bottom:auto;transform:translateX(50%);white-space:nowrap}
+.bar-scene .bar-cast{position:absolute!important;z-index:6;inset:0!important;display:block!important}
+.bar-scene .scene-customer,.bar-scene .scene-customer:only-child{position:absolute!important;top:0;bottom:0;width:clamp(126px,18%,190px)!important;min-width:0;height:auto!important;transform:translateX(-50%)!important}
+.bar-scene .scene-customer:hover,.bar-scene .scene-customer.active{transform:translateX(-50%)!important}
+.bar-scene .scene-customer .art-character{top:auto!important;right:0!important;bottom:calc(100% - var(--seat-line))!important;left:0!important;width:100%;height:var(--guest-h)!important;filter:drop-shadow(0 14px 12px #000b)}
+.bar-scene .scene-customer.active .art-character{transform:scale(1.03);transform-origin:50% 100%}
+.bar-scene .speech-bubble{top:auto!important;right:auto;bottom:calc(100% - var(--seat-line) + var(--guest-h) - 10px)!important;left:50%;width:min(190px,45vw);transform:translateX(-50%)}
+.bar-scene .customer-plate{right:8px!important;bottom:44px!important;left:8px!important;z-index:9}
+.customer-stool{bottom:40px;height:max(42px,calc(100% - var(--seat-line) - 8px))}
+
+/* Bottles sit directly on the measured shelves in the background. */
+.pshelf-box{position:absolute;z-index:2;inset:0;overflow:hidden;pointer-events:none;--shelf-edge:#d4a45d;--shelf-top:#8a5833;--shelf-face:#3c2416}
+.pshelf-box[data-shelf='brass']{--shelf-edge:#ffe08a;--shelf-top:#c99a48;--shelf-face:#664419}
+.pshelf-box[data-shelf='glass']{--shelf-edge:#e8f8ff;--shelf-top:#9dc6d8;--shelf-face:#3b6479}
+.pshelf-box[data-shelf='neon']{--shelf-edge:#5ff6ff;--shelf-top:#532359;--shelf-face:#160b28}
+.pshelf-hint{position:absolute;z-index:5;max-width:calc(100% - 20px);overflow:hidden;padding:3px 7px;border-radius:999px;background:#0c1018cc;color:#f8db9a;font-size:7px;font-weight:800;letter-spacing:.04em;white-space:nowrap;text-overflow:ellipsis;pointer-events:none}
+.pshelf-row{position:absolute;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;min-width:0;padding:10px 0 7px;pointer-events:auto;isolation:isolate}
+.pshelf-row::after{content:'';position:absolute;z-index:4;right:0;bottom:0;left:0;height:8px;border-top:1px solid var(--shelf-edge);background:linear-gradient(var(--shelf-top),var(--shelf-face));box-shadow:0 6px 8px #0008;pointer-events:none}
+.pshelf-label{position:absolute;z-index:5;top:1px;left:3px;max-width:60%;overflow:hidden;color:#f4d39b;font-size:6px;font-weight:900;letter-spacing:.08em;text-overflow:ellipsis;text-transform:uppercase;white-space:nowrap;text-shadow:0 1px 2px #000}
+.pshelf-bottles{display:flex;min-width:0;height:100%;align-items:flex-end;gap:2px;overflow-x:auto;overflow-y:hidden;padding:0 4px 4px;scroll-snap-type:x proximity;scrollbar-width:none;overscroll-behavior-x:contain;touch-action:pan-x}
+.pshelf-bottles::-webkit-scrollbar{display:none}
+.pshelf-bottles>button{position:relative;flex:0 0 clamp(43px,calc(var(--bottle) + 8px),82px);width:auto;height:100%;min-height:0;overflow:hidden;border:0;border-radius:7px;background:linear-gradient(180deg,transparent 20%,#090b10a8);color:#fff;cursor:grab;scroll-snap-align:start;touch-action:none;user-select:none}
+.pshelf-bottles>button:active{cursor:grabbing}
+.pshelf-bottles>button.empty{filter:grayscale(1) brightness(.5);cursor:not-allowed}
+.pshelf-bottles>button.poured{box-shadow:inset 0 0 0 1px #64dd9455}
+.pshelf-bottles .bottle-visual{position:absolute;right:50%;bottom:11px;width:var(--bottle);height:var(--bottle);margin:0;filter:drop-shadow(0 5px 3px #000b);transform:translateX(50%)}
+.pshelf-bottles>button>span{position:absolute;z-index:3;right:2px;bottom:2px;left:2px;overflow:hidden;padding:1px 2px;border-radius:4px;background:#080b10d9;color:#f7e3c2;font-size:6px;font-weight:800;line-height:1.05;text-align:center;text-overflow:ellipsis;white-space:nowrap}
+.pshelf-row>.shelf-nudge{z-index:6;display:flex;gap:2px;padding:0 2px 9px}
+.pshelf-row>.shelf-nudge button{display:grid;width:22px;height:22px;place-items:center;padding:0;border:1px solid var(--shelf-edge);border-radius:6px;background:#18120ed9;color:#ffe4aa;cursor:pointer}
+.pshelf-bottles[data-at-start='true']~.shelf-nudge button:first-child,.pshelf-bottles[data-at-end='true']~.shelf-nudge button:last-child{opacity:.35;pointer-events:none}
+
+.bar-scene .live-glass-station{z-index:10!important;right:auto!important;bottom:calc(100% - var(--glass-y))!important;left:var(--glass-x)!important;width:142px!important;height:190px!important;transform:translateX(-50%)}
+.bar-scene .live-glass-wrap{width:128px;height:190px;transform:scale(.58);transform-origin:50% 100%}
+.bar-scene .live-glass-wrap .glass-model{width:128px;height:190px}
+.bar-scene .live-glass-copy{top:0;left:50%;max-width:140px;transform:translateX(-50%);white-space:nowrap}
+.bar-scene.is-building .city-event.compact{z-index:14;top:8px;right:8px;bottom:auto;left:auto;max-width:190px}
+
+/* Recipes and fixed navigation must stay inside a phone viewport. */
+@media(max-width:760px){
+  .velvet-app{padding-bottom:calc(118px + var(--safe-bottom))}
+  .velvet-app main{width:100%;padding:6px}
+  .top-hud{grid-template-columns:minmax(0,1fr);gap:5px;padding:6px}
+  .venue-card{grid-template-columns:38px minmax(0,1fr) auto;gap:7px;padding:5px 7px}
+  .venue-mark{width:36px;height:36px}.venue-card b{font-size:15px}.venue-card small,.venue-card em{font-size:7px}
+  .hud-resources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;overflow:visible}
+  .hud-resources>div,.daily-hud-gift{min-width:0;padding:6px 7px;border-right:1px solid #334158;border-left:0}
+  .hud-resources .ui-icon{width:22px;height:22px}.hud-resources span b{font-size:11px}.shift-card{display:none}
+  .game-nav{right:6px;bottom:calc(5px + var(--safe-bottom));left:6px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;overflow:visible;padding:5px}
+  .game-nav button{width:auto;min-width:0;min-height:46px;padding:4px}.game-nav b{font-size:7px}.game-nav .ui-icon{width:18px;height:18px}
+  .service-layout{grid-template-columns:minmax(0,1fr);gap:7px}
+  .bar-scene{min-height:clamp(430px,90vw,520px);border-radius:13px}
+  .bar-scene.is-building{min-height:clamp(470px,94vw,550px)}
+  .bar-scene .bartender-layer .name-ribbon{display:none}
+  .bar-scene .scene-customer,.bar-scene .scene-customer:only-child{display:block;width:clamp(118px,31vw,155px)!important}
+  .bar-scene .scene-customer.waiting{display:none}
+  .bar-scene .speech-bubble{display:block;width:145px;padding:7px}.bar-scene .speech-bubble b{font-size:8px}.bar-scene .speech-bubble em{font-size:6px}
+  .bar-scene .customer-plate{right:2px!important;bottom:36px!important;left:2px!important;padding:4px 5px}.customer-plate b{font-size:10px}.customer-plate small{font-size:6px}
+  .pshelf-hint{display:none}.pshelf-row{padding-top:7px}.pshelf-label{font-size:5px;max-width:48%}
+  .pshelf-bottles>button{flex-basis:clamp(40px,12vw,58px)}.pshelf-bottles>button>span{font-size:5.5px}
+  .pshelf-row>.shelf-nudge{display:none}
+  .bar-scene .live-glass-station{width:105px!important;height:135px!important}
+  .bar-scene .live-glass-wrap{transform:scale(.45)}.bar-scene .live-glass-copy{top:-8px;max-width:110px;padding:4px 6px}.bar-scene .live-glass-copy b{font-size:8px}.bar-scene .live-glass-copy small{display:none}
+  .fresh-plus{right:-10px;bottom:30px}
+  .unlock-guide{display:grid;grid-template-columns:1fr;gap:6px;padding:8px}.unlock-guide>div{min-height:0;padding:10px}.unlock-guide .unlock-intro{min-height:86px}.unlock-guide h3{font-size:17px}
+  .recipe-mode-tabs{justify-content:flex-start;overflow-x:auto;padding:8px}.recipe-mode-tabs button{flex:0 0 auto;min-width:135px}
+  .recipe-cards{grid-template-columns:1fr;gap:8px;padding:8px}.recipe-cards button{grid-template-columns:110px minmax(0,1fr);min-height:152px;padding:8px;text-align:left}.recipe-cards .glass-model.glass-painted{width:110px;height:115px;flex:none}.recipe-card-copy b{font-size:18px}.recipe-card-copy p{-webkit-line-clamp:2}
+  .recipe-detail-heading{grid-template-columns:1fr auto}.recipe-detail-heading>button{grid-column:1/-1;justify-self:start}.recipe-detail-heading h2{font-size:18px}.recipe-detail-heading>span{font-size:8px;text-align:right}
+  .recipe-detail-page{grid-template-columns:1fr;gap:8px;padding:8px}.recipe-detail-page>*{padding:12px}.recipe-hero-art{min-height:250px}.recipe-hero-art .glass-model.glass-painted{width:210px;height:175px}.recipe-formula,.recipe-method{grid-column:auto}.recipe-formula{grid-template-columns:1fr 1fr}.recipe-method ol{grid-template-columns:1fr}.recipe-method li{min-height:0}.recipe-story p{font-size:11px}
+}
+
+@media(max-width:430px){
+  .hud-resources>div,.daily-hud-gift{gap:5px;padding:5px}.hud-resources small{font-size:6px}.hud-resources span b{font-size:10px}
+  .bar-scene,.bar-scene.is-building{min-height:470px}
+  .bar-scene .bartender-layer{display:block!important}
+  .bar-scene .speech-bubble{width:132px}
+  .recipe-formula{grid-template-columns:1fr}
+}
+
+.recipe-hero-art > div > small { display:block;line-height:1.45; }
+.tasting-badges { display:flex;flex-wrap:wrap;gap:7px;margin-top:9px; }
+.tasting-badges span { display:inline-flex;min-height:30px;align-items:center;justify-content:center;padding:6px 10px;border:1px solid #7e6746;border-radius:999px;background:#34291e;color:#ffe1a2;font-size:9px;font-weight:800;line-height:1.15;text-align:center;text-transform:capitalize; }
+
+/* ==== One painted scene (BarScene.vue + data/cosmetics/barLines.ts) ==== */
+.bar-scene { --back: 60%; --seat-top: 80%; --guest-h: 260px; --bt-h: 400px; --bt-x: 84%; --glass-x: 70%; --glass-y: 62%; }
+.bar-scene .bar-line-tint { display: none; }
+.customer-stool { display: none !important; }
+
+/* Back-bar bottles on the painted planks; the painted bottles behind them are softly blurred away. */
+.pshelf-box { --plank-edge: #f0c27a; --shelf-label: #f0cf95; --blur-tint: rgba(24, 12, 6, .28); position: absolute; z-index: 2; inset: 0; pointer-events: none; }
+.pshelf-box[data-shelf="brass"] { --plank-edge: #ffe2a0; --shelf-label: #ffe2a0; }
+.pshelf-box[data-shelf="glass"] { --plank-edge: #e8f6ff; --shelf-label: #e8f6ff; --blur-tint: rgba(20, 34, 48, .22); }
+.pshelf-box[data-shelf="neon"] { --plank-edge: #55f0ff; --shelf-label: #9ff6ff; --blur-tint: rgba(12, 6, 26, .34); }
+.pshelf-box[data-shelf="marble"] { --plank-edge: #ffffff; --shelf-label: #fff1d6; --blur-tint: rgba(40, 32, 28, .22); }
+.pshelf-box[data-shelf="bamboo"] { --plank-edge: #fff0c8; --shelf-label: #fff0cc; --blur-tint: rgba(44, 32, 14, .22); }
+.pshelf-box[data-shelf="rustic"] { --plank-edge: #b58a62; --shelf-label: #f2d3a6; }
+.pshelf-hint { position: absolute; padding: 2px 8px; border-radius: 8px; background: rgba(10, 6, 4, .62); color: var(--shelf-label); font-size: 8px; font-weight: 800; letter-spacing: .04em; white-space: nowrap; pointer-events: none; }
+.pshelf-row { position: absolute; pointer-events: auto; }
+.pshelf-row::before { content: ""; position: absolute; z-index: 0; inset: 2px -4px 2px; border-radius: 8px; pointer-events: none;
+  background: linear-gradient(180deg, transparent, var(--blur-tint));
+  -webkit-backdrop-filter: blur(9px) brightness(.8) saturate(1.1); backdrop-filter: blur(9px) brightness(.8) saturate(1.1);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+.pshelf-row::after { content: ""; position: absolute; z-index: 1; right: 0; bottom: 0; left: 0; height: 2px; border-radius: 2px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--plank-edge) 8%, var(--plank-edge) 92%, transparent); opacity: .55; box-shadow: 0 0 8px var(--plank-edge); }
+.pshelf-label { position: absolute; z-index: 3; top: 2px; left: 6px; color: var(--shelf-label); font-size: 7px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; text-shadow: 0 1px 2px #000; pointer-events: none; opacity: .85; }
+.pshelf-bottles { position: relative; z-index: 2; display: flex; height: 100%; align-items: flex-end; gap: 2px; padding: 0 6px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; scroll-snap-type: x proximity; overscroll-behavior-x: contain; }
+.pshelf-bottles::-webkit-scrollbar { display: none; }
+.pshelf-bottles > button { position: relative; flex: 0 0 calc(var(--bottle) * .8 + 12px); height: 100%; padding: 0; border: 0; background: transparent; color: #fff; cursor: grab; scroll-snap-align: start; touch-action: none; user-select: none; }
+.pshelf-bottles > button .bottle-visual { position: absolute; bottom: 11px; left: 50%; width: var(--bottle); height: var(--bottle); margin: 0; transform: translateX(-50%); filter: drop-shadow(0 5px 3px rgba(0, 0, 0, .65)); }
+.pshelf-bottles > button.poured .bottle-visual { transform: translate(-50%, -3px); }
+.pshelf-bottles > button > span { position: absolute; z-index: 2; right: 0; bottom: 1px; left: 0; overflow: hidden; padding: 0 2px; border-radius: 4px; background: rgba(10, 6, 4, .7); color: #f8e5c8; font-size: 7px; font-weight: 800; line-height: 10px; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.pshelf-bottles > button.empty { cursor: not-allowed; filter: grayscale(1) brightness(.5); }
+.pshelf-bottles[data-scrollable="true"]:not([data-at-end="true"]) { -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
+.pshelf-bottles[data-scrollable="true"][data-at-end="true"]:not([data-at-start="true"]) { -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%); mask-image: linear-gradient(90deg, transparent, #000 12%); }
+.pshelf-bottles[data-scrollable="true"]:not([data-at-start="true"]):not([data-at-end="true"]) { -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 10%, #000 88%, transparent); }
+.pshelf-row .shelf-nudge { position: absolute; z-index: 4; top: 2px; right: 4px; display: none; gap: 3px; }
+.pshelf-row:has(.pshelf-bottles[data-scrollable="true"]) .shelf-nudge { display: flex; }
+.pshelf-row .shelf-nudge button { width: 20px; height: 18px; border: 1px solid #a87943; border-radius: 5px; background: rgba(30, 18, 12, .85); color: #ffe4aa; font-size: 12px; line-height: 1; cursor: pointer; }
+.pshelf-row:has(.pshelf-bottles[data-at-start="true"]) .shelf-nudge button:first-child,
+.pshelf-row:has(.pshelf-bottles[data-at-end="true"]) .shelf-nudge button:last-child { opacity: .35; pointer-events: none; }
+
+/* Bartender: behind the painted counter, cut at its back edge. */
+.bar-scene .bartender-layer { top: calc(var(--back) - var(--bt-h) * .58) !important; right: auto !important; bottom: auto !important; left: calc(var(--bt-x) - var(--bt-h) * .28) !important;
+  width: calc(var(--bt-h) * .56) !important; height: var(--bt-h) !important; transform: none !important; opacity: 1 !important; clip-path: inset(-12% -30% 42% -30%); }
+.bar-scene .bartender-layer .name-ribbon { top: 2%; right: auto; bottom: auto; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+
+/* The glass stands on the counter top next to the bartender. */
+.bar-scene .live-glass-station { top: auto !important; right: auto !important; bottom: calc(100% - var(--glass-y)) !important; left: var(--glass-x) !important; width: 120px !important; height: 150px !important; transform: translateX(-50%) !important; }
+
+/* Guests sit on the painted stools, in front of the counter. */
+.bar-scene .bar-cast { display: block !important; inset: 0 !important; }
+.bar-scene .scene-customer { position: absolute !important; top: 0 !important; bottom: 0 !important; width: calc(var(--guest-h) * .72) !important; min-width: 0 !important; height: auto !important; transform: translateX(-50%) !important; }
+.bar-scene .scene-customer .art-character { top: auto !important; right: 0 !important; left: 0 !important; bottom: calc(100% - var(--seat-top) - var(--guest-h) * .03) !important; height: var(--guest-h) !important; }
+.bar-scene .scene-customer.active .art-character { transform: none; }
+.bar-scene .speech-bubble { top: auto !important; bottom: calc(100% - var(--seat-top) + var(--guest-h) - 8px) !important; }
+.bar-scene .customer-plate { top: calc(var(--seat-top) + 6px) !important; right: 4% !important; bottom: auto !important; left: 4% !important; }
+@media (max-width: 760px) {
+  .bar-scene .bartender-layer { display: block !important; }
+  .bar-scene .scene-customer { width: calc(var(--guest-h) * .8) !important; }
+}
+/* Speech bubble beside the guest's head (towards the middle of the bar), not above it over the shelves. */
+.bar-scene .speech-bubble { display: block !important; right: auto !important; bottom: calc(100% - var(--seat-top) + var(--guest-h) * .5) !important; left: 82% !important; width: 158px !important; transform: none !important; border-radius: 13px 13px 13px 3px; }
+.bar-scene .scene-customer.bubble-left .speech-bubble { right: 82% !important; left: auto !important; border-radius: 13px 13px 3px 13px; }
+.bar-scene .scene-customer.bubble-left .speech-bubble::after { right: 17px; left: auto; }
+@media (max-width: 760px) { .bar-scene .speech-bubble { width: 136px !important; left: 64% !important; } .bar-scene .scene-customer.bubble-left .speech-bubble { right: 64% !important; } }
+.bar-scene .customer-plate { top: min(calc(var(--seat-top) + 6px), calc(100% - 86px)) !important; }
+.bar-scene .speech-bubble { bottom: calc(100% - var(--seat-top) + var(--guest-h) * .22) !important; }
+/* The city event chip moves away from a shelf painted on the right. */
+.bar-scene.shelf-right.is-building .city-event.compact { right: auto !important; left: 22px !important; }
+@media (max-width: 760px) { .bar-scene .live-glass-copy { top: auto !important; bottom: -20px !important; } }
+
+/* Modular bartender atlas: outfit rows × real pose columns. */
+.role-bartender .sprite-hair-tint,
+.role-bartender .sprite-hair-style,
+.role-bartender .sprite-skin-tint,
+.role-bartender .sprite-tattoo-pattern { position:absolute;inset:0;display:block;pointer-events:none;mask-repeat:no-repeat;-webkit-mask-repeat:no-repeat; }
+.role-bartender .sprite-hair-tint { z-index:3;background:var(--hair-custom);opacity:.78;mix-blend-mode:color; }
+.role-bartender .sprite-hair-style { z-index:5;background:var(--hair-style-art) var(--hair-style-position,50% 1%)/var(--hair-style-size,48% auto) no-repeat;filter:drop-shadow(0 5px 4px #0005); }
+.role-bartender .sprite-hair-style::after { content:'';position:absolute;inset:0;background:var(--hair-custom);opacity:.72;mix-blend-mode:color;mask:var(--hair-style-mask) var(--hair-style-position,50% 1%)/var(--hair-style-size,48% auto) no-repeat;-webkit-mask:var(--hair-style-mask) var(--hair-style-position,50% 1%)/var(--hair-style-size,48% auto) no-repeat; }
+.role-bartender.character-noa { --hair-style-size:38% auto;--hair-style-position:50% -3%; }
+.role-bartender.character-leo { --hair-style-size:29% auto;--hair-style-position:50% -7%; }
+.role-bartender .sprite-skin-tint { z-index:2;background:var(--skin-custom);opacity:.42;mix-blend-mode:color;filter:brightness(var(--skin-tan,1)); }
+.role-bartender .sprite-tattoo-pattern { z-index:4;display:none;opacity:.62;mix-blend-mode:multiply;background:
+  repeating-radial-gradient(circle at 23% 52%,transparent 0 4px,#1d252b 5px 7px,transparent 8px 12px),
+  repeating-linear-gradient(35deg,transparent 0 8px,#1d252b 9px 11px,transparent 12px 18px); }
+.role-bartender.custom-skin-tattoo-light .sprite-tattoo-pattern,
+.role-bartender.custom-skin-tattoo-bold .sprite-tattoo-pattern { display:block; }
+.role-bartender.custom-skin-tattoo-light .sprite-tattoo-pattern { opacity:.36;clip-path:polygon(0 39%,38% 39%,38% 82%,0 82%); }
+.role-bartender.custom-skin-tattoo-bold .sprite-tattoo-pattern { opacity:.7;clip-path:polygon(0 34%,39% 34%,39% 86%,0 86%); }
+.role-bartender .custom-skin-tattoo-light .custom-skin-detail,
+.role-bartender .custom-skin-tattoo-bold .custom-skin-detail { display:none; }
+
+/* Hair silhouette additions make the style selector visible while the detailed
+   per-pixel mask keeps every colour off the face. */
+.custom-hair-detail { z-index:6;background:var(--hair-custom);filter:drop-shadow(0 3px 4px #0006);opacity:.92; }
+.character-noa .custom-hair-detail { left:29%;top:3%;width:43%;height:31%;border-radius:48% 52% 42% 42%; }
+.character-noa.custom-hair-updo .custom-hair-detail { left:42%;top:0;width:18%;height:12%;border-radius:55% 55% 42% 42%; }
+.character-noa.custom-hair-waves .custom-hair-detail { left:27%;top:6%;width:47%;height:34%;border-radius:45% 45% 34% 34%;clip-path:polygon(10% 0,90% 0,100% 24%,90% 100%,70% 76%,55% 100%,38% 78%,12% 100%,0 22%); }
+.character-noa.custom-hair-bob .custom-hair-detail { left:30%;top:7%;width:41%;height:25%;border-radius:48% 48% 34% 34%;clip-path:polygon(8% 0,92% 0,100% 58%,88% 100%,70% 82%,50% 97%,27% 82%,10% 100%,0 55%); }
+.character-noa.custom-hair-ponytail .custom-hair-detail { left:55%;top:5%;width:25%;height:30%;border-radius:50% 65% 75% 35%;transform:rotate(-12deg); }
+.character-noa.custom-hair-braids .custom-hair-detail { left:30%;top:7%;width:42%;height:35%;background:repeating-linear-gradient(150deg,var(--hair-custom) 0 7px,#1b1010 8px 10px);clip-path:polygon(12% 0,88% 0,100% 35%,80% 37%,76% 100%,62% 100%,58% 39%,42% 39%,38% 100%,24% 100%,20% 37%,0 35%); }
+.character-leo .custom-hair-detail { left:35%;top:2%;width:32%;height:13%;border-radius:60% 50% 35% 42%; }
+.character-leo.custom-hair-slick .custom-hair-detail { clip-path:polygon(4% 45%,18% 7%,84% 0,100% 50%,82% 88%,56% 66%,38% 100%,8% 78%);transform:skewX(-6deg); }
+.character-leo.custom-hair-short .custom-hair-detail { top:4%;height:9%;border-radius:48% 52% 38% 42%; }
+.character-leo.custom-hair-undercut .custom-hair-detail { left:40%;width:25%;height:10%;clip-path:polygon(2% 35%,22% 0,92% 5%,100% 72%,63% 58%,42% 100%,8% 72%); }
+
+/* Face and makeup remain independent from hair and outfits. */
+.role-bartender .custom-face-detail { z-index:7;box-sizing:border-box; }
+.role-bartender .custom-makeup-detail { z-index:8;overflow:visible;background:none; }
+.role-bartender .custom-makeup-detail::before,
+.role-bartender .custom-makeup-detail::after { content:'';position:absolute;display:block; }
+.character-noa .custom-makeup-detail::before { inset:0;border-radius:50%;background:var(--eye-makeup,transparent); }
+.character-noa .custom-makeup-detail::after { top:85%;left:34%;width:32%;height:24%;border-radius:55%;background:var(--lip-makeup,transparent); }
+.character-noa.custom-makeup-natural { --eye-makeup:linear-gradient(90deg,#6e443d66,transparent 40% 60%,#6e443d66);--lip-makeup:#9b555a88; }
+.character-noa.custom-makeup-smoky { --eye-makeup:linear-gradient(90deg,#1b1622cc,transparent 42% 58%,#1b1622cc);--lip-makeup:#75414daa; }
+.character-noa.custom-makeup-red-lip { --eye-makeup:linear-gradient(90deg,#5d382f66,transparent 42% 58%,#5d382f66);--lip-makeup:#b8223f; }
+.character-noa.custom-makeup-gold { --eye-makeup:linear-gradient(90deg,#d8ab43cc,transparent 42% 58%,#d8ab43cc);--lip-makeup:#a76351cc; }
+.character-noa.custom-makeup-neon { --eye-makeup:linear-gradient(90deg,#38e6e6dd,transparent 42% 58%,#ff4eacdd);--lip-makeup:#d82d8f; }
+
+.design-options i[data-skin-tone]{border:1px solid #ffffff33;background:var(--tone)!important}
+.design-options i[data-skin-tone='porcelain']{--tone:#f0c7b5}.design-options i[data-skin-tone='fair']{--tone:#dca58a}.design-options i[data-skin-tone='warm']{--tone:#b97858}.design-options i[data-skin-tone='olive']{--tone:#a36f4f}.design-options i[data-skin-tone='brown']{--tone:#82523d}.design-options i[data-skin-tone='deep']{--tone:#54362d}
+.bar-scene .bartender-layer:has(>.character-leo .character-composite.showing-base),
+.bar-scene .bartender-layer:has(>.character-noa .character-composite.showing-base){width:calc(var(--bt-h) * .572)!important}

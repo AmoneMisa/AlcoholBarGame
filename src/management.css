@@ -18,9 +18,9 @@
 .game-nav button.active .ui-icon { color:var(--gold); }
 .character-sprite { background-repeat:no-repeat;filter:drop-shadow(0 10px 8px #0008); }
 .wardrobe-art { height:100%;width:100%; }
-.bartender-custom { grid-template-rows:minmax(400px,1fr) auto auto;min-height:520px; }
-.bartender-custom > .art-character { display:block;align-self:stretch;padding:0;min-height:400px;height:100%;background:transparent; }
-.bartender-custom .wardrobe-art { width:min(100%,255px);height:440px;margin:0 auto;background-size:300% 100%; }
+.bartender-custom { grid-template-rows:minmax(0,1fr) auto auto;min-height:560px; }
+.bartender-custom > .art-character { display:block;align-self:start;justify-self:center;width:min(100%,310px);height:auto;min-height:0;aspect-ratio:var(--bartender-frame-ratio,.572);background:transparent; }
+.bartender-custom .character-composite,.bartender-custom .wardrobe-art,.bartender-custom .base-art { position:absolute;inset:0;width:100%;height:100%;margin:0;background-size:300% 100%; }
 .bartender-custom .art-character::after { content:none!important; }
 .bartender-custom > div { z-index:5; }
 .bartender-custom button { min-height:44px;font-size:11px; }
@@ -55,7 +55,8 @@
 .pack-stepper button,.sell-quantity button { min-width:44px;min-height:44px;border:1px solid #6f6246;border-radius:8px;background:#342d23;color:#ffdca0;font-size:18px;cursor:pointer; }
 .pack-stepper input,.sell-quantity input { width:68px;min-height:44px;border:1px solid #405470;border-radius:8px;background:#0d1828;color:#f5ead7;text-align:center;font-size:14px; }
 .pack-stepper small,.sell-quantity small { min-width:30px;color:#93a6bb;font-size:10px; }
-.sell-quantity button { font-size:11px; }
+.sell-quantity button { font-size:18px; }
+.sell-quantity .quantity-all { min-width:48px;font-size:11px; }
 .trade-checkout { position:sticky;top:96px;padding:18px;border:1px solid #776144;border-radius:13px;background:linear-gradient(155deg,#223147,#131e30);box-shadow:0 10px 25px #0003; }
 .trade-checkout > small,.incoming-deliveries small { color:#e9bd62;font-size:10px;font-weight:900;letter-spacing:.1em; }
 .trade-checkout h3 { margin:5px 0;font:700 25px Georgia,serif; }
@@ -156,7 +157,8 @@
   .login-reward-track { gap:3px;padding:0 8px 10px; }
   .login-reward-track b { font-size:16px; }
   .login-reward-track small { font-size:6px; }
-  .bartender-custom .wardrobe-art { width:240px;height:420px; }
+  .bartender-custom { min-height:0; }
+  .bartender-custom > .art-character { width:min(100%,300px); }
   .bartender-name-editor { flex-wrap:wrap;margin-inline:8px; }
   .bartender-name-editor label { flex-basis:100%; }
   .bartender-name-editor > span { flex:1; }
@@ -167,3 +169,46 @@
 header.top-hud { grid-template-columns: minmax(230px, 1fr) auto 130px; }
 @media (max-width: 1150px) { header.top-hud { grid-template-columns: minmax(0, 1fr) auto; } }
 @media (max-width: 900px) { header.top-hud { grid-template-columns: minmax(0, 1fr); } }
+
+/* Clear units, collectible recipe items, and locked multi-bar progression. */
+.game-nav .ui-icon { display:block;margin:auto; }
+.market-product-copy .stock-conversion { margin-top:4px;color:#bad4c1;font-size:9px;line-height:1.35; }
+.checkout-line span { min-width:0; }
+.checkout-line span em { display:block;margin-top:2px;color:#88b99a;font-size:9px;font-style:normal; }
+.transfer-locked { margin:8px 12px;padding:10px 12px;border:1px dashed #485b72;border-radius:9px;background:#111c2c;color:#aab9ca;font-size:10px;line-height:1.45; }
+.recipe-item-inventory { margin:0 12px 12px;overflow:hidden;border:1px solid #4b4059;border-radius:13px;background:#0f1828; }
+.recipe-item-inventory > header { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;border-bottom:1px solid #35445a;background:linear-gradient(90deg,#30213b,#142137); }
+.recipe-item-inventory > header small { color:var(--gold);font-size:8px;font-weight:900;letter-spacing:.12em; }
+.recipe-item-inventory > header h3 { margin:3px 0 0;font:700 18px Georgia,serif; }
+.recipe-item-inventory > header span { color:#a8b6c7;font-size:9px;text-align:right; }
+.recipe-item-inventory > div { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px; }
+.recipe-item-inventory article { position:relative;display:grid;grid-template-columns:68px minmax(0,1fr);align-items:center;gap:8px;min-height:92px;padding:8px;border:1px solid #384a62;border-radius:10px;background:linear-gradient(145deg,#1b2b42,#111a2a); }
+.recipe-item-inventory .glass-model.glass-painted { width:68px;height:72px; }
+.recipe-item-inventory article span small,.recipe-item-inventory article span b,.recipe-item-inventory article span em { display:block; }
+.recipe-item-inventory article span small { color:#d6ae61;font-size:7px;font-weight:900;letter-spacing:.09em; }
+.recipe-item-inventory article span b { margin:3px 0;font:700 13px Georgia,serif; }
+.recipe-item-inventory article span em { color:#91a3b8;font-size:8px;font-style:normal; }
+.recipe-item-inventory article > strong { position:absolute;right:7px;top:7px;display:grid;min-width:29px;height:24px;place-items:center;padding:0 6px;border:1px solid #806536;border-radius:999px;background:#17120c;color:#ffd27c;font-size:9px; }
+.bar-unlock-rules { display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px;padding:11px 13px;border:1px solid #465a73;border-radius:10px;background:#142238; }
+.bar-unlock-rules b { color:#ffd17a;font-size:11px; }
+.bar-unlock-rules span { max-width:620px;color:#aebdce;font-size:9px;line-height:1.45;text-align:right; }
+.region-cards > article { position:relative;display:grid;grid-template-rows:100px auto auto auto auto 42px;overflow:hidden;min-height:250px;border:1px solid #354861;border-radius:10px;background:#142238;color:#f1f3f6; }
+.region-cards > article.active { border-color:var(--gold);background:#3c2b24; }
+.region-cards > article.locked { border-color:#3a4050;background:#111824;color:#a7afbc; }
+.region-cards > article.locked img { filter:grayscale(.8) brightness(.5); }
+.region-cards > article img { width:100%;height:100px;object-fit:cover;border-bottom:1px solid #3a4b5f; }
+.region-cards > article > b,.region-cards > article > small,.region-cards > article > span { padding:0 10px; }
+.region-cards > article > small:first-of-type { margin-top:9px;color:#e5bb69;font-size:10px; }
+.region-cards > article > b { margin:5px 0;font-size:16px; }
+.region-cards > article > small { font-size:8px; }
+.region-cards > article > span { margin-top:7px;color:#9eafc2;font-size:8px; }
+.region-cards > article > button { align-self:end;min-height:36px;margin:7px 8px 8px;border:1px solid #9b773e;border-radius:7px;background:#4b361f;color:#ffe0a0;font-size:8px;font-weight:900;cursor:pointer; }
+.region-cards > article > button:disabled { border-color:#3d485a;background:#242d3b;color:#778397;cursor:default; }
+.atlas-city.locked { color:#6f7886;opacity:.65;cursor:not-allowed; }
+.atlas-city.locked i { border-radius:4px;background:#333b49;transform:rotate(45deg); }
+
+@media(max-width:760px){
+  .recipe-item-inventory > header,.bar-unlock-rules{align-items:flex-start;flex-direction:column}.recipe-item-inventory > header span,.bar-unlock-rules span{text-align:left}
+  .recipe-item-inventory > div{grid-template-columns:1fr 1fr;padding:8px}.recipe-item-inventory article{grid-template-columns:54px minmax(0,1fr)}.recipe-item-inventory .glass-model.glass-painted{width:54px;height:62px}
+  .region-cards > article{grid-template-rows:95px auto auto auto auto 42px}.region-cards > article img{height:95px}
+}

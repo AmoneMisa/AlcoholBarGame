@@ -35,26 +35,69 @@ const layout = computed(() => {
   const position = /(\d+)%\s*$/.exec(interior.position)?.[1];
   return sceneLayout(interior.id, width, height, position ? Number(position) / 100 : .5);
 });
-const sceneVars = computed(() => {
+const people = computed(() => {
   const current = layout.value;
   const { width } = sceneBox.value;
-  if (!current) return {};
-  const guest = Math.round(Math.min(330, Math.max(170, current.drawnHeight * .34)));
-  const bartender = Math.round(Math.min(480, Math.max(260, current.drawnHeight * .55)));
-  const bartenderX = Math.round(width * (width < 760 ? .8 : .84));
+  if (!current) return undefined;
+  // People are scaled by the room's perspective: back-bar planks are about 40 cm apart, a seated guest shows
+  // about 90 cm above the stool and a bartender's visible upper body is about 70 cm.
+  const planks = current.shelf.planks;
+  const plankGap = planks.length > 1 ? (planks[planks.length - 1]! - planks[0]!) / (planks.length - 1) : current.drawnHeight * .1;
+  // Phones show a compact scene, so people get smaller limits there.
+  const phone = width < 760;
+  const guest = Math.round(phone ? Math.min(190, Math.max(110, plankGap * 2.3)) : Math.min(300, Math.max(150, plankGap * 2.3)));
+  const bartender = Math.round(phone ? Math.min(260, Math.max(150, plankGap * 3.4)) : Math.min(440, Math.max(240, plankGap * 3.4)));
+  // The bartender works on the side away from the bottle shelf, so they never hide the bottles.
+  const shelfOnRight = (current.shelf.left + current.shelf.right) / 2 > width * .6;
+  const side = phone ? .84 : .86;
+  const bartenderX = current.bartenderX ?? Math.round(width * (shelfOnRight ? 1 - side : side));
+  // The glass stands at the bartender's left hand; only at the scene's left edge does it move to the right.
+  const glassOffset = bartender * (phone ? .5 : .46);
+  const glassX = bartenderX - glassOffset < 60 ? bartenderX + glassOffset : bartenderX - glassOffset;
+  return { guest, bartender, bartenderX, glassX, shelfOnRight, bartenderHalfWidth: bartender * .24 };
+});
+const sceneVars = computed(() => {
+  const current = layout.value;
+  const sizes = people.value;
+  if (!current || !sizes) return {};
   return {
-    '--back': `${current.back}px`, '--seat-top': `${current.seat}px`, '--guest-h': `${guest}px`, '--bt-h': `${bartender}px`,
-    '--bt-x': `${bartenderX}px`, '--glass-x': `${Math.round(width < 760 ? width * .78 : bartenderX - bartender * .42)}px`,
+    '--back': `${current.back}px`, '--seat-top': `${current.seat}px`, '--guest-h': `${sizes.guest}px`, '--bt-h': `${sizes.bartender}px`,
+    '--bt-x': `${sizes.bartenderX}px`, '--glass-x': `${Math.round(sizes.glassX)}px`,
     '--glass-y': `${Math.round(current.back + current.drawnHeight * .03)}px`
   };
 });
-// Guests take the painted stools nearest the middle of the scene.
+// Guests take painted stools near the middle, but not in front of the bottle shelf or where the bartender works,
+// so they never hide bottles; those stools are used only when there is no other.
 const seatXs = computed(() => {
   const { width } = sceneBox.value;
-  const stools = [...(layout.value?.stools ?? [])].sort((a, b) => Math.abs(a - width / 2) - Math.abs(b - width / 2));
-  return stools.length ? stools : [width * .5, width * .32, width * .68];
+  const current = layout.value;
+  const sizes = people.value;
+  // A guest hides bottles only when their head reaches the height of the lowest shelf row.
+  const lowestRow = Math.max(0, ...shelfRows.value.map((row) => parseFloat(row.style.top) + parseFloat(row.style.height)));
+  const headReachesShelf = !!current && !!sizes && current.seat - sizes.guest < lowestRow;
+  const blocked = (x: number) => (headReachesShelf && current ? x > current.shelf.left - 40 && x < current.shelf.right + 40 : false)
+    || (sizes ? Math.abs(x - sizes.bartenderX) < sizes.bartenderHalfWidth + 60 || Math.abs(x - sizes.glassX) < 90 : false);
+  // Free spots at the counter for when every visible stool is taken (narrow phones show only one or two).
+  const spots = [width * .28, width * .5, width * .18].filter((x) => !blocked(x));
+  const stools = [...(current?.stools ?? [])].sort((a, b) =>
+    Number(blocked(a)) - Number(blocked(b)) || Math.abs(a - width / 2) - Math.abs(b - width / 2));
+  const free = stools.filter((x) => !blocked(x));
+  const order = [...free, ...spots, ...stools.filter(blocked)];
+  return order.length ? order : [width * .5];
 });
 const customerStyle = (index: number) => ({ left: `${Math.round(seatXs.value[index % seatXs.value.length] ?? sceneBox.value.width / 2)}px` });
+// The speech bubble sits beside the guest's head, on the side away from the bartender and the glass,
+// so it covers neither the shelves nor the pouring station.
+const bartenderOnRight = computed(() => {
+  const current = layout.value;
+  return !current || (current.shelf.left + current.shelf.right) / 2 <= sceneBox.value.width * .6;
+});
+// …unless there is no room on that side (guests near the edge of a narrow phone scene).
+const bubbleOnLeft = (index: number) => {
+  const x = seatXs.value[index % seatXs.value.length] ?? 0;
+  const room = 170;
+  return bartenderOnRight.value ? x > room : x > sceneBox.value.width - room;
+};
 const freshPickerOpen = ref(false);
 const draggingIngredientId = ref<string>();
 const dragOverGlass = ref(false);
@@ -81,10 +124,33 @@ const shelfLines = computed(() => {
   return lines.filter((line) => line.bottles.length);
 });
 // One row per painted plank; with fewer planks than lines, neighbouring lines share a plank.
+// The span of a shelf row at `plank` height: it stops where the bartender and the glass work. `fits` is false when
+// too little of the row would be left (small screens) — then that plank is not used.
+function rowSpan(plank: number) {
+  const current = layout.value!;
+  const sizes = people.value;
+  let left = current.shelf.left;
+  let right = current.shelf.right;
+  if (sizes && plank > current.back - sizes.bartender * .58) {
+    const workLeft = Math.min(sizes.bartenderX - sizes.bartenderHalfWidth, sizes.glassX - 70);
+    const workRight = Math.max(sizes.bartenderX + sizes.bartenderHalfWidth, sizes.glassX + 70);
+    if ((workLeft + workRight) / 2 > (left + right) / 2) right = Math.min(right, workLeft);
+    else left = Math.max(left, workRight);
+  }
+  return { left, right, fits: right - left >= 140 };
+}
+// One row per usable painted plank; with fewer planks than lines, neighbouring lines share a plank.
 const shelfRows = computed(() => {
   const current = layout.value;
   if (!current) return [];
-  const planks = current.shelf.planks;
+  // Planks cropped off the top of the scene, or squeezed out by the bartender's work area, are skipped;
+  // their bottles move to the other planks.
+  const visible = current.shelf.planks.filter((plank) => plank - 56 >= 24);
+  const usable = visible.filter((plank) => rowSpan(plank).fits);
+  const planks = usable.length ? usable : visible.length ? visible.slice(0, 1) : current.shelf.planks.slice(-1);
+  // Small screens: when lower planks were squeezed out, stack rows upward above the top plank while there is room.
+  const wanted = Math.min(3, Math.max(visible.length, 1));
+  while (planks.length < wanted && planks[0]! - 58 - 56 >= 24) planks.unshift(planks[0]! - 58);
   const lines = shelfLines.value;
   const groups = planks.length >= lines.length ? lines.map((line) => [line])
     : planks.length === 3 ? [[lines[0]!], [lines[1]!], lines.slice(2)]
@@ -94,11 +160,14 @@ const shelfRows = computed(() => {
     const gap = index > 0 ? plank - planks[index - 1]! : (planks[1] ?? plank + 90) - plank;
     const height = Math.round(Math.max(56, Math.min(118, gap - 4)));
     const bottle = Math.round(Math.max(34, Math.min(76, height - 16)));
+    const span = rowSpan(plank);
+    const left = span.fits ? span.left : current.shelf.left;
+    const right = span.fits ? span.right : current.shelf.right;
     return {
       id: group.map((line) => line.id).join('-'),
       label: group.map((line) => line.label).join(' · '),
       bottles: group.flatMap((line) => line.bottles),
-      style: { left: `${current.shelf.left}px`, width: `${current.shelf.right - current.shelf.left}px`, top: `${plank - height}px`, height: `${height}px`, '--bottle': `${bottle}px` }
+      style: { left: `${left}px`, width: `${right - left}px`, top: `${plank - height}px`, height: `${height}px`, '--bottle': `${bottle}px` }
     };
   });
 });
@@ -295,7 +364,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section ref="sceneRef" class="bar-scene" :class="{ 'is-building': buildingEnabled }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
+  <section ref="sceneRef" class="bar-scene" :class="{ 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
     <div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div>
     <CityEvent compact />
     <div v-if="buildingEnabled" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
@@ -312,17 +381,17 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div class="bartender-layer">
-      <CharacterModel role="bartender" :character-id="game.decor.bartenderCharacter ?? 'noa'" :outfit="game.decor.bartender" :face-style="game.decor.face" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :skin-detail="game.decor.skinDetail" :bust="game.decor.bust" :pose="game.decor.pose" :makeup="game.decor.makeup" animation="idle" />
+      <CharacterModel role="bartender" :character-id="game.decor.bartenderCharacter ?? 'noa'" :outfit="game.decor.bartender" :face-style="game.decor.face" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :skin-detail="game.decor.skinDetail" :skin-tone="game.decor.skinTone" :tan-level="game.decor.tanLevel" :bust="game.decor.bust" :pose="game.decor.pose" :makeup="game.decor.makeup" animation="idle" />
       <span class="name-ribbon">{{ (game.decor.bartenderNickname || (game.decor.bartenderCharacter === 'leo' ? 'Leo' : 'Noa')).toUpperCase() }} · BARTENDER</span>
     </div>
     <div class="bar-line-tint" aria-hidden="true"></div>
     <div class="bar-cast">
-      <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" :style="customerStyle(index)" @click="game.openConversation(customer.id)">
+      <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId, 'bubble-left': bubbleOnLeft(index) }" :style="customerStyle(index)" @click="game.openConversation(customer.id)">
         <div class="speech-bubble"><span>{{ customer.greeting }}</span><b>{{ bubbleText(customer) }}</b><em>{{ customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></div>
         <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="expressionFor(customer.mood)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
         <div class="customer-plate"><div><b>{{ customer.name }}</b><small>{{ customer.mood }}</small></div><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i><em>{{ game.orderCountdown }}</em></span></div>
       </button>
-      <div v-if="!game.hasCustomer" class="empty-bar-wait"><small>NEXT CUSTOMER</small><b>{{ game.nextCustomerCountdown }}</b><p>Use the quiet time to restock, learn recipes, or customize this bar.</p><button type="button" :disabled="game.crystals < game.nextCustomerCrystalCost" @click="game.expediteCustomer()">Welcome now · ◆ {{ game.nextCustomerCrystalCost }}</button></div>
+      <!-- The wait for the next guest is shown once, in the panel below the scene (with “Welcome now”). -->
     </div>
     <div v-if="buildingEnabled" ref="glassTarget" class="live-glass-station" :class="{ 'drag-over': dragOverGlass }">
       <div class="live-glass-copy"><b>{{ dragOverGlass ? 'POURING' : totalAmount ? `${totalAmount} ML` : 'YOUR GLASS' }}</b><small>{{ itemCount ? `+ ${itemCount} fresh item${itemCount === 1 ? '' : 's'}` : 'Drag bottle over the glass' }}</small></div>
@@ -339,6 +408,6 @@ onBeforeUnmount(() => {
     <div v-if="draggingIngredientId && selectedIngredient" class="drag-bottle-ghost" :class="{ pouring: dragOverGlass }" :style="{ left: `${pointerX}px`, top: `${pointerY}px` }" aria-hidden="true">
       <BottleModel :ingredient="selectedIngredient" :amount="selectedAmount" /><i v-if="dragOverGlass" :style="{ '--stream-color': colorMap[selectedIngredient.id] ?? '#d7c88c' }"></i>
     <b class="ghost-name">{{ selectedIngredient.name }} · {{ pourable(selectedIngredient.id) }} ml</b></div>
-    <div class="scene-status"><span :class="{ waiting: !game.hasCustomer }"></span>{{ game.message }}<b>{{ game.hasCustomer ? (game.orderTimerPaused ? 'Paused in dialogue' : game.orderCountdown) : game.nextCustomerCountdown }}</b></div>
+    <div class="scene-status"><span :class="{ waiting: !game.hasCustomer }"></span>{{ game.message }}<b v-if="game.hasCustomer">{{ game.orderTimerPaused ? 'Paused in dialogue' : game.orderCountdown }}</b></div>
   </section>
 </template>

@@ -10,7 +10,7 @@ function position(id:RegionId) { const [longitude,latitude] = CITY_COORDINATES[i
   <div class="world-map-scroll"><div class="world-atlas" aria-label="Your bars around the world">
     <img src="/assets/bar/world-land.svg" alt="World coastlines" />
     <div class="atlas-graticule"></div>
-    <button v-for="region in REGIONS" :key="region.id" :style="position(region.id)" class="atlas-city" :class="[region.id,{active:region.id === game.regionId}]" type="button" :aria-label="`Manage ${game.bars[region.id].name} in ${region.name}`" @click="game.switchBar(region.id)"><i></i><b>{{ region.name }}</b></button>
-    <small class="atlas-caption">YOUR SIX LOCATIONS</small>
+    <button v-for="region in REGIONS" :key="region.id" :style="position(region.id)" class="atlas-city" :class="[region.id,{active:region.id === game.regionId && game.isBarOwned(region.id),locked:!game.isBarOwned(region.id)}]" type="button" :aria-label="game.isBarOwned(region.id) ? `Manage ${game.bars[region.id].name} in ${region.name}` : `${region.name} bar is locked`" :disabled="!game.isBarOwned(region.id)" @click="game.switchBar(region.id)"><i></i><b>{{ region.name }}</b></button>
+    <small class="atlas-caption">{{ game.ownedBarIds.length }} OF {{ REGIONS.length }} BARS OPEN</small>
   </div></div>
 </template>

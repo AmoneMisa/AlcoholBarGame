@@ -177,7 +177,7 @@ function misunderstand(state: PlayerState, negotiation: Negotiation, random: () 
       return { kind, percent: .08, text: 'Ah, you want the express price list? That is 8% more — no problem, I have added it.' };
     }
     if (kind === 'bar') {
-      const others = REGIONS.filter((region) => region.id !== negotiation.barId && !negotiation.misunderstandings.some((item) => item.kind === 'bar' && item.barId === region.id));
+      const others = REGIONS.filter((region) => state.ownedBarIds.includes(region.id) && region.id !== negotiation.barId && !negotiation.misunderstandings.some((item) => item.kind === 'bar' && item.barId === region.id));
       const target = others[Math.floor(random() * others.length)];
       if (target) return { kind, barId: target.id, text: `Oh, you want it delivered to your ${target.name} bar? Of course, I changed the address.` };
     }

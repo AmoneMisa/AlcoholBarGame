@@ -2,9 +2,9 @@ import { RECIPES } from '../domain/catalog';
 import type { Recipe } from '../domain/types';
 import { BASIC_RECIPE_COUNT, type PlayerState } from './state';
 
-// Recipe levels and spare copies.
-// Upgrading a recipe makes guests pay and tip more for it. Getting a recipe you already know (shop, daily gift,
-// VIP guests, friends) gives a spare copy, and spare copies of non-starter recipes can be gifted to friends.
+// Recipe levels and duplicate recipe cards.
+// Upgrading an advanced recipe consumes one duplicate card. Getting a recipe you already know (shop, daily gift,
+// VIP guests, friends) adds that separate inventory item; it may be used for mastery or gifted to a friend.
 
 export const RECIPE_MAX_LEVEL = 5;
 const COST_STEPS = [1, 1.8, 3, 5];
@@ -12,6 +12,7 @@ const COST_STEPS = [1, 1.8, 3, 5];
 export const isStarterRecipe = (recipeId: string) => RECIPES.slice(0, BASIC_RECIPE_COUNT).some((recipe) => recipe.id === recipeId);
 export const recipeLevel = (state: Pick<PlayerState, 'recipeLevels'>, recipeId: string) => Math.min(RECIPE_MAX_LEVEL, Math.max(1, state.recipeLevels?.[recipeId] ?? 1));
 export const recipeCopies = (state: Pick<PlayerState, 'recipeCopies'>, recipeId: string) => Math.max(0, state.recipeCopies?.[recipeId] ?? 0);
+export const recipeCardsRequired = (level: number) => Math.min(RECIPE_MAX_LEVEL, Math.max(1, Math.floor(level)) + 1);
 
 // +8% price and +12% tips for every level above 1.
 export function recipeBonus(level: number) {
@@ -26,6 +27,5 @@ export function upgradeCost(recipe: Recipe, level: number) {
 }
 
 export function addSpareCopy(state: PlayerState, recipeId: string, amount = 1) {
-  if (isStarterRecipe(recipeId)) return;
   state.recipeCopies = { ...(state.recipeCopies ?? {}), [recipeId]: recipeCopies(state, recipeId) + amount };
 }

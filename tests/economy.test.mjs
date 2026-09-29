@@ -1,16 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { REGIONS, SUPPLIERS } from '../src/domain/catalog.ts';
+import { RECIPES, REGIONS, SUPPLIERS } from '../src/domain/catalog.ts';
+import { BAR_PURCHASE_LEVEL, SECOND_BAR_COIN_COST, barUnlockPrice } from '../src/domain/barUnlocks.ts';
 import { quotePurchase } from '../src/domain/economy.ts';
 import { createMarket } from '../src/domain/engine.ts';
 import { EVENT_CATALOG, EVENT_WINDOW_MS, MAX_VIP_CHANCE, economyAt, eventAt, levelFor, levelPerks, levelProgress, marketFor, xpForLevel } from '../src/domain/progression.ts';
 import { applyAction, advanceClock } from '../src/sim/rules.ts';
-import { createInitialState } from '../src/sim/state.ts';
+import { createInitialState, normalizePlayerState } from '../src/sim/state.ts';
+import { recipeCardsRequired } from '../src/sim/recipes.ts';
+import { DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus } from '../src/domain/dailyLessons.ts';
 
 const context = (now) => ({ now, random: () => .5, checkEnglish: (text) => ({ ok: true, corrected: text }) });
 
 test('A new bar starts at level 1 and levels follow a rising XP curve', () => {
   const state = createInitialState(Date.now());
+  assert.deepEqual(state.tradeLog, []);
   assert.equal(state.xp, 0);
   assert.equal(levelFor(state.xp), 1);
   assert.equal(xpForLevel(2), 60);
@@ -20,6 +24,69 @@ test('A new bar starts at level 1 and levels follow a rising XP curve', () => {
   assert.equal(levelFor(139), 2);
   assert.deepEqual(levelProgress(100), { level: 2, into: 40, needed: 80, percent: 50 });
   for (let level = 2; level < 50; level++) assert.ok(xpForLevel(level + 1) - xpForLevel(level) > xpForLevel(level) - xpForLevel(level - 1));
+});
+
+test('The trade history contains operations, not old stock tutorial notices', () => {
+  const state = createInitialState(Date.now());
+  state.tradeLog = ['Sold 2 products for 12.50 coins.', 'Each city bar now keeps its own stock.'];
+  normalizePlayerState(state);
+  assert.deepEqual(state.tradeLog, ['Sold 2 products for 12.50 coins.']);
+});
+
+test('Daily lessons award server-checked XP and crystals once, with a streak bonus capped at 50%', () => {
+  const now = new Date(2026,8,29,12).getTime();
+  const state = createInitialState(now);
+  const lessons = dailyLessonsFor('2026-09-29');
+  assert.equal(lessons.length,3);
+  assert.throws(() => applyAction(state,{type:'completeDailyLesson',lessonId:lessons[0].id,answer:'wrong'},context(now)),/try again/i);
+  const firstXp = state.xp;const firstCrystals = state.crystals;
+  applyAction(state,{type:'completeDailyLesson',lessonId:lessons[0].id,answer:lessons[0].answer},context(now));
+  assert.equal(state.xp,firstXp + lessons[0].xp);assert.equal(state.crystals,firstCrystals + lessons[0].crystals);
+  assert.throws(() => applyAction(state,{type:'completeDailyLesson',lessonId:lessons[0].id,answer:lessons[0].answer},context(now)),/already/i);
+  for (const lesson of lessons.slice(1)) applyAction(state,{type:'completeDailyLesson',lessonId:lesson.id,answer:lesson.answer},context(now));
+  assert.equal(state.learningStreak,1);assert.equal(state.dailyLessonCompletedIds.length,3);
+  state.learningStreak = 99;state.lastLearningDayKey = '2026-09-29';
+  assert.equal(learningStreakBonus(100),.5);
+  const tomorrow = new Date(2026,8,30,12).getTime();const next = dailyLessonsFor('2026-09-30')[0];
+  const xp = state.xp;applyAction(state,{type:'completeDailyLesson',lessonId:next.id,answer:next.answer},context(tomorrow));
+  assert.equal(state.xp - xp,Math.round(next.xp * 1.5));
+});
+
+test('Completing the daily set can drop a random recipe at the configured low chance', () => {
+  assert.ok(DAILY_LESSON_RECIPE_CHANCE > 0 && DAILY_LESSON_RECIPE_CHANCE < .1);
+  const now = new Date(2026,8,29,12).getTime();const state = createInitialState(now);const before = state.knownRecipeIds.length;
+  const lucky = { ...context(now), random:() => 0 };
+  for (const lesson of dailyLessonsFor('2026-09-29')) applyAction(state,{type:'completeDailyLesson',lessonId:lesson.id,answer:lesson.answer},lucky);
+  assert.equal(state.knownRecipeIds.length,before + 1);assert.match(state.dailyLessonResult,/Lucky drop/);
+});
+
+test('The first bar is chosen freely; expansion starts at level 25, then costs coins and crystals', () => {
+  const now = Date.now();const state = createInitialState(now);
+  assert.equal(state.startingBarChosen,false);assert.deepEqual(state.ownedBarIds,['new-york']);
+  applyAction(state,{type:'chooseStartingBar',regionId:'berlin'},context(now));
+  assert.deepEqual(state.ownedBarIds,['berlin']);assert.equal(state.regionId,'berlin');
+  assert.throws(() => applyAction(state,{type:'switchBar',regionId:'london'},context(now)),/Purchase/);
+  assert.throws(() => applyAction(state,{type:'buyBar',regionId:'london'},context(now)),new RegExp(`level ${BAR_PURCHASE_LEVEL}`));
+  state.xp = xpForLevel(BAR_PURCHASE_LEVEL);state.money = SECOND_BAR_COIN_COST;
+  applyAction(state,{type:'buyBar',regionId:'london'},context(now));
+  assert.ok(state.ownedBarIds.includes('london'));assert.equal(state.money,0);assert.equal(state.regionId,'london');
+  assert.equal(barUnlockPrice(state.ownedBarIds).currency,'crystals');
+  state.crystals = barUnlockPrice(state.ownedBarIds).amount;
+  applyAction(state,{type:'buyBar',regionId:'tokyo'},context(now));
+  assert.ok(state.ownedBarIds.includes('tokyo'));assert.equal(state.crystals,0);
+});
+
+test('Recipe mastery consumes level plus one duplicate recipe cards', () => {
+  const now = Date.now();const state = createInitialState(now);const recipe = RECIPES[0];
+  state.money = 100000;state.recipeCopies = {[recipe.id]:2};
+  assert.equal(recipeCardsRequired(1),2);
+  applyAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now));
+  assert.equal(state.recipeLevels[recipe.id],2);assert.equal(state.recipeCopies[recipe.id],0);
+  state.recipeCopies[recipe.id] = 2;
+  assert.throws(() => applyAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now)),/need 3/i);
+  state.recipeCopies[recipe.id] = 3;
+  applyAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now));
+  assert.equal(state.recipeLevels[recipe.id],3);assert.equal(state.recipeCopies[recipe.id],0);
 });
 
 test('Higher levels: more VIPs (never above 35%), better pay, pricier supplies, shorter waits', () => {

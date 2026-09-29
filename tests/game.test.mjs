@@ -184,11 +184,11 @@ test('Bulk purchase is atomic and delivery goes to its original bar',() => {
   assert.equal(game.checkoutPurchase(),true);assert.equal(game.money,Number((balance - quote.total).toFixed(2)));assert.equal(game.deliveryOrders.length,1);
   assert.equal(game.inventory.find(item => item.ingredientId === offer.ingredientId).amount,original);
   const dueAt = game.deliveryOrders[0].dueAt;
-  game.switchBar('london');const london = game.inventory.find(item => item.ingredientId === offer.ingredientId).amount;
+  const london = game.inventories.london.find(item => item.ingredientId === offer.ingredientId).amount;
   game.tickGameClock(dueAt);
   assert.equal(game.deliveryOrders.length,0);
   assert.equal(game.inventories['new-york'].find(item => item.ingredientId === offer.ingredientId).amount,original + offer.quantity * 5);
-  assert.equal(game.inventory.find(item => item.ingredientId === offer.ingredientId).amount,london);
+  assert.equal(game.inventories.london.find(item => item.ingredientId === offer.ingredientId).amount,london);
   game.purchaseCart[offer.ingredientId] = 99;assert.ok(game.purchaseQuote.total > game.money);
   assert.equal(game.checkoutPurchase(),false);assert.equal(game.deliveryOrders.length,0);
 });
@@ -203,6 +203,7 @@ test('Sale cannot consume reserved mix or leave negative stock',() => {
 
 test('Stock transfer respects the glass reservation, and invalid sale amounts do nothing',() => {
   const game = freshGame();const id = INGREDIENTS[0].id;const initial = game.inventory[0].amount;
+  game.chooseStartingBar('new-york');game.ownedBarIds.push('london');
   const destination = game.inventories.london[0].amount;
   game.addIngredient(id,initial - 5);game.transferStock(id,'london');
   assert.equal(game.inventory[0].amount,initial - 5);
@@ -213,12 +214,12 @@ test('Stock transfer respects the glass reservation, and invalid sale amounts do
 });
 
 test('Bar names, bartender nicknames and styles are per-city and persisted; all 25 customer models are available',async() => {
-  const game = freshGame();game.ownedInteriorIds.push('skyline','cyberpunk');game.renameBar('North Star');game.decor.interior = 'skyline';
-  game.switchBar('london');assert.notEqual(game.decor.name,'North Star');game.renameBar('Juniper Club');game.renameBartender('Night Fox');game.decor.bartenderCharacter = 'leo';game.decor.bartender = 'apron';game.decor.interior = 'cyberpunk';game.decor.counter = 'glass';game.decor.counterColor = 'navy';game.decor.counterSize = 'grand';game.decor.lighting = 'violet';game.decor.highlightStrength = 'bright';game.decor.face = 'angular';game.decor.hairStyle = 'undercut';game.decor.hairColor = 'blue';game.decor.bodyShape = 'muscular';game.decor.skinDetail = 'scar-brow';game.decor.pose = 'lean';
+  const game = freshGame();game.chooseStartingBar('new-york');game.ownedBarIds.push('london');game.ownedInteriorIds.push('skyline','cyberpunk');game.renameBar('North Star');game.decor.interior = 'skyline';
+  game.switchBar('london');assert.notEqual(game.decor.name,'North Star');game.renameBar('Juniper Club');game.renameBartender('Night Fox');game.decor.bartenderCharacter = 'leo';game.decor.bartender = 'apron';game.decor.interior = 'cyberpunk';game.decor.counter = 'glass';game.decor.counterColor = 'navy';game.decor.counterSize = 'grand';game.decor.lighting = 'violet';game.decor.highlightStrength = 'bright';game.decor.face = 'angular';game.decor.hairStyle = 'undercut';game.decor.hairColor = 'blue';game.decor.bodyShape = 'muscular';game.decor.skinDetail = 'scar-brow';game.decor.pose = 'working';
   game.switchBar('new-york');assert.equal(game.decor.name,'North Star');assert.equal(game.decor.interior,'skyline');
   await nextTick();setActivePinia(createPinia());const reloaded = useGameStore();
   assert.equal(reloaded.bars.london.name,'Juniper Club');assert.equal(reloaded.bars.london.bartenderNickname,'Night Fox');assert.equal(reloaded.bars.london.bartenderCharacter,'leo');assert.equal(reloaded.bars.london.bartender,'apron');
-  assert.equal(reloaded.bars.london.interior,'cyberpunk');assert.equal(reloaded.bars.london.counter,'glass');assert.equal(reloaded.bars.london.counterSize,'grand');assert.equal(reloaded.bars.london.hairStyle,'undercut');assert.equal(reloaded.bars.london.skinDetail,'scar-brow');assert.equal(reloaded.bars.london.pose,'lean');
+  assert.equal(reloaded.bars.london.interior,'cyberpunk');assert.equal(reloaded.bars.london.counter,'glass');assert.equal(reloaded.bars.london.counterSize,'grand');assert.equal(reloaded.bars.london.hairStyle,'undercut');assert.equal(reloaded.bars.london.skinDetail,'scar-brow');assert.equal(reloaded.bars.london.pose,'working');
   assert.ok(INTERIORS.length >= 19);assert.ok(COUNTER_MATERIALS.length >= 8);assert.ok(HAIR_STYLES.length >= 8);assert.ok(SKIN_DETAILS.includes('clean') && SKIN_DETAILS.some(item => item.startsWith('tattoo')) && SKIN_DETAILS.some(item => item.startsWith('scar')));
   assert.equal(CUSTOMER_ART_BY_SLOT.length,25);
   assert.equal(game.customers.length,1,'the bar serves one customer at a time');

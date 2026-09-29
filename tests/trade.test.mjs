@@ -73,6 +73,7 @@ test('Hard mistakes make the seller misunderstand: price, bar or product', () =>
   const kinds = new Set();
   for (const roll of [.05, .4, .8]) {
     const state = openDeal(6, () => roll);
+    state.ownedBarIds = REGIONS.map((region) => region.id);
     const before = quoteOf(state);
     say(state, 'me want you price more low', () => roll);
     assert.equal(state.negotiation.misunderstandings.length, 0, 'one mistake is forgiven');

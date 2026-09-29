@@ -12,8 +12,10 @@ import { buildProfile, findRecipeMention, openingLine, replyTo, shortWish, type 
 import { serviceReply } from '../domain/conversation/serviceTalk';
 import { canWelcomeVip, nextCustomerArrival, nextVipAvailability, orderTimeSeconds, vipCarriesRecipe } from '../domain/customerTiming';
 import { economyAt, marketFor } from '../domain/progression';
+import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
+import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
-import { addSpareCopy, isStarterRecipe, RECIPE_MAX_LEVEL, recipeBonus, recipeLevel, upgradeCost } from './recipes';
+import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
 import { DELIVERY_DAY_MS, levelFor, normalizePlayerState, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
 
 // Game rules as pure state transitions. The server runs these for every request, so the client can only
@@ -26,6 +28,7 @@ export type GameAction =
   | { type: 'sell'; cart: Record<string, number> }
   | { type: 'transfer'; ingredientId: string; targetId: RegionId; amount?: number }
   | { type: 'claimDaily' }
+  | { type: 'completeDailyLesson'; lessonId: string; answer: string }
   | { type: 'exchangeCrystals'; crystals: number }
   | { type: 'buyRecipe'; recipeId: string }
   | { type: 'upgradeRecipe'; recipeId: string }
@@ -33,6 +36,8 @@ export type GameAction =
   | { type: 'buyBottleStock'; productId: string; quantity?: number }
   | { type: 'expediteCustomer' }
   | { type: 'switchBar'; regionId: RegionId }
+  | { type: 'chooseStartingBar'; regionId: RegionId }
+  | { type: 'buyBar'; regionId: RegionId }
   | { type: 'renameBar'; name: string }
   | { type: 'renameBartender'; name: string }
   | { type: 'setDecor'; key: string; value: string }
@@ -111,7 +116,10 @@ function makeArrivingCustomer(state: PlayerState, now: number, random: () => num
   if (canWelcomeVip(now, state.vipCooldownUntil, random, economy.vipChance)) {
     state.vipCooldownUntil = now + Math.round((nextVipAvailability(now, random) - now) * economy.vipCooldown);
     const locked = lockedRecipes(state);
-    if (vipCarriesRecipe(locked.length > 0, random)) return priced(withUniqueLook(makeSpecialCustomer(locked[Math.floor(random() * locked.length)]!, level), []));
+    const learnedAdvanced = knownRecipes(state);
+    // VIPs usually teach something new, but can also bring duplicate cards needed for mastery.
+    const recipeRewards = learnedAdvanced.length && random() < .35 ? learnedAdvanced : (locked.length ? locked : learnedAdvanced);
+    if (vipCarriesRecipe(recipeRewards.length > 0, random)) return priced(withUniqueLook(makeSpecialCustomer(recipeRewards[Math.floor(random() * recipeRewards.length)]!, level), []));
     const vip = withUniqueLook(generateCustomer(level, knownRecipes(state), .35, priceFactor), []);
     vip.mood = 'vip';
     vip.greeting = 'Good evening. I was told this bar is exceptional.';
@@ -266,7 +274,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.money = coins(state.money + revenue + tip);
       const crystalPayment = bottleSaleCrystalReward(product, request.quantity);
       state.crystals += crystalPayment;
-      state.xp += 28 + Math.min(state.streak * 2, 14);
+      state.xp += 110 + Math.min(state.streak * 2, 14);
       state.streak += 1;
       const note = `Sold ${request.quantity} × ${product.name} for ${revenue.toFixed(2)} coins and ${crystalPayment} crystals. Tip +${tip}.`;
       scheduleNextCustomer(state, now, random);
@@ -324,16 +332,19 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const bonus = guest.orderKind === 'serve' ? undefined : signatureBonus(verdict.recipe.id, pourBrands);
         const tip = Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .25 : .12) * economyOf(state, now).tips * mastery.tips) + (bonus ? 2 : 0);
         state.money = coins(state.money + revenue + tip);
-        state.xp += 22 + Math.min(state.streak * 2, 14);
+        // About 60 successful orders reach level 25: roughly four medium two-hour play days.
+        state.xp += 100 + Math.min(state.streak * 2, 14);
         state.streak += 1;
         const serveProduct = serve ? ALCOHOL_PRODUCTS.find((item) => item.id === serve.productId) : undefined;
         const brandedPayment = serveProduct ? brandedServeCrystalReward(serveProduct) : 0;
         const specialPayment = guest.specialRecipeRewardId || guest.mood === 'vip' ? conversationCrystalReward(guest, verdict.recipe) : 0;
         const crystalPayment = brandedPayment + specialPayment;
         state.crystals += crystalPayment;
+        const duplicateRecipe = !!guest.specialRecipeRewardId && state.knownRecipeIds.includes(guest.specialRecipeRewardId);
         const unlocked = guest.specialRecipeRewardId ? unlockRecipe(state, guest.specialRecipeRewardId, 'special-client') : false;
         const crystalNote = crystalPayment ? ` +${crystalPayment} crystals.` : '';
         const note = unlocked ? `Perfect service. ${verdict.recipe.name} was added to your recipe book!${crystalNote}`
+          : duplicateRecipe ? `Perfect service. You earned one ${verdict.recipe.name} recipe card for mastery.${crystalNote}`
           : bonus ? `Perfect service — classic touch with ${bonus}! Tip +${tip} coins.${crystalNote}` : `Perfect service. Tip +${tip} coins.${crystalNote}`;
         scheduleNextCustomer(state, now, random);
         state.message = note;
@@ -376,6 +387,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     }
     case 'transfer': {
       if (!isRegion(action.targetId) || action.targetId === state.regionId) throw new RuleError('Choose another bar.');
+      if (!state.ownedBarIds.includes(action.targetId)) throw new RuleError('Unlock that bar before transferring stock to it.');
       const ingredient = INGREDIENTS.find((item) => item.id === action.ingredientId);
       const source = inventoryOf(state).find((item) => item.ingredientId === action.ingredientId);
       const target = state.inventories[action.targetId].find((item) => item.ingredientId === action.ingredientId);
@@ -401,20 +413,57 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.crystals += crystalReward;
       state.dailyGiftClaimedKey = today;
       const locked = lockedRecipes(state);
-      if (locked.length && random() < .12) {
-        const recipe = locked[Math.floor(random() * locked.length)]!;
+      const learnedAdvanced = knownRecipes(state);
+      const recipeRewards = [...locked, ...learnedAdvanced];
+      if (recipeRewards.length && random() < .12) {
+        const recipe = recipeRewards[Math.floor(random() * recipeRewards.length)]!;
         unlockRecipe(state, recipe.id, 'daily-gift');
-        state.dailyGiftResult = `Day ${state.loginStreak}: +${reward} coins${crystalReward ? `, +${crystalReward} crystals` : ''} and a lucky ${recipe.name} recipe!`;
+        state.dailyGiftResult = `Day ${state.loginStreak}: +${reward} coins${crystalReward ? `, +${crystalReward} crystals` : ''} and a lucky ${recipe.name} recipe card!`;
       } else {
         state.dailyGiftResult = `Day ${state.loginStreak}: +${reward} coins${crystalReward ? ` and +${crystalReward} crystals` : ''}. Come back tomorrow to grow your streak.`;
       }
       state.message = state.dailyGiftResult;
       break;
     }
+    case 'completeDailyLesson': {
+      const today = calendarDate(new Date(now));
+      const lesson = dailyLessonsFor(today).find((item) => item.id === action.lessonId);
+      if (!lesson) throw new RuleError('This lesson is not part of today’s practice.');
+      if (state.dailyLessonKey !== today) {
+        state.dailyLessonKey = today;
+        state.dailyLessonCompletedIds = [];
+      }
+      if (state.dailyLessonCompletedIds.includes(lesson.id)) throw new RuleError('This lesson has already been completed today.');
+      if (normalizeLessonAnswer(action.answer) !== normalizeLessonAnswer(lesson.answer)) throw new RuleError('Not quite. Review the choices and try again.');
+
+      const prospectiveStreak = consecutiveDays(state.lastLearningDayKey, state.learningStreak, new Date(now));
+      const multiplier = 1 + learningStreakBonus(prospectiveStreak);
+      const xpReward = Math.round(lesson.xp * multiplier);
+      const crystalReward = Math.round(lesson.crystals * multiplier);
+      state.xp += xpReward;
+      state.crystals += crystalReward;
+      state.dailyLessonCompletedIds.push(lesson.id);
+
+      let recipeNote = '';
+      if (state.dailyLessonCompletedIds.length >= DAILY_LESSON_COUNT) {
+        state.learningStreak = prospectiveStreak;
+        state.lastLearningDayKey = today;
+        const rewards = [...lockedRecipes(state), ...knownRecipes(state)];
+        if (rewards.length && random() < DAILY_LESSON_RECIPE_CHANCE) {
+          const recipe = rewards[Math.floor(random() * rewards.length)]!;
+          const learned = unlockRecipe(state, recipe.id, 'daily-lesson');
+          recipeNote = learned ? ` Lucky drop: ${recipe.name} was learned!` : ` Lucky drop: +1 ${recipe.name} recipe card!`;
+        }
+      }
+      const bonus = Math.round((multiplier - 1) * 100);
+      state.dailyLessonResult = `${lesson.kind} complete: +${xpReward} XP and +${crystalReward} crystals${bonus ? ` (${bonus}% streak bonus)` : ''}.${recipeNote}`;
+      state.message = state.dailyLessonResult;
+      break;
+    }
     case 'buyRecipe': {
       const recipe = RECIPES.find((item) => item.id === action.recipeId);
-      // A known recipe can be bought again as a spare copy to gift — except the starter recipes everyone has.
-      if (!recipe || (state.knownRecipeIds.includes(recipe.id) && isStarterRecipe(recipe.id))) throw new RuleError('This recipe is not for sale.');
+      // A known recipe can be bought again as a duplicate card for mastery or gifting.
+      if (!recipe) throw new RuleError('This recipe is not for sale.');
       const spare = state.knownRecipeIds.includes(recipe.id);
       const price = recipePurchase(recipe, RECIPES.indexOf(recipe));
       if (price.currency === 'crystals') {
@@ -433,9 +482,12 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       if (!recipe || !state.knownRecipeIds.includes(recipe.id)) throw new RuleError('Learn this recipe first.');
       const level = recipeLevel(state, recipe.id);
       const cost = upgradeCost(recipe, level);
+      const cards = recipeCardsRequired(level);
       if (cost === undefined || level >= RECIPE_MAX_LEVEL) throw new RuleError(`${recipe.name} is already at the top level.`);
+      if (recipeCopies(state, recipe.id) < cards) throw new RuleError(`You need ${cards} ${recipe.name} recipe cards to reach level ${level + 1}.`);
       if (state.money < cost) throw new RuleError(`You need ${cost} coins to upgrade ${recipe.name}.`);
       state.money = coins(state.money - cost);
+      state.recipeCopies = { ...(state.recipeCopies ?? {}), [recipe.id]: recipeCopies(state, recipe.id) - cards };
       state.recipeLevels = { ...(state.recipeLevels ?? {}), [recipe.id]: level + 1 };
       state.message = `${recipe.name} is now level ${level + 1}: guests pay ${Math.round((recipeBonus(level + 1).pay - 1) * 100)}% more for it.`;
       break;
@@ -487,8 +539,36 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
 
     case 'switchBar': {
       if (!isRegion(action.regionId)) throw new RuleError('Unknown city.');
+      if (!state.ownedBarIds.includes(action.regionId)) throw new RuleError('Purchase this bar before managing it.');
       state.regionId = action.regionId;
       state.message = `Now managing the ${REGIONS.find((item) => item.id === action.regionId)!.name} bar.`;
+      break;
+    }
+    case 'chooseStartingBar': {
+      if (!isRegion(action.regionId)) throw new RuleError('Unknown city.');
+      if (state.startingBarChosen) throw new RuleError('Your first bar has already been chosen.');
+      state.ownedBarIds = [action.regionId];
+      state.regionId = action.regionId;
+      state.startingBarChosen = true;
+      state.message = `${REGIONS.find((item) => item.id === action.regionId)!.name} is now your first bar.`;
+      break;
+    }
+    case 'buyBar': {
+      if (!isRegion(action.regionId)) throw new RuleError('Unknown city.');
+      if (!state.startingBarChosen) throw new RuleError('Choose your first bar before expanding.');
+      if (state.ownedBarIds.includes(action.regionId)) throw new RuleError('You already own this bar.');
+      if (levelFor(state.xp) < BAR_PURCHASE_LEVEL) throw new RuleError(`Reach level ${BAR_PURCHASE_LEVEL} to buy another bar.`);
+      const price = barUnlockPrice(state.ownedBarIds);
+      if (price.currency === 'coins') {
+        if (state.money < price.amount) throw new RuleError(`You need ${price.amount} coins to buy this bar.`);
+        state.money = coins(state.money - price.amount);
+      } else {
+        if (state.crystals < price.amount) throw new RuleError(`You need ${price.amount} crystals to buy this bar.`);
+        state.crystals -= price.amount;
+      }
+      state.ownedBarIds.push(action.regionId);
+      state.regionId = action.regionId;
+      state.message = `${REGIONS.find((item) => item.id === action.regionId)!.name} bar unlocked.`;
       break;
     }
     case 'renameBar': {

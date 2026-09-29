@@ -2,23 +2,27 @@
 import { computed, ref } from 'vue';
 import { CONTEXT_LABEL, PHRASE_GROUPS, ROLE_LABEL, type WorkContext } from '../../domain/english/phrases';
 import { RULE_GROUPS, RULES, type RuleGroup, type RuleId } from '../../domain/english/rules';
-import { canSpeak, speak } from '../../domain/english/speak';
+import { speak } from '../../domain/english/speak';
 import { TOPIC_CONTEXT, VOCAB_TOPICS, VOCABULARY, type VocabEntry, type VocabTopic } from '../../domain/english/vocabulary';
 import { useLearningStore } from '../../stores/learning';
+import { useGameStore } from '../../stores/game';
 import { useGuide } from '../../composables/useGuide';
 import { guideFor } from '../../data/knowledge/guides';
 import { INGREDIENT_GUIDES, KIND_LABEL } from '../../data/knowledge/ingredients';
 import { BRANDS, EXTRA_ALCOHOL_GUIDES } from '../../data/knowledge/alcohol';
 import { INGREDIENTS, RECIPES } from '../../domain/catalog';
+import UiIcon from '../ui/UiIcon.vue';
 
 const learning = useLearningStore();
+const game = useGameStore();
 const { openGuide } = useGuide();
 const ingredientGroups = computed(() => (['spirit', 'liqueur', 'wine', 'mixer', 'fresh', 'garnish'] as const).map((kind) => ({
   kind, label: KIND_LABEL[kind], items: INGREDIENTS.filter((item) => INGREDIENT_GUIDES[item.id]?.kind === kind)
 })).filter((group) => group.items.length));
-type Tab = 'words' | 'phrases' | 'grammar' | 'guide' | 'mistakes' | 'practice';
-const tab = ref<Tab>('words');
+type Tab = 'daily' | 'words' | 'phrases' | 'grammar' | 'guide' | 'mistakes' | 'practice';
+const tab = ref<Tab>('daily');
 const tabs: { id: Tab; label: string; hint: string }[] = [
+  { id: 'daily', label: 'Daily', hint: 'XP, crystals & streak' },
   { id: 'words', label: 'Words', hint: 'Bar vocabulary' },
   { id: 'phrases', label: 'Phrases', hint: 'Questions to ask' },
   { id: 'grammar', label: 'Grammar', hint: 'Rules explained' },
@@ -26,6 +30,12 @@ const tabs: { id: Tab; label: string; hint: string }[] = [
   { id: 'mistakes', label: 'My mistakes', hint: 'Learn from them' },
   { id: 'practice', label: 'Practice', hint: 'Flashcards' }
 ];
+const dailyChoice = ref<Record<string, string>>({});
+const lessonDone = (id: string) => game.dailyLessonCompletedIds.includes(id);
+function submitDailyLesson(id: string) {
+  const answer = dailyChoice.value[id];
+  if (answer) game.completeDailyLesson(id, answer);
+}
 
 // Job: bartender, shop seller, or both. Filters words, phrases and flashcards.
 const job = ref<WorkContext | 'all'>('all');
@@ -127,8 +137,28 @@ function when(at: number) {
       </button>
     </nav>
 
+    <!-- DAILY LESSONS -->
+    <div v-if="tab === 'daily'" class="learning-body daily-learning">
+      <header class="daily-learning-head">
+        <div><small>EVERYDAY PRACTICE</small><h3>Three quick lessons</h3><p>Finish today’s set to keep your learning streak. Every correct answer gives XP and crystals; a completed set has a 6% chance to drop a random recipe card.</p></div>
+        <div class="learning-streak-card"><small>LEARNING STREAK</small><b>{{ game.learningStreak }} day{{ game.learningStreak === 1 ? '' : 's' }}</b><span>Today’s reward bonus: +{{ game.learningBonusPercent }}%</span></div>
+      </header>
+      <div class="daily-lesson-progress" :style="{ '--daily-progress': `${game.dailyLessonCompletedIds.length / game.dailyLessons.length * 100}%` }"><span>{{ game.dailyLessonCompletedIds.length }} / {{ game.dailyLessons.length }} complete</span><i></i></div>
+      <div class="daily-lesson-grid">
+        <article v-for="(lesson,index) in game.dailyLessons" :key="lesson.id" class="daily-lesson-card" :class="{ complete: lessonDone(lesson.id) }">
+          <header><span>{{ index + 1 }}</span><div><small>{{ lesson.kind }}</small><b>{{ lesson.prompt }}</b></div><em v-if="lessonDone(lesson.id)">✓ DONE</em></header>
+          <div class="daily-choices">
+            <button v-for="choice in lesson.choices" :key="choice" type="button" :class="{ selected: dailyChoice[lesson.id] === choice }" :disabled="lessonDone(lesson.id)" @click="dailyChoice[lesson.id] = choice">{{ choice }}</button>
+          </div>
+          <p v-if="lessonDone(lesson.id)" class="daily-explanation">{{ lesson.explanation }}</p>
+          <footer><span>+{{ Math.round(lesson.xp * (1 + game.learningBonusPercent / 100)) }} XP · +{{ Math.round(lesson.crystals * (1 + game.learningBonusPercent / 100)) }} ◆</span><button type="button" :disabled="lessonDone(lesson.id) || !dailyChoice[lesson.id]" @click="submitDailyLesson(lesson.id)">{{ lessonDone(lesson.id) ? 'Reward claimed' : 'Check answer' }}</button></footer>
+        </article>
+      </div>
+      <p class="daily-result" aria-live="polite">{{ game.dailyLessonResult }}</p>
+    </div>
+
     <!-- WORDS -->
-    <div v-if="tab === 'words'" class="learning-body">
+    <div v-else-if="tab === 'words'" class="learning-body">
       <div class="learning-filters">
         <button type="button" :class="{ active: topic === 'all' }" @click="topic = 'all'">All</button>
         <button v-for="item in topics" :key="item" type="button" :class="{ active: topic === item }" @click="topic = item">{{ item }}</button>
@@ -139,11 +169,11 @@ function when(at: number) {
         <article v-for="entry in words" :key="entry.word" class="vocab-card" :class="{ known: learning.knownWords.includes(entry.word) }">
           <header>
             <div><h3>{{ entry.word }}</h3><span class="ipa">{{ entry.ipa }}</span></div>
-            <button v-if="canSpeak()" type="button" class="speak-button" :aria-label="`Listen to ${entry.word}`" @click="speak(entry.word)">🔊</button>
+            <button type="button" class="speak-button" :aria-label="`Listen to ${entry.word}`" @click="speak(entry.word)"><UiIcon name="speaker" /></button>
           </header>
           <p class="vocab-tags"><span>{{ entry.pos }}</span><span>{{ entry.level }}</span><span v-if="learning.seenWords[entry.word]" class="seen">met {{ learning.seenWords[entry.word] }}×</span></p>
           <p class="vocab-meaning">{{ entry.meaning }}</p>
-          <p class="vocab-example">“{{ entry.example }}” <button v-if="canSpeak()" type="button" aria-label="Listen to example" @click="speak(entry.example)">🔊</button></p>
+          <p class="vocab-example">“{{ entry.example }}” <button type="button" class="inline-speak-button" aria-label="Listen to example" @click="speak(entry.example)"><UiIcon name="speaker" /></button></p>
           <dl v-if="entry.opposite || entry.related?.length">
             <template v-if="entry.opposite"><dt>≠</dt><dd>{{ entry.opposite }}</dd></template>
             <template v-if="entry.related?.length"><dt>≈</dt><dd>{{ entry.related.join(', ') }}</dd></template>
@@ -167,7 +197,7 @@ function when(at: number) {
           <p v-if="learning.usedPhrases.includes(lesson.text)" class="phrase-used">✓ You used this with a customer</p>
           <div class="phrase-line">
             <span v-for="(part, index) in lesson.parts" :key="index" class="phrase-part" :class="`role-${part.role}`"><b>{{ part.text }}</b><small>{{ ROLE_LABEL[part.role] }}</small></span>
-            <button v-if="canSpeak()" type="button" class="speak-button" aria-label="Listen" @click="speak(lesson.text)">🔊</button>
+            <button type="button" class="speak-button" aria-label="Listen" @click="speak(lesson.text)"><UiIcon name="speaker" /></button>
           </div>
           <p class="phrase-when"><span>When</span>{{ lesson.when }}</p>
           <p class="phrase-answers"><span>Guest may say</span><i v-for="answer in lesson.answers" :key="answer">“{{ answer }}”</i></p>
@@ -257,7 +287,7 @@ function when(at: number) {
       </div>
       <p v-else class="learning-empty">🎉 You marked every word as known. Great work!</p>
       <div v-if="card" class="practice-actions">
-        <button v-if="canSpeak()" type="button" class="secondary-button" @click="speak(card.word)">🔊 Listen</button>
+        <button type="button" class="secondary-button listen-button" @click="speak(card.word)"><UiIcon name="speaker" />Listen</button>
         <button type="button" class="secondary-button" @click="nextCard(false)">Again later</button>
         <button type="button" class="primary-button" :disabled="!revealed" @click="nextCard(true)">I knew it ✓</button>
       </div>

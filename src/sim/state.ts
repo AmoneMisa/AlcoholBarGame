@@ -12,7 +12,7 @@ import type { BottleConversationFacts } from '../domain/conversation/bottleTalk'
 
 export const BASIC_RECIPE_COUNT = 10;
 export const DELIVERY_DAY_MS = 24 * 60 * 60 * 1000;
-export type UnlockSource = 'starter' | 'shop' | 'special-client' | 'daily-gift' | 'friend-gift';
+export type UnlockSource = 'starter' | 'shop' | 'special-client' | 'daily-gift' | 'daily-lesson' | 'friend-gift';
 export interface ChatLine { id: number; speaker: 'customer' | 'bartender'; text: string; note?: string; ok?: boolean; }
 // One conversation with one guest. Only what has been said is stored here — never the hidden order.
 export interface Transcript { lines: ChatLine[]; facts: Fact[]; bottleFacts: BottleConversationFacts; expression: CustomerReply['expression']; attempts: number; correct: number; perfectRewardClaimed?: boolean; }
@@ -27,12 +27,19 @@ export interface PlayerState {
   xp: number;
   streak: number;
   bars: Record<RegionId, BarProfile>;
+  ownedBarIds: RegionId[];
+  startingBarChosen: boolean;
   ownedInteriorIds: string[];
   knownRecipeIds: string[];
   recipeUnlockSources: Record<string, UnlockSource>;
   dailyGiftClaimedKey: string;
   loginStreak: number;
   dailyGiftResult: string;
+  dailyLessonKey: string;
+  dailyLessonCompletedIds: string[];
+  learningStreak: number;
+  lastLearningDayKey: string;
+  dailyLessonResult: string;
   inventories: Record<RegionId, InventoryItem[]>;
   bottleInventories: Record<RegionId, BottleInventoryItem[]>;
   customers: Customer[];
@@ -50,7 +57,7 @@ export interface PlayerState {
   negotiation?: import('./trade').Negotiation;
   // When each supplier last agreed a negotiated deal (a rep haggles once an hour).
   lastNegotiatedAt?: Record<string, number>;
-  // Recipe mastery (1–5, see sim/recipes.ts) and spare recipe cards that can be gifted.
+  // Recipe mastery (1–5, see sim/recipes.ts) and duplicate cards used by mastery or friend gifts.
   recipeLevels?: Record<string, number>;
   recipeCopies?: Record<string, number>;
   // Day of the last rewarded visit to each friend's bar.
@@ -103,12 +110,19 @@ export function createInitialState(now = Date.now()): PlayerState {
     xp: 0,
     streak: 0,
     bars: structuredClone(DEFAULT_BARS),
+    ownedBarIds: ['new-york'],
+    startingBarChosen: false,
     ownedInteriorIds: ['velvet'],
     knownRecipeIds,
     recipeUnlockSources: Object.fromEntries(knownRecipeIds.map((id) => [id, 'starter'])),
     dailyGiftClaimedKey: '',
     loginStreak: 0,
     dailyGiftResult: 'A new gift is available today.',
+    dailyLessonKey: '',
+    dailyLessonCompletedIds: [],
+    learningStreak: 0,
+    lastLearningDayKey: '',
+    dailyLessonResult: 'Complete today’s three lessons to grow your learning streak.',
     inventories: Object.fromEntries(REGIONS.map((region, index) => [region.id, makeBarInventory(index)])) as Record<RegionId, InventoryItem[]>,
     bottleInventories: Object.fromEntries(REGIONS.map((region, barIndex) => [region.id, ALCOHOL_PRODUCTS.map((product, productIndex) => ({
       productId: product.id, quantity: 1 + ((barIndex + productIndex * 2) % 4)
@@ -119,7 +133,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     vipCooldownUntil: 0,
     lastClockAt: now,
     deliveryOrders: [],
-    tradeLog: ['Each city bar now keeps its own stock.'],
+    tradeLog: [],
     languageStats: { sentences: 0, correct: 0 },
     rewardedSentences: {},
     conversations: {},
@@ -131,11 +145,35 @@ export function createInitialState(now = Date.now()): PlayerState {
 // they are loaded so adding a currency never invalidates an existing account.
 export function normalizePlayerState(state: PlayerState) {
   state.crystals = Number.isFinite(state.crystals) && state.crystals >= 0 ? Math.floor(state.crystals) : 0;
+  state.dailyLessonKey = typeof state.dailyLessonKey === 'string' ? state.dailyLessonKey : '';
+  state.dailyLessonCompletedIds = Array.isArray(state.dailyLessonCompletedIds) ? [...new Set(state.dailyLessonCompletedIds.filter((id) => typeof id === 'string'))] : [];
+  state.learningStreak = Number.isFinite(state.learningStreak) ? Math.max(0, Math.floor(state.learningStreak)) : 0;
+  state.lastLearningDayKey = typeof state.lastLearningDayKey === 'string' ? state.lastLearningDayKey : '';
+  state.dailyLessonResult = typeof state.dailyLessonResult === 'string' ? state.dailyLessonResult : 'Complete today’s three lessons to grow your learning streak.';
+  state.tradeLog = Array.isArray(state.tradeLog)
+    ? state.tradeLog.filter((entry) => entry !== 'Each city bar now keeps its own stock.').slice(0, 40)
+    : [];
+  const validRegions = new Set(REGIONS.map((region) => region.id));
+  state.ownedBarIds = Array.isArray(state.ownedBarIds)
+    ? [...new Set(state.ownedBarIds.filter((id) => validRegions.has(id)))]
+    : [validRegions.has(state.regionId) ? state.regionId : 'new-york'];
+  if (!state.ownedBarIds.length) state.ownedBarIds = ['new-york'];
+  state.startingBarChosen = typeof state.startingBarChosen === 'boolean' ? state.startingBarChosen : true;
+  if (!state.ownedBarIds.includes(state.regionId)) state.regionId = state.ownedBarIds[0]!;
   const validInteriors = new Set(INTERIORS.map((item) => item.id));
   state.ownedInteriorIds = Array.isArray(state.ownedInteriorIds)
     ? [...new Set(['velvet', ...state.ownedInteriorIds.filter((id) => validInteriors.has(id as never))])]
     : ['velvet'];
-  for (const bar of Object.values(state.bars)) if (!state.ownedInteriorIds.includes(bar.interior)) bar.interior = 'velvet';
+  state.bars ??= structuredClone(DEFAULT_BARS);
+  for (const region of REGIONS) {
+    const saved = state.bars[region.id] as Partial<BarProfile> | undefined;
+    state.bars[region.id] = { ...structuredClone(DEFAULT_BARS[region.id]), ...saved };
+    const bar = state.bars[region.id];
+    if (!state.ownedInteriorIds.includes(bar.interior)) bar.interior = 'velvet';
+    if (['relaxed'].includes(bar.pose as string)) bar.pose = 'neutral';
+    if (['hip'].includes(bar.pose as string)) bar.pose = 'confident';
+    if (['lean','crossed'].includes(bar.pose as string)) bar.pose = 'working';
+  }
   state.conversations ??= {};
   for (const transcript of Object.values(state.conversations)) {
     transcript.attempts = Number.isFinite(transcript.attempts) ? Math.max(0, Math.floor(transcript.attempts)) : transcript.lines.filter((line) => line.speaker === 'bartender').length;

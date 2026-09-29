@@ -21,7 +21,12 @@
 .word-card dd { margin:0; }
 .word-note { margin:0 0 10px;padding:7px 9px;border-radius:8px;background:#f0dfbd;font-size:12px; }
 .word-card .secondary-button { min-height:36px;border-color:#b98b45;background:#fff;color:#5a3a12; }
-.speak-button { width:32px;height:32px;border:1px solid #cbb89c;border-radius:50%;background:#fff;cursor:pointer;font-size:14px;line-height:1; }
+.speak-button { display:inline-grid;width:32px;height:32px;flex:0 0 32px;place-items:center;padding:0;border:1px solid #cbb89c;border-radius:50%;background:#fff;color:#31506f;cursor:pointer;line-height:1; }
+.speak-button .ui-icon { display:block;width:17px;height:17px;margin:0; }
+.inline-speak-button { display:inline-grid;width:25px;height:25px;place-items:center;margin:-3px 0;padding:0;border:0;border-radius:50%;background:#20304a;color:#c9d8ea;cursor:pointer;vertical-align:middle; }
+.inline-speak-button .ui-icon { display:block;width:15px;height:15px;margin:0; }
+.listen-button { display:inline-flex;align-items:center;justify-content:center;gap:7px; }
+.listen-button .ui-icon { width:18px;height:18px; }
 
 /* --- Conversation popup: rule cards --- */
 /* Reset the older one-line issue badge style so explanations read as normal text. */
@@ -165,16 +170,76 @@ b.role-helper, b.role-person { padding:0 4px;border-bottom:2px solid; }
 .practice-actions { display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px; }
 .practice-count { color:#7f8ea3;font-size:12px; }
 
+.daily-learning { display:grid;gap:12px; }
+.daily-learning-head { display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:12px;align-items:stretch; }
+.daily-learning-head > div:first-child,.learning-streak-card { padding:16px;border:1px solid #3a4a60;border-radius:14px;background:linear-gradient(145deg,#1b2b43,#111b2c); }
+.daily-learning-head small,.daily-lesson-card small { color:#e4b35c;font-size:9px;font-weight:900;letter-spacing:.12em; }
+.daily-learning-head h3 { margin:5px 0;font:700 22px Georgia,serif; }
+.daily-learning-head p { margin:0;color:#b9c6d8;font-size:12px;line-height:1.55; }
+.learning-streak-card { display:grid;align-content:center;background:radial-gradient(circle at 80% 15%,#62452b,#18253b 68%); }
+.learning-streak-card b { margin:5px 0;color:#ffe1a0;font:700 25px Georgia,serif; }
+.learning-streak-card span { color:#a9e6bb;font-size:11px;font-weight:800; }
+.daily-lesson-progress { position:relative;height:34px;overflow:hidden;border:1px solid #3a4a60;border-radius:10px;background:#0b1422; }
+.daily-lesson-progress i { position:absolute;inset:0 auto 0 0;width:var(--daily-progress);background:linear-gradient(90deg,#8c5d24,#d7a94f,#55b979);transition:width .25s ease; }
+.daily-lesson-progress span { position:relative;z-index:1;display:grid;height:100%;place-items:center;color:#fff7e8;font-size:11px;font-weight:900;text-shadow:0 1px 3px #000; }
+.daily-lesson-grid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px; }
+.daily-lesson-card { display:flex;min-width:0;flex-direction:column;gap:10px;padding:13px;border:1px solid #3a4a60;border-radius:13px;background:linear-gradient(160deg,#1a2a42,#111b2c); }
+.daily-lesson-card.complete { border-color:#3f8a55;background:linear-gradient(160deg,#193529,#111e25); }
+.daily-lesson-card > header { display:grid;grid-template-columns:31px minmax(0,1fr) auto;gap:8px;align-items:start; }
+.daily-lesson-card > header > span { display:grid;width:31px;height:31px;place-items:center;border-radius:50%;background:#e4b35c;color:#24170f;font-weight:900; }
+.daily-lesson-card > header b { display:block;margin-top:3px;font-size:13px;line-height:1.35; }
+.daily-lesson-card > header em { color:#9fe6b2;font-size:8px;font-style:normal;font-weight:900;white-space:nowrap; }
+.daily-choices { display:grid;gap:6px; }
+.daily-choices button { min-height:40px;padding:7px 9px;border:1px solid #40516a;border-radius:9px;background:#111c2d;color:#c8d3e0;text-align:left;cursor:pointer; }
+.daily-choices button.selected { border-color:#e4b35c;background:#3a2c1c;color:#fff0c9;box-shadow:inset 3px 0 #e4b35c; }
+.daily-choices button:disabled { cursor:default;opacity:.68; }
+.daily-explanation { margin:0;padding:8px;border-radius:8px;background:#173424;color:#bde8c7;font-size:11px;line-height:1.45; }
+.daily-lesson-card footer { display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:7px;margin-top:auto; }
+.daily-lesson-card footer span { color:#f0c875;font-size:10px;font-weight:900; }
+.daily-lesson-card footer button { min-height:36px;padding:7px 10px;border:1px solid #9a6a2a;border-radius:8px;background:#6d4922;color:#fff4dc;font-size:10px;font-weight:900;cursor:pointer; }
+.daily-lesson-card footer button:disabled { border-color:#415069;background:#202c3e;color:#8998ab;cursor:default; }
+.daily-result { margin:0;padding:10px 12px;border:1px solid #6c5938;border-radius:10px;background:#2b2419;color:#f5d89a;font-size:12px;line-height:1.45; }
+
 @media (max-width:760px) {
+  .learning-page { min-width:0;width:100%; }
+  .learning-page button, .learning-page input { min-width:0; }
   .learning-hero { grid-template-columns:1fr;padding:16px; }
+  .learning-hero > *, .learning-stats > div { min-width:0; }
+  .learning-stats dd { overflow-wrap:anywhere; }
   .job-switch { grid-template-columns:1fr;padding:10px 12px 0; }
-  .job-switch button { grid-template-columns:auto 1fr;align-items:baseline;gap:8px; }
+  .job-switch button { grid-template-columns:minmax(0,auto) minmax(0,1fr);align-items:baseline;gap:8px; }
+  .job-switch button b, .job-switch button small { min-width:0;overflow-wrap:anywhere; }
+  .learning-tabs { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;overflow:visible;padding:10px 12px; }
+  .learning-tabs button { width:100%;min-width:0;padding:8px 9px; }
+  .learning-tabs button b, .learning-tabs button small { min-width:0;overflow-wrap:anywhere; }
   .learning-hero h2 { font-size:23px; }
   .learning-body { padding:12px; }
+  .daily-learning-head { grid-template-columns:1fr; }
+  .daily-lesson-grid { grid-template-columns:1fr; }
+  .daily-lesson-card { padding:11px; }
+  .learning-filters { display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));align-items:stretch; }
+  .learning-filters button { width:100%;min-width:0;min-height:36px;padding:6px 8px;white-space:normal; }
+  .learning-filters input { grid-column:1/-1;width:100%;min-width:0; }
   .rule-example { grid-template-columns:1fr;gap:2px; }
   .phrase-card p span { flex-basis:100%; }
   .rule-grid, .vocab-grid { grid-template-columns:1fr; }
   .word-card { left:10px;right:10px;bottom:8px; }
+}
+
+@media (max-width:430px) {
+  .learning-hero { padding:14px 12px; }
+  .learning-stats { gap:6px; }
+  .learning-stats > div { padding:9px; }
+  .learning-stats dd { font-size:20px; }
+  .job-switch { padding-inline:8px; }
+  .job-switch button { padding:9px 10px; }
+  .learning-tabs { grid-template-columns:repeat(2,minmax(0,1fr));padding-inline:8px; }
+  .learning-tabs button { min-height:52px; }
+  .learning-body { padding:10px 8px; }
+  .daily-learning-head > div:first-child,.learning-streak-card { padding:12px; }
+  .daily-learning-head h3 { font-size:19px; }
+  .learning-filters { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .learning-filters button { font-size:11px; }
 }
 
 .bottle-recommendations .bottle-info { background:transparent;border-color:#3c5a7a;color:#a9d3ff; }

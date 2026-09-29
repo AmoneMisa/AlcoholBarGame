@@ -45,14 +45,16 @@ export const HAIR_STYLES = ['updo','waves','bob','ponytail','braids','slick','sh
 export const HAIR_COLORS = ['espresso','black','chestnut','copper','blonde','platinum','red','blue','pink'] as const;
 export const BODY_SHAPES = ['slim','athletic','curvy','muscular','broad'] as const;
 export const SKIN_DETAILS = ['clean','freckles','tattoo-light','tattoo-bold','scar-brow','scar-cheek'] as const;
+export const SKIN_TONES = ['porcelain','fair','warm','olive','brown','deep'] as const;
+export const TAN_LEVELS = ['none','sun-kissed','deep'] as const;
 export const BUST_OPTIONS = ['petite','balanced','full'] as const;
-export const POSES = ['neutral','confident','relaxed','lean','hip','crossed'] as const;
+export const POSES = ['neutral','confident','working'] as const;
 export const MAKEUP_OPTIONS = ['none','natural','smoky','red-lip','gold','neon'] as const;
 export const BAR_PROFILE_OPTIONS = {
   wall:WALLS,counter:COUNTER_MATERIALS,counterColor:COUNTER_COLORS,counterSize:COUNTER_SIZES,
   lighting:HIGHLIGHTS,highlightStrength:HIGHLIGHT_STRENGTHS,shelf:SHELF_STYLES,bartenderCharacter:['noa','leo'] as const,
-  bartender:['vest','shirt','apron'] as const,interior:INTERIORS.map((item) => item.id),face:BARTENDER_FACES,
-  hairStyle:HAIR_STYLES,hairColor:HAIR_COLORS,bodyShape:BODY_SHAPES,skinDetail:SKIN_DETAILS,
+  bartender:['base','vest','shirt','apron'] as const,interior:INTERIORS.map((item) => item.id),face:BARTENDER_FACES,
+  hairStyle:HAIR_STYLES,hairColor:HAIR_COLORS,bodyShape:BODY_SHAPES,skinDetail:SKIN_DETAILS,skinTone:SKIN_TONES,tanLevel:TAN_LEVELS,
   bust:BUST_OPTIONS,pose:POSES,makeup:MAKEUP_OPTIONS
 } as const;
 
@@ -66,13 +68,15 @@ export interface BarProfile {
   highlightStrength: typeof HIGHLIGHT_STRENGTHS[number];
   bartenderCharacter: 'noa' | 'leo';
   bartenderNickname: string;
-  bartender: 'vest' | 'shirt' | 'apron';
+  bartender: 'base' | 'vest' | 'shirt' | 'apron';
   interior: InteriorId;
   face: typeof BARTENDER_FACES[number];
   hairStyle: typeof HAIR_STYLES[number];
   hairColor: typeof HAIR_COLORS[number];
   bodyShape: typeof BODY_SHAPES[number];
   skinDetail: typeof SKIN_DETAILS[number];
+  skinTone: typeof SKIN_TONES[number];
+  tanLevel: typeof TAN_LEVELS[number];
   bust: typeof BUST_OPTIONS[number];
   pose: typeof POSES[number];
   makeup: typeof MAKEUP_OPTIONS[number];
@@ -80,12 +84,12 @@ export interface BarProfile {
   shelf?: typeof SHELF_STYLES[number];
 }
 
-const femaleStyle = { face:'soft',hairStyle:'updo',hairColor:'espresso',bodyShape:'curvy',skinDetail:'clean',bust:'balanced',pose:'confident',makeup:'natural' } as const;
-const maleStyle = { face:'angular',hairStyle:'slick',hairColor:'chestnut',bodyShape:'muscular',skinDetail:'tattoo-bold',bust:'balanced',pose:'relaxed',makeup:'none' } as const;
+const femaleStyle = { face:'soft',hairStyle:'updo',hairColor:'espresso',bodyShape:'curvy',skinDetail:'clean',skinTone:'warm',tanLevel:'sun-kissed',bust:'balanced',pose:'confident',makeup:'natural' } as const;
+const maleStyle = { face:'angular',hairStyle:'slick',hairColor:'chestnut',bodyShape:'muscular',skinDetail:'tattoo-bold',skinTone:'warm',tanLevel:'sun-kissed',bust:'balanced',pose:'neutral',makeup:'none' } as const;
 export const DEFAULT_BARS: Record<RegionId, BarProfile> = {
   'new-york': { name:'The Velvet Hour',wall:'neon',counter:'classic',counterColor:'ruby',counterSize:'standard',lighting:'amber',highlightStrength:'medium',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'vest',interior:'velvet',...femaleStyle },
   london: { name:'Juniper & Oak',wall:'emerald',counter:'walnut',counterColor:'espresso',counterSize:'grand',lighting:'amber',highlightStrength:'soft',bartenderCharacter:'leo',bartenderNickname:'Leo',bartender:'shirt',interior:'velvet',...maleStyle },
-  berlin: { name:'Midnight Studio',wall:'charcoal',counter:'steel',counterColor:'smoke',counterSize:'slim',lighting:'blue',highlightStrength:'bright',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'apron',interior:'velvet',...femaleStyle,hairColor:'black',pose:'hip' },
+  berlin: { name:'Midnight Studio',wall:'charcoal',counter:'steel',counterColor:'smoke',counterSize:'slim',lighting:'blue',highlightStrength:'bright',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'apron',interior:'velvet',...femaleStyle,hairColor:'black',pose:'confident' },
   tashkent: { name:'Silk Road Social',wall:'terracotta',counter:'brass',counterColor:'gold',counterSize:'standard',lighting:'amber',highlightStrength:'medium',bartenderCharacter:'leo',bartenderNickname:'Leo',bartender:'vest',interior:'velvet',...maleStyle,hairColor:'black' },
   bucharest: { name:'The Amber Room',wall:'burgundy',counter:'brass',counterColor:'plum',counterSize:'grand',lighting:'rose',highlightStrength:'medium',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'vest',interior:'velvet',...femaleStyle,hairColor:'copper',makeup:'smoky' },
   tokyo: { name:'Blue Lantern',wall:'navy',counter:'obsidian',counterColor:'navy',counterSize:'slim',lighting:'blue',highlightStrength:'bright',bartenderCharacter:'leo',bartenderNickname:'Leo',bartender:'apron',interior:'velvet',...maleStyle,hairStyle:'undercut',skinDetail:'tattoo-light' }

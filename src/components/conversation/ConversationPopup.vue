@@ -9,7 +9,7 @@ import { checkText, useSpeller, type CheckResult } from '../../domain/english/ch
 import { loadSpeller } from '../../domain/english/dictionary';
 import { GLOSSARY } from '../../domain/english/lexicon';
 import { RULES, type GrammarRule } from '../../domain/english/rules';
-import { canSpeak, speak } from '../../domain/english/speak';
+import { speak } from '../../domain/english/speak';
 import { lookupWord, type VocabEntry } from '../../domain/english/vocabulary';
 import { useGameStore } from '../../stores/game';
 import { useLearningStore } from '../../stores/learning';
@@ -20,6 +20,7 @@ import BrandBottle from '../knowledge/BrandBottle.vue';
 import { serveTemplates } from '../../domain/brandServe';
 import { haptic } from '../../telegram/webapp';
 import CharacterModel from '../characters/CharacterModel.vue';
+import UiIcon from '../ui/UiIcon.vue';
 
 const inputMode = ref<'type' | 'words'>('words');
 
@@ -310,11 +311,11 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
               <span v-if="activeWord.ipa" class="ipa">{{ activeWord.ipa }}</span>
               <em>{{ activeWord.pos }} · {{ activeWord.level }}</em>
             </div>
-            <button v-if="canSpeak()" type="button" class="speak-button" aria-label="Listen" @click="speak(activeWord.word)">🔊</button>
+            <button type="button" class="speak-button" aria-label="Listen" @click="speak(activeWord.word)"><UiIcon name="speaker" /></button>
             <button type="button" class="word-card-close" aria-label="Close word card" @click="activeWord = undefined">×</button>
           </header>
           <p class="word-meaning">{{ activeWord.meaning }}</p>
-          <p v-if="activeWord.example" class="word-example">“{{ activeWord.example }}” <button v-if="canSpeak()" type="button" aria-label="Listen to example" @click="speak(activeWord.example)">🔊</button></p>
+          <p v-if="activeWord.example" class="word-example">“{{ activeWord.example }}” <button type="button" class="inline-speak-button" aria-label="Listen to example" @click="speak(activeWord.example)"><UiIcon name="speaker" /></button></p>
           <dl>
             <template v-if="activeWord.opposite"><dt>Opposite</dt><dd>{{ activeWord.opposite }}</dd></template>
             <template v-if="activeWord.related?.length"><dt>Related</dt><dd>{{ activeWord.related.join(', ') }}</dd></template>

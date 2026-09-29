@@ -8,10 +8,11 @@ import { bottleTotal } from '../../domain/bottleCatalog';
 import { useGameStore } from '../../stores/game';
 import { useGuide } from '../../composables/useGuide';
 import { INGREDIENTS, RECIPES } from '../../domain/catalog';
-import { canSpeak, speak } from '../../domain/english/speak';
+import { speak } from '../../domain/english/speak';
 import BottleModel from '../cocktails/BottleModel.vue';
 import BrandBottle from './BrandBottle.vue';
 import { SIGNATURE_BRANDS, SIGNATURE_REASON_LABEL } from '../../data/knowledge/signatureBrands';
+import UiIcon from '../ui/UiIcon.vue';
 
 const { current, openGuide, closeGuide } = useGuide();
 const recipe = computed(() => current.value?.kind === 'cocktail' ? RECIPES.find((item) => item.id === current.value!.id) : undefined);
@@ -40,13 +41,13 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
 <template>
   <div v-if="current" class="guide-backdrop" @click.self="closeGuide()">
     <article class="guide-sheet" role="dialog" aria-modal="true" :aria-label="recipe?.name ?? guideName">
-      <button class="guide-close" type="button" aria-label="Close guide" @click="closeGuide()">×</button>
+      <button class="guide-close" type="button" aria-label="Close guide" @click="closeGuide()"><span aria-hidden="true"></span></button>
 
       <!-- COCKTAIL -->
       <template v-if="recipe && cocktail">
         <header class="guide-head">
           <small>COCKTAIL GUIDE · {{ recipe.origin }}</small>
-          <h2>{{ recipe.name }} <button v-if="canSpeak()" type="button" class="guide-speak" aria-label="Listen to the name" @click="speak(recipe.name)">🔊</button></h2>
+          <h2>{{ recipe.name }} <button type="button" class="guide-speak" aria-label="Listen to the name" @click="speak(recipe.name)"><UiIcon name="speaker" /></button></h2>
           <p>{{ cocktail.summary }}</p>
           <div class="guide-badges"><span>{{ cocktail.preparation.technique }}</span><span>{{ cocktail.strength }}</span><span v-for="note in recipe.tastingNotes" :key="note">{{ note }}</span></div>
         </header>
@@ -63,7 +64,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
           <p class="guide-note">{{ TECHNIQUE_EXPLAINED[cocktail.preparation.technique] }}</p>
           <dl class="guide-facts"><dt>Glass</dt><dd>{{ cocktail.preparation.glass }}</dd><dt>Ice</dt><dd>{{ cocktail.preparation.ice }}</dd><dt>Garnish</dt><dd>{{ cocktail.preparation.garnish }}</dd></dl>
           <h4>Recipe card — step by step</h4>
-          <ol v-if="card" class="recipe-card">
+          <ol v-if="card" class="guide-recipe-card">
             <li v-for="(line, index) in card.lines" :key="index" :class="`role-${line.role}`">
               <span class="card-amount">{{ line.amount || '—' }}</span>
               <button v-if="line.ingredientId" type="button" class="guide-link card-name" @click="openGuide('ingredient', line.ingredientId)">{{ line.ingredient }}</button>
@@ -106,7 +107,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
           <BottleModel v-if="ingredient" :ingredient="ingredient" />
           <div>
             <small>{{ KIND_LABEL[ingredientGuide.kind].toUpperCase() }}<template v-if="ingredientGuide.abv"> · {{ ingredientGuide.abv }}</template></small>
-            <h2>{{ guideName }} <button v-if="canSpeak()" type="button" class="guide-speak" aria-label="Listen to the name" @click="speak(guideName)">🔊</button></h2>
+            <h2>{{ guideName }} <button type="button" class="guide-speak" aria-label="Listen to the name" @click="speak(guideName)"><UiIcon name="speaker" /></button></h2>
             <p>{{ ingredientGuide.summary }}</p>
           </div>
         </header>
@@ -129,7 +130,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
             <li v-for="brand in brands" :key="brand.name" class="brand-item">
               <div class="brand-model"><BrandBottle :brand="brand.name" :category="current!.id" :color="shopProductsFor(brand)[0]?.color" /></div>
               <div>
-              <header><b>{{ brand.name }}</b><button v-if="canSpeak()" type="button" class="guide-speak" :aria-label="`Listen to ${brand.name}`" @click="speak(brand.name)">🔊</button><span>{{ brand.from }} · since {{ brand.since }}</span></header>
+              <header><b>{{ brand.name }}</b><button type="button" class="guide-speak" :aria-label="`Listen to ${brand.name}`" @click="speak(brand.name)"><UiIcon name="speaker" /></button><span>{{ brand.from }} · since {{ brand.since }}</span></header>
               <p>{{ brand.description }}</p>
               <p v-for="product in shopProductsFor(brand)" :key="product.id" class="brand-shop">In your shop: <b>{{ product.name }}</b> · {{ product.volumeMl }} ml · {{ product.abv }}% · {{ bottleTotal(product, 1, game.economy.guestPriceFactor) }} coins · {{ stockOf(product.id) }} in stock</p>
               <p v-if="brandCocktails(brand.name).length" class="brand-cocktails">Classic in: <template v-for="(item, index) in brandCocktails(brand.name)" :key="item!.id"><button type="button" class="guide-link" @click="openGuide('cocktail', item!.id)">{{ item!.name }}</button>{{ index < brandCocktails(brand.name).length - 1 ? ', ' : '' }}</template></p>
