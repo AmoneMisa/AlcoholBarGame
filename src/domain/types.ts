@@ -73,6 +73,8 @@ export interface Customer {
   paymentMethod: PaymentMethod;
   specialRecipeRewardId?: string;
   orderRevealed?: boolean;
+  // What the guest says before the order is known (“Something to feel fresh and cool…”); safe to show.
+  wish?: string;
   orderKind?: 'cocktail' | 'bottle' | 'serve';
   // Brand-call order (“Jack Daniel’s on the rocks”): the only bar order that names a brand.
   serveRequest?: import('./brandServe').ServeRequest;

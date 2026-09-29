@@ -58,9 +58,13 @@ export function generateCustomer(level = 0, recipePool: Recipe[] = RECIPES, bott
   return customer;
 }
 
+// Shown while the server keeps a guest's order secret: nothing to match yet.
+const MYSTERY_RECIPE: Recipe = { id: 'mystery', name: 'Mystery order', price: 0, needsShake: false, category: 'cocktail', ingredients: [], origin: '', story: '', tastingNotes: [], occasions: [], method: [] };
+
 export function requiredRecipe(customer: Customer) {
   if (customer.orderKind === 'serve' && customer.serveRequest) return serveRecipe(customer.serveRequest);
-  const base = RECIPES.find((recipe) => recipe.id === customer.orderRecipeId)!;
+  const base = RECIPES.find((recipe) => recipe.id === customer.orderRecipeId);
+  if (!base) return MYSTERY_RECIPE;
   let ingredients = base.ingredients.map((item) => ({ ...item }));
   const modifier = MODIFIERS.find((item) => item.id === customer.modifierId);
 

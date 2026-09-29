@@ -28,12 +28,24 @@ export interface BottleReply extends CustomerReply {
 const normalize = (text: string) => text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ').trim();
 const wordsOf = (text: string) => normalize(text).split(/\s+/).filter(Boolean);
 
+// Words that do not identify a brand on their own (“Would you like Yellow?” is not a bottle).
+const GENERIC_WORDS = new Set(['the', 'and', 'original', 'yellow', 'label', 'black', 'white', 'red', 'blue', 'green', 'gold', 'silver', 'dark', 'light', 'club', 'reserve', 'special',
+  'old', 'number', 'seven', 'twenty', 'one', 'irish', 'whiskey', 'whisky', 'vodka', 'gin', 'rum', 'beer', 'wine', 'sparkling', 'extra', 'dry', 'premium', 'classic', 'blanca', 'carta',
+  'london', 'cream', 'liqueur', 'tequila', 'bianco', 'rosso', 'brut', 'imperial', 'fresh', 'zero', 'free', 'alcohol', 'lager', 'cider', 'soda']);
+
 export function findBottleMention(text: string, products: AlcoholProduct[] = ALCOHOL_PRODUCTS) {
   const haystack = ` ${normalize(text)} `;
-  return [...products].sort((a, b) => b.name.length - a.name.length).find((product) => {
+  const byLength = [...products].sort((a, b) => b.name.length - a.name.length);
+  // 1) Full product or brand names.
+  const full = byLength.find((product) => {
     const names = [product.name, product.brand, product.name.replace(/old no\.? 7/i, 'old number seven')];
     return names.some((name) => haystack.includes(` ${normalize(name)} `));
   });
+  if (full) return full;
+  // 2) A distinctive word of the brand (“Clicquot”, “Daniels”, “Goose”) — only if it points to one brand.
+  const words = new Set(wordsOf(text));
+  const matches = byLength.filter((product) => wordsOf(product.brand).some((word) => word.length >= 4 && !GENERIC_WORDS.has(word) && words.has(word)));
+  return new Set(matches.map((product) => product.brand)).size === 1 ? matches[0] : undefined;
 }
 
 export function scoreBottle(product: AlcoholProduct, facts: BottleConversationFacts, marketFactor = 1): BottleRecommendation {
@@ -71,7 +83,8 @@ export function scoreBottle(product: AlcoholProduct, facts: BottleConversationFa
 }
 
 export function rankBottles(facts: BottleConversationFacts, marketFactor = 1, products: AlcoholProduct[] = ALCOHOL_PRODUCTS) {
-  return products.map((product) => scoreBottle(product, facts, marketFactor)).sort((a, b) =>
+  // Once the customer has named the type they want, other types are not suggestions.
+  return products.filter((product) => !facts.type || product.type === facts.type).map((product) => scoreBottle(product, facts, marketFactor)).sort((a, b) =>
     Number(a.overBudget) - Number(b.overBudget) || b.score - a.score || b.product.popularity - a.product.popularity || a.product.price - b.product.price
   );
 }

@@ -1,15 +1,17 @@
-import { INGREDIENTS, RECIPES, REGIONS, SUPPLIERS } from '../domain/catalog';
+import { INGREDIENTS, MODIFIERS, RECIPES, REGIONS, SUPPLIERS } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS, bottleTotal } from '../domain/bottleCatalog';
 import { calendarDate, coins, consecutiveDays, dailyCoinsFor, quotePurchase } from '../domain/economy';
 import { withArticle } from '../domain/english/articles';
 import { BAR_PROFILE_OPTIONS } from '../data/cosmetics/bars';
 import { consumeMix, createMarket, generateCustomer, judgeMix, requiredRecipe } from '../domain/engine';
 import type { Customer, InventoryItem, Recipe, RegionId } from '../domain/types';
-import { pourableBrand, serveRequestText, substitutesFor } from '../domain/brandServe';
+import { pourableBrand, replyToServe, serveName, serveRequestText, substitutesFor } from '../domain/brandServe';
 import { signatureBonus } from '../domain/brandPours';
-import { bottleMatchesRequest } from '../domain/conversation/bottleTalk';
+import { bottleMatchesRequest, bottleOpeningLine, findBottleMention, replyToBottle } from '../domain/conversation/bottleTalk';
+import { buildProfile, findRecipeMention, openingLine, replyTo, shortWish, type CustomerReply } from '../domain/conversation/customerTalk';
+import { serviceReply } from '../domain/conversation/serviceTalk';
 import { canWelcomeVip, nextCustomerArrival, nextVipAvailability, orderTimeSeconds, vipCarriesRecipe } from '../domain/customerTiming';
-import { DELIVERY_DAY_MS, levelFor, withUniqueLook, type PlayerState, type UnlockSource } from './state';
+import { DELIVERY_DAY_MS, levelFor, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
 
 // Game rules as pure state transitions. The server runs these for every request, so the client can only
 // ask for an action — it can never set coins, stock, XP or timers itself. Every payload is treated as untrusted.
@@ -29,12 +31,9 @@ export type GameAction =
   | { type: 'selectCustomer'; customerId: string }
   | { type: 'openConversation'; customerId: string }
   | { type: 'closeConversation' }
-  | { type: 'sentence'; text: string }
-  | { type: 'wrongGuess' }
-  | { type: 'confirmOrder'; customerId: string; recipeId: string }
-  | { type: 'confirmBottle'; customerId: string; productId: string }
+  // The player says one sentence to the guest; the server checks the English and decides the guest's answer.
+  | { type: 'say'; text: string }
   | { type: 'sellBottle' }
-  | { type: 'switchServeBrand'; customerId: string; productId: string }
   | { type: 'offerSimilar'; customerId: string }
   | { type: 'rejectCustomer'; customerId: string };
 
@@ -43,8 +42,8 @@ export class RuleError extends Error {}
 export interface RuleContext {
   now: number;
   random?: () => number;
-  // Grammar check used to decide whether a sentence earns XP (the server runs its own copy).
-  isCorrectEnglish: (text: string) => boolean;
+  // Grammar check (the server runs its own copy): correctness decides XP; the corrected text is what the guest “hears”.
+  checkEnglish: (text: string) => { ok: boolean; corrected: string; note?: string };
   // Offline practice spawns guests locally; online clients wait for the server's guest.
   spawnCustomers?: boolean;
 }
@@ -105,7 +104,10 @@ function welcomeNextCustomer(state: PlayerState, now: number, random: () => numb
 }
 
 function scheduleNextCustomer(state: PlayerState, now: number, random: () => number) {
-  if (state.customers[0]) delete state.rewardedSentences[state.customers[0].id];
+  if (state.customers[0]) {
+    delete state.rewardedSentences[state.customers[0].id];
+    delete state.conversations[state.customers[0].id];
+  }
   state.customers = [];
   state.activeCustomerId = '';
   state.nextCustomerAt = nextCustomerArrival(now, random);
@@ -127,6 +129,7 @@ function processDeliveries(state: PlayerState, now: number) {
 
 // Time passes on the server clock only: deliveries arrive, patience runs down, the next guest walks in.
 export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now' | 'random' | 'spawnCustomers'>) {
+  state.conversations ??= {};
   const now = context.now;
   const random = context.random ?? Math.random;
   processDeliveries(state, now);
@@ -182,51 +185,22 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'openConversation': {
       if (!state.customers.some((item) => item.id === action.customerId)) throw new RuleError('This guest is no longer here.');
       state.activeCustomerId = action.customerId;
-      if (action.type === 'openConversation') state.conversationCustomerId = action.customerId;
+      if (action.type === 'openConversation') {
+        state.conversationCustomerId = action.customerId;
+        ensureTranscript(state, state.customers.find((item) => item.id === action.customerId)!);
+      }
       break;
     }
     case 'closeConversation': state.conversationCustomerId = undefined; break;
 
-    case 'sentence': {
+    case 'say': {
       if (!guest || state.conversationCustomerId !== guest.id) throw new RuleError('Open a conversation first.');
       const text = cleanText(action.text, 240);
       if (text.length < 3) throw new RuleError('Write a sentence first.');
-      state.languageStats.sentences++;
-      // The server checks the English itself — the client cannot claim a sentence was correct.
-      if (context.isCorrectEnglish(text)) {
-        state.languageStats.correct++;
-        const rewarded = state.rewardedSentences[guest.id] ?? 0;
-        if (rewarded < MAX_REWARDED_SENTENCES) {
-          state.rewardedSentences[guest.id] = rewarded + 1;
-          state.xp += 3;
-        }
-      } else {
-        guest.patienceRemaining = Math.max(1, guest.patienceRemaining - 15);
-      }
+      say(state, guest, text, context, region.marketFactor);
       break;
     }
-    case 'wrongGuess': if (guest) guest.patienceRemaining = Math.max(1, guest.patienceRemaining - 30); break;
 
-    case 'confirmOrder': {
-      const target = state.customers.find((item) => item.id === action.customerId);
-      if (!target || target.orderKind === 'bottle') throw new RuleError('This guest has no cocktail order.');
-      // Proof of the conversation: the player must name the drink the guest actually wants.
-      if (target.orderRecipeId !== action.recipeId) throw new RuleError('That is not what the guest ordered.');
-      if (!target.orderRevealed) { target.orderRevealed = true; state.xp += 10; }
-      state.message = `${target.name} ordered: ${RECIPES.find((item) => item.id === target.orderRecipeId)?.name ?? 'a drink'}. Time to mix!`;
-      break;
-    }
-    case 'confirmBottle': {
-      const target = state.customers.find((item) => item.id === action.customerId);
-      const product = ALCOHOL_PRODUCTS.find((item) => item.id === action.productId);
-      if (!target?.bottleRequest || !product) throw new RuleError('This guest is not buying bottles.');
-      if (!bottleMatchesRequest(product, target.bottleRequest, region.marketFactor)) throw new RuleError('That bottle does not fit what the customer asked for.');
-      if (!target.orderRevealed) state.xp += 10;
-      target.selectedBottleId = product.id;
-      target.orderRevealed = true;
-      state.message = `${target.name} chose ${target.bottleRequest.quantity} × ${product.name}. Complete the sealed-bottle sale.`;
-      break;
-    }
     case 'sellBottle': {
       const request = guest?.bottleRequest;
       const product = ALCOHOL_PRODUCTS.find((item) => item.id === guest?.selectedBottleId);
@@ -245,21 +219,15 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.message = note;
       break;
     }
-    case 'switchServeBrand': {
-      const target = state.customers.find((item) => item.id === action.customerId);
-      const product = ALCOHOL_PRODUCTS.find((item) => item.id === action.productId);
-      if (!target?.serveRequest || !product) throw new RuleError('This guest did not order a brand.');
-      const allowed = substitutesFor(target.serveRequest, (id) => (bottleStock(state, id)?.quantity ?? 0) > 0).some((item) => item.id === product.id);
-      if (!allowed) throw new RuleError('The guest will only accept the same spirit from your shelf.');
-      target.serveRequest = { ...target.serveRequest, substitutedFrom: target.serveRequest.substitutedFrom ?? target.serveRequest.productId, productId: product.id };
-      target.request = serveRequestText(target.serveRequest);
-      state.message = `${target.name} will have ${target.request.replace(/, please\.$/, '')} instead.`;
-      break;
-    }
     case 'offerSimilar': {
       const target = state.customers.find((item) => item.id === action.customerId);
       if (!target) throw new RuleError('This guest is no longer here.');
       offerSimilar(state, target, region.marketFactor);
+      const transcript = ensureTranscript(state, target);
+      addLine(transcript, 'bartender', 'I’m sorry, we cannot serve that order. May I offer you something similar?', { ok: true });
+      addLine(transcript, 'customer', target.request);
+      transcript.expression = 'smile';
+      target.wish = wishFor(target);
       break;
     }
     case 'rejectCustomer': {
@@ -471,3 +439,87 @@ function offerSimilar(state: PlayerState, target: Customer, marketFactor: number
   state.message = `${target.name} accepted ${substitute.name} as a similar drink.`;
 }
 
+
+// ---- Conversation (server side: the hidden order never leaves the server) ----
+
+const MAX_LINES = 60;
+function addLine(transcript: Transcript, speaker: 'customer' | 'bartender', text: string, extra: { note?: string; ok?: boolean } = {}) {
+  transcript.lines.push({ id: (transcript.lines.at(-1)?.id ?? -1) + 1, speaker, text, ...extra });
+  if (transcript.lines.length > MAX_LINES) transcript.lines.splice(0, transcript.lines.length - MAX_LINES);
+}
+
+function ensureTranscript(state: PlayerState, guest: Customer): Transcript {
+  state.conversations ??= {};
+  const existing = state.conversations[guest.id];
+  if (existing) return existing;
+  const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
+  const opening = guest.orderKind === 'bottle' ? bottleOpeningLine(guest)
+    : guest.orderKind === 'serve' || !recipe ? `${guest.greeting} ${guest.request}`
+      : openingLine(guest, buildProfile(recipe));
+  const transcript: Transcript = { lines: [], facts: [], bottleFacts: {}, expression: 'thinking' };
+  addLine(transcript, 'customer', opening);
+  state.conversations[guest.id] = transcript;
+  return transcript;
+}
+
+function say(state: PlayerState, guest: Customer, text: string, context: RuleContext, marketFactor: number) {
+  const transcript = ensureTranscript(state, guest);
+  const english = context.checkEnglish(text);
+  state.languageStats.sentences++;
+  if (english.ok) {
+    state.languageStats.correct++;
+    const rewarded = state.rewardedSentences[guest.id] ?? 0;
+    if (rewarded < MAX_REWARDED_SENTENCES) {
+      state.rewardedSentences[guest.id] = rewarded + 1;
+      state.xp += 3;
+    }
+  } else {
+    guest.patienceRemaining = Math.max(1, guest.patienceRemaining - 15);
+  }
+  addLine(transcript, 'bartender', text, { ok: english.ok, note: english.ok ? english.note : `Better: “${english.corrected}”` });
+
+  // The guest answers what they understood: the corrected sentence.
+  const heard = english.corrected;
+  const onShelf = (id: string) => (bottleStock(state, id)?.quantity ?? 0) > 0;
+  const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
+  const profile = guest.orderKind === 'cocktail' && recipe ? buildProfile(recipe) : undefined;
+  const serveAnswer = guest.orderKind === 'serve' ? replyToServe(heard, guest, onShelf) : undefined;
+  const namesOrder = !!findRecipeMention(heard, RECIPES) || !!findBottleMention(heard);
+  const service = serveAnswer || (namesOrder && guest.orderKind !== 'serve') ? undefined
+    : serviceReply(heard, { customer: guest, kind: guest.orderKind === 'bottle' ? 'bottle' : 'drink', confirmed: !!guest.orderRevealed, wish: profile ? shortWish(profile) : undefined });
+  const reply: CustomerReply & { bottleFacts?: Transcript['bottleFacts']; selectedBottleId?: string } =
+    (serveAnswer ? { text: serveAnswer.text, expression: serveAnswer.expression, facts: [] } : undefined)
+    ?? service
+    ?? (guest.orderKind === 'serve' && guest.serveRequest ? { text: `Just ${serveName(guest.serveRequest)}, please.`, expression: 'smile', facts: [] }
+      : guest.orderKind === 'bottle' ? replyToBottle(heard, guest, transcript.bottleFacts, marketFactor)
+        : profile ? replyTo(heard, guest, profile, RECIPES, transcript.facts, MODIFIERS.find((item) => item.id === guest.modifierId)?.label)
+          : { text: 'Sorry, I don’t understand.', expression: 'confused', facts: [] });
+
+  // Effects happen here, on the server — the client cannot trigger them directly.
+  if (serveAnswer?.switchTo && guest.serveRequest && substitutesFor(guest.serveRequest, onShelf).some((item) => item.id === serveAnswer.switchTo)) {
+    guest.serveRequest = { ...guest.serveRequest, substitutedFrom: guest.serveRequest.substitutedFrom ?? guest.serveRequest.productId, productId: serveAnswer.switchTo };
+    guest.request = serveRequestText(guest.serveRequest);
+    guest.wish = guest.request;
+    state.message = `${guest.name} will have ${guest.request.replace(/, please\.$/, '')} instead.`;
+  }
+  for (const fact of reply.facts) if (!transcript.facts.some((known) => known.topic === fact.topic)) transcript.facts.push(fact);
+  if (reply.bottleFacts) Object.assign(transcript.bottleFacts, reply.bottleFacts);
+  if (reply.confirmed) {
+    if (guest.orderKind === 'bottle' && guest.bottleRequest && reply.selectedBottleId) {
+      const product = ALCOHOL_PRODUCTS.find((item) => item.id === reply.selectedBottleId);
+      if (product && bottleMatchesRequest(product, guest.bottleRequest, marketFactor)) {
+        if (!guest.orderRevealed) state.xp += 10;
+        guest.selectedBottleId = product.id;
+        guest.orderRevealed = true;
+        state.message = `${guest.name} chose ${guest.bottleRequest.quantity} × ${product.name}. Complete the sealed-bottle sale.`;
+      }
+    } else if (guest.orderKind !== 'bottle') {
+      if (!guest.orderRevealed) state.xp += 10;
+      guest.orderRevealed = true;
+      state.message = `${guest.name} ordered: ${recipe?.name ?? 'a drink'}. Time to mix!`;
+    }
+  }
+  if (reply.wrongGuess) guest.patienceRemaining = Math.max(1, guest.patienceRemaining - 30);
+  addLine(transcript, 'customer', reply.text);
+  transcript.expression = reply.expression;
+}

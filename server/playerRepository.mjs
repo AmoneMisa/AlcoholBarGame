@@ -75,6 +75,8 @@ export function createMemoryRepository() {
   };
   return {
     ledger,
+    // Stored (full, secret) states by player id — for tests.
+    states,
     // Transactions run one at a time, like row locks for a single player.
     transaction(work) {
       const run = queue.then(() => work(tx));

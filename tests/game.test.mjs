@@ -60,7 +60,7 @@ test('Bottle dialogue ranks stocked brands by quantity, budget, type and taste',
   }
 });
 
-test('A confirmed full-bottle order consumes sealed stock and earns its retail price',() => {
+test('A confirmed full-bottle order consumes sealed stock and earns its retail price',async () => {
   const game = freshGame();
   const product = ALCOHOL_PRODUCTS.find((item) => item.id === 'jack-daniels-old-7');
   const customer = game.customer;
@@ -70,7 +70,9 @@ test('A confirmed full-bottle order consumes sealed stock and earns its retail p
   const stock = game.bottleInventory.find((item) => item.productId === product.id);
   stock.quantity = 2;
   const balance = game.money;
-  assert.equal(game.confirmBottleOrder(customer.id,product.id),true);
+  assert.equal(game.openConversation(customer.id),true);
+  await game.say(`Would you like ${product.name}?`);
+  assert.equal(customer.orderRevealed,true,JSON.stringify(game.conversations[customer.id].lines.at(-1)));
   assert.equal(game.sellBottleToCustomer(),true);
   assert.equal(stock.quantity,1);
   assert.ok(game.money >= balance + product.price * game.region.marketFactor);

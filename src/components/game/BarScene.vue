@@ -20,6 +20,8 @@ const expressionFor = (mood: string): CharacterExpression => ({
 }[mood] as CharacterExpression ?? 'neutral');
 function bubbleText(customer: Customer) {
   if (customer.orderRevealed) return customer.request;
+  // Online the order itself is secret until found out; the public wish is all the guest says at first.
+  if (customer.wish) return customer.wish;
   if (customer.orderKind === 'bottle') return `I need bottles for a ${customer.bottleRequest?.occasion ?? 'special occasion'}.`;
   const recipe = RECIPES.find((item) => item.id === customer.orderRecipeId);
   return recipe ? shortWish(buildProfile(recipe)) : customer.request;

@@ -1,16 +1,10 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { CUSTOMER_ART_BY_SLOT } from '../../data/cosmetics/artCatalog';
 import { MODIFIERS, RECIPES } from '../../domain/catalog';
 import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleTotal } from '../../domain/bottleCatalog';
-import {
-  buildProfile, matchesFacts, openingLine, questionTemplates, replyTo, tilesFor, correctedTileSelection, TOPIC_LABEL, withArticle,
-  type CustomerReply, type Fact
-} from '../../domain/conversation/customerTalk';
-import {
-  bottleFactChips, bottleOpeningLine, bottleQuestionTemplates, rankBottles, replyToBottle,
-  type BottleConversationFacts
-} from '../../domain/conversation/bottleTalk';
+import { matchesFacts, questionTemplates, tilesFor, correctedTileSelection, TOPIC_LABEL, withArticle } from '../../domain/conversation/customerTalk';
+import { bottleFactChips, bottleQuestionTemplates, rankBottles } from '../../domain/conversation/bottleTalk';
 import { checkText, useSpeller, type CheckResult } from '../../domain/english/checker';
 import { loadSpeller } from '../../domain/english/dictionary';
 import { GLOSSARY } from '../../domain/english/lexicon';
@@ -20,22 +14,14 @@ import { lookupWord, type VocabEntry } from '../../domain/english/vocabulary';
 import { useGameStore } from '../../stores/game';
 import { useLearningStore } from '../../stores/learning';
 import { useGuide } from '../../composables/useGuide';
-import { serviceReply, serviceTemplates } from '../../domain/conversation/serviceTalk';
+import { serviceTemplates } from '../../domain/conversation/serviceTalk';
 import { guideIdForProduct } from '../../data/knowledge/alcohol';
 import BrandBottle from '../knowledge/BrandBottle.vue';
-import { replyToServe, serveName, serveTemplates } from '../../domain/brandServe';
-import { findRecipeMention, shortWish } from '../../domain/conversation/customerTalk';
-import { findBottleMention } from '../../domain/conversation/bottleTalk';
+import { serveTemplates } from '../../domain/brandServe';
 import { haptic } from '../../telegram/webapp';
 import CharacterModel from '../characters/CharacterModel.vue';
 
-interface ChatLine { id: number; speaker: 'customer' | 'bartender'; text: string; note?: string; ok?: boolean; }
-interface Transcript { lines: ChatLine[]; facts: Fact[]; bottleFacts: BottleConversationFacts; expression: CustomerReply['expression']; }
-
-// Kept outside the component so a conversation survives closing and reopening the popup.
-const transcripts = reactive<Record<string, Transcript>>({});
 const inputMode = ref<'type' | 'words'>('words');
-let lineId = 0;
 
 const game = useGameStore();
 const learning = useLearningStore();
@@ -48,9 +34,12 @@ const GROUP_ORDER = ['Word order', 'Questions', 'Verbs', 'Articles & nouns', 'Co
 const customer = computed(() => game.customers.find((item) => item.id === game.conversationCustomerId));
 const slot = computed(() => Math.max(0, game.customers.findIndex((item) => item.id === customer.value?.id)));
 const recipe = computed(() => RECIPES.find((item) => item.id === customer.value?.orderRecipeId));
-const profile = computed(() => recipe.value && buildProfile(recipe.value));
 const modifierLabel = computed(() => MODIFIERS.find((item) => item.id === customer.value?.modifierId)?.label);
-const talk = computed(() => customer.value && transcripts[customer.value.id]);
+// The transcript is part of the game state: the rules (on the server when online) write both sides of it,
+// and the guest's hidden order never reaches this screen before it is found out.
+const talk = computed(() => customer.value && game.conversations[customer.value.id]);
+// The sentence on its way to the server, shown until the answer arrives.
+const pending = ref('');
 const confirmed = computed(() => !!customer.value?.orderRevealed);
 const bottleOrder = computed(() => customer.value?.orderKind === 'bottle');
 const conversationRecipes = computed(() => customer.value?.specialRecipeRewardId ? [...game.knownRecipes,...game.lockedRecipes.filter((item) => item.id === customer.value?.specialRecipeRewardId)] : game.knownRecipes);
@@ -104,18 +93,14 @@ function phraseCandidates() {
   return inputMode.value === 'words' && tileTarget.value ? [tileTarget.value] : all;
 }
 
-function ensureTranscript() {
-  const current = customer.value;
-  if (!current || transcripts[current.id] || (current.orderKind !== 'bottle' && !profile.value)) return;
-  const opening = current.orderKind === 'bottle' ? bottleOpeningLine(current)
-    : current.orderKind === 'serve' ? `${current.greeting} ${current.request}`
-      : openingLine(current, profile.value!);
-  transcripts[current.id] = { lines: [{ id: lineId++, speaker: 'customer', text: opening }], facts: [], bottleFacts: {}, expression: 'thinking' };
-  noteSeenWords(opening);
-}
+// New guest lines: remember the words the learner has seen, then scroll.
+watch(() => talk.value?.lines.length ?? 0, (count, before) => {
+  for (const line of talk.value?.lines.slice(before ?? 0) ?? []) if (line.speaker === 'customer') noteSeenWords(line.text);
+  scrollLog();
+}, { immediate: true });
 
 watch(() => customer.value?.id, () => {
-  ensureTranscript();
+  pending.value = '';
   draft.value = '';
   feedback.value = undefined;
   templateIndex.value = 0;
@@ -167,12 +152,12 @@ function highlighted(result: CheckResult, text: string) {
   return parts.filter((part) => part.text);
 }
 
-function send(text: string, force = false) {
+async function send(text: string, force = false) {
   const current = customer.value;
-  const transcript = talk.value;
-  if (!current || !transcript || (!profile.value && current.orderKind !== 'bottle') || customerTyping.value) return;
+  if (!current || !talk.value || customerTyping.value) return;
   const sentence = text.replace(/\s+/g, ' ').trim();
   if (!sentence) return;
+  // Instant feedback for learning; the rules re-check the sentence before it counts.
   const result = checkText(sentence, phraseCandidates());
   if (!result.ok && !force) {
     if (feedbackFor.value !== sentence) learning.recordMistakes(sentence, result.corrected, result.issues);
@@ -183,55 +168,26 @@ function send(text: string, force = false) {
     haptic('light');
     return;
   }
-  game.recordSentence(sentence);
   if (result.ok) {
     learning.recordCorrect(sentence);
     learning.markPhraseUsed(sentence);
   }
-  transcript.lines.push({
-    id: lineId++, speaker: 'bartender', text: sentence, ok: result.ok,
-    note: result.ok ? (result.issues.length ? result.issues[0]!.message : undefined) : `Better: “${result.corrected}”`
-  });
+  const wasConfirmed = !!current.orderRevealed;
   draft.value = '';
   feedback.value = undefined;
   picked.value = [];
+  pending.value = sentence;
   customerTyping.value = true;
   scrollLog();
-
-  window.setTimeout(() => {
-    customerTyping.value = false;
-    if (!customer.value || customer.value.id !== current.id) return;
-    // Service phrases (help, occasion, payment, receipt…) first — unless the sentence names a drink or bottle.
-    // Brand calls: questions about the serve (ice, neat, lime) and offering another brand come first.
-    const serveReply = current.orderKind === 'serve' ? replyToServe(result.corrected, current, game.brandOnShelf) : undefined;
-    if (serveReply?.switchTo) game.switchServeBrand(current.id, serveReply.switchTo);
-    const namesOrder = !!findRecipeMention(result.corrected, RECIPES) || !!findBottleMention(result.corrected);
-    const skipService = !!serveReply || (namesOrder && current.orderKind !== 'serve');
-    const service = skipService ? undefined : serviceReply(result.corrected, {
-      customer: current, kind: current.orderKind === 'bottle' ? 'bottle' : 'drink', confirmed: !!current.orderRevealed,
-      wish: profile.value ? shortWish(profile.value) : undefined
-    });
-    const reply = (serveReply ? { ...serveReply, facts: [] } : undefined) ?? service ?? (current.orderKind === 'serve'
-      ? { text: `Just ${serveName(current.serveRequest!)}, please.`, expression: 'smile' as const, facts: [] }
-      : current.orderKind === 'bottle'
-      ? replyToBottle(result.corrected, current, transcript.bottleFacts, game.region.marketFactor)
-      : replyTo(result.corrected, current, profile.value!, RECIPES, transcript.facts, modifierLabel.value));
-    for (const fact of reply.facts) if (!transcript.facts.some((known) => known.topic === fact.topic)) transcript.facts.push(fact);
-    if ('bottleFacts' in reply && reply.bottleFacts) Object.assign(transcript.bottleFacts, reply.bottleFacts);
-    transcript.lines.push({ id: lineId++, speaker: 'customer', text: reply.text });
-    noteSeenWords(reply.text);
-    transcript.expression = reply.expression;
-    if (reply.confirmed) {
-      const selectedBottleId = 'selectedBottleId' in reply ? reply.selectedBottleId as string | undefined : undefined;
-      if (selectedBottleId) game.confirmBottleOrder(current.id, selectedBottleId);
-      else game.confirmOrder(current.id);
-      haptic('medium');
-    }
-    if (reply.wrongGuess) game.penalizeWrongGuess();
-    templateIndex.value = 0;
-    resetTiles();
-    scrollLog();
-  }, 650);
+  // A short pause keeps the rhythm of a real answer even when the server is fast.
+  await Promise.all([game.say(sentence), new Promise((resolve) => window.setTimeout(resolve, 450))]);
+  customerTyping.value = false;
+  pending.value = '';
+  if (customer.value?.id !== current.id) return;
+  if (!wasConfirmed && customer.value.orderRevealed) haptic('medium');
+  templateIndex.value = 0;
+  resetTiles();
+  scrollLog();
 }
 
 function useCorrection() {
@@ -282,13 +238,7 @@ function completeBottleSale() {
 
 function offerAlternative() {
   const current = customer.value;
-  const transcript = talk.value;
-  if (!current || !transcript || !game.offerSimilarOrder(current.id)) return;
-  transcript.lines.push(
-    { id: lineId++, speaker: 'bartender', text: 'I’m sorry, we cannot serve that order. May I offer you something similar?', ok: true },
-    { id: lineId++, speaker: 'customer', text: current.request }
-  );
-  transcript.expression = 'smile';
+  if (!current || !game.offerSimilarOrder(current.id)) return;
   haptic('medium');
   scrollLog();
 }
@@ -349,6 +299,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
             <p v-else>{{ line.text }}</p>
             <small v-if="line.speaker === 'bartender'" :class="line.ok ? 'good' : 'fix'">{{ line.ok ? '✓ Correct English' : '✎ ' + line.note }}</small>
           </div>
+          <div v-if="pending" class="talk-line bartender"><p>{{ pending }}</p></div>
           <div v-if="customerTyping" class="talk-line customer typing"><p><i></i><i></i><i></i></p></div>
         </div>
 

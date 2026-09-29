@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { RECIPES } from '../src/domain/catalog';
 import { createApp, handleErrors } from './app.mjs';
 import { listCocktails, migrate, pool, seedCocktailsIfEmpty } from './database.mjs';
-import { isCorrectEnglish } from './english.mjs';
+import { checkEnglish } from './english.mjs';
 import { createGameService } from './gameService.mjs';
 import { createPgRepository } from './playerRepository.mjs';
 
@@ -14,7 +14,7 @@ const botToken = process.env.TELEGRAM_BOT_TOKEN;
 const allowDevLogin = process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production';
 if (!botToken && !allowDevLogin) console.warn('TELEGRAM_BOT_TOKEN is not set: players cannot sign in.');
 
-const service = createGameService({ repository: createPgRepository(pool), isCorrectEnglish });
+const service = createGameService({ repository: createPgRepository(pool), checkEnglish });
 const app = createApp({
   service, botToken, allowDevLogin,
   extraRoutes(api) {

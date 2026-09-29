@@ -4,6 +4,8 @@ import { DEFAULT_BARS, type BarProfile } from '../data/cosmetics/bars';
 import { CHARACTER_ART, CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { generateCustomer } from '../domain/engine';
 import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../domain/types';
+import { buildProfile, shortWish, type CustomerReply, type Fact } from '../domain/conversation/customerTalk';
+import type { BottleConversationFacts } from '../domain/conversation/bottleTalk';
 
 // The complete, serializable game state of one player. The server owns it; the client only displays it
 // (and, in offline practice mode, simulates it locally with the same rules).
@@ -11,6 +13,10 @@ import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../
 export const BASIC_RECIPE_COUNT = 10;
 export const DELIVERY_DAY_MS = 24 * 60 * 60 * 1000;
 export type UnlockSource = 'starter' | 'shop' | 'special-client' | 'daily-gift';
+export interface ChatLine { id: number; speaker: 'customer' | 'bartender'; text: string; note?: string; ok?: boolean; }
+// One conversation with one guest. Only what has been said is stored here — never the hidden order.
+export interface Transcript { lines: ChatLine[]; facts: Fact[]; bottleFacts: BottleConversationFacts; expression: CustomerReply['expression']; }
+
 export interface DeliveryOrder { id: string; supplier: string; barId: RegionId; dueAt: number; items: InventoryItem[]; total: number; }
 
 export interface PlayerState {
@@ -38,6 +44,7 @@ export interface PlayerState {
   languageStats: { sentences: number; correct: number };
   // Correct sentences already rewarded per customer, so talking cannot be farmed for XP.
   rewardedSentences: Record<string, number>;
+  conversations: Record<string, Transcript>;
   message: string;
 }
 
@@ -46,7 +53,25 @@ export function withUniqueLook(customer: Customer, others: Customer[]) {
   const used = new Set(others.map((item) => item.characterId));
   if (!customer.characterId || used.has(customer.characterId)) customer.characterId = CUSTOMER_ART_BY_SLOT.find((id) => !used.has(id));
   if (!customer.specialRecipeRewardId) customer.name = CHARACTER_ART.find((art) => art.id === customer.characterId)?.name ?? customer.name;
+  customer.wish = wishFor(customer);
   return customer;
+}
+
+export function wishFor(customer: Customer) {
+  if (customer.orderKind === 'bottle') return 'Some sealed bottles, please.';
+  if (customer.orderKind === 'serve' || customer.specialRecipeRewardId) return customer.request;
+  const recipe = RECIPES.find((item) => item.id === customer.orderRecipeId);
+  return recipe ? shortWish(buildProfile(recipe)) : 'Something nice, please.';
+}
+
+// What the client may see: unrevealed orders are hidden, so the player has to find them out in English.
+export function publicState(state: PlayerState): PlayerState {
+  const view = structuredClone(state);
+  view.customers = view.customers.map((customer) => customer.orderRevealed ? customer : {
+    ...customer, orderRecipeId: '', modifierId: undefined, bottleRequest: undefined, budget: 0,
+    wish: customer.wish ?? wishFor(customer), request: customer.wish ?? wishFor(customer)
+  });
+  return view;
 }
 
 const makeBarInventory = (barIndex: number) => STARTING_INVENTORY.map((item, ingredientIndex) => {
@@ -84,6 +109,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     tradeLog: ['Each city bar now keeps its own stock.'],
     languageStats: { sentences: 0, correct: 0 },
     rewardedSentences: {},
+    conversations: {},
     message: 'Tap a customer to talk, find out what they want, then build the cocktail.'
   };
 }

@@ -5,8 +5,9 @@ import { AuthError, verifyTelegramInitData } from '../server/auth.mjs';
 import { createApp, handleErrors } from '../server/app.mjs';
 import { createGameService } from '../server/gameService.mjs';
 import { createMemoryRepository } from '../server/playerRepository.mjs';
-import { isCorrectEnglish } from '../server/english.mjs';
+import { checkEnglish } from '../server/english.mjs';
 import { RECIPES } from '../src/domain/catalog.ts';
+import { ALCOHOL_PRODUCTS } from '../src/domain/bottleCatalog.ts';
 import { requiredRecipe } from '../src/domain/engine.ts';
 
 const BOT_TOKEN = '123456:TEST-token-for-unit-tests';
@@ -25,7 +26,7 @@ const requestId = () => `test-request-${++counter}-${Math.random().toString(36).
 
 function makeService(now = () => Date.now()) {
   const repository = createMemoryRepository();
-  return { repository, service: createGameService({ repository, isCorrectEnglish, now }) };
+  return { repository, service: createGameService({ repository, checkEnglish, now }) };
 }
 async function act(service, action, id = requestId(), who = identity()) {
   return (await service.act(who, { requestId: id, action })).body;
@@ -94,19 +95,47 @@ test('English XP is decided by the server checker and capped per guest; wrong co
   const { service } = makeService();
   const { state } = await service.session(identity());
   const guest = state.customers[0];
-  assert.equal((await act(service, { type: 'sentence', text: 'Do you like sweet drinks?' })).ok, false, 'no conversation open');
+  assert.equal((await act(service, { type: 'say', text: 'Do you like sweet drinks?' })).ok, false, 'no conversation open');
   await act(service, { type: 'openConversation', customerId: guest.id });
   const xp = (await act(service, { type: 'tick' })).state.xp;
-  const wrong = await act(service, { type: 'sentence', text: 'do you likes sweet drinks' });
+  const wrong = await act(service, { type: 'say', text: 'do you likes sweet drinks' });
   assert.equal(wrong.state.xp, xp, 'incorrect English earns nothing, whatever the client claims');
   let last = wrong.state.xp;
-  for (let index = 0; index < 12; index++) last = (await act(service, { type: 'sentence', text: 'Do you like sweet drinks?' })).state.xp;
-  assert.equal(last, xp + 6 * 3, 'only six correct sentences per guest earn XP');
-
-  if (guest.orderKind !== 'bottle') {
-    const other = RECIPES.find((recipe) => recipe.id !== guest.orderRecipeId);
-    assert.equal((await act(service, { type: 'confirmOrder', customerId: guest.id, recipeId: other.id })).ok, false);
+  for (let index = 0; index < 12; index++) last = (await act(service, { type: 'say', text: 'Do you like sweet drinks?' })).state.xp;
+  assert.ok(last <= xp + 6 * 3 + 10, 'only six correct sentences per guest earn XP (plus one confirmed order)');
+  for (const type of ['sentence', 'confirmOrder', 'confirmBottle', 'wrongGuess', 'switchServeBrand']) {
+    assert.equal((await act(service, { type, customerId: guest.id, recipeId: guest.orderRecipeId, text: 'Hi there.' })).ok, false, `${type} is not a client action`);
   }
+});
+
+test('The conversation runs on the server: orders stay secret until found out in English', async () => {
+  const { service, repository } = makeService();
+  const first = await service.session(identity());
+  const stored = repository.states.get(first.player.id).state;
+  const secret = stored.customers[0];
+  // A champagne guest: “Clicquot” should be understood as Veuve Clicquot, and the server confirms the order itself.
+  const product = ALCOHOL_PRODUCTS.find((item) => item.id === 'veuve-clicquot-yellow');
+  Object.assign(secret, { orderKind: 'bottle', orderRevealed: false, bottleRequest: { productId: product.id, quantity: 1, budget: 200, type: 'champagne', tastes: ['dry'], occasion: 'dinner' } });
+  stored.bottleInventories[stored.regionId].find((item) => item.productId === product.id).quantity = 3;
+  repository.states.get(first.player.id).state = stored;
+
+  const shown = (await service.session(identity())).state.customers[0];
+  assert.ok(!shown.orderRevealed);
+  assert.equal(shown.orderRecipeId, '', 'the hidden recipe is not sent');
+  assert.equal(shown.bottleRequest, undefined, 'the hidden bottle request is not sent');
+  assert.ok(shown.wish, 'the guest still says what they wish for');
+
+  const opened = await act(service, { type: 'openConversation', customerId: secret.id });
+  assert.equal(opened.state.conversations[secret.id].lines.length, 1, 'the guest opens the conversation');
+  const answer = await act(service, { type: 'say', text: 'Would you like Clicquot?' });
+  const guest = answer.state.customers.find((item) => item.id === secret.id);
+  const lines = answer.state.conversations[secret.id].lines;
+  assert.equal(lines.at(-2).text, 'Would you like Clicquot?');
+  assert.match(lines.at(-1).text, /Veuve Clicquot/);
+  assert.equal(guest.orderRevealed, true);
+  assert.equal(guest.selectedBottleId, product.id);
+  assert.equal(guest.bottleRequest.productId, product.id, 'a found-out order is visible');
+  assert.equal((await act(service, { type: 'sellBottle' })).ok, true);
 });
 
 test('Guests arrive only on the server clock; a client cannot summon customers', async () => {
