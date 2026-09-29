@@ -28,9 +28,9 @@ onUnmounted(() => {
     </div>
     <div class="hud-resources">
       <div><UiIcon name="coin" /><span><small>COINS</small><b>{{ game.money.toLocaleString('en-US', { maximumFractionDigits: 2 }) }}</b></span></div>
-      <button class="daily-hud-gift" type="button" :disabled="!game.dailyGiftAvailable" @click="game.claimDailyGift()"><UiIcon name="gift" /><span><small>DAY {{ game.upcomingLoginDay }}</small><b>{{ game.dailyGiftAvailable ? '+' + game.dailyCoinReward : 'Claimed' }}</b></span></button>
+      <button class="daily-hud-gift" type="button" :disabled="!game.dailyGiftAvailable" @click="game.claimDailyGift()"><UiIcon name="gift" /><span><small>LOGIN STREAK {{ game.upcomingLoginDay }}</small><b>{{ game.dailyGiftAvailable ? '+' + game.dailyCoinReward : 'Claimed' }}</b></span></button>
     </div>
-    <div class="shift-card"><small>DAY {{ game.day }} · WEEK {{ game.week }}</small><b>21:35</b><span>Evening shift</span></div>
+    <div class="shift-card"><small>LIVE SERVICE</small><b>{{ game.hasCustomer ? game.orderCountdown : game.nextCustomerCountdown }}</b><span>{{ game.hasCustomer ? 'Order time' : 'Next arrival' }}</span></div>
     <button class="settings-button" type="button" aria-label="Customize and rename bar" @click="$emit('design')"><UiIcon name="brush" /></button>
   </header>
 </template>

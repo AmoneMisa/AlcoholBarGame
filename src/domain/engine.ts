@@ -1,38 +1,65 @@
 import { INGREDIENTS, MODIFIERS, RECIPES } from './catalog';
+import { ALCOHOL_PRODUCTS, generateBottleRequest } from './bottleCatalog';
 import { withArticle } from './english/articles';
+import { makeServeRequest, serveRecipe, serveRequestText, servePrice } from './brandServe';
 import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
-import type { Customer, InventoryItem, Mood, Recipe, Region, SupplierOffer } from './types';
+import { orderTimeSeconds } from './customerTiming';
+import type { BottleOccasion, Customer, InventoryItem, Mood, Recipe, Region, SupplierOffer } from './types';
 
 const NAMES = ['Alex', 'Sam', 'Jamie', 'Robin', 'Casey', 'Morgan', 'Taylor', 'Jordan', 'Chris', 'Nina'];
-const MOODS: Mood[] = ['calm', 'impatient', 'sad', 'vip', 'wealthy', 'friendly'];
+// VIP arrival is controlled by the real-time cooldown in the game store. Keep
+// ordinary generation free of VIPs so that route is the single source of truth.
+const MOODS: Mood[] = ['calm', 'impatient', 'sad', 'wealthy', 'friendly'];
 const pick = <T>(list: T[]) => list[Math.floor(Math.random() * list.length)]!;
 
-export function generateCustomer(level = 0, recipePool: Recipe[] = RECIPES): Customer {
+export function generateCustomer(level = 0, recipePool: Recipe[] = RECIPES, bottleChance = .35, marketFactor = 1.35, serveChance = .25): Customer {
   const recipe = pick(recipePool.length ? recipePool : RECIPES);
   const mood = pick(MOODS);
   const modifier = level > 1 && Math.random() > 0.65 ? pick(MODIFIERS) : undefined;
-  const patience = mood === 'impatient' ? 38 : mood === 'calm' ? 82 : mood === 'sad' ? 54 : 68;
   const greeting = mood === 'sad' ? 'I am having a rough day.' :
     mood === 'impatient' ? 'Hurry up, please.' :
     mood === 'vip' ? 'Good evening.' : 'Hello!';
 
-  return {
+  const customer: Customer = {
     id: crypto.randomUUID(),
     characterId: pick(CUSTOMER_ART_BY_SLOT),
     name: pick(NAMES),
     mood,
-    patience,
-    patienceRemaining: patience,
+    patience: 1,
+    patienceRemaining: 1,
     budget: recipe.price * (mood === 'wealthy' || mood === 'vip' ? 1.8 : 1) + 4,
     orderRecipeId: recipe.id,
     modifierId: modifier?.id,
     greeting,
     request: modifier ? 'I’ll have ' + withArticle(recipe.name) + '. ' + modifier.label + '.' : 'I’ll have ' + withArticle(recipe.name) + ', please.',
-    paymentMethod: Math.random() > 0.45 ? 'card' : 'cash'
+    paymentMethod: Math.random() > 0.45 ? 'card' : 'cash',
+    orderKind: 'cocktail'
   };
+  if (Math.random() < bottleChance) {
+    const product = pick(ALCOHOL_PRODUCTS);
+    const quantity = 1 + Math.floor(Math.random() * (mood === 'wealthy' || mood === 'vip' ? 3 : 2));
+    const occasion = pick<BottleOccasion>(['gift','party','dinner','celebration','home bar']);
+    customer.orderKind = 'bottle';
+    customer.bottleRequest = generateBottleRequest(product, quantity, occasion, marketFactor);
+    customer.request = `${quantity} sealed bottle${quantity === 1 ? '' : 's'} for a ${occasion}.`;
+    customer.budget = customer.bottleRequest.budget;
+  } else if (Math.random() < serveChance) {
+    // A simple brand call: the guest names the spirit brand and how to serve it.
+    const serveRequest = makeServeRequest();
+    customer.orderKind = 'serve';
+    customer.serveRequest = serveRequest;
+    customer.request = serveRequestText(serveRequest);
+    customer.orderRevealed = true;
+    customer.modifierId = undefined;
+    customer.budget = servePrice(serveRequest) * (mood === 'wealthy' || mood === 'vip' ? 1.8 : 1.2) + 2;
+  }
+  customer.patience = orderTimeSeconds(customer.mood, customer.orderKind);
+  customer.patienceRemaining = customer.patience;
+  return customer;
 }
 
 export function requiredRecipe(customer: Customer) {
+  if (customer.orderKind === 'serve' && customer.serveRequest) return serveRecipe(customer.serveRequest);
   const base = RECIPES.find((recipe) => recipe.id === customer.orderRecipeId)!;
   let ingredients = base.ingredients.map((item) => ({ ...item }));
   const modifier = MODIFIERS.find((item) => item.id === customer.modifierId);

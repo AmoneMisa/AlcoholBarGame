@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import PairingPrinciples from './PairingPrinciples.vue';
 import { BAR_PAIRINGS } from '../data/pairings/barPairings';
 import {
   beverageProfile,
@@ -132,6 +133,7 @@ const lesson = computed(() => {
       <div v-for="item in foodResults" :key="item.beverage + item.food" class="pairing-result" :data-band="item.band">
         <div><small>PAIR WITH</small><b>{{ item.food }}</b><span>{{ item.relationship }}</span></div>
         <strong>{{ item.score }}</strong><section><small>WHY IT WORKS</small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests who enjoy {{ selectedProfile?.style.replaceAll('_', ' ') }} {{ selectedProfile?.family }} and {{ item.relationship }} food pairings.</p></section>
+        <PairingPrinciples :item="item" kind="food" />
       </div>
     </div>
 
@@ -140,6 +142,7 @@ const lesson = computed(() => {
         <div><small>EXPLORE NEXT</small><b>{{ partnerName(item.partnerId) }}</b><span>{{ item.relationship }}</span></div>
         <strong>{{ item.score }}</strong><section><small>WHY IT WORKS</small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests who already enjoy {{ selectedProfile?.name }} and want a related flavor direction.</p></section>
         <small v-if="item.examples.length">Example: {{ item.examples.join(', ') }}</small>
+        <PairingPrinciples :item="item" kind="drink" />
       </div>
     </div>
 
@@ -147,6 +150,7 @@ const lesson = computed(() => {
       <div v-for="item in contextResults" :key="JSON.stringify(item.context) + item.beverage" class="pairing-result" :data-band="item.band">
         <div><small>RECOMMEND</small><b>{{ partnerName(item.beverage) }}</b><span>{{ item.isNonAlcoholic ? 'non-alcoholic' : 'alcoholic' }}</span></div>
         <strong>{{ item.score }}</strong><section><small>WHY IT FITS</small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests whose stated setting, activity and time match this card.</p></section>
+        <PairingPrinciples :item="item" kind="context" />
       </div>
     </div>
 
@@ -154,6 +158,7 @@ const lesson = computed(() => {
       <div v-for="item in cigarResults" :key="item.cigar_body + item.cigar_note + item.beverage" class="pairing-result" :data-band="item.band">
         <div><small>PAIR WITH</small><b>{{ partnerName(item.beverage) }}</b><span>{{ item.alcoholic ? 'alcoholic' : 'non-alcoholic' }}</span></div>
         <strong>{{ item.score }}</strong><section><small>WHY IT WORKS</small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests smoking a {{ cigarBody }} cigar with {{ cigarNote }} notes.</p></section>
+        <PairingPrinciples :item="item" kind="cigar" />
       </div>
     </div>
 

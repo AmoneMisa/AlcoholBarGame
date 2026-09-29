@@ -1,4 +1,5 @@
 import type { Ingredient, Modifier, Recipe, Region, Supplier } from './types';
+import { ADDITIONAL_RECIPES } from './additionalRecipes';
 
 export const REGIONS: Region[] = [
   { id: 'new-york', name: 'New York', currencySymbol: '$', marketFactor: 1.35, rentPerDay: 50, tagline: 'Classic & diverse' },
@@ -21,12 +22,19 @@ export const INGREDIENTS: Ingredient[] = [
   { id: 'bitter-aperitif', name: 'Bitter aperitif', unit: 'ml', basePrice: 0.046, pourStep: 15, category: 'spirit' },
   { id: 'sparkling-wine', name: 'Sparkling wine', unit: 'ml', basePrice: 0.042, pourStep: 30, category: 'spirit' },
   { id: 'coffee-liqueur', name: 'Coffee liqueur', unit: 'ml', basePrice: 0.044, pourStep: 15, category: 'spirit' },
+  { id: 'blue-curacao', name: 'Blue Curaçao', unit: 'ml', basePrice: 0.040, pourStep: 5, category: 'spirit' },
+  { id: 'herbal-liqueur', name: 'Herbal liqueur', unit: 'ml', basePrice: 0.052, pourStep: 5, category: 'spirit' },
+  { id: 'specialty-liqueur', name: 'Specialty liqueur', unit: 'ml', basePrice: 0.045, pourStep: 5, category: 'spirit' },
+  { id: 'fruit-wine', name: 'Fruit wine', unit: 'ml', basePrice: 0.022, pourStep: 15, category: 'spirit' },
+  { id: 'alcohol-free-beer', name: 'Alcohol-free beer', unit: 'ml', basePrice: 0.010, pourStep: 30, category: 'mixer' },
   { id: 'lime-juice', name: 'Lime', unit: 'ml', basePrice: 0.012, pourStep: 5, category: 'fruit' },
   { id: 'lemon-juice', name: 'Lemon', unit: 'ml', basePrice: 0.012, pourStep: 5, category: 'fruit' },
   { id: 'pineapple-juice', name: 'Pineapple', unit: 'ml', basePrice: 0.008, pourStep: 30, category: 'fruit' },
   { id: 'cranberry-juice', name: 'Cranberry', unit: 'ml', basePrice: 0.009, pourStep: 30, category: 'fruit' },
   { id: 'sugar-syrup', name: 'Sugar', unit: 'ml', basePrice: 0.006, pourStep: 5, category: 'mixer' },
   { id: 'coconut-cream', name: 'Coconut cream', unit: 'ml', basePrice: 0.012, pourStep: 15, category: 'mixer' },
+  { id: 'milk', name: 'Milk', unit: 'ml', basePrice: 0.006, pourStep: 5, category: 'mixer' },
+  { id: 'coconut-milk', name: 'Coconut milk', unit: 'ml', basePrice: 0.010, pourStep: 5, category: 'mixer' },
   { id: 'tonic', name: 'Tonic', unit: 'ml', basePrice: 0.006, pourStep: 30, category: 'mixer' },
   { id: 'soda', name: 'Soda water', unit: 'ml', basePrice: 0.004, pourStep: 30, category: 'mixer' },
   { id: 'cola', name: 'Cola', unit: 'ml', basePrice: 0.005, pourStep: 30, category: 'mixer' },
@@ -154,8 +162,30 @@ export const RECIPES: Recipe[] = [
     tastingNotes: ['grapefruit', 'tart', 'refreshing'], occasions: ['Hot afternoon', 'Spicy food', 'Casual guest', 'Outdoor table'],
     method: ['Salt part of the rim if requested.', 'Fill a highball with ice.', 'Add tequila and lime.', 'Top with grapefruit soda and stir once.'], ingredients: [
       { ingredientId: 'tequila', amount: 45 }, { ingredientId: 'lime-juice', amount: 15 }, { ingredientId: 'grapefruit-soda', amount: 90 }, { ingredientId: 'ice', amount: 5 }, { ingredientId: 'salt', amount: 1 }
-  ]}
+  ]},
+  ...ADDITIONAL_RECIPES
 ];
+
+const INGREDIENT_ABV: Record<string, number> = {
+  'white-rum': 40, 'dark-rum': 40, gin: 40, vodka: 40, tequila: 40, whiskey: 40,
+  'orange-liqueur': 25, vermouth: 16, 'bitter-aperitif': 25, 'sparkling-wine': 12, 'coffee-liqueur': 20,
+  'blue-curacao': 21, 'herbal-liqueur': 38, 'specialty-liqueur': 22, 'fruit-wine': 10
+};
+
+/** Approximate serving strength after normal shaking/stirring dilution. */
+export function estimateRecipeAbv(recipe: Recipe) {
+  const liquid = recipe.ingredients.reduce((sum, part) => sum + (INGREDIENTS.find((item) => item.id === part.ingredientId)?.unit === 'ml' ? part.amount : 0), 0);
+  if (!liquid) return 0;
+  const alcohol = recipe.ingredients.reduce((sum, part) => sum + part.amount * (INGREDIENT_ABV[part.ingredientId] ?? 0), 0);
+  const dilution = recipe.needsShake ? .82 : .9;
+  return Math.round((alcohol / liquid) * dilution);
+}
+
+export function recipeAlcoholLabel(recipe: Recipe) {
+  const abv = estimateRecipeAbv(recipe);
+  const strength = abv === 0 ? 'Alcohol-free' : abv <= 12 ? 'Light' : abv <= 22 ? 'Medium' : 'Strong';
+  return abv === 0 ? strength : `~${abv}% ABV · ${strength}`;
+}
 
 export const MODIFIERS: Modifier[] = [
   { id: 'extra-lime', label: 'Extra lime, please', add: { ingredientId: 'lime-juice', amount: 10 } },

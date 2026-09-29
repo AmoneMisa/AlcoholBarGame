@@ -7,10 +7,12 @@
 - Multi-product purchase baskets, quantity controls, 5% off at five packs and 10% off at ten packs. Delivery fees and free-delivery minimums apply after discounts.
 - Scheduled deliveries return to the bar that placed the order, even when the player manages another location.
 - Multi-product selling pays immediately. Ingredients reserved in the glass cannot be sold or transferred.
-- Each of the six locations has its own saved inventory, name, room, wall mood, counter, lighting, and bartender outfit.
+- Each of the six locations has its own saved inventory, name, room, wall mood, counter, lighting, bartender model, custom bartender nickname, and bartender outfit.
 - Real-calendar daily gifts: 150 / 250 / 400 / 550 / 700 / 850 / 1,000 coins; day 7 onward stays at 1,000. A missed day resets the streak. In-game shifts cannot farm gifts. A recipe is an additional 12% chance reward.
-- Fifteen customer appearances: five existing plus ten newly illustrated models. Concurrent customers have distinct appearances.
-- Ten starter recipes; additional recipes unlock through the shop, special requests, or a daily gift. Lessons include history, ingredients, method, and occasion tags. Recommendation Academy explains what, why, and who.
+- Twenty-five customer appearances: five original models plus two ten-character illustrated atlases. Concurrent customers have distinct appearances.
+- Full-bottle retail alongside cocktail service. Customers may ask for one to three sealed bottles; the English dialogue reveals total budget, alcohol type, taste, occasion and optional favourite brand. The recommendation panel scores stocked products by coverage, flags over-budget choices, confirms quantity and total, then deducts per-bar bottle stock and records the sale.
+- Seventy popular branded products across whiskey, bourbon, liqueur, vodka, gin, rum, tequila, aperitif, vermouth, port wine, cognac, brandy, beer, alcohol-free beer, soju, sake, cider, fruit wine, herbal and specialty liqueurs, sambuca, sangria, infused spirits (настойки), Champagne and sparkling wine. Examples include Jack Daniel’s, Jägermeister, Hennessy, Guinness, Heineken 0.0, CHOYA, MauiWine, Molinari, Don Simón, Nemiroff, Żubrówka, Bols Blue Curaçao, Midori, Moët & Chandon and Veuve Clicquot. Every product includes bottle size, ABV, retail price, origin, taste profile and occasion tags.
+- Sixty-four cocktail recipes: ten starters and fifty-four locked lessons, all visible in the full catalog with a “Need to learn first” state. Additional lessons unlock through the shop, special requests, or a daily gift. Every card and lesson shows calculated serving ABV and strength; lessons include history, ingredients, method, and occasion tags. Recommendation Academy explains what, why, and who.
 - All generated question templates are accepted by the English checker and can be constructed from their word banks. Corrected phrases insert all required tiles, including repeated words. Shared article handling fixes “an Old Fashioned.” Longest-name matching distinguishes Espresso Martini from Martini.
 - Mobile ingredient filters and horizontal scrolling; +5 ml liquid / +1 item measurements. Pointer cancellation does not accidentally add an ingredient.
 
@@ -26,21 +28,25 @@ Animations: customer idle/listen/reaction transforms; bottle tilt and glug; a ne
 
 ## Generated artwork
 
-Generated using the built-in image generation tool, not Blender or the API/CLI fallback. Transparent sprite alpha is retained. All four final assets are checked into the project:
+Generated using the built-in image generation tool, not Blender or the API/CLI fallback. Transparent sprite alpha is retained. All six final assets are checked into the project:
 
 | File | Purpose |
 | --- | --- |
 | `public/assets/characters/customers/extended-cast.png` | Ten original customers in a five-column, two-row sprite atlas |
-| `public/assets/characters/bartender/noa-wardrobe.png` | Three illustrated outfits for the same bartender |
+| `public/assets/characters/customers/extended-cast-2.png` | Ten additional diverse customers in a five-column, two-row sprite atlas |
+| `public/assets/characters/bartender/noa-wardrobe.png` | Three glamorous illustrated outfits for Noa |
+| `public/assets/characters/bartender/leo-wardrobe.png` | Three illustrated outfits for muscular, tattooed Leo |
 | `public/assets/bar/backgrounds/botanical-room.png` | Botanical room interior |
 | `public/assets/bar/backgrounds/skyline-lounge.png` | Skyline lounge interior |
 
 Production prompt specifications:
 
 1. **Customer atlas:** Original polished, painterly 2D cocktail-bar game character artwork. Exactly ten distinct adult guests, arranged on a transparent five-column, two-row atlas. Consistent equal-size cells and scale; upper-body, front-facing relaxed poses with clean silhouettes. Diverse faces, ages, hairstyles and evening outfits; no props across neighboring cells, text, cell borders, fake mouth shapes, or background. Designed for independent CSS sprite cropping.
-2. **Bartender wardrobe:** Original polished, painterly 2D cocktail-bar game artwork. The same adult female bartender, consistent face, curly dark hair, natural pose and proportions, repeated in three equal transparent cells. One burgundy waistcoat over a white shirt, one rolled-sleeve white shirt, one dark apron. Upper-body to hips, complete head and hands, no text, background, borders, or overlapping cells. Outfit changes must be painted clothing, not flat color overlays.
-3. **Botanical room:** Wide original premium 2D game bar interior, warm evening light, green botanical walls and trailing plants, rich wood, brass lamps and detailed bottle shelves. Frontal bar-counter composition with a clear foreground surface for gameplay and no guests, UI, text or logos. Painterly illustration with coherent perspective and textured materials.
-4. **Skyline lounge:** Wide original premium 2D game bar interior, midnight blue and purple lounge, sunset city skyline through tall windows, dark marble counter, brass lamps, elegant sofas and detailed illuminated bottle shelves. Frontal counter view with clear foreground surface for gameplay. No people, UI, text or logos. Match the illustrated visual polish of the other interiors.
+2. **Additional customer atlas:** Match the first atlas's premium painterly rendering, warm rim light, waist-up framing and precise five-column, two-row transparent layout while creating ten entirely new adults. Vary age, presentation, skin tone, body build, hair and upscale evening clothing; keep every head, hand and elbow inside its cell; no repeated identities, props crossing cells, text, borders, scenery or watermarks.
+3. **Noa wardrobe:** Preserve Noa's adult identity and premium painterly style in three centered transparent cells. Fashion-forward, elegant and sensual but non-explicit: burgundy corset-waistcoat with off-shoulder ivory blouse; black bustier-inspired top with cropped ivory tailored jacket; fitted black blouse with emerald waist-cinching apron. Consistent pose, face, scale and anchor; no text, props, scenery or overlapping cells.
+4. **Leo wardrobe:** Original adult male bartender in three centered transparent cells. Clearly muscular V-shaped body with broad shoulders, developed chest and thick arms; consistent geometric forearm, botanical-serpent arm and compass chest tattoos. Burgundy velvet vest; open white shirt with suspenders; fitted black sleeveless shirt with emerald apron. Warm, premium painterly mobile-game rendering; no text, scenery or overlapping cells.
+5. **Botanical room:** Wide original premium 2D game bar interior, warm evening light, green botanical walls and trailing plants, rich wood, brass lamps and detailed bottle shelves. Frontal bar-counter composition with a clear foreground surface for gameplay and no guests, UI, text or logos. Painterly illustration with coherent perspective and textured materials.
+6. **Skyline lounge:** Wide original premium 2D game bar interior, midnight blue and purple lounge, sunset city skyline through tall windows, dark marble counter, brass lamps, elegant sofas and detailed illuminated bottle shelves. Frontal counter view with clear foreground surface for gameplay. No people, UI, text or logos. Match the illustrated visual polish of the other interiors.
 
 The coastlines are **not** generated art: `public/assets/bar/world-land.geojson` is Natural Earth's public-domain 1:110m land dataset, sourced from the Natural Earth vector repository. `scripts/build-world-map.mjs` deterministically projects it into `public/assets/bar/world-land.svg`. Buttons use actual city longitude/latitude.
 
@@ -50,7 +56,7 @@ Source: https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_1
 
 - Vue/TypeScript validation passes.
 - Production Vite build passes.
-- Nine automated tests pass, covering grammar/tile reachability, discounts, regional prices, gift streaks and persistence, atomic deliveries, reserved stock, transfers, names/styles and customer model coverage.
+- Automated tests cover the complete 64-recipe catalog and ABV estimates, branded-bottle matching and sales, all bottle names in English dialogue, grammar/tile reachability, discounts, regional prices, gift streaks and persistence, atomic deliveries, reserved stock, transfers, names/styles and customer model coverage.
 - Browser checks at desktop and 390 × 844 mobile: market filters, bulk quote/free-delivery threshold, location naming, artwork, map, and five-customer scene.
 
 This is a local game economy, not a server-authoritative economy: saves and daily claims use local storage and the device calendar. Clearing storage or changing the device clock can affect progression. Cross-device syncing and anti-cheat require a backend.

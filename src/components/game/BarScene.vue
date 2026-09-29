@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount } from 'vue';
+import { onBeforeUnmount } from 'vue';
 import { CUSTOMER_ART_BY_SLOT } from '../../data/cosmetics/artCatalog';
 import { RECIPES } from '../../domain/catalog';
 import { buildProfile, shortWish } from '../../domain/conversation/customerTalk';
@@ -9,18 +9,18 @@ import { useGameStore } from '../../stores/game';
 import CharacterModel from '../characters/CharacterModel.vue';
 
 const game = useGameStore();
-const props = withDefaults(defineProps<{ active?: boolean }>(), { active: true });
+withDefaults(defineProps<{ active?: boolean }>(), { active: true });
 const interval = window.setInterval(() => {
-  if (props.active && !document.hidden) game.tickPatience();
+  if (!document.hidden) game.tickGameClock();
 }, 1000);
 onBeforeUnmount(() => window.clearInterval(interval));
 
 const expressionFor = (mood: string): CharacterExpression => ({
   calm: 'neutral', friendly: 'smile', impatient: 'impatient', angry: 'angry', sad: 'worried', tired: 'thinking', shy: 'embarrassed', confused: 'confused', wealthy: 'impressed', vip: 'smile'
 }[mood] as CharacterExpression ?? 'neutral');
-const activeIndex = computed(() => game.customers.findIndex((item) => item.id === game.activeCustomerId));
 function bubbleText(customer: Customer) {
   if (customer.orderRevealed) return customer.request;
+  if (customer.orderKind === 'bottle') return `I need bottles for a ${customer.bottleRequest?.occasion ?? 'special occasion'}.`;
   const recipe = RECIPES.find((item) => item.id === customer.orderRecipeId);
   return recipe ? shortWish(buildProfile(recipe)) : customer.request;
 }
@@ -28,7 +28,7 @@ function patience(value: number, total: number) { return Math.max(0, Math.min(10
 </script>
 
 <template>
-  <section class="bar-scene" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-lighting="game.decor.lighting" :style="{ backgroundImage: `url('${game.barBackground}')` }">
+  <section class="bar-scene" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="game.barInteriorStyle">
     <div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div>
     <div class="bar-cast">
       <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" @click="game.openConversation(customer.id)">
@@ -36,15 +36,18 @@ function patience(value: number, total: number) { return Math.max(0, Math.min(10
         <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="expressionFor(customer.mood)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
         <div class="customer-plate">
           <div><b>{{ customer.name }}</b><small>{{ customer.mood }}</small></div>
-          <span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span>
+          <span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i><em>{{ game.orderCountdown }}</em></span>
         </div>
       </button>
+      <div v-if="!game.hasCustomer" class="empty-bar-wait">
+        <small>NEXT CUSTOMER</small><b>{{ game.nextCustomerCountdown }}</b><p>Use the quiet time to restock, learn recipes, or customize this bar.</p>
+      </div>
     </div>
     <div class="bartender-layer">
-      <CharacterModel role="bartender" character-id="noa" :outfit="game.decor.bartender" animation="idle" />
-      <span class="name-ribbon">NOA · BARTENDER</span>
+      <CharacterModel role="bartender" :character-id="game.decor.bartenderCharacter ?? 'noa'" :outfit="game.decor.bartender" :face-style="game.decor.face" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :skin-detail="game.decor.skinDetail" :bust="game.decor.bust" :pose="game.decor.pose" :makeup="game.decor.makeup" animation="idle" />
+      <span class="name-ribbon">{{ (game.decor.bartenderNickname || (game.decor.bartenderCharacter === 'leo' ? 'Leo' : 'Noa')).toUpperCase() }} · BARTENDER</span>
     </div>
     <div class="counter-glow"></div>
-    <div class="scene-status"><span></span>{{ game.message }}<b>{{ activeIndex + 1 }}/{{ game.customers.length }}</b></div>
+    <div class="scene-status"><span :class="{ waiting: !game.hasCustomer }"></span>{{ game.message }}<b>{{ game.hasCustomer ? (game.orderTimerPaused ? 'Paused in dialogue' : game.orderCountdown) : game.nextCustomerCountdown }}</b></div>
   </section>
 </template>

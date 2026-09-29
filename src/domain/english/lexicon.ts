@@ -20,12 +20,21 @@ easy simple classic popular special different same full empty ready sure
 much many more most less least few lot lots bit enough extra half double single
 drink drinks cocktail cocktails mocktail glass bottle can cup shot ice cube cubes straw slice wedge garnish flavour flavor taste recipe menu bar bartender barman customer friend day week
 alcohol alcoholic non spirit spirits liquor liqueur wine beer water juice soda tonic cola syrup sugar salt cream milk coffee espresso tea lemonade
-rum gin vodka tequila whiskey whisky brandy vermouth bitters aperitif champagne prosecco
+rum gin vodka tequila whiskey whisky brandy cognac port beer soju sake cider vermouth bitters aperitif champagne prosecco sambuca sangria infusion tincture nastoyka настойка настойки curacao curaçao umeshu
 lime lemon orange grapefruit pineapple cranberry coconut mint ginger strawberry raspberry cherry berry apple banana mango peach grape watermelon passion fruit fruits herb herbs
+molinari luxardo dei cesari ramazzotti don simón lolea peñasol nemiroff honey pepper żubrówka bison grass beluga hunting riga balsam
+boone's farm hill mauiwine maui blanc choya heineken guinness corona cero budweiser zero becherovka fernet branca chartreuse bols de kuyper midori melon malibu disaronno originale
+agave almond anise apple berry bittersweet bold botanical bright caramel cinnamon clean complex cucumber dried elegant grass juniper malty marzipan minty neutral nutty oak plum rice ripe roasted savory slightly smoky sugarcane vanilla
 mojito daiquiri margarita pina piña colada cosmopolitan fashioned martini negroni mai tai french moscow mule paloma island long
+cuba libre stormy tom collins fizz gimlet southside rickey bee knees lady pegu club corpse reviver number vesper kamikaze drop cape codder sea breeze bay madras woo sex beach russian mudslide boulevardier manhattan rob roy julep highball lynchburg rush sazerac paper plane runner hurricane planter punch zombie painkiller jungle bird cuban presidente hotel nacional aperitivo spritz americano sbagliato hugo
+jack daniel's beam white label jameson irish johnnie walker black chivas regal maker's mark jägermeister baileys cointreau absolut smirnoff grey goose bombay sapphire beefeater london hendrick's bacardí carta blanca captain morgan havana años jose cuervo especial gold patrón aperol bianco moët chandon impérial veuve clicquot yellow mionetto prosecco
+taylor's late bottled vintage graham's tawny hennessy vs rémy martin vsop courvoisier guinness draught heineken original corona stella artois budweiser jinro chamisul chum churum gekkeikan traditional dassai forty-five junmai daiginjo hakutsuru st-rémy torres gran reserva strongbow somersby magners
 kind type sort style way thing things time moment idea question choice option size price money
 dollar dollars euro pound percent one two three four five six seven eight nine ten
 mood feeling party birthday date dinner food snack
+shop store seller sell sold buy bought customer customers shelf shelves stock brand size sample gift present wrap popular delivery deliver supplier wholesale retail id passport licence license
+price cost cheap expensive discount sale percent off total budget cash card change receipt refund exchange return afford bag pack packs order orders litre liter bill value sealed quantity occasion
+twenty thirty forty fifty sixty seventy eighty ninety hundred thousand fourteen fifteen eleven twelve monday tuesday wednesday thursday friday saturday sunday soon possible instead similar look looking
 im i'm i'd i'll i've you're you'd you'll you've he's she's it's we're they're that's what's there's let's
 don't doesn't didn't isn't aren't wasn't weren't can't cannot couldn't won't wouldn't shouldn't haven't hasn't
 `;
@@ -43,10 +52,10 @@ export const IRREGULAR: Record<string, string> = {
 
 // Adjectives that form comparatives with -er (so "more sweet" -> "sweeter").
 export const SHORT_COMPARATIVES: Record<string, string> = {
-  sweet: 'sweeter', sour: 'sourer', strong: 'stronger', light: 'lighter', weak: 'weaker', mild: 'milder', cold: 'colder', cool: 'cooler',
+  sweet: 'sweeter', strong: 'stronger', light: 'lighter', weak: 'weaker', mild: 'milder', cold: 'colder', cool: 'cooler',
   warm: 'warmer', fresh: 'fresher', dry: 'drier', rich: 'richer', sharp: 'sharper', soft: 'softer', big: 'bigger', small: 'smaller',
-  cheap: 'cheaper', long: 'longer', short: 'shorter', happy: 'happier', lazy: 'lazier', easy: 'easier', fruity: 'fruitier', spicy: 'spicier',
-  juicy: 'juicier', creamy: 'creamier', salty: 'saltier', tangy: 'tangier', busy: 'busier', sleepy: 'sleepier', nice: 'nicer', calm: 'calmer'
+  cheap: 'cheaper', long: 'longer', short: 'shorter', happy: 'happier', lazy: 'lazier', easy: 'easier',
+  busy: 'busier', sleepy: 'sleepier', nice: 'nicer', calm: 'calmer'
 };
 
 // Base verb -> third person singular.

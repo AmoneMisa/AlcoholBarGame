@@ -11,6 +11,8 @@ export type Mood =
   | 'wealthy'
   | 'vip';
 export type PaymentMethod = 'cash' | 'card';
+export type AlcoholType = 'whiskey' | 'bourbon' | 'liqueur' | 'herbal-liqueur' | 'specialty-liqueur' | 'sambuca' | 'sangria' | 'infusion' | 'fruit-wine' | 'champagne' | 'sparkling-wine' | 'port-wine' | 'cognac' | 'brandy' | 'beer' | 'non-alcoholic-beer' | 'soju' | 'sake' | 'cider' | 'vodka' | 'gin' | 'rum' | 'tequila' | 'aperitif' | 'vermouth';
+export type BottleOccasion = 'gift' | 'party' | 'dinner' | 'celebration' | 'home bar';
 
 export interface Region {
   id: RegionId;
@@ -71,6 +73,43 @@ export interface Customer {
   paymentMethod: PaymentMethod;
   specialRecipeRewardId?: string;
   orderRevealed?: boolean;
+  orderKind?: 'cocktail' | 'bottle' | 'serve';
+  // Brand-call order (“Jack Daniel’s on the rocks”): the only bar order that names a brand.
+  serveRequest?: import('./brandServe').ServeRequest;
+  bottleRequest?: BottleRequest;
+  selectedBottleId?: string;
+}
+
+export interface AlcoholProduct {
+  id: string;
+  name: string;
+  brand: string;
+  type: AlcoholType;
+  volumeMl: number;
+  abv: number;
+  price: number;
+  popularity: number;
+  origin: string;
+  tastes: string[];
+  occasions: BottleOccasion[];
+  description: string;
+  ingredientId: string;
+  color: string;
+}
+
+export interface BottleRequest {
+  productId: string;
+  quantity: number;
+  budget: number;
+  type: AlcoholType;
+  tastes: string[];
+  occasion: BottleOccasion;
+  preferredBrand?: string;
+}
+
+export interface BottleInventoryItem {
+  productId: string;
+  quantity: number;
 }
 
 export interface InventoryItem {

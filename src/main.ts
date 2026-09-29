@@ -6,7 +6,11 @@ import './dashboard.css';
 import './game.css';
 import './conversation.css';
 import './management.css';
+import './learning.css';
+import './knowledge.css';
 import { initTelegram } from './telegram/webapp';
+import { hydrateCocktailCatalog } from './domain/recipeApi';
 
+await hydrateCocktailCatalog();
 initTelegram();
 createApp(App).use(createPinia()).mount('#app');

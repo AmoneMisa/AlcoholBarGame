@@ -174,7 +174,10 @@ export function replyTo(text: string, customer: Customer, profile: DrinkProfile,
   }
   if (words.some((word) => ['what', 'which', 'kind', 'type', 'flavour', 'flavours', 'flavor', 'taste', 'favourite', 'favorite', 'recommend', 'suggest'].includes(word))) {
     const known = new Set(revealedFacts.map((fact) => fact.topic));
-    const next = [...profile.traits].find((trait) => !known.has(trait));
+    // Asked about flavour or taste: answer with a flavour or fruit first, the spirit last.
+    const flavourFirst = words.some((word) => ['flavour', 'flavours', 'flavor', 'flavors', 'taste'].includes(word));
+    const ordered = flavourFirst ? [...profile.traits].sort((a, b) => Number(SPIRITS.includes(a)) - Number(SPIRITS.includes(b))) : [...profile.traits];
+    const next = ordered.find((trait) => !known.has(trait));
     if (next) return { text: describe(next, true, profile).replace(/^Yes, /, '').replace(/^./, (letter) => letter.toUpperCase()), expression: 'thinking', facts: [{ topic: next, likes: true }] };
     return { text: 'I think you know everything now. What do you recommend?', expression: 'smile', facts: [] };
   }

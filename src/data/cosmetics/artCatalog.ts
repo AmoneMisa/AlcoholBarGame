@@ -21,7 +21,12 @@ export const CHARACTER_ART: CharacterArtDefinition[] = [
     ['imani','Imani','female','soft','#89553c'],['owen','Owen','male','broad','#db9973'],['vera','Vera','female','straight','#dcac89'],['eli','Eli','neutral','straight','#a36b49'],['leila','Leila','female','soft','#b47e58'],
     ['felix','Felix','male','straight','#d9ac88'],['hana','Hana','female','straight','#e1b994'],['andre','André','male','broad','#754932'],['rosa','Rosa','female','soft','#b18c6a'],['marco','Marco','male','broad','#c28a64']
   ].map(([id,name,presentation,body,skinTone],castIndex) => ({ id,name,presentation:presentation as CharacterArtDefinition['presentation'],body:body as CharacterArtDefinition['body'],skinTone,castIndex,sheet:'/assets/characters/customers/extended-cast.png',columns:5,rows:2 })),
-  { id: 'noa', name: 'Noa', presentation: 'female', body: 'straight', skinTone: '#a86643', sheet:'/assets/characters/bartender/noa-wardrobe.png',columns:3,rows:1,castIndex:0 }
+  ...[
+    ['sora','Sora','male','straight','#d0a17f'],['priya','Priya','female','soft','#a86646'],['amara','Amara','female','straight','#8b553d'],['rowan','Rowan','neutral','straight','#e2a37f'],['mateo','Mateo','male','broad','#b87853'],
+    ['zahra','Zahra','female','straight','#bd805b'],['kenji','Kenji','male','broad','#b78462'],['raven','Raven','female','straight','#dfb293'],['niko','Niko','neutral','broad','#75472f'],['edith','Edith','female','soft','#d6a07f']
+  ].map(([id,name,presentation,body,skinTone],castIndex) => ({ id,name,presentation:presentation as CharacterArtDefinition['presentation'],body:body as CharacterArtDefinition['body'],skinTone,castIndex,sheet:'/assets/characters/customers/extended-cast-2.png',columns:5,rows:2 })),
+  { id: 'noa', name: 'Noa', presentation: 'female', body: 'straight', skinTone: '#a86643', sheet:'/assets/characters/bartender/noa-wardrobe.png',columns:3,rows:1,castIndex:0 },
+  { id: 'leo', name: 'Leo', presentation: 'male', body: 'broad', skinTone: '#a96f4d', sheet:'/assets/characters/bartender/leo-wardrobe.png',columns:3,rows:1,castIndex:0 }
 ];
 
-export const CUSTOMER_ART_BY_SLOT = CHARACTER_ART.filter((art) => art.id !== 'noa').map((art) => art.id);
+export const CUSTOMER_ART_BY_SLOT = CHARACTER_ART.filter((art) => !['noa','leo'].includes(art.id)).map((art) => art.id);

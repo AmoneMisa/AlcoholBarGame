@@ -11,4 +11,5 @@
   <symbol id="pair" viewBox="0 0 24 24"><path d="M4 3v7a3 3 0 0 0 6 0V3M7 3v19m10-1V3c-4 4-4 8 0 9h3V3"/></symbol>
   <symbol id="coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="7"/><path d="M10 8h4m-4 8h4m-4-4h3m-3-4v8"/></symbol>
   <symbol id="gift" viewBox="0 0 24 24"><path d="M3 8h18v5H3V8Zm2 5v8h14v-8M12 8v13m0-13C2 8 4 0 8 3l4 5Zm0 0c10 0 8-8 4-5l-4 5Z"/></symbol>
+  <symbol id="chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4V5Z"/><path d="m9 13 3-6 3 6m-5-2h4"/></symbol>
 </svg>

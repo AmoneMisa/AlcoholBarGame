@@ -8,7 +8,7 @@
 .hud-resources .ui-icon { width:28px;height:28px;color:#f8c865; }
 .hud-resources > div,.daily-hud-gift { display:flex;align-items:center;gap:9px;padding:8px 14px; }
 .daily-hud-gift { border:0;border-left:1px solid #354762;background:transparent;color:#fff4df;text-align:left;cursor:pointer; }
-.daily-hud-gift span b { display:block; }
+.daily-hud-gift span b { display:block;white-space:nowrap; }
 .daily-hud-gift:hover:enabled { background:#48371e; }
 .daily-hud-gift:disabled { color:#a7baab;opacity:.75; }
 .settings-button { display:grid;place-items:center; }
@@ -17,11 +17,11 @@
 .game-nav button.active .ui-icon { color:var(--gold); }
 .character-sprite { background-repeat:no-repeat;filter:drop-shadow(0 10px 8px #0008); }
 .wardrobe-art { height:100%;width:100%; }
-.bartender-custom { grid-template-rows:minmax(400px,1fr) auto;min-height:465px; }
+.bartender-custom { grid-template-rows:minmax(400px,1fr) auto auto;min-height:520px; }
 .bartender-custom > .art-character { display:block;align-self:stretch;padding:0;min-height:400px;height:100%;background:transparent; }
 .bartender-custom .wardrobe-art { width:min(100%,255px);height:440px;margin:0 auto;background-size:300% 100%; }
 .bartender-custom .art-character::after { content:none!important; }
-.bartender-custom > div:last-child { z-index:5; }
+.bartender-custom > div { z-index:5; }
 .bartender-custom button { min-height:44px;font-size:11px; }
 .bartender-layer .wardrobe-art { background-size:300% 100%; }
 .market-modes { display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid #354762; }
@@ -100,6 +100,11 @@
 .bar-name-editor input { min-height:44px;padding:8px 12px;border:1px solid #51647e;border-radius:8px;background:#0e192a;color:#f6ead1;font-size:16px; }
 .bar-name-editor > button { min-height:44px;padding:8px 18px;border:1px solid #dfb05c;border-radius:8px;background:#bd8b38;color:#1d180f;font-weight:900;cursor:pointer; }
 .bar-name-editor > span { flex:0 0 100%;color:#9cb4aa;font-size:10px; }
+.bartender-name-editor { display:flex;align-items:end;gap:10px;margin:0 12px 4px;padding:10px 12px;border:1px solid #3b4e68;border-radius:10px;background:#111d2f; }
+.bartender-name-editor label { display:grid;gap:6px;flex:1;color:#e8bd67;font-size:10px; }
+.bartender-name-editor input { min-height:42px;padding:8px 12px;border:1px solid #51647e;border-radius:8px;background:#0b1524;color:#f6ead1;font-size:15px; }
+.bartender-name-editor button { min-height:42px;padding:8px 15px;border:1px solid #d7a64f;border-radius:8px;background:#4c371f;color:#ffe1a0;font-weight:900;cursor:pointer; }
+.bartender-name-editor > span { color:#92a6bb;font-size:9px; }
 .mini-interior b { top:20px;max-width:90%;padding:8px 12px;border:1px solid #d7aa6066;border-radius:9px;background:#151420c9;white-space:normal;text-align:center;text-transform:uppercase;font-size:16px; }
 .design-options section button { min-height:40px;font-size:11px; }
 .world-map-scroll { margin:12px;overflow-x:auto;border:1px solid #36516a;border-radius:13px; }
@@ -130,7 +135,7 @@
 @media(max-width:760px) {
   .top-hud { grid-template-columns:minmax(0,1fr) 44px; }
   .hud-resources { grid-column:1/-1; }
-  .hud-resources > div,.daily-hud-gift { flex:1;padding:7px 10px; }
+  .hud-resources > div,.daily-hud-gift { flex:1;min-width:0;padding:7px 10px; }
   .hud-resources small { font-size:8px; }
   .venue-card b { font-size:17px; }
   .market-trading-layout { grid-template-columns:1fr;padding:10px;gap:12px; }
@@ -151,6 +156,9 @@
   .login-reward-track b { font-size:16px; }
   .login-reward-track small { font-size:6px; }
   .bartender-custom .wardrobe-art { width:240px;height:420px; }
+  .bartender-name-editor { flex-wrap:wrap;margin-inline:8px; }
+  .bartender-name-editor label { flex-basis:100%; }
+  .bartender-name-editor > span { flex:1; }
   .world-atlas { min-width:640px; }
   .region-cards button img { height:95px; }
 }

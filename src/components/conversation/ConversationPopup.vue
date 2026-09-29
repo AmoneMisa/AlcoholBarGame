@@ -2,19 +2,35 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
 import { CUSTOMER_ART_BY_SLOT } from '../../data/cosmetics/artCatalog';
 import { MODIFIERS, RECIPES } from '../../domain/catalog';
+import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleTotal } from '../../domain/bottleCatalog';
 import {
   buildProfile, matchesFacts, openingLine, questionTemplates, replyTo, tilesFor, correctedTileSelection, TOPIC_LABEL, withArticle,
   type CustomerReply, type Fact
 } from '../../domain/conversation/customerTalk';
+import {
+  bottleFactChips, bottleOpeningLine, bottleQuestionTemplates, rankBottles, replyToBottle,
+  type BottleConversationFacts
+} from '../../domain/conversation/bottleTalk';
 import { checkText, useSpeller, type CheckResult } from '../../domain/english/checker';
 import { loadSpeller } from '../../domain/english/dictionary';
 import { GLOSSARY } from '../../domain/english/lexicon';
+import { RULES, type GrammarRule } from '../../domain/english/rules';
+import { canSpeak, speak } from '../../domain/english/speak';
+import { lookupWord, type VocabEntry } from '../../domain/english/vocabulary';
 import { useGameStore } from '../../stores/game';
+import { useLearningStore } from '../../stores/learning';
+import { useGuide } from '../../composables/useGuide';
+import { serviceReply, serviceTemplates } from '../../domain/conversation/serviceTalk';
+import { guideIdForProduct } from '../../data/knowledge/alcohol';
+import BrandBottle from '../knowledge/BrandBottle.vue';
+import { replyToServe, serveName, serveTemplates } from '../../domain/brandServe';
+import { findRecipeMention, shortWish } from '../../domain/conversation/customerTalk';
+import { findBottleMention } from '../../domain/conversation/bottleTalk';
 import { haptic } from '../../telegram/webapp';
 import CharacterModel from '../characters/CharacterModel.vue';
 
 interface ChatLine { id: number; speaker: 'customer' | 'bartender'; text: string; note?: string; ok?: boolean; }
-interface Transcript { lines: ChatLine[]; facts: Fact[]; expression: CustomerReply['expression']; }
+interface Transcript { lines: ChatLine[]; facts: Fact[]; bottleFacts: BottleConversationFacts; expression: CustomerReply['expression']; }
 
 // Kept outside the component so a conversation survives closing and reopening the popup.
 const transcripts = reactive<Record<string, Transcript>>({});
@@ -22,6 +38,13 @@ const inputMode = ref<'type' | 'words'>('words');
 let lineId = 0;
 
 const game = useGameStore();
+const learning = useLearningStore();
+const { openGuide } = useGuide();
+const activeWord = ref<VocabEntry>();
+const openRule = ref<string>();
+const showAllCards = ref(false);
+// Most helpful first: sentence structure, then grammar, spelling, and small punctuation fixes last.
+const GROUP_ORDER = ['Word order', 'Questions', 'Verbs', 'Articles & nouns', 'Comparing', 'Spelling & words', 'Punctuation'];
 const customer = computed(() => game.customers.find((item) => item.id === game.conversationCustomerId));
 const slot = computed(() => Math.max(0, game.customers.findIndex((item) => item.id === customer.value?.id)));
 const recipe = computed(() => RECIPES.find((item) => item.id === customer.value?.orderRecipeId));
@@ -29,8 +52,16 @@ const profile = computed(() => recipe.value && buildProfile(recipe.value));
 const modifierLabel = computed(() => MODIFIERS.find((item) => item.id === customer.value?.modifierId)?.label);
 const talk = computed(() => customer.value && transcripts[customer.value.id]);
 const confirmed = computed(() => !!customer.value?.orderRevealed);
+const bottleOrder = computed(() => customer.value?.orderKind === 'bottle');
 const conversationRecipes = computed(() => customer.value?.specialRecipeRewardId ? [...game.knownRecipes,...game.lockedRecipes.filter((item) => item.id === customer.value?.specialRecipeRewardId)] : game.knownRecipes);
 const candidates = computed(() => conversationRecipes.value.filter((item) => matchesFacts(item, talk.value?.facts ?? [])));
+const bottleRecommendations = computed(() => {
+  const quantity = talk.value?.bottleFacts.quantity ?? 1;
+  return rankBottles(talk.value?.bottleFacts ?? {}, game.region.marketFactor).filter(({ product }) =>
+    (game.bottleInventory.find((stock) => stock.productId === product.id)?.quantity ?? 0) >= quantity
+  );
+});
+const confirmedBottle = computed(() => ALCOHOL_PRODUCTS.find((item) => item.id === customer.value?.selectedBottleId));
 
 const draft = ref('');
 const feedback = ref<CheckResult>();
@@ -40,7 +71,21 @@ const log = ref<HTMLElement>();
 const input = ref<HTMLInputElement>();
 
 const templateIndex = ref(0);
-const templates = computed(() => questionTemplates(talk.value?.facts ?? [], candidates.value));
+// The sentence the current word bank was built from: always reachable with these tiles.
+const tileTarget = ref('');
+// Order questions plus the service phrase that fits this moment (greeting first, payment and goodbye after the order).
+// Brand-call guests (“Jack Daniel’s on the rocks”) know exactly what they want.
+const serveOrder = computed(() => customer.value?.orderKind === 'serve' ? customer.value.serveRequest : undefined);
+const templates = computed(() => {
+  const base = serveOrder.value
+    ? serveTemplates(serveOrder.value, game.brandOnShelf).map((text) => ({ text }))
+    : bottleOrder.value
+      ? bottleQuestionTemplates(talk.value?.bottleFacts ?? {}, bottleRecommendations.value)
+      : questionTemplates(talk.value?.facts ?? [], candidates.value);
+  const turns = (talk.value?.lines.filter((line) => line.speaker === 'bartender').length ?? 0);
+  const service = serviceTemplates(bottleOrder.value ? 'bottle' : 'drink', confirmed.value, turns).map((text) => ({ text }));
+  return confirmed.value || turns === 0 ? [...service, ...base] : [...base, ...service];
+});
 const tiles = ref<{ id: string; text: string }[]>([]);
 const picked = ref<string[]>([]);
 const pickedTiles = computed(() => picked.value.map((id) => tiles.value.find((tile) => tile.id === id)!).filter(Boolean));
@@ -49,13 +94,24 @@ const builtSentence = computed(() => pickedTiles.value.map((tile) => tile.text).
 function resetTiles() {
   const template = templates.value[templateIndex.value % Math.max(1, templates.value.length)];
   tiles.value = template ? tilesFor(template.text, RECIPES) : [];
+  tileTarget.value = template?.text ?? '';
   picked.value = [];
+}
+
+// Valid phrases the checker may offer when a sentence is too broken to repair word by word.
+function phraseCandidates() {
+  const all = templates.value.map((item) => item.text);
+  return inputMode.value === 'words' && tileTarget.value ? [tileTarget.value] : all;
 }
 
 function ensureTranscript() {
   const current = customer.value;
-  if (!current || !profile.value || transcripts[current.id]) return;
-  transcripts[current.id] = { lines: [{ id: lineId++, speaker: 'customer', text: openingLine(current, profile.value) }], facts: [], expression: 'thinking' };
+  if (!current || transcripts[current.id] || (current.orderKind !== 'bottle' && !profile.value)) return;
+  const opening = current.orderKind === 'bottle' ? bottleOpeningLine(current)
+    : current.orderKind === 'serve' ? `${current.greeting} ${current.request}`
+      : openingLine(current, profile.value!);
+  transcripts[current.id] = { lines: [{ id: lineId++, speaker: 'customer', text: opening }], facts: [], bottleFacts: {}, expression: 'thinking' };
+  noteSeenWords(opening);
 }
 
 watch(() => customer.value?.id, () => {
@@ -71,9 +127,32 @@ function scrollLog() {
   nextTick(() => log.value?.scrollTo({ top: log.value.scrollHeight, behavior: 'smooth' }));
 }
 
-// Split a customer line into plain text and glossary words the learner can tap.
+// Split a customer line into plain text and dictionary words the learner can tap.
+function entryFor(word: string): VocabEntry | undefined {
+  const entry = lookupWord(word);
+  if (entry) return entry;
+  const meaning = GLOSSARY[word.toLowerCase()];
+  return meaning ? { word: word.toLowerCase(), ipa: '', pos: 'adjective', topic: 'Taste', level: 'A2', meaning: meaning.charAt(0).toUpperCase() + meaning.slice(1) + '.', example: '' } : undefined;
+}
 function segments(text: string) {
-  return text.split(/(\p{L}+)/u).filter(Boolean).map((part) => ({ part, meaning: GLOSSARY[part.toLowerCase()] }));
+  return text.split(/(\p{L}+)/u).filter(Boolean).map((part) => ({ part, entry: entryFor(part) }));
+}
+function noteSeenWords(text: string) {
+  learning.markSeen([...new Set(segments(text).map((segment) => segment.entry?.word).filter((word): word is string => !!word))]);
+}
+
+// One card per rule, in the order the mistakes appear; hints (unknown words) go last.
+function ruleCards(result: CheckResult) {
+  const cards: { rule?: GrammarRule; message: string; severity: 'error' | 'hint'; key: string }[] = [];
+  const seen = new Set<string>();
+  const rank = (issue: CheckResult['issues'][number]) => (issue.severity === 'hint' ? 100 : 0) + (issue.rule ? GROUP_ORDER.indexOf(RULES[issue.rule].group) : 50);
+  for (const issue of [...result.issues].sort((a, b) => rank(a) - rank(b))) {
+    const key = issue.rule ?? issue.message;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    cards.push({ rule: issue.rule ? RULES[issue.rule] : undefined, message: issue.message, severity: issue.severity, key });
+  }
+  return cards;
 }
 
 function highlighted(result: CheckResult, text: string) {
@@ -91,17 +170,24 @@ function highlighted(result: CheckResult, text: string) {
 function send(text: string, force = false) {
   const current = customer.value;
   const transcript = talk.value;
-  if (!current || !transcript || !profile.value || customerTyping.value) return;
+  if (!current || !transcript || (!profile.value && current.orderKind !== 'bottle') || customerTyping.value) return;
   const sentence = text.replace(/\s+/g, ' ').trim();
   if (!sentence) return;
-  const result = checkText(sentence);
+  const result = checkText(sentence, phraseCandidates());
   if (!result.ok && !force) {
+    if (feedbackFor.value !== sentence) learning.recordMistakes(sentence, result.corrected, result.issues);
     feedback.value = result;
     feedbackFor.value = sentence;
+    openRule.value = undefined;
+    showAllCards.value = false;
     haptic('light');
     return;
   }
   game.recordSentence(result.ok);
+  if (result.ok) {
+    learning.recordCorrect(sentence);
+    learning.markPhraseUsed(sentence);
+  }
   transcript.lines.push({
     id: lineId++, speaker: 'bartender', text: sentence, ok: result.ok,
     note: result.ok ? (result.issues.length ? result.issues[0]!.message : undefined) : `Better: “${result.corrected}”`
@@ -115,12 +201,30 @@ function send(text: string, force = false) {
   window.setTimeout(() => {
     customerTyping.value = false;
     if (!customer.value || customer.value.id !== current.id) return;
-    const reply = replyTo(result.corrected, current, profile.value!, RECIPES, transcript.facts, modifierLabel.value);
+    // Service phrases (help, occasion, payment, receipt…) first — unless the sentence names a drink or bottle.
+    // Brand calls: questions about the serve (ice, neat, lime) and offering another brand come first.
+    const serveReply = current.orderKind === 'serve' ? replyToServe(result.corrected, current, game.brandOnShelf) : undefined;
+    if (serveReply?.switchTo) game.switchServeBrand(current.id, serveReply.switchTo);
+    const namesOrder = !!findRecipeMention(result.corrected, RECIPES) || !!findBottleMention(result.corrected);
+    const skipService = !!serveReply || (namesOrder && current.orderKind !== 'serve');
+    const service = skipService ? undefined : serviceReply(result.corrected, {
+      customer: current, kind: current.orderKind === 'bottle' ? 'bottle' : 'drink', confirmed: !!current.orderRevealed,
+      wish: profile.value ? shortWish(profile.value) : undefined
+    });
+    const reply = (serveReply ? { ...serveReply, facts: [] } : undefined) ?? service ?? (current.orderKind === 'serve'
+      ? { text: `Just ${serveName(current.serveRequest!)}, please.`, expression: 'smile' as const, facts: [] }
+      : current.orderKind === 'bottle'
+      ? replyToBottle(result.corrected, current, transcript.bottleFacts, game.region.marketFactor)
+      : replyTo(result.corrected, current, profile.value!, RECIPES, transcript.facts, modifierLabel.value));
     for (const fact of reply.facts) if (!transcript.facts.some((known) => known.topic === fact.topic)) transcript.facts.push(fact);
+    if ('bottleFacts' in reply && reply.bottleFacts) Object.assign(transcript.bottleFacts, reply.bottleFacts);
     transcript.lines.push({ id: lineId++, speaker: 'customer', text: reply.text });
+    noteSeenWords(reply.text);
     transcript.expression = reply.expression;
     if (reply.confirmed) {
-      game.confirmOrder(current.id);
+      const selectedBottleId = 'selectedBottleId' in reply ? reply.selectedBottleId as string | undefined : undefined;
+      if (selectedBottleId) game.confirmBottleOrder(current.id, selectedBottleId);
+      else game.confirmOrder(current.id);
       haptic('medium');
     }
     if (reply.wrongGuess) game.penalizeWrongGuess();
@@ -140,6 +244,7 @@ function useCorrection() {
     // A suggested correction must be reachable in word mode, including newly inserted words.
     const corrected = feedback.value.corrected;
     tiles.value = tilesFor(corrected, RECIPES);
+    tileTarget.value = corrected;
     picked.value = correctedTileSelection(corrected,tiles.value,RECIPES);
     feedback.value = undefined;
   }
@@ -169,7 +274,41 @@ function startMixing() {
   nextTick(() => document.querySelector('.cocktail-workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
 }
 
-const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') game.closeConversation(); };
+function completeBottleSale() {
+  if (!game.sellBottleToCustomer()) return;
+  haptic('medium');
+  game.closeConversation();
+}
+
+function offerAlternative() {
+  const current = customer.value;
+  const transcript = talk.value;
+  if (!current || !transcript || !game.offerSimilarOrder(current.id)) return;
+  transcript.lines.push(
+    { id: lineId++, speaker: 'bartender', text: 'I’m sorry, we cannot serve that order. May I offer you something similar?', ok: true },
+    { id: lineId++, speaker: 'customer', text: current.request }
+  );
+  transcript.expression = 'smile';
+  haptic('medium');
+  scrollLog();
+}
+
+function rejectOrder() {
+  const current = customer.value;
+  if (!current) return;
+  haptic('light');
+  game.rejectCustomer(current.id);
+}
+
+function bottleStock(productId: string) {
+  return game.bottleInventory.find((item) => item.productId === productId)?.quantity ?? 0;
+}
+
+const onKey = (event: KeyboardEvent) => {
+  if (event.key !== 'Escape') return;
+  if (activeWord.value) activeWord.value = undefined;
+  else game.closeConversation();
+};
 onMounted(() => {
   window.addEventListener('keydown', onKey);
   loadSpeller().then(useSpeller);
@@ -191,6 +330,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <h2>{{ customer.name }}</h2>
           <div class="talk-meters">
             <label>Patience <span><i :style="{ width: patience + '%' }"></i></span></label>
+            <label>Order time <b>{{ game.orderCountdown }} · paused</b></label>
             <label>Your English <b>{{ accuracy }}%</b></label>
           </div>
         </div>
@@ -202,7 +342,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <div v-for="line in talk.lines" :key="line.id" class="talk-line" :class="line.speaker">
             <p v-if="line.speaker === 'customer'">
               <template v-for="(segment, index) in segments(line.text)" :key="index">
-                <button v-if="segment.meaning" type="button" class="gloss" :data-meaning="segment.meaning">{{ segment.part }}</button>
+                <button v-if="segment.entry" type="button" class="gloss" :class="{ saved: learning.savedWords.includes(segment.entry.word) }" :aria-label="`${segment.part}: show meaning`" @click="activeWord = segment.entry">{{ segment.part }}</button>
                 <template v-else>{{ segment.part }}</template>
               </template>
             </p>
@@ -212,23 +352,76 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <div v-if="customerTyping" class="talk-line customer typing"><p><i></i><i></i><i></i></p></div>
         </div>
 
+        <div v-if="activeWord" class="word-card" role="dialog" :aria-label="`Word: ${activeWord.word}`">
+          <header>
+            <div>
+              <b>{{ activeWord.word }}</b>
+              <span v-if="activeWord.ipa" class="ipa">{{ activeWord.ipa }}</span>
+              <em>{{ activeWord.pos }} · {{ activeWord.level }}</em>
+            </div>
+            <button v-if="canSpeak()" type="button" class="speak-button" aria-label="Listen" @click="speak(activeWord.word)">🔊</button>
+            <button type="button" class="word-card-close" aria-label="Close word card" @click="activeWord = undefined">×</button>
+          </header>
+          <p class="word-meaning">{{ activeWord.meaning }}</p>
+          <p v-if="activeWord.example" class="word-example">“{{ activeWord.example }}” <button v-if="canSpeak()" type="button" aria-label="Listen to example" @click="speak(activeWord.example)">🔊</button></p>
+          <dl>
+            <template v-if="activeWord.opposite"><dt>Opposite</dt><dd>{{ activeWord.opposite }}</dd></template>
+            <template v-if="activeWord.related?.length"><dt>Related</dt><dd>{{ activeWord.related.join(', ') }}</dd></template>
+          </dl>
+          <p v-if="activeWord.note" class="word-note">💡 {{ activeWord.note }}</p>
+          <button type="button" class="secondary-button" @click="learning.toggleSaved(activeWord.word)">{{ learning.savedWords.includes(activeWord.word) ? '★ Saved to my words' : '☆ Save to my words' }}</button>
+        </div>
+
         <aside class="talk-clues">
-          <small>WHAT YOU KNOW</small>
-          <div class="clue-chips">
-            <span v-for="fact in talk.facts" :key="fact.topic" :class="fact.likes ? 'yes' : 'no'">{{ fact.likes ? '✓' : '✗' }} {{ TOPIC_LABEL[fact.topic] }}</span>
-            <em v-if="!talk.facts.length">Ask about taste, fruit, strength or bubbles.</em>
-          </div>
-          <small>POSSIBLE DRINKS</small>
-          <div class="clue-drinks">
-            <button v-for="item in candidates.slice(0, 6)" :key="item.id" type="button" @click="suggest(`Would you like ${withArticle(item.name)}?`)">{{ item.name }}</button>
-            <em v-if="!candidates.length">No match in your recipe book.</em>
-          </div>
+          <template v-if="bottleOrder">
+            <small>CUSTOMER REQUEST</small>
+            <div class="clue-chips">
+              <span v-for="fact in bottleFactChips(talk.bottleFacts)" :key="fact" class="yes">✓ {{ fact }}</span>
+              <em v-if="!bottleFactChips(talk.bottleFacts).length">Ask how many, total budget, type, flavour, occasion and brand.</em>
+            </div>
+            <small>BEST STOCKED MATCHES</small>
+            <div class="bottle-recommendations">
+              <article v-for="match in bottleRecommendations.slice(0, 6)" :key="match.product.id" :class="{ over: match.overBudget }">
+                <div class="shop-brand-bottle"><BrandBottle :brand="match.product.brand" :category="guideIdForProduct(match.product)" :color="match.product.color" /></div>
+                <div><b>{{ match.product.name }}</b><span>{{ ALCOHOL_TYPE_LABELS[match.product.type] }} · {{ match.product.abv }}% ABV</span><small>{{ match.reasons.slice(0, 2).join(' · ') || 'popular choice' }}</small><em>{{ bottleTotal(match.product, talk.bottleFacts.quantity ?? 1, game.region.marketFactor) }} coins · {{ bottleStock(match.product.id) }} in stock</em></div>
+                <strong>{{ match.score }}%</strong>
+                <button type="button" @click="suggest(`Would you like ${match.product.name}?`)">Recommend</button>
+                <button type="button" class="bottle-info" :aria-label="`About ${match.product.brand}`" @click="openGuide('ingredient', guideIdForProduct(match.product))">About the brand</button>
+              </article>
+              <em v-if="!bottleRecommendations.length">No stocked bottle covers the known request.</em>
+            </div>
+          </template>
+          <template v-else>
+            <small>WHAT YOU KNOW</small>
+            <div class="clue-chips">
+              <span v-for="fact in talk.facts" :key="fact.topic" :class="fact.likes ? 'yes' : 'no'">{{ fact.likes ? '✓' : '✗' }} {{ TOPIC_LABEL[fact.topic] }}</span>
+              <em v-if="!talk.facts.length">Ask about taste, fruit, strength or bubbles.</em>
+            </div>
+            <small>POSSIBLE DRINKS</small>
+            <div class="clue-drinks">
+              <span v-for="item in candidates.slice(0, 6)" :key="item.id" class="drink-option"><button type="button" @click="suggest(`Would you like ${withArticle(item.name)}?`)">{{ item.name }}</button><button type="button" class="drink-info" :aria-label="`About ${item.name}`" @click="openGuide('cocktail', item.id)">i</button></span>
+              <em v-if="!candidates.length">No match in your recipe book.</em>
+            </div>
+          </template>
         </aside>
       </div>
 
       <div v-if="confirmed" class="talk-confirmed">
-        <div><small>ORDER CONFIRMED</small><b>{{ recipe?.name }}<template v-if="modifierLabel"> · {{ modifierLabel }}</template></b></div>
-        <button class="primary-button" type="button" @click="startMixing">Start mixing <span>→</span></button>
+        <template v-if="bottleOrder && confirmedBottle && customer.bottleRequest">
+          <div><small>SEALED-BOTTLE SALE CONFIRMED</small><b>{{ customer.bottleRequest.quantity }} × {{ confirmedBottle.name }}</b><span>{{ confirmedBottle.volumeMl }} ml · {{ confirmedBottle.abv }}% ABV · total {{ bottleTotal(confirmedBottle, customer.bottleRequest.quantity, game.region.marketFactor) }} coins</span></div>
+          <button class="primary-button" type="button" :disabled="game.serving || bottleStock(confirmedBottle.id) < customer.bottleRequest.quantity" @click="completeBottleSale">Sell full bottle{{ customer.bottleRequest.quantity === 1 ? '' : 's' }} <span>→</span></button>
+        </template>
+        <template v-else>
+          <div v-if="serveOrder"><small>BRAND ORDER</small><b>{{ customer.request.replace(/, please\.$/, '') }}</b><span v-if="!game.brandOnShelf(serveOrder.productId)" class="serve-missing">Not on your shelf — offer another brand of the same spirit.</span></div>
+          <div v-else><small>ORDER CONFIRMED</small><b>{{ recipe?.name }}<template v-if="modifierLabel"> · {{ modifierLabel }}</template></b></div>
+          <button class="primary-button" type="button" @click="startMixing">Start mixing <span>→</span></button>
+        </template>
+      </div>
+
+      <div class="service-decisions">
+        <div><small>CAN’T SERVE THIS ORDER?</small><span>The guest can accept the closest stocked alternative, or you can decline the order and let them leave.</span></div>
+        <button class="secondary-button" type="button" @click="offerAlternative">Offer similar</button>
+        <button class="reject-order-button" type="button" @click="rejectOrder">Reject order</button>
       </div>
 
       <footer class="talk-compose">
@@ -239,10 +432,27 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
 
         <div v-if="feedback" class="talk-feedback">
           <p class="feedback-sentence"><template v-for="(part, index) in highlighted(feedback, feedbackFor)" :key="index"><mark v-if="part.issue">{{ part.text }}</mark><template v-else>{{ part.text }}</template></template></p>
-          <ul><li v-for="(issue, index) in feedback.issues" :key="index" :class="issue.severity"><b>{{ issue.kind }}</b> {{ issue.message }}</li></ul>
-          <p class="feedback-fix">Correct: <b>{{ feedback.corrected }}</b></p>
+          <ol class="rule-cards">
+            <li v-for="card in ruleCards(feedback).slice(0, showAllCards ? undefined : 3)" :key="card.key" :class="card.severity">
+              <div class="rule-head">
+                <span class="rule-level" v-if="card.rule">{{ card.rule.level }}</span>
+                <b>{{ card.rule?.title ?? 'Note' }}</b>
+                <button v-if="card.rule" type="button" class="why-button" :aria-expanded="openRule === card.key" @click="openRule = openRule === card.key ? undefined : card.key">{{ openRule === card.key ? 'Hide' : 'Why?' }}</button>
+              </div>
+              <p class="rule-message">{{ card.message }}</p>
+              <div v-if="card.rule && openRule === card.key" class="rule-explain">
+                <p>{{ card.rule.explain }}</p>
+                <p v-if="card.rule.pattern" class="rule-pattern"><span>Pattern</span>{{ card.rule.pattern }}</p>
+                <div v-for="example in card.rule.examples.slice(0, 2)" :key="example.wrong" class="rule-example"><s>{{ example.wrong }}</s><b>{{ example.right }}</b></div>
+                <p class="rule-tip">💡 {{ card.rule.tip }}</p>
+              </div>
+            </li>
+          </ol>
+          <button v-if="!showAllCards && ruleCards(feedback).length > 3" type="button" class="more-fixes" @click="showAllCards = true">Show {{ ruleCards(feedback).length - 3 }} smaller {{ ruleCards(feedback).length - 3 === 1 ? 'fix' : 'fixes' }} ▾</button>
+          <p v-if="feedback.corrected !== feedbackFor" class="feedback-fix">{{ feedback.reliable ? 'Correct' : 'Try' }}: <b>{{ feedback.corrected }}</b></p>
+          <p v-else class="feedback-fix">Rebuild the sentence: start with “Do you …” or “Would you …”.</p>
           <div class="feedback-actions">
-            <button class="primary-button compact" type="button" @click="useCorrection">{{ inputMode === 'type' ? 'Use correction' : 'Build corrected sentence' }}</button>
+            <button v-if="feedback.corrected !== feedbackFor" class="primary-button compact" type="button" @click="useCorrection">{{ inputMode === 'type' ? 'Use correction' : 'Build corrected sentence' }}</button>
             <button class="secondary-button" type="button" @click="send(feedbackFor, true)">Send anyway</button>
           </div>
         </div>

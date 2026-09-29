@@ -1,0 +1,111 @@
+/* Guide sheet: full stories of cocktails and ingredients. */
+.guide-backdrop { position:fixed;z-index:220;inset:0;display:grid;place-items:center;padding:16px;background:#05080ecc;backdrop-filter:blur(6px);animation:talkFade .18s ease both; }
+.guide-sheet { position:relative;width:min(760px,100%);max-height:calc(100dvh - 32px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;padding:22px 24px;border:1px solid #58657d;border-radius:18px;background:linear-gradient(165deg,#1b2a44,#0d1624 55%,#121a2a);box-shadow:0 30px 80px #000c;color:#e6ecf4;font-size:14px;line-height:1.6;animation:talkRise .24s cubic-bezier(.2,.8,.25,1) both; }
+.guide-close { position:sticky;top:0;float:right;width:36px;height:36px;margin:-6px -8px 0 8px;border:1px solid #475a74;border-radius:50%;background:#1b2940;color:#e8eef6;font-size:20px;line-height:1;cursor:pointer;z-index:1; }
+.guide-head small { color:#e4b35c;font-size:10px;font-weight:900;letter-spacing:.14em; }
+.guide-head h2 { margin:4px 0 6px;font:700 30px Georgia,serif;color:#fff; }
+.guide-head > p, .guide-head div > p { margin:0;color:#c9d4e2;font-size:15px; }
+.guide-head-ingredient { display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:center; }
+.guide-speak { padding:0;border:0;background:none;font-size:16px;cursor:pointer;vertical-align:middle; }
+.guide-badges { display:flex;flex-wrap:wrap;gap:5px;margin-top:10px; }
+.guide-badges span { padding:2px 9px;border-radius:999px;background:#24344d;color:#c9d6e6;font-size:11px;font-weight:700;text-transform:capitalize; }
+.guide-badges span:first-child { background:#3a2c1c;color:#ffd98a; }
+.guide-section { margin-top:18px;padding-top:14px;border-top:1px solid #2c3b53; }
+.guide-section h3 { margin:0 0 8px;font:700 19px Georgia,serif;color:#f3ede4; }
+.guide-section h4 { margin:12px 0 4px;color:#e4b35c;font-size:12px;letter-spacing:.08em;text-transform:uppercase; }
+.guide-section p { margin:0 0 8px; }
+.guide-timeline { position:relative;display:grid;gap:8px;margin:0 0 12px;padding:0 0 0 16px;list-style:none;border-left:2px solid #3a4a60; }
+.guide-timeline li { position:relative;display:grid;grid-template-columns:120px 1fr;gap:10px; }
+.guide-timeline li::before { content:'';position:absolute;left:-22px;top:7px;width:10px;height:10px;border-radius:50%;background:#e4b35c;box-shadow:0 0 0 3px #0d1624; }
+.guide-timeline b { color:#ffd98a;font-size:13px; }
+.guide-timeline span { color:#d6dfeb; }
+.guide-why b { color:#ffd98a;text-transform:capitalize; }
+.guide-note { color:#9fb0c6;font-size:13px; }
+.guide-facts { display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 10px; }
+.guide-facts dt { color:#e4b35c;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.06em; }
+.guide-facts dd { margin:0; }
+.guide-steps { margin:0 0 8px;padding-left:20px; }
+.recipe-card { display:grid;gap:6px;margin:0 0 10px;padding:0;list-style:none;counter-reset:card; }
+.recipe-card li { display:grid;grid-template-columns:28px 130px 150px 1fr;gap:10px;align-items:baseline;padding:8px 10px;border:1px solid #2f4058;border-radius:10px;background:#132034;counter-increment:card; }
+.recipe-card li::before { content:counter(card);display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#24344d;color:#ffd98a;font-size:11px;font-weight:900; }
+.card-amount { color:#ffd98a;font-weight:800;font-size:13px; }
+.card-name { font-size:14px; }
+.card-action { color:#d6dfeb;font-size:13px;line-height:1.45; }
+.recipe-card .role-top { border-color:#2f5a78; }
+.recipe-card .role-garnish { border-color:#3f6a45; }
+.recipe-card .role-prepare { border-color:#6b4a24; }
+.guide-steps li { margin-bottom:4px; }
+.guide-list { margin:0;padding-left:18px; }
+.guide-compare { display:grid;gap:5px;margin:0;padding:0;list-style:none; }
+.guide-compare b { color:#f3ede4; }
+.guide-link { padding:0;border:0;border-bottom:1px dotted #e4b35c;background:none;color:#ffd98a;font:inherit;font-weight:700;cursor:pointer; }
+.guide-sell { padding:8px 10px;border-radius:9px;background:#16324a;color:#cfe6ff; }
+.brand-list { display:grid;gap:8px;margin:0 0 8px;padding:0;list-style:none; }
+.brand-list li.brand-item { display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start; }
+.brand-model { width:44px;height:88px; }
+.brand-count { margin-left:6px;padding:1px 8px;border-radius:999px;background:#24344d;color:#ffd98a;font:800 11px Inter,sans-serif;vertical-align:middle; }
+.brand-cocktails { color:#9fb0c6 !important; }
+.signature-list { display:grid;gap:8px;margin:0;padding:0;list-style:none; }
+.signature-list li { display:grid;grid-template-columns:44px 1fr;gap:12px;padding:10px 12px;border:1px solid #6b4a24;border-radius:10px;background:#1f170e; }
+.signature-list small { display:block;color:#e4b35c;font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase; }
+.signature-list b { font:700 17px Georgia,serif; }
+.signature-list p { margin:4px 0 0;font-size:13px; }
+.card-brand { display:block;margin-top:3px;color:#ffd98a;font-size:12px;font-style:normal;font-weight:700; }
+.brand-list li { padding:10px 12px;border:1px solid #2f4058;border-radius:10px;background:#132034; }
+.brand-list header { display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px; }
+.brand-list header b { font:700 16px Georgia,serif;color:#fff; }
+.brand-list header span { color:#e4b35c;font-size:11px;font-weight:700; }
+.brand-list p { margin:4px 0 0;font-size:13px;color:#d6dfeb; }
+.brand-list .brand-shop { padding:5px 8px;border-radius:7px;background:#16324a;color:#cfe6ff;font-size:12px; }
+.guide-fun { margin:18px 0 0;padding:10px 12px;border-radius:10px;background:#2a2017;color:#f2dcb8;font-size:13px; }
+.guide-open { padding:3px 9px;border:1px solid #3c5a7a;border-radius:999px;background:#132238;color:#a9d3ff;font-size:11px;font-weight:800;cursor:pointer; }
+.guide-open:hover { border-color:#e4b35c;color:#ffd98a; }
+
+.guide-library { display:grid;gap:18px; }
+.guide-library h3 { margin:0 0 8px;font:700 19px Georgia,serif; }
+.guide-cards { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px; }
+.guide-card { display:grid;gap:4px;padding:12px 14px;border:1px solid #3a4a60;border-radius:12px;background:#16243a;color:#e6ecf4;text-align:left;cursor:pointer; }
+.guide-card:hover { border-color:#e4b35c; }
+.guide-card b { font:700 16px Georgia,serif; }
+.guide-card small { color:#e4b35c;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase; }
+.guide-card span { color:#aebbd0;font-size:12px;line-height:1.4; }
+
+@media (max-width:700px) {
+  .guide-backdrop { padding:0;place-items:end stretch; }
+  .guide-sheet { max-height:100dvh;padding:18px 16px;border-radius:18px 18px 0 0; }
+  .guide-head h2 { font-size:25px; }
+  .guide-head-ingredient { grid-template-columns:70px 1fr; }
+  .guide-timeline li { grid-template-columns:1fr;gap:0; }
+  .recipe-card li { grid-template-columns:28px 1fr;gap:4px 8px; }
+  .card-action { grid-column:2; }
+  .card-amount { grid-column:2; }
+}
+
+/* Recipe book: what to do with each ingredient. */
+.formula-action { grid-column:1/-1;color:#aebbd0;font-size:11px;line-height:1.4; }
+.recipe-formula > div { grid-template-rows:auto auto auto;align-items:start;row-gap:4px;padding:10px; }
+.recipe-formula > div > .bottle-visual { grid-row:1 / span 2;width:52px;height:52px;margin:0; }
+.recipe-formula > div > b, .recipe-formula > div > span { grid-column:2;align-self:center; }
+.recipe-formula > div > .formula-action { grid-row:3; }
+.recipe-formula > div > .guide-open { grid-column:1 / -1;justify-self:start; }
+
+/* Brand bottle models in the order station (bottle sale) and the stock room. */
+.hero-brand-model { position:relative;width:118px;height:236px;margin:20px auto 0; }
+.hero-brand-model em { position:absolute;right:-6px;top:40%;padding:3px 8px;border-radius:999px;background:#1b2940;color:#ffd98a;font-size:12px;font-style:normal;font-weight:800; }
+.stock-brand-model { width:34px;height:68px;margin:6px auto 0; }
+@media (max-width:760px) { .hero-brand-model { width:80px;height:160px; } }
+
+/* Brand picker at the order station: house pour or a brand bottle from the shelf. */
+.brand-picker { display:flex;gap:6px;align-items:stretch;overflow-x:auto;padding:8px 12px 10px;border-bottom:1px solid #2c3b53;background:#0f1a2b;scrollbar-width:thin; }
+.brand-picker > small { flex:0 0 auto;align-self:center;margin-right:4px;color:#e4b35c;font-size:9px;font-weight:900;letter-spacing:.12em; }
+.brand-picker button { position:relative;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:6px;align-items:center;flex:0 0 auto;min-width:92px;padding:6px 10px;border:1px solid #33445e;border-radius:10px;background:#15223a;color:#dbe3ee;text-align:left;cursor:pointer; }
+.brand-picker button b { grid-column:2;font-size:12px; }
+.brand-picker button em { grid-column:2;color:#8796ab;font-size:10px;font-style:normal; }
+.brand-picker .picker-bottle { grid-row:1 / span 2;width:16px;height:32px; }
+.brand-picker button.active { border-color:#e4b35c;background:linear-gradient(#3a2c1c,#2a2017); }
+.brand-picker button.wanted { box-shadow:inset 0 0 0 2px #6ab0f3; }
+.brand-picker button.classic::after { content:'classic';position:absolute;top:-7px;right:6px;padding:0 6px;border-radius:999px;background:#e4b35c;color:#24170f;font-size:9px;font-weight:900; }
+.progress-brand { display:block;color:#ffd98a;font-size:10px;font-style:normal;font-weight:700; }
+.progress-brand.need { color:#ff9f93; }
+.progress-brand.hint { color:#8fb7e0;font-weight:600; }
+.action-prop .pour-brand { width:100%;height:100%; }

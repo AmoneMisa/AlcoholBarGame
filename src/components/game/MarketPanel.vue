@@ -63,7 +63,7 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
         <p class="trade-feedback" aria-live="polite">{{ game.message }}</p>
       </aside>
     </div>
-    <section class="incoming-deliveries"><div><small>SUPPLY ROUTES</small><h3>Incoming deliveries</h3></div><button type="button" @click="game.nextDay()">Next shift · rent {{ game.region.rentPerDay }} coins →</button><p v-if="!game.deliveryOrders.length">No orders in transit.</p><article v-for="order in game.deliveryOrders" :key="order.id"><UiIcon name="truck" /><div><b>{{ order.supplier }}</b><span>{{ game.bars[order.barId].name }} · {{ order.items.length }} products</span></div><strong>{{ order.dueShift - game.currentShift }} shifts left</strong></article></section>
+    <section class="incoming-deliveries"><div><small>SUPPLY ROUTES · REAL TIME</small><h3>Incoming deliveries</h3></div><p v-if="!game.deliveryOrders.length">No orders in transit.</p><article v-for="order in game.deliveryOrders" :key="order.id"><UiIcon name="truck" /><div><b>{{ order.supplier }}</b><span>{{ game.bars[order.barId].name }} · {{ order.items.length }} products</span></div><strong>{{ game.deliveryCountdown(order.dueAt) }}</strong></article></section>
     <div class="trade-log"><small>RECENT TRADES</small><span v-for="(entry,index) in game.tradeLog.slice(0,3)" :key="index">{{ entry }}</span></div>
   </article>
 </template>

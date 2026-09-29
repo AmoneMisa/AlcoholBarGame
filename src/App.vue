@@ -5,6 +5,8 @@ import ConversationPopup from './components/conversation/ConversationPopup.vue';
 import BarScene from './components/game/BarScene.vue';
 import ManagementDeck from './components/game/ManagementDeck.vue';
 import TopHud from './components/game/TopHud.vue';
+import LearningPage from './components/learning/LearningPage.vue';
+import GuideSheet from './components/knowledge/GuideSheet.vue';
 import UiIcon from './components/ui/UiIcon.vue';
 import { useGameStore } from './stores/game';
 
@@ -13,6 +15,7 @@ const view = ref('service');
 const managementView = ref('inventory');
 const nav = [
   { id: 'service', label: 'Service', mark: 'glass' },
+  { id: 'english', label: 'English', mark: 'chat' },
   { id: 'inventory', label: 'Stock', mark: 'stock' },
   { id: 'market', label: 'Market', mark: 'basket' },
   { id: 'recipes', label: 'Recipes', mark: 'book' },
@@ -23,7 +26,7 @@ const nav = [
 
 function selectView(id: string) {
   view.value = id;
-  if (id !== 'service') managementView.value = id;
+  if (id !== 'service' && id !== 'english') managementView.value = id;
 }
 </script>
 
@@ -35,9 +38,11 @@ function selectView(id: string) {
         <BarScene :active="view === 'service'" />
         <CocktailWorkspace />
       </section>
-      <ManagementDeck v-show="view !== 'service'" :active-view="managementView" />
+      <LearningPage v-if="view === 'english'" />
+      <ManagementDeck v-show="view !== 'service' && view !== 'english'" :active-view="managementView" />
     </main>
     <ConversationPopup v-if="game.conversationCustomerId" />
+    <GuideSheet />
     <nav class="game-nav" aria-label="Game views">
       <button v-for="item in nav" :key="item.id" :class="{ active: view === item.id }" type="button" @click="selectView(item.id)"><UiIcon :name="item.mark" /><b>{{ item.label }}</b></button>
     </nav>

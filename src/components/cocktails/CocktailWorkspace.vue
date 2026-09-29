@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { useGuide } from '../../composables/useGuide';
 import { INGREDIENTS } from '../../domain/catalog';
+import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleTotal } from '../../domain/bottleCatalog';
+import BrandBottle from '../knowledge/BrandBottle.vue';
+import { guideIdForProduct } from '../../data/knowledge/alcohol';
+import { sameBrand, signatureFor } from '../../domain/brandPours';
 import { useGameStore } from '../../stores/game';
 import { haptic } from '../../telegram/webapp';
 import BottleModel from './BottleModel.vue';
 import GlassModel from './GlassModel.vue';
 
 const game = useGameStore();
+const { openGuide } = useGuide();
 const selectedIngredient = ref<string>();
 const ingredientCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh'>('all');
 const action = ref<'idle' | 'pouring' | 'shaking' | 'garnishing' | 'serving'>('idle');
@@ -24,7 +30,7 @@ let actionTimer: number | undefined;
 const categoryOf = (id: string) => {
   const ingredient = INGREDIENTS.find((item) => item.id === id)!;
   if (ingredient.category === 'spirit') return 'spirit';
-  if (ingredient.category === 'mixer' && !['sugar-syrup', 'coconut-cream'].includes(id)) return 'mixer';
+  if (ingredient.category === 'mixer' && !['sugar-syrup', 'coconut-cream', 'milk', 'coconut-milk'].includes(id)) return 'mixer';
   return 'fresh';
 };
 const ingredients = computed(() => INGREDIENTS.filter((item) => ingredientCategory.value === 'all' || categoryOf(item.id) === ingredientCategory.value));
@@ -41,7 +47,8 @@ const colorMap: Record<string, string> = {
   'white-rum': '#e9e1b5', 'dark-rum': '#8a3e1f', gin: '#dce8d7', vodka: '#dce7ed', tequila: '#e5c675', whiskey: '#a94e21',
   'orange-liqueur': '#ed8c28', vermouth: '#d9b071', 'bitter-aperitif': '#cb3740', 'sparkling-wine': '#f1d784', 'coffee-liqueur': '#4a2119',
   'lime-juice': '#a9cf54', 'lemon-juice': '#ead45a', 'pineapple-juice': '#edbd3c', 'cranberry-juice': '#cc3152', 'sugar-syrup': '#f2e6c0',
-  'coconut-cream': '#efe6d4', tonic: '#d8e8dc', soda: '#dbe9e8', cola: '#572a1e', 'ginger-beer': '#d59535', 'grapefruit-soda': '#e88779'
+  'blue-curacao': '#169bd5', 'herbal-liqueur': '#557137', 'specialty-liqueur': '#8cbf39', 'fruit-wine': '#cb526e', 'alcohol-free-beer': '#d6aa32',
+  'coconut-cream': '#efe6d4', milk: '#f4f0e8', 'coconut-milk': '#eee5d7', tonic: '#d8e8dc', soda: '#dbe9e8', cola: '#572a1e', 'ginger-beer': '#d59535', 'grapefruit-soda': '#e88779'
 };
 const liquidColor = computed(() => {
   const liquids = game.currentMix.filter((item) => INGREDIENTS.find((ingredient) => ingredient.id === item.ingredientId)?.unit === 'ml');
@@ -58,9 +65,18 @@ const liquidColor = computed(() => {
 });
 const ice = computed(() => game.currentMix.find((item) => item.ingredientId === 'ice')?.amount ?? 0);
 const selected = computed(() => INGREDIENTS.find((item) => item.id === selectedIngredient.value));
+// Brand choice for spirits: “House” pour or a brand bottle from the shelf.
+const brandChoices = computed(() => selectedIngredient.value ? game.shelfBrandsFor(selectedIngredient.value) : []);
+const servedProduct = computed(() => game.customer.orderKind === 'serve' ? ALCOHOL_PRODUCTS.find((item) => item.id === game.customer.serveRequest?.productId) : undefined);
+const pourProduct = (ingredientId: string) => ALCOHOL_PRODUCTS.find((item) => item.id === game.pourBrands[ingredientId]);
+const bottleStockOf = (productId: string) => game.bottleInventory.find((item) => item.productId === productId)?.quantity ?? 0;
+const classicBrand = (ingredientId: string) => game.customer.orderRevealed && game.customer.orderKind !== 'serve' ? signatureFor(game.recipe.id, ingredientId)?.brand : undefined;
+const selectedPour = computed(() => selectedIngredient.value ? pourProduct(selectedIngredient.value) : undefined);
 const currentStep = computed(() => !game.currentMix.length ? 1 : !game.shaken && game.recipe.needsShake ? 2 : 3);
 const hasBubbles = computed(() => game.currentMix.some((item) => ['soda', 'tonic', 'ginger-beer', 'grapefruit-soda', 'sparkling-wine'].includes(item.ingredientId)));
 const garnish = computed(() => game.currentMix.some((item) => item.ingredientId === 'mint') ? 'mint' : game.currentMix.some((item) => ['lime-wedge', 'orange', 'pineapple-wedge'].includes(item.ingredientId)) ? 'citrus' : '');
+const activeBottle = computed(() => ALCOHOL_PRODUCTS.find((item) => item.id === game.customer.selectedBottleId));
+const activeBottleStock = computed(() => game.bottleInventory.find((item) => item.productId === activeBottle.value?.id)?.quantity ?? 0);
 
 // One timer for every station action, so a new tap never gets cut off by an older reset.
 function setAction(next: typeof action.value, resetAfter?: number) {
@@ -172,9 +188,27 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="cocktail-workspace game-panel">
+  <section v-if="!game.hasCustomer" class="cocktail-workspace waiting-station game-panel">
+    <div class="waiting-station-clock"><small>NEXT CUSTOMER</small><b>{{ game.nextCustomerCountdown }}</b></div>
+    <div><small>BAR PREP TIME</small><h2>The station is ready</h2><p>A new guest will arrive between five minutes and two hours after the previous customer leaves. Inventory, learning, recipes, market, and bar design remain available while you wait.</p></div>
+  </section>
+  <section v-else-if="game.customer.orderKind === 'bottle'" class="cocktail-workspace bottle-order-station game-panel">
     <header class="panel-heading ornate-heading">
-      <div><small>ORDER STATION</small><h2>{{ game.customer.orderRevealed ? `Craft ${game.recipe.name}` : 'Mystery order' }}</h2></div>
+      <div><small>BOTTLE RETAIL</small><h2>{{ game.customer.orderRevealed && activeBottle ? `Prepare ${activeBottle.brand}` : 'Customer consultation' }}</h2></div>
+      <span>{{ game.customer.orderRevealed ? 'Choice confirmed' : 'Ask · match · recommend' }}</span>
+    </header>
+    <div v-if="!game.customer.orderRevealed || !activeBottle" class="bottle-consultation-empty">
+      <div class="sealed-bottle-placeholder"><i></i><b>?</b></div>
+      <div><small>THE CUSTOMER NEEDS FULL, SEALED BOTTLES</small><h3>Discover the complete request</h3><p>Ask how many bottles they need, their total budget, preferred alcohol type and flavour, the occasion, and whether they have a favourite brand.</p><button class="primary-button" type="button" @click="game.openConversation(game.customer.id)">Continue the dialogue <span>→</span></button></div>
+    </div>
+    <div v-else class="confirmed-bottle-station">
+      <div class="hero-brand-model"><BrandBottle :brand="activeBottle.brand" :category="guideIdForProduct(activeBottle)" :color="activeBottle.color" /><em>{{ activeBottle.abv }}%</em></div>
+      <div><small>MOST COVERED MATCH</small><h3>{{ activeBottle.name }}</h3><p>{{ activeBottle.description }}</p><div class="bottle-sale-facts"><span>{{ ALCOHOL_TYPE_LABELS[activeBottle.type] }}</span><span>{{ activeBottle.volumeMl }} ml</span><span>{{ activeBottle.abv }}% ABV</span><span>{{ activeBottleStock }} in stock</span></div><strong>{{ game.customer.bottleRequest?.quantity }} bottle{{ game.customer.bottleRequest?.quantity === 1 ? '' : 's' }} · {{ bottleTotal(activeBottle, game.customer.bottleRequest?.quantity ?? 1, game.region.marketFactor) }} coins</strong><button class="primary-button" type="button" @click="game.openConversation(game.customer.id)">Return to customer and sell <span>→</span></button></div>
+    </div>
+  </section>
+  <section v-else class="cocktail-workspace game-panel">
+    <header class="panel-heading ornate-heading">
+      <div><small>ORDER STATION</small><h2>{{ game.customer.orderRevealed ? `Craft ${game.recipe.name}` : 'Mystery order' }}</h2><button v-if="servedProduct" type="button" class="guide-open" @click="openGuide('ingredient', guideIdForProduct(servedProduct))">About {{ servedProduct.brand }}</button><button v-else-if="game.customer.orderRevealed" type="button" class="guide-open" @click="openGuide('cocktail', game.recipe.id)">About this drink</button></div>
       <span>Step {{ currentStep }} / 3</span>
     </header>
     <div class="ingredient-shelf-toolbar">
@@ -188,12 +222,21 @@ onBeforeUnmount(() => {
         <span>{{ ingredient.name }}</span><small>+{{ incrementFor(ingredient.id) }} {{ ingredient.unit }}</small>
       </button>
     </div>
+    <div v-if="brandChoices.length && selected" class="brand-picker" role="group" :aria-label="`Brand for ${selected.name}`">
+      <small>BRAND FOR {{ selected.name.toUpperCase() }}</small>
+      <button type="button" :class="{ active: !game.pourBrands[selected.id] }" @click="game.setPourBrand(selected.id)"><b>House</b><em>bar stock</em></button>
+      <button v-for="product in brandChoices" :key="product.id" type="button" :class="{ active: game.pourBrands[selected.id] === product.id, wanted: servedProduct?.id === product.id, classic: !!classicBrand(selected.id) && sameBrand(product.brand, classicBrand(selected.id)!) }" @click="game.setPourBrand(selected.id, product.id)">
+        <span class="picker-bottle"><BrandBottle :brand="product.brand" :category="guideIdForProduct(product)" :color="product.color" /></span>
+        <b>{{ product.brand }}</b><em>{{ bottleStockOf(product.id) }} on shelf{{ servedProduct?.id === product.id ? ' · guest’s choice' : '' }}</em>
+      </button>
+    </div>
     <div class="workspace-main">
       <div ref="glassTarget" class="mixing-board" :class="{ 'drag-ready': draggingIngredientId, 'drag-over': dragOverGlass }">
         <div class="drop-instruction"><b>{{ dragOverGlass ? 'Pouring — release to stop' : draggingIngredientId ? 'Move over the glass' : 'Drag an ingredient here' }}</b><span>The glass calculates every measure</span></div>
         <div ref="glassStage" class="glass-stage" :style="pourGeometry">
           <div class="action-prop" :class="[`action-${action}`, { visible: selected && (action === 'pouring' || action === 'garnishing') }]">
-            <BottleModel v-if="selected" :ingredient="selected" />
+            <BrandBottle v-if="selected && selectedPour" class="pour-brand" :brand="selectedPour.brand" :category="guideIdForProduct(selectedPour)" :color="selectedPour.color" />
+            <BottleModel v-else-if="selected" :ingredient="selected" />
           </div>
           <div class="shaker-prop" :class="{ active: action === 'shaking' }"><i></i><i></i><i></i></div>
           <div class="pour-stream" :class="{ active: action === 'pouring' }" :style="{ '--stream-color': selected ? colorMap[selected.id] ?? '#d7c88c' : liquidColor }"></div>
@@ -206,7 +249,7 @@ onBeforeUnmount(() => {
         </div>
         <div v-else class="recipe-progress">
           <div v-for="part in game.recipe.ingredients" :key="part.ingredientId" :class="{ done: game.currentMix.find((item) => item.ingredientId === part.ingredientId)?.amount === part.amount, wrong: (game.currentMix.find((item) => item.ingredientId === part.ingredientId)?.amount ?? 0) > part.amount }">
-            <span>{{ INGREDIENTS.find((item) => item.id === part.ingredientId)?.name }}</span>
+            <span>{{ INGREDIENTS.find((item) => item.id === part.ingredientId)?.name }}<i v-if="pourProduct(part.ingredientId)" class="progress-brand">{{ pourProduct(part.ingredientId)!.brand }}</i><i v-else-if="servedProduct?.ingredientId === part.ingredientId" class="progress-brand need">choose {{ servedProduct.brand }}</i><i v-else-if="classicBrand(part.ingredientId)" class="progress-brand hint">classic: {{ classicBrand(part.ingredientId) }}</i></span>
             <b>{{ game.currentMix.find((item) => item.ingredientId === part.ingredientId)?.amount ?? 0 }} / {{ part.amount }}</b>
           </div>
         </div>
