@@ -18,8 +18,9 @@ export function nextVipAvailability(now = Date.now(), random = Math.random) {
   return now + between(VIP_COOLDOWN_MIN_MS, VIP_COOLDOWN_MAX_MS, random);
 }
 
-export function canWelcomeVip(now: number, cooldownUntil: number, random = Math.random) {
-  return now >= cooldownUntil && random() < VIP_CHANCE;
+// The chance grows with the bar's level (see progression.ts); VIP_CHANCE is the fallback.
+export function canWelcomeVip(now: number, cooldownUntil: number, random = Math.random, chance = VIP_CHANCE) {
+  return now >= cooldownUntil && random() < chance;
 }
 
 export function vipCarriesRecipe(hasLockedRecipes: boolean, random = Math.random) {

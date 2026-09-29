@@ -6,6 +6,7 @@
 .venue-card b { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 .top-hud { grid-template-columns:minmax(230px,1fr) auto 130px 48px; }
 .hud-resources .ui-icon { width:28px;height:28px;color:#f8c865; }
+.hud-resources .crystal-resource .ui-icon { color:#77ddf4;filter:drop-shadow(0 0 5px #38bde488); }
 .hud-resources > div,.daily-hud-gift { display:flex;align-items:center;gap:9px;padding:8px 14px; }
 .daily-hud-gift { border:0;border-left:1px solid #354762;background:transparent;color:#fff4df;text-align:left;cursor:pointer; }
 .daily-hud-gift span b { display:block;white-space:nowrap; }

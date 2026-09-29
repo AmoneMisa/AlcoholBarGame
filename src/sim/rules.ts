@@ -1,9 +1,9 @@
 import { INGREDIENTS, MODIFIERS, RECIPES, REGIONS, SUPPLIERS } from '../domain/catalog';
-import { ALCOHOL_PRODUCTS, bottleTotal } from '../domain/bottleCatalog';
-import { calendarDate, coins, consecutiveDays, dailyCoinsFor, quotePurchase } from '../domain/economy';
+import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost, bottleSaleCrystalReward, bottleTotal, brandedServeCrystalReward } from '../domain/bottleCatalog';
+import { arrivalSkipCrystalCost, calendarDate, coins, consecutiveDays, conversationCrystalReward, crystalExchange, dailyCoinsFor, dailyCrystalsFor, quotePurchase, recipePurchase } from '../domain/economy';
 import { withArticle } from '../domain/english/articles';
-import { BAR_PROFILE_OPTIONS } from '../data/cosmetics/bars';
-import { consumeMix, createMarket, generateCustomer, judgeMix, requiredRecipe } from '../domain/engine';
+import { BAR_PROFILE_OPTIONS, INTERIORS } from '../data/cosmetics/bars';
+import { consumeMix, generateCustomer, judgeMix, requiredRecipe } from '../domain/engine';
 import type { Customer, InventoryItem, Recipe, RegionId } from '../domain/types';
 import { pourableBrand, replyToServe, serveName, serveRequestText, substitutesFor } from '../domain/brandServe';
 import { signatureBonus } from '../domain/brandPours';
@@ -11,7 +11,8 @@ import { bottleMatchesRequest, bottleOpeningLine, findBottleMention, replyToBott
 import { buildProfile, findRecipeMention, openingLine, replyTo, shortWish, type CustomerReply } from '../domain/conversation/customerTalk';
 import { serviceReply } from '../domain/conversation/serviceTalk';
 import { canWelcomeVip, nextCustomerArrival, nextVipAvailability, orderTimeSeconds, vipCarriesRecipe } from '../domain/customerTiming';
-import { DELIVERY_DAY_MS, levelFor, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
+import { economyAt, marketFor } from '../domain/progression';
+import { DELIVERY_DAY_MS, levelFor, normalizePlayerState, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
 
 // Game rules as pure state transitions. The server runs these for every request, so the client can only
 // ask for an action — it can never set coins, stock, XP or timers itself. Every payload is treated as untrusted.
@@ -23,7 +24,11 @@ export type GameAction =
   | { type: 'sell'; cart: Record<string, number> }
   | { type: 'transfer'; ingredientId: string; targetId: RegionId; amount?: number }
   | { type: 'claimDaily' }
+  | { type: 'exchangeCrystals'; crystals: number }
   | { type: 'buyRecipe'; recipeId: string }
+  | { type: 'buyInterior'; interiorId: string }
+  | { type: 'buyBottleStock'; productId: string; quantity?: number }
+  | { type: 'expediteCustomer' }
   | { type: 'switchBar'; regionId: RegionId }
   | { type: 'renameBar'; name: string }
   | { type: 'renameBartender'; name: string }
@@ -76,21 +81,35 @@ function makeSpecialCustomer(recipe: Recipe, level: number): Customer {
   };
 }
 
+const economyOf = (state: PlayerState, now: number) => {
+  const region = REGIONS.find((item) => item.id === state.regionId)!;
+  return economyAt(region.id, region.marketFactor, state.xp, now);
+};
+// What this guest pays relative to catalog prices (fixed when they walked in, so budgets always match).
+const priceFactorOf = (guest: Customer | undefined, marketFactor: number) => guest?.priceFactor ?? marketFactor;
+
+// Higher levels bring guests sooner; city events (Hot Time, storms...) speed them up or slow them down.
+function nextArrival(state: PlayerState, now: number, random: () => number) {
+  return now + Math.round((nextCustomerArrival(now, random) - now) * economyOf(state, now).arrival);
+}
+
 function makeArrivingCustomer(state: PlayerState, now: number, random: () => number) {
   const level = levelFor(state.xp);
-  const marketFactor = REGIONS.find((region) => region.id === state.regionId)!.marketFactor;
-  if (canWelcomeVip(now, state.vipCooldownUntil, random)) {
-    state.vipCooldownUntil = nextVipAvailability(now, random);
+  const economy = economyOf(state, now);
+  const priceFactor = economy.guestPriceFactor;
+  const priced = (customer: Customer) => { customer.priceFactor = priceFactor; return customer; };
+  if (canWelcomeVip(now, state.vipCooldownUntil, random, economy.vipChance)) {
+    state.vipCooldownUntil = now + Math.round((nextVipAvailability(now, random) - now) * economy.vipCooldown);
     const locked = lockedRecipes(state);
-    if (vipCarriesRecipe(locked.length > 0, random)) return withUniqueLook(makeSpecialCustomer(locked[Math.floor(random() * locked.length)]!, level), []);
-    const vip = withUniqueLook(generateCustomer(level, knownRecipes(state), .35, marketFactor), []);
+    if (vipCarriesRecipe(locked.length > 0, random)) return priced(withUniqueLook(makeSpecialCustomer(locked[Math.floor(random() * locked.length)]!, level), []));
+    const vip = withUniqueLook(generateCustomer(level, knownRecipes(state), .35, priceFactor), []);
     vip.mood = 'vip';
     vip.greeting = 'Good evening. I was told this bar is exceptional.';
     vip.patience = orderTimeSeconds('vip', vip.orderKind);
     vip.patienceRemaining = vip.patience;
-    return vip;
+    return priced(vip);
   }
-  return withUniqueLook(generateCustomer(level, knownRecipes(state), .35, marketFactor), []);
+  return priced(withUniqueLook(generateCustomer(level, knownRecipes(state), .35, priceFactor), []));
 }
 
 function welcomeNextCustomer(state: PlayerState, now: number, random: () => number) {
@@ -110,7 +129,7 @@ function scheduleNextCustomer(state: PlayerState, now: number, random: () => num
   }
   state.customers = [];
   state.activeCustomerId = '';
-  state.nextCustomerAt = nextCustomerArrival(now, random);
+  state.nextCustomerAt = nextArrival(state, now, random);
   state.lastClockAt = now;
   state.conversationCustomerId = undefined;
 }
@@ -129,6 +148,7 @@ function processDeliveries(state: PlayerState, now: number) {
 
 // Time passes on the server clock only: deliveries arrive, patience runs down, the next guest walks in.
 export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now' | 'random' | 'spawnCustomers'>) {
+  normalizePlayerState(state);
   state.conversations ??= {};
   const now = context.now;
   const random = context.random ?? Math.random;
@@ -136,7 +156,7 @@ export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now
   if (!state.customers.length) {
     state.lastClockAt = now;
     if (context.spawnCustomers !== false && state.nextCustomerAt && now >= state.nextCustomerAt) welcomeNextCustomer(state, now, random);
-    else if (!state.nextCustomerAt) state.nextCustomerAt = nextCustomerArrival(now, random);
+    else if (!state.nextCustomerAt) state.nextCustomerAt = nextArrival(state, now, random);
     return;
   }
   // Whole seconds only; the remainder carries over to the next tick.
@@ -175,6 +195,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
   if (!action || typeof action !== 'object' || typeof action.type !== 'string') throw new RuleError('Unknown action.');
   advanceClock(state, context);
   const moneyBefore = state.money;
+  const crystalsBefore = state.crystals;
   const guest = currentCustomer(state);
   const region = REGIONS.find((item) => item.id === state.regionId)!;
 
@@ -197,7 +218,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       if (!guest || state.conversationCustomerId !== guest.id) throw new RuleError('Open a conversation first.');
       const text = cleanText(action.text, 240);
       if (text.length < 3) throw new RuleError('Write a sentence first.');
-      say(state, guest, text, context, region.marketFactor);
+      say(state, guest, text, context, priceFactorOf(guest, region.marketFactor));
       break;
     }
 
@@ -207,14 +228,16 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       if (!guest || guest.orderKind !== 'bottle' || !guest.orderRevealed || !request || !product) throw new RuleError('Confirm the customer’s bottle choice first.');
       const stock = bottleStock(state, product.id);
       if (!stock || stock.quantity < request.quantity) throw new RuleError(`Only ${stock?.quantity ?? 0} bottles of ${product.name} are in this bar.`);
-      const revenue = bottleTotal(product, request.quantity, region.marketFactor);
+      const revenue = bottleTotal(product, request.quantity, priceFactorOf(guest, region.marketFactor));
       if (revenue > request.budget) throw new RuleError(`The ${revenue} coin total is over the customer’s ${request.budget} coin budget.`);
       stock.quantity -= request.quantity;
-      const tip = guest.mood === 'vip' || guest.mood === 'wealthy' ? Math.ceil(revenue * .1) : Math.ceil(revenue * .04);
+      const tip = Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .1 : .04) * economyOf(state, now).tips);
       state.money = coins(state.money + revenue + tip);
+      const crystalPayment = bottleSaleCrystalReward(product, request.quantity);
+      state.crystals += crystalPayment;
       state.xp += 28 + Math.min(state.streak * 2, 14);
       state.streak += 1;
-      const note = `Sold ${request.quantity} × ${product.name} for ${revenue.toFixed(2)} coins. Tip +${tip}.`;
+      const note = `Sold ${request.quantity} × ${product.name} for ${revenue.toFixed(2)} coins and ${crystalPayment} crystals. Tip +${tip}.`;
       scheduleNextCustomer(state, now, random);
       state.message = note;
       break;
@@ -222,7 +245,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'offerSimilar': {
       const target = state.customers.find((item) => item.id === action.customerId);
       if (!target) throw new RuleError('This guest is no longer here.');
-      offerSimilar(state, target, region.marketFactor);
+      offerSimilar(state, target, priceFactorOf(target, region.marketFactor));
       const transcript = ensureTranscript(state, target);
       addLine(transcript, 'bartender', 'I’m sorry, we cannot serve that order. May I offer you something similar?', { ok: true });
       addLine(transcript, 'customer', target.request);
@@ -264,15 +287,21 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.inventories[state.regionId] = consumeMix(inventoryOf(state), mix);
       const verdict = judgeMix(mix, guest, action.shaken === true);
       if (verdict.success) {
-        const revenue = coins(verdict.recipe.price * region.marketFactor);
+        const revenue = coins(verdict.recipe.price * priceFactorOf(guest, region.marketFactor));
         const bonus = guest.orderKind === 'serve' ? undefined : signatureBonus(verdict.recipe.id, pourBrands);
-        const tip = (guest.mood === 'vip' || guest.mood === 'wealthy' ? Math.ceil(revenue * .25) : Math.ceil(revenue * .12)) + (bonus ? 2 : 0);
+        const tip = Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .25 : .12) * economyOf(state, now).tips) + (bonus ? 2 : 0);
         state.money = coins(state.money + revenue + tip);
         state.xp += 22 + Math.min(state.streak * 2, 14);
         state.streak += 1;
+        const serveProduct = serve ? ALCOHOL_PRODUCTS.find((item) => item.id === serve.productId) : undefined;
+        const brandedPayment = serveProduct ? brandedServeCrystalReward(serveProduct) : 0;
+        const specialPayment = guest.specialRecipeRewardId || guest.mood === 'vip' ? conversationCrystalReward(guest, verdict.recipe) : 0;
+        const crystalPayment = brandedPayment + specialPayment;
+        state.crystals += crystalPayment;
         const unlocked = guest.specialRecipeRewardId ? unlockRecipe(state, guest.specialRecipeRewardId, 'special-client') : false;
-        const note = unlocked ? `Perfect service. ${verdict.recipe.name} was added to your recipe book!`
-          : bonus ? `Perfect service — classic touch with ${bonus}! Tip +${tip} coins.` : `Perfect service. Tip +${tip} coins.`;
+        const crystalNote = crystalPayment ? ` +${crystalPayment} crystals.` : '';
+        const note = unlocked ? `Perfect service. ${verdict.recipe.name} was added to your recipe book!${crystalNote}`
+          : bonus ? `Perfect service — classic touch with ${bonus}! Tip +${tip} coins.${crystalNote}` : `Perfect service. Tip +${tip} coins.${crystalNote}`;
         scheduleNextCustomer(state, now, random);
         state.message = note;
       } else {
@@ -286,8 +315,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'buy': {
       const supplier = SUPPLIERS.find((item) => item.id === action.supplierId);
       if (!supplier) throw new RuleError('Unknown supplier.');
-      // Prices come from the server's own market for this bar and day, never from the client.
-      const quote = quotePurchase(createMarket(region, new Date(now).getDate()), cleanCart(action.cart, 99), supplier);
+      // Prices come from the server's own market for this bar, day, level and city event, never from the client.
+      const quote = quotePurchase(marketFor(region, now, state.xp), cleanCart(action.cart, 99), supplier);
       if (!quote.lines.length) throw new RuleError('Add packs to your order first.');
       if (state.money < quote.total) throw new RuleError('You do not have enough money.');
       state.money = coins(state.money - quote.total);
@@ -298,10 +327,11 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     }
     case 'sell': {
       const cart = cleanCart(action.cart, 100_000);
+      const economy = economyOf(state, now);
       const lines = Object.entries(cart).map(([ingredientId, quantity]) => {
         const item = INGREDIENTS.find((entry) => entry.id === ingredientId)!;
         const available = inventoryOf(state).find((stock) => stock.ingredientId === ingredientId)?.amount ?? 0;
-        return { ingredientId, quantity, available, revenue: coins(item.basePrice * quantity * region.marketFactor * .55) };
+        return { ingredientId, quantity, available, revenue: coins(item.basePrice * quantity * region.marketFactor * .55 * economy.buybackFactor(ingredientId)) };
       });
       if (!lines.length) throw new RuleError('Choose stock to sell first.');
       if (lines.some((line) => line.quantity > line.available)) throw new RuleError('Some stock is no longer available. Adjust your sale.');
@@ -334,14 +364,16 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.loginStreak = consecutiveDays(state.dailyGiftClaimedKey, state.loginStreak, new Date(now));
       const reward = dailyCoinsFor(state.loginStreak);
       state.money = coins(state.money + reward);
+      const crystalReward = dailyCrystalsFor(state.loginStreak);
+      state.crystals += crystalReward;
       state.dailyGiftClaimedKey = today;
       const locked = lockedRecipes(state);
       if (locked.length && random() < .12) {
         const recipe = locked[Math.floor(random() * locked.length)]!;
         unlockRecipe(state, recipe.id, 'daily-gift');
-        state.dailyGiftResult = `Day ${state.loginStreak}: +${reward} coins and a lucky ${recipe.name} recipe!`;
+        state.dailyGiftResult = `Day ${state.loginStreak}: +${reward} coins${crystalReward ? `, +${crystalReward} crystals` : ''} and a lucky ${recipe.name} recipe!`;
       } else {
-        state.dailyGiftResult = `Day ${state.loginStreak}: +${reward} coins. Come back tomorrow to grow your streak.`;
+        state.dailyGiftResult = `Day ${state.loginStreak}: +${reward} coins${crystalReward ? ` and +${crystalReward} crystals` : ''}. Come back tomorrow to grow your streak.`;
       }
       state.message = state.dailyGiftResult;
       break;
@@ -349,11 +381,60 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'buyRecipe': {
       const recipe = RECIPES.find((item) => item.id === action.recipeId);
       if (!recipe || state.knownRecipeIds.includes(recipe.id)) throw new RuleError('This recipe is not for sale.');
-      const price = Math.round(recipe.price * 18);
-      if (state.money < price) throw new RuleError(`You need ${price} coins to buy this recipe.`);
-      state.money = coins(state.money - price);
+      const price = recipePurchase(recipe, RECIPES.indexOf(recipe));
+      if (price.currency === 'crystals') {
+        if (state.crystals < price.amount) throw new RuleError(`You need ${price.amount} crystals to buy this recipe.`);
+        state.crystals -= price.amount;
+      } else {
+        if (state.money < price.amount) throw new RuleError(`You need ${price.amount} coins to buy this recipe.`);
+        state.money = coins(state.money - price.amount);
+      }
       unlockRecipe(state, recipe.id, 'shop');
       state.message = `${recipe.name} added to your recipe book.`;
+      break;
+    }
+    case 'exchangeCrystals': {
+      const amount = cleanAmount(action.crystals, 250);
+      const bundle = crystalExchange(amount);
+      if (!bundle) throw new RuleError('Choose one of the available crystal exchange bundles.');
+      if (state.crystals < bundle.crystals) throw new RuleError(`You need ${bundle.crystals} crystals for this exchange.`);
+      state.crystals -= bundle.crystals;
+      state.money = coins(state.money + bundle.coins);
+      log(state, `Exchanged ${bundle.crystals} crystals for ${bundle.coins.toLocaleString('en-US')} coins.`);
+      break;
+    }
+    case 'buyInterior': {
+      const interior = INTERIORS.find((item) => item.id === action.interiorId);
+      if (!interior || interior.crystalCost <= 0 || state.ownedInteriorIds.includes(interior.id)) throw new RuleError('This background is not for sale.');
+      if (state.crystals < interior.crystalCost) throw new RuleError(`You need ${interior.crystalCost} crystals for ${interior.name}.`);
+      state.crystals -= interior.crystalCost;
+      state.ownedInteriorIds.push(interior.id);
+      state.bars[state.regionId].interior = interior.id;
+      state.message = `${interior.name} purchased and applied to ${state.bars[state.regionId].name}.`;
+      break;
+    }
+    case 'buyBottleStock': {
+      const product = ALCOHOL_PRODUCTS.find((item) => item.id === action.productId);
+      const quantity = cleanAmount(action.quantity ?? 1, 10);
+      const unitCost = product ? bottleRestockCrystalCost(product) : 0;
+      if (!product || !unitCost || !quantity) throw new RuleError('This bottle is not available in the crystal reserve market.');
+      const cost = unitCost * quantity;
+      if (state.crystals < cost) throw new RuleError(`You need ${cost} crystals to restock ${quantity} × ${product.name}.`);
+      state.crystals -= cost;
+      const stock = bottleStock(state, product.id);
+      if (stock) stock.quantity += quantity;
+      else state.bottleInventories[state.regionId].push({ productId: product.id, quantity });
+      log(state, `Restocked ${quantity} × ${product.name} for ${cost} crystals.`);
+      break;
+    }
+    case 'expediteCustomer': {
+      if (state.customers.length || !state.nextCustomerAt) throw new RuleError('A customer is already at the bar.');
+      const cost = arrivalSkipCrystalCost(state.nextCustomerAt - now);
+      if (cost <= 0) throw new RuleError('The next customer is already arriving.');
+      if (state.crystals < cost) throw new RuleError(`You need ${cost} crystals to welcome the next customer now.`);
+      state.crystals -= cost;
+      welcomeNextCustomer(state, now, random);
+      state.message = `The next customer arrived early for ${cost} crystals.`;
       break;
     }
 
@@ -380,6 +461,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'setDecor': {
       const allowed = (BAR_PROFILE_OPTIONS as Record<string, readonly string[]>)[action.key];
       if (!allowed || !allowed.includes(action.value)) throw new RuleError('That style is not available.');
+      if (action.key === 'interior' && !state.ownedInteriorIds.includes(action.value)) throw new RuleError('Purchase this background before using it.');
       (state.bars[state.regionId] as unknown as Record<string, string>)[action.key] = action.value;
       break;
     }
@@ -388,7 +470,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
   }
 
   if (!Number.isFinite(state.money) || state.money < 0) throw new RuleError('Not enough money.');
-  return { moneyDelta: coins(state.money - moneyBefore) };
+  if (!Number.isFinite(state.crystals) || state.crystals < 0) throw new RuleError('Not enough crystals.');
+  return { moneyDelta: coins(state.money - moneyBefore), crystalDelta: state.crystals - crystalsBefore };
 }
 
 function offerSimilar(state: PlayerState, target: Customer, marketFactor: number) {
@@ -456,7 +539,7 @@ function ensureTranscript(state: PlayerState, guest: Customer): Transcript {
   const opening = guest.orderKind === 'bottle' ? bottleOpeningLine(guest)
     : guest.orderKind === 'serve' || !recipe ? `${guest.greeting} ${guest.request}`
       : openingLine(guest, buildProfile(recipe));
-  const transcript: Transcript = { lines: [], facts: [], bottleFacts: {}, expression: 'thinking' };
+  const transcript: Transcript = { lines: [], facts: [], bottleFacts: {}, expression: 'thinking', attempts: 0, correct: 0 };
   addLine(transcript, 'customer', opening);
   state.conversations[guest.id] = transcript;
   return transcript;
@@ -465,9 +548,11 @@ function ensureTranscript(state: PlayerState, guest: Customer): Transcript {
 function say(state: PlayerState, guest: Customer, text: string, context: RuleContext, marketFactor: number) {
   const transcript = ensureTranscript(state, guest);
   const english = context.checkEnglish(text);
+  transcript.attempts++;
   state.languageStats.sentences++;
   if (english.ok) {
     state.languageStats.correct++;
+    transcript.correct++;
     const rewarded = state.rewardedSentences[guest.id] ?? 0;
     if (rewarded < MAX_REWARDED_SENTENCES) {
       state.rewardedSentences[guest.id] = rewarded + 1;
@@ -517,6 +602,12 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
       if (!guest.orderRevealed) state.xp += 10;
       guest.orderRevealed = true;
       state.message = `${guest.name} ordered: ${recipe?.name ?? 'a drink'}. Time to mix!`;
+    }
+    if (!transcript.perfectRewardClaimed && transcript.attempts > 0 && transcript.correct === transcript.attempts) {
+      const reward = conversationCrystalReward(guest, recipe);
+      state.crystals += reward;
+      transcript.perfectRewardClaimed = true;
+      state.message += ` Perfect English: +${reward} crystals.`;
     }
   }
   if (reply.wrongGuess) guest.patienceRemaining = Math.max(1, guest.patienceRemaining - 30);

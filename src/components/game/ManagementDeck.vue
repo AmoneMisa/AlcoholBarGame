@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { INGREDIENTS, RECIPES, REGIONS, recipeAlcoholLabel } from '../../domain/catalog';
-import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS } from '../../domain/bottleCatalog';
+import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleSaleCrystalReward } from '../../domain/bottleCatalog';
 import BrandBottle from '../knowledge/BrandBottle.vue';
 import { guideIdForProduct } from '../../data/knowledge/alcohol';
 import { BARTENDER_FACES, BODY_SHAPES, BUST_OPTIONS, COUNTER_COLORS, COUNTER_MATERIALS, COUNTER_SIZES, HAIR_COLORS, HAIR_STYLES, HIGHLIGHTS, HIGHLIGHT_STRENGTHS, INTERIORS, MAKEUP_OPTIONS, POSES, SKIN_DETAILS, WALLS, interiorStyle } from '../../data/cosmetics/bars';
@@ -48,6 +48,11 @@ const outfitLabel = (outfit: 'vest' | 'shirt' | 'apron') => ({
   leo: { vest: 'Velvet vest', shirt: 'Open shirt', apron: 'Tattoo apron' }
 }[selectedBartender.value][outfit]);
 const isRecipeKnown = (id: string) => game.knownRecipeIds.includes(id);
+const isInteriorOwned = (id: string) => game.ownedInteriorIds.includes(id);
+const recipePriceLabel = (id: string) => {
+  const price = game.recipePrice(id);
+  return `${price.amount} ${price.currency}`;
+};
 function selectBartender(id: 'noa' | 'leo') {
   const oldDefault = selectedBartender.value === 'leo' ? 'Leo' : 'Noa';
   game.decor.bartenderCharacter = id;
@@ -100,8 +105,9 @@ function selectBartender(id: 'noa' | 'leo') {
         <div class="sealed-stock-grid">
           <article v-for="stock in game.bottleInventory" :key="stock.productId">
             <div class="stock-brand-model"><BrandBottle :brand="bottleById(stock.productId).brand" :category="guideIdForProduct(bottleById(stock.productId))" :color="bottleById(stock.productId).color" /></div>
-            <div><small>{{ ALCOHOL_TYPE_LABELS[bottleById(stock.productId).type] }} · {{ bottleById(stock.productId).abv }}% ABV</small><b>{{ bottleById(stock.productId).name }}</b><span>{{ bottleById(stock.productId).volumeMl }} ml · retail {{ (bottleById(stock.productId).price * game.region.marketFactor).toFixed(2) }}</span></div>
+            <div><small>{{ ALCOHOL_TYPE_LABELS[bottleById(stock.productId).type] }} · {{ bottleById(stock.productId).abv }}% ABV</small><b>{{ bottleById(stock.productId).name }}</b><span>{{ bottleById(stock.productId).volumeMl }} ml · customer pays {{ (bottleById(stock.productId).price * game.economy.guestPriceFactor).toFixed(2) }} coins + ◆ {{ bottleSaleCrystalReward(bottleById(stock.productId)) }}</span></div>
             <strong>{{ stock.quantity }}×</strong>
+            <button v-if="game.bottleCrystalCost(stock.productId)" class="reserve-restock" type="button" :disabled="game.crystals < game.bottleCrystalCost(stock.productId)" @click="game.buyBottleStock(stock.productId)">+1 reserve · ◆ {{ game.bottleCrystalCost(stock.productId) }}</button>
           </article>
         </div>
       </section>
@@ -116,9 +122,9 @@ function selectBartender(id: 'noa' | 'leo') {
           <div class="unlock-intro"><small>HOW THE RECIPE BOOK GROWS</small><h3>Ten classics start your journey</h3><p>Every cocktail appears in the catalog. Advanced lessons stay locked until you discover them, then reveal the complete story, guest profile, ingredients and cooking path.</p></div>
           <div><b>1</b><strong>Recipe shop</strong><span>Spend service earnings on a recipe you want next.</span></div>
           <div><b>2</b><strong>Special client</strong><span>Serve their secret order correctly and they teach it to you.</span></div>
-          <div class="daily-gift-card"><b>3</b><strong>Daily gift · day {{ game.upcomingLoginDay }}</strong><span>150–1,000 coins for consecutive logins. A recipe may drop as an extra gift (12% chance). Missing a day resets the streak.</span><button type="button" :disabled="!game.dailyGiftAvailable" @click="game.claimDailyGift()">{{ game.dailyGiftAvailable ? `Claim ${game.dailyCoinReward} coins` : 'Gift claimed today' }}</button><em>{{ game.dailyGiftResult }}</em></div>
+          <div class="daily-gift-card"><b>3</b><strong>Daily gift · day {{ game.upcomingLoginDay }}</strong><span>150–1,000 coins for consecutive logins. Day 3 adds 45 crystals and day 7 adds 120. A recipe may drop as an extra gift (12% chance).</span><button type="button" :disabled="!game.dailyGiftAvailable" @click="game.claimDailyGift()">{{ game.dailyGiftAvailable ? `Claim ${game.dailyCoinReward} coins${game.dailyCrystalReward ? ` + ${game.dailyCrystalReward} crystals` : ''}` : 'Gift claimed today' }}</button><em>{{ game.dailyGiftResult }}</em></div>
         </section>
-        <div class="login-reward-track"><span v-for="(reward,index) in DAILY_COINS" :key="reward" :class="{active:Math.min(7,game.upcomingLoginDay) === index + 1,claimed:game.loginStreak > index}"><small>DAY {{ index + 1 }}{{ index === 6 ? '+' : '' }}</small><b>{{ reward }}</b><em>coins</em></span></div>
+        <div class="login-reward-track"><span v-for="(reward,index) in DAILY_COINS" :key="reward" :class="{active:((game.upcomingLoginDay - 1) % 7) + 1 === index + 1,claimed:game.loginStreak > index}"><small>DAY {{ index + 1 }}</small><b>{{ reward }}</b><em>coins{{ index === 2 ? ' · +45 ◆' : index === 6 ? ' · +120 ◆' : '' }}</em></span></div>
         <div class="recipe-mode-tabs"><button :class="{ active: recipeMode === 'library' }" type="button" @click="recipeMode = 'library'">All recipes · {{ RECIPES.length }}</button><button :class="{ active: recipeMode === 'shop' }" type="button" @click="recipeMode = 'shop'">Learn locked · {{ game.lockedRecipes.length }}</button></div>
         <div v-if="recipeMode === 'library'" class="recipe-cards">
           <button v-for="recipe in RECIPES" :key="recipe.id" :class="{ locked: !isRecipeKnown(recipe.id) }" type="button" @click="isRecipeKnown(recipe.id) ? selectedRecipeId = recipe.id : recipeMode = 'shop'">
@@ -130,12 +136,12 @@ function selectBartender(id: 'noa' | 'leo') {
           <article v-for="recipe in game.lockedRecipes" :key="recipe.id" class="locked-recipe-card">
             <div class="locked-art"><GlassModel :art-index="RECIPES.indexOf(recipe) % 10" type="coupe" /><span>LOCKED</span></div>
             <div><small>ADVANCED RECIPE</small><h3>{{ recipe.name }}</h3><p>{{ recipeAlcoholLabel(recipe) }} · {{ recipe.tastingNotes.join(' · ') }}</p><span>Unlock the full history, guest profile and method.</span></div>
-            <button type="button" @click="game.buyRecipe(recipe.id)">Buy for {{ Math.round(recipe.price * 18) }} coins</button>
+            <button type="button" @click="game.buyRecipe(recipe.id)">Buy for {{ recipePriceLabel(recipe.id) }}</button>
           </article>
         </div>
       </template>
       <template v-else>
-        <header class="panel-heading recipe-detail-heading"><button type="button" @click="selectedRecipeId = null">← All recipes</button><div><small>{{ selectedRecipe.category }} · {{ selectedRecipe.origin }}</small><h2>{{ selectedRecipe.name }}</h2></div><span>{{ recipeAlcoholLabel(selectedRecipe) }} · {{ (selectedRecipe.price * game.region.marketFactor).toFixed(2) }} coins</span></header>
+        <header class="panel-heading recipe-detail-heading"><button type="button" @click="selectedRecipeId = null">← All recipes</button><div><small>{{ selectedRecipe.category }} · {{ selectedRecipe.origin }}</small><h2>{{ selectedRecipe.name }}</h2></div><span>{{ recipeAlcoholLabel(selectedRecipe) }} · {{ (selectedRecipe.price * game.economy.guestPriceFactor).toFixed(2) }} coins</span></header>
         <div class="recipe-detail-page">
           <aside class="recipe-hero-art"><GlassModel :art-index="selectedRecipeIndex" type="coupe" /><div><small>TASTING PROFILE · {{ recipeAlcoholLabel(selectedRecipe) }}</small><span v-for="note in selectedRecipe.tastingNotes" :key="note">{{ note }}</span></div></aside>
           <section class="recipe-story"><small>THE STORY</small><h3>A drink with a past</h3><p>{{ selectedRecipe.story }}</p><button type="button" class="guide-open" @click="openGuide('cocktail', selectedRecipe.id)">Full history, method &amp; why choose it →</button><div class="occasion-block"><small>WHEN IT IS A GOOD CHOICE</small><div><span v-for="occasion in selectedRecipe.occasions" :key="occasion">{{ occasion }}</span></div></div></section>
@@ -160,7 +166,7 @@ function selectBartender(id: 'noa' | 'leo') {
           <div class="outfit-selector" aria-label="Choose bartender outfit"><button v-for="outfit in ['vest','shirt','apron'] as const" :key="outfit" :class="{ active: game.decor.bartender === outfit }" type="button" @click="game.decor.bartender = outfit">{{ outfitLabel(outfit) }}</button></div>
         </div>
         <div class="design-options">
-          <section class="background-picker"><small>18 BACKGROUNDS · 15 NEW</small><div><button v-for="interior in INTERIORS" :key="interior.id" :class="{active:game.decor.interior === interior.id}" :style="interiorStyle(interior.id)" type="button" @click="game.decor.interior = interior.id"><span>{{ interior.name }}</span></button></div></section>
+          <section class="background-picker"><small>{{ INTERIORS.length }} BACKGROUNDS · {{ game.ownedInteriorIds.length }} OWNED</small><div><button v-for="interior in INTERIORS" :key="interior.id" :class="{active:game.decor.interior === interior.id,locked:!isInteriorOwned(interior.id),special:'special' in interior && interior.special}" :style="interiorStyle(interior.id)" type="button" @click="game.chooseInterior(interior.id)"><em v-if="!isInteriorOwned(interior.id)">◆ {{ interior.crystalCost }}</em><span>{{ interior.name }}</span></button></div></section>
           <section><small>WALL COLOR</small><div><button v-for="wall in WALLS" :key="wall" :class="{ active: game.decor.wall === wall }" type="button" @click="game.decor.wall = wall"><i :data-color="wall"></i>{{ wall }}</button></div></section>
           <section><small>BARLINE MATERIAL</small><div><button v-for="counter in COUNTER_MATERIALS" :key="counter" :class="{ active: game.decor.counter === counter }" type="button" @click="game.decor.counter = counter">{{ counter }}</button></div></section>
           <section><small>BARLINE COLOR</small><div><button v-for="color in COUNTER_COLORS" :key="color" :class="{ active: game.decor.counterColor === color }" type="button" @click="game.decor.counterColor = color"><i :data-color="color"></i>{{ color }}</button></div></section>

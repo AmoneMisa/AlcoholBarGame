@@ -169,10 +169,14 @@ export function replyTo(text: string, customer: Customer, profile: DrinkProfile,
   }
 
   if (words.some((word) => ['alcohol', 'alcoholic', 'non'].includes(word))) return { text: 'With alcohol, please. But not too much.', expression: 'smile', facts: [] };
-  if (words.some((word) => ['hello', 'hi', 'hey', 'evening'].includes(word)) || (words.includes('how') && words.includes('you'))) {
+  const greeted = words.some((word) => ['hello', 'hi', 'hey', 'evening'].includes(word));
+  const asksWhat = words.some((word) => ['what', 'which', 'kind', 'type', 'flavour', 'flavours', 'flavor', 'taste', 'favourite', 'favorite', 'recommend', 'suggest'].includes(word));
+  // “How are you?” gets small talk; a plain “Hello” gets a hello; “Hello, what would you like?” answers the question.
+  if (words.includes('how') && words.includes('you') && !asksWhat) {
     return { text: `Hi! ${customer.mood === 'sad' || customer.mood === 'tired' ? 'I’m a bit tired.' : 'I’m good, thanks.'} Can you help me choose a drink?`, expression: 'smile', facts: [] };
   }
-  if (words.some((word) => ['what', 'which', 'kind', 'type', 'flavour', 'flavours', 'flavor', 'taste', 'favourite', 'favorite', 'recommend', 'suggest'].includes(word))) {
+  if (greeted && !asksWhat) return { text: 'Hello! Can you help me choose a drink?', expression: 'smile', facts: [] };
+  if (asksWhat) {
     const known = new Set(revealedFacts.map((fact) => fact.topic));
     // Asked about flavour or taste: answer with a flavour or fruit first, the spirit last.
     const flavourFirst = words.some((word) => ['flavour', 'flavours', 'flavor', 'flavors', 'taste'].includes(word));

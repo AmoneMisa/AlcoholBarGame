@@ -4,6 +4,7 @@ import { INGREDIENTS, SUPPLIERS } from '../../domain/catalog';
 import { useGameStore } from '../../stores/game';
 import BottleModel from '../cocktails/BottleModel.vue';
 import UiIcon from '../ui/UiIcon.vue';
+import CityEvent from './CityEvent.vue';
 
 const game = useGameStore();
 const mode = ref<'buy'|'sell'>('buy');
@@ -13,7 +14,7 @@ const group = (id:string) => ingredient(id).category === 'spirit' ? 'spirit' : i
 const offers = computed(() => game.market.filter((offer) => offer.supplierId === game.selectedSupplier && (category.value === 'all' || group(offer.ingredientId) === category.value)));
 const stock = computed(() => game.inventory.filter((item) => category.value === 'all' || group(item.ingredientId) === category.value));
 const available = (id:string) => Math.max(0,(game.inventory.find((item) => item.ingredientId === id)?.amount ?? 0) - (game.currentMix.find((item) => item.ingredientId === id)?.amount ?? 0));
-const buyback = (id:string,quantity:number) => (ingredient(id).basePrice * quantity * game.region.marketFactor * .55).toFixed(2);
+const buyback = (id:string,quantity:number) => (ingredient(id).basePrice * quantity * game.region.marketFactor * .55 * game.economy.buybackFactor(id)).toFixed(2);
 function adjust(id:string,delta:number) { game.purchaseCart[id] = Math.min(99,Math.max(0,(game.purchaseCart[id] ?? 0) + delta)); }
 function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item) => [item.ingredientId,Math.floor(available(item.ingredientId))])); }
 </script>
@@ -21,6 +22,7 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
 <template>
   <article class="game-panel market-panel">
     <header class="panel-heading"><div><small>TRADE FLOOR · {{ game.region.name }}</small><h2>Stock your next shift</h2></div><span>{{ game.money.toFixed(2) }} coins</span></header>
+    <CityEvent />
     <div class="market-modes"><button :class="{active:mode === 'buy'}" type="button" @click="mode = 'buy'">Buy supplies</button><button :class="{active:mode === 'sell'}" type="button" @click="mode = 'sell'">Sell stock</button><span>City prices {{ game.region.marketFactor.toFixed(2) }}× · prices change each shift</span></div>
     <div v-if="mode === 'buy'" class="supplier-picker polished-suppliers">
       <button v-for="supplier in SUPPLIERS" :key="supplier.id" :class="{ active:game.selectedSupplier === supplier.id }" type="button" @click="game.selectSupplier(supplier.id)">

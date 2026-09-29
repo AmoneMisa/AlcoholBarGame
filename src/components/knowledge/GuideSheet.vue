@@ -131,7 +131,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
               <div>
               <header><b>{{ brand.name }}</b><button v-if="canSpeak()" type="button" class="guide-speak" :aria-label="`Listen to ${brand.name}`" @click="speak(brand.name)">🔊</button><span>{{ brand.from }} · since {{ brand.since }}</span></header>
               <p>{{ brand.description }}</p>
-              <p v-for="product in shopProductsFor(brand)" :key="product.id" class="brand-shop">In your shop: <b>{{ product.name }}</b> · {{ product.volumeMl }} ml · {{ product.abv }}% · {{ bottleTotal(product, 1, game.region.marketFactor) }} coins · {{ stockOf(product.id) }} in stock</p>
+              <p v-for="product in shopProductsFor(brand)" :key="product.id" class="brand-shop">In your shop: <b>{{ product.name }}</b> · {{ product.volumeMl }} ml · {{ product.abv }}% · {{ bottleTotal(product, 1, game.economy.guestPriceFactor) }} coins · {{ stockOf(product.id) }} in stock</p>
               <p v-if="brandCocktails(brand.name).length" class="brand-cocktails">Classic in: <template v-for="(item, index) in brandCocktails(brand.name)" :key="item!.id"><button type="button" class="guide-link" @click="openGuide('cocktail', item!.id)">{{ item!.name }}</button>{{ index < brandCocktails(brand.name).length - 1 ? ', ' : '' }}</template></p>
               </div>
             </li>

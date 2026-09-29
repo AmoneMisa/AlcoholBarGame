@@ -26,7 +26,7 @@ export const CHARACTER_ART: CharacterArtDefinition[] = [
     ['zahra','Zahra','female','straight','#bd805b'],['kenji','Kenji','male','broad','#b78462'],['raven','Raven','female','straight','#dfb293'],['niko','Niko','neutral','broad','#75472f'],['edith','Edith','female','soft','#d6a07f']
   ].map(([id,name,presentation,body,skinTone],castIndex) => ({ id,name,presentation:presentation as CharacterArtDefinition['presentation'],body:body as CharacterArtDefinition['body'],skinTone,castIndex,sheet:'/assets/characters/customers/extended-cast-2.png',columns:5,rows:2 })),
   { id: 'noa', name: 'Noa', presentation: 'female', body: 'straight', skinTone: '#a86643', sheet:'/assets/characters/bartender/noa-wardrobe.png',columns:3,rows:1,castIndex:0 },
-  { id: 'leo', name: 'Leo', presentation: 'male', body: 'broad', skinTone: '#a96f4d', sheet:'/assets/characters/bartender/leo-wardrobe.png',columns:3,rows:1,castIndex:0 }
+  { id: 'leo', name: 'Leo', presentation: 'male', body: 'broad', skinTone: '#a96f4d', sheet:'/assets/characters/bartender/leo-wardrobe-v5.png',columns:3,rows:1,castIndex:0 }
 ];
 
 export const CUSTOMER_ART_BY_SLOT = CHARACTER_ART.filter((art) => !['noa','leo'].includes(art.id)).map((art) => art.id);

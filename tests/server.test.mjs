@@ -7,8 +7,10 @@ import { createGameService } from '../server/gameService.mjs';
 import { createMemoryRepository } from '../server/playerRepository.mjs';
 import { checkEnglish } from '../server/english.mjs';
 import { RECIPES } from '../src/domain/catalog.ts';
-import { ALCOHOL_PRODUCTS } from '../src/domain/bottleCatalog.ts';
+import { ALCOHOL_PRODUCTS,bottleRestockCrystalCost } from '../src/domain/bottleCatalog.ts';
+import { recipePurchase } from '../src/domain/economy.ts';
 import { requiredRecipe } from '../src/domain/engine.ts';
+import { createTelegramBot, TelegramBotError } from '../server/telegramBot.mjs';
 
 const BOT_TOKEN = '123456:TEST-token-for-unit-tests';
 
@@ -42,6 +44,40 @@ test('Telegram login: a valid signature is accepted; forged, tampered or old dat
   assert.throws(() => verifyTelegramInitData(tampered, BOT_TOKEN), AuthError, 'changing the user id breaks the signature');
   assert.throws(() => verifyTelegramInitData(signInitData(user, { authDate: Math.floor(Date.now() / 1000) - 3 * 86400 }), BOT_TOKEN), AuthError, 'expired');
   assert.throws(() => verifyTelegramInitData('user=%7B%7D', BOT_TOKEN), AuthError, 'no hash');
+});
+
+test('Telegram bot connects from one token and sends a Main Mini App launch link', async () => {
+  const calls = [];
+  const fakeFetch = async (url, options) => {
+    const method = url.split('/').at(-1);
+    const payload = JSON.parse(options.body);
+    calls.push({ url, method, payload });
+    const result = method === 'getMe' ? { id: 123456, is_bot: true, username: 'BarLingoBot', has_main_web_app: true } : true;
+    return { ok: true, json: async () => ({ ok: true, result }) };
+  };
+  const bot = createTelegramBot({ token: BOT_TOKEN, fetchImpl: fakeFetch, logger: { error() {} } });
+  const status = await bot.start({ enablePolling: false });
+  assert.equal(status.connected, true);
+  assert.equal(status.id, 123456);
+  assert.equal(status.username, 'BarLingoBot');
+  assert.equal(status.mainMiniApp, true);
+  assert.ok(calls.some((call) => call.method === 'setMyCommands'));
+  assert.ok(calls.every((call) => call.url.includes(BOT_TOKEN)), 'the single token authenticates Bot API calls');
+
+  await bot.handleUpdate({ update_id: 1, message: { text: '/start payload', chat: { id: 77, type: 'private' }, from: { first_name: 'Ana' } } });
+  const welcome = calls.find((call) => call.method === 'sendMessage');
+  assert.match(welcome.payload.text, /Welcome, Ana/);
+  assert.equal(welcome.payload.reply_markup.inline_keyboard[0][0].url, 'https://t.me/BarLingoBot?startapp');
+  await bot.stop();
+});
+
+test('Telegram bot rejects an invalid BotFather token without exposing it', async () => {
+  const fetchImpl = async () => ({ ok: false, json: async () => ({ ok: false, description: 'Unauthorized' }) });
+  const bot = createTelegramBot({ token: 'secret-token', fetchImpl, logger: { error() {} } });
+  await assert.rejects(() => bot.start({ enablePolling: false }), TelegramBotError);
+  assert.equal(bot.status().connected, false);
+  assert.equal(bot.status().error, 'Unauthorized');
+  assert.ok(!bot.status().error.includes('secret-token'));
 });
 
 test('Coins only change through server rules: fake mixes, fake prices and client-sent money do nothing', async () => {
@@ -89,6 +125,49 @@ test('Replayed requests are applied once, and the daily gift is once per server 
   assert.equal(again.ok, false, 'a second claim the same day is refused');
   assert.equal(again.state.money, first.state.money);
   assert.equal(repository.ledger.filter((entry) => entry.action === 'claimDaily').length, 1);
+});
+
+test('Crystal purchases and rewards are server-authoritative and fully ledgered', async () => {
+  let clock = 1_800_000_000_000;
+  const { service, repository } = makeService(() => clock);
+  const first = await service.session(identity(88));
+  const stored = repository.states.get(first.player.id).state;
+  stored.crystals = 5000;
+  repository.states.get(first.player.id).state = stored;
+
+  assert.equal((await act(service,{type:'setCrystals',crystals:999999},requestId(),identity(88))).ok,false);
+  const exchangeId = requestId();
+  const exchanged = await act(service,{type:'exchangeCrystals',crystals:50},exchangeId,identity(88));
+  assert.equal(exchanged.ok,true);assert.equal(exchanged.state.crystals,4950);assert.equal(exchanged.state.money,first.state.money + 1350);
+  const replayedExchange = await act(service,{type:'exchangeCrystals',crystals:50},exchangeId,identity(88));
+  assert.deepEqual(replayedExchange,exchanged,'a replayed exchange cannot mint more coins');
+  assert.equal((await act(service,{type:'exchangeCrystals',crystals:11},requestId(),identity(88))).ok,false,'custom client rates are refused');
+  const interior = await act(service,{type:'buyInterior',interiorId:'garden'},requestId(),identity(88));
+  assert.equal(interior.ok,true);assert.ok(interior.state.ownedInteriorIds.includes('garden'));assert.equal(interior.state.bars[interior.state.regionId].interior,'garden');
+
+  const locked = RECIPES.find((recipe,index) => index >= 10 && recipePurchase(recipe,index).currency === 'crystals');
+  const recipeCost = recipePurchase(locked,RECIPES.indexOf(locked)).amount;
+  const beforeRecipe = interior.state.crystals;
+  const learned = await act(service,{type:'buyRecipe',recipeId:locked.id},requestId(),identity(88));
+  assert.equal(learned.ok,true);assert.equal(learned.state.crystals,beforeRecipe - recipeCost);assert.ok(learned.state.knownRecipeIds.includes(locked.id));
+
+  const product = ALCOHOL_PRODUCTS.find((item) => bottleRestockCrystalCost(item) > 0);
+  const beforeStock = learned.state.bottleInventories[learned.state.regionId].find((item) => item.productId === product.id).quantity;
+  const beforeRestock = learned.state.crystals;
+  const restocked = await act(service,{type:'buyBottleStock',productId:product.id,quantity:2},requestId(),identity(88));
+  assert.equal(restocked.ok,true);assert.equal(restocked.state.crystals,beforeRestock - bottleRestockCrystalCost(product) * 2);
+  assert.equal(restocked.state.bottleInventories[restocked.state.regionId].find((item) => item.productId === product.id).quantity,beforeStock + 2);
+
+  const guest = restocked.state.customers[0];
+  await act(service,{type:'rejectCustomer',customerId:guest.id},requestId(),identity(88));
+  const waiting = (await service.session(identity(88))).state;
+  const beforeArrival = waiting.crystals;
+  const welcomed = await act(service,{type:'expediteCustomer'},requestId(),identity(88));
+  assert.equal(welcomed.ok,true);assert.equal(welcomed.state.customers.length,1);assert.ok(welcomed.state.crystals < beforeArrival);
+
+  const crystalDelta = repository.crystalLedger.reduce((sum,entry) => sum + entry.delta,0);
+  assert.equal(crystalDelta,welcomed.state.crystals - 5000,'every crystal purchase is recorded in the premium-currency ledger');
+  assert.equal(repository.ledger.filter((entry) => entry.action === 'exchangeCrystals').length,1,'the coin side of an exchange is ledgered once');
 });
 
 test('English XP is decided by the server checker and capped per guest; wrong confirmations are refused', async () => {

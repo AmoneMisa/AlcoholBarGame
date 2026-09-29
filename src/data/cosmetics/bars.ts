@@ -1,24 +1,26 @@
 import type { RegionId } from '../../domain/types';
 
 export const INTERIORS = [
-  { id:'velvet',name:'Velvet lounge',asset:'/assets/bar/backgrounds/velvet-hour-bar.png',tint:'#2d0d1e55',position:'center',blend:'multiply' },
-  { id:'garden',name:'Botanical room',asset:'/assets/bar/backgrounds/botanical-room.png',tint:'#123d2b44',position:'center',blend:'multiply' },
-  { id:'skyline',name:'Skyline lounge',asset:'/assets/bar/backgrounds/skyline-lounge.png',tint:'#101d4655',position:'center',blend:'multiply' },
-  { id:'speakeasy',name:'Secret speakeasy',asset:'/assets/bar/backgrounds/velvet-hour-bar.png',tint:'#17100b88',position:'38% center',blend:'multiply' },
-  { id:'jazz-cellar',name:'Midnight jazz cellar',asset:'/assets/bar/backgrounds/velvet-hour-bar.png',tint:'#32143777',position:'62% center',blend:'color-burn' },
-  { id:'art-deco',name:'Golden Art Deco',asset:'/assets/bar/backgrounds/velvet-hour-bar.png',tint:'#6b4a1255',position:'center top',blend:'soft-light' },
-  { id:'library',name:'Private library',asset:'/assets/bar/backgrounds/velvet-hour-bar.png',tint:'#3b241777',position:'left center',blend:'multiply' },
-  { id:'palace',name:'Champagne palace',asset:'/assets/bar/backgrounds/velvet-hour-bar.png',tint:'#8c704744',position:'right center',blend:'screen' },
-  { id:'tropical',name:'Tropical greenhouse',asset:'/assets/bar/backgrounds/botanical-room.png',tint:'#0d5a3d44',position:'left center',blend:'soft-light' },
-  { id:'desert',name:'Desert sunset bar',asset:'/assets/bar/backgrounds/botanical-room.png',tint:'#9c4d2655',position:'right center',blend:'color' },
-  { id:'winter',name:'Winter conservatory',asset:'/assets/bar/backgrounds/botanical-room.png',tint:'#b7d9e855',position:'center top',blend:'screen' },
-  { id:'beach',name:'Beach club',asset:'/assets/bar/backgrounds/botanical-room.png',tint:'#1d8b9a44',position:'center bottom',blend:'color' },
-  { id:'rooftop',name:'Metropolitan rooftop',asset:'/assets/bar/backgrounds/skyline-lounge.png',tint:'#25345b44',position:'left center',blend:'multiply' },
-  { id:'cyberpunk',name:'Cyberpunk night',asset:'/assets/bar/backgrounds/skyline-lounge.png',tint:'#a0008655',position:'right center',blend:'color-dodge' },
-  { id:'izakaya',name:'Lantern izakaya',asset:'/assets/bar/backgrounds/skyline-lounge.png',tint:'#8b251d55',position:'center bottom',blend:'color' },
-  { id:'marina',name:'Midnight marina',asset:'/assets/bar/backgrounds/skyline-lounge.png',tint:'#073e5f66',position:'left bottom',blend:'multiply' },
-  { id:'parisian',name:'Parisian salon',asset:'/assets/bar/backgrounds/velvet-hour-bar.png',tint:'#713f5e44',position:'right top',blend:'soft-light' },
-  { id:'loft',name:'Industrial loft',asset:'/assets/bar/backgrounds/skyline-lounge.png',tint:'#4a4f5266',position:'center top',blend:'saturation' }
+  { id:'velvet',name:'Velvet lounge',asset:'/assets/bar/backgrounds/velvet-hour-bar.png',tint:'#2d0d1e55',position:'center',blend:'multiply',crystalCost:0 },
+  { id:'garden',name:'Botanical room',asset:'/assets/bar/backgrounds/botanical-room.png',tint:'#123d2b44',position:'center',blend:'multiply',crystalCost:350 },
+  { id:'skyline',name:'Skyline lounge',asset:'/assets/bar/backgrounds/skyline-lounge.png',tint:'#101d4655',position:'center',blend:'multiply',crystalCost:450 },
+  { id:'inferno-penthouse',name:'Midnight Penthouse',asset:'/assets/bar/backgrounds/inferno-penthouse-club.png',tint:'#25071322',position:'center',blend:'multiply',special:true,crystalCost:3500 },
+  { id:'speakeasy',name:'Secret speakeasy',asset:'/assets/bar/backgrounds/interior-speakeasy.webp',tint:'#21130b33',position:'center 62%',blend:'multiply',crystalCost:550 },
+  { id:'jazz-cellar',name:'Midnight jazz cellar',asset:'/assets/bar/backgrounds/interior-jazz-cellar.webp',tint:'#25122633',position:'center 62%',blend:'multiply',crystalCost:650 },
+  { id:'art-deco',name:'Golden Art Deco',asset:'/assets/bar/backgrounds/interior-art-deco.webp',tint:'#5e431511',position:'center 62%',blend:'soft-light',crystalCost:800 },
+  { id:'library',name:'Private library',asset:'/assets/bar/backgrounds/interior-library.webp',tint:'#26160d22',position:'center 62%',blend:'multiply',crystalCost:950 },
+  { id:'palace',name:'Champagne palace',asset:'/assets/bar/backgrounds/interior-palace.webp',tint:'#fff4dc11',position:'center 62%',blend:'screen',crystalCost:1250 },
+  { id:'tropical',name:'Tropical greenhouse',asset:'/assets/bar/backgrounds/interior-tropical.webp',tint:'#0a3b1d11',position:'center 62%',blend:'multiply',crystalCost:1050 },
+  { id:'desert',name:'Desert sunset bar',asset:'/assets/bar/backgrounds/interior-desert.webp',tint:'#8d3f1711',position:'center 62%',blend:'color',crystalCost:1150 },
+  { id:'winter',name:'Winter conservatory',asset:'/assets/bar/backgrounds/interior-winter.webp',tint:'#dff7ff18',position:'center 62%',blend:'screen',crystalCost:1400 },
+  { id:'beach',name:'Beach club',asset:'/assets/bar/backgrounds/interior-beach.webp',tint:'#8ddde511',position:'center 62%',blend:'soft-light',crystalCost:1500 },
+  { id:'rooftop',name:'Metropolitan rooftop',asset:'/assets/bar/backgrounds/interior-rooftop.webp',tint:'#10182d22',position:'center 62%',blend:'multiply',crystalCost:1800 },
+  { id:'cyberpunk',name:'Cyberpunk night',asset:'/assets/bar/backgrounds/interior-cyberpunk.webp',tint:'#9c087122',position:'center 62%',blend:'color-dodge',crystalCost:2200 },
+  { id:'izakaya',name:'Lantern izakaya',asset:'/assets/bar/backgrounds/interior-izakaya.webp',tint:'#7c241411',position:'center 62%',blend:'color',crystalCost:1650 },
+  { id:'marina',name:'Midnight marina',asset:'/assets/bar/backgrounds/interior-marina.webp',tint:'#082a4818',position:'center 62%',blend:'multiply',crystalCost:1950 },
+  { id:'parisian',name:'Parisian salon',asset:'/assets/bar/backgrounds/interior-parisian.webp',tint:'#713f5e11',position:'center 62%',blend:'soft-light',crystalCost:2500 },
+  { id:'loft',name:'Industrial loft',asset:'/assets/bar/backgrounds/interior-loft.webp',tint:'#343a3e18',position:'center 62%',blend:'saturation',crystalCost:1300 },
+  { id:'riad',name:'Moroccan riad',asset:'/assets/bar/backgrounds/interior-riad.webp',tint:'#5a1f0c11',position:'center 62%',blend:'soft-light',crystalCost:2100 }
 ] as const;
 
 export type InteriorId = typeof INTERIORS[number]['id'];
@@ -70,18 +72,23 @@ const femaleStyle = { face:'soft',hairStyle:'updo',hairColor:'espresso',bodyShap
 const maleStyle = { face:'angular',hairStyle:'slick',hairColor:'chestnut',bodyShape:'muscular',skinDetail:'tattoo-bold',bust:'balanced',pose:'relaxed',makeup:'none' } as const;
 export const DEFAULT_BARS: Record<RegionId, BarProfile> = {
   'new-york': { name:'The Velvet Hour',wall:'neon',counter:'classic',counterColor:'ruby',counterSize:'standard',lighting:'amber',highlightStrength:'medium',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'vest',interior:'velvet',...femaleStyle },
-  london: { name:'Juniper & Oak',wall:'emerald',counter:'walnut',counterColor:'espresso',counterSize:'grand',lighting:'amber',highlightStrength:'soft',bartenderCharacter:'leo',bartenderNickname:'Leo',bartender:'shirt',interior:'garden',...maleStyle },
-  berlin: { name:'Midnight Studio',wall:'charcoal',counter:'steel',counterColor:'smoke',counterSize:'slim',lighting:'blue',highlightStrength:'bright',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'apron',interior:'loft',...femaleStyle,hairColor:'black',pose:'hip' },
-  tashkent: { name:'Silk Road Social',wall:'terracotta',counter:'brass',counterColor:'gold',counterSize:'standard',lighting:'amber',highlightStrength:'medium',bartenderCharacter:'leo',bartenderNickname:'Leo',bartender:'vest',interior:'desert',...maleStyle,hairColor:'black' },
-  bucharest: { name:'The Amber Room',wall:'burgundy',counter:'brass',counterColor:'plum',counterSize:'grand',lighting:'rose',highlightStrength:'medium',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'vest',interior:'speakeasy',...femaleStyle,hairColor:'copper',makeup:'smoky' },
-  tokyo: { name:'Blue Lantern',wall:'navy',counter:'obsidian',counterColor:'navy',counterSize:'slim',lighting:'blue',highlightStrength:'bright',bartenderCharacter:'leo',bartenderNickname:'Leo',bartender:'apron',interior:'izakaya',...maleStyle,hairStyle:'undercut',skinDetail:'tattoo-light' }
+  london: { name:'Juniper & Oak',wall:'emerald',counter:'walnut',counterColor:'espresso',counterSize:'grand',lighting:'amber',highlightStrength:'soft',bartenderCharacter:'leo',bartenderNickname:'Leo',bartender:'shirt',interior:'velvet',...maleStyle },
+  berlin: { name:'Midnight Studio',wall:'charcoal',counter:'steel',counterColor:'smoke',counterSize:'slim',lighting:'blue',highlightStrength:'bright',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'apron',interior:'velvet',...femaleStyle,hairColor:'black',pose:'hip' },
+  tashkent: { name:'Silk Road Social',wall:'terracotta',counter:'brass',counterColor:'gold',counterSize:'standard',lighting:'amber',highlightStrength:'medium',bartenderCharacter:'leo',bartenderNickname:'Leo',bartender:'vest',interior:'velvet',...maleStyle,hairColor:'black' },
+  bucharest: { name:'The Amber Room',wall:'burgundy',counter:'brass',counterColor:'plum',counterSize:'grand',lighting:'rose',highlightStrength:'medium',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'vest',interior:'velvet',...femaleStyle,hairColor:'copper',makeup:'smoky' },
+  tokyo: { name:'Blue Lantern',wall:'navy',counter:'obsidian',counterColor:'navy',counterSize:'slim',lighting:'blue',highlightStrength:'bright',bartenderCharacter:'leo',bartenderNickname:'Leo',bartender:'apron',interior:'velvet',...maleStyle,hairStyle:'undercut',skinDetail:'tattoo-light' }
 };
 
 export function interiorStyle(id: InteriorId) {
   const item = INTERIORS.find((entry) => entry.id === id) ?? INTERIORS[0];
+  const atlas = 'atlas' in item && item.atlas;
   return {
     backgroundImage:`linear-gradient(${item.tint},${item.tint}),url('${item.asset}')`,
-    backgroundPosition:item.position,
+    backgroundPosition:`center, ${item.position}`,
+    backgroundSize:atlas ? '100% 100%, 200% 200%' : '100% 100%, cover',
+    '--interior-background-size':atlas ? '100% 100%, 200% 200%' : '100% 100%, cover',
+    '--interior-background-position':`center, ${item.position}`,
+    backgroundRepeat:'no-repeat',
     backgroundBlendMode:`${item.blend},normal`
   };
 }

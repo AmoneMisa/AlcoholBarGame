@@ -5,10 +5,11 @@ import { nextTick } from 'vue';
 import { checkText } from '../src/domain/english/checker.ts';
 import { questionTemplates,tilesFor,withArticle,buildProfile,matchesFacts,sentenceWords,correctedTileSelection } from '../src/domain/conversation/customerTalk.ts';
 import { INGREDIENTS,RECIPES,REGIONS,SUPPLIERS,estimateRecipeAbv,recipeAlcoholLabel } from '../src/domain/catalog.ts';
-import { ALCOHOL_PRODUCTS } from '../src/domain/bottleCatalog.ts';
+import { ALCOHOL_PRODUCTS,bottleRestockCrystalCost,bottleSaleCrystalReward } from '../src/domain/bottleCatalog.ts';
+import { brandBottleArtIndex,ingredientBottleArtIndex,PAINTED_BOTTLE_COLUMNS,PAINTED_BOTTLE_ROWS } from '../src/domain/bottleArt.ts';
 import { bottleQuestionTemplates,rankBottles } from '../src/domain/conversation/bottleTalk.ts';
 import { createMarket,generateCustomer } from '../src/domain/engine.ts';
-import { dailyCoinsFor,consecutiveDays,quotePurchase } from '../src/domain/economy.ts';
+import { arrivalSkipCrystalCost,CRYSTAL_EXCHANGE_BUNDLES,crystalExchange,dailyCoinsFor,dailyCrystalsFor,consecutiveDays,quotePurchase,recipePurchase } from '../src/domain/economy.ts';
 import { CHARACTER_ART,CUSTOMER_ART_BY_SLOT } from '../src/data/cosmetics/artCatalog.ts';
 import { INTERIORS,COUNTER_MATERIALS,HAIR_STYLES,SKIN_DETAILS } from '../src/data/cosmetics/bars.ts';
 import { useGameStore } from '../src/stores/game.ts';
@@ -70,12 +71,16 @@ test('A confirmed full-bottle order consumes sealed stock and earns its retail p
   const stock = game.bottleInventory.find((item) => item.productId === product.id);
   stock.quantity = 2;
   const balance = game.money;
+  const crystals = game.crystals;
   assert.equal(game.openConversation(customer.id),true);
   await game.say(`Would you like ${product.name}?`);
   assert.equal(customer.orderRevealed,true,JSON.stringify(game.conversations[customer.id].lines.at(-1)));
+  assert.ok(game.crystals >= crystals + 3 && game.crystals <= crystals + 15,'a perfect dialogue pays 3–15 crystals');
+  const afterDialogue = game.crystals;
   assert.equal(game.sellBottleToCustomer(),true);
   assert.equal(stock.quantity,1);
   assert.ok(game.money >= balance + product.price * game.region.marketFactor);
+  assert.equal(game.crystals,afterDialogue + bottleSaleCrystalReward(product));
 });
 
 test('Every suggested question is valid and can be built from its word bank',() => {
@@ -124,6 +129,42 @@ test('Login rewards grow to 1000, reset after missed days and cross month bounda
   assert.equal(consecutiveDays('2026-09-27',4,new Date(2026,8,28)),5);
   assert.equal(consecutiveDays('2026-09-26',4,new Date(2026,8,28)),1);
   assert.equal(consecutiveDays('2026-09-30',6,new Date(2026,9,1)),7);
+  assert.deepEqual([1,2,3,4,5,6,7,10,14].map(dailyCrystalsFor),[0,0,45,0,0,0,120,45,120]);
+});
+
+test('Every liquid and retail brand resolves to painted fantasy-label bottle art',() => {
+  const cellCount = PAINTED_BOTTLE_COLUMNS * PAINTED_BOTTLE_ROWS;
+  for (const ingredient of INGREDIENTS.filter((item) => item.unit === 'ml')) {
+    const index = ingredientBottleArtIndex(ingredient.id);
+    assert.ok(Number.isInteger(index) && index >= 0 && index < cellCount,`${ingredient.name} has painted bottle art`);
+  }
+  for (const product of ALCOHOL_PRODUCTS) {
+    const index = brandBottleArtIndex(product.brand,product.type);
+    assert.ok(index >= 0 && index < cellCount,`${product.brand} has a painted bottle cell`);
+  }
+});
+
+test('Crystal prices cover locked backgrounds, advanced recipes, waiting time and profitable brand reserves',() => {
+  assert.equal(INTERIORS[0].crystalCost,0);
+  assert.ok(INTERIORS.slice(1).every((item) => item.crystalCost >= 350 && item.crystalCost <= 3500));
+  assert.equal(new Set(INTERIORS.map((item) => item.crystalCost)).size,INTERIORS.length);
+  const advanced = RECIPES.slice(10).map((recipe) => recipePurchase(recipe,RECIPES.indexOf(recipe)));
+  assert.ok(advanced.filter((price) => price.currency === 'crystals').length > advanced.length / 2);
+  assert.ok(advanced.filter((price) => price.currency === 'crystals').every((price) => price.amount >= 120 && price.amount <= 550));
+  assert.equal(Math.min(...advanced.filter((price) => price.currency === 'crystals').map((price) => price.amount)),120);
+  assert.equal(Math.max(...advanced.filter((price) => price.currency === 'crystals').map((price) => price.amount)),550);
+  assert.equal(arrivalSkipCrystalCost(1),1);assert.equal(arrivalSkipCrystalCost(30 * 60_000),6);assert.equal(arrivalSkipCrystalCost(2 * 60 * 60_000),24);
+  const premium = ALCOHOL_PRODUCTS.filter((product) => bottleRestockCrystalCost(product) > 0);
+  assert.ok(premium.length >= 10 && premium.length < ALCOHOL_PRODUCTS.length);
+  for (const product of premium) assert.ok(bottleSaleCrystalReward(product) > bottleRestockCrystalCost(product),product.name);
+});
+
+test('Crystal exchange offers only fixed one-way bundles with larger-bundle bonuses',() => {
+  assert.deepEqual(CRYSTAL_EXCHANGE_BUNDLES.map((bundle) => bundle.crystals),[10,50,100,250]);
+  assert.equal(crystalExchange(50)?.coins,1350);
+  assert.equal(crystalExchange(11),undefined);
+  const rates = CRYSTAL_EXCHANGE_BUNDLES.map((bundle) => bundle.coins / bundle.crystals);
+  assert.ok(rates.every((rate,index) => index === 0 || rate >= rates[index - 1]));
 });
 
 test('Daily claim awards coins once, survives reload, and cannot be farmed by game shifts',async() => {
@@ -148,7 +189,7 @@ test('Bulk purchase is atomic and delivery goes to its original bar',() => {
   assert.equal(game.deliveryOrders.length,0);
   assert.equal(game.inventories['new-york'].find(item => item.ingredientId === offer.ingredientId).amount,original + offer.quantity * 5);
   assert.equal(game.inventory.find(item => item.ingredientId === offer.ingredientId).amount,london);
-  game.purchaseCart[offer.ingredientId] = 99;game.money = 0;
+  game.purchaseCart[offer.ingredientId] = 99;assert.ok(game.purchaseQuote.total > game.money);
   assert.equal(game.checkoutPurchase(),false);assert.equal(game.deliveryOrders.length,0);
 });
 
@@ -172,13 +213,13 @@ test('Stock transfer respects the glass reservation, and invalid sale amounts do
 });
 
 test('Bar names, bartender nicknames and styles are per-city and persisted; all 25 customer models are available',async() => {
-  const game = freshGame();game.renameBar('North Star');game.decor.interior = 'skyline';
+  const game = freshGame();game.ownedInteriorIds.push('skyline','cyberpunk');game.renameBar('North Star');game.decor.interior = 'skyline';
   game.switchBar('london');assert.notEqual(game.decor.name,'North Star');game.renameBar('Juniper Club');game.renameBartender('Night Fox');game.decor.bartenderCharacter = 'leo';game.decor.bartender = 'apron';game.decor.interior = 'cyberpunk';game.decor.counter = 'glass';game.decor.counterColor = 'navy';game.decor.counterSize = 'grand';game.decor.lighting = 'violet';game.decor.highlightStrength = 'bright';game.decor.face = 'angular';game.decor.hairStyle = 'undercut';game.decor.hairColor = 'blue';game.decor.bodyShape = 'muscular';game.decor.skinDetail = 'scar-brow';game.decor.pose = 'lean';
   game.switchBar('new-york');assert.equal(game.decor.name,'North Star');assert.equal(game.decor.interior,'skyline');
   await nextTick();setActivePinia(createPinia());const reloaded = useGameStore();
   assert.equal(reloaded.bars.london.name,'Juniper Club');assert.equal(reloaded.bars.london.bartenderNickname,'Night Fox');assert.equal(reloaded.bars.london.bartenderCharacter,'leo');assert.equal(reloaded.bars.london.bartender,'apron');
   assert.equal(reloaded.bars.london.interior,'cyberpunk');assert.equal(reloaded.bars.london.counter,'glass');assert.equal(reloaded.bars.london.counterSize,'grand');assert.equal(reloaded.bars.london.hairStyle,'undercut');assert.equal(reloaded.bars.london.skinDetail,'scar-brow');assert.equal(reloaded.bars.london.pose,'lean');
-  assert.equal(INTERIORS.length,18);assert.ok(COUNTER_MATERIALS.length >= 8);assert.ok(HAIR_STYLES.length >= 8);assert.ok(SKIN_DETAILS.includes('clean') && SKIN_DETAILS.some(item => item.startsWith('tattoo')) && SKIN_DETAILS.some(item => item.startsWith('scar')));
+  assert.ok(INTERIORS.length >= 19);assert.ok(COUNTER_MATERIALS.length >= 8);assert.ok(HAIR_STYLES.length >= 8);assert.ok(SKIN_DETAILS.includes('clean') && SKIN_DETAILS.some(item => item.startsWith('tattoo')) && SKIN_DETAILS.some(item => item.startsWith('scar')));
   assert.equal(CUSTOMER_ART_BY_SLOT.length,25);
   assert.equal(game.customers.length,1,'the bar serves one customer at a time');
   assert.equal(new Set(game.customers.map(customer => customer.characterId)).size,1);
@@ -375,6 +416,7 @@ test('Brand calls: the guest names a brand, the bartender must pick that brand; 
   game.selectCustomer(guest.id);
   game.addIngredient('whiskey', 50); game.addIngredient('ice', 3);
   const before = game.money;
+  const crystals = game.crystals;
   game.serveMix();
   assert.match(game.message, /asked for Jack Daniel’s/);
   assert.equal(game.money, before, 'no sale without the right brand');
@@ -384,6 +426,7 @@ test('Brand calls: the guest names a brand, the bartender must pick that brand; 
   game.setPourBrand('whiskey', 'jack-daniels-old-7');
   game.serveMix();
   assert.ok(game.money > before, `sold: ${game.message}`);
+  assert.ok(game.crystals > crystals,'a named-brand drink pays crystals as well as coins');
 
   // Offering another brand of the same spirit when the requested one is missing.
   const onShelf = (id) => id !== 'jack-daniels-old-7';

@@ -75,6 +75,8 @@ export interface Customer {
   orderRevealed?: boolean;
   // What the guest says before the order is known (“Something to feel fresh and cool…”); safe to show.
   wish?: string;
+  // City x level x event price level when the guest walked in; what they pay and budget with.
+  priceFactor?: number;
   orderKind?: 'cocktail' | 'bottle' | 'serve';
   // Brand-call order (“Jack Daniel’s on the rocks”): the only bar order that names a brand.
   serveRequest?: import('./brandServe').ServeRequest;

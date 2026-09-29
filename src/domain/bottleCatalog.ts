@@ -82,6 +82,16 @@ export const ALCOHOL_PRODUCTS: AlcoholProduct[] = [
 export const bottleTotal = (product: AlcoholProduct, quantity: number, marketFactor = 1) =>
   Number((product.price * quantity * marketFactor).toFixed(2));
 
+// Popular premium labels use the rare-currency reserve market. Customer crystal payments always
+// exceed the refill price, preserving a positive seller margin.
+export const bottleRestockCrystalCost = (product: AlcoholProduct) => product.popularity >= 90 && product.price >= 20
+  ? Math.min(24, Math.max(5, Math.round(product.price / 4))) : 0;
+export const bottleSaleCrystalReward = (product: AlcoholProduct, quantity = 1) => {
+  const cost = bottleRestockCrystalCost(product);
+  return (cost ? cost + Math.max(2, Math.ceil(cost * .3)) : 3) * Math.max(1, quantity);
+};
+export const brandedServeCrystalReward = (product: AlcoholProduct) => Math.max(3, Math.min(15, Math.ceil(product.popularity / 12)));
+
 export function generateBottleRequest(product: AlcoholProduct, quantity: number, occasion: BottleOccasion, marketFactor = 1): BottleRequest {
   const total = product.price * quantity * marketFactor;
   return {

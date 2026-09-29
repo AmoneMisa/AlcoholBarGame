@@ -1,6 +1,6 @@
 import { INGREDIENTS, RECIPES, REGIONS, STARTING_INVENTORY } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
-import { DEFAULT_BARS, type BarProfile } from '../data/cosmetics/bars';
+import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
 import { CHARACTER_ART, CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { generateCustomer } from '../domain/engine';
 import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../domain/types';
@@ -15,7 +15,7 @@ export const DELIVERY_DAY_MS = 24 * 60 * 60 * 1000;
 export type UnlockSource = 'starter' | 'shop' | 'special-client' | 'daily-gift';
 export interface ChatLine { id: number; speaker: 'customer' | 'bartender'; text: string; note?: string; ok?: boolean; }
 // One conversation with one guest. Only what has been said is stored here — never the hidden order.
-export interface Transcript { lines: ChatLine[]; facts: Fact[]; bottleFacts: BottleConversationFacts; expression: CustomerReply['expression']; }
+export interface Transcript { lines: ChatLine[]; facts: Fact[]; bottleFacts: BottleConversationFacts; expression: CustomerReply['expression']; attempts: number; correct: number; perfectRewardClaimed?: boolean; }
 
 export interface DeliveryOrder { id: string; supplier: string; barId: RegionId; dueAt: number; items: InventoryItem[]; total: number; }
 
@@ -23,9 +23,11 @@ export interface PlayerState {
   version: 1;
   regionId: RegionId;
   money: number;
+  crystals: number;
   xp: number;
   streak: number;
   bars: Record<RegionId, BarProfile>;
+  ownedInteriorIds: string[];
   knownRecipeIds: string[];
   recipeUnlockSources: Record<string, UnlockSource>;
   dailyGiftClaimedKey: string;
@@ -88,9 +90,11 @@ export function createInitialState(now = Date.now()): PlayerState {
     version: 1,
     regionId: 'new-york',
     money: 1240,
-    xp: 720,
+    crystals: 0,
+    xp: 0,
     streak: 0,
     bars: structuredClone(DEFAULT_BARS),
+    ownedInteriorIds: ['velvet'],
     knownRecipeIds,
     recipeUnlockSources: Object.fromEntries(knownRecipeIds.map((id) => [id, 'starter'])),
     dailyGiftClaimedKey: '',
@@ -114,4 +118,22 @@ export function createInitialState(now = Date.now()): PlayerState {
   };
 }
 
-export const levelFor = (xp: number) => Math.max(1, Math.floor(xp / 60));
+// JSON player snapshots are intentionally schema-light. Upgrade older snapshots in place whenever
+// they are loaded so adding a currency never invalidates an existing account.
+export function normalizePlayerState(state: PlayerState) {
+  state.crystals = Number.isFinite(state.crystals) && state.crystals >= 0 ? Math.floor(state.crystals) : 0;
+  const validInteriors = new Set(INTERIORS.map((item) => item.id));
+  state.ownedInteriorIds = Array.isArray(state.ownedInteriorIds)
+    ? [...new Set(['velvet', ...state.ownedInteriorIds.filter((id) => validInteriors.has(id as never))])]
+    : ['velvet'];
+  for (const bar of Object.values(state.bars)) if (!state.ownedInteriorIds.includes(bar.interior)) bar.interior = 'velvet';
+  state.conversations ??= {};
+  for (const transcript of Object.values(state.conversations)) {
+    transcript.attempts = Number.isFinite(transcript.attempts) ? Math.max(0, Math.floor(transcript.attempts)) : transcript.lines.filter((line) => line.speaker === 'bartender').length;
+    transcript.correct = Number.isFinite(transcript.correct) ? Math.max(0, Math.floor(transcript.correct)) : transcript.lines.filter((line) => line.speaker === 'bartender' && line.ok).length;
+  }
+  return state;
+}
+
+// Levels follow a rising XP curve (60, 80, 100… XP per level) — see domain/progression.ts.
+export { levelFor } from '../domain/progression';

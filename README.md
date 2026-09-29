@@ -21,14 +21,20 @@ Telegram Mini App bar-management game for practical English from absolute beginn
 
 ## Run
 
-    npm install
-    npm run dev
+    pnpm install
+    pnpm dev
 
 Build:
 
-    npm run build
+    pnpm build
 
-Production Telegram deployments must validate Telegram.WebApp.initData on the server.
+## Telegram bot
+
+1. Create the bot in `@BotFather` and configure its **Main Mini App** with the public HTTPS URL of this deployment.
+2. Copy `.env.example` to `.env` and paste the full BotFather token into `TELEGRAM_BOT_TOKEN`.
+3. Start the Compose stack. No bot ID, username, webhook secret, or app URL environment variable is needed.
+
+The app verifies every `Telegram.WebApp.initData` signature on the server. At startup it verifies the token with Telegram, installs `/start`, `/game` and `/help`, removes an old webhook, and receives commands by long polling. The launch button uses Telegram's Main Mini App deep link, derived from the bot username returned by Telegram.
 
 ## Next
 

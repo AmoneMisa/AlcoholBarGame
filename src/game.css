@@ -35,7 +35,7 @@ button { touch-action: manipulation; }
 .venue-mark span { position: absolute; right: 8px; bottom: 9px; width: 11px; height: 7px; border: 2px solid #ffd174; border-top: 0; }
 .xp-line { height: 4px; margin-top: 5px; overflow: hidden; border-radius: 9px; background: #070b13; }
 .xp-line span { display: block; height: 100%; background: linear-gradient(90deg, var(--raspberry), var(--gold)); }
-.hud-resources { display: flex; overflow: hidden; }
+.hud-resources { display: flex; overflow: visible; }
 .hud-resources > div { display: flex; min-width: 100px; align-items: center; gap: 8px; padding: 7px 12px; border-right: 1px solid #334158; }
 .hud-resources > div:last-child { border-right: 0; }
 .hud-resources span b { display: block; font-size: 14px; }
@@ -43,6 +43,18 @@ button { touch-action: manipulation; }
 .coin-icon::before { content: ''; width: 13px; height: 13px; border: 3px double #fff1a2; border-radius: 50%; background: #d38b25; }
 .gem-icon::before { content: ''; width: 13px; height: 13px; background: #47c9ff; clip-path: polygon(50% 0,100% 35%,72% 100%,28% 100%,0 35%); }
 .energy-icon::before { content: ''; width: 11px; height: 18px; background: #ffd146; clip-path: polygon(55% 0,100% 0,70% 40%,95% 40%,32% 100%,49% 56%,16% 56%); }
+.exchange-resource { position:relative;padding:0!important; }
+.exchange-open { display:flex;width:100%;height:100%;align-items:center;gap:8px;padding:7px 12px;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer; }
+.exchange-open:hover { background:#ffffff08; }.exchange-open span { white-space:nowrap; }
+.currency-exchange { position:absolute;z-index:180;top:calc(100% + 10px);right:0;width:310px;padding:10px;border:1px solid #d2a24e;border-radius:13px;background:linear-gradient(145deg,#17243a,#0b1320 70%);box-shadow:0 20px 50px #000d;text-align:left; }
+.currency-exchange::before { content:'';position:absolute;right:32px;top:-7px;width:12px;height:12px;border-top:1px solid #d2a24e;border-left:1px solid #d2a24e;background:#17243a;transform:rotate(45deg); }
+.currency-exchange header { display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:7px;border-bottom:1px solid #354762; }
+.currency-exchange header small,.currency-exchange header b { display:block; }.currency-exchange header b { margin-top:2px;font:700 17px Georgia,serif; }
+.currency-exchange header > button { display:grid;width:28px;height:28px;place-items:center;border:1px solid #495a72;border-radius:50%;background:#101a29;color:white;cursor:pointer; }
+.currency-exchange p { margin:8px 1px;color:#aeb9c7;font-size:8px;line-height:1.45; }
+.currency-exchange > button { display:grid;width:100%;grid-template-columns:1fr 24px 1fr;align-items:center;gap:4px;min-height:43px;margin-top:6px;padding:6px 9px;border:1px solid #455875;border-radius:9px;background:#152238;color:#fff;cursor:pointer; }
+.currency-exchange > button:hover:not(:disabled) { border-color:#edbd58;background:#283650; }.currency-exchange > button:disabled { opacity:.42;cursor:not-allowed; }
+.currency-exchange > button span { display:flex;align-items:center;gap:6px; }.currency-exchange > button span:last-child { justify-content:flex-end; }.currency-exchange > button .ui-icon { width:20px;height:20px;color:#f5c65d; }.currency-exchange > button span:first-child .ui-icon { color:#77ddf4; }.currency-exchange > button i { color:#d9b86d;font-style:normal;text-align:center; }
 .shift-card { min-width: 130px; padding: 6px 14px; text-align: center; }
 .shift-card b, .shift-card span { display: block; }
 .shift-card b { font-family: Georgia, serif; font-size: 17px; }
@@ -56,9 +68,10 @@ button { touch-action: manipulation; }
 .bar-scene::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, transparent 42%, #140d16aa 72%, #070a10 100%); }
 .bar-scene[data-wall='emerald']::after { content: ''; position: absolute; inset: 0; z-index: -1; background: #00594320; mix-blend-mode: color; }
 .bar-scene[data-wall='burgundy']::after { content: ''; position: absolute; inset: 0; z-index: -1; background: #99143318; mix-blend-mode: color; }
-.scene-light { position: absolute; top: -20%; width: 220px; height: 640px; pointer-events: none; background: linear-gradient(180deg, #ffd26f55, transparent 72%); filter: blur(22px); transform: rotate(18deg); }.scene-light-left { left: 8%; }.scene-light-right { right: 5%; transform: rotate(-18deg); }
-.bar-cast { position: absolute; inset: 0 2% 46px; display: flex; align-items: flex-end; justify-content: center; gap: clamp(0px, .4vw, 8px); }
+.scene-light { position: absolute; z-index: 1; top: -20%; width: 220px; height: 640px; pointer-events: none; background: linear-gradient(180deg, #ffd26f55, transparent 72%); filter: blur(22px); transform: rotate(18deg); }.scene-light-left { left: 8%; }.scene-light-right { right: 5%; transform: rotate(-18deg); }
+.bar-cast { position: absolute; z-index: 6; inset: 0 2% 46px; display: flex; align-items: flex-end; justify-content: center; gap: clamp(0px, .4vw, 8px); }
 .scene-customer { position: relative; width: min(18%, 190px); min-width: 118px; height: 380px; padding: 0; border: 0; background: transparent; color: white; cursor: pointer; transition: transform .25s ease, filter .25s ease, opacity .25s ease; }
+.scene-customer:only-child { width:min(32%,260px); }
 .scene-customer.waiting { filter: saturate(.8) brightness(.78); }.scene-customer:hover, .scene-customer.active { z-index: 4; filter: none; transform: translateY(-8px); }
 .scene-customer .art-character { position: absolute; inset: auto 0 29px; height: 270px; }
 .scene-customer.active .art-character { transform: scale(1.12); transform-origin: bottom; }
@@ -69,10 +82,68 @@ button { touch-action: manipulation; }
 .customer-plate b, .customer-plate small { display: block; }.customer-plate b { font: 700 12px Georgia, serif; }.customer-plate small { color: #c9a968; font-size: 8px; text-transform: uppercase; }
 .mini-patience { position:relative;height:16px;overflow:hidden;border:1px solid #5e4050;border-radius:99px;background:#281725; }.mini-patience i { display:block;height:100%;background:linear-gradient(90deg,#ef5471,#f5cb5c,#57d687); }.mini-patience em { position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:8px;font-style:normal;font-weight:900;text-shadow:0 1px 3px #000; }
 .empty-bar-wait { align-self:center;width:min(330px,82vw);padding:22px;border:1px solid #d2a04e99;border-radius:18px;background:#0a111de8;box-shadow:0 18px 50px #0009;text-align:center;backdrop-filter:blur(10px); }.empty-bar-wait small,.empty-bar-wait b { display:block; }.empty-bar-wait small { color:var(--gold);font-size:9px;font-weight:900;letter-spacing:.16em; }.empty-bar-wait b { margin:5px 0;font:700 36px Georgia,serif;color:#fff0c8; }.empty-bar-wait p { margin:0;color:#afbbc9;font-size:11px;line-height:1.45; }
-.bartender-layer { position: absolute; z-index: 6; right: 1%; bottom: 40px; width: 210px; height: 390px; pointer-events: none; }
-.bartender-layer .art-character { width: 100%; height: 100%; }.name-ribbon { position: absolute; right: 7px; bottom: 4px; padding: 5px 9px; border: 1px solid #d8a34e; background: #1c1420e8; color: #ffd98b; font-size: 8px; font-weight: 900; letter-spacing: .1em; }
-.counter-glow { position: absolute; right: 0; bottom: 0; left: 0; height: 48px; border-top: 2px solid #f0aa5877; background: linear-gradient(#542e28, #190f14); box-shadow: 0 -8px 22px #ff9b4b24; }
+.bartender-layer { position: absolute; z-index: 3; right: 2%; bottom: 30px; width: 225px; height: 420px; pointer-events: none; }
+.bartender-layer .art-character { width: 100%; height: 100%; }.name-ribbon { position: absolute; right: 7px; bottom: 30%; padding: 5px 9px; border: 1px solid #d8a34e; background: #1c1420e8; color: #ffd98b; font-size: 8px; font-weight: 900; letter-spacing: .1em; }
+.counter-glow { position: absolute; z-index: 5; right: 0; bottom: 0; left: 0; height: 122px; border-top: 7px solid #f0aa58; background: linear-gradient(180deg,#70443a 0 13px,#43251f 14px,#190f14 100%); box-shadow: 0 -9px 24px #ff9b4b38,inset 0 2px #ffe0a344; }
+.counter-glow::before { content:'';position:absolute;right:0;top:-13px;left:0;height:12px;background:linear-gradient(180deg,#f4c176,#77442e);box-shadow:0 -3px 8px #0008; }
 .scene-status { position: absolute; z-index: 12; right: 10px; bottom: 8px; left: 10px; display: flex; min-height: 32px; align-items: center; gap: 8px; padding: 5px 10px; border: 1px solid #5b4f58; border-radius: 9px; background: #0a111de6; color: #dce3ec; font-size: 10px; backdrop-filter: blur(8px); }.scene-status > span { flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 9px var(--green); }.scene-status > span.waiting { background:var(--gold);box-shadow:0 0 9px var(--gold); }.scene-status b { margin-left:auto;color:var(--gold);white-space:nowrap; }
+
+/* The bar itself is the mixing station. Bottles live on the back bar and the glass rests on the counter. */
+.bar-scene.is-building { min-height: 680px; }
+.live-backbar { position:absolute;z-index:2;top:22px;right:18px;left:18px;overflow:hidden;border:1px solid #c595554d;border-radius:14px;background:linear-gradient(180deg,#100b0bd9,#21130fbd 72%,#3f2416e8);box-shadow:inset 0 1px #ffe4a42b,0 15px 30px #0008;backdrop-filter:blur(4px); }
+.live-backbar::after { content:'';position:absolute;right:0;bottom:0;left:0;height:8px;border-top:2px solid #d7a058;background:linear-gradient(#8d5430,#321b12);box-shadow:0 -3px 8px #0008;pointer-events:none; }
+.live-backbar > header { display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px 4px; }
+.live-backbar > header > span:first-child { display:grid;gap:1px; }
+.live-backbar header b { color:#ffd47c;font-size:8px;letter-spacing:.16em; }
+.live-backbar header small { color:#cdbba5;font-size:7px; }
+.backbar-arrows { display:flex;gap:4px; }
+.backbar-arrows button { display:grid;width:28px;height:28px;place-items:center;border:1px solid #a87943;border-radius:7px;background:#21150f;color:#ffe4aa;font-size:19px;cursor:pointer; }
+.live-bottle-shelf { display:flex;gap:3px;overflow-x:auto;overflow-y:hidden;padding:0 8px 10px;scroll-snap-type:x proximity;scrollbar-width:none;touch-action:pan-x; }
+.live-bottle-shelf::-webkit-scrollbar { display:none; }
+.live-bottle-shelf > button { position:relative;flex:0 0 70px;height:102px;overflow:visible;border:0;border-radius:8px;background:transparent;color:#fff;cursor:grab;scroll-snap-align:start;touch-action:none;user-select:none; }
+.live-bottle-shelf > button:active { cursor:grabbing; }
+.live-bottle-shelf .bottle-visual { width:68px;height:78px;margin-top:-3px;filter:drop-shadow(0 7px 4px #000b); }
+.live-bottle-shelf .bottle-visual > b { top:7px;right:1px;padding:2px 4px;font-size:6px; }
+.live-bottle-shelf > button > span { position:absolute;right:2px;bottom:7px;left:2px;overflow:hidden;color:#f8e5c8;font-size:6px;font-weight:800;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 3px #000; }
+.bar-scene.is-building .bartender-layer { right:1%;bottom:42px;height:360px;opacity:.88; }
+.bar-scene.is-building .bar-cast { right:37%;left:1%; }
+.bar-scene.is-building .scene-customer { height:345px; }
+.live-glass-station { position:absolute;z-index:10;right:4%;bottom:49px;display:flex;width:240px;height:270px;align-items:flex-end;justify-content:center;border:1px solid transparent;border-radius:22px;transition:.18s ease; }
+.live-glass-station.drag-over { border-color:#ffd77d;background:radial-gradient(circle at 52% 58%,#ffd77d2e,transparent 58%);box-shadow:inset 0 0 30px #ffc75b20,0 0 22px #ffc75b26; }
+.live-glass-wrap { position:relative;width:148px;height:226px; }
+.live-glass-wrap .glass-model { width:148px;height:220px;transform:none;filter:drop-shadow(0 15px 8px #000b); }
+.live-glass-copy { position:absolute;z-index:3;top:4px;left:4px;display:grid;gap:1px;padding:6px 8px;border:1px solid #8d6941;border-radius:8px;background:#10131bd9;pointer-events:none; }
+.live-glass-copy b { color:#ffd677;font-size:10px;letter-spacing:.1em; }
+.live-glass-copy small { color:#d7cab9;font-size:7px; }
+.fresh-plus { position:absolute;z-index:12;right:-19px;bottom:37px;display:grid;width:48px;height:48px;place-content:center;border:2px solid #f4c96d;border-radius:50%;background:linear-gradient(#6d4326,#2c1a16);color:#fff4d2;box-shadow:0 7px 14px #0009,inset 0 1px #fff5;cursor:pointer; }
+.fresh-plus span { font:700 24px/18px Georgia,serif; }.fresh-plus small { color:#ffd885;font-size:6px;font-weight:900;text-transform:uppercase; }
+.live-pour-stream { position:absolute;z-index:8;top:-42px;left:49px;width:7px;height:93px;border-radius:60% 40% 50% 60%;background:linear-gradient(90deg,#fff7,var(--stream-color),#0002);filter:drop-shadow(0 0 3px var(--stream-color));transform:rotate(-9deg);transform-origin:top;animation:liveLiquidStream .42s ease-in-out infinite;pointer-events:none; }
+.fresh-picker { position:absolute;z-index:30;right:8px;bottom:12px;width:min(430px,calc(100vw - 40px));overflow:hidden;border:1px solid #d4a457;border-radius:14px;background:#0b1421f5;box-shadow:0 18px 50px #000d;backdrop-filter:blur(12px); }
+.fresh-picker > header { display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:1px solid #58432f; }
+.fresh-picker > header b { color:#ffd67c;font-size:8px;letter-spacing:.12em; }
+.fresh-picker > header button { width:28px;height:28px;border:1px solid #6b5945;border-radius:50%;background:#1a2330;color:white;cursor:pointer; }
+.fresh-picker > div { display:flex;gap:5px;overflow-x:auto;padding:8px;scrollbar-width:thin; }
+.fresh-picker > div > button { position:relative;flex:0 0 78px;min-height:105px;border:1px solid #3e5068;border-radius:10px;background:radial-gradient(circle at 50% 38%,#2b425a,#111c2c 72%);color:white;cursor:pointer; }
+.fresh-picker .bottle-visual { width:68px;height:68px; }
+.fresh-picker button > span,.fresh-picker button > small { display:block;font-size:7px; }.fresh-picker button > small { color:#f4c76c; }
+.drag-bottle-ghost { position:fixed;z-index:1000;width:92px;height:125px;pointer-events:none;transform:translate(-50%,-70%) rotate(-9deg);filter:drop-shadow(0 15px 10px #000b); }
+.drag-bottle-ghost .bottle-visual { width:92px;height:125px; }
+.drag-bottle-ghost.pouring { transform:translate(-80%,-73%) rotate(68deg);transform-origin:70% 80%; }
+.drag-bottle-ghost > i { position:absolute;top:77%;left:76%;width:6px;height:112px;border-radius:50%;background:linear-gradient(90deg,#fff6,var(--stream-color),#0002);transform:rotate(-68deg);transform-origin:top;animation:liveLiquidStream .42s ease-in-out infinite; }
+@keyframes liveLiquidStream { 0%,100%{opacity:.55;scale:1 .88}50%{opacity:1;scale:1 1.06} }
+
+.compact-order-station { min-height:0; }
+.compact-order-hidden { display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px; }
+.compact-order-hidden h3 { margin:3px 0;font:700 22px Georgia,serif; }.compact-order-hidden p { max-width:690px;margin:0;color:#aeb9c8;font-size:10px;line-height:1.5; }
+.compact-order-hidden small,.counter-instructions > small { color:var(--gold);font-size:8px;font-weight:900;letter-spacing:.13em; }
+.compact-order-body { display:grid;grid-template-columns:minmax(260px,.75fr) minmax(320px,1.25fr);gap:10px;padding:10px 12px; }
+.counter-instructions { display:grid;align-content:center;gap:4px;padding:13px;border:1px solid #674b35;border-radius:11px;background:linear-gradient(135deg,#2a1e1b,#121824); }
+.counter-instructions b { font:700 16px Georgia,serif; }.counter-instructions span { color:#c5bdaf;font-size:9px;line-height:1.45; }.counter-instructions i { display:inline-grid;width:18px;height:18px;place-items:center;border:1px solid #d6a954;border-radius:50%;color:#ffd477;font-style:normal;font-weight:900; }.counter-instructions em { color:#6ee0a2;font-size:8px;font-style:normal; }
+.compact-recipe-progress { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px; }
+.compact-recipe-progress > div { display:flex;min-height:44px;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px;border:1px solid #44546a;border-radius:9px;background:#101a29;color:#ccd5df; }
+.compact-recipe-progress > div.done { border-color:#3d9869;background:#10271f; }.compact-recipe-progress > div.wrong { border-color:#bd4d5b;background:#2d171c; }
+.compact-recipe-progress span,.compact-recipe-progress b,.compact-recipe-progress small { display:block; }.compact-recipe-progress b { font-size:9px; }.compact-recipe-progress small { margin-top:2px;color:#d8b66d;font-size:7px; }.compact-recipe-progress strong { color:inherit;font-size:9px;white-space:nowrap; }
+.compact-actions { grid-template-columns:100px 100px minmax(160px,1fr); }
 
 .art-character { position: relative; overflow: visible; transition: transform .24s ease; }
 .customer-art { width: 100%; height: 100%; background-image: url('/assets/characters/customers/velvet-hour-cast.png'); background-size: 500% auto; background-repeat: no-repeat; filter: drop-shadow(0 10px 8px #0008); }
@@ -163,7 +234,7 @@ button { touch-action: manipulation; }
 
 @media (max-width: 1280px) {
   .top-hud { grid-template-columns:minmax(250px,1fr) auto auto 48px; }.hud-resources > div { min-width:86px;padding-inline:9px; }
-  .service-layout { grid-template-columns:minmax(0,1.3fr) minmax(340px,.7fr); }.scene-customer { min-width:104px; }.bartender-layer { display:none; }
+  .service-layout { grid-template-columns:minmax(0,1.3fr) minmax(340px,.7fr); }.scene-customer { min-width:104px; }.bartender-layer { right:0;width:185px;height:350px;opacity:.9; }
   .ingredient-tray { grid-template-columns:repeat(4,1fr); }.inventory-cards { grid-template-columns:repeat(4,1fr); }.recipe-cards { grid-template-columns:repeat(3,1fr); }
   .bar-switcher { grid-template-columns:repeat(3,1fr); }.supplier-picker { grid-template-columns:repeat(2,1fr); }.market-offer-grid { grid-template-columns:repeat(2,1fr); }.recipe-cards { grid-template-columns:1fr 1fr; }.recipe-cards button { grid-template-columns:150px 1fr; }.recipe-cards .glass-model.glass-painted { width:150px;height:125px; }
 }
@@ -196,6 +267,43 @@ button { touch-action: manipulation; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important; }
+}
+
+@media (max-width: 760px) {
+  .currency-exchange { position:fixed;top:calc(max(8px,env(safe-area-inset-top)) + 112px);right:7px;left:7px;width:auto; }
+  .currency-exchange::before { display:none; }
+  .bar-scene.is-building { min-height: 560px; }
+  .live-backbar { top:8px;right:7px;left:7px;border-radius:11px; }
+  .live-backbar > header { padding:5px 7px 2px; }
+  .live-bottle-shelf { padding-inline:4px; }
+  .live-bottle-shelf > button { flex-basis:61px;height:91px; }
+  .live-bottle-shelf .bottle-visual { width:60px;height:69px; }
+  .bar-scene.is-building .bartender-layer { right:-8%;bottom:55px;width:180px;height:310px;opacity:.76; }
+  .bar-scene.is-building .bar-cast { right:28%;inset-block-end:48px; }
+  .bar-scene.is-building .scene-customer.active { width:195px;height:320px; }
+  .bar-scene.is-building .scene-customer .art-character { height:235px; }
+  .bar-scene.is-building .speech-bubble { top:28px;width:155px; }
+  .live-glass-station { right:-10px;bottom:48px;width:175px;height:230px; }
+  .live-glass-wrap { width:118px;height:185px; }
+  .live-glass-wrap .glass-model { width:118px;height:176px; }
+  .live-glass-copy { top:8px;left:0;max-width:105px; }
+  .live-glass-copy small { display:none; }
+  .fresh-plus { right:-18px;bottom:28px;width:44px;height:44px; }
+  .fresh-picker { position:fixed;right:8px;bottom:calc(70px + var(--safe-bottom));left:8px;width:auto; }
+  .drag-bottle-ghost { width:74px;height:105px; }
+  .drag-bottle-ghost .bottle-visual { width:74px;height:105px; }
+  .compact-order-body { grid-template-columns:1fr;padding:8px; }
+  .compact-recipe-progress { grid-template-columns:1fr 1fr; }
+  .compact-order-hidden { display:grid;padding:13px;text-align:left; }
+  .compact-actions { grid-template-columns:1fr 1fr; }
+  .compact-actions .primary-button { grid-column:1/-1;grid-row:1; }
+}
+
+@media (max-width: 430px) {
+  .bar-scene.is-building .bar-cast { right:35%; }
+  .bar-scene.is-building .scene-customer.active { width:170px; }
+  .bar-scene.is-building .bartender-layer { display:none; }
+  .compact-recipe-progress { grid-template-columns:1fr; }
 }
 
 /* Interactive order station: a real shelf, measured pouring and readable glass. */
@@ -408,7 +516,7 @@ button { touch-action: manipulation; }
 [data-counter-color='navy'] .counter-glow::after,.mini-interior[data-counter-color='navy']>i::after{background:#183f70}
 [data-counter-color='plum'] .counter-glow::after,.mini-interior[data-counter-color='plum']>i::after{background:#673257}
 [data-counter-color='smoke'] .counter-glow::after,.mini-interior[data-counter-color='smoke']>i::after{background:#69717a}
-.bar-scene[data-counter-size='slim'] .counter-glow{height:32px}.bar-scene[data-counter-size='grand'] .counter-glow{height:72px}
+.bar-scene[data-counter-size='slim'] .counter-glow{height:92px}.bar-scene[data-counter-size='grand'] .counter-glow{height:150px}
 .mini-interior[data-counter-size='slim']>i{height:25px}.mini-interior[data-counter-size='grand']>i{height:56px}
 
 /* High-resolution bartender art stays intact; these layers tint and reshape selected regions. */
@@ -417,8 +525,8 @@ button { touch-action: manipulation; }
 .role-bartender .wardrobe-art,.role-bartender .bartender-customization{transform:translate(var(--pose-x,0),var(--pose-y,0)) rotate(var(--pose-rotate,0deg)) scaleX(var(--body-custom-scale,1));transform-origin:50% 100%;transition:transform .28s ease,filter .28s ease}
 .bartender-customization{position:absolute;z-index:4;inset:0;pointer-events:none;overflow:hidden;filter:drop-shadow(0 8px 12px #0004)}
 .bartender-customization>span{position:absolute;display:block;pointer-events:none}
-.custom-hair-tint{left:30%;top:1%;width:40%;height:30%;border-radius:48% 52% 42% 45%;background:var(--hair-custom);opacity:.58;mix-blend-mode:color;clip-path:polygon(17% 0,83% 0,100% 36%,89% 78%,71% 100%,27% 92%,3% 66%,0 28%)}
-.character-leo .custom-hair-tint{left:35%;top:2%;width:31%;height:20%}.custom-hair-waves .custom-hair-tint{height:35%;border-radius:50% 45% 60% 55%}.custom-hair-bob .custom-hair-tint{top:5%;height:28%;border-radius:50% 50% 24% 24%}.custom-hair-ponytail .custom-hair-tint{left:31%;width:45%;clip-path:polygon(15% 0,75% 0,86% 40%,100% 100%,72% 74%,25% 94%,0 55%)}.custom-hair-braids .custom-hair-tint{height:39%;clip-path:polygon(16% 0,83% 0,96% 42%,80% 100%,63% 57%,37% 57%,19% 100%,2% 43%)}.custom-hair-slick .custom-hair-tint{top:4%;height:19%;transform:skewX(-7deg)}.custom-hair-short .custom-hair-tint{top:5%;height:16%}.custom-hair-undercut .custom-hair-tint{top:4%;left:38%;width:29%;height:16%;clip-path:polygon(8% 5%,100% 0,87% 86%,24% 100%,0 58%)}
+.custom-hair-tint{left:26%;top:0;width:48%;height:35%;background:var(--hair-custom);opacity:.62;mix-blend-mode:color;clip-path:polygon(7% 0,93% 0,100% 28%,95% 100%,80% 100%,76% 42%,65% 28%,35% 28%,24% 42%,20% 100%,5% 100%,0 28%)}
+.character-leo .custom-hair-tint{left:33%;top:0;width:38%;height:14%;border-radius:50% 50% 36% 40%;clip-path:polygon(8% 8%,88% 0,100% 45%,87% 92%,62% 74%,43% 100%,18% 81%,0 42%)}.character-noa.custom-hair-waves .custom-hair-tint{height:37%}.character-noa.custom-hair-bob .custom-hair-tint{top:2%;height:29%}.character-noa.custom-hair-ponytail .custom-hair-tint{width:50%;left:25%}.character-noa.custom-hair-braids .custom-hair-tint{height:39%}.character-leo.custom-hair-slick .custom-hair-tint{transform:skewX(-5deg)}.character-leo.custom-hair-short .custom-hair-tint{height:12%}.character-leo.custom-hair-undercut .custom-hair-tint{left:38%;width:29%;height:12%}
 .custom-face-detail{left:39%;top:15%;width:22%;height:17%;border:1px solid transparent;border-radius:48%;opacity:.48}.custom-face-soft .custom-face-detail{box-shadow:inset 0 -7px 12px #ffb49b20}.custom-face-angular .custom-face-detail{border-inline-color:#4b241f70;border-radius:38% 42% 52% 48%;transform:scaleX(.9)}.custom-face-heart .custom-face-detail{border-bottom-color:#7d3e3566;border-radius:50% 50% 60% 60%}.custom-face-oval .custom-face-detail{transform:scaleX(.88) scaleY(1.08);border-color:#8e554044}.custom-face-mature .custom-face-detail{background:linear-gradient(165deg,transparent 42%,#542b2630 43% 45%,transparent 46%)}
 .custom-skin-detail{inset:0}.custom-skin-clean .custom-skin-detail{display:none}
 .custom-skin-tattoo-light .custom-skin-detail,.custom-skin-tattoo-bold .custom-skin-detail{left:18%;top:55%;width:11%;height:15%;border-radius:44%;opacity:.62;background:radial-gradient(circle at 50% 42%,transparent 0 19%,#20262a 21% 26%,transparent 28%),conic-gradient(from 25deg,transparent,#20262a 0 8%,transparent 9% 24%,#20262a 25% 31%,transparent 32%);transform:rotate(-15deg);mix-blend-mode:multiply}.custom-skin-tattoo-bold .custom-skin-detail{width:13%;height:19%;opacity:.78}.character-leo.custom-skin-tattoo-light .custom-skin-detail,.character-leo.custom-skin-tattoo-bold .custom-skin-detail{display:none}
@@ -445,8 +553,14 @@ button { touch-action: manipulation; }
   .pour-stream { left:calc(50% - 47px); }
   .drop-instruction { top:8px;left:8px; }
   .bar-scene { min-height:445px; }
+  .bartender-layer { display:block;right:-6px;bottom:32px;width:150px;height:285px;opacity:.86;transform:none; }
+  .bartender-layer .name-ribbon { display:none; }
+  .counter-glow { height:96px; }
+  .bar-scene[data-counter-size='slim'] .counter-glow { height:76px; }
+  .bar-scene[data-counter-size='grand'] .counter-glow { height:116px; }
   .bar-cast { inset:0 2px 43px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:end;gap:1px; }
   .scene-customer { display:block;width:auto;min-width:0;height:335px;transform:none!important; }
+  .scene-customer:only-child { grid-column:1/4;justify-self:stretch;width:auto; }
   .scene-customer .art-character { inset:auto -13px 34px;height:225px; }
   .scene-customer.active .art-character { transform:scale(1.09); }
   .scene-customer .speech-bubble { display:none;top:4px;left:50%;width:154px; }
@@ -592,3 +706,129 @@ button { touch-action: manipulation; }
 
 @media(max-width:1050px){.design-options{grid-template-columns:repeat(2,minmax(0,1fr))}.background-picker>div{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:760px){.design-grid-new{grid-template-columns:1fr}.design-options{grid-template-columns:1fr}.background-picker>div{display:flex!important;overflow-x:auto;flex-wrap:nowrap!important;scroll-snap-type:x mandatory;padding-bottom:4px;scrollbar-width:thin}.background-picker button{flex:0 0 148px!important;min-height:78px!important;scroll-snap-align:start}.bartender-customization{overflow:hidden}.design-options section button{min-height:42px;font-size:9px}}
+
+/* Atlas thumbnails use the same selected quadrant as the full scene. */
+.background-picker button {
+  background-position:var(--interior-background-position,center)!important;
+  background-size:var(--interior-background-size,cover)!important;
+}
+.background-picker button.special { border-color:#deaa55;box-shadow:inset 0 0 0 1px #f1c87355,0 0 16px #9d31563b; }
+.background-picker button.special::before { content:'SPECIAL';position:absolute;z-index:3;top:5px;left:5px;padding:3px 6px;border:1px solid #f0c87588;border-radius:999px;background:#351323e6;color:#ffe5a5;font-size:6px;font-weight:1000;letter-spacing:.12em; }
+.background-picker button.locked { filter:saturate(.55) brightness(.72);border-color:#546072; }
+.background-picker button.locked:hover { filter:saturate(.8) brightness(.9);border-color:#66c5df; }
+.background-picker button > em { position:absolute;z-index:4;top:5px;right:5px;padding:3px 6px;border:1px solid #8fe8f5aa;border-radius:999px;background:#071925e8;color:#a9f2ff;font-size:7px;font-style:normal;font-weight:1000;letter-spacing:.04em; }
+.empty-bar-wait button { margin-top:12px;padding:9px 13px;border:1px solid #71cce3;border-radius:9px;background:linear-gradient(135deg,#173f59,#245f73);color:#e9fbff;font-size:10px;font-weight:900;cursor:pointer; }
+.empty-bar-wait button:disabled,.reserve-restock:disabled { opacity:.45;cursor:not-allowed; }
+.waiting-station .primary-button { margin-top:13px; }
+.sealed-stock-grid .reserve-restock { grid-column:1/-1;min-height:30px;border:1px solid #317c94;border-radius:7px;background:#12384a;color:#dffaff;font-size:8px;font-weight:900;cursor:pointer; }
+.brand-crystal-payment { display:block;margin-top:7px;color:#83e7f6;font-size:9px;font-style:normal;font-weight:900;letter-spacing:.06em;text-transform:uppercase; }
+
+/* Hair colour through a hair mask of the same sprite frame (see CharacterModel.vue). */
+.sprite-hair-tint{position:absolute;inset:0;display:block;background:var(--hair-custom,#2a1712);opacity:.72;mix-blend-mode:color;pointer-events:none;mask-repeat:no-repeat;-webkit-mask-repeat:no-repeat}
+
+/* Depth: the bartender works behind the bar line (the counter hides everything below the chest),
+   guests stand in front of it. --counter-top follows the counter size and the breakpoint. */
+.bar-scene { --counter-top: 122px; }
+.bar-scene[data-counter-size='slim'] { --counter-top: 92px; }
+.bar-scene[data-counter-size='grand'] { --counter-top: 150px; }
+.role-bartender .wardrobe-art { position: relative; }
+.bar-scene .bartender-layer { z-index: 3 !important; bottom: calc(var(--counter-top) + 7px) !important; transform: translateY(40%) !important; }
+.bar-scene .bartender-layer .name-ribbon { top: 6%; bottom: auto; }
+.bar-scene .bar-cast { bottom: 30px; }
+.bar-scene .scene-customer .art-character { bottom: 22px; height: 292px; filter: drop-shadow(0 16px 14px #000b); }
+@media (max-width: 760px) {
+  .bar-scene { --counter-top: 96px; }
+  .bar-scene[data-counter-size='slim'] { --counter-top: 76px; }
+  .bar-scene[data-counter-size='grand'] { --counter-top: 116px; }
+  .bar-scene .scene-customer .art-character { height: 290px; }
+}
+/* City event chip: under the bottle shelf while mixing. */
+.bar-scene.is-building .city-event.compact { top: auto; bottom: 50px; left: 12px; }
+
+/* Back bar: four shelf lines at once (spirits, liqueurs, juices, mixers) — no scrolling needed to reach a bottle. */
+.live-backbar { top: 14px; }
+.live-shelf-lines { display: grid; gap: 2px; padding: 0 8px 12px; }
+.live-shelf-line { display: grid; grid-template-columns: 74px 1fr; align-items: end; border-bottom: 3px solid #8d5430; box-shadow: 0 3px 5px #0007; }
+.live-shelf-label { align-self: center; color: #d8b582; font-size: 7px; font-weight: 800; letter-spacing: .06em; line-height: 1.25; text-transform: uppercase; }
+.live-shelf-line .live-bottle-shelf { display: flex; flex-wrap: nowrap; gap: 2px; overflow: visible; padding: 0; scroll-snap-type: none; }
+.live-shelf-line .live-bottle-shelf > button { flex: 0 1 62px; min-width: 0; height: 66px; }
+.live-shelf-line .live-bottle-shelf .bottle-visual { width: 54px; height: 54px; margin: -4px auto 0; }
+.live-shelf-line .live-bottle-shelf > button > span { bottom: 9px; font-size: 6px; }
+.live-shelf-line .live-bottle-shelf > button > em { position: absolute; right: 2px; bottom: 0; left: 2px; color: #9fd3a8; font-size: 6px; font-style: normal; font-weight: 800; text-shadow: 0 1px 2px #000; }
+.live-shelf-line .live-bottle-shelf > button.empty { cursor: not-allowed; filter: grayscale(1) brightness(.55); }
+.live-shelf-line .live-bottle-shelf > button.empty > em { color: #ff9ca5; }
+.live-shelf-line .live-bottle-shelf > button.poured .bottle-visual { transform: translateY(-3px); }
+.bar-scene.is-building { min-height: 760px; }
+@media (max-width: 760px) {
+  .live-shelf-lines { padding: 0 4px 9px; }
+  .live-shelf-line { grid-template-columns: 1fr; }
+  .live-shelf-label { padding: 2px 0 0; font-size: 6px; }
+  .live-shelf-line .live-bottle-shelf { justify-content: space-between; }
+  .live-shelf-line .live-bottle-shelf > button { flex: 1 1 0; height: 58px; }
+  .live-shelf-line .live-bottle-shelf .bottle-visual { width: 42px; height: 44px; }
+  .live-shelf-line .live-bottle-shelf > button > span { display: none; }
+  .bar-scene.is-building { min-height: 720px; }
+}
+@media (min-width: 761px) {
+  .live-shelf-line .live-bottle-shelf > button { flex-basis: 78px; height: 74px; }
+  .live-shelf-line .live-bottle-shelf .bottle-visual { width: 62px; height: 62px; }
+}
+/* Customer portraits keep their painted proportions: the sprite is as tall as its box and as wide as the frame ratio allows. */
+.art-character .customer-art { width: auto; max-width: none; height: 100%; aspect-ratio: var(--frame-ratio, .6); margin: 0 auto; }
+.art-character:has(> .customer-art) { display: flex; justify-content: center; }
+/* Mobile shelf: rows may never grow wider than the back bar. */
+.live-shelf-line { grid-template-columns: 74px minmax(0, 1fr); }
+.live-shelf-line > * { min-width: 0; }
+@media (max-width: 760px) { .live-shelf-line { grid-template-columns: minmax(0, 1fr); } }
+/* The bottle in hand always says what it is. */
+.drag-bottle-ghost .ghost-name { position: absolute; top: -26px; left: 50%; padding: 4px 8px; border: 1px solid #d6a54e; border-radius: 8px; background: #120d0ef0; color: #ffe2a8; font-size: 11px; font-weight: 800; white-space: nowrap; transform: translateX(-50%) rotate(9deg); box-shadow: 0 6px 14px #000a; }
+/* Shelf labels sit centred under their bottle; on phones the names wrap to two short lines. */
+.live-shelf-line .live-bottle-shelf > button { text-align: center; }
+.live-shelf-line .live-bottle-shelf > button > span, .live-shelf-line .live-bottle-shelf > button > em { text-align: center; }
+@media (max-width: 760px) {
+  .live-shelf-line .live-bottle-shelf > button { height: 70px; }
+  .live-shelf-line .live-bottle-shelf .bottle-visual { width: 38px; height: 40px; }
+  .live-shelf-line .live-bottle-shelf > button > span { display: -webkit-box; bottom: 9px; overflow: hidden; font-size: 6.5px; line-height: 1.1; white-space: normal; text-overflow: clip; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+}
+/* Header: labels stay inside their own cell. */
+.top-hud small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top-hud button > span, .top-hud div > span { min-width: 0; }
+@media (max-width: 760px) {
+  .top-hud small { overflow: visible; letter-spacing: .03em; line-height: 1.1; white-space: normal; text-overflow: clip; }
+  .live-shelf-line .live-bottle-shelf > button { height: 78px; }
+  .live-shelf-line .live-bottle-shelf .bottle-visual { margin-top: -2px; }
+}
+@media (max-width: 760px) { .bar-scene.is-building { min-height: 800px; } }
+@media (min-width: 761px) {
+  .live-shelf-line { grid-template-columns: 96px minmax(0, 1fr); }
+  .live-shelf-label { font-size: 8px; }
+  .live-shelf-line .live-bottle-shelf { justify-content: flex-start; gap: 4px; }
+  .live-shelf-line .live-bottle-shelf > button { flex: 1 1 0; max-width: 118px; height: 86px; }
+  .live-shelf-line .live-bottle-shelf > button > span { bottom: 12px; font-size: 9px; }
+  .live-shelf-line .live-bottle-shelf > button > em { font-size: 8px; }
+  .bar-scene.is-building { min-height: 800px; }
+}
+.live-shelf-line .live-bottle-shelf > button > span { z-index: 2; padding: 1px 3px; border-radius: 5px; background: #0d0a0acc; }
+@media (min-width: 761px) {
+  .live-shelf-line .live-bottle-shelf .bottle-visual { width: 56px; height: 56px; margin: -6px auto 0; }
+  .live-shelf-line .live-bottle-shelf > button > span { right: auto; left: 50%; max-width: 100%; transform: translateX(-50%); white-space: nowrap; }
+}
+/* Scrollable back bar: about two and a half shelf lines visible, scroll down for more; each line scrolls sideways. */
+.live-shelf-lines { max-height: 232px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: thin; scrollbar-color: #a87943 transparent; }
+.live-shelf-line .live-bottle-shelf { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none; }
+.live-shelf-line .live-bottle-shelf::-webkit-scrollbar { display: none; }
+.live-shelf-line .live-bottle-shelf > button { flex: 0 0 auto; width: 78px; max-width: none; }
+.bar-scene.is-building { min-height: 700px; }
+@media (max-width: 760px) {
+  .live-shelf-lines { max-height: 222px; }
+  .live-shelf-line .live-bottle-shelf > button { width: 60px; }
+  .bar-scene.is-building { min-height: 640px; }
+}
+/* While mixing, the city event chip sits in the free corner of the back-bar header. */
+.bar-scene.is-building .city-event.compact { top: 18px; right: 22px; bottom: auto; left: auto; max-width: 200px; }
+.live-backbar > header { padding-right: 190px; }
+@media (max-width: 760px) {
+  .bar-scene.is-building .city-event.compact { top: 12px; right: 12px; max-width: 150px; }
+  .bar-scene.is-building .city-event.compact .city-event-head { padding: 4px 7px; }
+  .live-backbar > header { padding-right: 150px; }
+}

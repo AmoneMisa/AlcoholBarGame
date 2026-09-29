@@ -46,7 +46,7 @@ const conversationRecipes = computed(() => customer.value?.specialRecipeRewardId
 const candidates = computed(() => conversationRecipes.value.filter((item) => matchesFacts(item, talk.value?.facts ?? [])));
 const bottleRecommendations = computed(() => {
   const quantity = talk.value?.bottleFacts.quantity ?? 1;
-  return rankBottles(talk.value?.bottleFacts ?? {}, game.region.marketFactor).filter(({ product }) =>
+  return rankBottles(talk.value?.bottleFacts ?? {}, game.guestPriceFactor).filter(({ product }) =>
     (game.bottleInventory.find((stock) => stock.productId === product.id)?.quantity ?? 0) >= quantity
   );
 });
@@ -334,7 +334,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
             <div class="bottle-recommendations">
               <article v-for="match in bottleRecommendations.slice(0, 6)" :key="match.product.id" :class="{ over: match.overBudget }">
                 <div class="shop-brand-bottle"><BrandBottle :brand="match.product.brand" :category="guideIdForProduct(match.product)" :color="match.product.color" /></div>
-                <div><b>{{ match.product.name }}</b><span>{{ ALCOHOL_TYPE_LABELS[match.product.type] }} · {{ match.product.abv }}% ABV</span><small>{{ match.reasons.slice(0, 2).join(' · ') || 'popular choice' }}</small><em>{{ bottleTotal(match.product, talk.bottleFacts.quantity ?? 1, game.region.marketFactor) }} coins · {{ bottleStock(match.product.id) }} in stock</em></div>
+                <div><b>{{ match.product.name }}</b><span>{{ ALCOHOL_TYPE_LABELS[match.product.type] }} · {{ match.product.abv }}% ABV</span><small>{{ match.reasons.slice(0, 2).join(' · ') || 'popular choice' }}</small><em>{{ bottleTotal(match.product, talk.bottleFacts.quantity ?? 1, game.guestPriceFactor) }} coins · {{ bottleStock(match.product.id) }} in stock</em></div>
                 <strong>{{ match.score }}%</strong>
                 <button type="button" @click="suggest(`Would you like ${match.product.name}?`)">Recommend</button>
                 <button type="button" class="bottle-info" :aria-label="`About ${match.product.brand}`" @click="openGuide('ingredient', guideIdForProduct(match.product))">About the brand</button>
@@ -359,7 +359,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
 
       <div v-if="confirmed" class="talk-confirmed">
         <template v-if="bottleOrder && confirmedBottle && customer.bottleRequest">
-          <div><small>SEALED-BOTTLE SALE CONFIRMED</small><b>{{ customer.bottleRequest.quantity }} × {{ confirmedBottle.name }}</b><span>{{ confirmedBottle.volumeMl }} ml · {{ confirmedBottle.abv }}% ABV · total {{ bottleTotal(confirmedBottle, customer.bottleRequest.quantity, game.region.marketFactor) }} coins</span></div>
+          <div><small>SEALED-BOTTLE SALE CONFIRMED</small><b>{{ customer.bottleRequest.quantity }} × {{ confirmedBottle.name }}</b><span>{{ confirmedBottle.volumeMl }} ml · {{ confirmedBottle.abv }}% ABV · total {{ bottleTotal(confirmedBottle, customer.bottleRequest.quantity, game.guestPriceFactor) }} coins</span></div>
           <button class="primary-button" type="button" :disabled="game.serving || bottleStock(confirmedBottle.id) < customer.bottleRequest.quantity" @click="completeBottleSale">Sell full bottle{{ customer.bottleRequest.quantity === 1 ? '' : 's' }} <span>→</span></button>
         </template>
         <template v-else>
