@@ -12,6 +12,8 @@ import { buildProfile, findRecipeMention, openingLine, replyTo, shortWish, type 
 import { serviceReply } from '../domain/conversation/serviceTalk';
 import { canWelcomeVip, nextCustomerArrival, nextVipAvailability, orderTimeSeconds, vipCarriesRecipe } from '../domain/customerTiming';
 import { economyAt, marketFor } from '../domain/progression';
+import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
+import { addSpareCopy, isStarterRecipe, RECIPE_MAX_LEVEL, recipeBonus, recipeLevel, upgradeCost } from './recipes';
 import { DELIVERY_DAY_MS, levelFor, normalizePlayerState, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
 
 // Game rules as pure state transitions. The server runs these for every request, so the client can only
@@ -26,6 +28,7 @@ export type GameAction =
   | { type: 'claimDaily' }
   | { type: 'exchangeCrystals'; crystals: number }
   | { type: 'buyRecipe'; recipeId: string }
+  | { type: 'upgradeRecipe'; recipeId: string }
   | { type: 'buyInterior'; interiorId: string }
   | { type: 'buyBottleStock'; productId: string; quantity?: number }
   | { type: 'expediteCustomer' }
@@ -38,6 +41,12 @@ export type GameAction =
   | { type: 'closeConversation' }
   // The player says one sentence to the guest; the server checks the English and decides the guest's answer.
   | { type: 'say'; text: string }
+  // Haggling with a supplier: open with the current cart, talk in English, then accept or leave.
+  | { type: 'startNegotiation'; supplierId: string; cart: Record<string, number> }
+  | { type: 'haggle'; text: string }
+  | { type: 'makeOffer'; price: number }
+  | { type: 'acceptDeal' }
+  | { type: 'leaveNegotiation' }
   | { type: 'sellBottle' }
   | { type: 'offerSimilar'; customerId: string }
   | { type: 'rejectCustomer'; customerId: string };
@@ -65,7 +74,8 @@ const log = (state: PlayerState, note: string) => { state.tradeLog = [note, ...s
 const cleanText = (text: unknown, max: number) => typeof text === 'string' ? text.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, max) : '';
 
 function unlockRecipe(state: PlayerState, recipeId: string, source: UnlockSource) {
-  if (state.knownRecipeIds.includes(recipeId)) return false;
+  // A recipe you already know becomes a spare copy (for gifting to friends).
+  if (state.knownRecipeIds.includes(recipeId)) { addSpareCopy(state, recipeId); return false; }
   state.knownRecipeIds.push(recipeId);
   state.recipeUnlockSources[recipeId] = source;
   return true;
@@ -222,6 +232,27 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       break;
     }
 
+    case 'startNegotiation':
+    case 'haggle':
+    case 'makeOffer':
+    case 'acceptDeal':
+    case 'leaveNegotiation': {
+      try {
+        if (action.type === 'startNegotiation') startNegotiation(state, action.supplierId, action.cart, now);
+        else if (action.type === 'haggle') {
+          const text = cleanText(action.text, 240);
+          if (text.length < 3) throw new RuleError('Write a sentence first.');
+          haggle(state, text, { checkEnglish: context.checkEnglish, random, now });
+        } else if (action.type === 'makeOffer') makeOffer(state, action.price, { random, now });
+        else if (action.type === 'acceptDeal') acceptDeal(state, now, DELIVERY_DAY_MS);
+        else state.negotiation = undefined;
+      } catch (error) {
+        if (error instanceof TradeError) throw new RuleError(error.message);
+        throw error;
+      }
+      break;
+    }
+
     case 'sellBottle': {
       const request = guest?.bottleRequest;
       const product = ALCOHOL_PRODUCTS.find((item) => item.id === guest?.selectedBottleId);
@@ -287,9 +318,11 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.inventories[state.regionId] = consumeMix(inventoryOf(state), mix);
       const verdict = judgeMix(mix, guest, action.shaken === true);
       if (verdict.success) {
-        const revenue = coins(verdict.recipe.price * priceFactorOf(guest, region.marketFactor));
+        // Upgraded recipes earn more: +8% price and +12% tips per level.
+        const mastery = recipeBonus(guest.orderKind === 'serve' ? 1 : recipeLevel(state, verdict.recipe.id));
+        const revenue = coins(verdict.recipe.price * priceFactorOf(guest, region.marketFactor) * mastery.pay);
         const bonus = guest.orderKind === 'serve' ? undefined : signatureBonus(verdict.recipe.id, pourBrands);
-        const tip = Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .25 : .12) * economyOf(state, now).tips) + (bonus ? 2 : 0);
+        const tip = Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .25 : .12) * economyOf(state, now).tips * mastery.tips) + (bonus ? 2 : 0);
         state.money = coins(state.money + revenue + tip);
         state.xp += 22 + Math.min(state.streak * 2, 14);
         state.streak += 1;
@@ -380,7 +413,9 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     }
     case 'buyRecipe': {
       const recipe = RECIPES.find((item) => item.id === action.recipeId);
-      if (!recipe || state.knownRecipeIds.includes(recipe.id)) throw new RuleError('This recipe is not for sale.');
+      // A known recipe can be bought again as a spare copy to gift — except the starter recipes everyone has.
+      if (!recipe || (state.knownRecipeIds.includes(recipe.id) && isStarterRecipe(recipe.id))) throw new RuleError('This recipe is not for sale.');
+      const spare = state.knownRecipeIds.includes(recipe.id);
       const price = recipePurchase(recipe, RECIPES.indexOf(recipe));
       if (price.currency === 'crystals') {
         if (state.crystals < price.amount) throw new RuleError(`You need ${price.amount} crystals to buy this recipe.`);
@@ -390,7 +425,19 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         state.money = coins(state.money - price.amount);
       }
       unlockRecipe(state, recipe.id, 'shop');
-      state.message = `${recipe.name} added to your recipe book.`;
+      state.message = spare ? `A spare ${recipe.name} recipe card is ready to gift.` : `${recipe.name} added to your recipe book.`;
+      break;
+    }
+    case 'upgradeRecipe': {
+      const recipe = RECIPES.find((item) => item.id === action.recipeId);
+      if (!recipe || !state.knownRecipeIds.includes(recipe.id)) throw new RuleError('Learn this recipe first.');
+      const level = recipeLevel(state, recipe.id);
+      const cost = upgradeCost(recipe, level);
+      if (cost === undefined || level >= RECIPE_MAX_LEVEL) throw new RuleError(`${recipe.name} is already at the top level.`);
+      if (state.money < cost) throw new RuleError(`You need ${cost} coins to upgrade ${recipe.name}.`);
+      state.money = coins(state.money - cost);
+      state.recipeLevels = { ...(state.recipeLevels ?? {}), [recipe.id]: level + 1 };
+      state.message = `${recipe.name} is now level ${level + 1}: guests pay ${Math.round((recipeBonus(level + 1).pay - 1) * 100)}% more for it.`;
       break;
     }
     case 'exchangeCrystals': {

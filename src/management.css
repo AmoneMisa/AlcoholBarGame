@@ -163,3 +163,7 @@
   .world-atlas { min-width:640px; }
   .region-cards button img { height:95px; }
 }
+/* The Design tab in the bottom navigation replaces the old brush button in the header. */
+header.top-hud { grid-template-columns: minmax(230px, 1fr) auto 130px; }
+@media (max-width: 1150px) { header.top-hud { grid-template-columns: minmax(0, 1fr) auto; } }
+@media (max-width: 900px) { header.top-hud { grid-template-columns: minmax(0, 1fr); } }

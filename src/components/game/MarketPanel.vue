@@ -5,6 +5,7 @@ import { useGameStore } from '../../stores/game';
 import BottleModel from '../cocktails/BottleModel.vue';
 import UiIcon from '../ui/UiIcon.vue';
 import CityEvent from './CityEvent.vue';
+import TradeTalk from './TradeTalk.vue';
 
 const game = useGameStore();
 const mode = ref<'buy'|'sell'>('buy');
@@ -23,6 +24,7 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
   <article class="game-panel market-panel">
     <header class="panel-heading"><div><small>TRADE FLOOR · {{ game.region.name }}</small><h2>Stock your next shift</h2></div><span>{{ game.money.toFixed(2) }} coins</span></header>
     <CityEvent />
+    <TradeTalk />
     <div class="market-modes"><button :class="{active:mode === 'buy'}" type="button" @click="mode = 'buy'">Buy supplies</button><button :class="{active:mode === 'sell'}" type="button" @click="mode = 'sell'">Sell stock</button><span>City prices {{ game.region.marketFactor.toFixed(2) }}× · prices change each shift</span></div>
     <div v-if="mode === 'buy'" class="supplier-picker polished-suppliers">
       <button v-for="supplier in SUPPLIERS" :key="supplier.id" :class="{ active:game.selectedSupplier === supplier.id }" type="button" @click="game.selectSupplier(supplier.id)">
@@ -52,6 +54,7 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
           <dl><div><dt>Supplies</dt><dd>{{ game.purchaseQuote.subtotal.toFixed(2) }}</dd></div><div><dt>Bulk discount {{ game.purchaseQuote.discountRate * 100 }}%</dt><dd>−{{ game.purchaseQuote.discount.toFixed(2) }}</dd></div><div><dt>Delivery</dt><dd>{{ game.purchaseQuote.delivery ? game.purchaseQuote.delivery.toFixed(2) : 'Free' }}</dd></div><div class="checkout-total"><dt>Total coins</dt><dd>{{ game.purchaseQuote.total.toFixed(2) }}</dd></div></dl>
           <div class="delivery-progress"><span>{{ game.purchaseQuote.freeDeliveryRemaining ? `${game.purchaseQuote.freeDeliveryRemaining.toFixed(2)} more coins for free delivery` : 'Free delivery unlocked' }}</span><progress :max="game.supplier.freeDeliveryAt" :value="game.purchaseQuote.subtotal - game.purchaseQuote.discount"></progress></div>
           <p class="discount-help">5+ packs: 5% off · 10+ packs: 10% off<br />Arrives in {{ game.supplier.deliveryDays }} shifts.</p>
+          <button class="secondary-button negotiate-button" type="button" :disabled="!game.purchaseQuote.lines.length" title="Talk to the sales rep in English to lower the price" @click="game.startNegotiation()">Negotiate price</button>
           <button class="primary-button" type="button" :disabled="!game.purchaseQuote.lines.length || game.purchaseQuote.total > game.money" @click="game.checkoutPurchase()">Place order</button>
           <button class="checkout-clear" type="button" @click="game.purchaseCart = {}">Clear order</button>
         </template>

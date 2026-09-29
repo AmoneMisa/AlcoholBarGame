@@ -12,7 +12,7 @@ import type { BottleConversationFacts } from '../domain/conversation/bottleTalk'
 
 export const BASIC_RECIPE_COUNT = 10;
 export const DELIVERY_DAY_MS = 24 * 60 * 60 * 1000;
-export type UnlockSource = 'starter' | 'shop' | 'special-client' | 'daily-gift';
+export type UnlockSource = 'starter' | 'shop' | 'special-client' | 'daily-gift' | 'friend-gift';
 export interface ChatLine { id: number; speaker: 'customer' | 'bartender'; text: string; note?: string; ok?: boolean; }
 // One conversation with one guest. Only what has been said is stored here — never the hidden order.
 export interface Transcript { lines: ChatLine[]; facts: Fact[]; bottleFacts: BottleConversationFacts; expression: CustomerReply['expression']; attempts: number; correct: number; perfectRewardClaimed?: boolean; }
@@ -46,6 +46,15 @@ export interface PlayerState {
   languageStats: { sentences: number; correct: number };
   // Correct sentences already rewarded per customer, so talking cannot be farmed for XP.
   rewardedSentences: Record<string, number>;
+  // Haggling with a supplier's sales rep (see sim/trade.ts); one open negotiation at a time.
+  negotiation?: import('./trade').Negotiation;
+  // When each supplier last agreed a negotiated deal (a rep haggles once an hour).
+  lastNegotiatedAt?: Record<string, number>;
+  // Recipe mastery (1–5, see sim/recipes.ts) and spare recipe cards that can be gifted.
+  recipeLevels?: Record<string, number>;
+  recipeCopies?: Record<string, number>;
+  // Day of the last rewarded visit to each friend's bar.
+  friendVisits?: Record<string, string>;
   conversations: Record<string, Transcript>;
   message: string;
 }
@@ -89,7 +98,7 @@ export function createInitialState(now = Date.now()): PlayerState {
   return {
     version: 1,
     regionId: 'new-york',
-    money: 1240,
+    money: 800,
     crystals: 0,
     xp: 0,
     streak: 0,

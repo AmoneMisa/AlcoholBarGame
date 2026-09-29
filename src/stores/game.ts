@@ -6,6 +6,7 @@ import { arrivalSkipCrystalCost, calendarDate, coins, consecutiveDays, dailyCoin
 import { BAR_PROFILE_OPTIONS, INTERIORS, interiorStyle, type BarProfile } from '../data/cosmetics/bars';
 import { judgeMix } from '../domain/engine';
 import { economyAt, levelProgress, marketFor } from '../domain/progression';
+import { negotiatedQuote } from '../sim/trade';
 import type { Customer, InventoryItem, RegionId, SupplierOffer } from '../domain/types';
 import { pourableBrand } from '../domain/brandServe';
 import { formatCountdown } from '../domain/customerTiming';
@@ -148,7 +149,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: mode.value !== 'online' });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal']);
 
   function saveOffline() {
     if (mode.value === 'online') return;
@@ -303,6 +304,26 @@ export const useGameStore = defineStore('game', () => {
   }
   const conversations = computed(() => state.value.conversations ?? {});
   const sellBottleToCustomer = () => dispatch({ type: 'sellBottle' });
+
+  // ---- Haggling with suppliers (rules in sim/trade.ts; the server decides every answer) ----
+  const negotiation = computed(() => state.value.negotiation);
+  const negotiationQuote = computed(() => state.value.negotiation ? negotiatedQuote(state.value, state.value.negotiation, nowMs.value) : undefined);
+  const startNegotiation = () => dispatch({ type: 'startNegotiation', supplierId: selectedSupplier.value, cart: { ...purchaseCart.value } });
+  async function haggle(text: string) {
+    if (mode.value === 'online') return send({ type: 'haggle', text });
+    return dispatch({ type: 'haggle', text });
+  }
+  // The server rolls the chance; the answer arrives with the new state.
+  async function makeOffer(price: number) {
+    if (mode.value === 'online') return send({ type: 'makeOffer', price });
+    return dispatch({ type: 'makeOffer', price });
+  }
+  function acceptDeal() {
+    const done = dispatch({ type: 'acceptDeal' });
+    if (done) purchaseCart.value = {};
+    return done;
+  }
+  const leaveNegotiation = () => dispatch({ type: 'leaveNegotiation' });
   const offerSimilarOrder = (id: string) => { const done = dispatch({ type: 'offerSimilar', customerId: id }); if (done) resetMix(); return done; };
   const rejectCustomer = (id: string) => { const done = dispatch({ type: 'rejectCustomer', customerId: id }); if (done) resetMix(); return done; };
 
@@ -352,6 +373,9 @@ export const useGameStore = defineStore('game', () => {
 
   // ---- Progress, bars and profile ----
   const buyRecipe = (recipeId: string) => dispatch({ type: 'buyRecipe', recipeId });
+  const upgradeRecipe = (recipeId: string) => dispatch({ type: 'upgradeRecipe', recipeId });
+  const recipeLevels = computed(() => state.value.recipeLevels ?? {});
+  const recipeCopies = computed(() => state.value.recipeCopies ?? {});
   const recipePrice = (recipeId: string) => {
     const recipe = RECIPES.find((item) => item.id === recipeId)!;
     return recipePurchase(recipe, RECIPES.indexOf(recipe));
@@ -382,6 +406,8 @@ export const useGameStore = defineStore('game', () => {
   return {
     mode, playerName, connect,
     economy, xpProgress, guestPriceFactor,
+    upgradeRecipe, recipeLevels, recipeCopies,
+    negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedInteriorIds, barBackground, barInteriorStyle,
     inventories, inventory, bottleInventories, bottleInventory, currentMix, shaken, customers, activeCustomerId, customer, hasCustomer, recipe, mixJudge,
     knownRecipeIds, recipeUnlockSources, knownRecipes, lockedRecipes, dailyGiftAvailable, dailyGiftResult, loginStreak, upcomingLoginDay, dailyCoinReward, dailyCrystalReward,

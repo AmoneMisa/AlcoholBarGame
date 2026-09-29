@@ -28,6 +28,16 @@ export const WALLS = ['neon','burgundy','emerald','navy','plum','charcoal','ivor
 export const COUNTER_MATERIALS = ['classic','marble','brass','obsidian','walnut','terrazzo','steel','glass'] as const;
 export const COUNTER_COLORS = ['espresso','ruby','ivory','gold','emerald','navy','plum','smoke'] as const;
 export const COUNTER_SIZES = ['slim','standard','grand'] as const;
+// Back-bar cabinet looks. 'auto' follows the background (see shelfStyleFor).
+export const SHELF_STYLES = ['auto','walnut','brass','glass','neon','marble','bamboo','rustic'] as const;
+export type ShelfStyle = Exclude<typeof SHELF_STYLES[number], 'auto'>;
+const SHELF_FOR_INTERIOR: Partial<Record<string, ShelfStyle>> = {
+  velvet:'walnut', garden:'bamboo', skyline:'glass', 'inferno-penthouse':'neon', speakeasy:'rustic', 'jazz-cellar':'walnut', 'art-deco':'brass', library:'walnut',
+  palace:'marble', tropical:'bamboo', desert:'rustic', winter:'glass', beach:'bamboo', rooftop:'glass', cyberpunk:'neon', izakaya:'rustic', marina:'walnut', parisian:'marble', loft:'rustic', riad:'brass'
+};
+export function shelfStyleFor(profile: Pick<BarProfile, 'interior'> & { shelf?: typeof SHELF_STYLES[number] }): ShelfStyle {
+  return profile.shelf && profile.shelf !== 'auto' ? profile.shelf : SHELF_FOR_INTERIOR[profile.interior] ?? 'walnut';
+}
 export const HIGHLIGHTS = ['amber','rose','blue','violet','emerald','ice'] as const;
 export const HIGHLIGHT_STRENGTHS = ['soft','medium','bright'] as const;
 export const BARTENDER_FACES = ['classic','soft','angular','heart','oval','mature'] as const;
@@ -40,7 +50,7 @@ export const POSES = ['neutral','confident','relaxed','lean','hip','crossed'] as
 export const MAKEUP_OPTIONS = ['none','natural','smoky','red-lip','gold','neon'] as const;
 export const BAR_PROFILE_OPTIONS = {
   wall:WALLS,counter:COUNTER_MATERIALS,counterColor:COUNTER_COLORS,counterSize:COUNTER_SIZES,
-  lighting:HIGHLIGHTS,highlightStrength:HIGHLIGHT_STRENGTHS,bartenderCharacter:['noa','leo'] as const,
+  lighting:HIGHLIGHTS,highlightStrength:HIGHLIGHT_STRENGTHS,shelf:SHELF_STYLES,bartenderCharacter:['noa','leo'] as const,
   bartender:['vest','shirt','apron'] as const,interior:INTERIORS.map((item) => item.id),face:BARTENDER_FACES,
   hairStyle:HAIR_STYLES,hairColor:HAIR_COLORS,bodyShape:BODY_SHAPES,skinDetail:SKIN_DETAILS,
   bust:BUST_OPTIONS,pose:POSES,makeup:MAKEUP_OPTIONS
@@ -66,6 +76,8 @@ export interface BarProfile {
   bust: typeof BUST_OPTIONS[number];
   pose: typeof POSES[number];
   makeup: typeof MAKEUP_OPTIONS[number];
+  // Back-bar cabinet; missing or 'auto' follows the background.
+  shelf?: typeof SHELF_STYLES[number];
 }
 
 const femaleStyle = { face:'soft',hairStyle:'updo',hairColor:'espresso',bodyShape:'curvy',skinDetail:'clean',bust:'balanced',pose:'confident',makeup:'natural' } as const;

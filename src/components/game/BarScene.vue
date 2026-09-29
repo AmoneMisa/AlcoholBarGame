@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { CUSTOMER_ART_BY_SLOT } from '../../data/cosmetics/artCatalog';
 import { INGREDIENTS, RECIPES } from '../../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../../domain/bottleCatalog';
@@ -12,10 +12,49 @@ import BottleModel from '../cocktails/BottleModel.vue';
 import GlassModel from '../cocktails/GlassModel.vue';
 import CharacterModel from '../characters/CharacterModel.vue';
 import CityEvent from './CityEvent.vue';
+import { INTERIORS, shelfStyleFor } from '../../data/cosmetics/bars';
+import { sceneLayout } from '../../data/cosmetics/barLines';
 
 const game = useGameStore();
 withDefaults(defineProps<{ active?: boolean }>(), { active: true });
 const glassTarget = ref<HTMLElement>();
+// Everything lives in the painting: our bottles stand on the background's own back-bar planks, the bartender
+// is cut at the back edge of its counter, the glass stands on the counter and guests sit on its stools.
+// The positions come from each background's measured geometry (data/cosmetics/barLines.ts).
+const sceneRef = ref<HTMLElement>();
+const sceneBox = ref({ width: 0, height: 0 });
+const sceneObserver = typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(() => measureScene());
+function measureScene() {
+  const element = sceneRef.value;
+  if (element) sceneBox.value = { width: element.clientWidth, height: element.clientHeight };
+}
+const layout = computed(() => {
+  const { width, height } = sceneBox.value;
+  if (!width || !height) return undefined;
+  const interior = INTERIORS.find((item) => item.id === game.decor.interior) ?? INTERIORS[0];
+  const position = /(\d+)%\s*$/.exec(interior.position)?.[1];
+  return sceneLayout(interior.id, width, height, position ? Number(position) / 100 : .5);
+});
+const sceneVars = computed(() => {
+  const current = layout.value;
+  const { width } = sceneBox.value;
+  if (!current) return {};
+  const guest = Math.round(Math.min(330, Math.max(170, current.drawnHeight * .34)));
+  const bartender = Math.round(Math.min(480, Math.max(260, current.drawnHeight * .55)));
+  const bartenderX = Math.round(width * (width < 760 ? .8 : .84));
+  return {
+    '--back': `${current.back}px`, '--seat-top': `${current.seat}px`, '--guest-h': `${guest}px`, '--bt-h': `${bartender}px`,
+    '--bt-x': `${bartenderX}px`, '--glass-x': `${Math.round(width < 760 ? width * .78 : bartenderX - bartender * .42)}px`,
+    '--glass-y': `${Math.round(current.back + current.drawnHeight * .03)}px`
+  };
+});
+// Guests take the painted stools nearest the middle of the scene.
+const seatXs = computed(() => {
+  const { width } = sceneBox.value;
+  const stools = [...(layout.value?.stools ?? [])].sort((a, b) => Math.abs(a - width / 2) - Math.abs(b - width / 2));
+  return stools.length ? stools : [width * .5, width * .32, width * .68];
+});
+const customerStyle = (index: number) => ({ left: `${Math.round(seatXs.value[index % seatXs.value.length] ?? sceneBox.value.width / 2)}px` });
 const freshPickerOpen = ref(false);
 const draggingIngredientId = ref<string>();
 const dragOverGlass = ref(false);
@@ -40,6 +79,28 @@ const shelfLines = computed(() => {
   // A liquid added to the catalog later still gets a place: on the mixers line.
   lines[lines.length - 1]!.bottles.push(...liquids.filter((item) => !placed.has(item.id)));
   return lines.filter((line) => line.bottles.length);
+});
+// One row per painted plank; with fewer planks than lines, neighbouring lines share a plank.
+const shelfRows = computed(() => {
+  const current = layout.value;
+  if (!current) return [];
+  const planks = current.shelf.planks;
+  const lines = shelfLines.value;
+  const groups = planks.length >= lines.length ? lines.map((line) => [line])
+    : planks.length === 3 ? [[lines[0]!], [lines[1]!], lines.slice(2)]
+      : planks.length === 2 ? [lines.slice(0, 2), lines.slice(2)] : [lines];
+  return groups.map((group, index) => {
+    const plank = planks[index]!;
+    const gap = index > 0 ? plank - planks[index - 1]! : (planks[1] ?? plank + 90) - plank;
+    const height = Math.round(Math.max(56, Math.min(118, gap - 4)));
+    const bottle = Math.round(Math.max(34, Math.min(76, height - 16)));
+    return {
+      id: group.map((line) => line.id).join('-'),
+      label: group.map((line) => line.label).join(' · '),
+      bottles: group.flatMap((line) => line.bottles),
+      style: { left: `${current.shelf.left}px`, width: `${current.shelf.right - current.shelf.left}px`, top: `${plank - height}px`, height: `${height}px`, '--bottle': `${bottle}px` }
+    };
+  });
 });
 // What is left in the bar for pouring: stock minus what is already in the glass.
 function pourable(id: string) {
@@ -118,8 +179,8 @@ function beginBottleDrag(id: string, event: PointerEvent) {
   // No native image drag, text selection or page scroll while a bottle is under the finger.
   event.preventDefault();
   const target = event.currentTarget as HTMLElement;
-  const row = target.closest<HTMLElement>('.live-bottle-shelf') ?? undefined;
-  const box = target.closest<HTMLElement>('.live-shelf-lines') ?? undefined;
+  const row = target.closest<HTMLElement>('.pshelf-bottles') ?? undefined;
+  const box = target.closest<HTMLElement>('.pshelf-box') ?? undefined;
   pending = { id, startX: event.clientX, startY: event.clientY, row, box, scrollLeft: row?.scrollLeft ?? 0, scrollTop: box?.scrollTop ?? 0 };
   activePointerId = event.pointerId;
   // Capture keeps the gesture alive outside the button; if the browser refuses it, window listeners still track the pointer.
@@ -163,7 +224,7 @@ function moveBottle(event: PointerEvent) {
       }
     }
     if (pending?.mode === 'scroll') {
-      if (pending.row) pending.row.scrollLeft = pending.scrollLeft - dx;
+      if (pending.row) { pending.row.scrollLeft = pending.scrollLeft - dx; markEdges(pending.row); }
       return;
     }
   }
@@ -184,6 +245,41 @@ function endBottle(event: PointerEvent) {
 }
 
 const interval = window.setInterval(() => { if (!document.hidden) game.tickGameClock(); }, 1000);
+watch(sceneRef, (element, previous) => {
+  if (previous) sceneObserver?.unobserve(previous);
+  if (element) { sceneObserver?.observe(element); measureScene(); }
+});
+watch(() => [buildingEnabled.value, game.decor.interior], () => nextTick(measureScene));
+onBeforeUnmount(() => sceneObserver?.disconnect());
+// Scroll edges: rows and the shelf box fade out where more bottles are hidden, and arrows appear only when useful.
+const lineElements = new Map<string, HTMLElement>();
+const edgeObserver = typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver((entries) => entries.forEach((entry) => markEdges(entry.target as HTMLElement)));
+function markEdges(element: HTMLElement) {
+  const axis = element.dataset.axis === 'y' ? 'y' : 'x';
+  const start = axis === 'x' ? element.scrollLeft : element.scrollTop;
+  const size = axis === 'x' ? element.scrollWidth - element.clientWidth : element.scrollHeight - element.clientHeight;
+  element.dataset.scrollable = String(size > 2);
+  element.dataset.atStart = String(start <= 2);
+  element.dataset.atEnd = String(start >= size - 2);
+}
+function trackLine(id: string, element: HTMLElement | null) {
+  const previous = lineElements.get(id);
+  if (previous === element) return;
+  if (previous) edgeObserver?.unobserve(previous);
+  if (!element) { lineElements.delete(id); return; }
+  lineElements.set(id, element);
+  edgeObserver?.observe(element);
+  markEdges(element);
+}
+function nudgeLine(id: string, direction: number) {
+  const element = lineElements.get(id);
+  if (!element) return;
+  element.scrollBy({ left: direction * Math.max(120, element.clientWidth * .6), behavior: 'smooth' });
+  // Smooth scrolling ends later; refresh the fades and arrows once it has settled.
+  window.setTimeout(() => markEdges(element), 400);
+}
+onBeforeUnmount(() => edgeObserver?.disconnect());
+
 onMounted(() => {
   window.addEventListener('pointermove', moveBottle);
   window.addEventListener('pointerup', endBottle);
@@ -199,31 +295,29 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="bar-scene" :class="{ 'is-building': buildingEnabled }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="game.barInteriorStyle">
+  <section ref="sceneRef" class="bar-scene" :class="{ 'is-building': buildingEnabled }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
     <div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div>
     <CityEvent compact />
-    <section v-if="buildingEnabled" class="live-backbar" aria-label="Bottle shelf">
-      <header><span><b>BACK BAR</b><small>Swipe a line sideways to browse · pull a bottle down to the glass (+5 ml while held)</small></span></header>
-      <div class="live-shelf-lines">
-        <div v-for="line in shelfLines" :key="line.id" class="live-shelf-line" :data-line="line.id">
-          <small class="live-shelf-label">{{ line.label }}</small>
-          <div class="live-bottle-shelf">
-            <button v-for="ingredient in line.bottles" :key="ingredient.id" type="button" :class="{ empty: pourable(ingredient.id) < 5, poured: game.currentMix.some((item) => item.ingredientId === ingredient.id) }" :aria-disabled="pourable(ingredient.id) < 5" :aria-label="`Drag ${ingredient.name} to the glass, ${pourable(ingredient.id)} ml left`" @pointerdown="beginBottleDrag(ingredient.id, $event)" @keydown.enter.prevent="addLiquid(ingredient.id)" @keydown.space.prevent="addLiquid(ingredient.id)">
-              <BottleModel :ingredient="ingredient" :amount="game.currentMix.find((item) => item.ingredientId === ingredient.id)?.amount" />
-              <span>{{ ingredient.name }}</span>
-              <em>{{ pourable(ingredient.id) }} ml</em>
-            </button>
-          </div>
+    <div v-if="buildingEnabled" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
+      <small v-if="shelfRows.length" class="pshelf-hint" :style="{ left: shelfRows[0]!.style.left, top: `calc(${shelfRows[0]!.style.top} - 18px)` }">Swipe a shelf sideways · pull a bottle down to the glass</small>
+      <div v-for="row in shelfRows" :key="row.id" class="pshelf-row" :style="row.style">
+        <small class="pshelf-label">{{ row.label }}</small>
+        <div :ref="(element) => trackLine(row.id, element as HTMLElement | null)" class="pshelf-bottles" @scroll="markEdges($event.currentTarget as HTMLElement)">
+          <button v-for="ingredient in row.bottles" :key="ingredient.id" type="button" :title="`${ingredient.name} · ${pourable(ingredient.id)} ml`" :class="{ empty: pourable(ingredient.id) < 5, poured: game.currentMix.some((item) => item.ingredientId === ingredient.id) }" :aria-disabled="pourable(ingredient.id) < 5" :aria-label="`Drag ${ingredient.name} to the glass, ${pourable(ingredient.id)} ml left`" @pointerdown="beginBottleDrag(ingredient.id, $event)" @keydown.enter.prevent="addLiquid(ingredient.id)" @keydown.space.prevent="addLiquid(ingredient.id)">
+            <BottleModel :ingredient="ingredient" :amount="game.currentMix.find((item) => item.ingredientId === ingredient.id)?.amount" />
+            <span>{{ ingredient.name }}</span>
+          </button>
         </div>
+        <span class="shelf-nudge"><button type="button" :aria-label="`Scroll ${row.label} left`" @click="nudgeLine(row.id, -1)">‹</button><button type="button" :aria-label="`Scroll ${row.label} right`" @click="nudgeLine(row.id, 1)">›</button></span>
       </div>
-    </section>
+    </div>
     <div class="bartender-layer">
       <CharacterModel role="bartender" :character-id="game.decor.bartenderCharacter ?? 'noa'" :outfit="game.decor.bartender" :face-style="game.decor.face" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :skin-detail="game.decor.skinDetail" :bust="game.decor.bust" :pose="game.decor.pose" :makeup="game.decor.makeup" animation="idle" />
       <span class="name-ribbon">{{ (game.decor.bartenderNickname || (game.decor.bartenderCharacter === 'leo' ? 'Leo' : 'Noa')).toUpperCase() }} · BARTENDER</span>
     </div>
-    <div class="counter-glow"></div>
+    <div class="bar-line-tint" aria-hidden="true"></div>
     <div class="bar-cast">
-      <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" @click="game.openConversation(customer.id)">
+      <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" :style="customerStyle(index)" @click="game.openConversation(customer.id)">
         <div class="speech-bubble"><span>{{ customer.greeting }}</span><b>{{ bubbleText(customer) }}</b><em>{{ customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></div>
         <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="expressionFor(customer.mood)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
         <div class="customer-plate"><div><b>{{ customer.name }}</b><small>{{ customer.mood }}</small></div><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i><em>{{ game.orderCountdown }}</em></span></div>

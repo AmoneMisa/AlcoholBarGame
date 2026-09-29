@@ -301,11 +301,14 @@ export function checkSentence(input: string): CheckResult {
     }
   }
 
+  // A statement followed by a question clause or tag keeps its order: "We have a big order, can you give us a discount?",
+  // "You like it, don't you?". Only the part after the comma is the question.
+  const tailQuestion = /,\s*(?:can|could|would|will|shall|should|may|do|does|did|is|are|was|were|have|has|don't|doesn't|didn't|won't|isn't|aren't|wasn't|haven't|right|ok|okay|what|how|why|when|where|which|who)\b[^,]*\?\s*$/i.test(input);
   // Statement word order used as a question: "You like rum?" -> "Do you like rum?".
-  if (hasQuestionMark && ['you', 'he', 'she', 'they', 'we'].includes(first) && at(1) && isAux(lowerAt(1)) && at(2)) {
+  if (hasQuestionMark && !tailQuestion && ['you', 'he', 'she', 'they', 'we'].includes(first) && at(1) && isAux(lowerAt(1)) && at(2)) {
     // "You do like rum?" -> "Do you like rum?": swap the subject and the helper verb.
     add('helper-first', 'grammar', `In a question, the helper verb comes first: “${matchCase(at(0)!.text, lowerAt(1))} ${first} …?”.`, at(0)!, at(1)!, `${matchCase(at(0)!.text, lowerAt(1))} ${first}`);
-  } else if (hasQuestionMark && ['you', 'he', 'she', 'they', 'we'].includes(first) && at(1) && (THIRD_PERSON[lowerAt(1)] || BASE_FORM[lowerAt(1)])) {
+  } else if (hasQuestionMark && !tailQuestion && ['you', 'he', 'she', 'they', 'we'].includes(first) && at(1) && (THIRD_PERSON[lowerAt(1)] || BASE_FORM[lowerAt(1)])) {
     const aux = ['he', 'she'].includes(first) ? 'Does' : 'Do';
     const subject = at(0)!;
     const verb = at(1)!;

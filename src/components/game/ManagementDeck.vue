@@ -4,11 +4,12 @@ import { INGREDIENTS, RECIPES, REGIONS, recipeAlcoholLabel } from '../../domain/
 import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleSaleCrystalReward } from '../../domain/bottleCatalog';
 import BrandBottle from '../knowledge/BrandBottle.vue';
 import { guideIdForProduct } from '../../data/knowledge/alcohol';
-import { BARTENDER_FACES, BODY_SHAPES, BUST_OPTIONS, COUNTER_COLORS, COUNTER_MATERIALS, COUNTER_SIZES, HAIR_COLORS, HAIR_STYLES, HIGHLIGHTS, HIGHLIGHT_STRENGTHS, INTERIORS, MAKEUP_OPTIONS, POSES, SKIN_DETAILS, WALLS, interiorStyle } from '../../data/cosmetics/bars';
+import { BARTENDER_FACES, BODY_SHAPES, BUST_OPTIONS, COUNTER_COLORS, COUNTER_MATERIALS, COUNTER_SIZES, HAIR_COLORS, HAIR_STYLES, HIGHLIGHTS, HIGHLIGHT_STRENGTHS, INTERIORS, MAKEUP_OPTIONS, POSES, SHELF_STYLES, SKIN_DETAILS, WALLS, interiorStyle, shelfStyleFor } from '../../data/cosmetics/bars';
 import { DAILY_COINS } from '../../domain/economy';
 import type { Ingredient, RegionId } from '../../domain/types';
 import { useGameStore } from '../../stores/game';
 import BottleModel from '../cocktails/BottleModel.vue';
+import RecipeMastery from '../cocktails/RecipeMastery.vue';
 import GlassModel from '../cocktails/GlassModel.vue';
 import CharacterModel from '../characters/CharacterModel.vue';
 import PairingAdvisor from '../PairingAdvisor.vue';
@@ -144,6 +145,7 @@ function selectBartender(id: 'noa' | 'leo') {
         <header class="panel-heading recipe-detail-heading"><button type="button" @click="selectedRecipeId = null">← All recipes</button><div><small>{{ selectedRecipe.category }} · {{ selectedRecipe.origin }}</small><h2>{{ selectedRecipe.name }}</h2></div><span>{{ recipeAlcoholLabel(selectedRecipe) }} · {{ (selectedRecipe.price * game.economy.guestPriceFactor).toFixed(2) }} coins</span></header>
         <div class="recipe-detail-page">
           <aside class="recipe-hero-art"><GlassModel :art-index="selectedRecipeIndex" type="coupe" /><div><small>TASTING PROFILE · {{ recipeAlcoholLabel(selectedRecipe) }}</small><span v-for="note in selectedRecipe.tastingNotes" :key="note">{{ note }}</span></div></aside>
+          <RecipeMastery :recipe="selectedRecipe" />
           <section class="recipe-story"><small>THE STORY</small><h3>A drink with a past</h3><p>{{ selectedRecipe.story }}</p><button type="button" class="guide-open" @click="openGuide('cocktail', selectedRecipe.id)">Full history, method &amp; why choose it →</button><div class="occasion-block"><small>WHEN IT IS A GOOD CHOICE</small><div><span v-for="occasion in selectedRecipe.occasions" :key="occasion">{{ occasion }}</span></div></div></section>
           <section class="recipe-formula"><small>WHAT YOU NEED</small><h3>Bar formula</h3><div v-for="part in selectedRecipe.ingredients" :key="part.ingredientId"><BottleModel :ingredient="ingredientById(part.ingredientId)" /><b>{{ ingredientById(part.ingredientId).name }}</b><span>{{ part.amount }} {{ ingredientById(part.ingredientId).unit }}</span><small class="formula-action">{{ formulaActions.get(part.ingredientId) }}</small><button type="button" class="guide-open" :aria-label="`About ${ingredientById(part.ingredientId).name}`" @click="openGuide('ingredient', part.ingredientId)">About</button></div></section>
           <section class="recipe-method"><small>COOKING PATH</small><h3>{{ selectedRecipe.needsShake ? 'Shake and serve' : 'Build with control' }}</h3><ol><li v-for="(step, index) in selectedRecipe.method" :key="step"><b>{{ index + 1 }}</b><span>{{ step }}</span></li></ol></section>
@@ -168,9 +170,8 @@ function selectBartender(id: 'noa' | 'leo') {
         <div class="design-options">
           <section class="background-picker"><small>{{ INTERIORS.length }} BACKGROUNDS · {{ game.ownedInteriorIds.length }} OWNED</small><div><button v-for="interior in INTERIORS" :key="interior.id" :class="{active:game.decor.interior === interior.id,locked:!isInteriorOwned(interior.id),special:'special' in interior && interior.special}" :style="interiorStyle(interior.id)" type="button" @click="game.chooseInterior(interior.id)"><em v-if="!isInteriorOwned(interior.id)">◆ {{ interior.crystalCost }}</em><span>{{ interior.name }}</span></button></div></section>
           <section><small>WALL COLOR</small><div><button v-for="wall in WALLS" :key="wall" :class="{ active: game.decor.wall === wall }" type="button" @click="game.decor.wall = wall"><i :data-color="wall"></i>{{ wall }}</button></div></section>
-          <section><small>BARLINE MATERIAL</small><div><button v-for="counter in COUNTER_MATERIALS" :key="counter" :class="{ active: game.decor.counter === counter }" type="button" @click="game.decor.counter = counter">{{ counter }}</button></div></section>
-          <section><small>BARLINE COLOR</small><div><button v-for="color in COUNTER_COLORS" :key="color" :class="{ active: game.decor.counterColor === color }" type="button" @click="game.decor.counterColor = color"><i :data-color="color"></i>{{ color }}</button></div></section>
-          <section><small>BARLINE SIZE</small><div><button v-for="size in COUNTER_SIZES" :key="size" :class="{ active: game.decor.counterSize === size }" type="button" @click="game.decor.counterSize = size">{{ size }}</button></div></section>
+          <section class="shelf-style-picker"><small>BACK-BAR SHELVES · {{ shelfStyleFor(game.decor) }}</small><div><button v-for="shelf in SHELF_STYLES" :key="shelf" :class="{ active: (game.decor.shelf ?? 'auto') === shelf }" :data-shelf-swatch="shelf === 'auto' ? shelfStyleFor({ interior: game.decor.interior }) : shelf" type="button" @click="game.decor.shelf = shelf">{{ shelf === 'auto' ? 'Match background' : shelf }}</button></div></section>
+          <section><small>BARLINE TINT · the counter in your background</small><div><button v-for="color in COUNTER_COLORS" :key="color" :class="{ active: game.decor.counterColor === color }" type="button" @click="game.decor.counterColor = color"><i :data-color="color"></i>{{ color }}</button></div></section>
           <section><small>HIGHLIGHT COLOR</small><div><button v-for="light in HIGHLIGHTS" :key="light" :class="{ active: game.decor.lighting === light }" type="button" @click="game.decor.lighting = light"><i :data-color="light"></i>{{ light }}</button></div></section>
           <section><small>HIGHLIGHT STRENGTH</small><div><button v-for="strength in HIGHLIGHT_STRENGTHS" :key="strength" :class="{ active: game.decor.highlightStrength === strength }" type="button" @click="game.decor.highlightStrength = strength">{{ strength }}</button></div></section>
           <section><small>FACE</small><div><button v-for="face in BARTENDER_FACES" :key="face" :class="{active:game.decor.face === face}" type="button" @click="game.decor.face = face">{{ face }}</button></div></section>
