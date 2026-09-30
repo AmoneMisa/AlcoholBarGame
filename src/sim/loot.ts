@@ -8,6 +8,8 @@ import {
   TIER_ORDER, TIER_SHARD_COST, boxDef, choiceOptions, consumableDef, describeReward, equipmentDef, featuredIndex, levelCap, perkCost, prestigeStarsFor, rollBox, rollRarity,
   upgradeCostFor, type BoxKind, type EquipmentId, type PrestigePerkId, type Reward
 } from '../domain/loot';
+import { INGREDIENTS } from '../domain/catalog';
+import { SPOIL_MAX_DAYS, SPOIL_START_LEVEL, capacityFor, isPerishable, spoiledAmount } from '../domain/warehouse';
 import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipeId, regularLevel } from '../domain/regulars';
 import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { ACHIEVEMENTS, TASTING_REWARD, achievementById, questById, questsForWeek, weekOf, type StatId } from '../domain/quests';
@@ -406,3 +408,41 @@ export function earnLoyalty(state: PlayerState, characterId: string | undefined,
   return gained.length ? ` ${gained.join('. ')}.` : '';
 }
 export { REGULAR_LEVELS };
+
+// ---- Storeroom: capacity and spoilage ----
+const DAY = 24 * 60 * 60 * 1000;
+export const fridgeLevelOf = (state: PlayerState, regionId: string) => state.loot.equipment[regionId]?.['fridge']?.level ?? 0;
+export const capacityOf = (state: PlayerState, regionId: string, ingredientId: string) => {
+  const ingredient = INGREDIENTS.find((item) => item.id === ingredientId);
+  return ingredient ? capacityFor(ingredient, fridgeLevelOf(state, regionId)) : 0;
+};
+// Room left for one ingredient in a bar, counting deliveries already on their way.
+export function roomFor(state: PlayerState, regionId: string, ingredientId: string) {
+  const stock = state.inventories[regionId as keyof typeof state.inventories]?.find((item) => item.ingredientId === ingredientId)?.amount ?? 0;
+  const pending = state.deliveryOrders.filter((order) => order.barId === regionId).flatMap((order) => order.items).filter((item) => item.ingredientId === ingredientId).reduce((sum, item) => sum + item.amount, 0);
+  return Math.max(0, capacityOf(state, regionId, ingredientId) - stock - pending);
+}
+// Once a day, fresh produce in every owned bar loses a share of its stock (see domain/warehouse.ts).
+export function applySpoilage(state: PlayerState, now: number) {
+  if (levelFor(state.xp) < SPOIL_START_LEVEL) { state.loot.spoiledAt = now; return; }
+  if (!state.loot.spoiledAt) { state.loot.spoiledAt = now; return; }
+  const days = Math.min(SPOIL_MAX_DAYS, Math.floor((now - state.loot.spoiledAt) / DAY));
+  if (days < 1) return;
+  state.loot.spoiledAt = Math.min(now, state.loot.spoiledAt + Math.floor((now - state.loot.spoiledAt) / DAY) * DAY);
+  const lost: string[] = [];
+  for (const regionId of state.ownedBarIds) {
+    const fridge = fridgeLevelOf(state, regionId);
+    for (const stock of state.inventories[regionId]) {
+      const ingredient = INGREDIENTS.find((item) => item.id === stock.ingredientId);
+      if (!ingredient || !isPerishable(ingredient)) continue;
+      let spoiled = 0;
+      for (let day = 0; day < days; day++) {
+        const loss = spoiledAmount(stock.amount, fridge);
+        stock.amount -= loss;
+        spoiled += loss;
+      }
+      if (spoiled > 0 && regionId === state.regionId) lost.push(`${spoiled} ${ingredient.unit === 'ml' ? 'ml ' : '× '}${ingredient.name}`);
+    }
+  }
+  if (lost.length) note(state, `Spoilage: ${lost.join(', ')} went off. A better fridge slows it.`);
+}

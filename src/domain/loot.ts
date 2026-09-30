@@ -18,7 +18,7 @@ export interface EquipmentDef {
 export const EQUIPMENT: EquipmentDef[] = [
   { id: 'shaker', name: 'Pro shaker', icon: '🍸', description: 'Guests tip more often.', perLevel: .02, unit: 'tip chance' },
   { id: 'ice-machine', name: 'Ice machine', icon: '🧊', description: 'Every drink pours a little less liquid from stock.', perLevel: .015, unit: 'liquid saved' },
-  { id: 'fridge', name: 'Back-bar fridge', icon: '❄️', description: 'Supplier deliveries arrive sooner.', perLevel: .03, unit: 'faster deliveries' },
+  { id: 'fridge', name: 'Back-bar fridge', icon: '❄️', description: 'Deliveries arrive sooner (3% per level). It also raises storeroom capacity (+10% per level) and slows spoilage of fresh produce.', perLevel: .03, unit: 'faster deliveries' },
   { id: 'speakers', name: 'Sound system', icon: '🎷', description: 'Guests wait longer before they leave.', perLevel: .025, unit: 'guest patience' },
   { id: 'register', name: 'Cash register', icon: '💰', description: 'Guests pay more for every drink.', perLevel: .015, unit: 'drink price' },
   { id: 'cellar', name: 'Wine cellar', icon: '🍾', description: 'Bottle restocking costs fewer crystals.', perLevel: .02, unit: 'bottle cost' }

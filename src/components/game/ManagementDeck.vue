@@ -5,6 +5,7 @@ import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleSaleCrystalReward } from '
 import BrandBottle from '../knowledge/BrandBottle.vue';
 import { guideIdForProduct } from '../../data/knowledge/alcohol';
 import { COUNTER_COLORS, COUNTER_MATERIALS, COUNTER_SIZES, HIGHLIGHTS, HIGHLIGHT_STRENGTHS, INTERIORS, POSES, SHELF_STYLES, WALLS, interiorStyle, shelfStyleFor } from '../../data/cosmetics/bars';
+import { capacityFor, isPerishable } from '../../domain/warehouse';
 import { DAILY_COINS, SPECIALTY_PREMIUM, isCitySpecialty, specialtyFactor } from '../../domain/economy';
 import type { Ingredient, RegionId } from '../../domain/types';
 import { useGameStore } from '../../stores/game';
@@ -31,6 +32,8 @@ watch(() => game.regionId, () => {
   bartenderNickname.value = game.decor.bartenderNickname ?? (game.decor.bartenderCharacter === 'leo' ? 'Leo' : 'Noa');
 });
 
+const fridgeLevel = computed(() => game.loot.equipment[game.regionId]?.fridge?.level ?? 0);
+const capacityOf = (id: string) => capacityFor(INGREDIENTS.find((item) => item.id === id)!, fridgeLevel.value);
 const ingredientById = (id: string) => INGREDIENTS.find((item) => item.id === id)!;
 const bottleById = (id: string) => ALCOHOL_PRODUCTS.find((item) => item.id === id)!;
 const uiCategory = (ingredient: Ingredient) => ingredient.category === 'spirit' ? 'spirit' : ingredient.category === 'mixer' && !['sugar-syrup', 'coconut-cream', 'milk', 'coconut-milk'].includes(ingredient.id) ? 'mixer' : 'fresh';
@@ -120,7 +123,7 @@ function selectBartender(id: 'noa' | 'leo') {
       <div class="inventory-cards">
         <div v-for="stock in visibleStock" :key="stock.ingredientId" class="inventory-card">
           <BottleModel :ingredient="ingredientById(stock.ingredientId)" />
-          <div><b>{{ ingredientById(stock.ingredientId).name }}</b><small>{{ stock.amount }} {{ ingredientById(stock.ingredientId).unit }}</small></div>
+          <div><b>{{ ingredientById(stock.ingredientId).name }}</b><small>{{ stock.amount }} / {{ capacityOf(stock.ingredientId) }} {{ ingredientById(stock.ingredientId).unit }}<template v-if="isPerishable(ingredientById(stock.ingredientId))"> · fresh, spoils</template></small></div>
           <span>{{ uiCategory(ingredientById(stock.ingredientId)) }}</span>
         </div>
       </div>

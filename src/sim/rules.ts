@@ -15,7 +15,7 @@ import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL, economyAt, formatDeliveryTime, mar
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
-import { LootError, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
+import { LootError, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
 import { usableIngredientIds } from '../domain/usableStock';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
@@ -240,7 +240,8 @@ function processDeliveries(state: PlayerState, now: number) {
   const arrived = state.deliveryOrders.filter((order) => order.dueAt <= now);
   for (const order of arrived) for (const item of order.items) {
     const stock = state.inventories[order.barId].find((entry) => entry.ingredientId === item.ingredientId);
-    if (stock) stock.amount += item.amount;
+    // The storeroom is full at its capacity: anything beyond it is lost on arrival.
+    if (stock) stock.amount = Math.min(Math.max(stock.amount, capacityOf(state, order.barId, item.ingredientId)), stock.amount + item.amount);
   }
   if (arrived.length) {
     state.deliveryOrders = state.deliveryOrders.filter((order) => order.dueAt > now);
@@ -256,6 +257,7 @@ export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now
   const random = context.random ?? Math.random;
   if (state.popularityBoost?.kind === 'no-cooldown' && state.popularityBoost.until <= now) state.popularityBoost = undefined;
   processDeliveries(state, now);
+  applySpoilage(state, now);
   autoRestock(state, now);
   if (!state.customers.length) {
     state.lastClockAt = now;
@@ -496,6 +498,10 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const voucher = (state.loot.armed['voucher'] ?? 0) > 0;
       const discount = lootBonuses(state, now).supplyFactor * (voucher ? .8 : 1);
       if (discount < 1) quote.total = coins(quote.total * discount);
+      for (const line of quote.lines) {
+        const room = roomFor(state, state.regionId, line.ingredientId);
+        if (line.amount > room) throw new RuleError(`No room for ${INGREDIENTS.find((item) => item.id === line.ingredientId)!.name}: storeroom holds ${capacityOf(state, state.regionId, line.ingredientId)} in total and has space for ${room} more. A better fridge raises capacity.`);
+      }
       if (state.money < quote.total) throw new RuleError('You do not have enough money.');
       if (voucher) { delete state.loot.armed['voucher']; state.message = 'Supplier Voucher used: 20% off.'; }
       state.money = coins(state.money - quote.total);

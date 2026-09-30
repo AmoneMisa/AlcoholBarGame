@@ -328,3 +328,70 @@ test('Regulars: loyalty grows per served guest, levels pay rewards once, favouri
   assert.equal(earnLoyalty(state, 'not-a-guest', 'X', other, false), '');
   assert.deepEqual(normalizeLoot({ regulars: { marin: 5, hacker: 999, kai: -3 } }, 1).regulars, { marin: 5 });
 });
+
+test('Spoilage: fresh produce loses stock daily from level 3, the fridge slows it, everything else keeps', async () => {
+  const { xpForLevel: xpFor } = await import('../src/domain/progression.ts');
+  const { spoiledAmount, spoilRate, isPerishable } = await import('../src/domain/warehouse.ts');
+  const { INGREDIENTS } = await import('../src/domain/catalog.ts');
+  const DAY = 86_400_000;
+  assert.equal(spoilRate(0), .12);
+  assert.equal(spoilRate(10), 0);
+  assert.equal(spoiledAmount(8, 0), 0, 'tiny reserves are safe');
+  assert.equal(isPerishable(INGREDIENTS.find((item) => item.id === 'mint')), true);
+  assert.equal(isPerishable(INGREDIENTS.find((item) => item.id === 'gin')), false);
+  const stockOf = (state, id) => state.inventories['new-york'].find((item) => item.ingredientId === id);
+
+  const beginner = fresh();
+  stockOf(beginner, 'lime-juice').amount = 1000;
+  run(beginner, { type: 'tick' }, undefined, NOW);
+  run(beginner, { type: 'tick' }, undefined, NOW + 3 * DAY);
+  assert.equal(stockOf(beginner, 'lime-juice').amount, 1000, 'no spoilage below level 3');
+
+  const state = fresh();
+  state.xp = xpFor(3);
+  stockOf(state, 'lime-juice').amount = 1000; stockOf(state, 'gin').amount = 1000;
+  run(state, { type: 'tick' }, undefined, NOW);
+  run(state, { type: 'tick' }, undefined, NOW + DAY / 2);
+  assert.equal(stockOf(state, 'lime-juice').amount, 1000, 'nothing before a full day');
+  run(state, { type: 'tick' }, undefined, NOW + DAY);
+  assert.equal(stockOf(state, 'lime-juice').amount, 880);
+  assert.equal(stockOf(state, 'gin').amount, 1000);
+  assert.match(state.loot.log[0], /Spoilage/);
+  run(state, { type: 'tick' }, undefined, NOW + DAY + 1000);
+  assert.equal(stockOf(state, 'lime-juice').amount, 880, 'once per day');
+
+  const cold = fresh();
+  cold.xp = xpFor(3); cold.loot.equipment['new-york'].fridge.level = 10;
+  stockOf(cold, 'lime-juice').amount = 1000;
+  run(cold, { type: 'tick' }, undefined, NOW);
+  run(cold, { type: 'tick' }, undefined, NOW + 5 * DAY);
+  assert.equal(stockOf(cold, 'lime-juice').amount, 1000, 'a level 10 fridge stops spoilage');
+});
+
+test('Storeroom capacity: orders beyond it are refused, the fridge raises it, late deliveries are clamped', async () => {
+  const { capacityFor } = await import('../src/domain/warehouse.ts');
+  const { INGREDIENTS, SUPPLIERS } = await import('../src/domain/catalog.ts');
+  const { marketFor } = await import('../src/domain/progression.ts');
+  const { REGIONS } = await import('../src/domain/catalog.ts');
+  const gin = INGREDIENTS.find((item) => item.id === 'gin');
+  assert.equal(capacityFor(gin, 0), 5000);
+  assert.equal(capacityFor(gin, 10), 10000);
+  const state = fresh();
+  state.money = 1e6;
+  const region = REGIONS[0];
+  const offer = marketFor(region, NOW, state.xp).find((item) => item.ingredientId === 'gin');
+  const supplier = SUPPLIERS.find((item) => item.id === offer.supplierId);
+  const packs = Math.ceil(5000 / offer.quantity) + 1;
+  assert.throws(() => run(state, { type: 'buy', supplierId: supplier.id, cart: { gin: packs } }), /No room for Gin/);
+  assert.equal(state.money, 1e6, 'a refused order costs nothing');
+  state.loot.equipment['new-york'].fridge.level = 10;
+  run(state, { type: 'buy', supplierId: supplier.id, cart: { gin: packs } });
+  assert.equal(state.deliveryOrders.length, 1);
+  // Pending deliveries count against the room.
+  assert.throws(() => run(state, { type: 'buy', supplierId: supplier.id, cart: { gin: 99 } }), /No room/);
+  // A delivery that lands on a nearly full shelf is clamped.
+  state.loot.equipment['new-york'].fridge.level = 0;
+  state.deliveryOrders[0].dueAt = NOW;
+  run(state, { type: 'tick' }, undefined, NOW + 1000);
+  assert.ok(state.inventories['new-york'].find((item) => item.ingredientId === 'gin').amount <= 5000);
+});

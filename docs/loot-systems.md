@@ -23,3 +23,10 @@ Random actions (`openBox`, `pickReward`, `drawStyle`, `prestige`) are server-onl
 - Box coins were worth more than serving itself (13k vs ~8k per run); coin rewards and their level scaling (1 + level/25) were cut so boxes are ~25 % of run income.
 - Bronze boxes come every second level (was every level), silver from special guests 40 % of the time.
 - Equipment effects: shaker 2 %/level, register 1.5 %/level; prestige pay 1.5 %/rank; tier promotion 8 / 20 shards; draw 50 / 450 crystals.
+
+## Hardening, English rewards, regulars, storeroom
+- **Loot ledger** (`database/migrations/005_loot_ledger.sql`): every box/draw/pick/shop/claim/prestige is logged with its message and detail (draw results, pity). The server rolls with `crypto.getRandomValues`.
+- **Onboarding**: new accounts get one bronze box; the first box a player opens always holds 8 parts. The Workshop shows a "Getting started" checklist. Notifications: box received, booster ended.
+- **English rewards**: a perfect conversation pays parts equal to its difficulty; every third one (or any difficulty 4+) drops a box. Finishing the 3 daily lessons drops a bronze box (silver on a 7-day learning streak). Matching weekly quests / achievements.
+- **Regulars** (`domain/regulars.ts`): each guest portrait earns loyalty (+1 per serve, +1 VIP, +1 favourite drink); levels at 3/8/15/25 pay boxes, parts, shards and crystals; regulars pay +10% for their favourite starter recipe.
+- **Storeroom** (`domain/warehouse.ts`): capacity 5000 ml / 120 pieces per ingredient per bar (+10% per fridge level); orders beyond it are refused, late deliveries clamp. From level 3, fruit, herbs and milks spoil 12% of stock per day (whole units only, so tiny reserves survive), minus 1.2 points per fridge level (none at level 10).

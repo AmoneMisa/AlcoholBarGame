@@ -31,6 +31,8 @@ export interface LootState {
   tasted: string[];
   // Loyalty points per guest portrait id (see domain/regulars.ts).
   regulars: Record<string, number>;
+  // When spoilage last ran (server clock); 0 until the bar is old enough.
+  spoiledAt: number;
 }
 
 export const createLoot = (): LootState => ({
@@ -38,7 +40,7 @@ export const createLoot = (): LootState => ({
   equipment: Object.fromEntries(REGIONS.map((region) => [region.id, Object.fromEntries(EQUIPMENT.map((item) => [item.id, newSlot()]))])),
   pity: { sinceRare: 0, sinceLegendary: 0 }, lastDraw: [],
   prestige: { stars: 0, earned: 0, count: 0, perks: {} }, runEarned: 0, levelRewarded: 1, log: [],
-  stats: {}, quests: { week: 0, progress: {}, claimed: [] }, achievements: [], tasted: [], regulars: {}
+  stats: {}, quests: { week: 0, progress: {}, claimed: [] }, achievements: [], tasted: [], regulars: {}, spoiledAt: 0
 });
 
 const count = (value: unknown, max = 1_000_000) => Number.isFinite(value) && (value as number) > 0 ? Math.min(max, Math.floor(value as number)) : 0;
@@ -83,6 +85,7 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
     achievements: Array.isArray(source.achievements) ? [...new Set(source.achievements.filter((id) => typeof id === 'string'))].slice(0, 50) : [],
     tasted: Array.isArray(source.tasted) ? [...new Set(source.tasted.filter((id) => typeof id === 'string'))].slice(0, 400) : [],
     regulars: counts(source.regulars, CUSTOMER_ART_BY_SLOT),
+    spoiledAt: count(source.spoiledAt, 1e14),
     log: Array.isArray(source.log) ? source.log.filter((line) => typeof line === 'string').slice(0, 20) : []
   };
 }
