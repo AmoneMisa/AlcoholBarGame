@@ -68,6 +68,8 @@ export function serviceTemplates(kind: 'drink' | 'bottle', confirmed: boolean, t
       ? ['Can I see your ID, please?', 'Would you like to pay by card or in cash?', 'Would you like a bag?', 'Here is your receipt and your change.']
       : ['Would you like anything else?', 'Here you are. Enjoy your drink!'];
   }
-  if (turns === 0) return kind === 'bottle' ? ['Hello! Can I help you?', 'What are you looking for?'] : ['Good evening! What can I get you?', 'Is it for a special occasion?'];
-  return kind === 'bottle' ? ['Is it a gift or for you?'] : ['Is it for a special occasion?'];
+  // Every guest opens by asking for help (and a bottle guest names the occasion), so the first reply
+  // accepts and starts helping instead of offering help again.
+  if (turns === 0) return kind === 'bottle' ? ['Of course! How many bottles do you need?', 'Sure! What is your total budget?'] : ['Of course! Do you like sweet drinks?', 'Sure! Is it for a special occasion?'];
+  return kind === 'bottle' ? [] : ['Is it for a special occasion?'];
 }

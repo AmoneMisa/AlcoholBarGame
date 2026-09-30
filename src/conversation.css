@@ -16,8 +16,7 @@
 .talk-meters span { display:block;width:110px;height:6px;overflow:hidden;border-radius:4px;background:#0b111c; }
 .talk-meters span i { display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#e0524f,#f0c14b 50%,#5fcf7c);transition:width .3s ease; }
 .talk-meters b { color:#8fe0a4; }
-.talk-close { align-self:start;width:38px;height:38px;border:1px solid #475a74;border-radius:50%;background:#1b2940;color:#e8eef6;font-size:22px;line-height:1;cursor:pointer; }
-.talk-close:hover { border-color:#e4b35c;color:#ffd98a; }
+.talk-close { align-self:start; }
 
 .talk-body { display:grid;grid-template-columns:minmax(0,1fr) 290px;min-height:0; }
 .talk-log { display:flex;flex-direction:column;gap:10px;min-height:220px;overflow-y:auto;padding:16px; }
@@ -115,4 +114,9 @@
   .talk-compose { padding:10px 12px 14px; }
   .service-decisions { grid-template-columns:1fr 1fr;padding:8px 12px; }.service-decisions > div { grid-column:1/-1; }.service-decisions .secondary-button,.reject-order-button { width:100%; }
   .word-tile { min-height:34px;padding:5px 10px;font-size:13px; }
+}
+/* Portrait crop tuned on all 25 guest sprites: the face sits in the middle of the circle, chin included. */
+.talk-portrait .art-character { top:-15px;left:calc(50% - 67px);width:134px;height:191px; }
+@media (max-width: 700px) {
+  .talk-portrait .art-character { top:-10px;left:calc(50% - 45px);width:90px;height:129px; }
 }

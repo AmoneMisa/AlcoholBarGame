@@ -143,14 +143,20 @@ function welcomeNextCustomer(state: PlayerState, now: number, random: () => numb
     : `${arrival.mood === 'vip' ? 'VIP guest' : 'A new customer'} ${arrival.name} arrived.`;
 }
 
+// The current guest leaves (served, declined or out of time). Guests still seated keep waiting and the next
+// one in the row is served; only an empty bar schedules the next arrival.
 function scheduleNextCustomer(state: PlayerState, now: number, random: () => number) {
-  if (state.customers[0]) {
-    delete state.rewardedSentences[state.customers[0].id];
-    delete state.conversations[state.customers[0].id];
+  const leaving = currentCustomer(state);
+  if (leaving) {
+    delete state.rewardedSentences[leaving.id];
+    delete state.conversations[leaving.id];
   }
-  state.customers = [];
-  state.activeCustomerId = '';
-  state.nextCustomerAt = nextArrival(state, now, random);
+  // Removed in place: on the client these rules run on reactive state, and re-assigning a filtered copy
+  // would store reactive proxies that structuredClone cannot save.
+  const seat = leaving ? state.customers.indexOf(leaving) : -1;
+  if (seat >= 0) state.customers.splice(seat, 1);
+  state.activeCustomerId = state.customers[0]?.id ?? '';
+  state.nextCustomerAt = state.customers.length ? 0 : nextArrival(state, now, random);
   state.lastClockAt = now;
   state.conversationCustomerId = undefined;
 }
@@ -695,7 +701,9 @@ function ensureTranscript(state: PlayerState, guest: Customer): Transcript {
   const opening = guest.orderKind === 'bottle' ? bottleOpeningLine(guest)
     : guest.orderKind === 'serve' || !recipe ? `${guest.greeting} ${guest.request}`
       : openingLine(guest, buildProfile(recipe));
-  const transcript: Transcript = { lines: [], facts: [], bottleFacts: {}, expression: 'thinking', attempts: 0, correct: 0 };
+  // A bottle customer names the occasion in the opening line, so it is already known and never asked again.
+  const bottleFacts: Transcript['bottleFacts'] = guest.orderKind === 'bottle' ? { occasion: guest.bottleRequest?.occasion ?? 'party' } : {};
+  const transcript: Transcript = { lines: [], facts: [], bottleFacts, expression: 'thinking', attempts: 0, correct: 0 };
   addLine(transcript, 'customer', opening);
   state.conversations[guest.id] = transcript;
   return transcript;

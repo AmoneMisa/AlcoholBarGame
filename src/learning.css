@@ -12,7 +12,6 @@
 .word-card header b { font:700 22px Georgia,serif; }
 .word-card .ipa { margin-left:8px;color:#8a5a2b;font-size:13px; }
 .word-card header em { display:block;color:#7d6a55;font-size:11px;font-style:normal;text-transform:capitalize; }
-.word-card-close { width:30px;height:30px;border:1px solid #cbb89c;border-radius:50%;background:#fff;color:#1b2335;font-size:18px;line-height:1;cursor:pointer; }
 .word-meaning { margin:8px 0 6px;font-size:15px;font-weight:600;line-height:1.4; }
 .word-example { margin:0 0 8px;color:#4a4032;font-size:13px;font-style:italic; }
 .word-example button { padding:0;border:0;background:none;cursor:pointer; }

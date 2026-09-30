@@ -108,8 +108,15 @@ const makeBarInventory = (barIndex: number) => STARTING_INVENTORY.map((item, ing
   return { ...item, amount: Math.max(floor, Math.round(item.amount * factor)) };
 });
 
+// A new player opens to a full row, so the bar feels alive and there is practice waiting right away.
+export const STARTER_GUESTS = 5;
+
 export function createInitialState(now = Date.now()): PlayerState {
-  const firstGuest = withUniqueLook(generateCustomer(2, RECIPES.slice(0, BASIC_RECIPE_COUNT), .35, REGIONS[0]!.marketFactor), []);
+  const starterGuests: Customer[] = [];
+  for (let seat = 0; seat < STARTER_GUESTS; seat++) {
+    starterGuests.push(withUniqueLook(generateCustomer(2, RECIPES.slice(0, BASIC_RECIPE_COUNT), .35, REGIONS[0]!.marketFactor), starterGuests));
+  }
+  const firstGuest = starterGuests[0]!;
   const knownRecipeIds = RECIPES.slice(0, BASIC_RECIPE_COUNT).map((recipe) => recipe.id);
   return {
     version: 1,
@@ -141,7 +148,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     bottleInventories: Object.fromEntries(REGIONS.map((region, barIndex) => [region.id, ALCOHOL_PRODUCTS.map((product, productIndex) => ({
       productId: product.id, quantity: 1 + ((barIndex + productIndex * 2) % 4)
     }))])) as Record<RegionId, BottleInventoryItem[]>,
-    customers: [firstGuest],
+    customers: starterGuests,
     activeCustomerId: firstGuest.id,
     nextCustomerAt: 0,
     vipCooldownUntil: 0,

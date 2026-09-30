@@ -13,6 +13,7 @@ import BottleModel from '../cocktails/BottleModel.vue';
 import BrandBottle from './BrandBottle.vue';
 import { SIGNATURE_BRANDS, SIGNATURE_REASON_LABEL } from '../../data/knowledge/signatureBrands';
 import UiIcon from '../ui/UiIcon.vue';
+import CloseButton from '../ui/CloseButton.vue';
 
 const { current, openGuide, closeGuide } = useGuide();
 const recipe = computed(() => current.value?.kind === 'cocktail' ? RECIPES.find((item) => item.id === current.value!.id) : undefined);
@@ -41,7 +42,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
 <template>
   <div v-if="current" class="guide-backdrop" @click.self="closeGuide()">
     <article class="guide-sheet" role="dialog" aria-modal="true" :aria-label="recipe?.name ?? guideName">
-      <button class="guide-close" type="button" aria-label="Close guide" @click="closeGuide()"><span aria-hidden="true"></span></button>
+      <CloseButton class="guide-close" label="Close guide" @click="closeGuide()" />
 
       <!-- COCKTAIL -->
       <template v-if="recipe && cocktail">

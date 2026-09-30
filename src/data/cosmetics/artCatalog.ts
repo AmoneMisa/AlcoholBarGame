@@ -33,3 +33,12 @@ export const CHARACTER_ART: CharacterArtDefinition[] = [
 ];
 
 export const CUSTOMER_ART_BY_SLOT = CHARACTER_ART.filter((art) => !['noa','leo'].includes(art.id)).map((art) => art.id);
+
+// Where each seated guest's figure ends inside its sprite frame (% of frame height, measured from the art's
+// alpha). The sheets were drawn with different baselines, so guests are shifted down to one common seat line.
+export const GUEST_FIGURE_BOTTOM: Record<string, number> = {
+  marin: 88.7, kai: 87, remy: 87.2, ana: 87.2, theo: 83.8,
+  imani: 96.4, owen: 95.8, vera: 94.4, eli: 95.4, leila: 94.6, felix: 86.9, hana: 84.3, andre: 83.9, rosa: 85.1, marco: 86.1,
+  sora: 93, priya: 92.8, amara: 92.8, rowan: 93, mateo: 93, zahra: 85.7, kenji: 85.7, raven: 85.1, niko: 86.3, edith: 86.3
+};
+export const GUEST_SEAT_LINE = 96;

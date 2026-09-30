@@ -6,6 +6,7 @@ import { MAX_OFFERS, SELLERS, TACTICS, offerChance } from '../../sim/trade';
 import { useGameStore } from '../../stores/game';
 import { useLearningStore } from '../../stores/learning';
 import { haptic } from '../../telegram/webapp';
+import CloseButton from '../ui/CloseButton.vue';
 
 // Haggling with a supplier's sales rep: talk in English to raise your chances, then make up to three offers.
 // The server checks every sentence and rolls every offer; hard mistakes make the seller misunderstand.
@@ -78,7 +79,7 @@ function accept() {
       <header class="haggle-header">
         <span class="haggle-avatar" :class="talk.mood" aria-hidden="true">{{ seller.name.charAt(0) }}</span>
         <div><small>NEGOTIATION · {{ quote.supplier.name }}</small><b>{{ seller.name }}</b><em>{{ { neutral: 'Listening', pleased: 'Pleased', confused: 'Confused', done: 'No more offers' }[talk.mood] }}</em></div>
-        <button type="button" class="haggle-close" aria-label="Leave the negotiation" @click="game.leaveNegotiation()">×</button>
+        <CloseButton class="haggle-close" label="Leave the negotiation" @click="game.leaveNegotiation()" />
       </header>
 
       <div class="haggle-body">
@@ -165,7 +166,6 @@ function accept() {
 .haggle-avatar { display: grid; width: 44px; height: 44px; place-items: center; border: 2px solid #d6a54e; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #7a5230, #2b1b14); color: #ffe2a8; font: 700 20px Georgia, serif; transition: border-color .2s; }
 .haggle-avatar.pleased { border-color: #6ee0a2; }
 .haggle-avatar.confused { border-color: #ff9ca5; }
-.haggle-close { width: 34px; height: 34px; border: 1px solid #4a5c75; border-radius: 50%; background: transparent; color: #dce3ec; font-size: 20px; cursor: pointer; }
 .haggle-body { display: grid; grid-template-columns: minmax(0, 1fr) 300px; min-height: 0; min-width: 0; }
 .haggle-body > * { min-width: 0; }
 .haggle-log { display: flex; flex-direction: column; gap: 8px; min-height: 260px; overflow-y: auto; padding: 14px 16px; scrollbar-width: thin; scrollbar-color: #a87943 transparent; }

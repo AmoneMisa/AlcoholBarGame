@@ -41,7 +41,7 @@ function serve() {
     </header>
     <div v-if="!game.customer.orderRevealed || !activeBottle" class="bottle-consultation-empty">
       <div class="sealed-bottle-placeholder"><i></i><b>?</b></div>
-      <div><small>THE CUSTOMER NEEDS FULL, SEALED BOTTLES</small><h3>Discover the complete request</h3><p>Ask how many bottles they need, their total budget, preferred alcohol type and flavour, the occasion, and whether they have a favourite brand.</p><button class="primary-button" type="button" @click="game.openConversation(game.customer.id)">Continue the dialogue <span>→</span></button></div>
+      <div><small>THE CUSTOMER NEEDS FULL, SEALED BOTTLES</small><h3>Discover the complete request</h3><p>Ask how many bottles they need, their total budget, preferred alcohol type and flavour, and whether they have a favourite brand.</p><p class="talk-hint">Tap {{ game.customer.name }}’s speech bubble in the bar to talk.</p></div>
     </div>
     <div v-else class="confirmed-bottle-station">
       <div class="hero-brand-model"><BrandBottle :brand="activeBottle.brand" :category="guideIdForProduct(activeBottle)" :color="activeBottle.color" /><em>{{ activeBottle.abv }}%</em></div>
@@ -55,8 +55,7 @@ function serve() {
       <span>Step {{ currentStep }} / 3</span>
     </header>
     <div v-if="!game.customer.orderRevealed" class="compact-order-hidden">
-      <div><small>CUSTOMER FIRST</small><h3>Talk before you pour</h3><p>Ask about flavour, strength, budget, and occasion. The counter becomes your measured work area as soon as the order is clear.</p></div>
-      <button class="primary-button" type="button" @click="game.openConversation(game.customer.id)">Talk to {{ game.customer.name }} <span>→</span></button>
+      <div><small>CUSTOMER FIRST</small><h3>Talk before you pour</h3><p>Ask about flavour, strength, budget, and occasion. The counter becomes your measured work area as soon as the order is clear.</p><p class="talk-hint">Tap {{ game.customer.name }}’s speech bubble in the bar to talk.</p></div>
     </div>
     <div v-else class="compact-order-body">
       <div class="counter-instructions"><small>WORK ON THE LIVE BAR</small><b>Drag a painted bottle into the glass above.</b><span>Keep holding to pour in 5 ml steps. Tap <i>+</i> beside the glass for ice, fruit, herbs, salt, or garnish.</span><em v-if="servedProduct">Specific brand order · pays ◆ {{ brandedServeCrystalReward(servedProduct) }}</em></div>

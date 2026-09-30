@@ -12,6 +12,8 @@ import BottleModel from '../cocktails/BottleModel.vue';
 import GlassModel from '../cocktails/GlassModel.vue';
 import CharacterModel from '../characters/CharacterModel.vue';
 import CityEvent from './CityEvent.vue';
+import PopoverPanel from '../ui/PopoverPanel.vue';
+import UiIcon from '../ui/UiIcon.vue';
 import { INTERIORS, shelfStyleFor } from '../../data/cosmetics/bars';
 import { sceneLayout } from '../../data/cosmetics/barLines';
 
@@ -61,6 +63,7 @@ const sceneVars = computed(() => {
   const sizes = people.value;
   if (!current || !sizes) return {};
   return {
+    ...(phoneTrack.value ? { '--cast-left': `${phoneTrack.value.start}px`, '--cast-right': `${sceneBox.value.width - phoneTrack.value.end}px` } : {}),
     '--back': `${current.back}px`, '--seat-top': `${current.seat}px`, '--guest-h': `${sizes.guest}px`, '--bt-h': `${sizes.bartender}px`,
     '--bt-x': `${sizes.bartenderX}px`, '--glass-x': `${Math.round(sizes.glassX)}px`,
     '--glass-y': `${Math.round(current.back + current.drawnHeight * .03)}px`
@@ -83,7 +86,85 @@ const seatXs = computed(() => {
   const order = [...free, ...spots, ...stools.filter(blocked)];
   return order.length ? order : [width * .5];
 });
-const customerStyle = (index: number) => ({ left: `${Math.round(seatXs.value[index % seatXs.value.length] ?? sceneBox.value.width / 2)}px` });
+// Phones have room for one or two stools beside the bartender, so every guest sits on a horizontal track
+// in the free space next to them; a sideways swipe over the guests (or the ‹ › buttons) scrolls it.
+// The counter space guests may use: everything beside the bartender (and, while pouring, beside the glass).
+const guestZone = computed(() => {
+  const sizes = people.value;
+  const { width } = sceneBox.value;
+  if (!sizes || !width) return undefined;
+  const reserve = sizes.bartenderHalfWidth + 14;
+  const bartenderOnLeft = sizes.bartenderX < width / 2;
+  // While pouring, the glass stands between the guests and the bartender and needs its own room.
+  const glassEdge = buildingEnabled.value ? (width < 760 ? 48 : 70) : 0;
+  const start = bartenderOnLeft ? Math.min(width - 80, Math.round(Math.max(sizes.bartenderX + reserve, glassEdge ? sizes.glassX + glassEdge : 0))) : 0;
+  const end = bartenderOnLeft ? width : Math.max(80, Math.round(Math.min(sizes.bartenderX - reserve, glassEdge ? sizes.glassX - glassEdge : width)));
+  return { start, end };
+});
+const phoneTrack = computed(() => {
+  const sizes = people.value;
+  const zone = guestZone.value;
+  if (!sizes || !zone || sceneBox.value.width >= 760 || !game.customers.length) return undefined;
+  const spacing = Math.round(sizes.guest * .8) + 4;
+  return { ...zone, zone: zone.end - zone.start, spacing, content: game.customers.length * spacing };
+});
+// Wider screens seat everyone at once: on the painted stools while there are enough distinct ones,
+// otherwise evenly along the free counter so no two guests share a spot.
+const wideSeats = computed(() => {
+  const zone = guestZone.value;
+  const sizes = people.value;
+  const count = game.customers.length;
+  if (!zone || !sizes || !count) return [];
+  const gap = sizes.guest * .62;
+  const stools: number[] = [];
+  for (const x of seatXs.value) {
+    if (x >= zone.start && x <= zone.end && stools.every((taken) => Math.abs(taken - x) >= gap)) stools.push(x);
+  }
+  if (stools.length >= count) return stools.slice(0, count);
+  const spacing = (zone.end - zone.start) / count;
+  return Array.from({ length: count }, (_, index) => zone.start + spacing * (index + .5));
+});
+const castRef = ref<HTMLElement>();
+const guestScroll = ref(0);
+const guestsOverflow = computed(() => !!phoneTrack.value && phoneTrack.value.content > phoneTrack.value.zone + 4);
+const trackX = (index: number) => phoneTrack.value!.spacing * (index + .5);
+function onGuestScroll() { guestScroll.value = castRef.value?.scrollLeft ?? 0; }
+// The track always stops on whole guests, so no one is left cut in half at the edge.
+const guestsPerView = () => Math.max(1, Math.floor((phoneTrack.value?.zone ?? 0) / (phoneTrack.value?.spacing ?? 1)));
+function scrollToFirstGuest(first: number, behavior: ScrollBehavior = 'smooth') {
+  const track = phoneTrack.value;
+  if (!track || !castRef.value) return;
+  const index = Math.min(Math.max(0, first), Math.max(0, game.customers.length - guestsPerView()));
+  castRef.value.scrollTo({ left: Math.max(0, Math.min(index * track.spacing, track.content - track.zone)), behavior });
+}
+function showGuest(index: number, behavior: ScrollBehavior = 'smooth') {
+  if (index >= 0) scrollToFirstGuest(index - Math.floor((guestsPerView() - 1) / 2), behavior);
+}
+function nudgeGuests(direction: number) {
+  if (!phoneTrack.value || !castRef.value) return;
+  scrollToFirstGuest(Math.round(castRef.value.scrollLeft / phoneTrack.value.spacing) + direction * guestsPerView());
+}
+// While nobody is being served, the first guest in view shows the "tap to talk" bubble.
+const bubbleIndex = computed(() => {
+  const active = game.customers.findIndex((item) => item.id === game.activeCustomerId);
+  if (active >= 0 || !phoneTrack.value) return Math.max(0, active);
+  return Math.max(0, game.customers.findIndex((_, index) => trackX(index) - guestScroll.value >= 0));
+});
+// Bring the guest being served into view, also when the phone track first appears or its width changes.
+watch([() => game.activeCustomerId, () => phoneTrack.value?.zone], ([id], previous) => {
+  void nextTick(() => showGuest(game.customers.findIndex((item) => item.id === id), previous[1] === undefined ? 'auto' : 'smooth'));
+});
+// On the phone track the speech bubble is narrowed to the guest area and shifted so it never leaves the visible part.
+function phoneBubbleVars(index: number) {
+  const track = phoneTrack.value!;
+  const width = Math.min(150, track.zone - 8);
+  const left = trackX(index) - guestScroll.value - width / 2;
+  const clamped = Math.min(Math.max(4, left), track.zone - width - 4);
+  return { '--bubble-w': `${width}px`, '--bubble-shift': `${Math.round(clamped - left)}px` };
+}
+const customerStyle = (index: number) => phoneTrack.value
+  ? { left: `${Math.round(trackX(index))}px`, ...(index === bubbleIndex.value ? phoneBubbleVars(index) : {}) }
+  : { left: `${Math.round(wideSeats.value[index] ?? seatXs.value[index % seatXs.value.length] ?? sceneBox.value.width / 2)}px` };
 // The speech bubble sits beside the guest's head, on the side away from the bartender and the glass,
 // so it covers neither the shelves nor the pouring station.
 const bartenderOnRight = computed(() => {
@@ -92,11 +173,24 @@ const bartenderOnRight = computed(() => {
 });
 // …unless there is no room on that side (guests near the edge of a narrow phone scene).
 const bubbleOnLeft = (index: number) => {
-  const x = seatXs.value[index % seatXs.value.length] ?? 0;
+  const track = phoneTrack.value;
+  if (track) return trackX(index) - guestScroll.value > track.zone / 2;
+  const x = wideSeats.value[index] ?? seatXs.value[index % seatXs.value.length] ?? 0;
   const room = 170;
   return bartenderOnRight.value ? x > room : x > sceneBox.value.width - room;
 };
 const freshPickerOpen = ref(false);
+// The dragged bottle follows the finger, but while pouring it sits just above and left of the glass rim,
+// so the glass's stream starts at the bottle's neck instead of wherever the finger happens to be.
+const ghostStyle = computed(() => {
+  const glass = dragOverGlass.value ? glassTarget.value?.querySelector('.live-glass-wrap')?.getBoundingClientRect() : undefined;
+  if (!glass) return { left: `${pointerX.value}px`, top: `${pointerY.value}px` };
+  // The tipped bottle's neck sits about 55% of the bottle's width right of its anchor and 13% of its height above.
+  const phone = sceneBox.value.width < 760;
+  const [width, height] = phone ? [74, 105] : [92, 125];
+  const neckX = glass.left + glass.width * .42;
+  return { left: `${Math.round(neckX - width * .55)}px`, top: `${Math.round(glass.top - 18 + height * .13)}px` };
+});
 const draggingIngredientId = ref<string>();
 const dragOverGlass = ref(false);
 const dragAdded = ref(false);
@@ -348,7 +442,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section ref="sceneRef" class="bar-scene" :class="{ 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
+  <section ref="sceneRef" class="bar-scene" :class="{ 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack, 'many-guests': game.customers.length > 1 }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
     <div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div>
     <CityEvent compact />
     <div v-if="buildingEnabled" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
@@ -361,7 +455,7 @@ onBeforeUnmount(() => {
             <span>{{ ingredient.name }}</span>
           </button>
         </div>
-        <span class="shelf-nudge"><button type="button" :aria-label="`Scroll ${row.label} left`" @pointerdown.stop @click.stop="nudgeLine(row.id, -1)">‹</button><button type="button" :aria-label="`Scroll ${row.label} right`" @pointerdown.stop @click.stop="nudgeLine(row.id, 1)">›</button></span>
+        <span class="shelf-nudge"><button type="button" :aria-label="`Scroll ${row.label} left`" @pointerdown.stop @click.stop="nudgeLine(row.id, -1)"><UiIcon name="chevron-left" /></button><button type="button" :aria-label="`Scroll ${row.label} right`" @pointerdown.stop @click.stop="nudgeLine(row.id, 1)"><UiIcon name="chevron-right" /></button></span>
       </div>
     </div>
     <div class="bartender-layer">
@@ -369,8 +463,8 @@ onBeforeUnmount(() => {
       <span class="name-ribbon">{{ (game.decor.bartenderNickname || (game.decor.bartenderCharacter === 'leo' ? 'Leo' : 'Noa')).toUpperCase() }} · BARTENDER</span>
     </div>
     <div class="bar-line-tint" aria-hidden="true"></div>
-    <div class="bar-cast">
-      <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId, 'bubble-left': bubbleOnLeft(index) }" :style="customerStyle(index)" @click="game.openConversation(customer.id)">
+    <div ref="castRef" class="bar-cast" @scroll.passive="onGuestScroll">
+      <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId, 'bubble-left': bubbleOnLeft(index), 'show-bubble': index === bubbleIndex }" :style="customerStyle(index)" @click="game.openConversation(customer.id)">
         <div class="speech-bubble"><span>{{ customer.greeting }}</span><b>{{ bubbleText(customer) }}</b><em>{{ customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></div>
         <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="expressionFor(customer.mood)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
         <span v-if="customer.smoker" class="customer-ashtray" aria-hidden="true"><i></i></span>
@@ -378,21 +472,29 @@ onBeforeUnmount(() => {
       </button>
       <!-- The wait for the next guest is shown once, in the panel below the scene (with “Welcome now”). -->
     </div>
+    <template v-if="guestsOverflow">
+      <button class="guest-nudge prev" type="button" aria-label="Show earlier guests" :disabled="guestScroll <= 2" @click="nudgeGuests(-1)"><UiIcon name="chevron-left" /></button>
+      <button class="guest-nudge next" type="button" aria-label="Show more guests" :disabled="guestScroll >= phoneTrack!.content - phoneTrack!.zone - 2" @click="nudgeGuests(1)"><UiIcon name="chevron-right" /></button>
+    </template>
     <div v-if="buildingEnabled" ref="glassTarget" class="live-glass-station" :class="{ 'drag-over': dragOverGlass }">
-      <div class="live-glass-copy"><b>{{ dragOverGlass ? 'POURING' : totalAmount ? `${totalAmount} ML` : 'YOUR GLASS' }}</b><small>{{ itemCount ? `+ ${itemCount} fresh item${itemCount === 1 ? '' : 's'}` : 'Drag bottle over the glass' }}</small></div>
+      <div v-if="dragOverGlass || totalAmount || itemCount" class="live-glass-copy"><b>{{ dragOverGlass ? 'POURING' : totalAmount ? `${totalAmount} ML` : 'FRESH' }}</b><small v-if="itemCount">+ {{ itemCount }} fresh item{{ itemCount === 1 ? '' : 's' }}</small></div>
       <div class="live-glass-wrap">
         <div v-if="dragOverGlass" class="live-pour-stream" :style="{ '--stream-color': selectedIngredient ? colorMap[selectedIngredient.id] : liquidColor }"></div>
         <GlassModel type="highball" :fill="fill" :color="liquidColor" :ice="ice" :garnish="garnish" :bubbles="hasBubbles" animation="idle" />
-        <button class="fresh-plus" type="button" :aria-expanded="freshPickerOpen" aria-label="Add fruit, ice, herb, or garnish" @click="freshPickerOpen = !freshPickerOpen"><span>+</span><small>fresh</small></button>
+        <button class="fresh-plus" type="button" :aria-expanded="freshPickerOpen" aria-label="Add fruit, ice, herb, or garnish" @click="freshPickerOpen = !freshPickerOpen"><UiIcon name="plus" /></button>
       </div>
-      <div v-if="freshPickerOpen" class="fresh-picker" role="dialog" aria-label="Choose fresh ingredient">
-        <header><b>ADD TO THE GLASS</b><button type="button" aria-label="Close" @click="freshPickerOpen = false">×</button></header>
-        <div><button v-for="ingredient in freshIngredients" :key="ingredient.id" type="button" @click="addFresh(ingredient.id)"><BottleModel :ingredient="ingredient" /><span>{{ ingredient.name }}</span><small>+1</small></button></div>
-      </div>
+      <!-- Rendered on <body>: the glass station is scaled down on phones, which would shrink and trap a fixed popup. -->
+      <Teleport to="body">
+        <PopoverPanel v-if="freshPickerOpen" class="fresh-picker" eyebrow="FRESH INGREDIENTS" title="Add to the glass" close-label="Close fresh ingredients" @close="freshPickerOpen = false">
+          <div><button v-for="ingredient in freshIngredients" :key="ingredient.id" type="button" @click="addFresh(ingredient.id)"><BottleModel :ingredient="ingredient" /><span>{{ ingredient.name }}</span><small>+1</small></button></div>
+        </PopoverPanel>
+      </Teleport>
     </div>
-    <div v-if="draggingIngredientId && selectedIngredient" class="drag-bottle-ghost" :class="{ pouring: dragOverGlass }" :style="{ left: `${pointerX}px`, top: `${pointerY}px` }" aria-hidden="true">
-      <BottleModel :ingredient="selectedIngredient" :amount="selectedAmount" /><i v-if="dragOverGlass" :style="{ '--stream-color': colorMap[selectedIngredient.id] ?? '#d7c88c' }"></i>
-    <b class="ghost-name">{{ selectedIngredient.name }} · {{ pourable(selectedIngredient.id) }} ml</b></div>
+    <!-- Over the glass the bottle settles above its rim and tips; the glass draws the single pour stream. -->
+    <div v-if="draggingIngredientId && selectedIngredient" class="drag-bottle-ghost" :class="{ pouring: dragOverGlass }" :style="ghostStyle" aria-hidden="true">
+      <span class="ghost-bottle"><BottleModel :ingredient="selectedIngredient" /></span>
+      <b class="ghost-name">{{ selectedIngredient.name }} · {{ pourable(selectedIngredient.id) }} ml</b>
+    </div>
     <div class="scene-status"><span :class="{ waiting: !game.hasCustomer }"></span>{{ game.message }}<b v-if="game.hasCustomer">{{ game.orderTimerPaused ? 'Paused in dialogue' : game.orderCountdown }}</b></div>
   </section>
 </template>

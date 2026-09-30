@@ -1,10 +1,7 @@
 /* Guide sheet: full stories of cocktails and ingredients. */
 .guide-backdrop { position:fixed;z-index:220;inset:0;display:grid;place-items:center;padding:16px;background:#05080ecc;backdrop-filter:blur(6px);animation:talkFade .18s ease both; }
 .guide-sheet { position:relative;isolation:isolate;width:min(760px,100%);max-height:calc(100dvh - 32px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;padding:22px 24px;border:1px solid #58657d;border-radius:18px;background:linear-gradient(165deg,#1b2a44,#0d1624 55%,#121a2a);box-shadow:0 30px 80px #000c;color:#e6ecf4;font-size:14px;line-height:1.6;animation:talkRise .24s cubic-bezier(.2,.8,.25,1) both; }
-.guide-close { position:sticky;top:0;display:grid;float:right;width:40px;height:40px;margin:-6px -8px 0 10px;padding:0;place-items:center;border:1px solid #475a74;border-radius:50%;background:#1b2940;color:#e8eef6;cursor:pointer;z-index:5; }
-.guide-close span,.guide-close span::after { display:block;width:15px;height:2px;border-radius:2px;background:currentColor; }
-.guide-close span { transform:rotate(45deg); }
-.guide-close span::after { content:'';transform:rotate(90deg); }
+.guide-close { position:sticky;top:0;float:right;margin:-6px -8px 0 10px;z-index:5; }
 .guide-head small { color:#e4b35c;font-size:10px;font-weight:900;letter-spacing:.14em; }
 .guide-head h2 { margin:4px 0 6px;font:700 30px Georgia,serif;color:#fff; }
 .guide-head > p, .guide-head div > p { margin:0;color:#c9d4e2;font-size:15px; }

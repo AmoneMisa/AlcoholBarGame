@@ -3,19 +3,26 @@
 import { ref, watch } from 'vue';
 
 const STORE_KEY = 'barlingo.audio';
-interface Prefs { music: boolean; sfx: boolean }
+// On/off is kept apart from the level, so muting and unmuting returns to the volume the player chose.
+interface Prefs { music: boolean; sfx: boolean; musicVolume: number; sfxVolume: number }
 
+const level = (value: unknown) => typeof value === 'number' && Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 1;
 function loadPrefs(): Prefs {
   try {
     const saved = JSON.parse(localStorage.getItem(STORE_KEY) ?? '{}');
-    return { music: saved.music !== false, sfx: saved.sfx !== false };
-  } catch { return { music: true, sfx: true }; }
+    return { music: saved.music !== false, sfx: saved.sfx !== false, musicVolume: level(saved.musicVolume), sfxVolume: level(saved.sfxVolume) };
+  } catch { return { music: true, sfx: true, musicVolume: 1, sfxVolume: 1 }; }
 }
 
-export const musicOn = ref(loadPrefs().music);
-export const sfxOn = ref(loadPrefs().sfx);
-watch([musicOn, sfxOn], () => {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify({ music: musicOn.value, sfx: sfxOn.value })); } catch { /* private mode */ }
+const prefs = loadPrefs();
+export const musicOn = ref(prefs.music);
+export const sfxOn = ref(prefs.sfx);
+/** 0–1, multiplied with the channel's mix level. */
+export const musicVolume = ref(prefs.musicVolume);
+export const sfxVolume = ref(prefs.sfxVolume);
+watch([musicOn, sfxOn, musicVolume, sfxVolume], () => {
+  const saved: Prefs = { music: musicOn.value, sfx: sfxOn.value, musicVolume: level(musicVolume.value), sfxVolume: level(sfxVolume.value) };
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(saved)); } catch { /* private mode */ }
   applyVolumes();
 });
 
@@ -49,8 +56,8 @@ function applyVolumes() {
   if (!ctx || !musicBus || !sfxBus) return;
   const now = ctx.currentTime;
   musicBus.gain.cancelScheduledValues(now);
-  musicBus.gain.setTargetAtTime(musicOn.value ? MUSIC_LEVEL * (ducked ? .3 : 1) : 0, now, .25);
-  sfxBus.gain.setTargetAtTime(sfxOn.value ? SFX_LEVEL : 0, now, .05);
+  musicBus.gain.setTargetAtTime(musicOn.value ? MUSIC_LEVEL * level(musicVolume.value) * (ducked ? .3 : 1) : 0, now, .25);
+  sfxBus.gain.setTargetAtTime(sfxOn.value ? SFX_LEVEL * level(sfxVolume.value) : 0, now, .05);
 }
 
 // Lower the music while a spoken word or phrase is playing.

@@ -178,8 +178,7 @@ test('Crystal purchases and rewards are server-authoritative and fully ledgered'
   assert.equal(restocked.ok,true);assert.equal(restocked.state.crystals,beforeRestock - bottleRestockCrystalCost(product) * 2);
   assert.equal(restocked.state.bottleInventories[restocked.state.regionId].find((item) => item.productId === product.id).quantity,beforeStock + 2);
 
-  const guest = restocked.state.customers[0];
-  await act(service,{type:'rejectCustomer',customerId:guest.id},requestId(),identity(88));
+  for (const guest of restocked.state.customers) await act(service,{type:'rejectCustomer',customerId:guest.id},requestId(),identity(88));
   const waiting = (await service.session(identity(88))).state;
   const beforeArrival = waiting.crystals;
   const welcomed = await act(service,{type:'expediteCustomer'},requestId(),identity(88));
@@ -241,7 +240,7 @@ test('Guests arrive only on the server clock; a client cannot summon customers',
   let clock = Date.now();
   const { service } = makeService(() => clock);
   const { state } = await service.session(identity());
-  await act(service, { type: 'rejectCustomer', customerId: state.customers[0].id });
+  for (const guest of state.customers) await act(service, { type: 'rejectCustomer', customerId: guest.id });
   const waiting = (await act(service, { type: 'tick' })).state;
   assert.equal(waiting.customers.length, 0);
   assert.ok(waiting.nextCustomerAt > clock);

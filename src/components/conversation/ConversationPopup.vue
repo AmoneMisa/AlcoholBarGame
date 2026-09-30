@@ -21,6 +21,7 @@ import { serveTemplates } from '../../domain/brandServe';
 import { haptic } from '../../telegram/webapp';
 import CharacterModel from '../characters/CharacterModel.vue';
 import UiIcon from '../ui/UiIcon.vue';
+import CloseButton from '../ui/CloseButton.vue';
 
 const inputMode = ref<'type' | 'words'>('words');
 
@@ -285,7 +286,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
             <label>Your English <b>{{ accuracy }}%</b></label>
           </div>
         </div>
-        <button class="talk-close" type="button" aria-label="Close conversation" @click="game.closeConversation()">×</button>
+        <CloseButton class="talk-close" label="Close conversation" @click="game.closeConversation()" />
       </header>
 
       <div class="talk-body">
@@ -312,7 +313,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
               <em>{{ activeWord.pos }} · {{ activeWord.level }}</em>
             </div>
             <button type="button" class="speak-button" aria-label="Listen" @click="speak(activeWord.word)"><UiIcon name="speaker" /></button>
-            <button type="button" class="word-card-close" aria-label="Close word card" @click="activeWord = undefined">×</button>
+            <CloseButton class="word-card-close" label="Close word card" tone="light" size="sm" @click="activeWord = undefined" />
           </header>
           <p class="word-meaning">{{ activeWord.meaning }}</p>
           <p v-if="activeWord.example" class="word-example">“{{ activeWord.example }}” <button type="button" class="inline-speak-button" aria-label="Listen to example" @click="speak(activeWord.example)"><UiIcon name="speaker" /></button></p>

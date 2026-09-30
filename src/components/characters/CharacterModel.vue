@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { CHARACTER_ART } from '../../data/cosmetics/artCatalog';
+import { CHARACTER_ART, GUEST_FIGURE_BOTTOM, GUEST_SEAT_LINE } from '../../data/cosmetics/artCatalog';
 import { createCharacterLook } from '../../domain/customers/characterFactory';
 import type { CharacterExpression } from '../../domain/dialogue/types';
 import type { Mood } from '../../domain/types';
@@ -41,6 +41,8 @@ const props = withDefaults(defineProps<{
 });
 
 const art = computed(() => CHARACTER_ART.find((item) => item.id === props.characterId) ?? CHARACTER_ART[0]!);
+// Guests from different sheets end at different heights in their frames; this drop puts every one on the same seat line.
+const figureDrop = computed(() => props.role === 'customer' ? `${Math.max(0, GUEST_SEAT_LINE - (GUEST_FIGURE_BOTTOM[art.value.id] ?? GUEST_SEAT_LINE)).toFixed(1)}%` : '0%');
 const look = computed(() => createCharacterLook(props.seed || props.characterId));
 // Frame proportions (sheet width / columns ÷ sheet height / rows) of the customer sheets.
 const FRAME_RATIO: Record<string, number> = {
@@ -74,7 +76,7 @@ const castStyle = computed(() => {
 </script>
 
 <template>
-  <div class="art-character" :class="[`role-${role}`, `character-${characterId}`, `expression-${expression}`, `motion-${animation}`, `body-${look.body}`, `skin-${look.skin}`, `hair-${look.hair}`, `face-${look.face}`, `outfit-${outfit}`, `accessory-${accessory}`, `glasses-${look.glasses}`, `hat-${look.hat}`, `vip-${look.vip}`, `custom-pose-${pose}`, mood]" :aria-label="`${art.name}, ${expression}`">
+  <div class="art-character" :style="{ '--figure-drop': figureDrop }" :class="[`role-${role}`, `character-${characterId}`, `expression-${expression}`, `motion-${animation}`, `body-${look.body}`, `skin-${look.skin}`, `hair-${look.hair}`, `face-${look.face}`, `outfit-${outfit}`, `accessory-${accessory}`, `glasses-${look.glasses}`, `hat-${look.hat}`, `vip-${look.vip}`, `custom-pose-${pose}`, mood]" :aria-label="`${art.name}, ${expression}`">
     <img v-if="art.asset" class="bartender-art" :src="art.asset" :alt="art.name" draggable="false" />
     <div v-else-if="role === 'customer'" class="character-sprite customer-art" :style="castStyle" role="img" :aria-label="art.name"></div>
     <div v-else class="character-composite" role="img" :aria-label="art.name">

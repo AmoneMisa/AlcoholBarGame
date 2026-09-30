@@ -78,11 +78,9 @@ button { touch-action: manipulation; }
 .exchange-resource { position:relative;padding:0!important; }
 .exchange-open { display:flex;width:100%;height:100%;align-items:center;gap:8px;padding:7px 12px;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer; }
 .exchange-open:hover { background:#ffffff08; }.exchange-open span { white-space:nowrap; }
-.currency-exchange { position:absolute;z-index:180;top:calc(100% + 10px);right:0;width:310px;padding:10px;border:1px solid #d2a24e;border-radius:13px;background:linear-gradient(145deg,#17243a,#0b1320 70%);box-shadow:0 20px 50px #000d;text-align:left; }
+.currency-exchange { position:absolute;top:calc(100% + 10px);right:0;width:310px;padding:0 10px 10px; }
+.currency-exchange > .ui-popover-head { margin:0 -10px; }
 .currency-exchange::before { content:'';position:absolute;right:32px;top:-7px;width:12px;height:12px;border-top:1px solid #d2a24e;border-left:1px solid #d2a24e;background:#17243a;transform:rotate(45deg); }
-.currency-exchange header { display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:7px;border-bottom:1px solid #354762; }
-.currency-exchange header small,.currency-exchange header b { display:block; }.currency-exchange header b { margin-top:2px;font:700 17px Georgia,serif; }
-.currency-exchange header > button { display:grid;width:28px;height:28px;place-items:center;border:1px solid #495a72;border-radius:50%;background:#101a29;color:white;cursor:pointer; }
 .currency-exchange p { margin:8px 1px;color:#aeb9c7;font-size:8px;line-height:1.45; }
 .currency-exchange > button { display:grid;width:100%;grid-template-columns:1fr 24px 1fr;align-items:center;gap:4px;min-height:43px;margin-top:6px;padding:6px 9px;border:1px solid #455875;border-radius:9px;background:#152238;color:#fff;cursor:pointer; }
 .currency-exchange > button:hover:not(:disabled) { border-color:#edbd58;background:#283650; }.currency-exchange > button:disabled { opacity:.42;cursor:not-allowed; }
@@ -151,9 +149,6 @@ button { touch-action: manipulation; }
 .fresh-plus span { font:700 24px/18px Georgia,serif; }.fresh-plus small { color:#ffd885;font-size:6px;font-weight:900;text-transform:uppercase; }
 .live-pour-stream { position:absolute;z-index:8;top:-42px;left:49px;width:7px;height:93px;border-radius:60% 40% 50% 60%;background:linear-gradient(90deg,#fff7,var(--stream-color),#0002);filter:drop-shadow(0 0 3px var(--stream-color));transform:rotate(-9deg);transform-origin:top;animation:liveLiquidStream .42s ease-in-out infinite;pointer-events:none; }
 .fresh-picker { position:absolute;z-index:30;right:8px;bottom:12px;width:min(430px,calc(100vw - 40px));overflow:hidden;border:1px solid #d4a457;border-radius:14px;background:#0b1421f5;box-shadow:0 18px 50px #000d;backdrop-filter:blur(12px); }
-.fresh-picker > header { display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:1px solid #58432f; }
-.fresh-picker > header b { color:#ffd67c;font-size:8px;letter-spacing:.12em; }
-.fresh-picker > header button { width:28px;height:28px;border:1px solid #6b5945;border-radius:50%;background:#1a2330;color:white;cursor:pointer; }
 .fresh-picker > div { display:flex;gap:5px;overflow-x:auto;padding:8px;scrollbar-width:thin; }
 .fresh-picker > div > button { position:relative;flex:0 0 78px;min-height:105px;border:1px solid #3e5068;border-radius:10px;background:radial-gradient(circle at 50% 38%,#2b425a,#111c2c 72%);color:white;cursor:pointer; }
 .fresh-picker .bottle-visual { width:68px;height:68px; }
@@ -1324,12 +1319,26 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
 .cosmetic-roulette button { min-width:180px;border-color:#d19a3d!important;background:#8e5e22!important;color:#fff3cf!important; }
 @media(max-width:760px){.cosmetic-roulette>div{grid-template-columns:1fr!important}.cosmetic-roulette button{width:100%;min-width:0}.design-options .face-builder{grid-column:1/-1}.design-options .face-builder>div{display:flex;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px;scroll-snap-type:x proximity}.design-options .face-builder button{flex:0 0 auto;min-width:78px;scroll-snap-align:start}}
 
-/* Music / sound effects toggles in the top bar */
-.sound-toggles { display: flex; gap: 4px; align-items: center; padding: 0 6px; }
-.sound-toggles button { display: grid; place-items: center; gap: 1px; min-width: 38px; padding: 4px 6px; border: 1px solid #3b4b65; border-radius: 9px; background: #101827; color: var(--gold); font-size: 15px; line-height: 1; cursor: pointer; }
-.sound-toggles button .ui-icon { width: 16px; height: 16px; }
-.sound-toggles button small { font-size: 8px; letter-spacing: .08em; }
-.sound-toggles button.off { color: #6b778b; }
+/* Sound: one HUD item (like coins/crystals) that opens the volume panel. */
+.sound-resource { position: relative; display: flex; align-items: stretch; }
+.hud-resources > .sound-resource { padding: 0; }
+.sound-open { display: flex; width: 100%; min-width: 0; align-items: center; gap: 8px; padding: 7px 12px; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.sound-open .ui-icon { color: #f8c865; }
+.sound-open.off .ui-icon, .sound-open.off b { color: #6b778b; }
+.sound-open b { display: block; font-size: 14px; white-space: nowrap; }
+.volume-panel { position: absolute; top: calc(100% + 10px); right: 0; display: grid; gap: 8px; width: 300px; padding: 0 10px 10px; }
+.volume-panel > .ui-popover-head { margin: 0 -10px; }
+.volume-panel .volume-row { display: grid; grid-template-columns: 1fr 44px auto; grid-template-areas: "name value mute" "slider slider slider"; align-items: center; gap: 4px 8px; padding: 8px 9px; border: 1px solid #455875; border-radius: 9px; background: #152238; }
+.volume-panel .volume-row > span { grid-area: name; display: flex; align-items: center; gap: 5px; color: #f3e2bf; font-size: 12px; font-weight: 800; }
+.volume-panel .volume-row > span .ui-icon { width: 15px; height: 15px; }
+.volume-panel output { grid-area: value; color: var(--gold); font-size: 12px; font-weight: 800; text-align: right; }
+.volume-panel .volume-row > button { grid-area: mute; min-width: 64px; padding: 4px 8px; border: 1px solid #495a72; border-radius: 7px; background: #101a29; color: #f3e2bf; font-size: 11px; cursor: pointer; }
+.volume-panel input[type="range"] { grid-area: slider; width: 100%; height: 28px; margin: 0; accent-color: #d2a24e; cursor: pointer; }
+.volume-panel .volume-row.off input[type="range"] { opacity: .45; }
+.volume-panel .volume-row.off output { color: #6b778b; }
+@media (max-width: 760px) {
+  .volume-panel { position: fixed; top: calc(max(8px, env(safe-area-inset-top)) + 112px); right: 7px; left: 7px; width: auto; }
+}
 
 /* ==== Stable avatar editor fallback =======================================
    The production avatar is moving to skinned GLB meshes. Until those assets
@@ -1468,3 +1477,94 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
   .region-cards > article > img { height:145px; }
   .region-cards > article > button { font-size:10px; }
 }
+
+/* The customer layer spans the whole scene above the bottle shelf; without this it swallowed every press meant for the bottles.
+   Empty space passes taps through, the guests themselves stay clickable. */
+.bar-scene .bar-cast { pointer-events: none; }
+.bar-scene .bar-cast .scene-customer { pointer-events: auto; }
+
+/* Phones: every guest sits on a horizontal track beside the bartender instead of only the active one being shown.
+   The track itself ignores taps (bottles behind it stay reachable); swiping over a guest scrolls it. */
+.bar-scene.phone-guests .bar-cast { right: var(--cast-right) !important; left: var(--cast-left) !important; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; overscroll-behavior-x: contain; }
+.bar-scene.phone-guests .bar-cast::-webkit-scrollbar { display: none; }
+.bar-scene.phone-guests .scene-customer, .bar-scene.phone-guests .scene-customer.waiting { display: block; touch-action: pan-x; }
+.guest-nudge { position: absolute; z-index: 8; top: calc(var(--back, 40%) - 30px); display: grid; width: 30px; height: 44px; place-items: center; padding: 0; border: 1px solid #a87943; border-radius: 8px; background: rgba(30, 18, 12, .9); color: #ffe4aa; font-size: 22px; line-height: 1; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 12px #0009; }
+.guest-nudge .ui-icon { width: 20px; height: 20px; stroke-width: 2.4; }
+.guest-nudge.prev { left: calc(var(--cast-left, 0px) + 2px); }
+.guest-nudge.next { right: calc(var(--cast-right, 0px) + 2px); }
+.guest-nudge:disabled { opacity: 0; pointer-events: none; }
+/* One speech bubble at a time: the guest being served, or the first guest while nobody is. */
+.bar-scene.phone-guests .scene-customer .speech-bubble { display: none !important; }
+.bar-scene.phone-guests .scene-customer.show-bubble .speech-bubble { display: block !important; }
+
+/* Guests sit on the stools in front of the bar (seat line), the bartender stands a little higher behind it. */
+.bar-scene .scene-customer .art-character { bottom: calc(100% - var(--seat-top) - 2px) !important; }
+.bar-scene .speech-bubble { bottom: calc(100% - var(--seat-top) + var(--guest-h) * .72) !important; }
+.bar-scene .bartender-layer { top: calc(var(--back) - var(--bt-h) * .66) !important; }
+/* Phones: the name plate sits on the guest's lap above the seat line, clear of the status bar at the scene's bottom. */
+.bar-scene.phone-guests .customer-plate { top: auto !important; bottom: calc(100% - var(--seat-top) + 4px) !important; right: 6% !important; left: 6% !important; padding: 3px 5px !important; }
+.bar-scene.phone-guests .customer-plate b { font-size: 10px; }
+.bar-scene.phone-guests .customer-plate small { font-size: 6px; }
+.bar-scene.phone-guests .customer-plate { display: grid !important; grid-template-columns: minmax(0, 1fr) 34px; align-items: center; gap: 4px; min-height: 0; text-align: left; }
+.bar-scene.phone-guests .customer-plate > div { min-width: 0; }
+.bar-scene.phone-guests .customer-plate b { overflow: hidden; line-height: 1.1; text-overflow: ellipsis; white-space: nowrap; }
+.bar-scene.phone-guests .customer-plate small { line-height: 1.1; }
+.bar-scene.phone-guests .customer-plate .mini-patience { width: 34px; height: 4px; margin: 0; }
+.bar-scene.phone-guests .customer-plate .mini-patience em { display: none; }
+.bar-scene.phone-guests .speech-bubble { right: auto !important; left: 50% !important; width: var(--bubble-w, 150px) !important; transform: translateX(calc(-50% + var(--bubble-shift, 0px))) !important; border-radius: 13px !important; }
+
+/* Dragged bottle: only the bottle tilts, the name label stays level and readable. */
+.drag-bottle-ghost, .drag-bottle-ghost.pouring { transform: translate(-50%, -70%) !important; transition: left .12s ease-out, top .12s ease-out; }
+.drag-bottle-ghost .ghost-bottle { display: block; width: 100%; height: 100%; transform: rotate(-9deg); transform-origin: 50% 60%; transition: transform .22s ease-out; }
+.drag-bottle-ghost.pouring { transform: translate(-50%, -100%) !important; }
+.drag-bottle-ghost.pouring .ghost-bottle { transform: rotate(118deg); }
+.drag-bottle-ghost .ghost-name { transform: translateX(-50%) !important; }
+.drag-bottle-ghost.pouring .ghost-name { display: none; }
+/* Phones: the ashtray sits on the guest's name plate instead of floating beside their shoulder. */
+.bar-scene.phone-guests .customer-ashtray { display: none; }
+
+/* Fresh "+" button: a clean centred icon (the old tiny caption read as an underline). */
+.fresh-plus { place-content: normal !important; place-items: center; padding: 0; }
+/* Fresh ingredient picker: a sheet above the bottom navigation with a scrollable grid. */
+.fresh-picker { position: fixed !important; z-index: 1200 !important; top: auto !important; right: 50% !important; bottom: calc(84px + var(--safe-bottom, 0px)) !important; left: auto !important; display: grid; grid-template-rows: auto minmax(0, 1fr); width: min(460px, calc(100vw - 16px)) !important; max-height: min(62vh, 520px); transform: translateX(50%); overflow: hidden; border: 1px solid #d4a457; border-radius: 16px; background: linear-gradient(160deg, #17243a, #0b1320 70%); box-shadow: 0 24px 60px #000e; }
+.fresh-plus .ui-icon { width: 22px; height: 22px; color: #fff4d2; stroke-width: 2.6; }
+.fresh-picker > div { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; overflow-x: hidden !important; overflow-y: auto; padding: 10px 12px 12px; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #a87943 transparent; }
+.fresh-picker > div::-webkit-scrollbar { width: 6px; }
+.fresh-picker > div::-webkit-scrollbar-thumb { border-radius: 3px; background: #a87943; }
+.fresh-picker > div > button { display: grid; justify-items: center; align-content: center; gap: 2px; min-height: 112px; padding: 6px 4px; border: 1px solid #3e5068; border-radius: 12px; background: radial-gradient(circle at 50% 38%, #2b425a, #111c2c 72%); color: #fff; cursor: pointer; }
+.fresh-picker > div > button:hover { border-color: #e4b35c; }
+.fresh-picker .bottle-visual { width: 62px; height: 62px; margin: 0; }
+.fresh-picker button > span { font-size: 11px; font-weight: 700; line-height: 1.15; text-align: center; }
+.fresh-picker button > small { color: #f4c76c; font-size: 10px; font-weight: 800; }
+
+@media (max-width: 760px) {
+  .hud-resources { grid-template-columns: repeat(3, minmax(0, 1fr)) 48px !important; }
+  .sound-open { justify-content: center; padding: 6px; }
+  .sound-open > span { display: none; }
+}
+/* Volume sliders in the game's gold style instead of the browser default. */
+.volume-panel input[type="range"] { -webkit-appearance: none; appearance: none; height: 24px; background: transparent; }
+.volume-panel input[type="range"]::-webkit-slider-runnable-track { height: 6px; border: 1px solid #5a4a33; border-radius: 3px; background: linear-gradient(90deg, #d2a24e var(--fill, 100%), #0b1320 var(--fill, 100%)); }
+.volume-panel input[type="range"]::-moz-range-track { height: 6px; border: 1px solid #5a4a33; border-radius: 3px; background: #0b1320; }
+.volume-panel input[type="range"]::-moz-range-progress { height: 6px; border-radius: 3px; background: #d2a24e; }
+.volume-panel input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; margin-top: -8px; border: 2px solid #fff1cf; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f6d387, #b8862f); box-shadow: 0 2px 6px #000a; }
+.volume-panel input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border: 2px solid #fff1cf; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f6d387, #b8862f); box-shadow: 0 2px 6px #000a; }
+.volume-panel input[type="range"]:focus-visible { outline: 2px solid #e4b35c; outline-offset: 2px; border-radius: 4px; }
+.volume-panel .volume-row.off input[type="range"]::-webkit-slider-runnable-track { background: #0b1320; }
+.volume-panel .volume-row.off input[type="range"]::-moz-range-progress { background: transparent; }
+.talk-hint { margin-top: 8px !important; color: var(--gold, #e8b85a) !important; font-weight: 800; }
+@media (max-width: 760px) { .fresh-picker { bottom: calc(118px + var(--safe-bottom, 0px)) !important; max-height: calc(100dvh - 230px); } }
+/* Shelf arrows: centred chevron icons instead of text glyphs. */
+.pshelf-row .shelf-nudge button { display: grid; place-items: center; padding: 0; line-height: 0; }
+.pshelf-row .shelf-nudge .ui-icon { width: 15px; height: 15px; stroke-width: 2.4; pointer-events: none; }
+/* A full row shows one speech bubble at a time (the guest being served), so bubbles never pile up. */
+.bar-scene.many-guests .scene-customer .speech-bubble { display: none !important; }
+.bar-scene.many-guests .scene-customer.show-bubble .speech-bubble { display: block !important; }
+/* Bar scene guests: one common seat line across sprite sheets, and softened frame edges instead of hard cuts. */
+.bar-scene .scene-customer .art-character { translate: 0 var(--figure-drop, 0%); }
+.bar-scene .scene-customer .customer-art { -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%); }
+/* With guests seated in front of the counter there is no surface for an ashtray, so it is not drawn. */
+.bar-scene .customer-ashtray { display: none !important; }
+/* More than one guest: only the served guest (or the first one) shows a bubble. */
+.bar-scene.many-guests .scene-customer .speech-bubble { display: none !important; }
+.bar-scene.many-guests .scene-customer.show-bubble .speech-bubble { display: block !important; }

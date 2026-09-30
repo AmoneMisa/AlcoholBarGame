@@ -252,8 +252,8 @@ test('Bar names, bartender nicknames and styles are per-city and persisted; all 
   assert.equal(reloaded.bars.london.interior,'cyberpunk');assert.equal(reloaded.bars.london.counter,'glass');assert.equal(reloaded.bars.london.counterSize,'grand');assert.equal(reloaded.bars.london.hairStyle,'undercut');assert.equal(reloaded.bars.london.skinDetail,'scar-brow');assert.equal(reloaded.bars.london.pose,'working');
   assert.ok(INTERIORS.length >= 19);assert.ok(COUNTER_MATERIALS.length >= 8);assert.ok(HAIR_STYLES.length >= 8);assert.ok(SKIN_DETAILS.includes('clean') && SKIN_DETAILS.some(item => item.startsWith('tattoo')) && SKIN_DETAILS.some(item => item.startsWith('scar')));
   assert.equal(CUSTOMER_ART_BY_SLOT.length,25);
-  assert.equal(game.customers.length,1,'the bar serves one customer at a time');
-  assert.equal(new Set(game.customers.map(customer => customer.characterId)).size,1);
+  assert.equal(game.customers.length,5,'a new player opens to a full row of five guests');
+  assert.equal(new Set(game.customers.map(customer => customer.characterId)).size,5,'every starter guest has their own look');
   for (let i=0;i<30;i++) { const customer = generateCustomer();assert.ok(CHARACTER_ART.some(art => art.id === customer.characterId)); }
 });
 
@@ -272,7 +272,7 @@ test('Customer arrivals, VIP rewards and the shared order timer follow the mobil
   assert.ok(orderTimeSeconds('vip','cocktail') > orderTimeSeconds('impatient','cocktail'));
 
   const game = freshGame();
-  assert.equal(game.customers.length,1);
+  assert.equal(game.customers.length,5);
   const guest = game.customer;
   guest.orderKind = 'cocktail';guest.orderRecipeId = game.knownRecipes[0].id;guest.orderRevealed = true;guest.specialRecipeRewardId = game.lockedRecipes[0].id;
   const originalRecipe = guest.orderRecipeId;
@@ -289,7 +289,10 @@ test('Customer arrivals, VIP rewards and the shared order timer follow the mobil
   assert.ok(guest.patienceRemaining < beforeDialog,'the same timer resumes for preparation');
 
   assert.equal(game.rejectCustomer(guest.id),true);
-  assert.equal(game.customers.length,0);
+  assert.equal(game.customers.length,4,'only the served guest leaves; the rest of the row keeps waiting');
+  assert.equal(game.customer.id,game.customers[0].id,'the next guest in the row is served');
+  assert.equal(game.nextCustomerAt,0,'nobody new is scheduled while guests are still seated');
+  while (game.customers.length) assert.equal(game.rejectCustomer(game.customer.id),true);
   assert.ok(game.nextCustomerAt - Date.now() >= CUSTOMER_ARRIVAL_MIN_MS - 1000);
   assert.ok(game.nextCustomerAt - Date.now() <= CUSTOMER_ARRIVAL_MAX_MS + 1000);
   game.tickGameClock(game.nextCustomerAt);
