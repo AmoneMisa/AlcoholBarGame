@@ -29,7 +29,6 @@
 .guide-facts { display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 10px; }
 .guide-facts dt { color:#e4b35c;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.06em; }
 .guide-facts dd { margin:0; }
-.guide-steps { margin:0 0 8px;padding-left:20px; }
 .guide-recipe-card { display:grid;gap:8px;margin:0 0 10px;padding:0;list-style:none;counter-reset:guide-card; }
 .guide-recipe-card li { display:grid;grid-template-columns:28px minmax(100px,130px) minmax(110px,150px) minmax(0,1fr);grid-template-areas:'step amount name action';gap:10px;align-items:start;padding:10px;border:1px solid #2f4058;border-radius:10px;background:#132034;counter-increment:guide-card; }
 .guide-recipe-card li::before { content:counter(guide-card);grid-area:step;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#24344d;color:#ffd98a;font-size:11px;font-weight:900; }
@@ -40,7 +39,6 @@
 .guide-recipe-card .role-top { border-color:#2f5a78; }
 .guide-recipe-card .role-garnish { border-color:#3f6a45; }
 .guide-recipe-card .role-prepare { border-color:#6b4a24; }
-.guide-steps li { margin-bottom:4px; }
 .guide-list { margin:0;padding-left:18px; }
 .guide-compare { display:grid;gap:5px;margin:0;padding:0;list-style:none; }
 .guide-compare b { color:#f3ede4; }
@@ -105,19 +103,6 @@
 @media (max-width:760px) { .hero-brand-model { width:80px;height:160px; } }
 
 /* Brand picker at the order station: house pour or a brand bottle from the shelf. */
-.brand-picker { display:flex;gap:6px;align-items:stretch;overflow-x:auto;padding:8px 12px 10px;border-bottom:1px solid #2c3b53;background:#0f1a2b;scrollbar-width:thin; }
-.brand-picker > small { flex:0 0 auto;align-self:center;margin-right:4px;color:#e4b35c;font-size:9px;font-weight:900;letter-spacing:.12em; }
-.brand-picker button { position:relative;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:6px;align-items:center;flex:0 0 auto;min-width:92px;padding:6px 10px;border:1px solid #33445e;border-radius:10px;background:#15223a;color:#dbe3ee;text-align:left;cursor:pointer; }
-.brand-picker button b { grid-column:2;font-size:12px; }
-.brand-picker button em { grid-column:2;color:#8796ab;font-size:10px;font-style:normal; }
-.brand-picker .picker-bottle { grid-row:1 / span 2;width:16px;height:32px; }
-.brand-picker button.active { border-color:#e4b35c;background:linear-gradient(#3a2c1c,#2a2017); }
-.brand-picker button.wanted { box-shadow:inset 0 0 0 2px #6ab0f3; }
-.brand-picker button.classic::after { content:'classic';position:absolute;top:-7px;right:6px;padding:0 6px;border-radius:999px;background:#e4b35c;color:#24170f;font-size:9px;font-weight:900; }
-.progress-brand { display:block;color:#ffd98a;font-size:10px;font-style:normal;font-weight:700; }
-.progress-brand.need { color:#ff9f93; }
-.progress-brand.hint { color:#8fb7e0;font-weight:600; }
-.action-prop .pour-brand { width:100%;height:100%; }
 
 /* Account connection status in the top bar. */
 .sync-badge { margin-left:8px;padding:1px 7px;border-radius:999px;background:#24344d;color:#a9d3ff;font-size:9px;font-style:normal;font-weight:900;letter-spacing:.06em;text-transform:uppercase; }

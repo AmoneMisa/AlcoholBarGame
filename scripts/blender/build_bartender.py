@@ -483,6 +483,35 @@ def build_accessories():
     bm = bmesh.new()
     for k in range(6): add_blob(bm, (.1 + k * .008, -.02, 1.62 + k * .02), (.008, .012, .022 - k * .002), 6, 4)
     part('acc_feather', bm, 'neon')
+    # -- everyday accessories for guests
+    def ring_xz(bm, c, r, radius=.0025, seg=20):
+        pts = [Vector((c[0] + math.cos(k * math.tau / seg) * r[0], c[1], c[2] + math.sin(k * math.tau / seg) * r[1])) for k in range(seg + 1)]
+        for a, b in zip(pts, pts[1:]): add_tube(bm, a, b, radius, 5)
+    for kind in ('round', 'angular'):
+        bm = bmesh.new()
+        for sg in (1, -1):
+            c = (sg * .043, -.13, 1.625)
+            if kind == 'round': ring_xz(bm, c, (.026, .024))
+            else:
+                w, h = .026, .02
+                for a, b in (((-w, -h), (w, -h)), ((w, -h), (w, h)), ((w, h), (-w, h)), ((-w, h), (-w, -h))):
+                    add_tube(bm, (c[0] + a[0], c[1], c[2] + a[1]), (c[0] + b[0], c[1], c[2] + b[1]), .0025, 5)
+            add_tube(bm, (c[0] + sg * .026, c[1], c[2] + .008), (sg * .106, .0, 1.63), .0022, 5)      # temple arm
+        add_tube(bm, (.017, -.13, 1.632), (-.017, -.13, 1.632), .0025, 5)                            # bridge
+        part(f'acc_glasses-{kind}', bm, 'shoes')
+    bm = head_shell('bn', lambda c: c.z > 1.665, .016, 'cape'); part('acc_beanie', bm, 'cape', uv=head_uv)
+    bm = bmesh.new(); add_ring(bm, (0, 0, 1.665), .112, .126, .014, 28); part('acc_beanie-cuff', bm, 'cape')
+    bm = bmesh.new(); add_disc(bm, (0, -.01, 1.727), .16, .008, 28); add_disc(bm, (0, 0, 1.775), .1, .09, 24, .92); part('acc_fedora', bm, 'leather')
+    bm = bmesh.new(); add_ring(bm, (0, 0, 1.745), .105, .12, .006, 28); part('acc_fedora-band', bm, 'accent')
+    bm = bmesh.new()
+    for sg in (1, -1): ring_xz(bm, (sg * .115, .005, 1.572), (.005, .018), .0028, 14)
+    for sg in (1, -1):
+        bm2 = None
+    part('acc_hoops', bm, 'accent')
+    bm = bmesh.new(); pts = [Vector((math.sin(k * .5) * .075, -.075 - math.cos(k * .5) * .03 + .03, 1.44 - (1 - math.cos(k * .5)) * .06)) for k in range(-6, 7)]
+    for a, b in zip(pts, pts[1:]): add_tube(bm, a, b, .0022, 5)
+    add_blob(bm, (0, -.108, 1.325), (.011, .006, .014), 8, 6)
+    part('acc_pendant', bm, 'accent', rigid='chest')
     return out
 
 # ---------------------------------------------------------------- morph targets: pure functions of position, shared by every mesh

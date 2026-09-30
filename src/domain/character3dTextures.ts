@@ -98,7 +98,7 @@ function scar(g: Ctx, points: [number, number][], size: number, dir: number) {
 // ---- BODY atlas: per-limb cylindrical cells (u = angle around the limb, 0.5 = front; v = height)
 export const BODY_CELLS = { torso: [0, .5, 1, 1], armL: [0, 0, .25, .5], armR: [.25, 0, .5, .5], legL: [.5, 0, .75, .5], legR: [.75, 0, 1, .5] } as const;
 const CELL_Z: Record<keyof typeof BODY_CELLS, [number, number]> = { torso: [.9, 1.5], armL: [.75, 1.45], armR: [.75, 1.45], legL: [0, 1], legR: [0, 1] };
-function cell(g: Ctx, name: keyof typeof BODY_CELLS, size: number) {
+function cell(name: keyof typeof BODY_CELLS, size: number) {
   const [x0, y0, x1, y1] = BODY_CELLS[name];
   const [z0, z1] = CELL_Z[name];
   const w = (x1 - x0) * size, h = (y1 - y0) * size;
@@ -117,7 +117,7 @@ export function paintBody(look: Look3dInput, target = canvas(1024)) {
   if (detail === 'freckles') {
     const random = SEED('body-freckles'); g.fillStyle = 'rgba(110,60,35,.45)';
     for (const name of ['armL', 'armR', 'torso'] as const) {
-      const c = cell(g, name, size);
+      const c = cell(name, size);
       for (let i = 0; i < 160; i++) { const p = c.at(random(), (name === 'torso' ? 1.3 : 1.1) + random() * .18); g.beginPath(); g.arc(p.x, p.y, size * .0012 + random() * size * .0012, 0, Math.PI * 2); g.fill(); }
     }
   }
@@ -125,14 +125,14 @@ export function paintBody(look: Look3dInput, target = canvas(1024)) {
     const bold = detail === 'tattoo-bold';
     g.strokeStyle = bold ? 'rgba(20,24,30,.9)' : 'rgba(45,70,90,.55)'; g.fillStyle = g.strokeStyle; g.lineCap = 'round';
     // left arm: a serpent winding down the forearm, plus bands
-    const arm = cell(g, 'armL', size);
+    const arm = cell('armL', size);
     g.lineWidth = size * (bold ? .0045 : .0028);
     g.beginPath();
     for (let i = 0; i <= 40; i++) { const t = i / 40; const p = arm.at(.5 + Math.sin(t * Math.PI * 4) * .22, 1.36 - t * .5); if (i) g.lineTo(p.x, p.y); else g.moveTo(p.x, p.y); }
     g.stroke();
     for (const z of [1.38, .9]) { g.beginPath(); const a = arm.at(.25, z), b = arm.at(.75, z); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke(); }
     // chest: a compass on the torso front
-    const chest = cell(g, 'torso', size);
+    const chest = cell('torso', size);
     const c = chest.at(.5, 1.3);
     for (const r of [.03, .045]) { g.beginPath(); g.arc(c.x, c.y, size * r * .8, 0, Math.PI * 2); g.stroke(); }
     for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2; g.beginPath(); g.moveTo(c.x, c.y); g.lineTo(c.x + Math.cos(a) * size * .05, c.y + Math.sin(a) * size * .05); g.stroke(); }

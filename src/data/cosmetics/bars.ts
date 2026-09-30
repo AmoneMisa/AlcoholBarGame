@@ -125,12 +125,11 @@ export const DEFAULT_BARS: Record<RegionId, BarProfile> = {
 
 export function interiorStyle(id: InteriorId) {
   const item = INTERIORS.find((entry) => entry.id === id) ?? INTERIORS[0];
-  const atlas = 'atlas' in item && item.atlas;
   return {
     backgroundImage:`linear-gradient(${item.tint},${item.tint}),url('${item.asset}')`,
     backgroundPosition:`center, ${item.position}`,
-    backgroundSize:atlas ? '100% 100%, 200% 200%' : '100% 100%, cover',
-    '--interior-background-size':atlas ? '100% 100%, 200% 200%' : '100% 100%, cover',
+    backgroundSize:'100% 100%, cover',
+    '--interior-background-size':'100% 100%, cover',
     '--interior-background-position':`center, ${item.position}`,
     backgroundRepeat:'no-repeat',
     backgroundBlendMode:`${item.blend},normal`

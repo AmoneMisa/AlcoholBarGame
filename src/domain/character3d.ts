@@ -8,6 +8,8 @@ export interface Look3dInput {
   skinTone?: string; tanLevel?: string; eyeShape?: string; browShape?: string; noseShape?: string; lipShape?: string; cheekShape?: string;
   eyeColor?: string; lipColor?: string; facialHair?: string; lighting?: string;
   skinDetail?: string; eyeliner?: string; eyeshadow?: string; blush?: string;
+  // Guests: their own clothes colours and accessory meshes (glasses, hats, jewellery) instead of a bartender outfit.
+  shirtColor?: string; vestColor?: string; extraParts?: string[];
 }
 export type Morphs = Record<string, number>;
 export type Gender = 'female' | 'male';
@@ -79,7 +81,8 @@ export function rigFor(input: Look3dInput): Rig3d {
     `eyes_${input.eyeShape ?? 'almond'}`, `brows_${input.browShape ?? 'soft-arch'}`, `nose_${input.noseShape ?? 'soft'}`,
     `mouth_${input.lipShape ?? 'balanced'}`, `cheeks_${input.cheekShape ?? 'soft'}`
   ]);
-  if (outfit.vest) visible.add('cloth_vest');
+  if (outfit.vest || input.vestColor) visible.add('cloth_vest');
+  for (const part of input.extraParts ?? []) visible.add(part);
   if (outfit.apron) visible.add('cloth_apron');
   for (const part of outfit.parts ?? []) visible.add(part);
   const hairMesh = `hair_${HAIR_MESH[style] ?? style}`;
@@ -89,7 +92,7 @@ export function rigFor(input: Look3dInput): Rig3d {
     gender, morphs,
     colors: {
       skin: shade(SKIN[input.skinTone ?? 'warm'] ?? SKIN.warm!, tan), hair, brow: shade(hair, .85), iris: EYE[input.eyeColor ?? 'brown'] ?? EYE.brown!, lip: LIP[input.lipColor ?? 'bare'] ?? LIP.bare!,
-      shirt: outfit.shirt, vest: outfit.vest ?? '#000000', apron: outfit.apron ?? '#000000', accent: outfit.accent ?? '#c2943f', neon: outfit.neon ?? '#ff2bd6',
+      shirt: input.shirtColor ?? outfit.shirt, vest: input.vestColor ?? outfit.vest ?? '#000000', apron: outfit.apron ?? '#000000', accent: outfit.accent ?? '#c2943f', neon: outfit.neon ?? '#ff2bd6',
       leather: outfit.leather ?? '#3b2a1e', cape: outfit.cape ?? '#3a2a4a', trim: '#e9dfc9', pants: '#15151b', shoes: '#0d0b0b', sclera: '#f2f1ee', pupil: '#050506', mouth: '#1c0508'
     },
     hair: hairMesh, beard, visible,

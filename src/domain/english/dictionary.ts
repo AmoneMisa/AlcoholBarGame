@@ -15,10 +15,6 @@ export interface Speller {
 let speller: Speller | undefined;
 let loading: Promise<Speller | undefined> | undefined;
 
-export function getSpeller() {
-  return speller;
-}
-
 export function loadSpeller() {
   loading ??= (async () => {
     try {

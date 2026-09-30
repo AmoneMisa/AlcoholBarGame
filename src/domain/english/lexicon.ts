@@ -67,10 +67,6 @@ export const THIRD_PERSON: Record<string, string> = {
 };
 export const BASE_FORM: Record<string, string> = Object.fromEntries(Object.entries(THIRD_PERSON).map(([base, third]) => [third, base]));
 
-export const FRUIT_PLURALS: Record<string, string> = {
-  strawberry: 'strawberries', raspberry: 'raspberries', cherry: 'cherries', berry: 'berries', cranberry: 'cranberries',
-  apple: 'apples', banana: 'bananas', mango: 'mangoes', peach: 'peaches', grape: 'grapes'
-};
 
 // Short learner-friendly definitions, shown as tap hints inside customer lines.
 export const GLOSSARY: Record<string, string> = {

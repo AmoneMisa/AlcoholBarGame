@@ -151,8 +151,3 @@ export function bottlePath(shape: BottleShape) {
   }
 }
 
-export const LABEL_BOX: Record<BottleShape, { y: number; h: number; w: number }> = {
-  tall: { y: 64, h: 28, w: 20 }, shoulder: { y: 60, h: 30, w: 24 }, square: { y: 58, h: 34, w: 28 }, decanter: { y: 68, h: 26, w: 32 },
-  squat: { y: 70, h: 28, w: 28 }, round: { y: 70, h: 26, w: 30 }, flask: { y: 66, h: 30, w: 26 }, champagne: { y: 76, h: 24, w: 24 },
-  wine: { y: 70, h: 26, w: 21 }, beer: { y: 78, h: 22, w: 20 }, soju: { y: 80, h: 22, w: 18 }, can: { y: 58, h: 40, w: 28 }
-};

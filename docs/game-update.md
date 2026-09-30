@@ -65,7 +65,7 @@ The English checker is an explainable short-conversation rule checker with a spe
 
 ## 3D bartender (prototype)
 
-The bartender is a rigged 3D "mannequin" rendered with three.js (`src/components/characters/Bartender3D.vue`); the painted 2D character remains only as a fallback for devices without WebGL.
+The bartender is a rigged 3D "mannequin" rendered with three.js (`src/components/characters/Person3D.vue`); the painted 2D character remains only as a fallback for devices without WebGL.
 
 - **Two mannequins, one skeleton:** `bartender-female.glb` and `bartender-male.glb` (built by `python scripts/blender/build_bartender.py --gender both`, needs `pip install bpy==4.2.0`). Both share identical joints, so all 13 animation clips fit both; they differ in body volumes and default face.
 - **Everything is a separate, named mesh with its own material and UVs:** `body`, `head`, `ears`, and swappable slots `eyes_<shape>`, `brows_<shape>`, `nose_<shape>`, `mouth_<shape>`, `cheeks_<shape>`, `hair_<style>`, `beard_<style>`, `cloth_<part>`. Only the chosen mesh of each slot is shown. Face part shapes are defined in `src/data/character/faceParts.json`, shared by Blender and the game.
@@ -73,7 +73,7 @@ The bartender is a rigged 3D "mannequin" rendered with three.js (`src/components
 - **Customisation:** `src/domain/character3d.ts` maps the saved bar profile to morph weights, colours and visible meshes. `tests/character3d.test.mjs` checks every option against both real GLB files.
 - **Special outfits** are real accessory meshes (`acc_*`): gala bow tie and pocket square, cyberpunk visor and shoulder pads, steampunk top hat, goggles and belt, post-apocalypse bandana, shoulder plate and bandolier, historical jabot and tricorn, fantasy cloak and circlet, masquerade mask and feather. Colours come from the outfit table in `character3d.ts`.
 - **Size:** each model is ~1.7 MB after meshopt compression (the build script runs `gltf-transform` if it is installed: `npm i -g @gltf-transform/cli`; the game loads it with three's `MeshoptDecoder`).
-- **Not yet in 3D:** customers.
+- **Guests are 3D too (prototype, look under review):** `customerLook.ts` builds every guest from their id (same guest = same look; named regulars keep gender and skin tone), `CustomerStage3D.vue` draws all guests on one canvas, `Person3D.vue` draws the conversation portraits. The procedural mannequins do not match the painted 2D art style yet.
 
 ## 3D bar props
 
@@ -83,6 +83,11 @@ The glass, the pour stream, the shaker and the orange / salt icons are 3D now (n
 - `Glass3D.vue` is the live glass on the bar: liquid clipped at the fill level (stays level when the glass tilts), ice, bubbles, garnish, a 3D pour stream while a bottle is over the glass, and the shaker taking over while shaking.
 - `PropThumb.vue` shows cached still renders of any prop (one shared WebGL context), used by `GlassModel` and `BottleModel`.
 - Bottles and cocktail pictures stay painted 2D art; `IngredientArt.vue` (SVG) is gone.
+
+## Small screens and clean-up
+
+- On phones, guests wait along a track that a horizontal swipe over the guest band scrolls (`guest-scroller` in `BarScene.vue`); a tap on the band still opens the guest under the finger.
+- Removed dead code: the unused dialogue subsystem (10 files), unused exports/imports, ~550 unused CSS rules and 17 unused keyframes (checked by comparing computed styles of ~54,000 elements on every screen before and after), and ~12 MB of unused images.
 
 ## Deploy to the server
 

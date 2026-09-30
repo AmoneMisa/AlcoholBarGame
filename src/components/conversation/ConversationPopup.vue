@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { CUSTOMER_ART_BY_SLOT } from '../../data/cosmetics/artCatalog';
 import { MODIFIERS, RECIPES } from '../../domain/catalog';
 import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleTotal } from '../../domain/bottleCatalog';
 import { matchesFacts, questionTemplates, tilesFor, correctedTileSelection, TOPIC_LABEL, withArticle } from '../../domain/conversation/customerTalk';
@@ -19,7 +18,8 @@ import { guideIdForProduct } from '../../data/knowledge/alcohol';
 import BrandBottle from '../knowledge/BrandBottle.vue';
 import { serveTemplates } from '../../domain/brandServe';
 import { haptic } from '../../telegram/webapp';
-import CharacterModel from '../characters/CharacterModel.vue';
+import Person3D from '../characters/Person3D.vue';
+import { customerLook } from '../../domain/customerLook';
 import UiIcon from '../ui/UiIcon.vue';
 
 const inputMode = ref<'type' | 'words'>('words');
@@ -33,7 +33,6 @@ const showAllCards = ref(false);
 // Most helpful first: sentence structure, then grammar, spelling, and small punctuation fixes last.
 const GROUP_ORDER = ['Word order', 'Questions', 'Verbs', 'Articles & nouns', 'Comparing', 'Spelling & words', 'Punctuation'];
 const customer = computed(() => game.customers.find((item) => item.id === game.conversationCustomerId));
-const slot = computed(() => Math.max(0, game.customers.findIndex((item) => item.id === customer.value?.id)));
 const recipe = computed(() => RECIPES.find((item) => item.id === customer.value?.orderRecipeId));
 const modifierLabel = computed(() => MODIFIERS.find((item) => item.id === customer.value?.modifierId)?.label);
 // The transcript is part of the game state: the rules (on the server when online) write both sides of it,
@@ -95,7 +94,7 @@ function phraseCandidates() {
 }
 
 // New guest lines: remember the words the learner has seen, then scroll.
-watch(() => talk.value?.lines.length ?? 0, (count, before) => {
+watch(() => talk.value?.lines.length ?? 0, (_count, before) => {
   for (const line of talk.value?.lines.slice(before ?? 0) ?? []) if (line.speaker === 'customer') noteSeenWords(line.text);
   scrollLog();
 }, { immediate: true });
@@ -275,7 +274,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
   <div v-if="customer && talk" class="talk-backdrop" @click.self="game.closeConversation()">
     <section class="talk-popup" role="dialog" aria-modal="true" :aria-label="`Conversation with ${customer.name}`">
       <header class="talk-header">
-        <div class="talk-portrait"><CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[slot % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="talk.expression" animation="talk" /></div>
+        <div class="talk-portrait"><Person3D role="customer" crop="portrait" :character-id="customer.characterId" :look="customerLook(customer.id, customer.characterId)" :expression="talk.expression" animation="talk" /></div>
         <div class="talk-title">
           <small>ENGLISH PRACTICE · {{ customer.mood }}</small>
           <h2>{{ customer.name }}</h2>

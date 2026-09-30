@@ -12,8 +12,6 @@
 .daily-hud-gift span b { display:block;white-space:nowrap; }
 .daily-hud-gift:hover:enabled { background:#48371e; }
 .daily-hud-gift:disabled { color:#a7baab;opacity:.75; }
-.settings-button { display:grid;place-items:center; }
-.settings-button .ui-icon { width:23px;height:23px;color:#e7be72; }
 .game-nav .ui-icon { width:20px;height:20px;color:#c2a668; }
 .game-nav button.active .ui-icon { color:var(--gold); }
 .character-sprite { background-repeat:no-repeat;filter:drop-shadow(0 10px 8px #0008); }

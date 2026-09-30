@@ -1,8 +1,6 @@
 /* Customer conversation: opens as a popup over the bar, never as a separate panel. */
 .service-layout { grid-template-columns:minmax(0,1fr); }
 .speech-bubble em { position:relative;z-index:1;display:block;margin-top:5px;color:#b0772c;font-size:8px;font-style:normal;font-weight:900;letter-spacing:.08em;text-transform:uppercase; }
-.recipe-locked { display:grid;align-content:center;gap:10px;text-align:center; }
-.recipe-locked p { margin:0;color:#c9d3e1;font-size:12px;line-height:1.45; }
 
 .talk-backdrop { position:fixed;z-index:200;inset:0;display:grid;place-items:center;padding:16px;background:#05080ecc;backdrop-filter:blur(6px);animation:talkFade .18s ease both; }
 .talk-popup { display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;width:min(860px,100%);max-height:min(760px,calc(100dvh - 32px));overflow:hidden;border:1px solid #58657d;border-radius:18px;background:linear-gradient(160deg,#18253b,#0d1624 60%,#121a2a);box-shadow:0 30px 80px #000c,inset 0 1px #ffffff12;color:#f3ede4;animation:talkRise .24s cubic-bezier(.2,.8,.25,1) both; }
@@ -57,9 +55,6 @@
 .bottle-recommendations article em { color:#d9ae5d;font-size:8px;font-style:normal; }
 .bottle-recommendations article > strong { align-self:start;padding:4px;border-radius:999px;background:#183826;color:#94e5ad;font-size:9px; }
 .bottle-recommendations article > button { grid-column:2/-1;padding:5px 7px;border:1px solid #8c6938;border-radius:7px;background:#31271b;color:#ffd98a;font-size:9px;font-weight:900;cursor:pointer; }
-.mini-brand-bottle { position:relative;display:grid;place-items:center;width:32px;height:48px;margin:auto;border:2px solid #bac8cf;border-radius:7px 7px 9px 9px;background:linear-gradient(90deg,#ffffff35,transparent 32%),var(--bottle-color);box-shadow:0 5px 9px #0007; }
-.mini-brand-bottle i { position:absolute;bottom:100%;width:13px;height:9px;border:2px solid #bac8cf;border-bottom:0;border-radius:3px 3px 0 0;background:#b99752; }
-.mini-brand-bottle b { padding:3px;border-radius:3px;background:#f5ead4;color:#332216;font:900 8px Georgia,serif; }
 
 .talk-confirmed { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;border-top:1px solid #3f8a55;background:linear-gradient(90deg,#173424,#10241b); }
 .talk-confirmed small { display:block;color:#9fe6b2;font-size:9px;font-weight:900;letter-spacing:.13em; }
@@ -116,3 +111,7 @@
   .service-decisions { grid-template-columns:1fr 1fr;padding:8px 12px; }.service-decisions > div { grid-column:1/-1; }.service-decisions .secondary-button,.reject-order-button { width:100%; }
   .word-tile { min-height:34px;padding:5px 10px;font-size:13px; }
 }
+
+/* 3D guest portrait */
+.talk-portrait .bartender3d { position:absolute; left:calc(50% - 75px); top:-2px; width:150px; height:215px; }
+@media (max-width: 760px) { .talk-portrait .bartender3d { left:calc(50% - 51px); top:-1px; width:102px; height:146px; } }

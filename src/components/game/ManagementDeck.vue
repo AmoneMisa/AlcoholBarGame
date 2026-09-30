@@ -4,14 +4,14 @@ import { INGREDIENTS, RECIPES, REGIONS, recipeAlcoholLabel } from '../../domain/
 import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleSaleCrystalReward } from '../../domain/bottleCatalog';
 import BrandBottle from '../knowledge/BrandBottle.vue';
 import { guideIdForProduct } from '../../data/knowledge/alcohol';
-import { BLUSH_OPTIONS, BODY_SHAPES, BROW_SHAPES, BUST_OPTIONS, CHEEK_SHAPES, COUNTER_COLORS, COUNTER_MATERIALS, COUNTER_SIZES, EYELINER_OPTIONS, EYESHADOW_OPTIONS, EYE_COLORS, EYE_SHAPES, FACE_SHAPES, FACIAL_HAIR_OPTIONS, HAIR_COLORS, HIGHLIGHTS, HIGHLIGHT_STRENGTHS, INTERIORS, LEO_HAIR_STYLES, LIP_COLORS, LIP_SHAPES, NOA_HAIR_STYLES, NOSE_SHAPES, POSES, SHELF_STYLES, SKIN_DETAILS, SKIN_TONES, TAN_LEVELS, WALLS, interiorStyle, shelfStyleFor } from '../../data/cosmetics/bars';
+import { BLUSH_OPTIONS, BODY_SHAPES, BROW_SHAPES, BUST_OPTIONS, CHEEK_SHAPES, COUNTER_COLORS, EYELINER_OPTIONS, EYESHADOW_OPTIONS, EYE_COLORS, EYE_SHAPES, FACE_SHAPES, FACIAL_HAIR_OPTIONS, HAIR_COLORS, HIGHLIGHTS, HIGHLIGHT_STRENGTHS, INTERIORS, LEO_HAIR_STYLES, LIP_COLORS, LIP_SHAPES, NOA_HAIR_STYLES, NOSE_SHAPES, POSES, SHELF_STYLES, SKIN_DETAILS, SKIN_TONES, TAN_LEVELS, WALLS, interiorStyle, shelfStyleFor } from '../../data/cosmetics/bars';
 import { DAILY_COINS } from '../../domain/economy';
 import type { Ingredient, RegionId } from '../../domain/types';
 import { useGameStore } from '../../stores/game';
 import BottleModel from '../cocktails/BottleModel.vue';
 import RecipeMastery from '../cocktails/RecipeMastery.vue';
 import GlassModel from '../cocktails/GlassModel.vue';
-import Bartender3D from '../characters/Bartender3D.vue';
+import Person3D from '../characters/Person3D.vue';
 import PairingAdvisor from '../PairingAdvisor.vue';
 import MarketPanel from './MarketPanel.vue';
 import { useGuide } from '../../composables/useGuide';
@@ -188,7 +188,7 @@ function selectBartender(id: 'noa' | 'leo') {
       <div class="design-grid-new">
         <div class="mini-interior" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="game.barInteriorStyle"><span></span><b>{{ game.decor.name }}</b><i></i><em>{{ game.region.name }} · Saved automatically</em></div>
         <div class="bartender-custom">
-          <Bartender3D :look="{ ...game.decor, bartenderCharacter: selectedBartender }" crop="bust" />
+          <Person3D :look="{ ...game.decor, bartenderCharacter: selectedBartender }" crop="bust" />
           <div class="bartender-selector" aria-label="Choose bartender">
             <button v-for="person in [{id:'noa',label:'Woman'},{id:'leo',label:'Man'}] as const" :key="person.id" :class="{ active: selectedBartender === person.id }" type="button" @click="selectBartender(person.id)">{{ person.label }}</button>
           </div>

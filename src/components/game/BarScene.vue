@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { CUSTOMER_ART_BY_SLOT } from '../../data/cosmetics/artCatalog';
+import { customerLook } from '../../domain/customerLook';
 import { INGREDIENTS, RECIPES } from '../../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../../domain/bottleCatalog';
 import { buildProfile, shortWish } from '../../domain/conversation/customerTalk';
@@ -10,8 +10,8 @@ import { useGameStore } from '../../stores/game';
 import { haptic } from '../../telegram/webapp';
 import BottleModel from '../cocktails/BottleModel.vue';
 import Glass3D from '../props/Glass3D.vue';
-import CharacterModel from '../characters/CharacterModel.vue';
-import Bartender3D from '../characters/Bartender3D.vue';
+import Person3D from '../characters/Person3D.vue';
+import CustomerStage3D from '../characters/CustomerStage3D.vue';
 import CityEvent from './CityEvent.vue';
 import { INTERIORS, shelfStyleFor } from '../../data/cosmetics/bars';
 import { sceneLayout } from '../../data/cosmetics/barLines';
@@ -26,6 +26,11 @@ function act(name: string, ms: number) {
   clearTimeout(oneShotTimer);
   oneShotTimer = setTimeout(() => { oneShot.value = undefined; }, ms);
 }
+// Every guest is a 3D person made from their id; the stage draws them all on one canvas.
+const guests3d = computed(() => game.customers.map((customer) => ({
+  id: customer.id, look: customerLook(customer.id, customer.characterId), expression: expressionFor(customer.mood),
+  animation: game.conversationCustomerId === customer.id ? 'talk' : customer.id === game.activeCustomerId ? 'listen' : 'idle'
+})));
 const bartenderAnimation = computed(() => oneShot.value ?? (game.conversationCustomerId ? 'talk' : 'idle'));
 let coinsWhenPouring = game.money;
 watch(() => game.currentMix.reduce((sum, item) => sum + item.amount, 0), (now, before) => {
@@ -79,7 +84,7 @@ const sceneVars = computed(() => {
   const sizes = people.value;
   if (!current || !sizes) return {};
   return {
-    '--back': `${current.back}px`, '--seat-top': `${current.seat}px`, '--guest-h': `${sizes.guest}px`, '--bt-h': `${sizes.bartender}px`,
+    '--back': `${current.back}px`, '--scroll-w': `${scrollZone.value}px`, '--seat-top': `${current.seat}px`, '--guest-h': `${sizes.guest}px`, '--bt-h': `${sizes.bartender}px`,
     '--bt-x': `${sizes.bartenderX}px`, '--glass-x': `${Math.round(sizes.glassX)}px`,
     '--glass-y': `${Math.round(current.back + current.drawnHeight * .03)}px`
   };
@@ -103,7 +108,30 @@ const seatXs = computed(() => {
   const order = [...free, ...spots, ...stools.filter(blocked)];
   return order.length ? order : [width * .5];
 });
-const customerStyle = (index: number) => ({ left: `${Math.round(seatXs.value[index % seatXs.value.length] ?? sceneBox.value.width / 2)}px` });
+// Phones fit one or two guests: the rest wait along a track that a horizontal swipe over the guest band scrolls.
+const phoneScroll = computed(() => sceneBox.value.width < 760 && !!people.value && game.customers.length > 0);
+const seatSpacing = computed(() => Math.round((people.value?.guest ?? 150) * .8 + 6));
+// The band ends before the bartender and the glass so their buttons stay reachable.
+const scrollZone = computed(() => Math.max(seatSpacing.value, Math.round((people.value?.bartenderX ?? sceneBox.value.width) - (people.value?.bartenderHalfWidth ?? 0) - 14)));
+const trackWidth = computed(() => Math.max(scrollZone.value, game.customers.length * seatSpacing.value + 8));
+const guestScroll = ref(0);
+const guestScroller = ref<HTMLElement>();
+const canScrollGuests = computed(() => phoneScroll.value && trackWidth.value > scrollZone.value + 4);
+const phoneSeatX = (index: number) => Math.round(seatSpacing.value / 2 + 4 + index * seatSpacing.value - guestScroll.value);
+const customerStyle = (index: number) => ({ left: `${phoneScroll.value ? phoneSeatX(index) : Math.round(seatXs.value[index % seatXs.value.length] ?? sceneBox.value.width / 2)}px` });
+function onGuestScroll() { guestScroll.value = guestScroller.value?.scrollLeft ?? 0; }
+// A tap on the scroller is meant for the guest under the finger (the scroller sits above the guests).
+function tapGuest(event: MouseEvent) {
+  const guest = document.elementsFromPoint(event.clientX, event.clientY).find((element) => element.classList.contains('scene-customer'));
+  (guest as HTMLElement | undefined)?.click();
+}
+function showGuest(index: number) {
+  const scroller = guestScroller.value;
+  if (!scroller || index < 0) return;
+  scroller.scrollTo({ left: Math.max(0, index * seatSpacing.value - (scrollZone.value - seatSpacing.value) / 2), behavior: 'smooth' });
+}
+watch(() => game.activeCustomerId, (id) => { if (phoneScroll.value) showGuest(game.customers.findIndex((item) => item.id === id)); });
+watch(phoneScroll, (on) => { if (!on) guestScroll.value = 0; });
 // The speech bubble sits beside the guest's head, on the side away from the bartender and the glass,
 // so it covers neither the shelves nor the pouring station.
 const bartenderOnRight = computed(() => {
@@ -112,7 +140,7 @@ const bartenderOnRight = computed(() => {
 });
 // …unless there is no room on that side (guests near the edge of a narrow phone scene).
 const bubbleOnLeft = (index: number) => {
-  const x = seatXs.value[index % seatXs.value.length] ?? 0;
+  const x = phoneScroll.value ? phoneSeatX(index) : seatXs.value[index % seatXs.value.length] ?? 0;
   const room = 170;
   return bartenderOnRight.value ? x > room : x > sceneBox.value.width - room;
 };
@@ -385,7 +413,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section ref="sceneRef" class="bar-scene" :class="{ 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
+  <section ref="sceneRef" class="bar-scene" :class="{ 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-scroll': phoneScroll }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
     <div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div>
     <CityEvent compact />
     <div v-if="buildingEnabled" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
@@ -402,14 +430,19 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div class="bartender-layer">
-      <Bartender3D crop="full" :look="game.decor" :animation="bartenderAnimation" :expression="game.hasCustomer ? 'smile' : 'neutral'" />
+      <Person3D crop="full" :look="game.decor" :animation="bartenderAnimation" :expression="game.hasCustomer ? 'smile' : 'neutral'" />
       <span class="name-ribbon">{{ (game.decor.bartenderNickname || (game.decor.bartenderCharacter === 'leo' ? 'Leo' : 'Noa')).toUpperCase() }} · BARTENDER</span>
+    </div>
+    <div v-if="phoneScroll" ref="guestScroller" class="guest-scroller" :class="{ scrollable: canScrollGuests }" aria-label="Swipe sideways to see more guests" @scroll.passive="onGuestScroll" @click="tapGuest">
+      <div class="guest-scroll-track" :style="{ width: `${trackWidth}px` }"></div>
+      <small v-if="canScrollGuests && guestScroll < 8" class="guest-scroll-hint" aria-hidden="true">swipe · {{ game.customers.length }} guests ›</small>
     </div>
     <div class="bar-line-tint" aria-hidden="true"></div>
     <div class="bar-cast">
+      <CustomerStage3D :guests="guests3d" />
       <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId, 'bubble-left': bubbleOnLeft(index) }" :style="customerStyle(index)" @click="game.openConversation(customer.id)">
         <div class="speech-bubble"><span>{{ customer.greeting }}</span><b>{{ bubbleText(customer) }}</b><em>{{ customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></div>
-        <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="expressionFor(customer.mood)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
+        <div class="art-character customer-3d-slot" :data-guest-slot="customer.id" aria-hidden="true"></div>
         <span v-if="customer.smoker" class="customer-ashtray" aria-hidden="true"><i></i></span>
         <div class="customer-plate"><div><b>{{ customer.name }}</b><small>{{ customer.mood }}</small></div><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i><em>{{ game.orderCountdown }}</em></span></div>
       </button>

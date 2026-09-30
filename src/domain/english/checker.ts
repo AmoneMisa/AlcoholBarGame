@@ -45,7 +45,6 @@ const COUNTABLE = new Set(['drink', 'cocktail', 'mocktail', 'glass', 'bottle', '
 const ARTICLE_TRIGGERS = new Set(['like', 'want', 'recommend', 'try', 'have', 'prefer', 'need', 'for', 'with', 'order', 'suggest', 'make', 'get', 'is', 'take']);
 const TO_VERBS = new Set(['try', 'taste', 'drink', 'order', 'have', 'see', 'get', 'eat', 'relax', 'feel', 'celebrate', 'know', 'pay', 'buy', 'exchange', 'return']);
 const CAUSATIVES = new Set(['make', 'makes', 'made', 'let', 'lets', 'help', 'helps', 'have', 'has']);
-const LIKE_VERBS = new Set(['like', 'likes', 'love', 'loves', 'hate', 'hates', 'prefer', 'prefers', 'enjoy', 'enjoys']);
 const RELATIVE_HEADS = new Set(['something', 'anything', 'drink', 'cocktail', 'one', 'everything', 'nothing']);
 const ADJECTIVES = new Set(['sweet', 'sour', 'bitter', 'strong', 'light', 'fresh', 'cold', 'dry', 'fruity', 'creamy', 'good', 'nice', 'big', 'small', 'new', 'classic', 'special', 'simple', 'tropical', 'sparkling', 'refreshing', 'different', 'popular', 'spicy', 'mild', 'cool', 'long', 'short', 'soft', 'rich', 'great', 'perfect', 'favourite', 'favorite', 'another', 'other', 'second']);
 
