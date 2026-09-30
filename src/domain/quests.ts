@@ -1,7 +1,7 @@
 import type { BoxKind } from './loot';
 
 // Weekly quests and lifetime achievements. Both read the same counters (`loot.stats`), which only server rules increase.
-export type StatId = 'serves' | 'servesCoins' | 'vips' | 'bottles' | 'boxes' | 'draws' | 'upgrades' | 'tasted';
+export type StatId = 'serves' | 'servesCoins' | 'vips' | 'bottles' | 'boxes' | 'draws' | 'upgrades' | 'tasted' | 'perfectTalks' | 'lessons';
 export interface Goal { id: string; name: string; stat: StatId; target: number; box: BoxKind; crystals: number; }
 
 export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -13,6 +13,8 @@ const QUEST_POOL: Goal[] = [
   { id: 'q-vip', name: 'Serve 3 VIP guests', stat: 'vips', target: 3, box: 'silver', crystals: 15 },
   { id: 'q-bottles', name: 'Sell 3 sealed bottles', stat: 'bottles', target: 3, box: 'bronze', crystals: 10 },
   { id: 'q-upgrade', name: 'Upgrade equipment twice', stat: 'upgrades', target: 2, box: 'bronze', crystals: 10 },
+  { id: 'q-talk', name: 'Have 5 perfect English conversations', stat: 'perfectTalks', target: 5, box: 'bronze', crystals: 10 },
+  { id: 'q-lessons', name: 'Finish 3 daily English lesson sets', stat: 'lessons', target: 3, box: 'silver', crystals: 15 },
   { id: 'q-taste', name: 'Serve 3 recipes for the first time', stat: 'tasted', target: 3, box: 'silver', crystals: 15 }
 ];
 // Three quests per week, rotating deterministically from the server clock.
@@ -30,6 +32,8 @@ export const ACHIEVEMENTS: Goal[] = [
   { id: 'a-boxes-20', name: 'Treasure hunter: open 20 boxes', stat: 'boxes', target: 20, box: 'silver', crystals: 15 },
   { id: 'a-draws-30', name: 'Fashionista: 30 style draws', stat: 'draws', target: 30, box: 'choice', crystals: 30 },
   { id: 'a-upgrades-30', name: 'Master builder: 30 upgrades', stat: 'upgrades', target: 30, box: 'choice', crystals: 30 },
+  { id: 'a-talk-25', name: 'Silver tongue: 25 perfect conversations', stat: 'perfectTalks', target: 25, box: 'silver', crystals: 25 },
+  { id: 'a-lessons-14', name: 'Dedicated student: 14 daily lesson sets', stat: 'lessons', target: 14, box: 'choice', crystals: 40 },
   { id: 'a-taste-20', name: 'Sommelier: taste 20 recipes', stat: 'tasted', target: 20, box: 'silver', crystals: 25 }
 ];
 export const achievementById = (id: string) => ACHIEVEMENTS.find((item) => item.id === id);

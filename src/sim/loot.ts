@@ -355,3 +355,25 @@ export function tasteFirst(state: PlayerState, key: string, kind: 'recipe' | 'br
   return ` New brand poured: +${TASTING_REWARD.brandShards} skin shard.`;
 }
 export { ACHIEVEMENTS, questsForWeek, weekOf };
+
+// ---- English rewards ----
+// Perfect conversations pay parts by difficulty; every third one (or any hard one) also drops a box.
+export function englishTalkReward(state: PlayerState, difficulty: number, now: number) {
+  track(state, 'perfectTalks', 1, now);
+  state.loot.parts += difficulty;
+  const streak = state.loot.stats['perfectTalks'] ?? 0;
+  const hard = difficulty >= 4;
+  if (hard || streak % 3 === 0) {
+    const kind: BoxKind = hard ? 'silver' : 'bronze';
+    grantBox(state, kind);
+    return ` +${difficulty} parts and a ${boxDef(kind)!.name}${hard ? ' for hard English' : ' for your perfect streak'}.`;
+  }
+  return ` +${difficulty} parts.`;
+}
+// A finished set of daily lessons pays a box; a week of learning pays a silver one.
+export function dailyLessonsBox(state: PlayerState, learningStreak: number, now: number) {
+  track(state, 'lessons', 1, now);
+  const kind: BoxKind = learningStreak > 0 && learningStreak % 7 === 0 ? 'silver' : 'bronze';
+  grantBox(state, kind);
+  return ` Daily set finished: a ${boxDef(kind)!.name}!`;
+}

@@ -75,7 +75,7 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
     prestige: { stars: count(source.prestige?.stars), earned: count(source.prestige?.earned), count: count(source.prestige?.count, 1000), perks },
     runEarned: count(source.runEarned, 1e12),
     levelRewarded: Math.max(1, count(source.levelRewarded, 50) || currentLevel),
-    stats: counts(source.stats, ['serves', 'servesCoins', 'vips', 'bottles', 'boxes', 'draws', 'upgrades', 'tasted']),
+    stats: counts(source.stats, ['serves', 'servesCoins', 'vips', 'bottles', 'boxes', 'draws', 'upgrades', 'tasted', 'perfectTalks', 'lessons']),
     quests: { week: count(source.quests?.week, 1e6), progress: counts(source.quests?.progress), claimed: Array.isArray(source.quests?.claimed) ? source.quests!.claimed.filter((id) => typeof id === 'string').slice(0, 10) : [] },
     achievements: Array.isArray(source.achievements) ? [...new Set(source.achievements.filter((id) => typeof id === 'string'))].slice(0, 50) : [],
     tasted: Array.isArray(source.tasted) ? [...new Set(source.tasted.filter((id) => typeof id === 'string'))].slice(0, 400) : [],

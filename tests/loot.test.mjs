@@ -11,7 +11,7 @@ import { createInitialState, normalizePlayerState } from '../src/sim/state.ts';
 
 const NOW = new Date(2026, 8, 30, 12).getTime();
 const context = (random = () => .5, now = NOW) => ({ now, random, checkEnglish: (text) => ({ ok: true, corrected: text }) });
-const run = (state, action, random) => applyAction(state, action, context(random));
+const run = (state, action, random, now) => applyAction(state, action, context(random, now));
 const fresh = () => { const state = createInitialState(NOW); state.startingBarChosen = true; state.loot.boxes = {}; return state; };
 
 test('Old saves gain a valid loot state and tampered numbers are discarded', () => {
@@ -268,4 +268,33 @@ test('Starting stock is small but covers several levels of starter orders', asyn
     const perOrder = RECIPES.slice(0, 10).flatMap((recipe) => recipe.ingredients.filter((part) => part.ingredientId === id)).reduce((sum, part) => sum + part.amount, 0) / 10;
     assert.ok(amount <= Math.max(perOrder * STARTER_SERVES * 3, 0.5 * 3 * 90), `${id} is not over-stocked`);
   }
+});
+
+test('English rewards: perfect talks pay parts, every third (or hard) one a box; finishing the daily set pays a box', async () => {
+  const { englishTalkReward, dailyLessonsBox } = await import('../src/sim/loot.ts');
+  const { dailyLessonsFor } = await import('../src/domain/dailyLessons.ts');
+  const { questsForWeek } = await import('../src/domain/quests.ts');
+  const state = fresh();
+  englishTalkReward(state, 1, NOW);
+  englishTalkReward(state, 2, NOW);
+  assert.equal(state.loot.parts, 3);
+  assert.equal(state.loot.boxes.bronze, undefined);
+  englishTalkReward(state, 1, NOW);
+  assert.equal(state.loot.boxes.bronze, 1);
+  englishTalkReward(state, 4, NOW);
+  assert.equal(state.loot.boxes.silver, 1, 'hard English drops a silver box');
+  assert.equal(state.loot.stats.perfectTalks, 4);
+  dailyLessonsBox(state, 3, NOW);
+  assert.equal(state.loot.boxes.bronze, 2);
+  dailyLessonsBox(state, 7, NOW);
+  assert.equal(state.loot.boxes.silver, 2);
+  assert.equal(state.loot.stats.lessons, 2);
+  for (let week = 0; week < 30; week++) assert.equal(new Set(questsForWeek(week).map((quest) => quest.id)).size, 3);
+
+  // Through the real action: the third lesson of the day grants the box exactly once.
+  const day = new Date(2026, 8, 29, 12).getTime();
+  const player = fresh();
+  for (const lesson of dailyLessonsFor('2026-09-29')) run(player, { type: 'completeDailyLesson', lessonId: lesson.id, answer: lesson.answer }, undefined, day);
+  assert.equal(player.loot.boxes.bronze, 1);
+  assert.equal(player.loot.stats.lessons, 1);
 });
