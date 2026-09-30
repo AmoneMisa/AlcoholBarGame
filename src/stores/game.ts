@@ -16,6 +16,7 @@ import { formatCountdown } from '../domain/customerTiming';
 import { checkText } from '../domain/english/checker';
 import { advanceClock, applyAction, RuleError, type GameAction } from '../sim/rules';
 import { createInitialState, levelFor, normalizePlayerState, type PlayerState } from '../sim/state';
+import { playSfx } from '../audio/index';
 import { connectSession, sendAction } from '../telegram/api';
 
 // The client side of a server-authoritative game.
@@ -184,14 +185,36 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function send(action: GameAction) {
+    const levelBefore = levelFor(state.value.xp ?? 0);
     return sendAction(action).then((result) => {
       if (result.state) adoptServerState(result.state, result.serverTime, result.ok ? result.message : result.error);
+      if (result.ok) playActionSound(action, levelBefore);
+      else playSfx('error');
       return result.ok;
     }).catch(() => {
       message.value = 'Connection lost. Reconnecting…';
       connect();
       return false;
     });
+  }
+
+  const ACTION_SOUNDS: Partial<Record<GameAction['type'], Parameters<typeof playSfx>[0]>> = {
+    serve: 'serve', sellBottle: 'coin', claimDaily: 'coin', exchangeCrystals: 'coin', buy: 'buy', sell: 'coin', acceptDeal: 'buy', buyBar: 'buy', buyRecipe: 'buy',
+    buyInterior: 'buy', buyBottleStock: 'buy', selectCustomer: 'select', openConversation: 'select', completeDailyLesson: 'correct'
+  };
+  // Spoken English: a chime when the sentence was right, a soft buzz when it needed a fix.
+  function playEnglishSound(action: GameAction) {
+    if (action.type !== 'say' && action.type !== 'haggle') return false;
+    const lines = action.type === 'say' ? Object.values(state.value.conversations ?? {}).flatMap((talk) => talk.lines) : state.value.negotiation?.lines ?? [];
+    const mine = [...lines].reverse().find((line) => line.speaker === 'bartender' || line.speaker === 'buyer');
+    if (mine?.ok !== undefined) playSfx(mine.ok ? 'correct' : 'wrong');
+    return true;
+  }
+  function playActionSound(action: GameAction, levelBefore: number) {
+    if (levelFor(state.value.xp ?? 0) > levelBefore) { playSfx('levelUp'); return; }
+    if (playEnglishSound(action)) return;
+    const sound = ACTION_SOUNDS[action.type];
+    if (sound) playSfx(sound);
   }
 
   // Apply an action locally (instant feedback), then let the server decide. Returns false if the rules refuse it.
@@ -203,15 +226,18 @@ export const useGameStore = defineStore('game', () => {
     }
     // Applied in place (objects the screens hold stay valid); a refused action is rolled back.
     const snapshot = structuredClone(toRaw(state.value));
+    const levelBefore = levelFor(state.value.xp ?? 0);
     try {
       applyAction(state.value, action, ruleContext());
     } catch (error) {
       state.value = snapshot;
       if (!(error instanceof RuleError)) throw error;
       message.value = error.message;
+      playSfx('error');
       return false;
     }
     message.value = state.value.message;
+    playActionSound(action, levelBefore);
     if (mode.value === 'online') void send(action);
     else {
       saveOffline();
@@ -244,6 +270,7 @@ export const useGameStore = defineStore('game', () => {
     const arrivalDue = !draft.customers.length && draft.nextCustomerAt > 0 && now >= draft.nextCustomerAt;
     if (draft.customers.length !== before || arrivalDue) {
       message.value = draft.message;
+      if (draft.customers.length > before) playSfx('guest');
       if (draft.customers.length < before) resetMix();
       // Online, guests and timeouts are decided by the server: ask it (at most every 5 s).
       if (mode.value === 'online' && now - lastSyncTick > 5000) {
@@ -296,6 +323,7 @@ export const useGameStore = defineStore('game', () => {
     const current = currentMix.value.find((item) => item.ingredientId === ingredientId);
     if (current) current.amount += amount;
     else currentMix.value.push({ ingredientId, amount });
+    playSfx('pour');
     message.value = ingredient.name + ': +' + amount + ' ' + ingredient.unit + '.';
   }
   function shakeCurrentMix() {
@@ -304,6 +332,7 @@ export const useGameStore = defineStore('game', () => {
       return;
     }
     shaken.value = true;
+    playSfx('shake');
     message.value = 'Shaken. Now serve the drink.';
   }
   function serveMix() {

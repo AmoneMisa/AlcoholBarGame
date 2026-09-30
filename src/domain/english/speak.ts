@@ -1,6 +1,7 @@
 // Read a word or sentence aloud. Pre-rendered neural voice clips (public/assets/voice, see
 // scripts/generate_voice.py) are played first; anything without a clip falls back to the
 // device's built-in English voice.
+import { duckMusic } from '../../audio/engine';
 let manifest: Promise<Record<string, string>> | undefined;
 let player: HTMLAudioElement | undefined;
 
@@ -17,9 +18,10 @@ export function canSpeak() {
 
 function speakWithDevice(text: string) {
   if (!('speechSynthesis' in window)) {
+    const win: Window = window;
     const message = 'Voice playback is not available in this browser. Update Telegram or open the game in Chrome.';
-    if (window.Telegram?.WebApp?.showAlert) window.Telegram.WebApp.showAlert(message);
-    else window.alert(message);
+    if (win.Telegram?.WebApp?.showAlert) win.Telegram.WebApp.showAlert(message);
+    else win.alert(message);
     return;
   }
   window.speechSynthesis.cancel();
@@ -41,8 +43,14 @@ export function speak(text: string) {
       player?.pause();
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       player = new Audio(`${import.meta.env.BASE_URL}assets/voice/${file}`);
-      await player.play();
+      const clip = player;
+      const restore = () => duckMusic(false);
+      clip.addEventListener('ended', restore);
+      clip.addEventListener('pause', restore);
+      duckMusic(true);
+      await clip.play();
     } catch {
+      duckMusic(false);
       speakWithDevice(key);
     }
   });

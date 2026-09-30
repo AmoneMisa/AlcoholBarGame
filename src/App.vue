@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import CocktailWorkspace from './components/cocktails/CocktailWorkspace.vue';
 import ConversationPopup from './components/conversation/ConversationPopup.vue';
 import BarScene from './components/game/BarScene.vue';
@@ -10,6 +10,7 @@ import GuideSheet from './components/knowledge/GuideSheet.vue';
 import UiIcon from './components/ui/UiIcon.vue';
 import FriendsPage from './components/friends/FriendsPage.vue';
 import { useGameStore } from './stores/game';
+import { initMusic, musicOn, playSfx, refreshMusic, setMusicInterior } from './audio/index';
 
 const game = useGameStore();
 const view = ref('service');
@@ -25,6 +26,16 @@ const nav = [
   { id: 'advisor', label: 'Pairings', mark: 'pair' },
   { id: 'friends', label: 'Friends', mark: 'friends' }
 ];
+
+// Music follows the bar's interior; taps on buttons get a soft click.
+watch(() => game.decor.interior, (id) => setMusicInterior(id), { immediate: true });
+watch(musicOn, refreshMusic);
+onMounted(() => {
+  initMusic();
+  document.addEventListener('click', (event) => {
+    if ((event.target as Element | null)?.closest('button, [role="button"], a')) playSfx('tap');
+  });
+});
 
 function selectView(id: string) {
   view.value = id;
