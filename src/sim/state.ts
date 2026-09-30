@@ -166,7 +166,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     knownRecipeIds,
     recipeUnlockSources: Object.fromEntries(knownRecipeIds.map((id) => [id, 'starter'])),
     popularity: 0,
-    loot: createLoot(),
+    loot: { ...createLoot(), boxes: { bronze: 1 } },
     dailyGiftClaimedKey: '',
     loginStreak: 0,
     dailyGiftResult: 'A new gift is available today.',

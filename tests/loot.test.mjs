@@ -12,7 +12,7 @@ import { createInitialState, normalizePlayerState } from '../src/sim/state.ts';
 const NOW = new Date(2026, 8, 30, 12).getTime();
 const context = (random = () => .5, now = NOW) => ({ now, random, checkEnglish: (text) => ({ ok: true, corrected: text }) });
 const run = (state, action, random) => applyAction(state, action, context(random));
-const fresh = () => { const state = createInitialState(NOW); state.startingBarChosen = true; return state; };
+const fresh = () => { const state = createInitialState(NOW); state.startingBarChosen = true; state.loot.boxes = {}; return state; };
 
 test('Old saves gain a valid loot state and tampered numbers are discarded', () => {
   const state = fresh();
@@ -56,9 +56,11 @@ test('A refused upgrade never spends anything', () => {
 test('Boxes: only owned boxes open, rewards land in the state, choice boxes need a pick', () => {
   const state = fresh();
   assert.throws(() => run(state, { type: 'openBox', box: 'gold' }), /do not have/);
-  state.loot.boxes = { bronze: 1, choice: 1 };
+  state.loot.boxes = { bronze: 2, choice: 1 };
   run(state, { type: 'openBox', box: 'bronze' }, () => 0);
-  assert.equal(state.loot.parts, 3);
+  assert.equal(state.loot.parts, 8, 'the first box always holds enough parts for a first upgrade');
+  run(state, { type: 'openBox', box: 'bronze' }, () => 0);
+  assert.equal(state.loot.parts, 11);
   assert.equal(state.loot.boxes.bronze, undefined);
   run(state, { type: 'openBox', box: 'choice' }, () => .1);
   assert.equal(state.loot.pendingChoice.length, 3);

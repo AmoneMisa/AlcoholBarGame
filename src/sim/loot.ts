@@ -103,7 +103,9 @@ export function openBox(state: PlayerState, kind: string, random: () => number, 
     state.message = 'Choice box opened: pick one of three rewards.';
     return;
   }
-  const reward = rollBox(kind as Exclude<BoxKind, 'choice'>, level, random);
+  // The very first box a player opens always holds enough parts for a first equipment upgrade.
+  const first = (state.loot.stats['boxes'] ?? 0) <= 1;
+  const reward: Reward = first ? { kind: 'parts', amount: 8 } : rollBox(kind as Exclude<BoxKind, 'choice'>, level, random);
   note(state, `${boxDef(kind)!.name}: ${grantReward(state, reward, random)}.`);
 }
 

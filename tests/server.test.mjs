@@ -280,3 +280,35 @@ test('HTTP API: login required, dev login only when enabled, rate limited, state
     lockedServer.close();
   }
 });
+
+test('Loot actions are audited, replayed request ids never charge twice, and concurrent draws cannot overspend', async () => {
+  const { repository, service } = makeService(() => Date.UTC(2026, 8, 30));
+  const who = identity(801);
+  const session = await service.session(who);
+  const row = repository.states.get(session.player.id);
+  row.state.crystals = 60; // enough for one 50-crystal draw only
+  row.state.loot.boxes = { bronze: 2 };
+  repository.states.set(session.player.id, row);
+
+  // A replayed request returns the stored answer instead of acting twice.
+  const id = requestId();
+  const first = await act(service, { type: 'openBox', box: 'bronze' }, id, who);
+  const replay = await act(service, { type: 'openBox', box: 'bronze' }, id, who);
+  assert.equal(first.ok, true);
+  assert.deepEqual(replay, first);
+  assert.equal(repository.states.get(session.player.id).state.loot.boxes.bronze, 1);
+
+  // Two simultaneous draws with money for one: exactly one succeeds.
+  const results = await Promise.all([
+    act(service, { type: 'drawStyle', count: 1 }, requestId(), who),
+    act(service, { type: 'drawStyle', count: 1 }, requestId(), who)
+  ]);
+  assert.equal(results.filter((item) => item.ok).length, 1);
+  assert.equal(repository.states.get(session.player.id).state.crystals, 10);
+
+  const draws = repository.lootLedger.filter((entry) => entry.action === 'drawStyle');
+  assert.equal(draws.length, 1);
+  assert.equal(draws[0].detail.results.length, 1);
+  assert.ok(repository.lootLedger.some((entry) => entry.action === 'openBox'));
+  assert.equal(repository.crystalLedger.filter((entry) => entry.action === 'drawStyle').reduce((sum, entry) => sum + entry.delta, 0), -50);
+});

@@ -19,7 +19,9 @@ const friendIdFrom = (value) => {
 };
 
 export function createGameService({ repository, checkEnglish, now = () => Date.now() }) {
-  const context = () => ({ now: now(), checkEnglish, spawnCustomers: true });
+  // Loot rolls use the operating system's secure random source, never Math.random.
+  const secureRandom = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
+  const context = () => ({ now: now(), random: secureRandom, checkEnglish, spawnCustomers: true });
 
   async function session(identity) {
     return repository.transaction(async (tx) => {
@@ -74,6 +76,7 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       await tx.saveState(player.id, next, (record?.version ?? 0) + 1);
       if (result.moneyDelta !== 0) await tx.addLedger(player.id, { requestId, action: action.type, delta: result.moneyDelta, balance: next.money });
       if (result.crystalDelta !== 0) await tx.addCrystalLedger(player.id, { requestId, action: action.type, delta: result.crystalDelta, balance: next.crystals });
+      if (result.audit) await tx.addLootLedger(player.id, { requestId, ...result.audit });
       const response = { ok: true, message: next.message, state: publicState(next), serverTime: now() };
       await tx.saveRequest(player.id, requestId, response);
       return { status: 200, body: response };

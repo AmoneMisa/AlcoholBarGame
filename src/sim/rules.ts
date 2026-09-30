@@ -824,7 +824,19 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
   grantLevelBoxes(state);
   if (!Number.isFinite(state.money) || state.money < 0) throw new RuleError('Not enough money.');
   if (!Number.isFinite(state.crystals) || state.crystals < 0) throw new RuleError('Not enough crystals.');
-  return { moneyDelta: coins(state.money - moneyBefore), crystalDelta: state.crystals - crystalsBefore };
+  return { moneyDelta: coins(state.money - moneyBefore), crystalDelta: state.crystals - crystalsBefore, audit: auditEntry(state, action) };
+}
+
+// Loot actions leave a trail (what was rolled, pity, prestige) for the server's loot ledger.
+const AUDITED = new Set<GameAction['type']>(['openBox', 'pickReward', 'buyBox', 'buyConsumable', 'drawStyle', 'craftSkin', 'prestige', 'buyPrestigePerk', 'claimQuest', 'claimAchievement']);
+export interface LootAudit { action: string; message: string; detail: Record<string, unknown>; }
+function auditEntry(state: PlayerState, action: GameAction): LootAudit | undefined {
+  if (!AUDITED.has(action.type)) return undefined;
+  const detail: Record<string, unknown> = {};
+  if (action.type === 'drawStyle') Object.assign(detail, { results: state.loot.lastDraw, pity: state.loot.pity });
+  else if (action.type === 'prestige') Object.assign(detail, { prestige: state.loot.prestige });
+  else if (action.type === 'openBox' && state.loot.pendingChoice) Object.assign(detail, { offered: state.loot.pendingChoice });
+  return { action: action.type, message: state.message, detail };
 }
 
 function offerSimilar(state: PlayerState, target: Customer, marketFactor: number) {

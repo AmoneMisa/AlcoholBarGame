@@ -52,6 +52,9 @@ function pgTx(client) {
     async addLedger(playerId, entry) {
       await client.query('INSERT INTO coin_ledger (player_id, request_id, action, delta, balance) VALUES ($1, $2, $3, $4, $5)', [playerId, entry.requestId, entry.action, entry.delta, entry.balance]);
     },
+    async addLootLedger(playerId, entry) {
+      await client.query('INSERT INTO loot_ledger (player_id, request_id, action, message, detail) VALUES ($1, $2, $3, $4, $5::jsonb)', [playerId, entry.requestId, entry.action, entry.message, JSON.stringify(entry.detail ?? {})]);
+    },
     async addCrystalLedger(playerId, entry) {
       await client.query('INSERT INTO crystal_ledger (player_id, request_id, action, delta, balance) VALUES ($1, $2, $3, $4, $5)', [playerId, entry.requestId, entry.action, entry.delta, entry.balance]);
     },
@@ -110,6 +113,7 @@ export function createMemoryRepository() {
   const gifts = [];
   let nextGiftId = 1;
   const crystalLedger = [];
+  const lootLedger = [];
   let queue = Promise.resolve();
   let nextId = 1;
   const tx = {
@@ -123,6 +127,7 @@ export function createMemoryRepository() {
     async saveRequest(playerId, requestId, response) { requests.set(`${playerId}:${requestId}`, structuredClone(response)); },
     async addLedger(playerId, entry) { ledger.push({ playerId, ...entry }); },
     async addCrystalLedger(playerId, entry) { crystalLedger.push({ playerId, ...entry }); },
+    async addLootLedger(playerId, entry) { lootLedger.push({ playerId, ...structuredClone(entry) }); },
     async getPlayer(id) {
       for (const player of players.values()) if (player.id === id) return { id: player.id, name: player.name };
       return null;
@@ -155,6 +160,7 @@ export function createMemoryRepository() {
   return {
     ledger,
     crystalLedger,
+    lootLedger,
     // Stored (full, secret) states by player id — for tests.
     states,
     // Transactions run one at a time, like row locks for a single player.

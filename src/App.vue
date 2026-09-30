@@ -58,6 +58,21 @@ watch(() => game.customers.map((customer) => customer.id).join(','),(next,previo
 watch(() => game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'incoming').map((friend) => friend.code).join(','),(next,previous) => {
   if (next && next !== previous) notifications.push('friendRequest','New friend request','Open Friends to accept or decline.',`friend-request:${next}`);
 });
+// Workshop: a new box to open, and boosters that have just run out.
+const boxTotal = () => Object.values(game.loot.boxes).reduce((sum, count) => sum + count, 0);
+watch(boxTotal, (next, previous) => {
+  if (previous !== undefined && next > previous) notifications.push('loot', 'You got a box', 'Open it in the Workshop.');
+});
+const boostNames: Record<string, string> = { 'happy-hour': 'Happy Hour', 'xp-boost': 'XP Booster', 'coin-boost': 'Coin Booster', 'tip-boost': 'Tip Booster' };
+let boostTimer: ReturnType<typeof setInterval>;
+onMounted(() => {
+  boostTimer = setInterval(() => {
+    for (const [kind, until] of Object.entries(game.loot.boosts)) {
+      if (until <= Date.now() && until > Date.now() - 120_000) notifications.push('loot', `${boostNames[kind] ?? kind} ended`, 'Use another one from the Workshop.', `boost-ended:${kind}:${until}`);
+    }
+  }, 15_000);
+});
+onUnmounted(() => clearInterval(boostTimer));
 watch(() => game.message,(message,previous) => {
   if (!message || message === previous) return;
   if (/visited your bar/i.test(message)) notifications.push('friendVisit','A friend visited',message,`visit:${message}`);

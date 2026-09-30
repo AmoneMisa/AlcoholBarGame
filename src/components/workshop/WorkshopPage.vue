@@ -28,6 +28,12 @@ const quests = computed(() => questsForWeek(week.value).map((quest) => {
 }));
 const stat = (id: string) => game.loot.stats[id] ?? 0;
 const cosmeticKind = (key: string) => key.replace(/([A-Z])/g, ' $1').toLowerCase();
+const started = computed(() => [
+  { label: 'Open your welcome box in the Boxes tab', done: (game.loot.stats.boxes ?? 0) >= 1 },
+  { label: 'Upgrade a piece of equipment', done: (game.loot.stats.upgrades ?? 0) >= 1 },
+  { label: 'Serve a perfect drink to earn parts and boxes', done: (game.loot.stats.serves ?? 0) >= 1 }
+]);
+const gettingStarted = computed(() => started.value.some((step) => !step.done));
 const runStars = computed(() => prestigeStarsFor(game.loot.runEarned));
 const effectText = (id: string) => {
   const item = equipmentDef(id)!;
@@ -51,6 +57,7 @@ const boostLeft = (id: string) => {
       </dl>
     </header>
     <nav class="workshop-tabs"><button v-for="[id, label] in tabs" :key="id" type="button" :class="{ active: tab === id }" @click="tab = id">{{ label }}</button></nav>
+    <aside v-if="gettingStarted" class="getting-started"><b>Getting started</b><ol><li v-for="step in started" :key="step.label" :class="{ done: step.done }">{{ step.label }}</li></ol></aside>
     <p v-if="game.loot.log[0]" class="workshop-log">{{ game.loot.log[0] }}</p>
 
     <div v-if="tab === 'equipment'" class="grid">
@@ -164,6 +171,7 @@ const boostLeft = (id: string) => {
 .workshop-hero small{color:#e4b35c;font-size:9px;font-weight:900;letter-spacing:.12em}.workshop-hero h2{margin:5px 0;font:700 29px Georgia,serif}.workshop-hero p{margin:0;color:#bdc8d6;font-size:12px}
 .workshop-hero dl{display:flex;gap:14px;margin:0}.workshop-hero dt{color:#91a2b5;font-size:9px;letter-spacing:.1em;text-transform:uppercase}.workshop-hero dd{margin:2px 0 0;color:#fff0c8;font:700 20px Georgia,serif}
 .workshop-tabs{display:flex;gap:6px;padding:12px 14px 0;overflow-x:auto}.workshop-tabs button{padding:8px 12px;border:1px solid #40536c;border-radius:9px;background:#111c2d;color:#c7d3e0;font-weight:800;white-space:nowrap;cursor:pointer}.workshop-tabs button.active{border-color:#b78649;background:#3b2b1f;color:#fff0ce}
+.getting-started{margin:10px 14px 0;padding:10px 14px;border:1px solid #b78649;border-radius:10px;background:#2a2016;color:#ffe9bd;font-size:12px}.getting-started ol{margin:6px 0 0;padding-left:20px;display:grid;gap:3px}.getting-started li.done{color:#8fd1a0;text-decoration:line-through}
 .workshop-log{margin:10px 14px 0;padding:8px 10px;border:1px solid #3e7756;border-radius:8px;background:#173425;color:#b9e5c6;font-size:11px}
 .grid,.draw{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;padding:14px}.draw{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
 .card{display:grid;align-content:start;gap:8px;padding:14px;border:1px solid #354762;border-radius:13px;background:#111c2d}.card h3{margin:0;font:700 17px Georgia,serif}.card p{margin:0;color:#aebdce;font-size:11px;line-height:1.45}.card>b{color:#f4d08e;font-size:11px}.card select{padding:8px;border:1px solid #40536c;border-radius:8px;background:#0c1625;color:#fff}
