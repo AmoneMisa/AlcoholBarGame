@@ -33,6 +33,8 @@ export interface LootState {
   regulars: Record<string, number>;
   // When spoilage last ran (server clock); 0 until the bar is old enough.
   spoiledAt: number;
+  // Workshop gifts sent today (limit enforced in sim/gifts.ts).
+  giftsSent?: { day: string; count: number };
 }
 
 export const createLoot = (): LootState => ({
@@ -86,6 +88,7 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
     tasted: Array.isArray(source.tasted) ? [...new Set(source.tasted.filter((id) => typeof id === 'string'))].slice(0, 400) : [],
     regulars: counts(source.regulars, CUSTOMER_ART_BY_SLOT),
     spoiledAt: count(source.spoiledAt, 1e14),
+    giftsSent: typeof source.giftsSent?.day === 'string' ? { day: source.giftsSent.day.slice(0, 10), count: count(source.giftsSent.count, 1000) } : undefined,
     log: Array.isArray(source.log) ? source.log.filter((line) => typeof line === 'string').slice(0, 20) : []
   };
 }

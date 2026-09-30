@@ -181,7 +181,7 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       const record = await tx.lockState(player.id);
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
       try {
-        const paid = payForGift(state, gift);
+        const paid = payForGift(state, gift, now());
         await tx.addGift({ fromId: Number(player.id), toId: targetId, payload: paid });
         state.message = `Gift sent to ${target.name}.`;
       } catch (error) {

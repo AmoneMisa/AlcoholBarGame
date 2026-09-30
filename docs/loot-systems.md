@@ -30,3 +30,6 @@ Random actions (`openBox`, `pickReward`, `drawStyle`, `prestige`) are server-onl
 - **English rewards**: a perfect conversation pays parts equal to its difficulty; every third one (or any difficulty 4+) drops a box. Finishing the 3 daily lessons drops a bronze box (silver on a 7-day learning streak). Matching weekly quests / achievements.
 - **Regulars** (`domain/regulars.ts`): each guest portrait earns loyalty (+1 per serve, +1 VIP, +1 favourite drink); levels at 3/8/15/25 pay boxes, parts, shards and crystals; regulars pay +10% for their favourite starter recipe.
 - **Storeroom** (`domain/warehouse.ts`): capacity 5000 ml / 120 pieces per ingredient per bar (+10% per fridge level); orders beyond it are refused, late deliveries clamp. From level 3, fruit, herbs and milks spoil 12% of stock per day (whole units only, so tiny reserves survive), minus 1.2 points per fridge level (none at level 10).
+
+## Friend gifts
+Consumables (one per gift) and skin shards (5 / 10 / 20) can be sent to friends you are visiting. Items move, they are never created; a sender may send 5 Workshop gifts per day (`LOOT_GIFTS_PER_DAY`).

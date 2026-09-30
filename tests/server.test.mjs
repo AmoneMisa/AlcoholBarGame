@@ -312,3 +312,31 @@ test('Loot actions are audited, replayed request ids never charge twice, and con
   assert.ok(repository.lootLedger.some((entry) => entry.action === 'openBox'));
   assert.equal(repository.crystalLedger.filter((entry) => entry.action === 'drawStyle').reduce((sum, entry) => sum + entry.delta, 0), -50);
 });
+
+test('Friends can gift consumables and skin shards; limits, ownership and friendship are enforced', async () => {
+  const { repository, service } = makeService(() => Date.UTC(2026, 8, 30, 12));
+  const aId = identity(901), bId = identity(902), strangerId = identity(903);
+  const a = await service.session(aId); const b = await service.session(bId); await service.session(strangerId);
+  const row = repository.states.get(a.player.id);
+  row.state.loot.consumables = { 'golden-ice': 1 };
+  row.state.loot.skinShards = 12;
+  repository.states.set(a.player.id, row);
+  const addFriendResult = await service.addFriend(aId, b.player.friendCode);
+  assert.ok(addFriendResult.status < 400);
+  await service.answerFriend(bId, a.player.friendCode, true);
+  await service.visitFriend(aId, b.player.friendCode);
+
+  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'consumable', id: 'courier' })).body.ok, false, 'not owned');
+  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'skin-shards', amount: 7 })).body.ok, false, 'invalid amount');
+  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'skin-shards', amount: 20 })).body.ok, false, 'not enough shards');
+  const sent = await service.sendGift(aId, b.player.friendCode, { kind: 'consumable', id: 'golden-ice' });
+  assert.equal(sent.body.ok, true);
+  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'skin-shards', amount: 10 })).body.ok, true);
+  const received = await service.session(bId);
+  assert.equal(received.state.loot.consumables['golden-ice'], 1);
+  assert.equal(received.state.loot.skinShards, 10);
+  const after = repository.states.get(a.player.id).state.loot;
+  assert.equal(after.consumables['golden-ice'], undefined);
+  assert.equal(after.skinShards, 2);
+  assert.equal((await service.sendGift(strangerId, b.player.friendCode, { kind: 'skin-shards', amount: 5 })).body.ok, false, 'strangers cannot gift');
+});

@@ -395,3 +395,13 @@ test('Storeroom capacity: orders beyond it are refused, the fridge raises it, la
   run(state, { type: 'tick' }, undefined, NOW + 1000);
   assert.ok(state.inventories['new-york'].find((item) => item.ingredientId === 'gin').amount <= 5000);
 });
+
+test('Workshop gifts are limited to five per day and reset the next day', async () => {
+  const { payForGift, LOOT_GIFTS_PER_DAY } = await import('../src/sim/gifts.ts');
+  const state = fresh();
+  state.loot.skinShards = 1000;
+  for (let i = 0; i < LOOT_GIFTS_PER_DAY; i++) payForGift(state, { kind: 'skin-shards', amount: 5 }, NOW);
+  assert.throws(() => payForGift(state, { kind: 'skin-shards', amount: 5 }, NOW), /per day/);
+  assert.equal(state.loot.skinShards, 1000 - 5 * LOOT_GIFTS_PER_DAY);
+  payForGift(state, { kind: 'skin-shards', amount: 5 }, NOW + 86_400_000);
+});

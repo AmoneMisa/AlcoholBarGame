@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { RECIPES } from '../../domain/catalog';
+import { CONSUMABLES } from '../../domain/loot';
+import { SHARD_GIFT_AMOUNTS } from '../../sim/gifts';
 import { useGameStore } from '../../stores/game';
 import { NOTIFICATION_EVENTS, useNotificationsStore } from '../../stores/notifications';
 import UiIcon from '../ui/UiIcon.vue';
@@ -15,6 +17,8 @@ const accepted = computed(() => game.friends.filter((friend) => friend.status ==
 const incoming = computed(() => game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'incoming'));
 const outgoing = computed(() => game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'outgoing'));
 const recipeCards = computed(() => RECIPES.map((recipe) => ({ recipe, quantity:game.recipeCopies[recipe.id] ?? 0 })).filter((item) => item.quantity > 0));
+const itemGifts = computed(() => CONSUMABLES.map((item) => ({ id:item.id,name:item.name,quantity:game.loot.consumables[item.id] ?? 0 })).filter((item) => item.quantity > 0));
+const shardGifts = SHARD_GIFT_AMOUNTS;
 const styleItems = computed(() => game.cosmetics.map((cosmetic) => ({ cosmetic, quantity:game.cosmeticCopies[cosmetic.id] ?? 0 })).filter((item) => item.quantity > 0));
 
 async function shareInvite() {
@@ -65,7 +69,7 @@ onMounted(async () => {
       <aside v-if="game.visitedFriend" class="friend-visit">
         <small>VISITING NOW</small><h3>{{ game.visitedFriend.nickname }}</h3><p v-if="game.visitedFriend.customName">{{ game.visitedFriend.customName }}</p><strong>{{ game.visitedFriend.name }} · level {{ game.visitedFriend.level }}</strong><ul><li>{{ game.visitedFriend.recipes }} recipes</li><li>{{ game.visitedFriend.interiors }} interiors</li></ul>
         <button class="gift-toggle" type="button" @click="giftOpen=!giftOpen"><UiIcon name="gift" /> Send a gift</button>
-        <div v-if="giftOpen" class="gift-inventory"><small>CHOOSE FROM YOUR INVENTORY</small><article v-for="item in recipeCards" :key="item.recipe.id"><span>{{ item.recipe.name }} <b>×{{ item.quantity }}</b></span><button type="button" @click="game.giftFriend({kind:'recipe-copy',recipeId:item.recipe.id})">Send</button></article><article v-for="item in styleItems" :key="item.cosmetic.id"><span>{{ item.cosmetic.label }} <b>×{{ item.quantity }}</b></span><button type="button" @click="game.giftFriend({kind:'cosmetic-copy',cosmeticId:item.cosmetic.id})">Send</button></article><p v-if="!recipeCards.length&&!styleItems.length">No giftable recipe cards or styles in your inventory.</p></div>
+        <div v-if="giftOpen" class="gift-inventory"><small>CHOOSE FROM YOUR INVENTORY</small><article v-for="item in recipeCards" :key="item.recipe.id"><span>{{ item.recipe.name }} <b>×{{ item.quantity }}</b></span><button type="button" @click="game.giftFriend({kind:'recipe-copy',recipeId:item.recipe.id})">Send</button></article><article v-for="item in styleItems" :key="item.cosmetic.id"><span>{{ item.cosmetic.label }} <b>×{{ item.quantity }}</b></span><button type="button" @click="game.giftFriend({kind:'cosmetic-copy',cosmeticId:item.cosmetic.id})">Send</button></article><article v-for="item in itemGifts" :key="item.id"><span>{{ item.name }} <b>×{{ item.quantity }}</b></span><button type="button" @click="game.giftFriend({kind:'consumable',id:item.id})">Send</button></article><article v-for="amount in shardGifts" :key="amount"><span>{{ amount }} skin shards <b>({{ game.loot.skinShards }} owned)</b></span><button type="button" :disabled="game.loot.skinShards < amount" @click="game.giftFriend({kind:'skin-shards',amount})">Send</button></article><p v-if="!recipeCards.length&&!styleItems.length&&!itemGifts.length">No giftable recipe cards, styles or Workshop items in your inventory.</p></div>
       </aside>
       <aside v-else class="visit-empty"><UiIcon name="pin" /><h3>Choose a friend to visit</h3><p>Their current bar appears here. The first visit each day adds one popularity to their account.</p></aside>
     </div>
