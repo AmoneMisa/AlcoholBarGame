@@ -54,7 +54,7 @@ def material(name, color):
     return mat
 for name, color in dict(skin=(.72, .47, .35), skin_body=(.72, .47, .35), skin_head=(.72, .47, .35), brow=(.16, .09, .07), hair=(.16, .09, .07), sclera=(.95, .95, .93), iris=(.3, .18, .12), pupil=(.02, .02, .03),
                         lip=(.6, .33, .3), mouth=(.12, .02, .03), shirt=(.93, .92, .88), vest=(.35, .06, .12), apron=(.06, .35, .27),
-                        pants=(.08, .08, .1), shoes=(.05, .04, .04), trim=(.75, .58, .25)).items():
+                        pants=(.08, .08, .1), shoes=(.05, .04, .04), trim=(.75, .58, .25), accent=(.75, .58, .25), neon=(1, .17, .84), leather=(.23, .16, .12), cape=(.23, .16, .29)).items():
     material(name, color)
 
 def apply_uv(bm, uv):
@@ -117,17 +117,17 @@ def body_uv(face, co):
 JOINTS = {
     'hips': ((0, 0, .98), (.17, .12)), 'spine': ((0, 0, 1.12), (.155, .115)), 'chest': ((0, 0, 1.29), (.19, .125)), 'neck': ((0, 0, 1.44), (.055, .055)),
     'shoulder': ((.17, 0, 1.38), (.07, .07)), 'elbow': ((.31, 0, 1.13), (.052, .052)), 'wrist': ((.37, 0, .93), (.04, .04)), 'hand': ((.395, 0, .84), (.055, .045)),
-    'hip': ((.09, 0, .93), (.09, .09)), 'knee': ((.1, 0, .52), (.07, .07)), 'ankle': ((.1, 0, .09), (.055, .055)), 'toe': ((.1, -.11, .035), (.055, .045))
+    'hip': ((.09, 0, .93), (.09, .09)), 'fingers': ((.405, -.005, .785), (.04, .03)), 'thumb': ((.365, -.048, .862), (.017, .017)), 'knee': ((.1, 0, .52), (.07, .07)), 'ankle': ((.1, 0, .09), (.055, .055)), 'toe': ((.1, -.11, .035), (.055, .045))
 }
 # Same joint positions for both genders (so every animation fits both); only the volumes differ.
 RADII = {
     'male':   dict(hips=(.155, .115), spine=(.16, .115), chest=(.205, .13), neck=(.062, .062), shoulder=(.078, .078), elbow=(.056, .056), wrist=(.043, .043), hand=(.06, .05),
-                   hip=(.095, .095), knee=(.075, .075), ankle=(.058, .058), toe=(.058, .048)),
+                   hip=(.095, .095), knee=(.075, .075), ankle=(.058, .058), toe=(.058, .048), fingers=(.048, .03), thumb=(.02, .02)),
     'female': dict(hips=(.18, .125), spine=(.122, .10), chest=(.158, .115), neck=(.045, .045), shoulder=(.058, .058), elbow=(.045, .045), wrist=(.034, .034), hand=(.045, .038),
-                   hip=(.095, .095), knee=(.066, .066), ankle=(.048, .048), toe=(.05, .04)),
+                   hip=(.095, .095), knee=(.066, .066), ankle=(.048, .048), toe=(.05, .04), fingers=(.038, .024), thumb=(.015, .015)),
 }[GENDER]
 JOINTS = {key: (pos, RADII[key]) for key, (pos, _) in JOINTS.items()}
-EDGES = [('hips', 'spine'), ('spine', 'chest'), ('chest', 'neck'), ('chest', 'shoulder'), ('shoulder', 'elbow'), ('elbow', 'wrist'), ('wrist', 'hand'),
+EDGES = [('hand', 'fingers'), ('hand', 'thumb'), ('hips', 'spine'), ('spine', 'chest'), ('chest', 'neck'), ('chest', 'shoulder'), ('shoulder', 'elbow'), ('elbow', 'wrist'), ('wrist', 'hand'),
          ('hips', 'hip'), ('hip', 'knee'), ('knee', 'ankle'), ('ankle', 'toe')]
 
 def build_body():
@@ -398,7 +398,7 @@ def shell_from(body, name, cuts, mat, grow, thickness=.006, keep=None):
 
 Z, X, Y = (0, 0, 1), (1, 0, 0), (0, 1, 0)
 def build_clothes(body):
-    sleeves = [((.34, 0, 0), X, 'below'), ((-.34, 0, 0), X, 'above')]
+    sleeves = [((.295, 0, 0), X, 'below'), ((-.295, 0, 0), X, 'above')]
     return [
         shell_from(body, 'cloth_shirt', [((0, 0, 1.0), Z, 'above'), ((0, 0, 1.47), Z, 'below'), *sleeves], 'shirt', .008),
         shell_from(body, 'cloth_vest', [((0, 0, 1.04), Z, 'above'), ((0, 0, 1.4), Z, 'below'), ((.19, 0, 0), X, 'below'), ((-.19, 0, 0), X, 'above')], 'vest', .017, .008,
@@ -407,6 +407,83 @@ def build_clothes(body):
         shell_from(body, 'cloth_pants', [((0, 0, 1.03), Z, 'below'), ((0, 0, .1), Z, 'above'), ((.235, 0, 0), X, 'below'), ((-.235, 0, 0), X, 'above')], 'pants', .01),
         shell_from(body, 'cloth_shoes', [((0, 0, .115), Z, 'below'), ((.235, 0, 0), X, 'below'), ((-.235, 0, 0), X, 'above')], 'shoes', .012, .01),
     ]
+
+# ---------------------------------------------------------------- accessories for the special outfits (acc_<name>)
+def head_shell(name, keep_fn, grow, mat):
+    bm = bmesh.new()
+    bmesh.ops.create_uvsphere(bm, u_segments=36, v_segments=20, radius=1.0)
+    for v in bm.verts:
+        x, y, z = v.co
+        t = (z + 1) / 2
+        taper = .82 + .18 * math.sin(min(1, t * 1.25) * math.pi / 2)
+        v.co = Vector((x * .108 * taper, y * .12 * (0.95 if z < -.4 else 1), z * .135 + 1.605))
+        if z < -.55: v.co.y -= (z + .55) * .02 * -1
+        n = Vector((v.co.x / .108, v.co.y / .12, (v.co.z - 1.605) / .135)).normalized()
+        v.co += n * grow
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if not keep_fn(v.co)], context='VERTS')
+    return bm
+
+def add_disc(bm, centre, radius, height, segments=24, taper=1.0):
+    geo = bmesh.ops.create_cone(bm, cap_ends=True, segments=segments, radius1=radius, radius2=radius * taper, depth=height)
+    bmesh.ops.transform(bm, matrix=Matrix.Translation(centre), verts=geo['verts'])
+    return geo['verts']
+
+def add_ring(bm, centre, rx, ry, radius, segments=28, arc=(0, 2 * math.pi)):
+    pts = [Vector((centre[0] + math.cos(arc[0] + (arc[1] - arc[0]) * k / segments) * rx, centre[1] + math.sin(arc[0] + (arc[1] - arc[0]) * k / segments) * ry, centre[2])) for k in range(segments + 1)]
+    for a, b in zip(pts, pts[1:]): add_tube(bm, a, b, radius, 6)
+
+def build_accessories():
+    out = []
+    def part(name, bm, mats, uv=None, rigid='head'):
+        uv = uv or (lambda f, co: (co.x * 1.5 + .5, co.z * .6))    # simple planar UVs so accessories can take textures too
+        obj = multi_object(name, bm, mats, uv=uv) if isinstance(mats, list) else new_object(name, bm, mats, uv=uv)
+        out.append((obj, rigid))
+    # -- gala
+    bm = bmesh.new(); add_blob(bm, (0, -.1, 1.425), (.014, .012, .012))
+    for sg in (1, -1): add_blob(bm, (sg * .03, -.1, 1.425), (.026, .008, .017), 10, 6)
+    part('acc_bowtie', bm, 'accent', rigid='chest')
+    bm = bmesh.new(); add_blob(bm, (.085, -.12, 1.3), (.028, .006, .02), 10, 6); part('acc_pocket', bm, 'trim', rigid='chest')
+    # -- cyberpunk: visor + shoulder pads with neon trim
+    bm = head_shell('v', lambda c: c.y < -.03 and 1.61 < c.z < 1.655, .012, 'neon'); part('acc_visor', bm, 'neon', uv=head_uv)
+    bm = bmesh.new()
+    for sg in (1, -1): add_blob(bm, (sg * .215, .0, 1.445), (.075, .07, .038), 12, 8); add_blob(bm, (sg * .215, -.052, 1.445), (.05, .012, .008), 8, 6)
+    part('acc_shoulder-pads', bm, 'pants', rigid='chest')
+    # -- steampunk: goggles on the forehead, top hat, belt
+    bm = bmesh.new()
+    for sg in (1, -1):
+        add_disc(bm, (sg * .04, -.105, 1.705), .028, .02, 16); add_disc(bm, (sg * .04, -.112, 1.705), .02, .012, 16)
+    add_ring(bm, (0, 0, 1.7), .112, .125, .004, 28, (math.pi * .55, math.pi * 2.45))
+    part('acc_goggles', bm, 'accent')
+    bm = bmesh.new(); add_disc(bm, (0, 0, 1.745), .145, .008, 28); add_disc(bm, (0, 0, 1.805), .098, .12, 28, .92)
+    part('acc_tophat', bm, 'shoes'); bm = bmesh.new(); add_disc(bm, (0, 0, 1.765), .1, .022, 28); part('acc_hatband', bm, 'accent')
+    bm = bmesh.new(); add_ring(bm, (0, 0, 1.0), .17, .128, .013, 32); add_blob(bm, (0, -.13, 1.0), (.024, .008, .02), 8, 6)
+    part('acc_belt', bm, ['leather'] if False else 'leather', rigid='hips')
+    # -- post-apocalypse: bandana, one big shoulder plate, bandolier
+    bm = head_shell('b', lambda c: c.z < 1.548 and c.z > 1.46 and c.y < .09, .012, 'cape'); part('acc_bandana', bm, 'leather', uv=head_uv)
+    bm = bmesh.new(); add_blob(bm, (.215, 0, 1.45), (.085, .08, .05), 12, 8)
+    for k in range(3): add_blob(bm, (.215 + k * .012, -.02 + k * .0, 1.5 + k * .012), (.012, .012, .03), 6, 4)
+    part('acc_shoulder-plate', bm, 'leather', rigid='chest')
+    bm = bmesh.new(); add_tube(bm, (.17, -.1, 1.42), (-.13, -.1, 1.04), .013, 8)
+    for k in range(4): t = k / 3; add_blob(bm, (.13 - .26 * t * .85, -.118, 1.39 - .3 * t), (.02, .012, .022), 8, 6)
+    part('acc_bandolier', bm, 'leather', rigid='chest')
+    # -- historical: jabot ruffle, tricorn
+    bm = bmesh.new()
+    for k in range(5): add_blob(bm, (0, -.1 - .002 * k, 1.42 - .028 * k), (.03 - .003 * k, .014, .02), 10, 6)
+    part('acc_jabot', bm, 'trim', rigid='chest')
+    bm = bmesh.new(); geo = add_disc(bm, (0, 0, 1.75), .17, .012, 3); bmesh.ops.transform(bm, matrix=Matrix.Rotation(math.radians(90), 4, 'Z'), verts=geo)
+    add_disc(bm, (0, 0, 1.78), .09, .07, 20, .9)
+    part('acc_tricorn', bm, 'shoes')
+    # -- fantasy: cloak and circlet
+    cape = shell_from(body_obj, 'acc_cloak', [((0, 0, .74), Z, 'above'), ((0, 0, 1.48), Z, 'below'), ((0, .02, 0), Y, 'above'), ((.3, 0, 0), X, 'below'), ((-.3, 0, 0), X, 'above')], 'cape', .05, .01)
+    out.append((cape, None))
+    bm = bmesh.new(); add_ring(bm, (0, 0, 1.688), .1, .116, .004, 28); add_blob(bm, (0, -.117, 1.688), (.012, .008, .014), 8, 6)
+    part('acc_circlet', bm, 'accent')
+    # -- masquerade: eye mask and feather
+    bm = head_shell('m', lambda c: c.y < -.035 and 1.6 < c.z < 1.665 and not any(((c.x - sx * .043) ** 2 + (c.z - 1.625) ** 2) < .0002 for sx in (1, -1)), .008, 'accent'); part('acc_mask', bm, 'accent', uv=head_uv)
+    bm = bmesh.new()
+    for k in range(6): add_blob(bm, (.1 + k * .008, -.02, 1.62 + k * .02), (.008, .012, .022 - k * .002), 6, 4)
+    part('acc_feather', bm, 'neon')
+    return out
 
 # ---------------------------------------------------------------- morph targets: pure functions of position, shared by every mesh
 def gauss(p, c, r): return math.exp(-((p - Vector(c)).length / r) ** 2)
@@ -438,12 +515,13 @@ BODY_MORPHS = {'broad', 'slim', 'curvy', 'muscular', 'bust'}
 SKULL = {'faceWidth', 'faceLength'}
 ALLOWED = {
     'head': SKULL | {'jaw', 'chin', 'cheeks', 'forehead'}, 'eyes': SKULL | {'blink'}, 'brows': SKULL | {'browRaise', 'browAngry'}, 'nose': SKULL,
-    'mouth': SKULL | {'jaw', 'chin', 'smile', 'mouthOpen'}, 'cheeks': SKULL | {'cheeks'}, 'ears': SKULL, 'hair': SKULL, 'beard': SKULL | {'jaw', 'chin'},
+    'mouth': SKULL | {'jaw', 'chin', 'smile', 'mouthOpen'}, 'acc': SKULL, 'cheeks': SKULL | {'cheeks'}, 'ears': SKULL, 'hair': SKULL, 'beard': SKULL | {'jaw', 'chin'},
 }
 def add_shape_keys(obj):
     mesh = obj.data
     is_body = obj.name == 'body' or obj.name.startswith('cloth_')
     allowed = BODY_MORPHS if is_body else ALLOWED.get(obj.name.split('_')[0], set())
+    if obj.name == 'acc_cloak': allowed = BODY_MORPHS
     coords = [v.co.copy() for v in mesh.vertices]
     obj.shape_key_add(name='Basis', from_mix=False)
     for name, fn in MORPHS.items():
@@ -570,9 +648,9 @@ def build_actions(arm):
     ramp = lambda t, a=.25, b=.75: min(1, t / a, (1 - t) / (1 - b)) if a > 0 else 1
     make_action(arm, 'pour', P, {
         'chest': cycle(P, lambda t: (-4 * ramp(t), 0, -6 * ramp(t))), 'head': cycle(P, lambda t: (8 * ramp(t), 0, 0)),
-        'upper_arm.R': cycle(P, lambda t: (-70 * ramp(t), -20 * ramp(t), 0)), 'forearm.R': cycle(P, lambda t: (-55 * ramp(t), 0, 0)),
+        'upper_arm.R': cycle(P, lambda t: (-38 * ramp(t), -28 * ramp(t), 0)), 'forearm.R': cycle(P, lambda t: (-105 * ramp(t), 0, 0)),
         'hand.R': cycle(P, lambda t: (-70 * max(0, min(1, (t - .25) / .2, (.8 - t) / .2)), 0, 0)),
-        'upper_arm.L': cycle(P, lambda t: (-55 * ramp(t), 25 * ramp(t), 0)), 'forearm.L': cycle(P, lambda t: (-60 * ramp(t), 0, 0))})
+        'upper_arm.L': cycle(P, lambda t: (-30 * ramp(t), 32 * ramp(t), 0)), 'forearm.L': cycle(P, lambda t: (-100 * ramp(t), 0, 0))})
     S = 48
     shake_arm = lambda s, ph: {
         side('upper_arm', s): cycle(S, lambda t: (-58, -s * 30, 0)),
@@ -583,8 +661,8 @@ def build_actions(arm):
     make_action(arm, 'shake', S, keys)
     make_action(arm, 'stir', S, {
         'chest': cycle(S, lambda t: (-3, 0, sw(t, 3))), 'head': cycle(S, lambda t: (10, 0, 0)),
-        'upper_arm.R': cycle(S, lambda t: (-62 + sw(t + .25, 6), -18 + sw(t, 8), 0)), 'forearm.R': cycle(S, lambda t: (-58, 0, sw(t, 12))),
-        'upper_arm.L': cycle(S, lambda t: (-35, 20, 0)), 'forearm.L': cycle(S, lambda t: (-70, 0, 0))})
+        'upper_arm.R': cycle(S, lambda t: (-40 + sw(t + .25, 6), -22 + sw(t, 8), 0)), 'forearm.R': cycle(S, lambda t: (-100, 0, sw(t, 12))),
+        'upper_arm.L': cycle(S, lambda t: (-30, 28, 0)), 'forearm.L': cycle(S, lambda t: (-95, 0, 0))})
     V = 60
     make_action(arm, 'serve', V, {
         'chest': cycle(V, lambda t: (-8 * ramp(t, .3, .7), 0, 0)), 'head': cycle(V, lambda t: (-2, 0, 0)),
@@ -592,8 +670,8 @@ def build_actions(arm):
         'upper_arm.L': cycle(V, lambda t: (0, 8, 0))})
     make_action(arm, 'garnish', 60, {
         'chest': cycle(60, lambda t: (-4, 0, 3)), 'head': cycle(60, lambda t: (10, 0, 0)),
-        'upper_arm.R': cycle(60, lambda t: (-60 + sw(t * 2, 4), -15, 0)), 'forearm.R': cycle(60, lambda t: (-65, 0, 0)), 'hand.R': cycle(60, lambda t: (sw(t * 2, 15), 0, 0)),
-        'upper_arm.L': cycle(60, lambda t: (-40, 22, 0)), 'forearm.L': cycle(60, lambda t: (-75, 0, 0))})
+        'upper_arm.R': cycle(60, lambda t: (-38 + sw(t * 2, 4), -20, 0)), 'forearm.R': cycle(60, lambda t: (-100, 0, 0)), 'hand.R': cycle(60, lambda t: (sw(t * 2, 15), 0, 0)),
+        'upper_arm.L': cycle(60, lambda t: (-32, 26, 0)), 'forearm.L': cycle(60, lambda t: (-95, 0, 0))})
     make_action(arm, 'react_happy', 48, {
         'hips': [(f, (0, 0, 0), (0, 0, .02 * abs(sw(f / 48 * 2)))) for f in range(0, 49, 4)],
         'head': cycle(48, lambda t: (-4, 0, sw(t, 6))), 'chest': cycle(48, lambda t: (-3, 0, sw(t, 3))),
@@ -619,16 +697,19 @@ face = build_face(head)
 hair = build_hair()
 beards = build_beards(head)
 clothes = build_clothes(body)
+body_obj = body
+accessories = build_accessories()
 arm = build_armature()
-for obj in [body, head, *face, *hair, *beards, *clothes]:
+for obj in [body, head, *face, *hair, *beards, *clothes, *[a for a, _ in accessories]]:
     add_shape_keys(obj)
 HEAD_SCALE = 1.22
 head_matrix = Matrix.Translation((0, 0, 1.5)) @ Matrix.Scale(HEAD_SCALE, 4) @ Matrix.Translation((0, 0, -1.5))
-for obj in [head, *face, *hair, *beards]:
+for obj in [head, *face, *hair, *beards, *[a for a, bone in accessories if bone == 'head']]:
     obj.data.transform(head_matrix, shape_keys=True)
 skin_to(body, arm)
 for obj in clothes: skin_to(obj, arm)
 for obj in [head, *face, *hair, *beards]: skin_to(obj, arm, rigid_bone='head')
+for obj, bone in accessories: skin_to(obj, arm, rigid_bone=bone)
 build_actions(arm)
 
 # ---------------------------------------------------------------- optional preview render
@@ -648,6 +729,7 @@ def render(path, frame_action=None, frame=0, view='front'):
     bpy.ops.render.render(write_still=True)
 
 if render_prefix:
+    for o, _ in accessories: o.hide_render = True
     keep = {'hair_short', 'hair_pompadour', 'beard_short-beard', 'cloth_shirt', 'cloth_vest', 'cloth_pants', 'cloth_shoes', 'beard_moustache'}
     keep |= {'eyes_almond', 'brows_soft-arch', 'nose_soft', 'mouth_balanced', 'cheeks_soft', 'ears'}
     for o in list(face) + list(hair) + list(beards) + list(clothes):
@@ -664,6 +746,17 @@ for o in scene.objects: o.select_set(True)
 bpy.ops.export_scene.gltf(filepath=str(OUT), export_format='GLB', export_animations=True, export_animation_mode='ACTIONS', export_morph=True,
                           export_skins=True, export_apply=False, export_yup=True, export_image_format='NONE', export_cameras=False, export_lights=False)
 print('exported', OUT, OUT.stat().st_size // 1024, 'KB')
+
+# Meshopt compression (~4x smaller): uses gltf-transform if available (npm i -g @gltf-transform/cli). The game loads it with three's MeshoptDecoder.
+import shutil, subprocess
+tool = shutil.which('gltf-transform')
+if tool and '--no-compress' not in sys.argv:
+    packed = OUT.with_suffix('.packed.glb')
+    subprocess.run([tool, 'meshopt', str(OUT), str(packed), '--level', 'high'], check=True, capture_output=True)
+    packed.replace(OUT)
+    print('compressed', OUT.stat().st_size // 1024, 'KB')
+else:
+    print('skipped compression (install @gltf-transform/cli to shrink the file)')
 sys.stdout.flush()
 import os
 os._exit(0)   # bpy can crash while tearing down; the file is already written

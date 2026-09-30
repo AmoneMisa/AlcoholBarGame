@@ -27,7 +27,11 @@ function act(name: string, ms: number) {
   oneShotTimer = setTimeout(() => { oneShot.value = undefined; }, ms);
 }
 const bartenderAnimation = computed(() => oneShot.value ?? (game.conversationCustomerId ? 'talk' : 'idle'));
-watch(() => game.currentMix.reduce((sum, item) => sum + item.amount, 0), (now, before) => { if (now > before) act('pour', 1800); else if (now === 0 && before > 0) act('serve', 2000); });
+let coinsWhenPouring = game.money;
+watch(() => game.currentMix.reduce((sum, item) => sum + item.amount, 0), (now, before) => {
+  if (now > before) { coinsWhenPouring = game.money; act('pour', 1800); }
+  else if (now === 0 && before > 0 && game.money > coinsWhenPouring) act('serve', 2000);   // the mix emptied because a drink was served, not because the guest left
+});
 watch(() => game.shaken, (now) => { if (now) act('shake', 2200); });
 onBeforeUnmount(() => clearTimeout(oneShotTimer));
 withDefaults(defineProps<{ active?: boolean }>(), { active: true });

@@ -17,7 +17,7 @@ export interface Rig3d {
 export const genderOf = (character?: string): Gender => (character === 'leo' ? 'male' : 'female');
 export const modelUrl = (gender: Gender) => `/assets/characters3d/bartender-${gender}.glb`;
 // Mesh-name prefixes of the swappable slots: only the chosen mesh of each slot is shown.
-export const SLOT_PREFIXES = ['cloth_', 'hair_', 'beard_', 'eyes_', 'brows_', 'nose_', 'mouth_', 'cheeks_'] as const;
+export const SLOT_PREFIXES = ['cloth_', 'hair_', 'beard_', 'eyes_', 'brows_', 'nose_', 'mouth_', 'cheeks_', 'acc_'] as const;
 
 const FACE: Record<string, Morphs> = {
   oval: {}, heart: { jaw: -.8, chin: .3, forehead: .4, faceWidth: .1 }, square: { jaw: .9, chin: -.2, faceWidth: .15 }, round: { faceWidth: .5, faceLength: -.5, cheeks: .6 },
@@ -45,11 +45,16 @@ const HAIR: Record<string, string> = { espresso: '#2a1712', black: '#100e12', ch
 const EYE: Record<string, string> = { brown: '#4b2f25', hazel: '#7a6a32', green: '#4f764b', blue: '#4e7896', gray: '#76808a', amber: '#a66c27', violet: '#76548d', black: '#17151a' };
 const LIP: Record<string, string> = { bare: '#9b5f55', rose: '#a85169', nude: '#a86f62', berry: '#7f294b', red: '#b4243a', plum: '#62233e', coral: '#c9655d', brown: '#70443c', black: '#241b23', gloss: '#b66b72' };
 const LIGHT: Record<string, string> = { amber: '#ffd9a0', rose: '#ffb3c6', blue: '#b3d4ff', violet: '#d2b8ff', emerald: '#b3f0cf', ice: '#e3f6ff' };
-const OUTFIT: Record<string, { shirt: string; vest?: string; apron?: string }> = {
+interface OutfitDef { shirt: string; vest?: string; apron?: string; accent?: string; neon?: string; leather?: string; cape?: string; parts?: string[] }
+const OUTFIT: Record<string, OutfitDef> = {
   base: { shirt: '#8b8f99' }, vest: { shirt: '#eeece6', vest: '#59101f' }, shirt: { shirt: '#e8e6df' }, apron: { shirt: '#1a1a1f', apron: '#0f5a45' },
-  'special-gala': { shirt: '#f5f0e6', vest: '#1b1b24' }, 'special-cyberpunk': { shirt: '#15121f', vest: '#7a1fa0' }, 'special-steampunk': { shirt: '#d9c7a0', vest: '#5a3a1c' },
-  'special-post-apocalypse': { shirt: '#6b5e4a', vest: '#3a3f33' }, 'special-historical': { shirt: '#efe6d0', vest: '#4a2a3a' },
-  'special-fantasy': { shirt: '#d8e6d0', vest: '#2f5d4a' }, 'special-masquerade': { shirt: '#1a1420', vest: '#6d1a3a' }
+  'special-gala': { shirt: '#f5f0e6', vest: '#1b1b24', accent: '#d9b24c', parts: ['acc_bowtie', 'acc_pocket'] },
+  'special-cyberpunk': { shirt: '#15121f', vest: '#241a3a', neon: '#ff2bd6', parts: ['acc_visor', 'acc_shoulder-pads'] },
+  'special-steampunk': { shirt: '#d9c7a0', vest: '#5a3a1c', accent: '#b8862f', leather: '#3b2a1e', parts: ['acc_goggles', 'acc_tophat', 'acc_hatband', 'acc_belt'] },
+  'special-post-apocalypse': { shirt: '#6b5e4a', vest: '#3a3f33', leather: '#4a3a2a', parts: ['acc_bandana', 'acc_shoulder-plate', 'acc_bandolier'] },
+  'special-historical': { shirt: '#efe6d0', vest: '#4a2a3a', parts: ['acc_jabot', 'acc_tricorn'] },
+  'special-fantasy': { shirt: '#d8e6d0', vest: '#2f5d4a', accent: '#d9c36b', cape: '#3b2b5a', parts: ['acc_cloak', 'acc_circlet'] },
+  'special-masquerade': { shirt: '#1a1420', vest: '#6d1a3a', accent: '#d9b24c', neon: '#7fe0ff', parts: ['acc_mask', 'acc_feather'] }
 };
 const HAIR_MESH: Record<string, string> = { waves: 'shoulder-waves' };
 
@@ -76,6 +81,7 @@ export function rigFor(input: Look3dInput): Rig3d {
   ]);
   if (outfit.vest) visible.add('cloth_vest');
   if (outfit.apron) visible.add('cloth_apron');
+  for (const part of outfit.parts ?? []) visible.add(part);
   const hairMesh = `hair_${HAIR_MESH[style] ?? style}`;
   const beard = input.facialHair && input.facialHair !== 'clean' ? `beard_${input.facialHair}` : undefined;
   visible.add(hairMesh); if (beard) visible.add(beard);
@@ -83,7 +89,8 @@ export function rigFor(input: Look3dInput): Rig3d {
     gender, morphs,
     colors: {
       skin: shade(SKIN[input.skinTone ?? 'warm'] ?? SKIN.warm!, tan), hair, brow: shade(hair, .85), iris: EYE[input.eyeColor ?? 'brown'] ?? EYE.brown!, lip: LIP[input.lipColor ?? 'bare'] ?? LIP.bare!,
-      shirt: outfit.shirt, vest: outfit.vest ?? '#000000', apron: outfit.apron ?? '#000000', pants: '#15151b', shoes: '#0d0b0b', sclera: '#f2f1ee', pupil: '#050506', mouth: '#1c0508'
+      shirt: outfit.shirt, vest: outfit.vest ?? '#000000', apron: outfit.apron ?? '#000000', accent: outfit.accent ?? '#c2943f', neon: outfit.neon ?? '#ff2bd6',
+      leather: outfit.leather ?? '#3b2a1e', cape: outfit.cape ?? '#3a2a4a', trim: '#e9dfc9', pants: '#15151b', shoes: '#0d0b0b', sclera: '#f2f1ee', pupil: '#050506', mouth: '#1c0508'
     },
     hair: hairMesh, beard, visible,
     scale: (HEIGHT[input.bartenderCharacter ?? 'noa'] ?? 1) * (input.bodyShape === 'slim' ? 1.01 : 1),

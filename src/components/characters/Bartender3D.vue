@@ -4,6 +4,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { CLIP_FOR, EXPRESSION_MORPHS, SLOT_PREFIXES, modelUrl, rigFor, type Gender, type Look3dInput } from '../../domain/character3d';
 import { paintBody, paintCloth, paintHair, paintHead } from '../../domain/character3dTextures';
@@ -24,7 +25,7 @@ const rig = computed(() => rigFor(props.look));
 type Model = THREE.Group & { animations: THREE.AnimationClip[] };
 const models = new Map<Gender, Promise<Model>>();
 function loadModel(gender: Gender) {
-  if (!models.has(gender)) models.set(gender, new GLTFLoader().loadAsync(modelUrl(gender)).then((gltf) => Object.assign(gltf.scene, { animations: gltf.animations })));
+  if (!models.has(gender)) models.set(gender, new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(modelUrl(gender)).then((gltf) => Object.assign(gltf.scene, { animations: gltf.animations })));
   return models.get(gender)!;
 }
 
@@ -96,6 +97,7 @@ function applyLook() {
     if (SLOT_PREFIXES.some((prefix) => object.name.startsWith(prefix))) object.visible = next.visible.has(object.name.replace(/_\d+$/, ''));
   });
   for (const [role, color] of Object.entries(next.colors)) materials.get(role)?.color.set(color);
+  materials.get('neon')?.emissive.set(next.colors.neon!);
   paintTextures();
   root.scale.setScalar(next.scale);
   key.color.set(next.light);
@@ -128,7 +130,7 @@ function resize() {
 }
 function frameCamera() {
   // 'bust' frames head to hips (the bar hides the rest); 'full' shows the whole figure.
-  const [span, centre] = { head: [.5, 1.66], bust: [1.05, 1.36], full: [1.95, .93] }[props.crop];
+  const [span, centre] = { head: [.5, 1.66], bust: [1.05, 1.36], full: [2.05, .97] }[props.crop];
   const distance = span / 2 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
   camera.position.set(0, centre, distance * Math.max(1, 1 / camera.aspect * .55));
   camera.lookAt(0, centre, 0);

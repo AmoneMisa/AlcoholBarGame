@@ -1170,7 +1170,7 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
 /* Bartender: behind the painted counter, cut at its back edge. */
 .bar-scene .bartender-layer { top: calc(var(--back) - var(--bt-h) * .58) !important; right: auto !important; bottom: auto !important; left: calc(var(--bt-x) - var(--bt-h) * .28) !important;
   width: calc(var(--bt-h) * .56) !important; height: var(--bt-h) !important; transform: none !important; opacity: 1 !important; clip-path: inset(-12% -30% 42% -30%); }
-.bar-scene .bartender-layer .name-ribbon { top: 2%; right: auto; bottom: auto; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+.bar-scene .bartender-layer .name-ribbon { top: -24px; right: auto; bottom: auto; left: 50%; transform: translateX(-50%); white-space: nowrap; }  /* above the 3D bartender's head */
 
 /* The glass stands on the counter top next to the bartender. */
 .bar-scene .live-glass-station { top: auto !important; right: auto !important; bottom: calc(100% - var(--glass-y)) !important; left: var(--glass-x) !important; width: 120px !important; height: 150px !important; transform: translateX(-50%) !important; }
