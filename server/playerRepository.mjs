@@ -61,6 +61,10 @@ function pgTx(client) {
       const { rows } = await client.query('SELECT player_id, score, label, level FROM weekly_scores WHERE week = $1 ORDER BY score DESC, updated_at ASC, player_id ASC LIMIT $2', [week, limit]);
       return rows.map((row, index) => ({ playerId: Number(row.player_id), rank: index + 1, score: row.score, label: row.label, level: row.level }));
     },
+    async weeklyFor(week, playerIds) {
+      const { rows } = await client.query('SELECT player_id, score, label, level FROM weekly_scores WHERE week = $1 AND player_id = ANY($2::bigint[]) ORDER BY score DESC, updated_at ASC, player_id ASC', [week, playerIds]);
+      return rows.map((row) => ({ playerId: Number(row.player_id), score: row.score, label: row.label, level: row.level }));
+    },
     async weeklyStanding(week, playerId) {
       const { rows: [row] } = await client.query(`SELECT s.score,
           (SELECT COUNT(*) FROM weekly_scores o WHERE o.week = s.week AND (o.score > s.score OR (o.score = s.score AND (o.updated_at < s.updated_at OR (o.updated_at = s.updated_at AND o.player_id < s.player_id))))) + 1 AS rank,
@@ -153,6 +157,7 @@ export function createMemoryRepository() {
       weekly.set(key, { week, playerId, score: entry.score, label: entry.label, level: entry.level, order: ++weeklyOrder });
     },
     async topWeekly(week, limit) { return weeklyRows(week).slice(0, limit).map((row, index) => ({ playerId: row.playerId, rank: index + 1, score: row.score, label: row.label, level: row.level })); },
+    async weeklyFor(week, playerIds) { return weeklyRows(week).filter((row) => playerIds.includes(row.playerId)).map((row) => ({ playerId: row.playerId, score: row.score, label: row.label, level: row.level })); },
     async weeklyStanding(week, playerId) {
       const rows = weeklyRows(week);
       const index = rows.findIndex((row) => row.playerId === playerId);

@@ -70,13 +70,15 @@ const fame = computed(() => fameLevel(saved.value?.served ?? 0));
 const board = ref<LeaderboardResult | null>(null);
 const boardError = ref('');
 const boardLoading = ref(false);
+const boardScope = ref<'global' | 'friends'>('global');
 async function loadBoard() {
   if (game.mode !== 'online') return;
   boardLoading.value = true; boardError.value = '';
-  try { board.value = await fetchLeaderboard(); } catch (error) { boardError.value = (error as Error).message; }
+  try { board.value = await fetchLeaderboard(boardScope.value); } catch (error) { boardError.value = (error as Error).message; }
   boardLoading.value = false;
 }
 watch(tab, (next) => { if (next === 'weekly') void loadBoard(); });
+watch(boardScope, () => { void loadBoard(); });
 watch(() => game.loot.leaderboardClaimed, () => { if (tab.value === 'weekly') void loadBoard(); });
 const daysLeft = computed(() => board.value ? Math.max(0, Math.ceil((board.value.endsAt - Date.now()) / 86_400_000)) : 0);
 const rewardTable = [1, 2, 4, 11, 30].map((rank) => ({ rank, reward: leaderboardReward(rank, MIN_WEEKLY_SCORE)! }));
@@ -247,12 +249,13 @@ const boostLeft = (id: string) => {
       <article v-if="game.mode !== 'online'" class="card"><h3>🏆 Weekly leaderboard</h3><p>The leaderboard needs an online account. Open the game from Telegram to compete.</p></article>
       <template v-else>
         <article class="card">
-          <h3>🏆 This week's top bars</h3>
+          <h3>🏆 This week's {{ boardScope === 'friends' ? 'friends' : 'top bars' }}</h3>
+          <div class="row"><button type="button" :class="{ picked: boardScope === 'global' }" @click="boardScope = 'global'">Everyone</button><button type="button" :class="{ picked: boardScope === 'friends' }" @click="boardScope = 'friends'">Friends</button></div>
           <p>Score = XP you earn this week (serving, English, lessons). A drink pays the same XP at every level, so newcomers can win. Resets in {{ daysLeft }} day{{ daysLeft === 1 ? '' : 's' }}.</p>
           <p v-if="boardLoading">Loading…</p><p v-if="boardError" class="sig-error">{{ boardError }}</p>
           <ol v-if="board" class="board">
-            <li v-for="row in board.top" :key="row.rank" :class="{ me: row.me }"><b>{{ row.rank }}</b><span>{{ row.label }}<small> · level {{ row.level }}</small></span><em>{{ row.score }}</em></li>
-            <li v-if="!board.top.length" class="empty">Nobody has scored yet this week. Serve a drink to take the lead.</li>
+            <li v-for="row in board.top" :key="row.rank" :class="{ me: row.me }"><b>{{ row.rank }}</b><span>{{ row.label }}<small v-if="row.level"> · level {{ row.level }}</small></span><em>{{ row.score }}</em></li>
+            <li v-if="!board.top.length" class="empty">{{ boardScope === 'friends' ? 'Add friends in the Friends tab to compete with them.' : 'Nobody has scored yet this week. Serve a drink to take the lead.' }}</li>
           </ol>
           <p v-if="board?.me">You are <b>#{{ board.me.rank }}</b> of {{ board.me.size }} with {{ board.me.score }} XP.<template v-if="board.me.rank > LEADERBOARD_SIZE"> The list shows the top {{ LEADERBOARD_SIZE }}.</template></p>
           <p v-else-if="board">You have no score this week yet.</p>

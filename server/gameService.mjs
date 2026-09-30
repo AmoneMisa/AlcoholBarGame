@@ -90,18 +90,39 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
   }
 
   // The weekly leaderboard: the top bars by XP earned this week, the player's own rank, and last week's claimable reward.
-  async function leaderboard(identity) {
+  async function leaderboard(identity, scope = 'global') {
     return repository.transaction(async (tx) => {
       const player = await tx.findOrCreatePlayer(identity);
       const week = weekOf(now());
-      const top = await tx.topWeekly(week, LEADERBOARD_SIZE);
-      const mine = await tx.weeklyStanding(week, Number(player.id));
+      const ownId = Number(player.id);
+      let top;
+      let mine;
+      if (scope === 'friends') {
+        // Friends only: accepted friends plus me, including friends with no score yet. Names are the friends' own names.
+        const own = normalizePlayerState((await tx.readState(player.id)) ?? createInitialState(now()));
+        const friendIds = new Map();
+        for (const row of await tx.listFriendships(player.id)) {
+          if (row.status !== 'accepted') continue;
+          const otherId = Number(row.playerId) === ownId ? Number(row.friendId) : Number(row.playerId);
+          friendIds.set(otherId, own.friendLabels?.[String(otherId)] || row.name);
+        }
+        const scored = new Map((await tx.weeklyFor(week, [ownId, ...friendIds.keys()])).map((row) => [row.playerId, row]));
+        const entries = [ownId, ...friendIds.keys()].map((id) => ({ playerId: id, score: scored.get(id)?.score ?? 0, label: id === ownId ? (scored.get(id)?.label ?? own.bars[own.regionId].name) : (friendIds.get(id) || scored.get(id)?.label || 'Friend'), level: scored.get(id)?.level ?? null, order: [...scored.keys()].indexOf(id) }));
+        // Stable order: higher score first; equal scores keep the database order (who got there first); unscored last.
+        entries.sort((a, b) => b.score - a.score || (a.order < 0) - (b.order < 0) || a.order - b.order || a.playerId - b.playerId);
+        top = entries.slice(0, 50).map((row, index) => ({ playerId: row.playerId, rank: index + 1, score: row.score, label: row.label, level: row.level }));
+        const at = entries.findIndex((row) => row.playerId === ownId);
+        mine = at < 0 ? null : { week, rank: at + 1, size: entries.length, score: entries[at].score };
+      } else {
+        top = await tx.topWeekly(week, LEADERBOARD_SIZE);
+        mine = await tx.weeklyStanding(week, ownId);
+      }
       const previous = await tx.weeklyStanding(week - 1, Number(player.id));
       const record = await tx.lockState(player.id);
       const claimed = normalizePlayerState(record?.state ?? createInitialState(now())).loot.leaderboardClaimed;
       const reward = previous ? leaderboardReward(previous.rank, previous.score) : undefined;
       return {
-        ok: true, week, endsAt: (week + 1) * WEEK_MS, minScore: MIN_WEEKLY_SCORE,
+        ok: true, scope: scope === 'friends' ? 'friends' : 'global', week, endsAt: (week + 1) * WEEK_MS, minScore: MIN_WEEKLY_SCORE,
         top: top.map((row) => ({ rank: row.rank, label: row.label, level: row.level, score: row.score, me: row.playerId === Number(player.id) })),
         me: mine, previous: previous ? { ...previous, tier: reward?.tier ?? null, reward: reward ? describeLeaderboardReward(reward) : null, claimable: !!reward && claimed < previous.week } : null
       };

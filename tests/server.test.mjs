@@ -398,3 +398,44 @@ test('Weekly leaderboard: ranks by XP earned this week, shows bar names only, an
   clock += WEEK_MS;
   assert.equal((await act(service, { type: 'claimLeaderboardReward' }, requestId(), a)).ok, false);
 });
+
+test('Friends-only leaderboard lists me and accepted friends (even unscored), never strangers or pending requests', async () => {
+  const { weekOf } = await import('../src/domain/quests.ts');
+  const clock = Date.UTC(2026, 8, 30, 12);
+  const { repository, service } = makeService(() => clock);
+  const me = identity(1101), friend = identity(1102), quiet = identity(1103), stranger = identity(1104), pending = identity(1105);
+  const sMe = await service.session(me), sFriend = await service.session(friend), sQuiet = await service.session(quiet), sStranger = await service.session(stranger), sPending = await service.session(pending);
+  for (const other of [friend, quiet]) {
+    const target = other === friend ? sFriend : sQuiet;
+    assert.ok((await service.addFriend(me, target.player.friendCode)).status < 400);
+    await service.answerFriend(other, sMe.player.friendCode, true);
+  }
+  await service.addFriend(me, sPending.player.friendCode); // never answered
+  const week = weekOf(clock);
+  await repository.transaction(async (tx) => {
+    await tx.setWeeklyScore(Number(sMe.player.id), week, { score: 200, label: 'My Bar', level: 4 });
+    await tx.setWeeklyScore(Number(sFriend.player.id), week, { score: 900, label: 'Friend Bar', level: 9 });
+    await tx.setWeeklyScore(Number(sStranger.player.id), week, { score: 5000, label: 'Stranger Bar', level: 30 });
+    await tx.setWeeklyScore(Number(sPending.player.id), week, { score: 4000, label: 'Pending Bar', level: 30 });
+  });
+  const global = await service.leaderboard(me);
+  assert.equal(global.scope, 'global');
+  assert.equal(global.top[0].label, 'Stranger Bar');
+
+  const board = await service.leaderboard(me, 'friends');
+  assert.equal(board.scope, 'friends');
+  assert.deepEqual(board.top.map((row) => row.rank), [1, 2, 3]);
+  assert.equal(board.top[0].score, 900, 'the friend leads');
+  assert.equal(board.top[0].label, 'Player 1102', 'friends show their own names');
+  assert.equal(board.top[1].me, true);
+  assert.equal(board.top[2].score, 0, 'an unscored friend is still listed, last');
+  assert.deepEqual(board.me, { week, rank: 2, size: 3, score: 200 });
+  assert.doesNotMatch(JSON.stringify(board), /Stranger|Pending/);
+
+  // A player with no friends sees only themselves.
+  const alone = await service.leaderboard(stranger, 'friends');
+  assert.equal(alone.top.length, 1);
+  assert.equal(alone.top[0].me, true);
+  // Unknown scopes fall back to the global board.
+  assert.equal((await service.leaderboard(me, 'bogus')).scope, 'global');
+});
