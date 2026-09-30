@@ -27,7 +27,7 @@ function play(serves) {
   }
   return { state, milestones };
 }
-const { state, milestones } = play(400);
+const { state, milestones } = play(900);
 console.log(JSON.stringify(milestones, null, 1));
 let coins = 0, parts = 0; for (let l = 0; l < 10; l++) { coins += upgradeCostFor(l).coins; parts += upgradeCostFor(l).parts; }
 console.log('one item to level 10:', { coins, parts }, 'level5:', [0,1,2,3,4].reduce((a,l)=>({c:a.c+upgradeCostFor(l).coins,p:a.p+upgradeCostFor(l).parts}),{c:0,p:0}));

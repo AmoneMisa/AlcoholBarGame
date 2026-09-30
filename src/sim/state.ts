@@ -256,5 +256,5 @@ export function normalizePlayerState(state: PlayerState) {
   return state;
 }
 
-// Levels follow a rising XP curve (60, 80, 100… XP per level) — see domain/progression.ts.
+// Levels follow a rising XP curve (60, 130, 200… XP per level) — see domain/progression.ts.
 export { levelFor } from '../domain/progression';

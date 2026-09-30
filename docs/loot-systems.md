@@ -19,7 +19,7 @@ Random actions (`openBox`, `pickReward`, `drawStyle`, `prestige`) are server-onl
 
 ## Balance notes
 `scripts/sim-loot.mjs` (run with `node --import ./tests/register.mjs scripts/sim-loot.mjs`) plays ~400 perfect serves with the real rules and opens every box earned. Findings that shaped the numbers:
-- A run to level 50 takes ~230 serves and earns 5-9k coins, so equipment costs were cut from 90·n^1.7 to 35·n^1.5 coins (level 5 ≈ 1k coins / 29 parts, level 10 ≈ 5k / 95 parts per item).
+- The XP curve now needs ~700 served orders for the level 50 cap (steps of 60, 130, 200… XP; level 25 ≈ 170 serves). A run earns ~15-19k coins, ~600 parts and ~900 crystals; one fully upgraded bar (all six items at level 8 ≈ 18k coins / 400 parts) roughly matches a run's income. Equipment costs were cut from 90·n^1.7 to 35·n^1.5 coins (level 5 ≈ 1k coins / 29 parts, level 10 ≈ 5k / 95 parts per item).
 - Box coins were worth more than serving itself (13k vs ~8k per run); coin rewards and their level scaling (1 + level/25) were cut so boxes are ~25 % of run income.
 - Bronze boxes come every second level (was every level), silver from special guests 40 % of the time.
 - Equipment effects: shaker 2 %/level, register 1.5 %/level; prestige pay 1.5 %/rank; tier promotion 8 / 20 shards; draw 50 / 450 crystals.

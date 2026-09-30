@@ -427,7 +427,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const tipped = !auto && (golden || rollTip(state, guest, now, random));
         const tip = tipped ? Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .2 : .1) * economyOf(state, now).tips * mastery.tips) + (bonus ? 2 : 0) : 0;
         state.money = coins(state.money + revenue + tip);
-        // About 60 successful orders reach level 25: roughly four medium two-hour play days.
+        // About 170 successful orders reach level 25 and about 700 reach the level 50 cap.
         state.xp += xpGain(state, 100 + Math.min(state.streak * 2, 14), now);
         state.streak += 1;
         track(state, 'serves', 1, now);
