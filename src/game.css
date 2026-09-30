@@ -702,9 +702,9 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
 /* Guests sit on the painted stools, in front of the counter. */
 .bar-scene .bar-cast { display: block !important; inset: 0 !important; }
 .bar-scene .scene-customer { position: absolute !important; top: 0 !important; bottom: 0 !important; width: calc(var(--guest-h) * .72) !important; min-width: 0 !important; height: auto !important; transform: translateX(-50%) !important; }
-.bar-scene .scene-customer .art-character { top: auto !important; right: 0 !important; left: 0 !important; bottom: calc(100% - var(--back) - 2px) !important; height: var(--guest-h) !important; }
+.bar-scene .scene-customer .art-character { top: auto !important; right: 0 !important; left: 0 !important; bottom: calc(100% - var(--seat-top) - 2px) !important; height: var(--guest-h) !important; }
 .bar-scene .scene-customer.active .art-character { transform: none; }
-.bar-scene .speech-bubble { top: auto !important; bottom: calc(100% - var(--back) + var(--guest-h) * .72) !important; }
+.bar-scene .speech-bubble { top: auto !important; bottom: calc(100% - var(--seat-top) + var(--guest-h) * .72) !important; }
 .bar-scene .customer-plate { top: calc(var(--seat-top) + 6px) !important; right: 4% !important; bottom: auto !important; left: 4% !important; }
 @media (max-width: 760px) {
   .bar-scene .bartender-layer { display: block !important; }
@@ -716,8 +716,8 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
 .bar-scene .scene-customer.bubble-left .speech-bubble::after { right: 17px; left: auto; }
 @media (max-width: 760px) { .bar-scene .speech-bubble { width: 136px !important; left: 64% !important; } .bar-scene .scene-customer.bubble-left .speech-bubble { right: 64% !important; } }
 .bar-scene .customer-plate { top: min(calc(var(--seat-top) + 6px), calc(100% - 86px)) !important; }
-.bar-scene .speech-bubble { bottom: calc(100% - var(--back) + var(--guest-h) * .48) !important; }
-.customer-ashtray { position:absolute;z-index:12;top:calc(var(--back) - 6px);left:72%;width:34px;height:11px;transform:translate(-50%,-50%);border:2px solid #aeb5bd;border-radius:50%;background:radial-gradient(ellipse,#1d252d 0 38%,#78818a 42% 55%,#c8d0d5 58% 70%,#555d65 72%);box-shadow:0 4px 5px #0008;pointer-events:none; }
+.bar-scene .speech-bubble { bottom: calc(100% - var(--seat-top) + var(--guest-h) * .48) !important; }
+.customer-ashtray { position:absolute;z-index:12;top:calc(var(--seat-top) - 6px);left:72%;width:34px;height:11px;transform:translate(-50%,-50%);border:2px solid #aeb5bd;border-radius:50%;background:radial-gradient(ellipse,#1d252d 0 38%,#78818a 42% 55%,#c8d0d5 58% 70%,#555d65 72%);box-shadow:0 4px 5px #0008;pointer-events:none; }
 .customer-ashtray i { position:absolute;right:4px;top:-2px;width:20px;height:3px;border-radius:3px;background:linear-gradient(90deg,#e5d6bc 0 68%,#93402c 70% 82%,#dedede 84%);transform:rotate(-8deg);box-shadow:0 0 3px #d68a58; }
 /* The city event chip moves away from a shelf painted on the right. */
 .bar-scene.shelf-right.is-building .city-event.compact { right: auto !important; left: 22px !important; }
@@ -849,7 +849,7 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
 .bar-scene .bar-cast .scene-customer { pointer-events: auto; }
 
 /* Phones: swipe sideways over the guest band to bring the other guests to the stools. */
-.bar-scene .guest-scroller { position: absolute; z-index: 7; left: 0; bottom: calc(100% - var(--back) - 6px); width: var(--scroll-w, 100%); height: calc(var(--guest-h) + 6px); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; scrollbar-width: none; touch-action: pan-x; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+.bar-scene .guest-scroller { position: absolute; z-index: 7; left: 0; bottom: calc(100% - var(--seat-top) - 6px); width: var(--scroll-w, 100%); height: calc(var(--guest-h) + 6px); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; scrollbar-width: none; touch-action: pan-x; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
 .bar-scene .guest-scroller::-webkit-scrollbar { display: none; }
 .bar-scene .guest-scroll-track { height: 1px; }
 .bar-scene .guest-scroll-hint { position: sticky; left: 8px; top: 6px; display: inline-block; margin: -1px 0 0 8px; padding: 3px 8px; border-radius: 99px; background: #150f1ccc; color: #ffd98b; font-size: 9px; font-weight: 800; letter-spacing: .05em; pointer-events: none; animation: guestHint 1.6s ease-in-out infinite alternate; }

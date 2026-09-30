@@ -453,7 +453,7 @@ onBeforeUnmount(() => {
       <!-- The wait for the next guest is shown once, in the panel below the scene (with “Welcome now”). -->
     </div>
     <div v-if="buildingEnabled" ref="glassTarget" class="live-glass-station" :class="{ 'drag-over': dragOverGlass }">
-      <div class="live-glass-copy"><b>{{ dragOverGlass ? 'POURING' : totalAmount ? `${totalAmount} ML` : 'YOUR GLASS' }}</b><small>{{ itemCount ? `+ ${itemCount} fresh item${itemCount === 1 ? '' : 's'}` : 'Drag bottle over the glass' }}</small></div>
+      <div v-if="dragOverGlass || totalAmount" class="live-glass-copy"><b>{{ dragOverGlass ? 'POURING' : `${totalAmount} ML` }}</b><small v-if="itemCount">+ {{ itemCount }} fresh item{{ itemCount === 1 ? '' : 's' }}</small></div>
       <div class="live-glass-wrap">
         <Glass3D type="highball" :fill="fill" :color="liquidColor" :ice="ice" :garnish="garnish" :bubbles="hasBubbles" :pouring="dragOverGlass ? (selectedIngredient ? colorMap[selectedIngredient.id] ?? liquidColor : liquidColor) : undefined" :shaking="oneShot === 'shake'" />
         <button class="fresh-plus" type="button" :aria-expanded="freshPickerOpen" aria-label="Add fruit, ice, herb, or garnish" @click="freshPickerOpen = !freshPickerOpen"><span>+</span><small>fresh</small></button>
