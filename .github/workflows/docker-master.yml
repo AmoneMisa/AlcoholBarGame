@@ -27,7 +27,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
 
       - name: Enable Corepack
         run: corepack enable
@@ -114,14 +114,19 @@ jobs:
           $SSH "mkdir -p '$DEPLOY_PATH'"
           scp -i ~/.ssh/deploy_key -P "$DEPLOY_PORT" deploy/compose.prod.yaml deploy/Caddyfile "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/"
           echo "$REGISTRY_TOKEN" | $SSH "docker login ghcr.io -u '${GITHUB_ACTOR}' --password-stdin"
-          $SSH "cd '$DEPLOY_PATH' && export APP_IMAGE='$IMAGE' && docker compose -f compose.prod.yaml pull app && docker compose -f compose.prod.yaml up -d --remove-orphans && sed -i 's#^APP_IMAGE=.*#APP_IMAGE=$IMAGE#' .env && docker image prune -f"
+          $SSH "cd '$DEPLOY_PATH' && test -r .env || { echo 'Deployment error: $DEPLOY_PATH/.env is missing or unreadable.' >&2; exit 1; }"
+          $SSH "cd '$DEPLOY_PATH' && APP_IMAGE='$IMAGE' docker compose --env-file .env -f compose.prod.yaml pull app"
+          # Only the application image changed. Do not recreate or restart Postgres and Caddy.
+          $SSH "cd '$DEPLOY_PATH' && APP_IMAGE='$IMAGE' docker compose --env-file .env -f compose.prod.yaml up -d --no-deps app"
+          # Persist the image only after the new container has started successfully.
+          $SSH "cd '$DEPLOY_PATH' && if grep -q '^APP_IMAGE=' .env; then sed -i 's#^APP_IMAGE=.*#APP_IMAGE=$IMAGE#' .env; else printf '\\nAPP_IMAGE=%s\\n' '$IMAGE' >> .env; fi && docker image prune -f"
           echo "Deployed $IMAGE"
 
       - name: Health check
         if: steps.config.outputs.enabled == 'true'
         run: |
           for attempt in $(seq 1 20); do
-            if ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "curl -fsS http://127.0.0.1/api/health -H 'Host: localhost' >/dev/null 2>&1 || docker compose -f $DEPLOY_PATH/compose.prod.yaml exec -T app node -e \"fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""; then
+            if ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "cd '$DEPLOY_PATH' && docker compose --env-file .env -f compose.prod.yaml exec -T app node -e \"fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""; then
               echo "Game is healthy."; exit 0
             fi
             sleep 6

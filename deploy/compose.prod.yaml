@@ -1,6 +1,6 @@
 # Production stack on the server: Postgres + the game (image from GitHub Container Registry) + Caddy (HTTPS).
 # Lives in the deploy directory on the server (default /opt/barlingo) next to Caddyfile and .env.
-# The CI deploy job updates it with:  docker compose -f compose.prod.yaml pull app && docker compose -f compose.prod.yaml up -d
+# CI passes this file an explicit server-side .env and updates only `app` with --no-deps.
 name: barlingo
 
 services:
