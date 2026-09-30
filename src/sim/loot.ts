@@ -45,7 +45,7 @@ export function lootBonuses(state: PlayerState, now: number) {
     deliveryFactor: 1 - effect(state, 'fridge'),
     patienceFactor: 1 + effect(state, 'speakers'),
     // Cash register, prestige name and the Coin Booster multiply what guests pay.
-    payFactor: (1 + effect(state, 'register')) * (1 + perkRank(state, 'pay') * .02) * (boostActive(state, 'coin-boost', now) ? 1.25 : 1),
+    payFactor: (1 + effect(state, 'register')) * (1 + perkRank(state, 'pay') * .015) * (boostActive(state, 'coin-boost', now) ? 1.25 : 1),
     supplyFactor: 1 - perkRank(state, 'supply') * .02,
     bottleCostFactor: 1 - effect(state, 'cellar'),
     xpFactor: boostActive(state, 'xp-boost', now) ? 1.5 : 1,
@@ -240,7 +240,7 @@ export function craftSkin(state: PlayerState, cosmeticId: unknown) {
 export function dropAfterServe(state: PlayerState, vip: boolean, special: boolean, random: () => number) {
   const found: string[] = [];
   if (random() < .35) { const amount = 1 + Math.floor(random() * 3); state.loot.parts += amount; found.push(`${amount} workshop parts`); }
-  if (special) { grantBox(state, 'silver'); found.push('a silver box'); }
+  if (special && random() < .4) { grantBox(state, 'silver'); found.push('a silver box'); }
   else if (vip && random() < .3) { grantBox(state, 'bronze'); found.push('a bronze box'); }
   return found.length ? ` Found ${found.join(' and ')}.` : '';
 }
@@ -248,7 +248,9 @@ export function grantLevelBoxes(state: PlayerState) {
   const level = levelFor(state.xp);
   const gained: string[] = [];
   for (let next = state.loot.levelRewarded + 1; next <= level; next++) {
-    const kind: BoxKind = next % 10 === 0 ? 'choice' : next % 5 === 0 ? 'silver' : 'bronze';
+    // Every second level gives a bronze box, every fifth a silver one, every tenth a choice box.
+    const kind: BoxKind | undefined = next % 10 === 0 ? 'choice' : next % 5 === 0 ? 'silver' : next % 2 === 0 ? 'bronze' : undefined;
+    if (!kind) continue;
     grantBox(state, kind);
     gained.push(boxDef(kind)!.name);
   }

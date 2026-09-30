@@ -42,7 +42,7 @@ test('Equipment upgrades cost coins and parts, respect the tier cap and are per 
   run(state, { type: 'promoteEquipment', item: 'register' });
   run(state, { type: 'upgradeEquipment', item: 'register' });
   assert.equal(state.loot.equipment['new-york'].register.level, TIER_LEVEL_CAP.common + 1);
-  assert.ok(lootBonuses(state, NOW).payFactor > 1.06);
+  assert.ok(lootBonuses(state, NOW).payFactor > 1.07);
 });
 
 test('A refused upgrade never spends anything', () => {
@@ -147,13 +147,13 @@ test('Level-ups grant boxes exactly once', () => {
   run(state, { type: 'tick' });
   assert.equal(state.loot.boxes.choice, undefined);
   assert.equal(state.loot.boxes.silver, 1);
-  assert.equal(state.loot.boxes.bronze, 7);
+  assert.equal(state.loot.boxes.bronze, 4);
   state.xp = xpForLevel(10);
   run(state, { type: 'tick' });
   assert.equal(state.loot.boxes.choice, 1);
   run(state, { type: 'tick' });
   assert.equal(state.loot.boxes.choice, 1);
-  assert.equal(state.loot.boxes.bronze, 7);
+  assert.equal(state.loot.boxes.bronze, 4);
 });
 
 test('Prestige needs level 50, resets the business, keeps recipes and crystals, and stars buy permanent perks', () => {
@@ -178,7 +178,7 @@ test('Prestige needs level 50, resets the business, keeps recipes and crystals, 
   run(state, { type: 'buyPrestigePerk', perk: 'pay' });
   run(state, { type: 'buyPrestigePerk', perk: 'bank' });
   assert.equal(state.loot.prestige.stars, stars - 2);
-  assert.equal(lootBonuses(state, NOW).payFactor, 1.02);
+  assert.equal(lootBonuses(state, NOW).payFactor, 1.015);
   state.loot.prestige.stars = 0;
   assert.throws(() => run(state, { type: 'buyPrestigePerk', perk: 'supply' }), /stars/);
   assert.throws(() => run(state, { type: 'buyPrestigePerk', perk: 'fake' }), /Unknown/);

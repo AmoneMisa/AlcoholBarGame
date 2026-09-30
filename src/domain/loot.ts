@@ -7,7 +7,7 @@ export type EquipmentTier = 'common' | 'rare' | 'legendary';
 export const TIER_ORDER: EquipmentTier[] = ['common', 'rare', 'legendary'];
 export const TIER_LEVEL_CAP: Record<EquipmentTier, number> = { common: 5, rare: 8, legendary: 10 };
 // Item shards needed to raise a tier (common → rare, rare → legendary).
-export const TIER_SHARD_COST: Record<EquipmentTier, number | undefined> = { common: 10, rare: 25, legendary: undefined };
+export const TIER_SHARD_COST: Record<EquipmentTier, number | undefined> = { common: 8, rare: 20, legendary: undefined };
 export const EQUIPMENT_MAX_LEVEL = 10;
 
 export interface EquipmentDef {
@@ -16,11 +16,11 @@ export interface EquipmentDef {
   perLevel: number; unit: string;
 }
 export const EQUIPMENT: EquipmentDef[] = [
-  { id: 'shaker', name: 'Pro shaker', icon: '🍸', description: 'Guests tip more often.', perLevel: .015, unit: 'tip chance' },
+  { id: 'shaker', name: 'Pro shaker', icon: '🍸', description: 'Guests tip more often.', perLevel: .02, unit: 'tip chance' },
   { id: 'ice-machine', name: 'Ice machine', icon: '🧊', description: 'Every drink pours a little less liquid from stock.', perLevel: .015, unit: 'liquid saved' },
   { id: 'fridge', name: 'Back-bar fridge', icon: '❄️', description: 'Supplier deliveries arrive sooner.', perLevel: .03, unit: 'faster deliveries' },
   { id: 'speakers', name: 'Sound system', icon: '🎷', description: 'Guests wait longer before they leave.', perLevel: .025, unit: 'guest patience' },
-  { id: 'register', name: 'Cash register', icon: '💰', description: 'Guests pay more for every drink.', perLevel: .012, unit: 'drink price' },
+  { id: 'register', name: 'Cash register', icon: '💰', description: 'Guests pay more for every drink.', perLevel: .015, unit: 'drink price' },
   { id: 'cellar', name: 'Wine cellar', icon: '🍾', description: 'Bottle restocking costs fewer crystals.', perLevel: .02, unit: 'bottle cost' }
 ];
 export const equipmentDef = (id: string) => EQUIPMENT.find((item) => item.id === id);
@@ -34,7 +34,7 @@ export function levelCap(tier: EquipmentTier, prestigeCapBonus = 0) {
 // Coins and workshop parts needed to go from `level` to `level + 1`.
 export function upgradeCostFor(level: number) {
   const next = level + 1;
-  return { coins: Math.round(90 * Math.pow(next, 1.7)), parts: 2 + next * 2 };
+  return { coins: Math.round(35 * Math.pow(next, 1.5)), parts: 1 + Math.ceil(next * 1.5) };
 }
 
 // ---- Materials and consumables ----
@@ -86,7 +86,7 @@ const shards = (min: number, max: number): Entry['make'] => (_l, random) => ({ k
 export const BOX_TABLES: Record<Exclude<BoxKind, 'choice'>, Entry[]> = {
   bronze: [
     { weight: 30, make: (_l, r) => ({ kind: 'parts', amount: between(r, 3, 6) }) },
-    { weight: 26, make: (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 60, 120) * (1 + l / 10)) }) },
+    { weight: 26, make: (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 25, 50) * (1 + l / 25)) }) },
     { weight: 20, make: consumable(['golden-ice', 'voucher', 'second-chance']) },
     { weight: 10, make: consumable(['tip-boost', 'happy-hour']) },
     { weight: 8, make: shards(1, 2) },
@@ -95,8 +95,8 @@ export const BOX_TABLES: Record<Exclude<BoxKind, 'choice'>, Entry[]> = {
   ],
   silver: [
     { weight: 24, make: (_l, r) => ({ kind: 'parts', amount: between(r, 6, 12) }) },
-    { weight: 20, make: (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 150, 320) * (1 + l / 10)) }) },
-    { weight: 16, make: shards(2, 5) },
+    { weight: 20, make: (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 60, 120) * (1 + l / 25)) }) },
+    { weight: 16, make: shards(3, 6) },
     { weight: 14, make: consumable(['xp-boost', 'coin-boost', 'tip-boost', 'happy-hour']) },
     { weight: 10, make: consumable(['courier', 'golden-ice', 'voucher']) },
     { weight: 8, make: (_l, r) => ({ kind: 'skinShards', amount: between(r, 4, 9) }) },
@@ -105,12 +105,12 @@ export const BOX_TABLES: Record<Exclude<BoxKind, 'choice'>, Entry[]> = {
   ],
   gold: [
     { weight: 22, make: (_l, r) => ({ kind: 'crystals', amount: between(r, 30, 60) }) },
-    { weight: 18, make: shards(5, 10) },
+    { weight: 18, make: shards(6, 12) },
     { weight: 16, make: (_l, r) => ({ kind: 'skinShards', amount: between(r, 10, 20) }) },
     { weight: 14, make: () => ({ kind: 'recipeCard' }) },
     { weight: 10, make: () => ({ kind: 'mysteryBottle' }) },
     { weight: 8, make: consumable(['vip-magnet', 'scroll']) },
-    { weight: 8, make: (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 500, 900) * (1 + l / 10)) }) },
+    { weight: 8, make: (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 200, 350) * (1 + l / 25)) }) },
     { weight: 4, make: (_l, r) => ({ kind: 'parts', amount: between(r, 20, 30) }) }
   ]
 };
@@ -147,7 +147,7 @@ export function describeReward(reward: Reward, names: { consumable: (id: string)
 }
 
 // ---- Style draw (skins gacha) ----
-export const DRAW_COST = { single: 60, ten: 540 } as const;
+export const DRAW_COST = { single: 50, ten: 450 } as const;
 export const LEGENDARY_PITY = 50;
 export const RARE_PITY = 10;
 // Base odds; shown in the interface. A duplicate becomes skin shards instead of a lost pull.
@@ -175,7 +175,7 @@ export const ARMED_CHARGES = ['golden-ice', 'voucher', 'second-chance'] as const
 export const PRESTIGE_LEVEL = 50;
 export type PrestigePerkId = 'pay' | 'supply' | 'cap' | 'bank';
 export const PRESTIGE_PERKS: { id: PrestigePerkId; name: string; description: string; maxRank: number }[] = [
-  { id: 'pay', name: 'Renowned name', description: '+2% guest pay per rank.', maxRank: 10 },
+  { id: 'pay', name: 'Renowned name', description: '+1.5% guest pay per rank.', maxRank: 10 },
   { id: 'supply', name: 'Trade contacts', description: '−2% supplier prices per rank.', maxRank: 8 },
   { id: 'cap', name: 'Master craftsmen', description: '+1 equipment level cap per rank.', maxRank: 3 },
   { id: 'bank', name: 'Family fortune', description: '+300 starting coins after each Grand Opening per rank.', maxRank: 5 }

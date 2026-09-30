@@ -16,3 +16,10 @@ Random actions (`openBox`, `pickReward`, `drawStyle`, `prestige`) are server-onl
 - **Weekly quests**: three per week, rotating from the server clock; progress resets each week; reward crystals plus a box.
 - **Achievements**: lifetime counters (kept through prestige); larger ones give a choice box.
 - **Tasting log**: the first successful serve of each recipe gives 2 parts and 3 skin shards; each newly poured brand gives 1 skin shard.
+
+## Balance notes
+`scripts/sim-loot.mjs` (run with `node --import ./tests/register.mjs scripts/sim-loot.mjs`) plays ~400 perfect serves with the real rules and opens every box earned. Findings that shaped the numbers:
+- A run to level 50 takes ~230 serves and earns 5-9k coins, so equipment costs were cut from 90·n^1.7 to 35·n^1.5 coins (level 5 ≈ 1k coins / 29 parts, level 10 ≈ 5k / 95 parts per item).
+- Box coins were worth more than serving itself (13k vs ~8k per run); coin rewards and their level scaling (1 + level/25) were cut so boxes are ~25 % of run income.
+- Bronze boxes come every second level (was every level), silver from special guests 40 % of the time.
+- Equipment effects: shaker 2 %/level, register 1.5 %/level; prestige pay 1.5 %/rank; tier promotion 8 / 20 shards; draw 50 / 450 crystals.
