@@ -19,7 +19,7 @@ const gridPosition = (index: number, columns: number, rows: number) => {
 };
 const kind = computed(() => props.ingredient.unit === 'ml' ? 'bottle' : props.ingredient.id in ingredientArt ? 'ingredient' : 'vector');
 const spriteStyle = computed(() => kind.value === 'ingredient' ? ({
-  backgroundImage: "url('/assets/drinks/ingredients/velvet-ingredients-v2.png')",
+  backgroundImage: "url('/assets/drinks/ingredients/velvet-ingredients-v2.webp')",
   backgroundSize: '400% 200%',
   backgroundPosition: gridPosition(ingredientArt[props.ingredient.id], 4, 2)
 }) : paintedBottleSpriteStyle(ingredientBottleArtIndex(props.ingredient.id) ?? 0));
