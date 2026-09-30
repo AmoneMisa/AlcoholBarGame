@@ -1,12 +1,12 @@
-import type { Customer, Recipe, Supplier, SupplierOffer } from './types';
+import type { Customer, Recipe, RegionId, Supplier, SupplierOffer } from './types';
 
 export const coins = (value: number) => Math.round(value * 100) / 100;
 export const bulkDiscount = (packs: number) => packs >= 10 ? .10 : packs >= 5 ? .05 : 0;
-export const DAILY_COINS = [150, 250, 400, 550, 700, 850, 1000] as const;
+export const DAILY_COINS = [100, 150, 200, 260, 320, 400, 500] as const;
 export const dailyCoinsFor = (streak: number) => DAILY_COINS[Math.min(6, Math.max(0, Math.floor(streak) - 1))]!;
 export const dailyCrystalsFor = (streak: number) => {
   const day = ((Math.max(1, Math.floor(streak)) - 1) % 7) + 1;
-  return day === 7 ? 120 : day === 3 ? 45 : 0;
+  return day === 7 ? 90 : day === 3 ? 30 : 0;
 };
 
 // Premium currency can only move into earned currency. Fixed server-known bundles prevent a client
@@ -62,4 +62,23 @@ export function quotePurchase(offers: SupplierOffer[], cart: Record<string, numb
   const discountedSubtotal = coins(subtotal - discount);
   const delivery = lines.length && discountedSubtotal < supplier.freeDeliveryAt ? supplier.deliveryFee : 0;
   return { lines, packs, subtotal, discountRate, discount, delivery, total: coins(discountedSubtotal + delivery), freeDeliveryRemaining: coins(Math.max(0, supplier.freeDeliveryAt - discountedSubtotal)) };
+}
+
+// ---- City economy ----
+// Every city has signature cocktails its guests pay a premium for; everything else follows the city's price level.
+export const SPECIALTY_PREMIUM = .2;
+export const CITY_SPECIALTIES: Record<RegionId, string[]> = {
+  'new-york': ['manhattan', 'cosmopolitan', 'long-island', 'martini'],
+  london: ['gin-tonic', 'tom-collins', 'french-75', 'white-lady', 'bees-knees'],
+  berlin: ['negroni', 'aperol-spritz', 'hugo-spritz', 'moscow-mule'],
+  tashkent: ['mojito', 'pina-colada', 'whiskey-ginger', 'madras'],
+  bucharest: ['daiquiri', 'cuba-libre', 'sex-on-the-beach', 'woo-woo'],
+  tokyo: ['whiskey-highball', 'old-fashioned', 'vesper', 'espresso-martini']
+};
+export const isCitySpecialty = (regionId: RegionId, recipeId: string) => CITY_SPECIALTIES[regionId]?.includes(recipeId) ?? false;
+export const specialtyFactor = (regionId: RegionId, recipeId: string) => isCitySpecialty(regionId, recipeId) ? 1 + SPECIALTY_PREMIUM : 1;
+
+// Delivery costs follow the city's price level too: couriers in Tokyo cost more than in Tashkent.
+export function supplierInCity(supplier: Supplier, marketFactor: number): Supplier {
+  return { ...supplier, deliveryFee: coins(supplier.deliveryFee * marketFactor), freeDeliveryAt: Math.round(supplier.freeDeliveryAt * marketFactor) };
 }

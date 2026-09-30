@@ -109,7 +109,8 @@ test('A confirmed full-bottle order consumes sealed stock and earns its retail p
   const afterDialogue = game.crystals;
   assert.equal(game.sellBottleToCustomer(),true);
   assert.equal(stock.quantity,1);
-  assert.ok(game.money >= balance + product.price * game.region.marketFactor);
+  // A level-1 bar earns the guest's own rate (85% of the city price), fixed when they walked in.
+  assert.ok(game.money >= balance + product.price * customer.priceFactor - .01);
   assert.equal(game.crystals,afterDialogue + bottleSaleCrystalReward(product));
 });
 
@@ -143,9 +144,9 @@ test('Correct common English is accepted, and corrections do not create more err
 test('Quotes calculate supplier deals, bulk tiers and free delivery after discounts',() => {
   const offers = createMarket(REGIONS[0],1);const supplier = SUPPLIERS[0];const offer = offers.find(item => item.supplierId === supplier.id);
   const small = quotePurchase(offers,{[offer.ingredientId]:1},supplier);
-  assert.equal(small.delivery,8);assert.equal(small.total,Number((offer.price + 8).toFixed(2)));
+  assert.equal(small.delivery,supplier.deliveryFee);assert.equal(small.total,Number((offer.price + supplier.deliveryFee).toFixed(2)));
   const medium = quotePurchase(offers,{[offer.ingredientId]:5},supplier);assert.equal(medium.discountRate,.05);
-  const large = quotePurchase(offers,{[offer.ingredientId]:10},supplier);assert.equal(large.discountRate,.10);assert.equal(large.delivery,0);
+  const large = quotePurchase(offers,{[offer.ingredientId]:30},supplier);assert.equal(large.discountRate,.10);assert.equal(large.delivery,0);
   assert.equal(quotePurchase(offers,{},supplier).total,0);
   assert.equal(quotePurchase(offers,{[offer.ingredientId]:Infinity},supplier).total,0);
   assert.equal(quotePurchase(offers,{[offer.ingredientId]:.5},supplier).total,0);
@@ -154,12 +155,12 @@ test('Quotes calculate supplier deals, bulk tiers and free delivery after discou
   assert.notEqual(createMarket(REGIONS[0],1)[0].price,createMarket(REGIONS[0],2)[0].price);
 });
 
-test('Login rewards grow to 1000, reset after missed days and cross month boundaries',() => {
-  assert.deepEqual([1,2,3,4,5,6,7,30].map(dailyCoinsFor),[150,250,400,550,700,850,1000,1000]);
+test('Login rewards grow to 500, reset after missed days and cross month boundaries',() => {
+  assert.deepEqual([1,2,3,4,5,6,7,30].map(dailyCoinsFor),[100,150,200,260,320,400,500,500]);
   assert.equal(consecutiveDays('2026-09-27',4,new Date(2026,8,28)),5);
   assert.equal(consecutiveDays('2026-09-26',4,new Date(2026,8,28)),1);
   assert.equal(consecutiveDays('2026-09-30',6,new Date(2026,9,1)),7);
-  assert.deepEqual([1,2,3,4,5,6,7,10,14].map(dailyCrystalsFor),[0,0,45,0,0,0,120,45,120]);
+  assert.deepEqual([1,2,3,4,5,6,7,10,14].map(dailyCrystalsFor),[0,0,30,0,0,0,90,30,90]);
 });
 
 test('Every liquid and retail brand resolves to painted fantasy-label bottle art',() => {
@@ -199,8 +200,8 @@ test('Crystal exchange offers only fixed one-way bundles with larger-bundle bonu
 
 test('Daily claim awards coins once, survives reload, and cannot be farmed by game shifts',async() => {
   const game = freshGame();const before = game.money;
-  game.claimDailyGift();assert.equal(game.money,before + 150);assert.equal(game.loginStreak,1);
-  game.claimDailyGift();assert.equal(game.money,before + 150);
+  game.claimDailyGift();assert.equal(game.money,before + 100);assert.equal(game.loginStreak,1);
+  game.claimDailyGift();assert.equal(game.money,before + 100);
   assert.equal('nextDay' in game,false,'there is no manual day-skip mechanic');assert.equal(game.dailyGiftAvailable,false);
   await nextTick();setActivePinia(createPinia());const reloaded = useGameStore();
   assert.equal(reloaded.dailyGiftAvailable,false);assert.equal(reloaded.money,game.money);
@@ -482,4 +483,20 @@ test('The brand picker only offers real pours of the ingredient (no cognac as wh
   assert.ok(whiskeyBrands.length > 0);
   assert.ok(whiskeyBrands.every((product) => ['whiskey', 'bourbon'].includes(product.type)), whiskeyBrands.map((product) => product.type).join(','));
   assert.ok(ALCOHOL_PRODUCTS.filter((product) => ['cognac', 'sambuca', 'beer'].includes(product.type)).every((product) => !pourableBrand(product)));
+});
+
+test('Actions keep working after one delivery arrives while another is still on the way',() => {
+  const game = freshGame();
+  const [fast, slow] = [SUPPLIERS.find((item) => item.id === 'fresh'), SUPPLIERS.find((item) => item.id === 'local')];
+  for (const supplier of [fast, slow]) {
+    game.selectSupplier(supplier.id);
+    const offer = game.market.find((item) => item.supplierId === supplier.id);
+    game.purchaseCart[offer.ingredientId] = 1;
+    assert.equal(game.checkoutPurchase(),true);
+  }
+  assert.equal(game.deliveryOrders.length,2);
+  game.tickGameClock(Math.min(...game.deliveryOrders.map((order) => order.dueAt)));
+  assert.equal(game.deliveryOrders.length,1,'the faster delivery arrived');
+  assert.equal(game.chooseStartingBar('london'),true,'later actions still apply (the state can still be copied and saved)');
+  assert.equal(game.regionId,'london');
 });

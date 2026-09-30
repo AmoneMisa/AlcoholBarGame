@@ -3,6 +3,7 @@ import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
 import { CHARACTER_ART, CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { generateCustomer } from '../domain/engine';
+import { levelPerks } from '../domain/progression';
 import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../domain/types';
 import { buildProfile, shortWish, type CustomerReply, type Fact } from '../domain/conversation/customerTalk';
 import type { BottleConversationFacts } from '../domain/conversation/bottleTalk';
@@ -54,6 +55,8 @@ export interface PlayerState {
   vipCooldownUntil: number;
   lastClockAt: number;
   deliveryOrders: DeliveryOrder[];
+  /** Level 5+: low stock is reordered automatically from the cheapest supplier. */
+  autoSupply?: boolean;
   tradeLog: string[];
   languageStats: { sentences: number; correct: number };
   // Correct sentences already rewarded per customer, so talking cannot be farmed for XP.
@@ -113,15 +116,19 @@ export const STARTER_GUESTS = 5;
 
 export function createInitialState(now = Date.now()): PlayerState {
   const starterGuests: Customer[] = [];
+  // Starter guests pay the same level-1 rate as everyone who walks in later.
+  const priceFactor = Number((REGIONS[0]!.marketFactor * levelPerks(1).pay).toFixed(4));
   for (let seat = 0; seat < STARTER_GUESTS; seat++) {
-    starterGuests.push(withUniqueLook(generateCustomer(2, RECIPES.slice(0, BASIC_RECIPE_COUNT), .35, REGIONS[0]!.marketFactor), starterGuests));
+    const guest = withUniqueLook(generateCustomer(2, RECIPES.slice(0, BASIC_RECIPE_COUNT), .35, REGIONS[0]!.marketFactor), starterGuests);
+    guest.priceFactor = priceFactor;
+    starterGuests.push(guest);
   }
   const firstGuest = starterGuests[0]!;
   const knownRecipeIds = RECIPES.slice(0, BASIC_RECIPE_COUNT).map((recipe) => recipe.id);
   return {
     version: 1,
     regionId: 'new-york',
-    money: 800,
+    money: 600,
     crystals: 0,
     xp: 0,
     streak: 0,

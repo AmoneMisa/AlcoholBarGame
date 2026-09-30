@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { INGREDIENTS, SUPPLIERS } from '../../domain/catalog';
+import { INGREDIENTS } from '../../domain/catalog';
 import { useGameStore } from '../../stores/game';
 import BottleModel from '../cocktails/BottleModel.vue';
 import UiIcon from '../ui/UiIcon.vue';
-import CityEvent from './CityEvent.vue';
+import { AUTO_SUPPLY_LEVEL, formatDeliveryTime } from '../../domain/progression';
 import TradeTalk from './TradeTalk.vue';
 
 const game = useGameStore();
@@ -34,13 +34,17 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
 <template>
   <article class="game-panel market-panel">
     <header class="panel-heading"><div><small>TRADE FLOOR · {{ game.region.name }}</small><h2>Stock your next shift</h2></div><span>{{ game.money.toFixed(2) }} coins</span></header>
-    <CityEvent />
+    <!-- Level perks live on the bar scene's city chip; the market only shows what changes buying here. -->
+    <div class="auto-supply" :class="{ locked: game.level < AUTO_SUPPLY_LEVEL, on: game.autoSupply }">
+      <div><b>Auto-supply</b><small>{{ game.level < AUTO_SUPPLY_LEVEL ? `Unlocks at level ${AUTO_SUPPLY_LEVEL}` : 'Reorders anything that runs low from the cheapest supplier, with normal prices and delivery fees.' }}</small></div>
+      <button type="button" role="switch" :aria-checked="game.autoSupply" :disabled="game.level < AUTO_SUPPLY_LEVEL" @click="game.setAutoSupply(!game.autoSupply)">{{ game.level < AUTO_SUPPLY_LEVEL ? `Lv ${AUTO_SUPPLY_LEVEL}` : game.autoSupply ? 'On' : 'Off' }}</button>
+    </div>
     <TradeTalk />
     <div class="market-modes"><button :class="{active:mode === 'buy'}" type="button" @click="mode = 'buy'">Buy supplies</button><button :class="{active:mode === 'sell'}" type="button" @click="mode = 'sell'">Sell stock</button><span>City prices {{ game.region.marketFactor.toFixed(2) }}× · prices change each shift</span></div>
     <div v-if="mode === 'buy'" class="supplier-picker polished-suppliers">
-      <button v-for="supplier in SUPPLIERS" :key="supplier.id" :class="{ active:game.selectedSupplier === supplier.id }" type="button" @click="game.selectSupplier(supplier.id)">
+      <button v-for="supplier in game.localSuppliers" :key="supplier.id" :class="{ active:game.selectedSupplier === supplier.id }" type="button" @click="game.selectSupplier(supplier.id)">
         <span class="supplier-icon" :class="supplier.id"><UiIcon :name="supplier.icon" /></span>
-        <div><h3>{{ supplier.name }}</h3><p>{{ supplier.description }}</p><small>{{ supplier.deliveryDays }} shifts · {{ supplier.reputation }}/5 reputation</small><em>Free delivery from {{ supplier.freeDeliveryAt }} coins</em></div>
+        <div><h3>{{ supplier.name }}</h3><p>{{ supplier.description }}</p><small>Delivery {{ formatDeliveryTime(supplier.deliveryDays * game.economy.delivery) }} · {{ supplier.reputation }}/5 reputation</small><em>Fee {{ supplier.deliveryFee }} coins · free from {{ supplier.freeDeliveryAt }} coins</em></div>
       </button>
     </div>
     <div class="category-tabs market-filter"><button v-for="item in ['all','spirit','mixer','fresh']" :key="item" :class="{active:category === item}" type="button" @click="category = item">{{ {all:'All',spirit:'Spirits',mixer:'Mixers',fresh:'Fresh & food'}[item] }}</button></div>

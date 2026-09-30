@@ -9,6 +9,7 @@ import LearningPage from './components/learning/LearningPage.vue';
 import GuideSheet from './components/knowledge/GuideSheet.vue';
 import UiIcon from './components/ui/UiIcon.vue';
 import FriendsPage from './components/friends/FriendsPage.vue';
+import StartingBarPicker from './components/game/StartingBarPicker.vue';
 import { useGameStore } from './stores/game';
 import { initMusic, musicOn, playSfx, refreshMusic, setMusicInterior } from './audio/index';
 
@@ -57,6 +58,7 @@ function selectView(id: string) {
     </main>
     <ConversationPopup v-if="game.conversationCustomerId" />
     <GuideSheet />
+    <StartingBarPicker v-if="!game.startingBarChosen" />
     <nav class="game-nav" aria-label="Game views">
       <button v-for="item in nav" :key="item.id" :class="{ active: view === item.id }" type="button" @click="selectView(item.id)"><UiIcon :name="item.mark" /><b>{{ item.label }}</b></button>
     </nav>

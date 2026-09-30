@@ -1,5 +1,5 @@
 import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS } from './bottleCatalog';
-import { INGREDIENTS } from './catalog';
+import { INGREDIENTS, RECIPES } from './catalog';
 import type { AlcoholProduct, Customer, Recipe, RecipeItem } from './types';
 
 // Brand-call orders: the only time a bar guest names a brand is for a simple serve of one spirit
@@ -21,7 +21,10 @@ const STYLES_BY_TYPE: Partial<Record<AlcoholProduct['type'], ServeStyle[]>> = {
   aperitif: ['with-soda', 'rocks'], vermouth: ['rocks']
 };
 
-const brandOf = (product: AlcoholProduct) => product.brand;
+// A brand that shares its name with a cocktail (“Martini”) is called by its full product name, so
+// “Martini Bianco on the rocks” is never mistaken for an order of the Martini cocktail.
+const COCKTAIL_NAMES = new Set(RECIPES.map((recipe) => recipe.name.toLowerCase()));
+const brandOf = (product: AlcoholProduct) => COCKTAIL_NAMES.has(product.brand.toLowerCase()) ? product.name : product.brand;
 const spiritOf = (product: AlcoholProduct) => INGREDIENTS.find((item) => item.id === product.ingredientId && item.unit === 'ml');
 
 // Shop bottles that can be poured as a single serve.

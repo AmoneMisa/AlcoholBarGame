@@ -140,7 +140,7 @@ test('Replayed requests are applied once, and the daily gift is once per server 
   const replay = await act(service, { type: 'claimDaily' }, id);
   assert.equal(first.ok, true);
   assert.deepEqual(replay, first, 'the same request id returns the stored answer');
-  assert.equal(first.state.money, state.money + 150);
+  assert.equal(first.state.money, state.money + 100);
   const again = await act(service, { type: 'claimDaily' });
   assert.equal(again.ok, false, 'a second claim the same day is refused');
   assert.equal(again.state.money, first.state.money);

@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { INGREDIENTS } from '../../domain/catalog';
 import { formatCountdown } from '../../domain/customerTiming';
+import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL } from '../../domain/progression';
 import { useGameStore } from '../../stores/game';
 
 // The city's current buff or disaster, plus what the bar's level gives. `compact` is the chip on the bar scene.
@@ -12,14 +13,18 @@ const event = computed(() => game.economy.event);
 // `economy` is recomputed on every game-clock tick, so this countdown stays live.
 const endsIn = computed(() => event.value ? formatCountdown(Math.max(0, (event.value.endsAt - Date.now()) / 1000)) : '');
 const shortage = computed(() => event.value?.shortageIds.map((id) => INGREDIENTS.find((item) => item.id === id)?.name).filter(Boolean).join(', '));
-const percent = (value: number) => `${value >= 1 ? '+' : '−'}${Math.round(Math.abs(value - 1) * 100)}%`;
+const percent = (value: number) => Math.abs(value - 1) < .005 ? '±0%' : `${value > 1 ? '+' : '−'}${Math.round(Math.abs(value - 1) * 100)}%`;
 const perks = computed(() => {
   const economy = game.economy;
   return [
-    `VIP chance ${Math.round(economy.vipChance * 100)}%`,
     `Guests pay ${percent(economy.perks.pay)}`,
+    `Tip chance ${Math.round(economy.tipChance * 100)}%`,
+    `VIP chance ${Math.round(economy.vipChance * 100)}%`,
     `Supplier prices ${percent(economy.perks.supply)}`,
-    `Next guest ${percent(economy.perks.arrival)} wait`
+    `Delivery time ${percent(economy.perks.delivery)}`,
+    `Next guest ${percent(economy.perks.arrival)} wait`,
+    game.level >= AUTO_SUPPLY_LEVEL ? 'Auto-supply unlocked' : `Auto-supply at level ${AUTO_SUPPLY_LEVEL}`,
+    game.level >= AUTO_SERVE_LEVEL ? 'Auto-serve unlocked' : `Auto-serve at level ${AUTO_SERVE_LEVEL}`
   ];
 });
 </script>

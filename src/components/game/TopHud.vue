@@ -24,12 +24,19 @@ function exchange(crystals: number) {
   if (game.exchangeCrystals(crystals)) exchangeOpen.value = false;
 }
 let calendarTimer: ReturnType<typeof setInterval>;
+// Other screens pin content just below the HUD (the Design preview), so its height is published as --hud-h.
+const hud = ref<HTMLElement>();
+const hudObserver = typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(() => {
+  if (hud.value) document.documentElement.style.setProperty('--hud-h', `${Math.round(hud.value.getBoundingClientRect().height)}px`);
+});
 onMounted(() => {
+  if (hud.value) hudObserver?.observe(hud.value);
   calendarTimer = setInterval(game.refreshDailyGift, 60_000);
   window.addEventListener('focus', game.refreshDailyGift);
   document.addEventListener('visibilitychange', game.refreshDailyGift);
 });
 onUnmounted(() => {
+  hudObserver?.disconnect();
   clearInterval(calendarTimer);
   window.removeEventListener('focus', game.refreshDailyGift);
   document.removeEventListener('visibilitychange', game.refreshDailyGift);
@@ -37,7 +44,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <header class="top-hud">
+  <header ref="hud" class="top-hud">
     <div class="venue-card">
       <div class="venue-mark"><UiIcon name="glass" /></div>
       <div><small>YOUR BAR · {{ game.region.name }}<em v-if="game.mode !== 'online'" class="sync-badge" :class="game.mode" :title="game.mode === 'offline' ? 'No connection to the game server: progress is saved on this device only and is not added to your account.' : 'Connecting to your account…'">{{ game.mode === 'offline' ? 'Offline practice' : 'Connecting…' }}</em></small><b>{{ game.decor.name }}</b><div class="xp-line"><span :style="{ width: xpPercent + '%' }"></span></div></div>

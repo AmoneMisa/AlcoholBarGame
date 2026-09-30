@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { RECIPES, REGIONS, SUPPLIERS } from '../src/domain/catalog.ts';
 import { BAR_PURCHASE_LEVEL, SECOND_BAR_COIN_COST, barUnlockPrice } from '../src/domain/barUnlocks.ts';
-import { quotePurchase } from '../src/domain/economy.ts';
-import { createMarket } from '../src/domain/engine.ts';
+import { quotePurchase, supplierInCity } from '../src/domain/economy.ts';
+import { createMarket, requiredRecipe } from '../src/domain/engine.ts';
 import { EVENT_CATALOG, EVENT_WINDOW_MS, MAX_VIP_CHANCE, economyAt, eventAt, levelFor, levelPerks, levelProgress, marketFor, xpForLevel } from '../src/domain/progression.ts';
 import { applyAction, advanceClock } from '../src/sim/rules.ts';
 import { createInitialState, normalizePlayerState } from '../src/sim/state.ts';
@@ -76,29 +76,35 @@ test('The first bar is chosen freely; expansion starts at level 25, then costs c
   assert.ok(state.ownedBarIds.includes('tokyo'));assert.equal(state.crystals,0);
 });
 
-test('Recipe mastery consumes level plus one duplicate recipe cards', () => {
+test('Recipe mastery: levels 2 and 3 cost coins only, the top two levels also take 2 and 3 cards', () => {
   const now = Date.now();const state = createInitialState(now);const recipe = RECIPES[0];
-  state.money = 100000;state.recipeCopies = {[recipe.id]:2};
-  assert.equal(recipeCardsRequired(1),2);
+  state.money = 100000;state.recipeCopies = {};
+  assert.deepEqual([1,2,3,4].map(recipeCardsRequired),[0,0,2,3]);
   applyAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now));
-  assert.equal(state.recipeLevels[recipe.id],2);assert.equal(state.recipeCopies[recipe.id],0);
+  applyAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now));
+  assert.equal(state.recipeLevels[recipe.id],3,'coins alone reach level 3');
+  state.recipeCopies[recipe.id] = 1;
+  assert.throws(() => applyAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now)),/need 2/i);
   state.recipeCopies[recipe.id] = 2;
-  assert.throws(() => applyAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now)),/need 3/i);
-  state.recipeCopies[recipe.id] = 3;
   applyAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now));
-  assert.equal(state.recipeLevels[recipe.id],3);assert.equal(state.recipeCopies[recipe.id],0);
+  assert.equal(state.recipeLevels[recipe.id],4);assert.equal(state.recipeCopies[recipe.id],0);
 });
 
-test('Higher levels: more VIPs (never above 35%), better pay, pricier supplies, shorter waits', () => {
+test('Higher levels: more VIPs (never above the cap), better pay and tips, cheaper and faster supplies, shorter waits', () => {
   let previous = levelPerks(1);
   assert.equal(previous.vipChance, .05);
   for (let level = 2; level <= 60; level++) {
     const perks = levelPerks(level);
     assert.ok(perks.vipChance >= previous.vipChance && perks.vipChance <= MAX_VIP_CHANCE);
-    assert.ok(perks.pay >= previous.pay && perks.supply >= previous.supply && perks.arrival <= previous.arrival);
+    assert.ok(perks.pay >= previous.pay && perks.supply <= previous.supply && perks.delivery <= previous.delivery && perks.tipChance >= previous.tipChance && perks.arrival <= previous.arrival);
     previous = perks;
   }
   assert.equal(levelPerks(50).vipChance, MAX_VIP_CHANCE);
+  // A new bar earns less and pays full supplier prices; perks stay within modest caps.
+  assert.equal(levelPerks(1).pay, .85);assert.equal(levelPerks(1).supply, 1);assert.equal(levelPerks(1).tipChance, .45);
+  assert.ok(levelPerks(50).pay <= 1.3 && levelPerks(50).supply >= .85 && levelPerks(50).delivery >= .65 && levelPerks(50).tipChance <= .75);
+  assert.equal(levelPerks(4).autoSupply, false);assert.equal(levelPerks(5).autoSupply, true);
+  assert.equal(levelPerks(9).autoServe, false);assert.equal(levelPerks(10).autoServe, true);
   // Even VIP Night cannot push the chance over the cap.
   const region = REGIONS[0];
   for (let window = 0; window < 3000; window++) {
@@ -142,7 +148,8 @@ test('The rules charge event and level prices on the server side', () => {
   now += 1000;
   const state = createInitialState(now);
   advanceClock(state, context(now));
-  const supplier = SUPPLIERS.find((item) => item.id === 'global');
+  // The bar pays this city's delivery terms.
+  const supplier = supplierInCity(SUPPLIERS.find((item) => item.id === 'global'), region.marketFactor);
   const offer = marketFor(region, now, state.xp).find((item) => item.supplierId === 'global');
   const cart = { [offer.ingredientId]: 3 };
   const money = state.money;
@@ -169,4 +176,66 @@ test('Guests carry their price level, so level-ups mid-order never break a budge
   advanceClock(slow, context(now));
   advanceClock(fast, context(now));
   assert.ok(fast.nextCustomerAt - now < slow.nextCustomerAt - now);
+});
+
+test('Tips are a chance, Auto-serve needs level 10 and a confirmed order, and never earns a tip', () => {
+  const now = 1_800_000_000_000;
+  const at = (random) => ({ now, random: () => random, checkEnglish: (text) => ({ ok: true, corrected: text }) });
+  const setup = (xp) => {
+    const state = createInitialState(now);state.xp = xp;
+    const guest = state.customers[0];guest.mood = 'calm';guest.orderKind = 'cocktail';guest.orderRecipeId = RECIPES[0].id;guest.orderRevealed = true;
+    // Guests may ask for a twist (“extra lime”), so the exact drink comes from the rules, not the plain recipe.
+    for (const item of requiredRecipe(guest).ingredients) state.inventories[state.regionId].find((stock) => stock.ingredientId === item.ingredientId).amount += 1000;
+    return state;
+  };
+  const serve = (state, random) => applyAction(state,{type:'serve',mix:requiredRecipe(state.customers[0]).ingredients.map((item) => ({...item})),shaken:true,pourBrands:{}},at(random));
+  // Guests without a fixed price factor pay the city's rate (the rules' own fallback).
+  const price = (state) => Math.round(requiredRecipe(state.customers[0]).price * (state.customers[0].priceFactor ?? REGIONS.find((region) => region.id === state.regionId).marketFactor) * 100) / 100;
+
+  const lucky = setup(0);const luckyPrice = price(lucky);const before = lucky.money;serve(lucky, .1);
+  assert.ok(lucky.money - before > luckyPrice, 'a roll under the tip chance adds a tip');
+  const unlucky = setup(0);const unluckyPrice = price(unlucky);const start = unlucky.money;serve(unlucky, .9);
+  assert.equal(Math.round((unlucky.money - start) * 100) / 100, unluckyPrice, 'no tip above the chance');
+
+  const low = setup(0);
+  assert.throws(() => applyAction(low,{type:'autoServe'},at(.1)),/level 10/i);
+  const high = setup(xpForLevel(10));high.customers[0].orderRevealed = false;
+  assert.throws(() => applyAction(high,{type:'autoServe'},at(.1)),/talk to the guest/i);
+  high.customers[0].orderRevealed = true;const autoPrice = price(high);const autoStart = high.money;const guestsBefore = high.customers.length;
+  applyAction(high,{type:'autoServe'},at(.1));
+  assert.equal(Math.round((high.money - autoStart) * 100) / 100, autoPrice, 'automated drinks are paid but not tipped');
+  assert.equal(high.customers.length, guestsBefore - 1);
+});
+
+test('Auto-supply unlocks at level 5 and reorders low stock once, at market prices plus delivery', () => {
+  const now = 1_800_000_000_000;
+  const state = createInitialState(now);
+  assert.throws(() => applyAction(state,{type:'setAutoSupply',enabled:true},context(now)),/level 5/i);
+  state.xp = xpForLevel(5);state.money = 5000;
+  const lime = state.inventories[state.regionId].find((stock) => stock.ingredientId === 'lime-juice');lime.amount = 20;
+  applyAction(state,{type:'setAutoSupply',enabled:true},context(now));
+  const orders = state.deliveryOrders.filter((order) => order.items.some((item) => item.ingredientId === 'lime-juice'));
+  assert.equal(orders.length, 1, 'low stock is reordered');
+  assert.ok(state.money < 5000);
+  advanceClock(state,{ now: now + 1000 });
+  assert.equal(state.deliveryOrders.filter((order) => order.items.some((item) => item.ingredientId === 'lime-juice')).length, 1, 'never ordered twice while on the way');
+  const ordersBefore = state.deliveryOrders.length;
+  applyAction(state,{type:'setAutoSupply',enabled:false},context(now + 2000));
+  for (const stock of state.inventories[state.regionId]) stock.amount = 0;
+  advanceClock(state,{ now: now + 3000 });
+  assert.equal(state.deliveryOrders.length, ordersBefore, 'switched off, nothing is ordered');
+});
+
+test('City economy: every specialty is a real recipe, specialties pay a premium, delivery terms follow city prices', async () => {
+  const { CITY_SPECIALTIES, SPECIALTY_PREMIUM, specialtyFactor, supplierInCity } = await import('../src/domain/economy.ts');
+  for (const region of REGIONS) {
+    assert.ok(CITY_SPECIALTIES[region.id].length >= 3, `${region.name} has specialties`);
+    for (const id of CITY_SPECIALTIES[region.id]) assert.ok(RECIPES.some((recipe) => recipe.id === id), `${id} exists`);
+  }
+  assert.equal(specialtyFactor('tokyo','whiskey-highball'), 1 + SPECIALTY_PREMIUM);
+  assert.equal(specialtyFactor('tashkent','whiskey-highball'), 1);
+  const courier = SUPPLIERS[0];
+  const cheap = supplierInCity(courier, REGIONS.find((region) => region.id === 'tashkent').marketFactor);
+  const dear = supplierInCity(courier, REGIONS.find((region) => region.id === 'new-york').marketFactor);
+  assert.ok(cheap.deliveryFee < dear.deliveryFee && cheap.freeDeliveryAt < dear.freeDeliveryAt);
 });

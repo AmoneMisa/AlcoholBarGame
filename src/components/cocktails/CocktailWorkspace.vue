@@ -6,6 +6,7 @@ import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleSaleCrystalReward, bottleT
 import { guideIdForProduct } from '../../data/knowledge/alcohol';
 import { signatureFor } from '../../domain/brandPours';
 import { useGameStore } from '../../stores/game';
+import { AUTO_SERVE_LEVEL } from '../../domain/progression';
 import { haptic } from '../../telegram/webapp';
 import BrandBottle from '../knowledge/BrandBottle.vue';
 
@@ -58,6 +59,10 @@ function serve() {
       <div><small>CUSTOMER FIRST</small><h3>Talk before you pour</h3><p>Ask about flavour, strength, budget, and occasion. The counter becomes your measured work area as soon as the order is clear.</p><p class="talk-hint">Tap {{ game.customer.name }}’s speech bubble in the bar to talk.</p></div>
     </div>
     <div v-else class="compact-order-body">
+      <div class="auto-serve" :class="{ locked: game.level < AUTO_SERVE_LEVEL }">
+        <span>{{ game.level < AUTO_SERVE_LEVEL ? `Auto-serve unlocks at level ${AUTO_SERVE_LEVEL}` : 'Auto-serve makes this order from stock. Guests pay, but automated drinks get no tip.' }}</span>
+        <button type="button" class="secondary-button" :disabled="game.level < AUTO_SERVE_LEVEL" @click="game.autoServe()">Auto-serve</button>
+      </div>
       <div class="counter-instructions"><small>WORK ON THE LIVE BAR</small><b>Drag a painted bottle into the glass above.</b><span>Keep holding to pour in 5 ml steps. Tap <i>+</i> beside the glass for ice, fruit, herbs, salt, or garnish.</span><em v-if="servedProduct">Specific brand order · pays ◆ {{ brandedServeCrystalReward(servedProduct) }}</em></div>
       <div class="compact-recipe-progress">
         <div v-for="part in game.recipe.ingredients" :key="part.ingredientId" :class="{ done: game.currentMix.find((item) => item.ingredientId === part.ingredientId)?.amount === part.amount, wrong: (game.currentMix.find((item) => item.ingredientId === part.ingredientId)?.amount ?? 0) > part.amount }">

@@ -36,12 +36,12 @@ const pct = (value: number) => `+${Math.round((value - 1) * 100)}%`;
       <span class="mastery-levels" :aria-label="`Level ${level} of ${RECIPE_MAX_LEVEL}`"><i v-for="step in RECIPE_MAX_LEVEL" :key="step" :class="{ on: step <= level, current: step === level }">{{ step }}</i></span>
     </header>
     <p>Level {{ level }} · guests pay <b>{{ pct(bonus.pay) }}</b> and tip <b>{{ pct(bonus.tips) }}</b> more for this drink.</p>
-    <div class="recipe-card-balance"><span>{{ recipe.name.toUpperCase() }} CARDS</span><b>×{{ copies }}</b><em>{{ next ? `Level ${level + 1} needs ${cardsRequired} cards.` : 'Mastery is complete; extra cards may be gifted.' }}</em></div>
+    <div class="recipe-card-balance"><span>{{ recipe.name.toUpperCase() }} CARDS</span><b>×{{ copies }}</b><em>{{ !next ? 'Mastery is complete; extra cards may be gifted.' : cardsRequired ? `Level ${level + 1} needs ${cardsRequired} cards.` : `Level ${level + 1} needs coins only.` }}</em></div>
     <button v-if="next && cost !== undefined" type="button" class="primary-button" :disabled="!canUpgrade" @click="game.upgradeRecipe(recipe.id)">
-      Upgrade to level {{ level + 1 }} · {{ cost.toLocaleString('en-US') }} coins<span> + {{ cardsRequired }} cards</span><em>pay {{ pct(next.pay) }}, tips {{ pct(next.tips) }}</em>
+      Upgrade to level {{ level + 1 }} · {{ cost.toLocaleString('en-US') }} coins<span v-if="cardsRequired"> + {{ cardsRequired }} cards</span><em>pay {{ pct(next.pay) }}, tips {{ pct(next.tips) }}</em>
     </button>
-    <p v-if="next && copies < cardsRequired" class="mastery-help">You need {{ cardsRequired - copies }} more {{ recipe.name }} card{{ cardsRequired - copies === 1 ? '' : 's' }}. Earn duplicates from VIP recipe challenges, daily gifts, the recipe shop, or friends.</p>
-    <p v-else class="mastery-max">Top level reached.</p>
+    <p v-if="next && cardsRequired && copies < cardsRequired" class="mastery-help">You need {{ cardsRequired - copies }} more {{ recipe.name }} card{{ cardsRequired - copies === 1 ? '' : 's' }}. Earn duplicates from VIP recipe challenges, daily gifts, the recipe shop, or friends.</p>
+    <p v-else-if="!next" class="mastery-max">Top level reached.</p>
     <footer>
       <span>Duplicate cards can upgrade this recipe or be gifted.</span>
       <button type="button" class="secondary-button" :disabled="sparePrice.currency === 'coins' ? game.money < sparePrice.amount : game.crystals < sparePrice.amount" @click="game.buyRecipe(recipe.id)">Get another card · {{ sparePrice.currency === 'coins' ? '' : '◆ ' }}{{ sparePrice.amount }}{{ sparePrice.currency === 'coins' ? ' coins' : '' }}</button>

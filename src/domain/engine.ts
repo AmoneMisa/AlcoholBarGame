@@ -118,7 +118,8 @@ export function createMarket(region: Region, day: number): SupplierOffer[] {
   ];
   return INGREDIENTS.flatMap((ingredient, index) => {
     const pack = ingredient.unit === 'ml' ? 500 : 12;
-    const wholesale = ingredient.basePrice * pack * region.marketFactor * wave;
+    // Wholesale sits 15% above catalog cost; level perks and events adjust it from there (see marketFor).
+    const wholesale = ingredient.basePrice * pack * region.marketFactor * wave * 1.15;
     return suppliers
       .filter((supplier) => supplier.accepts.includes(ingredient.category))
       .map((supplier) => {

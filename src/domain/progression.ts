@@ -28,22 +28,35 @@ export function levelProgress(xp: number) {
 }
 
 // ---- What a level changes ----
-export const MAX_VIP_CHANCE = .35;
+// Perks grow slowly and cap early enough that a high level helps without breaking the economy.
+export const MAX_VIP_CHANCE = .25;
+// Level unlocks: automation is earned, not given.
+export const AUTO_SUPPLY_LEVEL = 5;
+export const AUTO_SERVE_LEVEL = 10;
 export function levelPerks(level: number) {
   const steps = Math.max(0, Math.min(MAX_LEVEL, level) - 1);
   return {
-    // Chance that an arriving guest is a VIP: 5% at level 1, +1% per level, never above 35%.
-    vipChance: Math.min(MAX_VIP_CHANCE, .05 + steps * .01),
-    // Guests pay more for cocktails, serves and bottles: +1.5% per level, up to +60%.
-    pay: 1 + Math.min(.6, steps * .015),
-    // A busier, better-known bar also pays more to suppliers: +0.6% per level, up to +25%.
-    supply: 1 + Math.min(.25, steps * .006),
-    // The wait for the next guest shrinks: −1.5% per level, down to 40% of the base wait.
-    arrival: Math.max(.4, 1 - steps * .015),
+    // Chance that an arriving guest is a VIP: 5% at level 1, +0.5% per level, never above 25%.
+    vipChance: Math.min(MAX_VIP_CHANCE, .05 + steps * .005),
+    // A new bar is unknown, so guests pay 85% of list prices at first: +1% per level, up to 130%.
+    pay: Math.min(1.3, .85 + steps * .01),
+    // Suppliers give regular customers better terms: −0.4% per level, down to 85% of the list price.
+    supply: Math.max(.85, 1 - steps * .004),
+    // Deliveries get priority as the bar grows: −0.8% delivery time per level, down to 65%.
+    delivery: Math.max(.65, 1 - steps * .008),
+    // Tips are never guaranteed: 45% of guests tip at level 1, +0.6% per level, up to 75%.
+    tipChance: Math.min(.75, .45 + steps * .006),
+    // The wait for the next guest shrinks: −1% per level, down to 60% of the base wait.
+    arrival: Math.max(.6, 1 - steps * .01),
     // VIPs come back sooner too.
-    vipCooldown: Math.max(.35, 1 - steps * .02)
+    vipCooldown: Math.max(.5, 1 - steps * .012),
+    autoSupply: level >= AUTO_SUPPLY_LEVEL,
+    autoServe: level >= AUTO_SERVE_LEVEL
   };
 }
+
+// Delivery time as players read it (orders log and supplier cards use the same wording).
+export const formatDeliveryTime = (days: number) => days >= 1.95 ? `${Math.round(days * 10) / 10} days` : `${Math.round(days * 24)} hours`;
 
 // ---- City events: buffs and disasters ----
 // Each city rolls its own event for every two-hour window from the server clock, so nobody can pick or fake one.
@@ -53,7 +66,7 @@ export interface EventEffects {
   tips?: number;         // multiplies tips
   pay?: number;          // multiplies what arriving guests pay
   supply?: number;       // multiplies all supplier prices
-  vipBonus?: number;     // added to the VIP chance (the 35% cap still applies)
+  vipBonus?: number;     // added to the VIP chance (the 25% cap still applies)
   shortage?: number;     // supplier price multiplier for the ingredients in short supply
   buyback?: number;      // what other bars pay for those ingredients
 }
@@ -65,7 +78,7 @@ export interface MarketEvent {
 const EVENTS: (Omit<MarketEvent, 'shortageIds' | 'startsAt' | 'endsAt'> & { weight: number })[] = [
   { id: 'hot-time', name: 'Hot Time', kind: 'buff', icon: '🔥', weight: 3, description: 'The whole city is out tonight: guests arrive twice as fast and tip 50% more.', effects: { arrival: .5, tips: 1.5 } },
   { id: 'discounts', name: 'Supplier Discounts', kind: 'buff', icon: '🏷️', weight: 3, description: 'Suppliers clear their warehouses: every pack costs 20% less.', effects: { supply: .8 } },
-  { id: 'vip-night', name: 'VIP Night', kind: 'buff', icon: '💎', weight: 2, description: 'A gala nearby: VIP guests are 15% more likely (up to 35%).', effects: { vipBonus: .15 } },
+  { id: 'vip-night', name: 'VIP Night', kind: 'buff', icon: '💎', weight: 2, description: 'A gala nearby: VIP guests are 15% more likely (up to 25%).', effects: { vipBonus: .15 } },
   { id: 'festival', name: 'City Festival', kind: 'buff', icon: '🎉', weight: 2, description: 'Festival crowds: new guests pay 15% more and tip 30% more.', effects: { pay: 1.15, tips: 1.3, arrival: .8 } },
   { id: 'shortage', name: 'Product Shortage', kind: 'disaster', icon: '📦', weight: 3, description: 'A delivery failed: some ingredients cost 80% more — but other bars pay 50% more for yours.', effects: { shortage: 1.8, buyback: 1.5 } },
   { id: 'storm', name: 'Storm Warning', kind: 'disaster', icon: '⛈️', weight: 2, description: 'Heavy rain keeps people at home: guests take 70% longer to arrive.', effects: { arrival: 1.7 } }
@@ -117,6 +130,8 @@ export function economyAt(regionId: RegionId, marketFactor: number, xp: number, 
     arrival: perks.arrival * (effects.arrival ?? 1),
     vipCooldown: perks.vipCooldown,
     tips: effects.tips ?? 1,
+    tipChance: perks.tipChance,
+    delivery: perks.delivery,
     supplyFactor: (ingredientId: string) => perks.supply * (effects.supply ?? 1) * (shortage.has(ingredientId) ? effects.shortage ?? 1 : 1),
     buybackFactor: (ingredientId: string) => shortage.has(ingredientId) ? effects.buyback ?? 1 : 1
   };

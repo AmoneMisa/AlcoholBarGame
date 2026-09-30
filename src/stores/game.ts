@@ -2,7 +2,7 @@ import { computed, ref, toRaw } from 'vue';
 import { defineStore } from 'pinia';
 import { INGREDIENTS, RECIPES, REGIONS, SUPPLIERS } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost } from '../domain/bottleCatalog';
-import { arrivalSkipCrystalCost, calendarDate, coins, consecutiveDays, dailyCoinsFor, dailyCrystalsFor, quotePurchase, recipePurchase } from '../domain/economy';
+import { arrivalSkipCrystalCost, calendarDate, coins, consecutiveDays, dailyCoinsFor, dailyCrystalsFor, quotePurchase, recipePurchase, supplierInCity } from '../domain/economy';
 import { BAR_PROFILE_OPTIONS, INTERIORS, interiorStyle, type BarProfile } from '../data/cosmetics/bars';
 import { judgeMix } from '../domain/engine';
 import { economyAt, levelProgress, marketFor } from '../domain/progression';
@@ -147,7 +147,9 @@ export const useGameStore = defineStore('game', () => {
   const upcomingLoginDay = computed(() => consecutiveDays(state.value.dailyGiftClaimedKey, state.value.loginStreak, new Date(nowMs.value)));
   const dailyCoinReward = computed(() => dailyCoinsFor(upcomingLoginDay.value));
   const dailyCrystalReward = computed(() => dailyCrystalsFor(upcomingLoginDay.value));
-  const supplier = computed(() => SUPPLIERS.find((item) => item.id === selectedSupplier.value) ?? SUPPLIERS[0]!);
+  // Suppliers with this city's delivery fees (the same terms the rules charge).
+  const localSuppliers = computed(() => SUPPLIERS.map((item) => supplierInCity(item, region.value.marketFactor)));
+  const supplier = computed(() => localSuppliers.value.find((item) => item.id === selectedSupplier.value) ?? localSuppliers.value[0]!);
   const purchaseQuote = computed(() => quotePurchase(market.value, purchaseCart.value, supplier.value));
   const saleQuote = computed(() => INGREDIENTS.filter((item) => Number.isFinite(saleCart.value[item.id]) && saleCart.value[item.id]! >= 1).map((item) => {
     const quantity = Math.max(0, Math.floor(saleCart.value[item.id]!));
@@ -170,7 +172,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: mode.value !== 'online' });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson','spinCosmeticRoulette','giftCosmetic']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson','spinCosmeticRoulette','giftCosmetic']);
 
   function saveOffline() {
     if (mode.value === 'online') return;
@@ -225,7 +227,9 @@ export const useGameStore = defineStore('game', () => {
       return true;
     }
     // Applied in place (objects the screens hold stay valid); a refused action is rolled back.
-    const snapshot = structuredClone(toRaw(state.value));
+    // A JSON copy, not structuredClone: rules that filter reactive lists (deliveries, guests) leave Vue proxies
+    // inside the state, which structuredClone refuses — and then every later action silently failed.
+    const snapshot = JSON.parse(JSON.stringify(state.value)) as PlayerState;
     const levelBefore = levelFor(state.value.xp ?? 0);
     try {
       applyAction(state.value, action, ruleContext());
@@ -376,6 +380,10 @@ export const useGameStore = defineStore('game', () => {
   const leaveNegotiation = () => dispatch({ type: 'leaveNegotiation' });
   const offerSimilarOrder = (id: string) => { const done = dispatch({ type: 'offerSimilar', customerId: id }); if (done) resetMix(); return done; };
   const rejectCustomer = (id: string) => { const done = dispatch({ type: 'rejectCustomer', customerId: id }); if (done) resetMix(); return done; };
+  // Level unlocks: Auto-serve makes the confirmed order from stock, Auto-supply reorders low stock.
+  const autoServe = () => { const done = dispatch({ type: 'autoServe' }); if (done) resetMix(); return done; };
+  const setAutoSupply = (enabled: boolean) => dispatch({ type: 'setAutoSupply', enabled });
+  const autoSupply = computed(() => state.value.autoSupply === true);
 
   // ---- Trade ----
   function selectSupplier(id: string) {
@@ -467,7 +475,7 @@ export const useGameStore = defineStore('game', () => {
   return {
     mode, playerName, playerId, connect,
     economy, xpProgress, guestPriceFactor,
-    upgradeRecipe, recipeLevels, recipeCopies,
+    upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, ownedInteriorIds, barBackground, barInteriorStyle,
     cosmetics:COSMETICS, ownedCosmeticIds, cosmeticCopies, cosmeticRouletteAvailable, cosmeticRouletteResult, cosmeticGiftLog, canUseCosmetic, spinCosmeticRoulette, giftCosmetic,
@@ -478,7 +486,7 @@ export const useGameStore = defineStore('game', () => {
     message, market, selectedSupplier, transferTargetId, tradeLog, recipeCategory, filteredRecipes,
     pourBrands, brandOnShelf, shelfBrandsFor, setPourBrand,
     selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, tickGameClock, welcomeNextCustomer, offerSimilarOrder, rejectCustomer, buy, sell, switchBar, isBarOwned, nextBarPrice, barPurchaseLevel:BAR_PURCHASE_LEVEL, chooseStartingBar, buyBar, transferStock,
-    supplier, purchaseCart, saleCart, purchaseQuote, saleQuote, saleRevenue, deliveryOrders, deliveryCountdown, selectSupplier, checkoutPurchase, checkoutSale, renameBar, renameBartender,
+    supplier, localSuppliers, purchaseCart, saleCart, purchaseQuote, saleQuote, saleRevenue, deliveryOrders, deliveryCountdown, selectSupplier, checkoutPurchase, checkoutSale, renameBar, renameBartender,
     buyRecipe, recipePrice, buyInterior, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
   };
 });
