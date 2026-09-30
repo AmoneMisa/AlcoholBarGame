@@ -74,3 +74,12 @@ The bartender is a rigged 3D "mannequin" rendered with three.js (`src/components
 - **Special outfits** are real accessory meshes (`acc_*`): gala bow tie and pocket square, cyberpunk visor and shoulder pads, steampunk top hat, goggles and belt, post-apocalypse bandana, shoulder plate and bandolier, historical jabot and tricorn, fantasy cloak and circlet, masquerade mask and feather. Colours come from the outfit table in `character3d.ts`.
 - **Size:** each model is ~1.7 MB after meshopt compression (the build script runs `gltf-transform` if it is installed: `npm i -g @gltf-transform/cli`; the game loads it with three's `MeshoptDecoder`).
 - **Not yet in 3D:** customers.
+
+## Deploy to the server
+
+`.github/workflows/docker-master.yml` now has a `deploy` job that runs after tests, build and image publish on every push to `master`. It uses the GitHub environment **Production**:
+
+- secret `DEPLOY_SSH_KEY` (private key; the public key must be in `~/.ssh/authorized_keys` of the server user)
+- variables `DEPLOY_HOST`, `DEPLOY_USER`, and optionally `DEPLOY_PATH` (default `/opt/alcoholbargame`) and `DEPLOY_PORT` (default `22`)
+
+One-time server setup: install Docker with the compose plugin, create the deploy folder and put a `.env` in it (copy `.env.example`; `POSTGRES_PASSWORD` and `TELEGRAM_BOT_TOKEN` are required). The job then uploads `compose.yaml`, logs the server in to GHCR with the workflow token, pulls the exact image built for that commit (`master-<sha>`), starts it with `docker compose up -d`, waits for `/api/health` and fails with the container logs if the app does not come up.

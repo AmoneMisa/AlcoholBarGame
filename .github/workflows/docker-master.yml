@@ -1,4 +1,4 @@
-name: Build and publish Docker image
+name: Build, publish and deploy
 
 on:
   push:
@@ -71,3 +71,94 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  deploy:
+    # Runs only after tests, the build and the image publish succeeded. Uses the "Production" environment:
+    #   secret   DEPLOY_SSH_KEY   private key whose public half is in ~/.ssh/authorized_keys on the server
+    #   variable DEPLOY_HOST      server address
+    #   variable DEPLOY_USER      SSH user
+    #   variable DEPLOY_PATH      (optional) folder on the server, default /opt/alcoholbargame
+    #   variable DEPLOY_PORT      (optional) SSH port, default 22
+    # The folder on the server must contain a .env file (see .env.example) with POSTGRES_PASSWORD and TELEGRAM_BOT_TOKEN.
+    needs: test-build-publish
+    runs-on: ubuntu-latest
+    environment: Production
+    permissions:
+      contents: read
+      packages: read
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    env:
+      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/opt/alcoholbargame' }}
+      DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '22' }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Check deploy settings
+        run: |
+          missing=0
+          for name in DEPLOY_HOST DEPLOY_USER; do
+            if [ -z "${!name}" ]; then echo "::error::Variable $name is not set in the Production environment"; missing=1; fi
+          done
+          if [ -z "${{ secrets.DEPLOY_SSH_KEY }}" ]; then echo "::error::Secret DEPLOY_SSH_KEY is not set in the Production environment"; missing=1; fi
+          exit $missing
+
+      - name: Prepare SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          {
+            echo "Host deploy-target"
+            echo "  HostName $DEPLOY_HOST"
+            echo "  User $DEPLOY_USER"
+            echo "  Port $DEPLOY_PORT"
+            echo "  IdentityFile ~/.ssh/deploy_key"
+            echo "  IdentitiesOnly yes"
+            echo "  ServerAliveInterval 30"
+          } >> ~/.ssh/config
+
+      - name: Upload compose file
+        run: |
+          ssh deploy-target "mkdir -p '$DEPLOY_PATH'"
+          scp compose.yaml "deploy-target:$DEPLOY_PATH/compose.yaml"
+
+      - name: Log the server in to the container registry
+        env:
+          REGISTRY_USER: ${{ github.actor }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$REGISTRY_TOKEN" | ssh deploy-target "docker login ghcr.io -u '$REGISTRY_USER' --password-stdin"
+
+      - name: Deploy on the server
+        run: |
+          # The same immutable tag the publish job pushed (docker/metadata-action: master-<7 char sha>, lower-case image name).
+          image="ghcr.io/${GITHUB_REPOSITORY,,}:master-${GITHUB_SHA::7}"
+          echo "Deploying $image to $DEPLOY_HOST"
+          ssh deploy-target "IMAGE='$image' DEPLOY_PATH='$DEPLOY_PATH' bash -s" <<'REMOTE'
+          set -euo pipefail
+          cd "$DEPLOY_PATH"
+          if [ ! -f .env ]; then echo "Missing $DEPLOY_PATH/.env - create it from .env.example first" >&2; exit 1; fi
+          # Remember the running image in .env so a plain "docker compose up" later uses the same one.
+          { grep -v '^APP_IMAGE=' .env || true; echo "APP_IMAGE=$IMAGE"; } > .env.new && mv .env.new .env
+          docker compose pull app
+          docker compose up -d --remove-orphans
+          # Wait until the app answers, otherwise fail the deploy with the container logs.
+          port="$(grep -E '^APP_PORT=' .env | cut -d= -f2 || true)"; port="${port:-3000}"
+          for attempt in $(seq 1 30); do
+            if curl -fsS "http://127.0.0.1:$port/api/health" >/dev/null 2>&1; then echo "App is healthy on port $port"; docker image prune -f >/dev/null; exit 0; fi
+            sleep 2
+          done
+          echo "App did not become healthy in time" >&2
+          docker compose ps >&2 || true
+          docker compose logs --tail 60 app >&2 || true
+          exit 1
+          REMOTE
+
+      - name: Log the server out of the container registry
+        if: always()
+        run: ssh deploy-target "docker logout ghcr.io" || true
