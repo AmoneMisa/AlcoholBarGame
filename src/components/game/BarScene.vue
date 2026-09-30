@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { CUSTOMER_ART_BY_SLOT } from '../../data/cosmetics/artCatalog';
+import { GUESTS_3D } from '../../data/cosmetics/people3d';
 import { customerLook } from '../../domain/customerLook';
 import { INGREDIENTS, RECIPES } from '../../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../../domain/bottleCatalog';
@@ -10,6 +12,7 @@ import { useGameStore } from '../../stores/game';
 import { haptic } from '../../telegram/webapp';
 import BottleModel from '../cocktails/BottleModel.vue';
 import Glass3D from '../props/Glass3D.vue';
+import CharacterModel from '../characters/CharacterModel.vue';
 import Person3D from '../characters/Person3D.vue';
 import CustomerStage3D from '../characters/CustomerStage3D.vue';
 import CityEvent from './CityEvent.vue';
@@ -439,10 +442,11 @@ onBeforeUnmount(() => {
     </div>
     <div class="bar-line-tint" aria-hidden="true"></div>
     <div class="bar-cast">
-      <CustomerStage3D :guests="guests3d" />
+      <CustomerStage3D v-if="GUESTS_3D" :guests="guests3d" />
       <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId, 'bubble-left': bubbleOnLeft(index) }" :style="customerStyle(index)" @click="game.openConversation(customer.id)">
         <div class="speech-bubble"><span>{{ customer.greeting }}</span><b>{{ bubbleText(customer) }}</b><em>{{ customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></div>
-        <div class="art-character customer-3d-slot" :data-guest-slot="customer.id" aria-hidden="true"></div>
+        <div v-if="GUESTS_3D" class="art-character customer-3d-slot" :data-guest-slot="customer.id" aria-hidden="true"></div>
+        <CharacterModel v-else role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="expressionFor(customer.mood)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
         <span v-if="customer.smoker" class="customer-ashtray" aria-hidden="true"><i></i></span>
         <div class="customer-plate"><div><b>{{ customer.name }}</b><small>{{ customer.mood }}</small></div><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i><em>{{ game.orderCountdown }}</em></span></div>
       </button>
