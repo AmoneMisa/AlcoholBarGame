@@ -1320,3 +1320,10 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
 .cosmetic-roulette p { margin:0;color:#d9c6a4;font-size:11px;line-height:1.4; }
 .cosmetic-roulette button { min-width:180px;border-color:#d19a3d!important;background:#8e5e22!important;color:#fff3cf!important; }
 @media(max-width:760px){.cosmetic-roulette>div{grid-template-columns:1fr!important}.cosmetic-roulette button{width:100%;min-width:0}.design-options .face-builder{grid-column:1/-1}.design-options .face-builder>div{display:flex;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px;scroll-snap-type:x proximity}.design-options .face-builder button{flex:0 0 auto;min-width:78px;scroll-snap-align:start}}
+
+/* Music / sound effects toggles in the top bar */
+.sound-toggles { display: flex; gap: 4px; align-items: center; padding: 0 6px; }
+.sound-toggles button { display: grid; place-items: center; gap: 1px; min-width: 38px; padding: 4px 6px; border: 1px solid #3b4b65; border-radius: 9px; background: #101827; color: var(--gold); font-size: 15px; line-height: 1; cursor: pointer; }
+.sound-toggles button .ui-icon { width: 16px; height: 16px; }
+.sound-toggles button small { font-size: 8px; letter-spacing: .08em; }
+.sound-toggles button.off { color: #6b778b; }

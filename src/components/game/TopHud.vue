@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { CRYSTAL_EXCHANGE_BUNDLES } from '../../domain/economy';
 import { useGameStore } from '../../stores/game';
 import UiIcon from '../ui/UiIcon.vue';
+import { musicOn, sfxOn } from '../../audio/index';
 defineEmits<{ design:[] }>();
 
 const game = useGameStore();
@@ -42,6 +43,10 @@ onUnmounted(() => {
         </section>
       </div>
       <button class="daily-hud-gift" type="button" :disabled="!game.dailyGiftAvailable" @click="game.claimDailyGift()"><UiIcon name="gift" /><span><small>LOGIN STREAK {{ game.upcomingLoginDay }}</small><b>{{ game.dailyGiftAvailable ? `+${game.dailyCoinReward}${game.dailyCrystalReward ? ` · ◆${game.dailyCrystalReward}` : ''}` : 'Claimed' }}</b></span></button>
+      <div class="sound-toggles">
+        <button type="button" :class="{ off: !musicOn }" :aria-pressed="musicOn" aria-label="Music" title="Music" @click="musicOn = !musicOn">♫<small>{{ musicOn ? 'On' : 'Off' }}</small></button>
+        <button type="button" :class="{ off: !sfxOn }" :aria-pressed="sfxOn" aria-label="Sound effects" title="Sound effects" @click="sfxOn = !sfxOn"><UiIcon name="speaker" /><small>{{ sfxOn ? 'On' : 'Off' }}</small></button>
+      </div>
     </div>
     <div class="shift-card"><small>LIVE SERVICE</small><b>{{ game.hasCustomer ? game.orderCountdown : game.nextCustomerCountdown }}</b><span>{{ game.hasCustomer ? 'Order time' : 'Next arrival' }}</span></div>
   </header>
