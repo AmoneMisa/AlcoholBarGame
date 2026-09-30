@@ -184,7 +184,7 @@ const boostLeft = (id: string) => {
       <template v-else>
         <article class="card">
           <h3>🍹 Design your signature</h3>
-          <p>Some guests will come just for it (about {{ Math.round(SIGNATURE_GUEST_CHANCE * 100) }}% of arrivals). Developing or changing it costs {{ SIGNATURE_FEE }} coins and restarts its fame.</p>
+          <p>Some guests will come asking for your house special (about {{ Math.round(SIGNATURE_GUEST_CHANCE * 100) }}% of arrivals) without naming it: open the conversation and offer it in English, by name or as “the house special”. Developing or changing it costs {{ SIGNATURE_FEE }} coins and restarts its fame.</p>
           <input v-model="draftName" maxlength="24" placeholder="Cocktail name" />
           <div v-for="(row, index) in draftItems" :key="index" class="row sig-row">
             <select :value="row.ingredientId" @change="pickIngredient(row, ($event.target as HTMLSelectElement).value)"><option v-for="item in usableList" :key="item.id" :value="item.id">{{ item.name }}</option></select>

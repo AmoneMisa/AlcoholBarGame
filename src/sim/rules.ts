@@ -394,6 +394,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'serve': {
       const auto = action.auto === true;
       if (!guest) throw new RuleError('There is no order to serve.');
+      if (guest.signature && !guest.orderRevealed) throw new RuleError('Talk to the guest first: ask about your house special.');
       if (guest.orderKind === 'bottle') throw new RuleError('This customer wants sealed bottles. Complete the sale in the conversation.');
       const mix = Array.isArray(action.mix) ? action.mix.filter((item) => INGREDIENTS.some((ingredient) => ingredient.id === item?.ingredientId))
         .map((item) => ({ ingredientId: item.ingredientId, amount: cleanAmount(item.amount, 1000) })).filter((item) => item.amount > 0) : [];
@@ -928,7 +929,14 @@ function ensureTranscript(state: PlayerState, guest: Customer): Transcript {
 
 function say(state: PlayerState, guest: Customer, text: string, context: RuleContext, marketFactor: number) {
   const transcript = ensureTranscript(state, guest);
-  const english = context.checkEnglish(text);
+  // A signature cocktail's name is invented, so the spell checker cannot know it: it is swapped for a real drink
+  // word while the grammar is checked, and put back in the correction.
+  const signatureName = guest.signature?.name;
+  const mask = signatureName && /^[aeiou]/i.test(signatureName) ? 'Orange' : 'Mojito';
+  const nameRegex = signatureName ? new RegExp(signatureName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+'), 'i') : undefined;
+  const namesSignature = !!nameRegex && nameRegex.test(text);
+  const checked = context.checkEnglish(nameRegex ? text.replace(nameRegex, mask) : text);
+  const english = signatureName ? { ...checked, corrected: checked.corrected.replace(new RegExp(mask, 'g'), signatureName) } : checked;
   transcript.attempts++;
   state.languageStats.sentences++;
   if (english.ok) {
@@ -951,12 +959,17 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
   const profile = guest.orderKind === 'cocktail' && recipe ? buildProfile(recipe) : undefined;
   const serveAnswer = guest.orderKind === 'serve' ? replyToServe(heard, guest, onShelf) : undefined;
   const namesOrder = !!findRecipeMention(heard, RECIPES) || !!findBottleMention(heard);
-  const service = serveAnswer || (namesOrder && guest.orderKind !== 'serve') ? undefined
+  // The bartender has to bring up the house special (by name, or as "the house special") before the guest confirms.
+  const signatureAnswer: CustomerReply | undefined = guest.signature && !guest.orderRevealed && (namesSignature || /\b(house special|signature)\b/i.test(heard))
+    ? { text: `Yes! ${guest.signature.name} is exactly what I came for. Thank you!`, expression: 'very-happy', facts: [], confirmed: true } : undefined;
+  const service = signatureAnswer || serveAnswer || (namesOrder && guest.orderKind !== 'serve') ? undefined
     : serviceReply(heard, { customer: guest, kind: guest.orderKind === 'bottle' ? 'bottle' : 'drink', confirmed: !!guest.orderRevealed, wish: profile ? shortWish(profile) : undefined });
   const reply: CustomerReply & { bottleFacts?: Transcript['bottleFacts']; selectedBottleId?: string } =
-    (serveAnswer ? { text: serveAnswer.text, expression: serveAnswer.expression, facts: [] } : undefined)
+    signatureAnswer
+    ?? (serveAnswer ? { text: serveAnswer.text, expression: serveAnswer.expression, facts: [] } : undefined)
     ?? service
-    ?? (guest.signature ? { text: `Just your ${guest.signature.name}, please.`, expression: 'smile', facts: [] }
+    ?? (guest.signature ? (guest.orderRevealed ? { text: `Just your ${guest.signature.name}, please.`, expression: 'smile' as const, facts: [] }
+      : { text: 'I heard this bar has a wonderful house special. Do you know which one I mean?', expression: 'thinking' as const, facts: [] })
     : guest.orderKind === 'serve' && guest.serveRequest ? { text: `Just ${serveName(guest.serveRequest)}, please.`, expression: 'smile', facts: [] }
       : guest.orderKind === 'bottle' ? replyToBottle(heard, guest, transcript.bottleFacts, marketFactor)
         : profile ? replyTo(heard, guest, profile, RECIPES, transcript.facts, MODIFIERS.find((item) => item.id === guest.modifierId)?.label)
@@ -983,7 +996,8 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
     } else if (guest.orderKind !== 'bottle') {
       if (!guest.orderRevealed) state.xp += 10;
       guest.orderRevealed = true;
-      state.message = `${guest.name} ordered: ${recipe?.name ?? 'a drink'}. Time to mix!`;
+      if (guest.signature) { guest.request = `I heard about your ${guest.signature.name}. One, please.`; guest.wish = guest.request; }
+      state.message = `${guest.name} ordered: ${recipe?.name ?? guest.signature?.name ?? 'a drink'}. Time to mix!`;
     }
     if (!transcript.perfectRewardClaimed && transcript.attempts > 0 && transcript.correct === transcript.attempts) {
       const reward = conversationCrystalReward(guest, recipe);

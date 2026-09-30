@@ -458,10 +458,27 @@ test('Signature guests order the house special, pay its price with fame, and can
   applyAction(state, { type: 'tick' }, { now: NOW + 10_000, random: () => 0, checkEnglish: (t) => ({ ok: true, corrected: t }), spawnCustomers: true });
   const guest = state.customers[0];
   assert.ok(guest?.signature, 'a signature guest arrived');
+  // The house special is not announced: the client never sees it, and it must be brought up in English.
+  const { publicState } = await import('../src/sim/state.ts');
+  const view = publicState(state).customers[0];
+  assert.equal(view.signature, undefined);
+  assert.doesNotMatch(view.request, /Sky Tonic/);
+  assert.equal(guest.orderRevealed, false);
+  assert.throws(() => run(state, { type: 'serve', mix: items.map((item) => ({ ...item })), shaken: false, pourBrands: {} }), /Talk to the guest/);
+  assert.throws(() => run(state, { type: 'offerSimilar', customerId: guest.id }), /signature cocktail/);
+  run(state, { type: 'openConversation', customerId: guest.id });
+  assert.doesNotMatch(state.conversations[guest.id].lines[0].text, /Sky Tonic/, 'the opening line does not give the name away');
+  const seen = [];
+  const talk = (text) => applyAction(state, { type: 'say', text }, { now: NOW + 20_000, random: () => .5, checkEnglish: (t) => { seen.push(t); return { ok: true, corrected: t }; } });
+  talk('Good evening, how are you?');
+  assert.equal(guest.orderRevealed, false, 'small talk does not confirm the order');
+  talk('Would you like the Sky Tonic?');
+  assert.match(seen.at(-1), /Mojito/, 'the invented name is masked for the spell checker');
   assert.equal(guest.orderRevealed, true);
   assert.match(guest.request, /Sky Tonic/);
   assert.equal(requiredRecipe(guest).ingredients.length, 2);
-  assert.throws(() => run(state, { type: 'offerSimilar', customerId: guest.id }), /signature cocktail/);
+  assert.match(state.conversations[guest.id].lines.at(-1).text, /Sky Tonic is exactly what/);
+  assert.equal(publicState(state).customers[0].signature.name, 'Sky Tonic');
 
   const price = guest.signature.price;
   for (const stock of state.inventories['new-york']) stock.amount = 5000;
@@ -496,4 +513,24 @@ test('Saved signatures are re-validated on load', () => {
   assert.notEqual(loot.signatures['new-york'].price, 99, 'price is recomputed, never trusted');
   assert.equal(loot.signatures.london, undefined);
   assert.equal(loot.signatures.berlin, undefined);
+});
+
+test('The house special can also be asked for as "the house special"; wrong dishes never confirm it', async () => {
+  const state = fresh();
+  state.xp = xpForLevel(15); state.money = 1000; state.vipCooldownUntil = NOW + 1e12;
+  run(state, { type: 'designSignature', name: 'Amber Sour', items: [{ ingredientId: 'whiskey', amount: 45 }, { ingredientId: 'lemon-juice', amount: 25 }], needsShake: true });
+  state.customers = []; state.nextCustomerAt = 1;
+  applyAction(state, { type: 'tick' }, { now: NOW + 10_000, random: () => 0, checkEnglish: (t) => ({ ok: true, corrected: t }), spawnCustomers: true });
+  const guest = state.customers[0];
+  run(state, { type: 'openConversation', customerId: guest.id });
+  const seen = [];
+  const talk = (text) => applyAction(state, { type: 'say', text }, { now: NOW + 20_000, random: () => .5, checkEnglish: (t) => { seen.push(t); return { ok: true, corrected: t }; } });
+  talk('Would you like a Mojito?');
+  assert.equal(guest.orderRevealed, false, 'naming another drink does not confirm it');
+  talk('Maybe our house special?');
+  assert.equal(guest.orderRevealed, true);
+  assert.equal(state.conversations[guest.id].correct, 2);
+  // A vowel-initial name is masked with a vowel-initial word so "an Amber Sour" stays grammatical.
+  talk('An Amber Sour is nice.');
+  assert.match(seen.at(-1), /An Orange/);
 });

@@ -105,7 +105,7 @@ export function wishFor(customer: Customer) {
 export function publicState(state: PlayerState): PlayerState {
   const view = structuredClone(state);
   view.customers = view.customers.map((customer) => customer.orderRevealed ? customer : {
-    ...customer, orderRecipeId: '', modifierId: undefined, bottleRequest: undefined, budget: 0,
+    ...customer, orderRecipeId: '', modifierId: undefined, bottleRequest: undefined, budget: 0, signature: undefined,
     wish: customer.wish ?? wishFor(customer), request: customer.wish ?? wishFor(customer)
   });
   return view;

@@ -25,7 +25,7 @@ export function crystalExchange(crystals: number) {
 export const arrivalSkipCrystalCost = (remainingMs: number) => remainingMs <= 0 ? 0 : Math.min(24, Math.max(1, Math.ceil(remainingMs / 300_000)));
 
 export function conversationDifficulty(customer: Customer, recipe?: Recipe) {
-  let score = customer.orderKind === 'bottle' ? 3 : customer.orderKind === 'serve' ? 2 : 1;
+  let score = customer.orderKind === 'bottle' || customer.signature ? 3 : customer.orderKind === 'serve' ? 2 : 1;
   score += customer.mood === 'vip' || customer.mood === 'impatient' || customer.mood === 'angry' ? 1 : 0;
   score += recipe && recipe.ingredients.length >= 5 ? 1 : 0;
   return Math.min(5, Math.max(1, score));

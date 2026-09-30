@@ -473,8 +473,9 @@ export function applySignatureGuest(state: PlayerState, guest: Customer, random:
   guest.orderKind = 'cocktail';
   guest.orderRecipeId = 'signature';
   guest.modifierId = undefined; guest.bottleRequest = undefined; guest.serveRequest = undefined; guest.selectedBottleId = undefined;
-  guest.orderRevealed = true;
-  guest.request = `I heard about your ${signature.name}. One, please.`;
+  // Not announced: the bartender has to bring up the house special in English before the guest confirms it.
+  guest.orderRevealed = false;
+  guest.request = 'I heard this bar has a famous house special. What would you recommend?';
   guest.wish = guest.request;
   guest.budget = signature.price * 1.5 + 4;
 }
