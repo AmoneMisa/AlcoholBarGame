@@ -44,10 +44,9 @@ const art = computed(() => CHARACTER_ART.find((item) => item.id === props.charac
 const look = computed(() => createCharacterLook(props.seed || props.characterId));
 // Frame proportions (sheet width / columns ÷ sheet height / rows) of the customer sheets.
 const FRAME_RATIO: Record<string, number> = {
-  'extended-cast':(1568 / 5) / (1003 / 2),'extended-cast-2':(1568 / 5) / (1003 / 2),'velvet-hour-cast':(2122 / 5) / 741,
   'extended-seated-cast-v2':(1568 / 5) / (1003 / 2),'extended-seated-cast-2-v2':(1568 / 5) / (1003 / 2),'velvet-hour-seated-cast-v2':(2122 / 5) / 741
 };
-const sheetName = (sheet?: string) => (sheet ?? '/velvet-hour-cast.png').split('/').pop()!.replace(/\.(?:png|webp)$/, '');
+const sheetName = (sheet?: string) => (sheet ?? '/velvet-hour-seated-cast-v2.webp').split('/').pop()!.replace(/\.(?:png|webp)$/, '');
 const poseFrame = computed(() => ({ neutral:0, relaxed:0, confident:1, hip:1, working:2, lean:2, crossed:2 }[props.pose] ?? 0));
 const spriteStyle = (sheet: string, columns: number, rows: number, index: number, frameRatio?: number) => ({
   backgroundImage:`url('${sheet}')`,
@@ -69,7 +68,7 @@ const castStyle = computed(() => {
   }
   const outfitRow = Math.max(0,['vest','shirt','apron'].indexOf(props.outfit));
   const index = props.role === 'bartender' ? outfitRow * columns + poseFrame.value : art.value.castIndex ?? 0;
-  const sheet = art.value.sheet ?? '/assets/characters/customers/velvet-hour-cast.png';
+  const sheet = art.value.sheet ?? '/assets/characters/customers/velvet-hour-seated-cast-v2.webp';
   return spriteStyle(sheet, columns, rows, index, FRAME_RATIO[sheetName(sheet)] ?? .6);
 });
 const baseStyle = computed(() => {
@@ -83,7 +82,7 @@ const hairMask = computed(() => {
   return match ? `${match[1]}-hair-mask${match[2] ?? ''}.png` : undefined;
 });
 const hairMaskStyle = computed(() => {
-  // noa-wardrobe.png → noa-hair-mask.png, leo-wardrobe-v5.png → leo-hair-mask-v5.png
+  // The active wardrobe version resolves to the matching versioned hair mask.
   const mask = `url('${hairMask.value}')`;
   const { backgroundSize, backgroundPosition } = castStyle.value;
   return { maskImage: mask, WebkitMaskImage: mask, maskSize: backgroundSize, WebkitMaskSize: backgroundSize, maskPosition: backgroundPosition, WebkitMaskPosition: backgroundPosition };
