@@ -1,5 +1,6 @@
 import { BOOST_KINDS, EQUIPMENT, TIER_ORDER, PRESTIGE_PERKS, newSlot, type EquipmentSlot, type Pity, type Reward } from './loot';
 import { REGIONS } from './catalog';
+import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 
 // The loot layer of a player's save: materials, consumables, boxes, per-bar equipment, gacha pity and prestige.
 export interface DrawResult { id: string; label: string; rarity: 'common' | 'rare' | 'legendary'; duplicate: boolean; shards: number; }
@@ -28,6 +29,8 @@ export interface LootState {
   quests: { week: number; progress: Record<string, number>; claimed: string[] };
   achievements: string[];
   tasted: string[];
+  // Loyalty points per guest portrait id (see domain/regulars.ts).
+  regulars: Record<string, number>;
 }
 
 export const createLoot = (): LootState => ({
@@ -35,7 +38,7 @@ export const createLoot = (): LootState => ({
   equipment: Object.fromEntries(REGIONS.map((region) => [region.id, Object.fromEntries(EQUIPMENT.map((item) => [item.id, newSlot()]))])),
   pity: { sinceRare: 0, sinceLegendary: 0 }, lastDraw: [],
   prestige: { stars: 0, earned: 0, count: 0, perks: {} }, runEarned: 0, levelRewarded: 1, log: [],
-  stats: {}, quests: { week: 0, progress: {}, claimed: [] }, achievements: [], tasted: []
+  stats: {}, quests: { week: 0, progress: {}, claimed: [] }, achievements: [], tasted: [], regulars: {}
 });
 
 const count = (value: unknown, max = 1_000_000) => Number.isFinite(value) && (value as number) > 0 ? Math.min(max, Math.floor(value as number)) : 0;
@@ -79,6 +82,7 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
     quests: { week: count(source.quests?.week, 1e6), progress: counts(source.quests?.progress), claimed: Array.isArray(source.quests?.claimed) ? source.quests!.claimed.filter((id) => typeof id === 'string').slice(0, 10) : [] },
     achievements: Array.isArray(source.achievements) ? [...new Set(source.achievements.filter((id) => typeof id === 'string'))].slice(0, 50) : [],
     tasted: Array.isArray(source.tasted) ? [...new Set(source.tasted.filter((id) => typeof id === 'string'))].slice(0, 400) : [],
+    regulars: counts(source.regulars, CUSTOMER_ART_BY_SLOT),
     log: Array.isArray(source.log) ? source.log.filter((line) => typeof line === 'string').slice(0, 20) : []
   };
 }

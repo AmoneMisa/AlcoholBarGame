@@ -15,7 +15,7 @@ import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL, economyAt, formatDeliveryTime, mar
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
-import { LootError, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
+import { LootError, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
 import { usableIngredientIds } from '../domain/usableStock';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
@@ -424,7 +424,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const specialty = guest.orderKind === 'serve' ? 1 : specialtyFactor(state.regionId, verdict.recipe.id);
         const golden = !auto && (state.loot.armed['golden-ice'] ?? 0) > 0;
         if (golden) delete state.loot.armed['golden-ice'];
-        const revenue = coins(verdict.recipe.price * priceFactorOf(guest, region.marketFactor) * mastery.pay * specialty * lootBonuses(state, now).payFactor * (golden ? 1.5 : 1));
+        const revenue = coins(verdict.recipe.price * priceFactorOf(guest, region.marketFactor) * mastery.pay * specialty * lootBonuses(state, now).payFactor * (golden ? 1.5 : 1) * (guest.orderKind === 'serve' ? 1 : regularPriceBonus(state, guest.characterId, verdict.recipe.id)));
         const bonus = guest.orderKind === 'serve' ? undefined : signatureBonus(verdict.recipe.id, pourBrands);
         // Tips are a chance, never a given; drinks made with Auto-serve are paid but never tipped.
         const tipped = !auto && (golden || rollTip(state, guest, now, random));
@@ -438,6 +438,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         if (guest.mood === 'vip' || guest.specialRecipeRewardId) track(state, 'vips', 1, now);
         let found = dropAfterServe(state, guest.mood === 'vip', !!guest.specialRecipeRewardId, random);
         if (guest.orderKind !== 'serve') found += tasteFirst(state, verdict.recipe.id, 'recipe', now);
+        if (guest.orderKind !== 'serve') found += earnLoyalty(state, guest.characterId, guest.name, verdict.recipe.id, guest.mood === 'vip');
         for (const productId of Object.values(pourBrands)) found += tasteFirst(state, productId, 'brand', now);
         const serveProduct = serve ? ALCOHOL_PRODUCTS.find((item) => item.id === serve.productId) : undefined;
         const brandedPayment = serveProduct ? brandedServeCrystalReward(serveProduct) : 0;

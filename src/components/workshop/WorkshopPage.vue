@@ -7,12 +7,14 @@ import {
   consumableDef, describeReward, equipmentDef, levelCap, perkCost, prestigeStarsFor, upgradeCostFor
 } from '../../domain/loot';
 import { ACHIEVEMENTS, questsForWeek, weekOf } from '../../domain/quests';
+import { CHARACTER_ART } from '../../data/cosmetics/artCatalog';
+import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipeId, isRegularId, nextRegularStep, regularLevel } from '../../domain/regulars';
 import { featuredLegendary } from '../../sim/loot';
 import { useGameStore } from '../../stores/game';
 
 const game = useGameStore();
-const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'prestige'>('equipment');
-const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['prestige', 'Grand Opening']] as const;
+const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'prestige'>('equipment');
+const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['prestige', 'Grand Opening']] as const;
 const scrollRecipe = ref('');
 const names = { consumable: (id: string) => consumableDef(id)?.name ?? id, equipment: (id: string) => equipmentDef(id)?.name ?? id };
 const cap = (id: string) => levelCap(game.loot.equipment[game.regionId]![id]!.tier, game.loot.prestige.perks.cap ?? 0);
@@ -34,6 +36,11 @@ const started = computed(() => [
   { label: 'Serve a perfect drink to earn parts and boxes', done: (game.loot.stats.serves ?? 0) >= 1 }
 ]);
 const gettingStarted = computed(() => started.value.some((step) => !step.done));
+const regulars = computed(() => CHARACTER_ART.filter((art) => isRegularId(art.id)).map((art) => {
+  const points = game.loot.regulars[art.id] ?? 0;
+  return { art, points, level: regularLevel(points), next: nextRegularStep(points), favorite: RECIPES.find((recipe) => recipe.id === favoriteRecipeId(art.id))?.name ?? '' };
+}).sort((a, b) => b.points - a.points || a.art.name.localeCompare(b.art.name)));
+const metRegulars = computed(() => regulars.value.filter((item) => item.points > 0));
 const runStars = computed(() => prestigeStarsFor(game.loot.runEarned));
 const effectText = (id: string) => {
   const item = equipmentDef(id)!;
@@ -148,6 +155,17 @@ const boostLeft = (id: string) => {
         <b>{{ Math.min(stat(goal.stat), goal.target) }} / {{ goal.target }} · +{{ goal.crystals }} crystals + {{ goal.box }} box</b>
         <button type="button" :disabled="game.loot.achievements.includes(goal.id) || stat(goal.stat) < goal.target" @click="game.act({ type: 'claimAchievement', id: goal.id })">{{ game.loot.achievements.includes(goal.id) ? 'Claimed' : 'Claim' }}</button>
       </article>
+    </div>
+
+    <div v-else-if="tab === 'regulars'" class="grid">
+      <p class="hint">Guests remember you. Every drink you serve earns loyalty (+1, +1 for VIPs, +1 for their favourite drink). Loyalty levels at {{ REGULAR_LEVELS.join(' / ') }} points pay rewards, and a regular pays {{ Math.round((REGULAR_FAVORITE_BONUS - 1) * 100) }}% more for their favourite. Level rewards: {{ REGULAR_REWARDS.map((reward) => [reward.box && reward.box + ' box', reward.parts && reward.parts + ' parts', reward.skinShards && reward.skinShards + ' skin shards', reward.crystals && reward.crystals + ' crystals'].filter(Boolean).join(' + ')).join(' → ') }}.</p>
+      <article v-for="item in metRegulars" :key="item.art.id" class="card">
+        <h3>👤 {{ item.art.name }} <b>Lv {{ item.level }}</b></h3>
+        <progress :value="item.points" :max="item.next ?? item.points"></progress>
+        <p>{{ item.points }}{{ item.next ? ` / ${item.next}` : '' }} loyalty · favourite: <b>{{ item.favorite }}</b></p>
+      </article>
+      <article v-if="!metRegulars.length" class="card"><h3>No regulars yet</h3><p>Serve a few guests and they will start to remember you.</p></article>
+      <p class="hint">{{ regulars.length - metRegulars.length }} guests have not been served yet.</p>
     </div>
 
     <div v-else class="grid">

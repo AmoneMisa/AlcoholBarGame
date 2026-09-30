@@ -8,6 +8,8 @@ import {
   TIER_ORDER, TIER_SHARD_COST, boxDef, choiceOptions, consumableDef, describeReward, equipmentDef, featuredIndex, levelCap, perkCost, prestigeStarsFor, rollBox, rollRarity,
   upgradeCostFor, type BoxKind, type EquipmentId, type PrestigePerkId, type Reward
 } from '../domain/loot';
+import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipeId, regularLevel } from '../domain/regulars';
+import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { ACHIEVEMENTS, TASTING_REWARD, achievementById, questById, questsForWeek, weekOf, type StatId } from '../domain/quests';
 import type { DrawResult } from '../domain/lootState';
 import { createLoot } from '../domain/lootState';
@@ -377,3 +379,30 @@ export function dailyLessonsBox(state: PlayerState, learningStreak: number, now:
   grantBox(state, kind);
   return ` Daily set finished: a ${boxDef(kind)!.name}!`;
 }
+
+const CUSTOMER_IDS = new Set(CUSTOMER_ART_BY_SLOT);
+// ---- Regulars ----
+// Multiplier a regular pays when served their favourite drink (only once they have reached loyalty level 1).
+export function regularPriceBonus(state: PlayerState, characterId: string | undefined, recipeId: string) {
+  if (!characterId) return 1;
+  return regularLevel(state.loot.regulars[characterId] ?? 0) >= 1 && favoriteRecipeId(characterId) === recipeId ? REGULAR_FAVORITE_BONUS : 1;
+}
+export function earnLoyalty(state: PlayerState, characterId: string | undefined, name: string, recipeId: string, vip: boolean) {
+  if (!characterId || !(characterId in state.loot.regulars) && !CUSTOMER_IDS.has(characterId)) return '';
+  const favorite = favoriteRecipeId(characterId) === recipeId;
+  const before = state.loot.regulars[characterId] ?? 0;
+  const points = 1 + (vip ? 1 : 0) + (favorite ? 1 : 0);
+  state.loot.regulars[characterId] = before + points;
+  const gained: string[] = [];
+  for (let level = regularLevel(before); level < regularLevel(before + points); level++) {
+    const reward = REGULAR_REWARDS[level]!;
+    const parts: string[] = [];
+    if (reward.box) { grantBox(state, reward.box); parts.push(`a ${boxDef(reward.box)!.name}`); }
+    if (reward.parts) { state.loot.parts += reward.parts; parts.push(`${reward.parts} parts`); }
+    if (reward.skinShards) { state.loot.skinShards += reward.skinShards; parts.push(`${reward.skinShards} skin shards`); }
+    if (reward.crystals) { state.crystals += reward.crystals; parts.push(`${reward.crystals} crystals`); }
+    gained.push(`${name} is now a level ${level + 1} regular (${parts.join(', ')})`);
+  }
+  return gained.length ? ` ${gained.join('. ')}.` : '';
+}
+export { REGULAR_LEVELS };

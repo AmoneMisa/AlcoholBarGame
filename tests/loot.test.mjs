@@ -298,3 +298,33 @@ test('English rewards: perfect talks pay parts, every third (or hard) one a box;
   assert.equal(player.loot.boxes.bronze, 1);
   assert.equal(player.loot.stats.lessons, 1);
 });
+
+test('Regulars: loyalty grows per served guest, levels pay rewards once, favourites pay a bonus only for regulars', async () => {
+  const { earnLoyalty, regularPriceBonus } = await import('../src/sim/loot.ts');
+  const { favoriteRecipeId, regularLevel, REGULAR_FAVORITE_BONUS } = await import('../src/domain/regulars.ts');
+  const state = fresh();
+  const favorite = favoriteRecipeId('marin');
+  const other = RECIPES.slice(0, 10).find((recipe) => recipe.id !== favorite).id;
+  assert.equal(favoriteRecipeId('marin'), favorite, 'stable favourite');
+  assert.equal(regularPriceBonus(state, 'marin', favorite), 1, 'no bonus before level 1');
+  earnLoyalty(state, 'marin', 'Marin', other, false);
+  earnLoyalty(state, 'marin', 'Marin', other, false);
+  assert.equal(state.loot.boxes.bronze, undefined);
+  const note = earnLoyalty(state, 'marin', 'Marin', other, false);
+  assert.match(note, /level 1 regular/);
+  assert.equal(state.loot.boxes.bronze, 1);
+  assert.equal(regularLevel(state.loot.regulars.marin), 1);
+  assert.equal(regularPriceBonus(state, 'marin', favorite), REGULAR_FAVORITE_BONUS);
+  assert.equal(regularPriceBonus(state, 'marin', other), 1);
+  // VIP + favourite jump three points, and a level is never paid twice.
+  earnLoyalty(state, 'marin', 'Marin', favorite, true);
+  assert.equal(state.loot.regulars.marin, 6);
+  earnLoyalty(state, 'marin', 'Marin', favorite, true);
+  assert.equal(state.loot.regulars.marin, 9);
+  assert.equal(state.loot.parts, 8);
+  earnLoyalty(state, 'marin', 'Marin', other, false);
+  assert.equal(state.loot.parts, 8);
+  // Unknown portraits and tampered saves are ignored.
+  assert.equal(earnLoyalty(state, 'not-a-guest', 'X', other, false), '');
+  assert.deepEqual(normalizeLoot({ regulars: { marin: 5, hacker: 999, kai: -3 } }, 1).regulars, { marin: 5 });
+});
