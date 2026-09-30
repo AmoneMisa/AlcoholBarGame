@@ -1,7 +1,7 @@
 import { reactive, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 
-export type NotificationEvent = 'dailyLesson'|'dailyReward'|'friendVisit'|'reward'|'customer'|'friendRequest'|'loot';
+export type NotificationEvent = 'dailyLesson'|'dailyReward'|'friendVisit'|'reward'|'customer'|'friendRequest'|'loot'|'leaderboard';
 export const NOTIFICATION_EVENTS: { id:NotificationEvent; label:string; detail:string }[] = [
   { id:'dailyLesson',label:'Daily lesson',detail:'Remind me to complete today’s English quests.' },
   { id:'dailyReward',label:'Daily reward',detail:'Tell me when the login reward is ready.' },
@@ -9,7 +9,8 @@ export const NOTIFICATION_EVENTS: { id:NotificationEvent; label:string; detail:s
   { id:'reward',label:'Rewards and gifts',detail:'Show rewards, gifts and successful claims.' },
   { id:'customer',label:'New customer',detail:'Tell me when a new guest reaches the bar.' },
   { id:'friendRequest',label:'Friend request',detail:'Tell me about a new request to accept or decline.' },
-  { id:'loot',label:'Boxes and boosters',detail:'Tell me when I get a box or a booster runs out.' }
+  { id:'loot',label:'Boxes and boosters',detail:'Tell me when I get a box or a booster runs out.' },
+  { id:'leaderboard',label:'Weekly leaderboard',detail:'Tell me when a week ends and my leaderboard reward is ready.' }
 ];
 const KEY = 'barlingo.notifications';
 

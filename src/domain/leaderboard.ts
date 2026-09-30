@@ -22,3 +22,14 @@ export function describeLeaderboardReward(reward: LeaderboardReward) {
   if (reward.crystals) parts.push(`${reward.crystals} crystals`);
   return parts.join(' + ');
 }
+
+// The notification for a finished week: only when there is a reward to claim. The key makes it show once per week.
+export interface WeekResult { week: number; rank: number; size: number; tier: string | null; reward: string | null; claimable: boolean; }
+export function weeklyRewardNotice(previous: WeekResult | null | undefined) {
+  if (!previous || !previous.claimable || !previous.reward) return null;
+  return {
+    key: `weekly-reward:${previous.week}`,
+    title: `Weekly leaderboard: ${previous.tier ?? 'reward'}`,
+    text: `You finished #${previous.rank} of ${previous.size}. Claim ${previous.reward} in Workshop → Weekly.`
+  };
+}

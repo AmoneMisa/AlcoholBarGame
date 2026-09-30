@@ -55,3 +55,5 @@ Consumables (one per gift) and skin shards (5 / 10 / 20) can be sent to friends 
 - A "New season" notification is shown once per season. Draws are audited with their banner and season progress.
 
 **Friends-only view:** `POST /api/leaderboard { scope: 'friends' }` ranks the player and their *accepted* friends (pending requests and strangers never appear), including friends who have not scored yet (shown last, at 0). Friends appear under their own name or the nickname the player gave them; global rows still show only bar names. Weekly rewards stay tied to the global rank.
+
+**Week-end notification:** when the session is ready and every 30 minutes the app asks the leaderboard endpoint for last week's standing; if a reward is claimable it shows one "Weekly leaderboard" toast per week (`weeklyRewardNotice`, keyed by week) pointing to Workshop → Weekly. It has its own on/off switch in the notification settings and does nothing offline.

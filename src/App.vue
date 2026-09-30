@@ -60,6 +60,21 @@ watch(() => game.friends.filter((friend) => friend.status === 'pending' && frien
 });
 // Workshop: a new box to open, and boosters that have just run out.
 import { seasonAt } from './domain/seasons';
+import { weeklyRewardNotice } from './domain/leaderboard';
+import { fetchLeaderboard } from './telegram/api';
+// Online only: when a new week has started and last week paid a reward, tell the player once.
+async function checkWeeklyReward() {
+  if (game.mode !== 'online') return;
+  try {
+    const board = await fetchLeaderboard();
+    const notice = weeklyRewardNotice(board.previous);
+    if (notice) notifications.push('leaderboard', notice.title, notice.text, notice.key);
+  } catch { /* offline or rate-limited: try again later */ }
+}
+let weeklyTimer: ReturnType<typeof setInterval>;
+onMounted(() => { weeklyTimer = setInterval(() => void checkWeeklyReward(), 30 * 60_000); });
+onUnmounted(() => clearInterval(weeklyTimer));
+watch(() => game.sessionReady, (ready) => { if (ready) void checkWeeklyReward(); }, { immediate: true });
 watch(() => game.sessionReady, (ready) => {
   if (!ready) return;
   const season = seasonAt(Date.now());

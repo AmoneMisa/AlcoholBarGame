@@ -600,3 +600,16 @@ test('Season banner: rate-up, draw counting, milestone boxes once, spark pick, m
   assert.equal(state.loot.season.spark, false);
   assert.equal(normalizeLoot({ season: { id: 'bad', draws: -5, rewarded: [10, 999], spark: 'yes' } }, 1).season.rewarded.length, 1);
 });
+
+test('Week-end notice appears only for a claimable reward, once per week key', async () => {
+  const { weeklyRewardNotice } = await import('../src/domain/leaderboard.ts');
+  const base = { week: 2950, rank: 2, size: 40, tier: 'Podium', reward: '1 choice box + 1 silver box + 30 crystals', claimable: true };
+  const notice = weeklyRewardNotice(base);
+  assert.equal(notice.key, 'weekly-reward:2950');
+  assert.match(notice.title, /Podium/);
+  assert.match(notice.text, /#2 of 40/);
+  assert.notEqual(weeklyRewardNotice({ ...base, week: 2951 }).key, notice.key);
+  assert.equal(weeklyRewardNotice({ ...base, claimable: false }), null, 'already claimed');
+  assert.equal(weeklyRewardNotice({ ...base, reward: null, claimable: false }), null, 'below the minimum score');
+  assert.equal(weeklyRewardNotice(null), null, 'did not play last week');
+});
