@@ -15,7 +15,7 @@ import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL, economyAt, formatDeliveryTime, mar
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
-import { LootError, buyBox, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
+import { LootError, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
 import { DELIVERY_DAY_MS, levelFor, normalizePlayerState, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
@@ -72,6 +72,8 @@ export type GameAction =
   | { type: 'drawStyle'; count: 1 | 10 }
   | { type: 'craftSkin'; cosmeticId: string }
   | { type: 'prestige' }
+  | { type: 'claimQuest'; questId: string }
+  | { type: 'claimAchievement'; id: string }
   | { type: 'buyPrestigePerk'; perk: string };
 
 export class RuleError extends Error {}
@@ -357,6 +359,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.crystals += crystalPayment;
       state.xp += xpGain(state, 110 + Math.min(state.streak * 2, 14), now);
       state.streak += 1;
+      track(state, 'bottles', request.quantity, now);
       const note = `Sold ${request.quantity} × ${product.name} for ${revenue.toFixed(2)} coins and ${crystalPayment} crystals.${tip ? ` Tip +${tip}.` : ' No tip this time.'}`;
       scheduleNextCustomer(state, now, random);
       state.message = note;
@@ -427,7 +430,12 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         // About 60 successful orders reach level 25: roughly four medium two-hour play days.
         state.xp += xpGain(state, 100 + Math.min(state.streak * 2, 14), now);
         state.streak += 1;
-        const found = dropAfterServe(state, guest.mood === 'vip', !!guest.specialRecipeRewardId, random);
+        track(state, 'serves', 1, now);
+        track(state, 'servesCoins', Math.floor(revenue + tip), now);
+        if (guest.mood === 'vip' || guest.specialRecipeRewardId) track(state, 'vips', 1, now);
+        let found = dropAfterServe(state, guest.mood === 'vip', !!guest.specialRecipeRewardId, random);
+        if (guest.orderKind !== 'serve') found += tasteFirst(state, verdict.recipe.id, 'recipe', now);
+        for (const productId of Object.values(pourBrands)) found += tasteFirst(state, productId, 'brand', now);
         const serveProduct = serve ? ALCOHOL_PRODUCTS.find((item) => item.id === serve.productId) : undefined;
         const brandedPayment = serveProduct ? brandedServeCrystalReward(serveProduct) : 0;
         const specialPayment = guest.specialRecipeRewardId || guest.mood === 'vip' ? conversationCrystalReward(guest, verdict.recipe) : 0;
@@ -779,12 +787,14 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'drawStyle':
     case 'craftSkin':
     case 'prestige':
+    case 'claimQuest':
+    case 'claimAchievement':
     case 'buyPrestigePerk': {
       try {
         switch (action.type) {
-          case 'upgradeEquipment': upgradeEquipment(state, action.item); break;
+          case 'upgradeEquipment': upgradeEquipment(state, action.item, now); break;
           case 'promoteEquipment': promoteEquipment(state, action.item); break;
-          case 'openBox': openBox(state, action.box, random); break;
+          case 'openBox': openBox(state, action.box, random, now); break;
           case 'pickReward': pickChoice(state, action.index, random); break;
           case 'buyBox': buyBox(state, action.box, action.quantity); break;
           case 'buyConsumable': buyConsumable(state, action.id, action.quantity); break;
@@ -792,6 +802,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           case 'drawStyle': drawStyle(state, action.count, now, random); break;
           case 'craftSkin': craftSkin(state, action.cosmeticId); break;
           case 'prestige': prestige(state, now); break;
+          case 'claimQuest': claimQuest(state, action.questId, now); break;
+          case 'claimAchievement': claimAchievement(state, action.id); break;
           case 'buyPrestigePerk': buyPrestigePerk(state, action.perk); break;
         }
       } catch (error) {

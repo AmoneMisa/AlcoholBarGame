@@ -10,3 +10,9 @@ State is `PlayerState.loot` (`src/domain/lootState.ts`), validated in `normalize
 - **Prestige** (level 50): resets money, XP, stock, equipment; keeps recipes, styles, crystals, parts, boxes. Stars = 2 + floor(sqrt(run earnings / 400)); spend them on pay, supplier prices, equipment cap and starting coins.
 
 Random actions (`openBox`, `pickReward`, `drawStyle`, `prestige`) are server-only in the client store. Crystal changes reach the existing crystal ledger automatically.
+
+## Quests, achievements, tasting log
+`src/domain/quests.ts`. Server rules count serves, coins, VIPs, bottles, boxes, draws, upgrades and tasted recipes (`track` in `sim/loot.ts`).
+- **Weekly quests**: three per week, rotating from the server clock; progress resets each week; reward crystals plus a box.
+- **Achievements**: lifetime counters (kept through prestige); larger ones give a choice box.
+- **Tasting log**: the first successful serve of each recipe gives 2 parts and 3 skin shards; each newly poured brand gives 1 skin shard.

@@ -23,13 +23,19 @@ export interface LootState {
   // Highest level whose level-up box was already granted.
   levelRewarded: number;
   log: string[];
+  // Lifetime counters, this week's quest progress, claimed achievements and the tasting log (first serves).
+  stats: Record<string, number>;
+  quests: { week: number; progress: Record<string, number>; claimed: string[] };
+  achievements: string[];
+  tasted: string[];
 }
 
 export const createLoot = (): LootState => ({
   parts: 0, skinShards: 0, itemShards: {}, consumables: {}, boxes: {}, armed: {}, boosts: {},
   equipment: Object.fromEntries(REGIONS.map((region) => [region.id, Object.fromEntries(EQUIPMENT.map((item) => [item.id, newSlot()]))])),
   pity: { sinceRare: 0, sinceLegendary: 0 }, lastDraw: [],
-  prestige: { stars: 0, earned: 0, count: 0, perks: {} }, runEarned: 0, levelRewarded: 1, log: []
+  prestige: { stars: 0, earned: 0, count: 0, perks: {} }, runEarned: 0, levelRewarded: 1, log: [],
+  stats: {}, quests: { week: 0, progress: {}, claimed: [] }, achievements: [], tasted: []
 });
 
 const count = (value: unknown, max = 1_000_000) => Number.isFinite(value) && (value as number) > 0 ? Math.min(max, Math.floor(value as number)) : 0;
@@ -69,6 +75,10 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
     prestige: { stars: count(source.prestige?.stars), earned: count(source.prestige?.earned), count: count(source.prestige?.count, 1000), perks },
     runEarned: count(source.runEarned, 1e12),
     levelRewarded: Math.max(1, count(source.levelRewarded, 50) || currentLevel),
+    stats: counts(source.stats, ['serves', 'servesCoins', 'vips', 'bottles', 'boxes', 'draws', 'upgrades', 'tasted']),
+    quests: { week: count(source.quests?.week, 1e6), progress: counts(source.quests?.progress), claimed: Array.isArray(source.quests?.claimed) ? source.quests!.claimed.filter((id) => typeof id === 'string').slice(0, 10) : [] },
+    achievements: Array.isArray(source.achievements) ? [...new Set(source.achievements.filter((id) => typeof id === 'string'))].slice(0, 50) : [],
+    tasted: Array.isArray(source.tasted) ? [...new Set(source.tasted.filter((id) => typeof id === 'string'))].slice(0, 400) : [],
     log: Array.isArray(source.log) ? source.log.filter((line) => typeof line === 'string').slice(0, 20) : []
   };
 }

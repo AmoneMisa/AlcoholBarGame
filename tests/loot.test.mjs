@@ -196,3 +196,38 @@ test('Recipe Scroll needs a known recipe; Express Courier needs a delivery', () 
   run(state, { type: 'tick' });
   assert.equal(state.deliveryOrders.length, 0);
 });
+
+test('Serving tracks stats, pays the tasting reward only the first time, and quests/achievements claim once', async () => {
+  const { RECIPES } = await import('../src/domain/catalog.ts');
+  const { questsForWeek, weekOf } = await import('../src/domain/quests.ts');
+  const state = fresh();
+  const serve = () => {
+    const guest = state.customers[0];
+    guest.modifierId = undefined; guest.orderKind = 'cocktail'; guest.orderRevealed = true; guest.orderRecipeId = RECIPES[0].id;
+    for (const stock of state.inventories['new-york']) stock.amount = 5000;
+    run(state, { type: 'serve', mix: RECIPES[0].ingredients.map((item) => ({ ...item })), shaken: true, pourBrands: {} });
+    state.customers = state.customers.length ? state.customers : [];
+  };
+  serve();
+  assert.equal(state.loot.stats.serves, 1);
+  assert.equal(state.loot.stats.tasted, 1);
+  assert.equal(state.loot.skinShards, 3);
+  serve();
+  assert.equal(state.loot.stats.serves, 2);
+  assert.equal(state.loot.skinShards, 3, 'no second tasting reward');
+
+  assert.throws(() => run(state, { type: 'claimAchievement', id: 'a-serve-10' }), /not finished/);
+  state.loot.stats.serves = 10;
+  run(state, { type: 'claimAchievement', id: 'a-serve-10' });
+  assert.equal(state.loot.boxes.bronze >= 1, true);
+  assert.throws(() => run(state, { type: 'claimAchievement', id: 'a-serve-10' }), /already claimed/);
+
+  const quest = questsForWeek(weekOf(NOW))[0];
+  assert.throws(() => run(state, { type: 'claimQuest', questId: quest.id }), /not finished/);
+  state.loot.quests = { week: weekOf(NOW), progress: { [quest.stat]: quest.target }, claimed: [] };
+  const crystals = state.crystals;
+  run(state, { type: 'claimQuest', questId: quest.id });
+  assert.equal(state.crystals, crystals + quest.crystals);
+  assert.throws(() => run(state, { type: 'claimQuest', questId: quest.id }), /already claimed/);
+  assert.throws(() => run(state, { type: 'claimQuest', questId: 'q-fake' }), /not active/);
+});

@@ -8,6 +8,7 @@ import {
   TIER_ORDER, TIER_SHARD_COST, boxDef, choiceOptions, consumableDef, describeReward, equipmentDef, featuredIndex, levelCap, perkCost, prestigeStarsFor, rollBox, rollRarity,
   upgradeCostFor, type BoxKind, type EquipmentId, type PrestigePerkId, type Reward
 } from '../domain/loot';
+import { ACHIEVEMENTS, TASTING_REWARD, achievementById, questById, questsForWeek, weekOf, type StatId } from '../domain/quests';
 import type { DrawResult } from '../domain/lootState';
 import { createLoot } from '../domain/lootState';
 import { addSpareCopy, isStarterRecipe } from './recipes';
@@ -90,12 +91,13 @@ export function grantReward(state: PlayerState, reward: Reward, random: () => nu
 
 export function grantBox(state: PlayerState, kind: BoxKind, amount = 1) { add(state.loot.boxes, kind, amount); }
 
-export function openBox(state: PlayerState, kind: string, random: () => number) {
+export function openBox(state: PlayerState, kind: string, random: () => number, now: number) {
   if (!boxDef(kind)) throw new LootError('Unknown box.');
   if (state.loot.pendingChoice) throw new LootError('Pick your reward from the open choice box first.');
   if (!has(state.loot.boxes, kind)) throw new LootError('You do not have this box.');
   const level = levelFor(state.xp);
   take(state.loot.boxes, kind, 1);
+  track(state, 'boxes', 1, now);
   if (kind === 'choice') {
     state.loot.pendingChoice = choiceOptions(level, random);
     state.message = 'Choice box opened: pick one of three rewards.';
@@ -170,7 +172,7 @@ export function useConsumable(state: PlayerState, id: string, recipeId: unknown,
 }
 
 // ---- Equipment ----
-export function upgradeEquipment(state: PlayerState, id: string) {
+export function upgradeEquipment(state: PlayerState, id: string, now: number) {
   const slot = slotOf(state, id);
   const cap = levelCap(slot.tier, perkRank(state, 'cap'));
   if (slot.level >= cap) throw new LootError(TIER_SHARD_COST[slot.tier] ? 'Raise the item’s tier with shards to unlock more levels.' : 'This item is at its top level.');
@@ -180,6 +182,7 @@ export function upgradeEquipment(state: PlayerState, id: string) {
   state.money = coins(state.money - cost.coins);
   state.loot.parts -= cost.parts;
   slot.level += 1;
+  track(state, 'upgrades', 1, now);
   note(state, `${equipmentDef(id)!.name} is now level ${slot.level} in this bar.`);
 }
 export function promoteEquipment(state: PlayerState, id: string) {
@@ -217,6 +220,7 @@ export function drawStyle(state: PlayerState, count: unknown, now: number, rando
     results.push({ id: reward.id, label: reward.label, rarity, duplicate, shards });
   }
   loot.lastDraw = results;
+  track(state, 'draws', count, now);
   const best = results.find((item) => item.rarity === 'legendary') ?? results.find((item) => item.rarity === 'rare') ?? results[0]!;
   note(state, `Style draw: ${results.map((item) => item.label).join(', ')}${results.some((item) => item.duplicate) ? ` (duplicates became ${results.reduce((sum, item) => sum + item.shards, 0)} skin shards)` : ''}. Best: ${best.label}.`);
 }
@@ -298,3 +302,52 @@ export function buyPrestigePerk(state: PlayerState, perkId: unknown) {
 }
 
 export { BOXES, CONSUMABLES, EQUIPMENT, MAX_LEVEL };
+
+// ---- Quests, achievements and the tasting log ----
+// Counters only ever go up from server rules; this week's quest progress restarts when the week changes.
+export function track(state: PlayerState, stat: StatId, amount: number, now: number) {
+  const loot = state.loot;
+  const week = weekOf(now);
+  if (loot.quests.week !== week) loot.quests = { week, progress: {}, claimed: [] };
+  add(loot.stats, stat, amount);
+  add(loot.quests.progress, stat, amount);
+}
+const goalProgress = (state: PlayerState, stat: StatId) => state.loot.stats[stat] ?? 0;
+
+export function claimQuest(state: PlayerState, questId: unknown, now: number) {
+  const week = weekOf(now);
+  if (state.loot.quests.week !== week) state.loot.quests = { week, progress: {}, claimed: [] };
+  const quest = questsForWeek(week).find((item) => item.id === questId);
+  if (!quest) throw new LootError('This quest is not active this week.');
+  if (state.loot.quests.claimed.includes(quest.id)) throw new LootError('Quest reward already claimed.');
+  if ((state.loot.quests.progress[quest.stat] ?? 0) < quest.target) throw new LootError('This quest is not finished yet.');
+  state.loot.quests.claimed.push(quest.id);
+  state.crystals += quest.crystals;
+  grantBox(state, quest.box);
+  note(state, `Quest done: ${quest.name}. +${quest.crystals} crystals and a ${boxDef(quest.box)!.name}.`);
+}
+export function claimAchievement(state: PlayerState, id: unknown) {
+  const goal = achievementById(String(id));
+  if (!goal) throw new LootError('Unknown achievement.');
+  if (state.loot.achievements.includes(goal.id)) throw new LootError('Achievement reward already claimed.');
+  if (goalProgress(state, goal.stat) < goal.target) throw new LootError('This achievement is not finished yet.');
+  state.loot.achievements.push(goal.id);
+  state.crystals += goal.crystals;
+  grantBox(state, goal.box);
+  note(state, `Achievement: ${goal.name}. +${goal.crystals} crystals and a ${boxDef(goal.box)!.name}.`);
+}
+// First time a recipe is served (or a brand poured) pays a small one-time reward.
+export function tasteFirst(state: PlayerState, key: string, kind: 'recipe' | 'brand', now: number) {
+  const id = `${kind}:${key}`;
+  if (state.loot.tasted.includes(id)) return '';
+  state.loot.tasted.push(id);
+  if (kind === 'recipe') {
+    track(state, 'tasted', 1, now);
+    state.loot.parts += TASTING_REWARD.parts;
+    state.loot.skinShards += TASTING_REWARD.skinShards;
+    return ` First time serving this recipe: +${TASTING_REWARD.parts} parts, +${TASTING_REWARD.skinShards} skin shards.`;
+  }
+  state.loot.skinShards += TASTING_REWARD.brandShards;
+  return ` New brand poured: +${TASTING_REWARD.brandShards} skin shard.`;
+}
+export { ACHIEVEMENTS, questsForWeek, weekOf };

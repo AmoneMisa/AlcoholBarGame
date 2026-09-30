@@ -6,12 +6,13 @@ import {
   BOXES, CONSUMABLES, DRAW_COST, DRAW_ODDS, DUPLICATE_SHARDS, EQUIPMENT, LEGENDARY_PITY, PRESTIGE_LEVEL, PRESTIGE_PERKS, SHARD_CRAFT_COST, TIER_SHARD_COST,
   consumableDef, describeReward, equipmentDef, levelCap, perkCost, prestigeStarsFor, upgradeCostFor
 } from '../../domain/loot';
+import { ACHIEVEMENTS, questsForWeek, weekOf } from '../../domain/quests';
 import { featuredLegendary } from '../../sim/loot';
 import { useGameStore } from '../../stores/game';
 
 const game = useGameStore();
-const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'prestige'>('equipment');
-const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['prestige', 'Grand Opening']] as const;
+const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'prestige'>('equipment');
+const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['prestige', 'Grand Opening']] as const;
 const scrollRecipe = ref('');
 const names = { consumable: (id: string) => consumableDef(id)?.name ?? id, equipment: (id: string) => equipmentDef(id)?.name ?? id };
 const cap = (id: string) => levelCap(game.loot.equipment[game.regionId]![id]!.tier, game.loot.prestige.perks.cap ?? 0);
@@ -20,6 +21,13 @@ const boxCount = (id: string) => game.loot.boxes[id] ?? 0;
 const knownRecipes = computed(() => RECIPES.filter((recipe) => game.knownRecipeIds.includes(recipe.id)));
 const featured = computed(() => featuredLegendary(Date.now()));
 const lockedSkins = computed(() => COSMETICS.filter((item) => !game.ownedCosmeticIds.includes(item.id)));
+const week = computed(() => weekOf(Date.now()));
+const quests = computed(() => questsForWeek(week.value).map((quest) => {
+  const current = game.loot.quests.week === week.value;
+  return { quest, progress: current ? game.loot.quests.progress[quest.stat] ?? 0 : 0, claimed: current && game.loot.quests.claimed.includes(quest.id) };
+}));
+const stat = (id: string) => game.loot.stats[id] ?? 0;
+const cosmeticKind = (key: string) => key.replace(/([A-Z])/g, ' $1').toLowerCase();
 const runStars = computed(() => prestigeStarsFor(game.loot.runEarned));
 const effectText = (id: string) => {
   const item = equipmentDef(id)!;
@@ -108,9 +116,30 @@ const boostLeft = (id: string) => {
         <h3>🧩 Craft with shards</h3>
         <p>Common {{ SHARD_CRAFT_COST.common }} · Rare {{ SHARD_CRAFT_COST.rare }} · Legendary {{ SHARD_CRAFT_COST.legendary }} skin shards.</p>
         <div class="crafts">
-          <button v-for="item in lockedSkins" :key="item.id" type="button" :class="item.rarity" :disabled="game.loot.skinShards < SHARD_CRAFT_COST[item.rarity]" @click="game.act({ type: 'craftSkin', cosmeticId: item.id })">{{ item.label }}{{ item.character ? ` (${item.character})` : '' }} · {{ SHARD_CRAFT_COST[item.rarity] }}</button>
+          <button v-for="item in lockedSkins" :key="item.id" type="button" :class="item.rarity" :disabled="game.loot.skinShards < SHARD_CRAFT_COST[item.rarity]" @click="game.act({ type: 'craftSkin', cosmeticId: item.id })">{{ item.label }} ({{ cosmeticKind(item.key) }}{{ item.character ? `, ${item.character}` : '' }}) · {{ SHARD_CRAFT_COST[item.rarity] }}</button>
           <p v-if="!lockedSkins.length">You own every style.</p>
         </div>
+      </article>
+    </div>
+
+    <div v-else-if="tab === 'quests'" class="grid">
+      <article v-for="item in quests" :key="item.quest.id" class="card">
+        <h3>📋 Weekly quest</h3>
+        <p>{{ item.quest.name }}</p>
+        <progress :value="Math.min(item.progress, item.quest.target)" :max="item.quest.target"></progress>
+        <b>{{ Math.min(item.progress, item.quest.target) }} / {{ item.quest.target }} · +{{ item.quest.crystals }} crystals + {{ item.quest.box }} box</b>
+        <button type="button" :disabled="item.claimed || item.progress < item.quest.target" @click="game.act({ type: 'claimQuest', questId: item.quest.id })">{{ item.claimed ? 'Claimed' : 'Claim' }}</button>
+      </article>
+      <article class="card">
+        <h3>🍷 Tasting log</h3>
+        <p>{{ stat('tasted') }} recipes and {{ game.loot.tasted.length - stat('tasted') }} brands tasted. Serving a recipe for the first time gives parts and skin shards; a new brand gives a shard.</p>
+      </article>
+      <article v-for="goal in ACHIEVEMENTS" :key="goal.id" class="card">
+        <h3>🏅 Achievement</h3>
+        <p>{{ goal.name }}</p>
+        <progress :value="Math.min(stat(goal.stat), goal.target)" :max="goal.target"></progress>
+        <b>{{ Math.min(stat(goal.stat), goal.target) }} / {{ goal.target }} · +{{ goal.crystals }} crystals + {{ goal.box }} box</b>
+        <button type="button" :disabled="game.loot.achievements.includes(goal.id) || stat(goal.stat) < goal.target" @click="game.act({ type: 'claimAchievement', id: goal.id })">{{ game.loot.achievements.includes(goal.id) ? 'Claimed' : 'Claim' }}</button>
       </article>
     </div>
 
