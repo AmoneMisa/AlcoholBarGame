@@ -66,17 +66,15 @@ const sceneVars = computed(() => {
     '--glass-y': `${Math.round(current.back + current.drawnHeight * .03)}px`
   };
 });
-// Guests take painted stools near the middle, but not in front of the bottle shelf or where the bartender works,
-// so they never hide bottles; those stools are used only when there is no other.
+// Guests take the painted stool nearest the middle, avoiding only the bartender and glass.
+// The old shelf-overlap heuristic pushed a single guest to the extreme edge even when the centre stool was free.
 const seatXs = computed(() => {
   const { width } = sceneBox.value;
   const current = layout.value;
   const sizes = people.value;
-  // A guest hides bottles only when their head reaches the height of the lowest shelf row.
-  const lowestRow = Math.max(0, ...shelfRows.value.map((row) => parseFloat(row.style.top) + parseFloat(row.style.height)));
-  const headReachesShelf = !!current && !!sizes && current.seat - sizes.guest < lowestRow;
-  const blocked = (x: number) => (headReachesShelf && current ? x > current.shelf.left - 40 && x < current.shelf.right + 40 : false)
-    || (sizes ? Math.abs(x - sizes.bartenderX) < sizes.bartenderHalfWidth + 60 || Math.abs(x - sizes.glassX) < 90 : false);
+  const blocked = (x: number) => sizes
+    ? Math.abs(x - sizes.bartenderX) < sizes.bartenderHalfWidth + 60 || Math.abs(x - sizes.glassX) < 90
+    : false;
   // Free spots at the counter for when every visible stool is taken (narrow phones show only one or two).
   const spots = [width * .28, width * .5, width * .18].filter((x) => !blocked(x));
   const stools = [...(current?.stools ?? [])].sort((a, b) =>
@@ -106,6 +104,9 @@ const pointerX = ref(0);
 const pointerY = ref(0);
 let activePointerId: number | undefined;
 let pourInterval: number | undefined;
+let dragStartX = 0;
+let dragStartY = 0;
+let dragTravelled = false;
 
 const liquidIngredients = computed(() => INGREDIENTS.filter((item) => item.unit === 'ml'));
 // The back bar has four shelf lines, all visible at once, so every bottle can be reached without scrolling.
@@ -238,22 +239,18 @@ function addFresh(id: string) {
   freshPickerOpen.value = false;
   haptic('light');
 }
-// A press on a shelf bottle is a scroll or a grab, decided by the first few pixels of movement:
-// mostly sideways scrolls that shelf line, mostly up or down lifts the bottle towards the glass.
-const GESTURE_SLOP = 7;
-let pending: { id: string; startX: number; startY: number; row?: HTMLElement; box?: HTMLElement; scrollLeft: number; scrollTop: number; mode?: 'scroll' } | undefined;
-
 function beginBottleDrag(id: string, event: PointerEvent) {
   if (event.button !== 0 || !buildingEnabled.value) return;
-  // No native image drag, text selection or page scroll while a bottle is under the finger.
   event.preventDefault();
   const target = event.currentTarget as HTMLElement;
-  const row = target.closest<HTMLElement>('.pshelf-bottles') ?? undefined;
-  const box = target.closest<HTMLElement>('.pshelf-box') ?? undefined;
-  pending = { id, startX: event.clientX, startY: event.clientY, row, box, scrollLeft: row?.scrollLeft ?? 0, scrollTop: box?.scrollTop ?? 0 };
   activePointerId = event.pointerId;
-  // Capture keeps the gesture alive outside the button; if the browser refuses it, window listeners still track the pointer.
+  dragStartX = event.clientX;
+  dragStartY = event.clientY;
+  dragTravelled = false;
   try { target.setPointerCapture?.(event.pointerId); } catch { /* not capturable */ }
+  // Bottles are always grabbed immediately. Shelf navigation has dedicated arrow controls,
+  // so a diagonal pull can never be mistaken for horizontal scrolling.
+  liftBottle(id, event);
 }
 function liftBottle(id: string, event: PointerEvent) {
   if (pourable(id) < 5) {
@@ -279,25 +276,8 @@ function liftBottle(id: string, event: PointerEvent) {
 }
 function moveBottle(event: PointerEvent) {
   if (activePointerId !== event.pointerId) return;
-  if (pending) {
-    const dx = event.clientX - pending.startX;
-    const dy = event.clientY - pending.startY;
-    if (!pending.mode) {
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < GESTURE_SLOP) return;
-      if (Math.abs(dx) > Math.abs(dy)) pending.mode = 'scroll';
-      else {
-        const id = pending.id;
-        pending = undefined;
-        liftBottle(id, event);
-        if (!draggingIngredientId.value) return;
-      }
-    }
-    if (pending?.mode === 'scroll') {
-      if (pending.row) { pending.row.scrollLeft = pending.scrollLeft - dx; markEdges(pending.row); }
-      return;
-    }
-  }
   if (!glassTarget.value || !draggingIngredientId.value) return;
+  if (Math.hypot(event.clientX - dragStartX, event.clientY - dragStartY) > 6) dragTravelled = true;
   pointerX.value = event.clientX;
   pointerY.value = event.clientY;
   const rect = glassTarget.value.getBoundingClientRect();
@@ -305,9 +285,11 @@ function moveBottle(event: PointerEvent) {
 }
 function endBottle(event: PointerEvent) {
   if (activePointerId !== event.pointerId) return;
-  pending = undefined;
   window.clearInterval(pourInterval);
-  if (event.type !== 'pointercancel' && dragOverGlass.value && !dragAdded.value && draggingIngredientId.value) addLiquid(draggingIngredientId.value);
+  if (event.type !== 'pointercancel' && draggingIngredientId.value) {
+    if (dragOverGlass.value && !dragAdded.value) addLiquid(draggingIngredientId.value);
+    else if (!dragTravelled) addLiquid(draggingIngredientId.value);
+  }
   draggingIngredientId.value = undefined;
   dragOverGlass.value = false;
   activePointerId = undefined;
@@ -343,9 +325,11 @@ function trackLine(id: string, element: HTMLElement | null) {
 function nudgeLine(id: string, direction: number) {
   const element = lineElements.get(id);
   if (!element) return;
-  element.scrollBy({ left: direction * Math.max(120, element.clientWidth * .6), behavior: 'smooth' });
-  // Smooth scrolling ends later; refresh the fades and arrows once it has settled.
-  window.setTimeout(() => markEdges(element), 400);
+  const distance = Math.max(120, element.clientWidth * .6);
+  const maximum = Math.max(0, element.scrollWidth - element.clientWidth);
+  element.scrollLeft = Math.max(0, Math.min(maximum, element.scrollLeft + direction * distance));
+  markEdges(element);
+  window.requestAnimationFrame(() => markEdges(element));
 }
 onBeforeUnmount(() => edgeObserver?.disconnect());
 
@@ -377,7 +361,7 @@ onBeforeUnmount(() => {
             <span>{{ ingredient.name }}</span>
           </button>
         </div>
-        <span class="shelf-nudge"><button type="button" :aria-label="`Scroll ${row.label} left`" @click="nudgeLine(row.id, -1)">‹</button><button type="button" :aria-label="`Scroll ${row.label} right`" @click="nudgeLine(row.id, 1)">›</button></span>
+        <span class="shelf-nudge"><button type="button" :aria-label="`Scroll ${row.label} left`" @pointerdown.stop @click.stop="nudgeLine(row.id, -1)">‹</button><button type="button" :aria-label="`Scroll ${row.label} right`" @pointerdown.stop @click.stop="nudgeLine(row.id, 1)">›</button></span>
       </div>
     </div>
     <div class="bartender-layer">

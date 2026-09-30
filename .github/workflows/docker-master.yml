@@ -71,3 +71,61 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+
+  # Deploys the image just built to the server over SSH, then checks that the game answers.
+  # Needs repository secrets: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY (private key), and optionally
+  # DEPLOY_PORT (default 22) and DEPLOY_PATH (default /opt/barlingo). Skipped while DEPLOY_HOST is not set.
+  deploy:
+    needs: test-build-publish
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      packages: read
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+    steps:
+      - name: Check deploy configuration
+        id: config
+        run: echo "enabled=${{ env.DEPLOY_HOST != '' }}" >> "$GITHUB_OUTPUT"
+
+      - name: Check out deploy files
+        if: steps.config.outputs.enabled == 'true'
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: deploy
+
+      - name: Deploy over SSH
+        if: steps.config.outputs.enabled == 'true'
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '22' }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || '/opt/barlingo' }}
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          IMAGE="${REGISTRY}/${GITHUB_REPOSITORY,,}:master-${GITHUB_SHA::7}"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$DEPLOY_PORT" "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          SSH="ssh -i ~/.ssh/deploy_key -p $DEPLOY_PORT $DEPLOY_USER@$DEPLOY_HOST"
+          $SSH "mkdir -p '$DEPLOY_PATH'"
+          scp -i ~/.ssh/deploy_key -P "$DEPLOY_PORT" deploy/compose.prod.yaml deploy/Caddyfile "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/"
+          echo "$REGISTRY_TOKEN" | $SSH "docker login ghcr.io -u '${GITHUB_ACTOR}' --password-stdin"
+          $SSH "cd '$DEPLOY_PATH' && export APP_IMAGE='$IMAGE' && docker compose -f compose.prod.yaml pull app && docker compose -f compose.prod.yaml up -d --remove-orphans && sed -i 's#^APP_IMAGE=.*#APP_IMAGE=$IMAGE#' .env && docker image prune -f"
+          echo "Deployed $IMAGE"
+
+      - name: Health check
+        if: steps.config.outputs.enabled == 'true'
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '22' }}
+        run: |
+          for attempt in $(seq 1 20); do
+            if ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "curl -fsS http://127.0.0.1/api/health -H 'Host: localhost' >/dev/null 2>&1 || docker compose -f ${{ secrets.DEPLOY_PATH || '/opt/barlingo' }}/compose.prod.yaml exec -T app node -e \"fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""; then
+              echo "Game is healthy."; exit 0
+            fi
+            sleep 6
+          done
+          echo "The game did not become healthy." >&2; exit 1

@@ -65,7 +65,7 @@ export const SKIN_TONES = ['porcelain','fair','warm','olive','brown','deep'] as 
 export const TAN_LEVELS = ['none','sun-kissed','deep'] as const;
 export const BUST_OPTIONS = ['petite','balanced','full'] as const;
 export const POSES = ['neutral','confident','working'] as const;
-export const BARTENDER_OUTFITS = ['base','vest','shirt','apron','special-gala','special-cyberpunk','special-steampunk','special-post-apocalypse','special-historical','special-fantasy','special-masquerade'] as const;
+export const BARTENDER_OUTFITS = ['vest','shirt','apron','special-gala','special-cyberpunk','special-steampunk','special-post-apocalypse','special-historical','special-fantasy','special-masquerade'] as const;
 export const BAR_PROFILE_OPTIONS = {
   wall:WALLS,counter:COUNTER_MATERIALS,counterColor:COUNTER_COLORS,counterSize:COUNTER_SIZES,
   lighting:HIGHLIGHTS,highlightStrength:HIGHLIGHT_STRENGTHS,shelf:SHELF_STYLES,bartenderCharacter:['noa','leo'] as const,

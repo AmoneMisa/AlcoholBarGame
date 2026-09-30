@@ -192,6 +192,9 @@ export function normalizePlayerState(state: PlayerState) {
     const saved = state.bars[region.id] as Partial<BarProfile> | undefined;
     state.bars[region.id] = { ...structuredClone(DEFAULT_BARS[region.id]), ...saved };
     const bar = state.bars[region.id];
+    // `base` was an editor-only wooden mannequin. It must never be presented
+    // as a wearable look, including for old local saves.
+    if ((bar.bartender as string) === 'base') bar.bartender = 'vest';
     if (!state.ownedInteriorIds.includes(bar.interior)) bar.interior = 'velvet';
     if (['relaxed'].includes(bar.pose as string)) bar.pose = 'neutral';
     if (['hip'].includes(bar.pose as string)) bar.pose = 'confident';

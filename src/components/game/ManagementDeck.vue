@@ -4,7 +4,7 @@ import { INGREDIENTS, RECIPES, REGIONS, recipeAlcoholLabel } from '../../domain/
 import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleSaleCrystalReward } from '../../domain/bottleCatalog';
 import BrandBottle from '../knowledge/BrandBottle.vue';
 import { guideIdForProduct } from '../../data/knowledge/alcohol';
-import { BLUSH_OPTIONS, BODY_SHAPES, BROW_SHAPES, BUST_OPTIONS, CHEEK_SHAPES, COUNTER_COLORS, COUNTER_MATERIALS, COUNTER_SIZES, EYELINER_OPTIONS, EYESHADOW_OPTIONS, EYE_COLORS, EYE_SHAPES, FACE_SHAPES, FACIAL_HAIR_OPTIONS, HAIR_COLORS, HIGHLIGHTS, HIGHLIGHT_STRENGTHS, INTERIORS, LEO_HAIR_STYLES, LIP_COLORS, LIP_SHAPES, NOA_HAIR_STYLES, NOSE_SHAPES, POSES, SHELF_STYLES, SKIN_DETAILS, SKIN_TONES, TAN_LEVELS, WALLS, interiorStyle, shelfStyleFor } from '../../data/cosmetics/bars';
+import { COUNTER_COLORS, COUNTER_MATERIALS, COUNTER_SIZES, HIGHLIGHTS, HIGHLIGHT_STRENGTHS, INTERIORS, POSES, SHELF_STYLES, WALLS, interiorStyle, shelfStyleFor } from '../../data/cosmetics/bars';
 import { DAILY_COINS } from '../../domain/economy';
 import type { Ingredient, RegionId } from '../../domain/types';
 import { useGameStore } from '../../stores/game';
@@ -44,12 +44,12 @@ const targetRegions = computed(() => REGIONS.filter((region) => region.id !== ga
 const barUnits = (id: RegionId) => game.inventories[id].reduce((sum, stock) => sum + stock.amount, 0);
 const barBottles = (id: RegionId) => game.bottleInventories[id].reduce((sum, stock) => sum + stock.quantity, 0);
 const selectedBartender = computed(() => game.decor.bartenderCharacter ?? 'noa');
-const visibleHairStyles = computed(() => selectedBartender.value === 'leo' ? LEO_HAIR_STYLES : NOA_HAIR_STYLES);
-const visibleOutfits = computed(() => selectedBartender.value === 'leo'
-  ? ['base','vest','shirt','apron','special-cyberpunk','special-steampunk','special-post-apocalypse','special-historical','special-fantasy','special-masquerade'] as const
-  : ['base','vest','shirt','apron','special-gala','special-cyberpunk','special-steampunk','special-post-apocalypse','special-historical','special-fantasy'] as const);
+// Only coherent complete looks stay visible while the new skinned-mesh avatar
+// pipeline is being introduced. The wooden mannequin and painted "parts" are
+// not valid cosmetics and are deliberately absent here.
+const visibleOutfits = ['vest','shirt','apron'] as const;
 const outfitLabel = (outfit: string) => ({
-  base:'Mannequin',vest:selectedBartender.value === 'leo' ? 'Velvet vest' : 'Corset vest',shirt:selectedBartender.value === 'leo' ? 'Open shirt' : 'Ivory jacket',apron:'Work apron',
+  vest:selectedBartender.value === 'leo' ? 'Velvet vest' : 'Corset vest',shirt:selectedBartender.value === 'leo' ? 'Open shirt' : 'Ivory jacket',apron:'Work apron',
   'special-gala':'Midnight gown','special-cyberpunk':'Cyberpunk','special-steampunk':'Steampunk','special-post-apocalypse':'Wasteland','special-historical':'Historical','special-fantasy':'Fantasy','special-masquerade':'Masquerade'
 }[outfit] ?? outfit);
 const isRecipeKnown = (id: string) => game.knownRecipeIds.includes(id);
@@ -77,15 +77,15 @@ function selectBartender(id: 'noa' | 'leo') {
   game.decor.bartenderCharacter = id;
   if (game.decor.bartender.startsWith('special-')) game.decor.bartender = 'vest';
   if (id === 'leo') {
-    if (['slim','curvy'].includes(game.decor.bodyShape)) game.decor.bodyShape = 'muscular';
-    if ((NOA_HAIR_STYLES as readonly string[]).includes(game.decor.hairStyle)) game.decor.hairStyle = 'slick';
-    if (game.decor.skinDetail === 'clean') game.decor.skinDetail = 'tattoo-bold';
+    game.decor.bodyShape = 'muscular';
+    game.decor.hairStyle = 'slick';
+    game.decor.skinDetail = 'clean';
     game.decor.facialHair = 'short-beard';
     game.decor.eyeliner = 'none'; game.decor.eyeshadow = 'none'; game.decor.blush = 'none'; game.decor.lipColor = 'bare';
   } else {
-    if (['muscular','broad'].includes(game.decor.bodyShape)) game.decor.bodyShape = 'curvy';
-    if ((LEO_HAIR_STYLES as readonly string[]).includes(game.decor.hairStyle)) game.decor.hairStyle = 'updo';
-    if (game.decor.skinDetail === 'tattoo-bold') game.decor.skinDetail = 'clean';
+    game.decor.bodyShape = 'curvy';
+    game.decor.hairStyle = 'updo';
+    game.decor.skinDetail = 'clean';
     game.decor.facialHair = 'clean';
     if (game.decor.eyeshadow === 'none') game.decor.eyeshadow = 'bronze';
     if (game.decor.lipColor === 'bare') game.decor.lipColor = 'rose';
@@ -188,40 +188,20 @@ function selectBartender(id: 'noa' | 'leo') {
       <div class="design-grid-new">
         <div class="mini-interior" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="game.barInteriorStyle"><span></span><b>{{ game.decor.name }}</b><i></i><em>{{ game.region.name }} · Saved automatically</em></div>
         <div class="bartender-custom">
-          <CharacterModel role="bartender" :character-id="selectedBartender" :outfit="game.decor.bartender" :face-style="game.decor.face" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :skin-detail="game.decor.skinDetail" :skin-tone="game.decor.skinTone" :tan-level="game.decor.tanLevel" :bust="game.decor.bust" :pose="game.decor.pose" :eye-shape="game.decor.eyeShape" :brow-shape="game.decor.browShape" :nose-shape="game.decor.noseShape" :lip-shape="game.decor.lipShape" :cheek-shape="game.decor.cheekShape" :eye-color="game.decor.eyeColor" :eyeliner="game.decor.eyeliner" :eyeshadow="game.decor.eyeshadow" :lip-color="game.decor.lipColor" :blush="game.decor.blush" :facial-hair="game.decor.facialHair" />
+          <CharacterModel role="bartender" :character-id="selectedBartender" :outfit="game.decor.bartender" :pose="game.decor.pose" />
           <div class="bartender-selector" aria-label="Choose bartender">
-            <button v-for="person in [{id:'noa',label:'Woman'},{id:'leo',label:'Man'}] as const" :key="person.id" :class="{ active: selectedBartender === person.id }" type="button" @click="selectBartender(person.id)">{{ person.label }}</button>
+            <button v-for="person in [{id:'noa',label:'Woman bartender'},{id:'leo',label:'Man bartender'}] as const" :key="person.id" :class="{ active: selectedBartender === person.id }" type="button" @click="selectBartender(person.id)">{{ person.label }}</button>
           </div>
           <div class="outfit-selector" aria-label="Choose bartender outfit"><button v-for="outfit in visibleOutfits" :key="outfit" :class="{ active: game.decor.bartender === outfit, special:outfit.startsWith('special-'), locked:cosmeticLocked('bartender',outfit) }" type="button" :disabled="cosmeticLocked('bartender',outfit)" :title="cosmeticLocked('bartender',outfit) ? 'Unlock in the daily style draw' : outfitLabel(outfit)" @click="game.decor.bartender = outfit"><em v-if="cosmeticLocked('bartender',outfit)">🔒</em>{{ outfitLabel(outfit) }}</button></div>
         </div>
         <div class="design-options">
-          <section class="cosmetic-roulette"><small>DAILY STYLE DRAW · HAIR · FACE PARTS · SPECIAL OUTFITS</small><div><p>{{ game.cosmeticRouletteResult }}</p><button type="button" :disabled="!game.cosmeticRouletteAvailable" @click="game.spinCosmeticRoulette()">{{ game.cosmeticRouletteAvailable ? 'Spin free daily draw' : 'Come back tomorrow' }}</button></div></section>
           <section class="background-picker"><small>{{ INTERIORS.length }} BACKGROUNDS · {{ game.ownedInteriorIds.length }} OWNED</small><div><button v-for="interior in INTERIORS" :key="interior.id" :class="{active:game.decor.interior === interior.id,locked:!isInteriorOwned(interior.id),special:'special' in interior && interior.special}" :style="interiorStyle(interior.id)" type="button" @click="game.chooseInterior(interior.id)"><em v-if="!isInteriorOwned(interior.id)">◆ {{ interior.crystalCost }}</em><span>{{ interior.name }}</span></button></div></section>
           <section><small>WALL COLOR</small><div><button v-for="wall in WALLS" :key="wall" :class="{ active: game.decor.wall === wall }" type="button" @click="game.decor.wall = wall"><i :data-color="wall"></i>{{ wall }}</button></div></section>
           <section class="shelf-style-picker"><small>BACK-BAR SHELVES · {{ shelfStyleFor(game.decor) }}</small><div><button v-for="shelf in SHELF_STYLES" :key="shelf" :class="{ active: (game.decor.shelf ?? 'auto') === shelf }" :data-shelf-swatch="shelf === 'auto' ? shelfStyleFor({ interior: game.decor.interior }) : shelf" type="button" @click="game.decor.shelf = shelf">{{ shelf === 'auto' ? 'Match background' : shelf }}</button></div></section>
           <section><small>BARLINE TINT · the counter in your background</small><div><button v-for="color in COUNTER_COLORS" :key="color" :class="{ active: game.decor.counterColor === color }" type="button" @click="game.decor.counterColor = color"><i :data-color="color"></i>{{ color }}</button></div></section>
           <section><small>HIGHLIGHT COLOR</small><div><button v-for="light in HIGHLIGHTS" :key="light" :class="{ active: game.decor.lighting === light }" type="button" @click="game.decor.lighting = light"><i :data-color="light"></i>{{ light }}</button></div></section>
           <section><small>HIGHLIGHT STRENGTH</small><div><button v-for="strength in HIGHLIGHT_STRENGTHS" :key="strength" :class="{ active: game.decor.highlightStrength === strength }" type="button" @click="game.decor.highlightStrength = strength">{{ strength }}</button></div></section>
-          <section class="face-builder"><small>FACE SHAPE · SKIN-TONE NEUTRAL</small><div><button v-for="face in FACE_SHAPES" :key="face" :class="{active:game.decor.face === face,locked:cosmeticLocked('face',face)}" type="button" :disabled="cosmeticLocked('face',face)" @click="game.decor.face = face"><em v-if="cosmeticLocked('face',face)">🔒</em>{{ face }}</button></div></section>
-          <section class="face-builder"><small>EYES</small><div><button v-for="shape in EYE_SHAPES" :key="shape" :class="{active:game.decor.eyeShape === shape,locked:cosmeticLocked('eyeShape',shape)}" type="button" :disabled="cosmeticLocked('eyeShape',shape)" @click="game.decor.eyeShape = shape"><em v-if="cosmeticLocked('eyeShape',shape)">🔒</em>{{ shape }}</button></div></section>
-          <section class="face-builder"><small>EYE COLOR</small><div><button v-for="color in EYE_COLORS" :key="color" :class="{active:game.decor.eyeColor === color,locked:cosmeticLocked('eyeColor',color)}" type="button" :disabled="cosmeticLocked('eyeColor',color)" @click="game.decor.eyeColor = color"><i :data-eye-color="color"></i>{{ color }}</button></div></section>
-          <section class="face-builder"><small>EYEBROWS</small><div><button v-for="shape in BROW_SHAPES" :key="shape" :class="{active:game.decor.browShape === shape,locked:cosmeticLocked('browShape',shape)}" type="button" :disabled="cosmeticLocked('browShape',shape)" @click="game.decor.browShape = shape"><em v-if="cosmeticLocked('browShape',shape)">🔒</em>{{ shape.replace('-', ' ') }}</button></div></section>
-          <section class="face-builder"><small>NOSE</small><div><button v-for="shape in NOSE_SHAPES" :key="shape" :class="{active:game.decor.noseShape === shape,locked:cosmeticLocked('noseShape',shape)}" type="button" :disabled="cosmeticLocked('noseShape',shape)" @click="game.decor.noseShape = shape"><em v-if="cosmeticLocked('noseShape',shape)">🔒</em>{{ shape.replace('-', ' ') }}</button></div></section>
-          <section class="face-builder"><small>LIPS</small><div><button v-for="shape in LIP_SHAPES" :key="shape" :class="{active:game.decor.lipShape === shape,locked:cosmeticLocked('lipShape',shape)}" type="button" :disabled="cosmeticLocked('lipShape',shape)" @click="game.decor.lipShape = shape"><em v-if="cosmeticLocked('lipShape',shape)">🔒</em>{{ shape.replace('-', ' ') }}</button></div></section>
-          <section class="face-builder"><small>CHEEKS</small><div><button v-for="shape in CHEEK_SHAPES" :key="shape" :class="{active:game.decor.cheekShape === shape,locked:cosmeticLocked('cheekShape',shape)}" type="button" :disabled="cosmeticLocked('cheekShape',shape)" @click="game.decor.cheekShape = shape"><em v-if="cosmeticLocked('cheekShape',shape)">🔒</em>{{ shape }}</button></div></section>
-          <section><small>HAIR STYLE</small><div><button v-for="hair in visibleHairStyles" :key="hair" :class="{active:game.decor.hairStyle === hair,locked:cosmeticLocked('hairStyle',hair)}" type="button" :disabled="cosmeticLocked('hairStyle',hair)" @click="game.decor.hairStyle = hair"><em v-if="cosmeticLocked('hairStyle',hair)">🔒</em>{{ hair }}</button></div></section>
-          <section><small>HAIR COLOR</small><div><button v-for="color in HAIR_COLORS" :key="color" :class="{active:game.decor.hairColor === color}" type="button" @click="game.decor.hairColor = color"><i :data-color="color"></i>{{ color }}</button></div></section>
-          <section><small>SKIN TONE</small><div><button v-for="tone in SKIN_TONES" :key="tone" :class="{active:game.decor.skinTone === tone}" type="button" @click="game.decor.skinTone = tone"><i :data-skin-tone="tone"></i>{{ tone }}</button></div></section>
-          <section><small>TAN</small><div><button v-for="tan in TAN_LEVELS" :key="tan" :class="{active:game.decor.tanLevel === tan}" type="button" @click="game.decor.tanLevel = tan">{{ tan.replace('-', ' ') }}</button></div></section>
-          <section><small>BODY BUILD</small><div><button v-for="shape in BODY_SHAPES" :key="shape" :class="{active:game.decor.bodyShape === shape}" type="button" @click="game.decor.bodyShape = shape">{{ shape }}</button></div></section>
-          <section><small>SKIN · TATTOOS · SCARS</small><div><button v-for="detail in SKIN_DETAILS" :key="detail" :class="{active:game.decor.skinDetail === detail}" type="button" @click="game.decor.skinDetail = detail">{{ detail.replace('-', ' ') }}</button></div></section>
-          <section v-if="selectedBartender === 'noa'"><small>CURVES</small><div><button v-for="bust in BUST_OPTIONS" :key="bust" :class="{active:game.decor.bust === bust}" type="button" @click="game.decor.bust = bust">{{ bust }}</button></div></section>
           <section><small>POSE · OUTFITS HAVE THEIR OWN GESTURE</small><div><button v-for="(pose,index) in POSES" :key="pose" :class="{active:game.decor.pose === pose}" type="button" @click="game.decor.pose = pose">Pose {{ index + 1 }}</button></div></section>
-          <section v-if="selectedBartender === 'noa'" class="face-builder"><small>EYELINER</small><div><button v-for="style in EYELINER_OPTIONS" :key="style" :class="{active:game.decor.eyeliner === style,locked:cosmeticLocked('eyeliner',style)}" type="button" :disabled="cosmeticLocked('eyeliner',style)" @click="game.decor.eyeliner = style"><em v-if="cosmeticLocked('eyeliner',style)">🔒</em>{{ style.replace('-', ' ') }}</button></div></section>
-          <section v-if="selectedBartender === 'noa'" class="face-builder"><small>EYESHADOW</small><div><button v-for="style in EYESHADOW_OPTIONS" :key="style" :class="{active:game.decor.eyeshadow === style,locked:cosmeticLocked('eyeshadow',style)}" type="button" :disabled="cosmeticLocked('eyeshadow',style)" @click="game.decor.eyeshadow = style"><em v-if="cosmeticLocked('eyeshadow',style)">🔒</em>{{ style }}</button></div></section>
-          <section v-if="selectedBartender === 'noa'" class="face-builder"><small>LIP COLOR</small><div><button v-for="color in LIP_COLORS" :key="color" :class="{active:game.decor.lipColor === color,locked:cosmeticLocked('lipColor',color)}" type="button" :disabled="cosmeticLocked('lipColor',color)" @click="game.decor.lipColor = color"><em v-if="cosmeticLocked('lipColor',color)">🔒</em>{{ color }}</button></div></section>
-          <section v-if="selectedBartender === 'noa'" class="face-builder"><small>BLUSH</small><div><button v-for="style in BLUSH_OPTIONS" :key="style" :class="{active:game.decor.blush === style,locked:cosmeticLocked('blush',style)}" type="button" :disabled="cosmeticLocked('blush',style)" @click="game.decor.blush = style"><em v-if="cosmeticLocked('blush',style)">🔒</em>{{ style }}</button></div></section>
-          <section v-if="selectedBartender === 'leo'" class="face-builder"><small>FACIAL HAIR</small><div><button v-for="style in FACIAL_HAIR_OPTIONS" :key="style" :class="{active:game.decor.facialHair === style,locked:cosmeticLocked('facialHair',style)}" type="button" :disabled="cosmeticLocked('facialHair',style)" @click="game.decor.facialHair = style"><em v-if="cosmeticLocked('facialHair',style)">🔒</em>{{ style.replace('-', ' ') }}</button></div></section>
         </div>
       </div>
     </article>

@@ -214,7 +214,7 @@ button { touch-action: manipulation; }
 
 .game-nav { position: fixed; z-index: 120; right: 12px; bottom: calc(10px + var(--safe-bottom)); left: 12px; display: flex; max-width: 820px; margin: auto; gap: 4px; padding: 6px; border: 1px solid #43536b; border-radius: 17px; background: #0c1421ee; box-shadow: 0 13px 35px #000b; backdrop-filter: blur(18px); }.game-nav button { display:grid;grid-template-rows:22px auto;align-content:center;justify-items:center;gap:2px;flex: 1; min-width: 68px; min-height: 50px;padding:4px; border: 0; border-radius: 11px; background: transparent; color: #909cac;text-align:center; cursor: pointer; }.game-nav span, .game-nav b { display: block; }.game-nav span { color: #c2a668; font-size: 15px; }.game-nav b { max-width:100%;margin-top:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size: 8px;line-height:1.2; letter-spacing: .04em; }.game-nav button.active { background: linear-gradient(#3d2f27,#251d1d); color: #fff5e4; box-shadow: inset 0 0 0 1px #b78649; }.game-nav button.active span { color: var(--gold); }
 
-.management-deck { min-height: 680px; }.management-deck > .game-panel, .management-deck > .panel { min-height: 650px; margin: 0; }.category-tabs { display: flex; gap: 6px; padding: 10px 12px; border-bottom: 1px solid #293a52; }.category-tabs button, .design-options button, .bartender-custom button { min-height: 36px; border: 1px solid #3c4c64; border-radius: 8px; background: #152237; color: #b8c2d0; padding: 7px 13px; cursor: pointer; }.category-tabs button.active, .design-options button.active, .bartender-custom button.active { border-color: #d6a54d; background: #45301e; color: #ffe3a4; }
+.management-deck { min-height:680px;padding-bottom:calc(86px + var(--safe-bottom)); }.management-deck > .game-panel, .management-deck > .panel { min-height:650px;margin:0; }.category-tabs { display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid #293a52; }.category-tabs button, .design-options button, .bartender-custom button { min-height:36px;border:1px solid #3c4c64;border-radius:8px;background:#152237;color:#b8c2d0;padding:7px 13px;cursor:pointer; }.category-tabs button.active, .design-options button.active, .bartender-custom button.active { border-color:#d6a54d;background:#45301e;color:#ffe3a4; }
 .inventory-cards { display: grid; grid-template-columns: repeat(6,1fr); gap: 9px; padding: 12px; }.inventory-card { position: relative; display: grid; min-height: 180px; place-items: center; padding: 12px 8px; border: 1px solid #35465e; border-radius: 12px; background: radial-gradient(circle at 50% 35%,#2a405a,#101a2b 72%); text-align: center; }.inventory-card .bottle-visual { transform: scale(1.18); }.inventory-card b, .inventory-card small { display: block; }.inventory-card b { font-size: 11px; }.inventory-card small { color: #8f9daf; font-size: 8px; }.inventory-card > span { position: absolute; top: 8px; right: 8px;display:inline-flex;min-height:22px;align-items:center;justify-content:center;padding: 3px 8px;border:1px solid #765c2e; border-radius:999px; background: #0a111de8; color: var(--gold); font-size:7px;font-weight:900;line-height:1;text-transform:uppercase; }
 .sealed-stock-section { margin:0 12px 12px;overflow:hidden;border:1px solid #3d4d63;border-radius:14px;background:#0d1726; }
 .sealed-stock-section > header { display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #33435a;background:linear-gradient(90deg,#251b27,#152237); }
@@ -1161,9 +1161,9 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
 .pshelf-bottles[data-scrollable="true"]:not([data-at-end="true"]) { -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
 .pshelf-bottles[data-scrollable="true"][data-at-end="true"]:not([data-at-start="true"]) { -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%); mask-image: linear-gradient(90deg, transparent, #000 12%); }
 .pshelf-bottles[data-scrollable="true"]:not([data-at-start="true"]):not([data-at-end="true"]) { -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 10%, #000 88%, transparent); }
-.pshelf-row .shelf-nudge { position: absolute; z-index: 4; top: 2px; right: 4px; display: none; gap: 3px; }
+.pshelf-row .shelf-nudge { position: absolute; z-index: 20; top: 2px; right: 4px; display: none; gap: 3px; pointer-events:auto; }
 .pshelf-row:has(.pshelf-bottles[data-scrollable="true"]) .shelf-nudge { display: flex; }
-.pshelf-row .shelf-nudge button { width: 20px; height: 18px; border: 1px solid #a87943; border-radius: 5px; background: rgba(30, 18, 12, .85); color: #ffe4aa; font-size: 12px; line-height: 1; cursor: pointer; }
+.pshelf-row .shelf-nudge button { position:relative;z-index:21;width: 24px; height: 22px; padding:0;border: 1px solid #a87943; border-radius: 5px; background: rgba(30, 18, 12, .94); color: #ffe4aa; font-size: 15px; line-height: 1; cursor: pointer; pointer-events:auto;touch-action:manipulation; }
 .pshelf-row:has(.pshelf-bottles[data-at-start="true"]) .shelf-nudge button:first-child,
 .pshelf-row:has(.pshelf-bottles[data-at-end="true"]) .shelf-nudge button:last-child { opacity: .35; pointer-events: none; }
 
@@ -1251,6 +1251,9 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
 .design-options i[data-skin-tone='porcelain']{--tone:#f0c7b5}.design-options i[data-skin-tone='fair']{--tone:#dca58a}.design-options i[data-skin-tone='warm']{--tone:#b97858}.design-options i[data-skin-tone='olive']{--tone:#a36f4f}.design-options i[data-skin-tone='brown']{--tone:#82523d}.design-options i[data-skin-tone='deep']{--tone:#54362d}
 .bar-scene .bartender-layer:has(>.character-leo .character-composite.showing-base),
 .bar-scene .bartender-layer:has(>.character-noa .character-composite.showing-base){width:calc(var(--bt-h) * .572)!important}
+/* Wardrobe atlases already contain a finished painterly face. Do not draw the
+   editor's parametric guide features a second time in the live bar scene. */
+.bar-scene .role-bartender .modular-face{display:none}
 
 /* Parametric face builder. The painted portrait is covered by a neutral head
    whose colour follows SKIN TONE; every feature below is independently shaped. */
@@ -1327,3 +1330,141 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
 .sound-toggles button .ui-icon { width: 16px; height: 16px; }
 .sound-toggles button small { font-size: 8px; letter-spacing: .08em; }
 .sound-toggles button.off { color: #6b778b; }
+
+/* ==== Stable avatar editor fallback =======================================
+   The production avatar is moving to skinned GLB meshes. Until those assets
+   land, the 2D fallback only exposes changes it can render without inventing
+   anatomy in CSS or stacking a second painted head over the first one. */
+.bartender-custom {
+  width:100%;
+  min-width:0;
+  grid-template-rows:minmax(390px,560px) auto auto;
+  justify-items:stretch;
+}
+.bartender-custom > .art-character {
+  width:min(100%,320px);
+  height:auto;
+  min-height:0;
+  aspect-ratio:.572;
+  justify-self:center;
+  overflow:hidden;
+}
+.bartender-custom .bartender-selector {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  width:100%;
+  min-width:0;
+}
+.bartender-custom .bartender-selector button {
+  width:100%;
+  min-width:0;
+  min-height:42px;
+  font-size:10px;
+  white-space:normal;
+}
+.bartender-custom .outfit-selector {
+  display:flex;
+  width:100%;
+  min-width:0;
+  gap:6px;
+  overflow-x:auto;
+  overscroll-behavior-x:contain;
+  scroll-snap-type:x proximity;
+  scrollbar-width:thin;
+  scrollbar-color:#c89242 #0b1421;
+}
+.bartender-custom .outfit-selector button {
+  flex:1 0 96px;
+  min-width:0;
+  min-height:42px;
+  font-size:9px;
+  scroll-snap-align:start;
+}
+.bartender-custom .outfit-selector::-webkit-scrollbar,
+.background-picker > div::-webkit-scrollbar,
+.design-location-tabs::-webkit-scrollbar { height:7px; }
+.bartender-custom .outfit-selector::-webkit-scrollbar-track,
+.background-picker > div::-webkit-scrollbar-track,
+.design-location-tabs::-webkit-scrollbar-track {
+  border-radius:999px;
+  background:#0b1421;
+}
+.bartender-custom .outfit-selector::-webkit-scrollbar-thumb,
+.background-picker > div::-webkit-scrollbar-thumb,
+.design-location-tabs::-webkit-scrollbar-thumb {
+  border:1px solid #f4d18a55;
+  border-radius:999px;
+  background:linear-gradient(90deg,#8d5d2d,#d8aa57,#8d5d2d);
+}
+.background-picker > div,.design-location-tabs {
+  scrollbar-width:thin;
+  scrollbar-color:#c89242 #0b1421;
+}
+.design-grid-new,.design-options,.design-options section,.design-options section > div { min-width:0; }
+.design-options section button { max-width:100%;overflow:hidden;text-overflow:ellipsis; }
+
+/* There is no extra face, hairstyle, tattoo, tint or body-scaling layer in the
+   fallback. Those settings return only with the skinned-mesh renderer. */
+.role-bartender .character-composite { transform:none; }
+
+@media(max-width:760px) {
+  .design-grid-new { width:100%;grid-template-columns:minmax(0,1fr);padding:7px;overflow:hidden; }
+  .bartender-custom { min-height:0;grid-template-rows:minmax(360px,520px) auto auto; }
+  .bartender-custom > .art-character { width:min(100%,298px); }
+  .design-options { width:100%;grid-template-columns:minmax(0,1fr); }
+  .design-options section > div { flex-wrap:wrap;overflow:hidden; }
+  .design-options section button { flex:1 1 calc(50% - 6px);min-width:0; }
+  .background-picker > div { overflow-x:auto!important;overflow-y:hidden!important; }
+  .background-picker button { flex:0 0 min(140px,42vw)!important; }
+}
+
+/* City cards are articles now; the older rule treated their action as the
+   entire card and left disabled labels against the border. */
+.region-cards > article {
+  display:grid;
+  grid-template-rows:auto auto auto 1fr auto auto;
+  min-width:0;
+  overflow:hidden;
+  padding:0 12px 12px;
+  border:1px solid #354861;
+  border-radius:12px;
+  background:#111b2b;
+}
+.region-cards > article.active { border-color:var(--gold);background:#2f231f; }
+.region-cards > article > img {
+  display:block;
+  width:calc(100% + 24px);
+  height:125px;
+  margin:0 -12px 10px;
+  object-fit:cover;
+}
+.region-cards > article > small,
+.region-cards > article > b,
+.region-cards > article > span { min-width:0;overflow-wrap:anywhere; }
+.region-cards > article > small { margin:4px 2px;color:#9aa9bb;font-size:9px;line-height:1.45; }
+.region-cards > article > small:first-of-type { color:#e8b956; }
+.region-cards > article > b { margin:8px 2px;font:700 18px/1.15 Georgia,serif; }
+.region-cards > article > span { align-self:end;margin:10px 2px 0;color:#aeb9c7;font-size:9px;line-height:1.4; }
+.region-cards > article > button {
+  width:100%;
+  min-width:0;
+  min-height:44px;
+  margin-top:8px;
+  padding:10px 12px;
+  border:1px solid #44566f;
+  border-radius:9px;
+  background:#1b283b;
+  color:#dce5ee;
+  font-size:9px;
+  font-weight:800;
+  line-height:1.35;
+  text-align:left;
+  white-space:normal;
+}
+.region-cards > article.active > button { border-color:#b88943;background:#493421;color:#ffe0a0; }
+.region-cards > article > button:disabled { color:#8f9bad;opacity:1;cursor:default; }
+@media(max-width:430px) {
+  .region-cards { grid-template-columns:1fr; }
+  .region-cards > article > img { height:145px; }
+  .region-cards > article > button { font-size:10px; }
+}
