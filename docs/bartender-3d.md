@@ -22,7 +22,7 @@ Each bartender has **one fixed body shape** baked into the body and every garmen
 
 ## Budget (mobile)
 
-About 70k vertices per character. `amber.glb` is about 9 MB and `leo.glb` about 10 MB. Textures are at most 2048 (Noa's head skin), 1536 (Leo's head skin) and 1024 elsewhere; eyes and beards use 512. Hair cards are never decimated (it destroys their alpha edges).
+Both assets stay below 12 MiB and 130k stored vertices, including all wardrobe choices. Textures are at most 2048 (Noa's head skin), 1536 (Leo's head skin) and 1024 elsewhere; eyes, beards, normal and roughness maps use 512. Source normal and roughness maps preserve skin and fabric detail. Hair cards are never decimated (it destroys their alpha edges).
 
 ## Rebuild
 
@@ -34,6 +34,8 @@ $blender = 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe'
 
 Outputs: the GLBs, plus editable `.blend` projects and a build report under the git-ignored `assets-src/`. Noa's arms are relaxed by a skin-weight-driven rotation; Leo's are posed through his real rig, so his shirt deforms with its own weights. No rig ships in the GLB. Source assets are user supplied and keep their original licences.
 
+Body and eye meshes retain source topology so eyelids and lashes keep their original morph correspondence. Eyeballs stay at their source depth. Leo's neck is shortened by 4.5 cm with the same displacement applied to his head, hair and facial morphs. Lashes export with a dark material, and scalp cards provide the hairline instead of a painted horizontal forehead band. Noa's tee uses selective subdivision, a smoothed collar and extra clearance from skin; the jacket is fitted over the tee.
+
 ## Verify
 
 ```powershell
@@ -41,7 +43,9 @@ pnpm build
 pnpm test
 ```
 
-The asset tests check each GLB's structure, parts, shared body morphs, face UVs, metre scale, the vertex/file-size budget, and that every editor value is valid for saved profiles. Restart the dev API process after changing `src/data/cosmetics/bars.ts`.
+The asset tests check each GLB's structure, parts, fixed body shapes, neutral expression defaults, face UVs, metre scale, the vertex/file-size budget, and that every editor value is valid for saved profiles. Idle tests cover motion bounds, brief blinks and stopping when paused. Restart the dev API process after changing `src/data/cosmetics/bars.ts`.
+
+For a source-material close-up after rebuilding, run Blender with `--python scripts/render_avatar_preview.py -- female` (or `male`). This writes an image under `docs/screenshots`; it does not exercise the runtime makeup or animation shaders. Idle motion adds breathing, small head turns and blinks; eye presets fade during blinks so they do not prevent eyelids closing. Pausing or reduced-motion preferences disable idle motion.
 
 ## Garments from other bodies
 

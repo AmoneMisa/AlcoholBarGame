@@ -43,7 +43,7 @@ const OUTFIT_PARTS: Record<string, string[]> = {
 // Per-character model and camera heights: [camera, look-at] for the full body and for the face close-up.
 const CHARACTERS: Record<string, { glb: string; full: [number, number]; face: [number, number]; eyeY: number }> = {
   noa: { glb: '/assets/characters/3d/amber.glb', full: [1.0, .8], face: [1.6, 1.58], eyeY: 1.5965 },
-  leo: { glb: '/assets/characters/3d/leo.glb', full: [1.06, .8], face: [1.72, 1.7], eyeY: 1.72 }
+  leo: { glb: '/assets/characters/3d/leo.glb', full: [1.03, .8], face: [1.675, 1.655], eyeY: 1.675 }
 };
 const character = () => CHARACTERS[props.characterId ?? 'noa'] ?? CHARACTERS.noa!;
 // 3D beard meshes: which facial-hair choices show each one.
@@ -59,7 +59,7 @@ const uniforms = {
   idleBreath: { value: 0 }, idleYaw: { value: 0 }, idleNod: { value: 0 }, neckHeight: { value: 1.45 },
   blushTint: { value: new THREE.Color() }, lipGloss: { value: 0 },
   eyeTint: { value: new THREE.Color() }, garmentTint: { value: new THREE.Color() }, garmentAmount: { value: 0 }, lipTint: { value: new THREE.Color() }, shadowTint: { value: new THREE.Color() }, beardTint: { value: new THREE.Color() }, scalpTint: { value: new THREE.Color() },
-  lipAmount: { value: 0 }, shadowAmount: { value: 0 }, blushAmount: { value: 0 }, linerAmount: { value: 0 }, beardMode: { value: 0 }
+  lipAmount: { value: 0 }, shadowAmount: { value: 0 }, blushAmount: { value: 0 }, linerAmount: { value: 0 }, linerWing: { value: 0 }, beardMode: { value: 0 }
 };
 function makeup(material: THREE.MeshStandardMaterial) {
   material.onBeforeCompile = shader => {
@@ -68,7 +68,7 @@ function makeup(material: THREE.MeshStandardMaterial) {
     shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvFaceCoord = vec2(faceCoord.x, 1.0-faceCoord.y); vScalp = scalpMask;');
     shader.fragmentShader = `varying vec2 vFaceCoord; varying float vScalp;
       uniform vec3 lipTint, shadowTint, beardTint, scalpTint, blushTint;
-      uniform float lipAmount, shadowAmount, blushAmount, linerAmount, beardMode;
+      uniform float lipAmount, shadowAmount, blushAmount, linerAmount, linerWing, beardMode;
       float spot(vec2 p, vec2 c, vec2 r) { return 1.0-smoothstep(.2,1.0,length((p-c)/r)); }
       ` + shader.fragmentShader;
     shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', `#include <map_fragment>
@@ -82,6 +82,9 @@ function makeup(material: THREE.MeshStandardMaterial) {
       vec2 ep = vec2(abs(p.x-.5),p.y);
       float arc = .534 + .017*(1.0-pow((ep.x-.15)/.08,2.0));
       float liner = (1.0-smoothstep(.004,.009,abs(ep.y-arc))) * (1.0-smoothstep(.07,.09,abs(ep.x-.15)));
+      float wing = smoothstep(.207,.219,ep.x)*(1.0-smoothstep(.24,.27,ep.x));
+      wing *= 1.0-smoothstep(.002,.007,abs(ep.y-(.536+(ep.x-.22)*.42)));
+      liner = max(liner,wing*linerWing);
       float cheeks = max(spot(p,vec2(.24,.38),vec2(.13,.08)),spot(p,vec2(.76,.38),vec2(.13,.08)));
       float beard = spot(p,vec2(.5,.16),vec2(.29,.16))*(1.0-lips);
       float moustache = spot(p,vec2(.5,.325),vec2(.14,.028));
@@ -192,8 +195,10 @@ function update() {
       set('cheekHollow', cheek === 'hollow' ? .7 : 0);
       set('lipsWide', lips === 'wide' ? .6 : 0);
       set('lipsSmall', lips === 'small' ? .5 : 0);
-      set('smile', .12);
+      set('smile', .08);
       set('mouthClose', 0);
+      mesh.userData.openEyes = dict.eyesWide !== undefined ? weights[dict.eyesWide] : 0;
+      mesh.userData.narrowEyes = dict.eyesNarrow !== undefined ? weights[dict.eyesNarrow] : 0;
     }
   }
   for (const material of materials) {
@@ -203,7 +208,7 @@ function update() {
       if (/Hair|Scalp/.test(material.name)) {
         material.color.multiplyScalar(1.2);
         // A little self-light keeps near-black roots from reading as holes.
-        material.emissive.copy(material.color).multiplyScalar(.28);
+        material.emissive.copy(material.color).multiplyScalar(.06);
       } else if (/Brow/.test(material.name)) material.color.multiplyScalar(.95);
       else material.color.multiplyScalar(.8);
     }
@@ -214,13 +219,17 @@ function update() {
   uniforms.lipTint.value.set(LIP_PALETTE[props.lipColor ?? 'bare'] ?? LIP_PALETTE.bare!);
   uniforms.shadowTint.value.set(SHADOW_PALETTE[props.eyeshadow ?? 'none'] ?? SHADOW_PALETTE.none!);
   uniforms.blushTint.value.set(({soft:'#ae6669',peach:'#d18a70',rose:'#bd5873',bronze:'#966443'} as Record<string,string>)[props.blush ?? 'soft'] ?? '#ae6669');
-  uniforms.lipGloss.value = props.lipColor === 'gloss' ? 1 : .2;
+  uniforms.lipGloss.value = props.lipColor === 'gloss' ? 1 : !props.lipColor || props.lipColor === 'bare' ? 0 : .2;
   uniforms.beardTint.value.set(HAIR_PALETTE[props.hairColor ?? 'espresso'] ?? HAIR_PALETTE.espresso!);
   uniforms.scalpTint.value.set(HAIR_PALETTE[props.hairColor ?? 'espresso'] ?? HAIR_PALETTE.espresso!).multiplyScalar(.5);
   uniforms.lipAmount.value = !props.lipColor || props.lipColor === 'bare' ? 0 : .5;
   uniforms.shadowAmount.value = !props.eyeshadow || props.eyeshadow === 'none' ? 0 : .32;
   uniforms.blushAmount.value = !props.blush || props.blush === 'none' ? 0 : .16;
   uniforms.linerAmount.value = !props.eyeliner || props.eyeliner === 'none' ? 0 : props.eyeliner === 'fine' ? .5 : .85;
+  uniforms.linerWing.value = props.eyeliner === 'winged' ? 1 : 0;
+  for (const material of materials) {
+    if (/Scalp/.test(material.name)) material.visible = true;
+  }
   // Leo's beards are real meshes; only stubble is painted on the skin.
   uniforms.beardMode.value = props.characterId === 'leo' ? (props.facialHair === 'stubble' ? 1 : 0) : ({ clean:0,stubble:1,'short-beard':2,goatee:3,moustache:4 } as Record<string,number>)[props.facialHair ?? 'clean'] ?? 0;
   avatar.rotation.y = clampTurn(angle + sway) + (props.pose === 'confident' ? -.12 : props.pose === 'working' ? .12 : 0);
@@ -256,7 +265,14 @@ function applyIdle(enabled: boolean) {
   sway = interacting ? 0 : state.sway;
   for (const mesh of meshes) {
     const index = mesh.morphTargetDictionary?.blink;
-    if (index !== undefined && mesh.morphTargetInfluences) mesh.morphTargetInfluences[index] = state.blink;
+    if (index !== undefined && mesh.morphTargetInfluences) {
+      mesh.morphTargetInfluences[index] = state.blink;
+      // Wide/squint presets must not fight a closed eyelid.
+      for (const [name,key] of [['eyesWide','openEyes'],['eyesNarrow','narrowEyes']] as const) {
+        const shape=mesh.morphTargetDictionary?.[name];
+        if (shape!==undefined) mesh.morphTargetInfluences[shape]=(mesh.userData[key] ?? 0)*(1-state.blink);
+      }
+    }
   }
   if (avatar) avatar.rotation.y = clampTurn(angle+sway)+(props.pose==='confident' ? -.12 : props.pose==='working' ? .12 : 0);
 }
@@ -302,9 +318,9 @@ onMounted(async () => {
       const prepare=(original:THREE.Material) => {
         const mat=original.clone() as THREE.MeshStandardMaterial; materials.push(mat);
         // The brow mesh ships with an opaque skin-coloured underlay that shows as white patches; the hairs alone look right.
-        // The opaque scalp cap and the brow underlay read as a helmet and patches; the tinted skull replaces them.
-        if (/Brow_Base|Skin_BrowBase|Scalp/.test(mat.name)) mat.visible = false;
+        if (/Brow_Base|Skin_BrowBase/.test(mat.name)) mat.visible = false;
         if (/^Std_Eye_[LR]$/.test(mat.name)) eyeColour(mat);
+        if (/Eyelash/.test(mat.name)) { mat.color.set('#211810'); mat.emissive.set(0); mat.roughness=.85; }
         if (RECOLOURABLE.test(mat.name)) garmentColour(mat);
         if (isHairMaterial(mat.name) || /Eyelash/.test(mat.name)) {
           // Scalp cards must stay solid, strands need a cleaner edge, lashes the hardest cut.
@@ -314,9 +330,10 @@ onMounted(async () => {
         if (mat.name === 'Std_Skin_Head' && object.geometry.getAttribute('faceCoord')) {
           makeup(mat);
           if (!object.geometry.getAttribute('scalpMask')) {
-            // 1 over the skull above the hairline, fading out over the forehead.
-            const pos = object.geometry.getAttribute('position'), mask = new Float32Array(pos.count), top = character().eyeY;
-            for (let i = 0; i < pos.count; i++) mask[i] = THREE.MathUtils.smoothstep(pos.getY(i), top + .045, top + .07);
+            const pos = object.geometry.getAttribute('position'), mask = new Float32Array(pos.count);
+            // Hair cards provide the hairline; painting a horizontal band across
+            // the forehead creates a visibly artificial edge.
+            for (let i = 0; i < pos.count; i++) mask[i] = 0;
             object.geometry.setAttribute('scalpMask', new THREE.BufferAttribute(mask, 1));
           }
         }
@@ -361,7 +378,7 @@ function loadAvatar(url: string) {
     <button type="button" aria-label="Turn character left" @click="turn(-.3)">↶</button>
     <button type="button" :aria-pressed="closeup" @click="focusFace">{{ closeup ? 'Full body' : 'Face close-up' }}</button>
     <button type="button" aria-label="Turn character right" @click="turn(.3)">↷</button>
-    <button type="button" :aria-pressed="motionPaused" aria-label="Pause idle animation" @click="motionPaused = !motionPaused">{{ motionPaused ? 'Play' : 'Pause' }}</button>
+    <button type="button" :aria-pressed="motionPaused" :aria-label="motionPaused ? 'Resume idle animation' : 'Pause idle animation'" @click="motionPaused = !motionPaused">{{ motionPaused ? 'Play' : 'Pause' }}</button>
   </div>
 </template>
 <style scoped>

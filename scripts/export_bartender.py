@@ -92,8 +92,9 @@ SF=body_zmax/1.709   # body scale relative to the female base, used by the body 
 
 # Refitted garments must not sink into the new body: push any vertex that lies
 # inside the skin out to a small margin above the nearest body surface.
-def push_out(obj,margin=.006,passes=3):
- bvh=BVHTree.FromPolygons([v.co.copy() for v in body.data.vertices],[tuple(p.vertices) for p in body.data.polygons])
+def push_out(obj,margin=.006,passes=3,surface=None):
+ surface=surface or body
+ bvh=BVHTree.FromPolygons([v.co.copy() for v in surface.data.vertices],[tuple(p.vertices) for p in surface.data.polygons])
  for _ in range(passes):
   for v in obj.data.vertices:
    hit=bvh.find_nearest(v.co)
@@ -398,7 +399,7 @@ for obj in list(scene.objects):
 
 HAIR={'Hair_Base','Bang','Bun','Real_Hair','SKM_Hair_Bangs','SKM_Hair_Base_01','SKM_Hair_Base_02','Short_blowback','Circle_Thick','Mustache_Horseshoe','Soul_Path_Thick','Chinstrap_Thick'}  # alpha cards keep their topology
 FITTED={'CC_Base_Body','Jeans','Crop_T_Shirt','Punk_Leather_Jacket','Boots','Suit_Jacket','Suit_Skirt','Punk_Strap_Boots','Bunny_Leotard','Bunny_Vest','Bunny_Collar','Bunny_Jacket','Bunny_Gloves','Bunny_Stockings','Bunny_Pads_Nipples','Bunny_Pads_Vagina','Bunny_Tail','Loose_Kimono','Loose_BaggyTee','Loose_Streetwear','Plaid_Punk_Shirt'}
-BUDGET={'CC_Base_Body':11000,'Bunny_Jacket':3800,'Bunny_Vest':3300}
+BUDGET={'CC_Base_Body':11000,'Crop_T_Shirt':6000,'Punk_Leather_Jacket':5000,'Bunny_Jacket':3800,'Bunny_Vest':3300}
 DEFAULT_BUDGET=3000
 for obj in list(scene.objects):
  if obj.type!='MESH': continue
@@ -415,7 +416,10 @@ for obj in list(scene.objects):
    valid=[keys[s] for s in sources if s in keys]
    if valid: deltas[name]=[sum((s.data[i].co-base[i] for s in valid),Vector()) for i in range(len(base))]
   obj.shape_key_clear()
- budget=len(base) if (obj.name in HAIR) else BUDGET.get(obj.name,DEFAULT_BUDGET)
+ # Eyelids and lashes need the source topology; nearest-vertex morph transfer
+ # across simplified lids can pick the opposite lid and distort one eye.
+ preserve=obj.name in HAIR or obj.name in {'CC_Base_Body','CC_Base_Eye'}
+ budget=len(base) if preserve else BUDGET.get(obj.name,DEFAULT_BUDGET)
  if len(base)>budget:
   if obj.name=='CC_Base_Body':
    keep=obj.vertex_groups.new(name='HeadKeep')
@@ -436,17 +440,41 @@ for obj in list(scene.objects):
    for centre,spread,width,depth in regions:
     weight=fade*math.exp(-((z-centre)/spread)**2)
     v.co.x*=1+width*weight; v.co.y*=1+depth*weight
- nearest=[tree.find(v.co)[1] for v in obj.data.vertices]
+ nearest=list(range(len(base))) if preserve else [tree.find(v.co)[1] for v in obj.data.vertices]
  if deltas:
   obj.shape_key_add(name='Basis')
   for name,delta in deltas.items():
    key=obj.shape_key_add(name=name)
+   key.value=0.0
    for i,v in enumerate(obj.data.vertices): key.data[i].co=v.co+delta[nearest[i]]
  obj['source']='Hassan+V1.blend' if MALE else ('Amber.Fbx' if obj in amber_objs else 'Female_Leather_Suit.Fbx')
 
 # The body was simplified after the garments were fitted to it; keep every refitted garment outside the final surface.
 for g in amber_objs:
- push_out(g,margin=.003,passes=2)
+ if g.name=='Crop_T_Shirt':
+  bpy.context.view_layer.objects.active=g
+  bm=bmesh.new(); bm.from_mesh(g.data)
+  # Refine only broad triangles; fine collar/face topology should not inflate
+  # the full wardrobe's mobile vertex budget.
+  bmesh.ops.subdivide_edges(bm,edges=[e for e in bm.edges if e.calc_length()>.018],cuts=1,use_grid_fill=True)
+  collar=[v for v in bm.verts if v.is_boundary and v.co.z>1.30*SF and abs(v.co.x)<.17]
+  for _ in range(10):
+   bmesh.ops.smooth_vert(bm,verts=collar,factor=.45,use_axis_x=True,use_axis_y=True,use_axis_z=True)
+  bm.to_mesh(g.data); bm.free()
+ push_out(g,margin=.006 if g.name=='Crop_T_Shirt' else .003,passes=2)
+ if g.name=='Crop_T_Shirt':
+  # Projection against individual skin triangles can reintroduce a serrated
+  # neckline. Fair the edge after fitting, retaining clearance in front.
+  bm=bmesh.new(); bm.from_mesh(g.data)
+  collar=[v for v in bm.verts if v.is_boundary and v.co.z>1.30*SF and abs(v.co.x)<.17]
+  for _ in range(15):
+   bmesh.ops.smooth_vert(bm,verts=collar,factor=.5,use_axis_x=True,use_axis_y=True,use_axis_z=True)
+  for v in collar:
+   if v.co.y<0: v.co.y-=.003
+  bm.to_mesh(g.data); bm.free(); g.data.update()
+if not MALE:
+ # The jacket layers over the tee. Fitting both only to skin lets the tee poke through it.
+ push_out(bpy.data.objects['Punk_Leather_Jacket'],margin=.007,passes=3,surface=bpy.data.objects['Crop_T_Shirt'])
 # Stockings hug the whole leg, so cut their triangles in half and snap them to the final surface: no skin can poke between vertices.
 if not MALE and 'Bunny_Stockings' in bpy.data.objects:
  st=bpy.data.objects['Bunny_Stockings']
@@ -457,6 +485,17 @@ if not MALE and 'Bunny_Stockings' in bpy.data.objects:
   hit=fbvh.find_nearest(v.co)
   if hit[0] is not None and (v.co-hit[0]).dot(hit[1])<.005: v.co=hit[0]+hit[1]*.005
  st.data.update()
+
+if MALE:
+ # Compress the neck by 4.5 cm, carrying the head, eyes, hair and morphs together.
+ for obj in scene.objects:
+  if obj.type!='MESH': continue
+  def shorten(co): co.z-=.045*smooth3(1.43,1.60,co.z)
+  for v in obj.data.vertices: shorten(v.co)
+  if obj.data.shape_keys:
+   for key in obj.data.shape_keys.key_blocks:
+    for v in key.data: shorten(v.co)
+  obj.data.update()
 
 # Face projection for procedural makeup, placed from this body's own eye position.
 eye=bpy.data.objects['CC_Base_Eye']
@@ -472,8 +511,7 @@ for obj in scene.objects:
  for poly in obj.data.polygons: poly.use_smooth=True
  for color in list(obj.data.color_attributes): obj.data.color_attributes.remove(color)
 
-# The source eyeballs sit deep behind the lids, which reads as sunken eyes; bring them forward about two millimetres.
-for v in eye.data.vertices: v.co.y-=.0022
+# Keep the source eyeball placement: pushing them forward cuts through the lids.
 eye.data.update()
 # ---- Materials: simplify and size textures for mobile delivery -------------
 bpy.ops.outliner.orphans_purge(do_local_ids=True,do_linked_ids=True,do_recursive=True)
@@ -499,6 +537,8 @@ for mat in bpy.data.materials:
  images=[n.image for n in nodes if n.type=='TEX_IMAGE' and n.image and n.image.size[0]>0]
  diffuse=next((i for i in images if 'Diffuse' in i.name or 'BaseColor' in i.name or 'basecolor' in i.name.lower()),None)
  opacity=next((i for i in images if 'Opacity' in i.name or 'opacity' in i.name.lower()),None)
+ normal=next((i for i in images if 'normal' in i.name.lower()),None)
+ roughness=next((i for i in images if 'roughness' in i.name.lower()),None)
  CUTOUT=any(s in mat.name for s in ['Transparency','Eyelash','Scalp','Beard','Brow','Hair'])
  if not CUTOUT: opacity=None   # clothes are opaque: the opacity map would only force a heavy RGBA texture
  mat.use_backface_culling=False   # refitted garments can have faces that end up facing inward; never cull them
@@ -509,13 +549,29 @@ for mat in bpy.data.materials:
  if diffuse:
   tex=nodes.new('ShaderNodeTexImage'); tex.image=diffuse
   mat.node_tree.links.new(tex.outputs['Color'],bs.inputs['Base Color'])
+ if 'Eyelash' in mat.name:
+  for link in list(bs.inputs['Base Color'].links): mat.node_tree.links.remove(link)
+  bs.inputs['Base Color'].default_value=(.009,.006,.004,1)
+  bs.inputs['Roughness'].default_value=.85
+ # Keep the artist's surface detail: pores, woven cloth and leather grain.
+ # These were previously discarded when rebuilding the material graph.
+ if normal:
+  normal.colorspace_settings.name='Non-Color'
+  tex=nodes.new('ShaderNodeTexImage'); tex.image=normal
+  nm=nodes.new('ShaderNodeNormalMap'); nm.inputs['Strength'].default_value=.65 if 'Skin' in mat.name else .8
+  mat.node_tree.links.new(tex.outputs['Color'],nm.inputs['Color'])
+  mat.node_tree.links.new(nm.outputs['Normal'],bs.inputs['Normal'])
+ if roughness:
+  roughness.colorspace_settings.name='Non-Color'
+  tex=nodes.new('ShaderNodeTexImage'); tex.image=roughness
+  mat.node_tree.links.new(tex.outputs['Color'],bs.inputs['Roughness'])
  if any(s in mat.name for s in ['Transparency','Eyelash','Scalp','Beard','Brow','Hair']):
   mat.surface_render_method='DITHERED'; mat.use_backface_culling=False
   if opacity:
    tex=nodes.new('ShaderNodeTexImage'); tex.image=opacity
    mat.node_tree.links.new(tex.outputs['Color'],bs.inputs['Alpha'])
  for img in images:
-  limit=(1536 if MALE else 2048) if mat.name=='Std_Skin_Head' else 512 if re.search('Eye|Cornea|Beard|Scalp|Skin_BrowBase',mat.name) else 1024
+  limit=(1536 if MALE else 2048) if mat.name=='Std_Skin_Head' and img is diffuse else 512 if (img is normal or img is roughness or re.search('Eye|Cornea|Beard|Scalp|Skin_BrowBase',mat.name)) else 1024
   if img.size[0]>limit or img.size[1]>limit:
    factor=limit/max(img.size); img.scale(max(1,int(img.size[0]*factor)),max(1,int(img.size[1]*factor))); img.pack()
   if not opacity and img is diffuse and img.file_format!='JPEG':

@@ -4,6 +4,7 @@ import test from 'node:test';
 import { AVATAR_OPTIONS, avatarOptionsFor } from '../src/data/cosmetics/avatar.ts';
 import { BAR_PROFILE_OPTIONS } from '../src/data/cosmetics/bars.ts';
 import { canUseCosmetic } from '../src/domain/cosmetics.ts';
+import { avatarIdleAt } from '../src/domain/avatarMotion.ts';
 
 const load = (file) => {
   const data = readFileSync(new URL(`../public/assets/characters/3d/${file}`, import.meta.url));
@@ -11,7 +12,7 @@ const load = (file) => {
 };
 const noa = load('amber.glb');
 const leo = load('leo.glb');
-const FACE_MORPHS = ['eyesWide', 'eyesNarrow', 'lipsFull', 'lipsThin', 'lipsWide', 'lipsSmall', 'browArch', 'browInner', 'noseWide', 'noseNarrow', 'noseUp', 'cheekHigh', 'cheekFull', 'cheekHollow'];
+const FACE_MORPHS = ['blink', 'eyesWide', 'eyesNarrow', 'lipsFull', 'lipsThin', 'lipsWide', 'lipsSmall', 'browArch', 'browInner', 'noseWide', 'noseNarrow', 'noseUp', 'cheekHigh', 'cheekFull', 'cheekHollow'];
 const LEO_ONLY_MORPHS = ['mouthClose'];   // closes the male mouth, which the source leaves slightly open
 
 for (const [label, { data, model }, parts, garments] of [
@@ -34,6 +35,13 @@ for (const [label, { data, model }, parts, garments] of [
     for (const morph of [...FACE_MORPHS, ...(label === 'Leo' ? LEO_ONLY_MORPHS : [])]) assert.ok(body.extras.targetNames.includes(morph), morph);
     assert.ok(!body.extras.targetNames.includes('bodyBroad'));
     assert.ok(body.primitives.every((part) => part.attributes.TEXCOORD_1 !== undefined));
+    for (const mesh of model.meshes) assert.ok((mesh.weights ?? []).every((weight) => weight === 0), `${mesh.name}: expressions must start neutral`);
+    const lashes = model.materials.filter((material) => /Eyelash/.test(material.name));
+    assert.ok(lashes.length > 0);
+    for (const material of lashes) {
+      const colour = material.pbrMetallicRoughness?.baseColorFactor ?? [1, 1, 1, 1];
+      assert.ok(colour.slice(0, 3).every((channel) => channel < .05), `${material.name}: lashes must not export white`);
+    }
   });
   test(`${label}: stays light enough for mobile`, () => {
     let vertices = 0;
@@ -70,6 +78,20 @@ test('Each character only offers what its model can show', () => {
   assert.ok(keys('noa').includes('lipColor'));
   assert.ok(avatarOptionsFor('noa').find((option) => option.key === 'hairStyle').values.includes('waves'));
   assert.ok(avatarOptionsFor('leo').find((option) => option.key === 'hairStyle').values.includes('buzz'));
+});
+
+test('Idle motion stays subtle, blinks briefly, and fully stops when paused', () => {
+  let closingFrames=0;
+  for(let i=0;i<3000;i++) {
+    const pose=avatarIdleAt(i/60);
+    assert.ok(pose.blink>=0 && pose.blink<=1);
+    assert.ok(Math.abs(pose.breath)<=.0023 && Math.abs(pose.yaw)<=.046 && Math.abs(pose.nod)<=.013);
+    if(pose.blink>.2) closingFrames++;
+    assert.deepEqual(avatarIdleAt(i/60,false),{blink:0,breath:0,yaw:0,nod:0,sway:0});
+  }
+  assert.ok(closingFrames>0 && closingFrames<180,'eyes should remain open for over 94% of the idle cycle');
+  assert.equal(avatarIdleAt(3.6).blink,1);
+  assert.equal(avatarIdleAt(3.9).blink,0);
 });
 
 test('Facial hair keeps existing ownership IDs across avatars without bypassing locks', () => {

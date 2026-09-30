@@ -220,7 +220,7 @@ function selectBartender(id: 'noa' | 'leo') {
         <!-- Clothes and Character share one pinned 3D viewer; the options scroll underneath it. -->
         <div v-show="designTab !== 'bar'" class="bartender-custom">
           <div class="avatar-stage">
-            <CharacterModel role="bartender" interactive :character-id="selectedBartender" :outfit="game.decor.bartender" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :eye-shape="game.decor.eyeShape" :eye-color="game.decor.eyeColor" :brow-shape="game.decor.browShape" :lip-shape="game.decor.lipShape" :lip-color="game.decor.lipColor" :eyeshadow="game.decor.eyeshadow" :eyeliner="game.decor.eyeliner" :blush="game.decor.blush" :facial-hair="game.decor.facialHair" :outfit-color="game.decor.outfitColor" :pose="game.decor.pose" />
+            <CharacterModel role="bartender" interactive :character-id="selectedBartender" :outfit="game.decor.bartender" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :eye-shape="game.decor.eyeShape" :eye-color="game.decor.eyeColor" :brow-shape="game.decor.browShape" :nose-shape="game.decor.noseShape" :cheek-shape="game.decor.cheekShape" :lip-shape="game.decor.lipShape" :lip-color="game.decor.lipColor" :eyeshadow="game.decor.eyeshadow" :eyeliner="game.decor.eyeliner" :blush="game.decor.blush" :facial-hair="game.decor.facialHair" :outfit-color="game.decor.outfitColor" :pose="game.decor.pose" />
           </div>
           <div v-show="designTab === 'clothes'" class="design-tab-clothes">
           <div class="bartender-selector" aria-label="Choose bartender">
