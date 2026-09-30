@@ -9,9 +9,12 @@ import {
   upgradeCostFor, type BoxKind, type EquipmentId, type PrestigePerkId, type Reward
 } from '../domain/loot';
 import { INGREDIENTS } from '../domain/catalog';
+import { FAME_PRICE_BONUS, FAME_STEPS, SIGNATURE_FEE, SIGNATURE_GUEST_CHANCE, SIGNATURE_LEVEL, SignatureError, fameLevel, validateSignature } from '../domain/signature';
+import { usableIngredientIds } from '../domain/usableStock';
 import { SPOIL_MAX_DAYS, SPOIL_START_LEVEL, capacityFor, isPerishable, spoiledAmount } from '../domain/warehouse';
 import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipeId, regularLevel } from '../domain/regulars';
 import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
+import type { Customer } from '../domain/types';
 import { ACHIEVEMENTS, TASTING_REWARD, achievementById, questById, questsForWeek, weekOf, type StatId } from '../domain/quests';
 import type { DrawResult } from '../domain/lootState';
 import { createLoot } from '../domain/lootState';
@@ -446,3 +449,46 @@ export function applySpoilage(state: PlayerState, now: number) {
   }
   if (lost.length) note(state, `Spoilage: ${lost.join(', ')} went off. A better fridge slows it.`);
 }
+
+// ---- Signature cocktail ----
+export function designSignature(state: PlayerState, input: unknown) {
+  if (levelFor(state.xp) < SIGNATURE_LEVEL) throw new LootError(`Signature cocktails unlock at level ${SIGNATURE_LEVEL}.`);
+  let clean;
+  try { clean = validateSignature(input, usableIngredientIds(state.knownRecipeIds)); }
+  catch (error) { if (error instanceof SignatureError) throw new LootError(error.message); throw error; }
+  const previous = state.loot.signatures[state.regionId];
+  if (previous && previous.name === clean.name && previous.needsShake === clean.needsShake && JSON.stringify(previous.items) === JSON.stringify(clean.items)) throw new LootError('This is already your signature cocktail.');
+  if (state.money < SIGNATURE_FEE) throw new LootError(`You need ${SIGNATURE_FEE} coins to develop a signature cocktail.`);
+  state.money = coins(state.money - SIGNATURE_FEE);
+  // A new recipe starts unknown again: fame is earned per creation.
+  state.loot.signatures[state.regionId] = { ...clean, served: 0 };
+  note(state, `${clean.name} is now the signature cocktail of ${state.bars[state.regionId].name}: guests will pay ${clean.price.toFixed(2)} coins.`);
+}
+// Some arriving guests come for the house special, and it is announced up front (no detective work).
+export function applySignatureGuest(state: PlayerState, guest: Customer, random: () => number) {
+  const signature = state.loot.signatures[state.regionId];
+  if (!signature || guest.specialRecipeRewardId || random() >= SIGNATURE_GUEST_CHANCE) return;
+  const { served: _served, ...snapshot } = signature;
+  guest.signature = snapshot;
+  guest.orderKind = 'cocktail';
+  guest.orderRecipeId = 'signature';
+  guest.modifierId = undefined; guest.bottleRequest = undefined; guest.serveRequest = undefined; guest.selectedBottleId = undefined;
+  guest.orderRevealed = true;
+  guest.request = `I heard about your ${signature.name}. One, please.`;
+  guest.wish = guest.request;
+  guest.budget = signature.price * 1.5 + 4;
+}
+export const signatureFameFactor = (state: PlayerState) => 1 + FAME_PRICE_BONUS * fameLevel(state.loot.signatures[state.regionId]?.served ?? 0);
+export function signatureServed(state: PlayerState, now: number) {
+  const signature = state.loot.signatures[state.regionId];
+  if (!signature) return '';
+  const before = fameLevel(signature.served);
+  signature.served += 1;
+  track(state, 'signatures', 1, now);
+  const after = fameLevel(signature.served);
+  if (after <= before) return '';
+  const kind: BoxKind = ['bronze', 'silver', 'choice'][after - 1] as BoxKind;
+  grantBox(state, kind);
+  return ` ${signature.name} reached fame level ${after} (+${Math.round(FAME_PRICE_BONUS * after * 100)}% price) and earned a ${boxDef(kind)!.name}!`;
+}
+export { FAME_STEPS };

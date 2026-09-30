@@ -33,3 +33,10 @@ Random actions (`openBox`, `pickReward`, `drawStyle`, `prestige`) are server-onl
 
 ## Friend gifts
 Consumables (one per gift) and skin shards (5 / 10 / 20) can be sent to friends you are visiting. Items move, they are never created; a sender may send 5 Workshop gifts per day (`LOOT_GIFTS_PER_DAY`).
+
+## Signature cocktail
+`domain/signature.ts`, `sim/loot.ts`. Unlocks at level 15; one per bar; costs 300 coins to develop or replace (replacing restarts fame).
+- **Design:** 2-5 ingredients of your known recipes, at least one spirit, 60-250 ml of liquid, amounts in pour steps, optional shaking. Price is computed by the server from the ingredients (base 7 + spirit strength + variety + balanced sour/sweet, long drink and garnish bonuses, "too strong" penalty; range 6-15) and shown live in the designer.
+- **Guests:** about 15 % of arriving guests come for it. The order is announced up front (`Customer.signature` snapshot, `orderRecipeId = 'signature'`), judged by `requiredRecipe`, and cannot be swapped.
+- **Fame:** serves at 10 / 30 / 60 raise price by 5 % per level and pay a bronze / silver / choice box. Achievement: serve it 50 times.
+- Saved signatures are re-validated when loaded; the price is always recomputed.

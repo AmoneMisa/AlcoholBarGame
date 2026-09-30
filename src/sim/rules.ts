@@ -15,7 +15,7 @@ import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL, economyAt, formatDeliveryTime, mar
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
-import { LootError, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
+import { LootError, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
 import { usableIngredientIds } from '../domain/usableStock';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
@@ -73,6 +73,7 @@ export type GameAction =
   | { type: 'drawStyle'; count: 1 | 10 }
   | { type: 'craftSkin'; cosmeticId: string }
   | { type: 'prestige' }
+  | { type: 'designSignature'; name: string; items: { ingredientId: string; amount: number }[]; needsShake: boolean }
   | { type: 'claimQuest'; questId: string }
   | { type: 'claimAchievement'; id: string }
   | { type: 'buyPrestigePerk'; perk: string };
@@ -208,6 +209,7 @@ function welcomeNextCustomer(state: PlayerState, now: number, random: () => numb
   const arrival = makeArrivingCustomer(state, now, random);
   // The sound system keeps guests happy for longer.
   const patienceFactor = lootBonuses(state, now).patienceFactor;
+  applySignatureGuest(state, arrival, random);
   arrival.patience = Math.round(arrival.patience * patienceFactor);
   arrival.patienceRemaining = Math.round(arrival.patienceRemaining * patienceFactor);
   state.customers = [arrival];
@@ -426,7 +428,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const specialty = guest.orderKind === 'serve' ? 1 : specialtyFactor(state.regionId, verdict.recipe.id);
         const golden = !auto && (state.loot.armed['golden-ice'] ?? 0) > 0;
         if (golden) delete state.loot.armed['golden-ice'];
-        const revenue = coins(verdict.recipe.price * priceFactorOf(guest, region.marketFactor) * mastery.pay * specialty * lootBonuses(state, now).payFactor * (golden ? 1.5 : 1) * (guest.orderKind === 'serve' ? 1 : regularPriceBonus(state, guest.characterId, verdict.recipe.id)));
+        const revenue = coins(verdict.recipe.price * priceFactorOf(guest, region.marketFactor) * mastery.pay * specialty * lootBonuses(state, now).payFactor * (golden ? 1.5 : 1) * (guest.orderKind === 'serve' ? 1 : regularPriceBonus(state, guest.characterId, verdict.recipe.id)) * (guest.signature ? signatureFameFactor(state) : 1));
         const bonus = guest.orderKind === 'serve' ? undefined : signatureBonus(verdict.recipe.id, pourBrands);
         // Tips are a chance, never a given; drinks made with Auto-serve are paid but never tipped.
         const tipped = !auto && (golden || rollTip(state, guest, now, random));
@@ -439,7 +441,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         track(state, 'servesCoins', Math.floor(revenue + tip), now);
         if (guest.mood === 'vip' || guest.specialRecipeRewardId) track(state, 'vips', 1, now);
         let found = dropAfterServe(state, guest.mood === 'vip', !!guest.specialRecipeRewardId, random);
-        if (guest.orderKind !== 'serve') found += tasteFirst(state, verdict.recipe.id, 'recipe', now);
+        if (guest.signature) found += signatureServed(state, now);
+        if (guest.orderKind !== 'serve' && !guest.signature) found += tasteFirst(state, verdict.recipe.id, 'recipe', now);
         if (guest.orderKind !== 'serve') found += earnLoyalty(state, guest.characterId, guest.name, verdict.recipe.id, guest.mood === 'vip');
         for (const productId of Object.values(pourBrands)) found += tasteFirst(state, productId, 'brand', now);
         const serveProduct = serve ? ALCOHOL_PRODUCTS.find((item) => item.id === serve.productId) : undefined;
@@ -798,6 +801,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'drawStyle':
     case 'craftSkin':
     case 'prestige':
+    case 'designSignature':
     case 'claimQuest':
     case 'claimAchievement':
     case 'buyPrestigePerk': {
@@ -813,6 +817,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           case 'drawStyle': drawStyle(state, action.count, now, random); break;
           case 'craftSkin': craftSkin(state, action.cosmeticId); break;
           case 'prestige': prestige(state, now); break;
+          case 'designSignature': designSignature(state, { name: action.name, items: action.items, needsShake: action.needsShake }); break;
           case 'claimQuest': claimQuest(state, action.questId, now); break;
           case 'claimAchievement': claimAchievement(state, action.id); break;
           case 'buyPrestigePerk': buyPrestigePerk(state, action.perk); break;
@@ -848,6 +853,7 @@ function auditEntry(state: PlayerState, action: GameAction): LootAudit | undefin
 }
 
 function offerSimilar(state: PlayerState, target: Customer, marketFactor: number) {
+  if (target.signature) throw new RuleError('This guest came for your signature cocktail and will not swap it.');
   const onShelf = (id: string) => (bottleStock(state, id)?.quantity ?? 0) > 0;
   if (target.orderKind === 'serve' && target.serveRequest) {
     const substitute = substitutesFor(target.serveRequest, onShelf)[0];
@@ -950,7 +956,8 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
   const reply: CustomerReply & { bottleFacts?: Transcript['bottleFacts']; selectedBottleId?: string } =
     (serveAnswer ? { text: serveAnswer.text, expression: serveAnswer.expression, facts: [] } : undefined)
     ?? service
-    ?? (guest.orderKind === 'serve' && guest.serveRequest ? { text: `Just ${serveName(guest.serveRequest)}, please.`, expression: 'smile', facts: [] }
+    ?? (guest.signature ? { text: `Just your ${guest.signature.name}, please.`, expression: 'smile', facts: [] }
+    : guest.orderKind === 'serve' && guest.serveRequest ? { text: `Just ${serveName(guest.serveRequest)}, please.`, expression: 'smile', facts: [] }
       : guest.orderKind === 'bottle' ? replyToBottle(heard, guest, transcript.bottleFacts, marketFactor)
         : profile ? replyTo(heard, guest, profile, RECIPES, transcript.facts, MODIFIERS.find((item) => item.id === guest.modifierId)?.label)
           : { text: 'Sorry, I don’t understand.', expression: 'confused', facts: [] });

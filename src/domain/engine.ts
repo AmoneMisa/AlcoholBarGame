@@ -1,3 +1,4 @@
+import { signatureRecipe } from './signature';
 import { INGREDIENTS, MODIFIERS, RECIPES } from './catalog';
 import { ALCOHOL_PRODUCTS, generateBottleRequest } from './bottleCatalog';
 import { withArticle } from './english/articles';
@@ -62,6 +63,7 @@ export function generateCustomer(level = 0, recipePool: Recipe[] = RECIPES, bott
 const MYSTERY_RECIPE: Recipe = { id: 'mystery', name: 'Mystery order', price: 0, needsShake: false, category: 'cocktail', ingredients: [], origin: '', story: '', tastingNotes: [], occasions: [], method: [] };
 
 export function requiredRecipe(customer: Customer) {
+  if (customer.signature) return signatureRecipe(customer.signature);
   if (customer.orderKind === 'serve' && customer.serveRequest) return serveRecipe(customer.serveRequest);
   const base = RECIPES.find((recipe) => recipe.id === customer.orderRecipeId);
   if (!base) return MYSTERY_RECIPE;

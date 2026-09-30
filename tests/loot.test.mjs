@@ -405,3 +405,95 @@ test('Workshop gifts are limited to five per day and reset the next day', async 
   assert.equal(state.loot.skinShards, 1000 - 5 * LOOT_GIFTS_PER_DAY);
   payForGift(state, { kind: 'skin-shards', amount: 5 }, NOW + 86_400_000);
 });
+
+test('Signature cocktails: validation, price scoring, fee, level gate', async () => {
+  const { scoreSignature, validateSignature, SIGNATURE_FEE, SIGNATURE_LEVEL } = await import('../src/domain/signature.ts');
+  const { usableIngredientIds } = await import('../src/domain/usableStock.ts');
+  const { RECIPES } = await import('../src/domain/catalog.ts');
+  const good = { name: '  Velvet   Hour!! ', needsShake: true, items: [{ ingredientId: 'gin', amount: 45 }, { ingredientId: 'lime-juice', amount: 20 }, { ingredientId: 'sugar-syrup', amount: 15 }, { ingredientId: 'mint', amount: 2 }] };
+  const usable = usableIngredientIds(RECIPES.slice(0, 10).map((recipe) => recipe.id));
+  const clean = validateSignature(good, usable);
+  assert.equal(clean.name, 'Velvet Hour');
+  const score = scoreSignature(good.items);
+  assert.match(score.notes.join(), /Balanced sour and sweet/);
+  assert.match(score.notes.join(), /Garnished/);
+  assert.ok(score.price > 9 && score.price <= 15);
+  const bad = (patch, pattern) => assert.throws(() => validateSignature({ ...good, ...patch }, usable), pattern);
+  bad({ name: 'x' }, /name/);
+  bad({ items: [{ ingredientId: 'gin', amount: 45 }] }, /2 to 5/);
+  bad({ items: [{ ingredientId: 'gin', amount: 47 }, { ingredientId: 'soda', amount: 60 }] }, /steps of/);
+  bad({ items: [{ ingredientId: 'gin', amount: 45 }, { ingredientId: 'gin', amount: 15 }] }, /twice/);
+  bad({ items: [{ ingredientId: 'soda', amount: 60 }, { ingredientId: 'tonic', amount: 60 }] }, /spirit/);
+  bad({ items: [{ ingredientId: 'gin', amount: 15 }, { ingredientId: 'soda', amount: 30 }] }, /liquid/);
+  bad({ items: [{ ingredientId: 'nonsense', amount: 15 }, { ingredientId: 'soda', amount: 30 }] }, /Unknown/);
+  bad({ items: [{ ingredientId: 'dark-rum', amount: 30 }, { ingredientId: 'soda', amount: 60 }] }, /not stocked/);
+  assert.ok(scoreSignature([{ ingredientId: 'gin', amount: 60 }, { ingredientId: 'vodka', amount: 60 }, { ingredientId: 'white-rum', amount: 60 }]).notes.some((line) => /Too strong/.test(line)));
+
+  const state = fresh();
+  const action = { type: 'designSignature', name: good.name, items: good.items, needsShake: true };
+  assert.throws(() => run(state, action), /unlock at level/);
+  state.xp = xpForLevel(SIGNATURE_LEVEL);
+  state.money = 100;
+  assert.throws(() => run(state, action), /coins/);
+  state.money = 1000;
+  run(state, action);
+  assert.equal(state.money, 1000 - SIGNATURE_FEE);
+  assert.equal(state.loot.signatures['new-york'].name, 'Velvet Hour');
+  assert.equal(state.loot.signatures.london, undefined, 'per bar');
+  assert.throws(() => run(state, action), /already/);
+  assert.equal(state.money, 700, 'a refused redesign is free');
+});
+
+test('Signature guests order the house special, pay its price with fame, and cannot be swapped', async () => {
+  const { RECIPES } = await import('../src/domain/catalog.ts');
+  const { requiredRecipe } = await import('../src/domain/engine.ts');
+  const { fameLevel, FAME_STEPS } = await import('../src/domain/signature.ts');
+  const state = fresh();
+  state.xp = xpForLevel(15);
+  state.money = 1000;
+  const items = [{ ingredientId: 'gin', amount: 45 }, { ingredientId: 'tonic', amount: 90 }];
+  run(state, { type: 'designSignature', name: 'Sky Tonic', items, needsShake: false });
+  // Force the next arrival to be a signature guest (random() = 0 is below the guest chance).
+  state.customers = []; state.nextCustomerAt = 1; state.vipCooldownUntil = NOW + 1e12;
+  applyAction(state, { type: 'tick' }, { now: NOW + 10_000, random: () => 0, checkEnglish: (t) => ({ ok: true, corrected: t }), spawnCustomers: true });
+  const guest = state.customers[0];
+  assert.ok(guest?.signature, 'a signature guest arrived');
+  assert.equal(guest.orderRevealed, true);
+  assert.match(guest.request, /Sky Tonic/);
+  assert.equal(requiredRecipe(guest).ingredients.length, 2);
+  assert.throws(() => run(state, { type: 'offerSimilar', customerId: guest.id }), /signature cocktail/);
+
+  const price = guest.signature.price;
+  for (const stock of state.inventories['new-york']) stock.amount = 5000;
+  guest.priceFactor = 1;
+  const before = state.money;
+  run(state, { type: 'serve', mix: items.map((item) => ({ ...item })), shaken: false, pourBrands: {} }, () => .99);
+  assert.ok(state.money - before >= price * .85, 'paid about the signature price');
+  assert.equal(state.loot.signatures['new-york'].served, 1);
+  assert.equal(state.loot.stats.signatures, 1);
+  assert.equal(state.loot.stats.tasted ?? 0, 0, 'no tasting reward for the house special');
+
+  // Fame levels up at the thresholds and pays a box once.
+  state.loot.signatures['new-york'].served = FAME_STEPS[0] - 1;
+  const g2 = { ...state.customers[0] };
+  assert.equal(fameLevel(state.loot.signatures['new-york'].served), 0);
+  state.customers = [{ ...guest, id: 'again', signature: guest.signature, patienceRemaining: 500, orderRevealed: true }];
+  state.activeCustomerId = 'again';
+  run(state, { type: 'serve', mix: items.map((item) => ({ ...item })), shaken: false, pourBrands: {} }, () => .99);
+  assert.equal(fameLevel(state.loot.signatures['new-york'].served), 1);
+  assert.ok((state.loot.boxes.bronze ?? 0) >= 1);
+  void g2;
+});
+
+test('Saved signatures are re-validated on load', () => {
+  const loot = normalizeLoot({ signatures: {
+    'new-york': { name: 'Good One', needsShake: false, price: 99, served: 4, items: [{ ingredientId: 'gin', amount: 45 }, { ingredientId: 'tonic', amount: 90 }] },
+    london: { name: 'Hack', items: [{ ingredientId: 'gin', amount: 1000 }] },
+    berlin: 'not an object'
+  } }, 1);
+  assert.equal(loot.signatures['new-york'].name, 'Good One');
+  assert.equal(loot.signatures['new-york'].served, 4);
+  assert.notEqual(loot.signatures['new-york'].price, 99, 'price is recomputed, never trusted');
+  assert.equal(loot.signatures.london, undefined);
+  assert.equal(loot.signatures.berlin, undefined);
+});

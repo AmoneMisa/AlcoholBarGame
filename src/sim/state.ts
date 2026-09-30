@@ -96,7 +96,7 @@ export function withUniqueLook(customer: Customer, others: Customer[]) {
 
 export function wishFor(customer: Customer) {
   if (customer.orderKind === 'bottle') return 'Some sealed bottles, please.';
-  if (customer.orderKind === 'serve' || customer.specialRecipeRewardId) return customer.request;
+  if (customer.orderKind === 'serve' || customer.specialRecipeRewardId || customer.signature) return customer.request;
   const recipe = RECIPES.find((item) => item.id === customer.orderRecipeId);
   return recipe ? shortWish(buildProfile(recipe)) : 'Something nice, please.';
 }

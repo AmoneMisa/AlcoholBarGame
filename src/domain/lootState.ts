@@ -1,5 +1,6 @@
 import { BOOST_KINDS, EQUIPMENT, TIER_ORDER, PRESTIGE_PERKS, newSlot, type EquipmentSlot, type Pity, type Reward } from './loot';
-import { REGIONS } from './catalog';
+import { INGREDIENTS, REGIONS } from './catalog';
+import { SignatureError, validateSignature, type Signature } from './signature';
 import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 
 // The loot layer of a player's save: materials, consumables, boxes, per-bar equipment, gacha pity and prestige.
@@ -35,6 +36,8 @@ export interface LootState {
   spoiledAt: number;
   // Workshop gifts sent today (limit enforced in sim/gifts.ts).
   giftsSent?: { day: string; count: number };
+  // One signature cocktail per bar, invented by the player.
+  signatures: Record<string, Signature | undefined>;
 }
 
 export const createLoot = (): LootState => ({
@@ -42,7 +45,7 @@ export const createLoot = (): LootState => ({
   equipment: Object.fromEntries(REGIONS.map((region) => [region.id, Object.fromEntries(EQUIPMENT.map((item) => [item.id, newSlot()]))])),
   pity: { sinceRare: 0, sinceLegendary: 0 }, lastDraw: [],
   prestige: { stars: 0, earned: 0, count: 0, perks: {} }, runEarned: 0, levelRewarded: 1, log: [],
-  stats: {}, quests: { week: 0, progress: {}, claimed: [] }, achievements: [], tasted: [], regulars: {}, spoiledAt: 0
+  stats: {}, quests: { week: 0, progress: {}, claimed: [] }, achievements: [], tasted: [], regulars: {}, spoiledAt: 0, signatures: {}
 });
 
 const count = (value: unknown, max = 1_000_000) => Number.isFinite(value) && (value as number) > 0 ? Math.min(max, Math.floor(value as number)) : 0;
@@ -82,13 +85,31 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
     prestige: { stars: count(source.prestige?.stars), earned: count(source.prestige?.earned), count: count(source.prestige?.count, 1000), perks },
     runEarned: count(source.runEarned, 1e12),
     levelRewarded: Math.max(1, count(source.levelRewarded, 50) || currentLevel),
-    stats: counts(source.stats, ['serves', 'servesCoins', 'vips', 'bottles', 'boxes', 'draws', 'upgrades', 'tasted', 'perfectTalks', 'lessons']),
+    stats: counts(source.stats, ['serves', 'servesCoins', 'vips', 'bottles', 'boxes', 'draws', 'upgrades', 'tasted', 'perfectTalks', 'lessons', 'signatures']),
     quests: { week: count(source.quests?.week, 1e6), progress: counts(source.quests?.progress), claimed: Array.isArray(source.quests?.claimed) ? source.quests!.claimed.filter((id) => typeof id === 'string').slice(0, 10) : [] },
     achievements: Array.isArray(source.achievements) ? [...new Set(source.achievements.filter((id) => typeof id === 'string'))].slice(0, 50) : [],
     tasted: Array.isArray(source.tasted) ? [...new Set(source.tasted.filter((id) => typeof id === 'string'))].slice(0, 400) : [],
     regulars: counts(source.regulars, CUSTOMER_ART_BY_SLOT),
     spoiledAt: count(source.spoiledAt, 1e14),
+    signatures: cleanSignatures(source.signatures),
     giftsSent: typeof source.giftsSent?.day === 'string' ? { day: source.giftsSent.day.slice(0, 10), count: count(source.giftsSent.count, 1000) } : undefined,
     log: Array.isArray(source.log) ? source.log.filter((line) => typeof line === 'string').slice(0, 20) : []
   };
+}
+
+// Signatures are re-validated on load; anything invalid is dropped. Ingredient availability is not re-checked
+// (a player who learned the recipes once keeps their creation), only names, amounts and structure.
+function cleanSignatures(value: unknown): Record<string, Signature | undefined> {
+  const result: Record<string, Signature | undefined> = {};
+  if (!value || typeof value !== 'object') return result;
+  const everything = new Set(INGREDIENTS.map((item) => item.id));
+  for (const region of REGIONS) {
+    const saved = (value as Record<string, Signature | undefined>)[region.id];
+    if (!saved) continue;
+    try {
+      const clean = validateSignature(saved, everything);
+      result[region.id] = { ...clean, served: count(saved.served, 1e6) };
+    } catch (error) { if (!(error instanceof SignatureError)) throw error; }
+  }
+  return result;
 }

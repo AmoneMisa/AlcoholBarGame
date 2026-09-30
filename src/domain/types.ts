@@ -83,6 +83,8 @@ export interface Customer {
   bottleRequest?: BottleRequest;
   selectedBottleId?: string;
   smoker?: boolean;
+  // A guest who came for the bar's own signature cocktail (see domain/signature.ts).
+  signature?: import('./signature').SignatureSnapshot;
 }
 
 export interface AlcoholProduct {

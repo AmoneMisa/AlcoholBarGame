@@ -7,14 +7,17 @@ import {
   consumableDef, describeReward, equipmentDef, levelCap, perkCost, prestigeStarsFor, upgradeCostFor
 } from '../../domain/loot';
 import { ACHIEVEMENTS, questsForWeek, weekOf } from '../../domain/quests';
+import { INGREDIENTS } from '../../domain/catalog';
+import { FAME_PRICE_BONUS, FAME_STEPS, MAX_ITEMS, SIGNATURE_FEE, SIGNATURE_GUEST_CHANCE, SIGNATURE_LEVEL, fameLevel, nextFameStep, scoreSignature, validateSignature } from '../../domain/signature';
+import { usableIngredientIds } from '../../domain/usableStock';
 import { CHARACTER_ART } from '../../data/cosmetics/artCatalog';
 import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipeId, isRegularId, nextRegularStep, regularLevel } from '../../domain/regulars';
 import { featuredLegendary } from '../../sim/loot';
 import { useGameStore } from '../../stores/game';
 
 const game = useGameStore();
-const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'prestige'>('equipment');
-const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['prestige', 'Grand Opening']] as const;
+const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'signature' | 'prestige'>('equipment');
+const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['signature', 'Signature'], ['prestige', 'Grand Opening']] as const;
 const scrollRecipe = ref('');
 const names = { consumable: (id: string) => consumableDef(id)?.name ?? id, equipment: (id: string) => equipmentDef(id)?.name ?? id };
 const cap = (id: string) => levelCap(game.loot.equipment[game.regionId]![id]!.tier, game.loot.prestige.perks.cap ?? 0);
@@ -41,6 +44,25 @@ const regulars = computed(() => CHARACTER_ART.filter((art) => isRegularId(art.id
   return { art, points, level: regularLevel(points), next: nextRegularStep(points), favorite: RECIPES.find((recipe) => recipe.id === favoriteRecipeId(art.id))?.name ?? '' };
 }).sort((a, b) => b.points - a.points || a.art.name.localeCompare(b.art.name)));
 const metRegulars = computed(() => regulars.value.filter((item) => item.points > 0));
+// ---- Signature cocktail designer ----
+const saved = computed(() => game.loot.signatures[game.regionId]);
+const draftName = ref(saved.value?.name ?? '');
+const draftShake = ref(saved.value?.needsShake ?? true);
+const draftItems = ref<{ ingredientId: string; amount: number }[]>(saved.value ? saved.value.items.map((item) => ({ ...item })) : [{ ingredientId: 'gin', amount: 45 }, { ingredientId: 'lime-juice', amount: 20 }]);
+const usableList = computed(() => [...usableIngredientIds(game.knownRecipeIds)].map((id) => INGREDIENTS.find((item) => item.id === id)!).filter(Boolean));
+const ingredient = (id: string) => INGREDIENTS.find((item) => item.id === id)!;
+const preview = computed(() => scoreSignature(draftItems.value));
+const draftError = computed(() => {
+  try { validateSignature({ name: draftName.value, items: draftItems.value, needsShake: draftShake.value }, usableIngredientIds(game.knownRecipeIds)); return ''; }
+  catch (error) { return (error as Error).message; }
+});
+const stepAmount = (row: { ingredientId: string; amount: number }, direction: 1 | -1) => {
+  const item = ingredient(row.ingredientId);
+  row.amount = Math.max(item.pourStep, row.amount + direction * item.pourStep);
+};
+const pickIngredient = (row: { ingredientId: string; amount: number }, id: string) => { row.ingredientId = id; row.amount = ingredient(id).pourStep * (ingredient(id).unit === 'ml' ? 3 : 1); };
+const addRow = () => { const free = usableList.value.find((item) => !draftItems.value.some((row) => row.ingredientId === item.id)); if (free && draftItems.value.length < MAX_ITEMS) draftItems.value.push({ ingredientId: free.id, amount: free.pourStep * (free.unit === 'ml' ? 3 : 1) }); };
+const fame = computed(() => fameLevel(saved.value?.served ?? 0));
 const runStars = computed(() => prestigeStarsFor(game.loot.runEarned));
 const effectText = (id: string) => {
   const item = equipmentDef(id)!;
@@ -157,6 +179,37 @@ const boostLeft = (id: string) => {
       </article>
     </div>
 
+    <div v-else-if="tab === 'signature'" class="draw">
+      <article v-if="game.level < SIGNATURE_LEVEL" class="card"><h3>🍹 Signature cocktail</h3><p>Invent your own cocktail for this bar. Unlocks at level {{ SIGNATURE_LEVEL }} (you are level {{ game.level }}).</p></article>
+      <template v-else>
+        <article class="card">
+          <h3>🍹 Design your signature</h3>
+          <p>Some guests will come just for it (about {{ Math.round(SIGNATURE_GUEST_CHANCE * 100) }}% of arrivals). Developing or changing it costs {{ SIGNATURE_FEE }} coins and restarts its fame.</p>
+          <input v-model="draftName" maxlength="24" placeholder="Cocktail name" />
+          <div v-for="(row, index) in draftItems" :key="index" class="row sig-row">
+            <select :value="row.ingredientId" @change="pickIngredient(row, ($event.target as HTMLSelectElement).value)"><option v-for="item in usableList" :key="item.id" :value="item.id">{{ item.name }}</option></select>
+            <button type="button" @click="stepAmount(row, -1)">−</button><b>{{ row.amount }} {{ ingredient(row.ingredientId).unit === 'ml' ? 'ml' : '×' }}</b><button type="button" @click="stepAmount(row, 1)">+</button>
+            <button type="button" :disabled="draftItems.length <= 2" @click="draftItems.splice(index, 1)">✕</button>
+          </div>
+          <div class="row"><button type="button" :disabled="draftItems.length >= MAX_ITEMS" @click="addRow">Add ingredient</button><label><input v-model="draftShake" type="checkbox" /> Needs shaking</label></div>
+          <b>Guests would pay {{ preview.price.toFixed(2) }} coins</b>
+          <small v-for="line in preview.notes" :key="line">{{ line }}</small>
+          <small v-if="draftError" class="sig-error">{{ draftError }}</small>
+          <button type="button" :disabled="!!draftError || game.money < SIGNATURE_FEE" @click="game.act({ type: 'designSignature', name: draftName, items: draftItems, needsShake: draftShake })">{{ saved ? 'Replace signature' : 'Develop signature' }} · {{ SIGNATURE_FEE }} coins</button>
+        </article>
+        <article class="card">
+          <h3>⭐ {{ saved?.name ?? 'No signature yet' }}</h3>
+          <template v-if="saved">
+            <p>Price {{ saved.price.toFixed(2) }} coins · served {{ saved.served }} times · fame level {{ fame }} (+{{ Math.round(FAME_PRICE_BONUS * fame * 100) }}% price).</p>
+            <progress :value="saved.served" :max="nextFameStep(saved.served) ?? saved.served"></progress>
+            <p>{{ nextFameStep(saved.served) ? `${nextFameStep(saved.served)! - saved.served} more serves to fame level ${fame + 1}.` : 'Top fame reached.' }} Fame levels at {{ FAME_STEPS.join(' / ') }} serves pay a bronze, silver and choice box.</p>
+            <ul class="results"><li v-for="item in saved.items" :key="item.ingredientId">{{ ingredient(item.ingredientId).name }} · {{ item.amount }} {{ ingredient(item.ingredientId).unit === 'ml' ? 'ml' : '×' }}</li><li>{{ saved.needsShake ? 'Shake with ice' : 'Build over ice' }}</li></ul>
+          </template>
+          <p v-else>Each bar keeps its own signature.</p>
+        </article>
+      </template>
+    </div>
+
     <div v-else-if="tab === 'regulars'" class="grid">
       <p class="hint">Guests remember you. Every drink you serve earns loyalty (+1, +1 for VIPs, +1 for their favourite drink). Loyalty levels at {{ REGULAR_LEVELS.join(' / ') }} points pay rewards, and a regular pays {{ Math.round((REGULAR_FAVORITE_BONUS - 1) * 100) }}% more for their favourite. Level rewards: {{ REGULAR_REWARDS.map((reward) => [reward.box && reward.box + ' box', reward.parts && reward.parts + ' parts', reward.skinShards && reward.skinShards + ' skin shards', reward.crystals && reward.crystals + ' crystals'].filter(Boolean).join(' + ')).join(' → ') }}.</p>
       <article v-for="item in metRegulars" :key="item.art.id" class="card">
@@ -196,5 +249,6 @@ const boostLeft = (id: string) => {
 .card em{margin-left:6px;padding:2px 6px;border-radius:6px;background:#26364d;color:#c7d3e0;font-size:9px;font-style:normal;text-transform:uppercase}.card em.rare{background:#1d4b6e}.card em.legendary{background:#7a4d12;color:#ffe0a0}
 .card progress{width:100%;accent-color:#e7b556}.row{display:flex;flex-wrap:wrap;gap:6px}.card button,.crafts button{padding:8px 10px;border:1px solid #a97938;border-radius:8px;background:#5f3d1c;color:#ffe9bd;font-weight:800;font-size:11px;cursor:pointer}.card button:disabled,.crafts button:disabled{opacity:.4;cursor:default}
 .results{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:11px}.results li{padding:5px 8px;border-radius:7px;background:#17253a}.results li.rare,.crafts .rare{border-color:#3f86b8;color:#bfe2ff}.results li.legendary,.crafts .legendary{background:#4a3210;color:#ffe0a0}
-.crafts{display:flex;flex-wrap:wrap;gap:5px;max-height:260px;overflow:auto}.hint{grid-column:1/-1;margin:0;color:#93a5b9;font-size:11px}small{color:#e4b35c}
+.crafts{display:flex;flex-wrap:wrap;gap:5px;max-height:260px;overflow:auto}input[type=text],.card>input{padding:8px;border:1px solid #40536c;border-radius:8px;background:#0c1625;color:#fff}.sig-row{align-items:center}.sig-row select{flex:1;min-width:120px}.sig-row b{min-width:58px;text-align:center;color:#fff0c8}.sig-error{color:#f2a0a0}.card label{color:#c7d3e0;font-size:11px}
+.hint{grid-column:1/-1;margin:0;color:#93a5b9;font-size:11px}small{color:#e4b35c}
 </style>

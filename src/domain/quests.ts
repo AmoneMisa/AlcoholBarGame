@@ -1,7 +1,7 @@
 import type { BoxKind } from './loot';
 
 // Weekly quests and lifetime achievements. Both read the same counters (`loot.stats`), which only server rules increase.
-export type StatId = 'serves' | 'servesCoins' | 'vips' | 'bottles' | 'boxes' | 'draws' | 'upgrades' | 'tasted' | 'perfectTalks' | 'lessons';
+export type StatId = 'serves' | 'servesCoins' | 'vips' | 'bottles' | 'boxes' | 'draws' | 'upgrades' | 'tasted' | 'perfectTalks' | 'lessons' | 'signatures';
 export interface Goal { id: string; name: string; stat: StatId; target: number; box: BoxKind; crystals: number; }
 
 export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -34,6 +34,7 @@ export const ACHIEVEMENTS: Goal[] = [
   { id: 'a-upgrades-30', name: 'Master builder: 30 upgrades', stat: 'upgrades', target: 30, box: 'choice', crystals: 30 },
   { id: 'a-talk-25', name: 'Silver tongue: 25 perfect conversations', stat: 'perfectTalks', target: 25, box: 'silver', crystals: 25 },
   { id: 'a-lessons-14', name: 'Dedicated student: 14 daily lesson sets', stat: 'lessons', target: 14, box: 'choice', crystals: 40 },
+  { id: 'a-sig-50', name: 'House favourite: serve your signature 50 times', stat: 'signatures', target: 50, box: 'silver', crystals: 30 },
   { id: 'a-taste-20', name: 'Sommelier: taste 20 recipes', stat: 'tasted', target: 20, box: 'silver', crystals: 25 }
 ];
 export const achievementById = (id: string) => ACHIEVEMENTS.find((item) => item.id === id);
