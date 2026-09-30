@@ -8,3 +8,7 @@ dist
 dist-server
 /.claude/
 /.codex-remote-attachments/
+
+# Large source models and regenerable Blender projects (rebuild with scripts/export_bartender.py)
+/assets/
+/assets-src/

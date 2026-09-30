@@ -29,10 +29,13 @@ export const COSMETICS: CosmeticItem[] = [
   ...['special-cyberpunk','special-steampunk','special-post-apocalypse','special-historical','special-fantasy','special-masquerade'].map((value) => item('bartender',value,'legendary','leo'))
 ];
 
-export const cosmeticFor = (key:string,value:string,character?:string) => COSMETICS.find((entry) => entry.key === key && entry.value === value && (!entry.character || entry.character === character));
+// Facial hair now works on the imported avatar too. Keep the original item IDs
+// so previously awarded Leo cosmetics remain owned after this update.
+const matchesCharacter = (entry:CosmeticItem, character?:string) => !entry.character || entry.character === character || entry.key === 'facialHair';
+export const cosmeticFor = (key:string,value:string,character?:string) => COSMETICS.find((entry) => entry.key === key && entry.value === value && matchesCharacter(entry,character));
 export const canUseCosmetic = (owned:readonly string[], key:string,value:string,character?:string) => {
   const variants = COSMETICS.filter((entry) => entry.key === key && entry.value === value);
-  if (variants.length && !variants.some((entry) => !entry.character || entry.character === character)) return false;
+  if (variants.length && !variants.some((entry) => matchesCharacter(entry,character))) return false;
   const cosmetic = cosmeticFor(key,value,character);
   return !cosmetic || owned.includes(cosmetic.id);
 };

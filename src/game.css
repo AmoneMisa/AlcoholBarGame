@@ -1300,3 +1300,14 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:clip}
 /* `clip` still trims overflow but, unlike `hidden`, does not create a scroll container that would break the sticky preview. */
 .design-deck, .design-deck .design-grid-new { overflow: clip !important; }
 .specialty-badge { justify-self: start; width: max-content; margin: 2px 0; padding: 2px 8px; border: 1px solid #d6a54e; border-radius: 999px; background: #3a2a14; color: #ffd98a; font-size: 10px; font-style: normal; font-weight: 800; letter-spacing: .04em; }
+
+/* Imported Blender character editor. */
+.avatar-help{margin:8px 0;color:#bdc6d4;font-size:12px;line-height:1.5}
+.avatar-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;padding:12px 0}
+.avatar-options label{display:grid;gap:6px;font-size:12px;color:#d6c5b0}
+.avatar-options select{width:100%;min-width:0;min-height:40px;padding:8px;color:#f0e7dc;background:#182232;border:1px solid #465064;border-radius:8px}
+.avatar-options select{color-scheme:dark}
+.avatar-options option{background:#182232;color:#f0e7dc}
+.avatar-options option:checked{background:#8a5d22;color:#fff}
+.avatar-options option:disabled{color:#7d8696}
+.avatar-options select:focus-visible{outline:2px solid #d8aa57;outline-offset:2px}
