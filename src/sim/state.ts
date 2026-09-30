@@ -7,7 +7,6 @@ import { levelFor, levelPerks } from '../domain/progression';
 import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../domain/types';
 import { buildProfile, shortWish, type CustomerReply, type Fact } from '../domain/conversation/customerTalk';
 import type { BottleConversationFacts } from '../domain/conversation/bottleTalk';
-import { usableIngredientIds } from '../domain/usableStock';
 import { createLoot, normalizeLoot, type LootState } from '../domain/lootState';
 
 // The complete, serializable game state of one player. The server owns it; the client only displays it
@@ -112,14 +111,26 @@ export function publicState(state: PlayerState): PlayerState {
   return view;
 }
 
-// Only ingredients of the starter recipes are stocked; every other row starts empty (and stays hidden until it is needed).
-const makeBarInventory = (barIndex: number, usable: ReadonlySet<string>) => STARTING_INVENTORY.map((item, ingredientIndex) => {
-  const ingredient = INGREDIENTS.find((entry) => entry.id === item.ingredientId)!;
-  if (!usable.has(item.ingredientId)) return { ...item, amount: 0 };
-  const factor = .48 + ((barIndex * 3 + ingredientIndex) % 6) * .11;
-  const floor = ingredient.unit === 'ml' ? 90 : 4;
-  return { ...item, amount: Math.max(floor, Math.round(item.amount * factor)) };
-});
+// A new bar is stocked for about STARTER_SERVES orders across the starter recipes (a few levels), and no more:
+// three of the biggest single pour of each ingredient at the least, so any starter drink can be made three times.
+// Ingredients no starter recipe uses start empty and stay hidden until a recipe needs them.
+export const STARTER_SERVES = 14;
+// Demand varies with which drinks guests ask for: 60% slack on the average, and at least three of the biggest pour.
+const STARTER_SAFETY = 1.6;
+const STARTER_POURS = 3;
+export function starterStock(recipeIds: readonly string[]) {
+  const recipes = RECIPES.filter((recipe) => recipeIds.includes(recipe.id));
+  const stock = new Map<string, number>();
+  for (const item of INGREDIENTS) {
+    const parts = recipes.flatMap((recipe) => recipe.ingredients.filter((part) => part.ingredientId === item.id).map((part) => part.amount));
+    if (!parts.length) { stock.set(item.id, 0); continue; }
+    const average = parts.reduce((sum, amount) => sum + amount, 0) / recipes.length;
+    const wanted = Math.max(Math.ceil(average * STARTER_SERVES * STARTER_SAFETY), Math.max(...parts) * STARTER_POURS);
+    stock.set(item.id, item.unit === 'ml' ? Math.ceil(wanted / 5) * 5 : wanted);
+  }
+  return stock;
+}
+const makeBarInventory = (stock: ReadonlyMap<string, number>) => STARTING_INVENTORY.map((item) => ({ ...item, amount: stock.get(item.ingredientId) ?? 0 }));
 
 // A new player opens to a full row, so the bar feels alive and there is practice waiting right away.
 export const STARTER_GUESTS = 5;
@@ -135,7 +146,7 @@ export function createInitialState(now = Date.now()): PlayerState {
   }
   const firstGuest = starterGuests[0]!;
   const knownRecipeIds = RECIPES.slice(0, BASIC_RECIPE_COUNT).map((recipe) => recipe.id);
-  const usable = usableIngredientIds(knownRecipeIds);
+  const starting = starterStock(knownRecipeIds);
   return {
     version: 1,
     regionId: 'new-york',
@@ -164,7 +175,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     learningStreak: 0,
     lastLearningDayKey: '',
     dailyLessonResult: 'Complete today’s three lessons to grow your learning streak.',
-    inventories: Object.fromEntries(REGIONS.map((region, index) => [region.id, makeBarInventory(index, usable)])) as Record<RegionId, InventoryItem[]>,
+    inventories: Object.fromEntries(REGIONS.map((region) => [region.id, makeBarInventory(starting)])) as Record<RegionId, InventoryItem[]>,
     bottleInventories: Object.fromEntries(REGIONS.map((region, barIndex) => [region.id, ALCOHOL_PRODUCTS.map((product, productIndex) => ({
       productId: product.id, quantity: 1 + ((barIndex + productIndex * 2) % 4)
     }))])) as Record<RegionId, BottleInventoryItem[]>,

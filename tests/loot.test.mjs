@@ -252,3 +252,18 @@ test('New players start with stock only for their starter recipes; other rows ar
   state.knownRecipeIds.push(locked.id);
   assert.ok(locked.ingredients.every((item) => usableIngredientIds(state.knownRecipeIds).has(item.ingredientId)));
 });
+
+test('Starting stock is small but covers several levels of starter orders', async () => {
+  const { RECIPES } = await import('../src/domain/catalog.ts');
+  const { starterStock, STARTER_SERVES } = await import('../src/sim/state.ts');
+  const ids = RECIPES.slice(0, 10).map((recipe) => recipe.id);
+  const stock = starterStock(ids);
+  // Every starter recipe can be made at least three times from the starting stock alone.
+  for (const recipe of RECIPES.slice(0, 10)) for (const part of recipe.ingredients) assert.ok((stock.get(part.ingredientId) ?? 0) >= part.amount * 3, `${recipe.name}: ${part.ingredientId}`);
+  // ...but nothing is stocked for more than ~40 average orders (it used to be 120+ for some items).
+  for (const [id, amount] of stock) {
+    if (!amount) continue;
+    const perOrder = RECIPES.slice(0, 10).flatMap((recipe) => recipe.ingredients.filter((part) => part.ingredientId === id)).reduce((sum, part) => sum + part.amount, 0) / 10;
+    assert.ok(amount <= Math.max(perOrder * STARTER_SERVES * 3, 0.5 * 3 * 90), `${id} is not over-stocked`);
+  }
+});
