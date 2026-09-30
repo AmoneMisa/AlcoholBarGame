@@ -144,41 +144,13 @@ function nudgeGuests(direction: number) {
   if (!phoneTrack.value || !castRef.value) return;
   scrollToFirstGuest(Math.round(castRef.value.scrollLeft / phoneTrack.value.spacing) + direction * guestsPerView());
 }
-// While nobody is being served, the first guest in view shows the "tap to talk" bubble.
-const bubbleIndex = computed(() => {
-  const active = game.customers.findIndex((item) => item.id === game.activeCustomerId);
-  if (active >= 0 || !phoneTrack.value) return Math.max(0, active);
-  return Math.max(0, game.customers.findIndex((_, index) => trackX(index) - guestScroll.value >= 0));
-});
 // Bring the guest being served into view, also when the phone track first appears or its width changes.
 watch([() => game.activeCustomerId, () => phoneTrack.value?.zone], ([id], previous) => {
   void nextTick(() => showGuest(game.customers.findIndex((item) => item.id === id), previous[1] === undefined ? 'auto' : 'smooth'));
 });
-// On the phone track the speech bubble is narrowed to the guest area and shifted so it never leaves the visible part.
-function phoneBubbleVars(index: number) {
-  const track = phoneTrack.value!;
-  const width = Math.min(150, track.zone - 8);
-  const left = trackX(index) - guestScroll.value - width / 2;
-  const clamped = Math.min(Math.max(4, left), track.zone - width - 4);
-  return { '--bubble-w': `${width}px`, '--bubble-shift': `${Math.round(clamped - left)}px` };
-}
 const customerStyle = (index: number) => phoneTrack.value
-  ? { left: `${Math.round(trackX(index))}px`, ...(index === bubbleIndex.value ? phoneBubbleVars(index) : {}) }
+  ? { left: `${Math.round(trackX(index))}px` }
   : { left: `${Math.round(wideSeats.value[index] ?? seatXs.value[index % seatXs.value.length] ?? sceneBox.value.width / 2)}px` };
-// The speech bubble sits beside the guest's head, on the side away from the bartender and the glass,
-// so it covers neither the shelves nor the pouring station.
-const bartenderOnRight = computed(() => {
-  const current = layout.value;
-  return !current || (current.shelf.left + current.shelf.right) / 2 <= sceneBox.value.width * .6;
-});
-// …unless there is no room on that side (guests near the edge of a narrow phone scene).
-const bubbleOnLeft = (index: number) => {
-  const track = phoneTrack.value;
-  if (track) return trackX(index) - guestScroll.value > track.zone / 2;
-  const x = wideSeats.value[index] ?? seatXs.value[index % seatXs.value.length] ?? 0;
-  const room = 170;
-  return bartenderOnRight.value ? x > room : x > sceneBox.value.width - room;
-};
 const freshPickerOpen = ref(false);
 // The dragged bottle follows the finger, but while pouring it sits just above and left of the glass rim,
 // so the glass's stream starts at the bottle's neck instead of wherever the finger happens to be.
@@ -442,11 +414,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section ref="sceneRef" class="bar-scene" :class="{ 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack, 'many-guests': game.customers.length > 1 }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
+  <section ref="sceneRef" class="bar-scene" :class="{ 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
     <div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div>
     <CityEvent compact />
     <div v-if="buildingEnabled" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
-      <small v-if="shelfRows.length" class="pshelf-hint" :style="{ left: shelfRows[0]!.style.left, top: `calc(${shelfRows[0]!.style.top} - 18px)` }">Swipe a shelf sideways · pull a bottle down to the glass</small>
+      <small v-if="shelfRows.length" class="pshelf-hint" :style="{ left: shelfRows[0]!.style.left, top: `calc(${shelfRows[0]!.style.top} - 18px)` }">Use ‹ › to browse a shelf · pull a bottle down to the glass</small>
       <div v-for="row in shelfRows" :key="row.id" class="pshelf-row" :style="row.style">
         <small class="pshelf-label">{{ row.label }}</small>
         <div :ref="(element) => trackLine(row.id, element as HTMLElement | null)" class="pshelf-bottles" @scroll="markEdges($event.currentTarget as HTMLElement)">
@@ -464,11 +436,15 @@ onBeforeUnmount(() => {
     </div>
     <div class="bar-line-tint" aria-hidden="true"></div>
     <div ref="castRef" class="bar-cast" @scroll.passive="onGuestScroll">
-      <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId, 'bubble-left': bubbleOnLeft(index), 'show-bubble': index === bubbleIndex }" :style="customerStyle(index)" @click="game.openConversation(customer.id)">
-        <div class="speech-bubble"><span>{{ customer.greeting }}</span><b>{{ bubbleText(customer) }}</b><em>{{ customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></div>
+      <!-- Only the figure and the card take taps; the rest of the guest's column lets presses reach the shelves. -->
+      <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" :style="customerStyle(index)" :aria-label="`Talk to ${customer.name}`" @click="game.openConversation(customer.id)">
         <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="expressionFor(customer.mood)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
-        <span v-if="customer.smoker" class="customer-ashtray" aria-hidden="true"><i></i></span>
-        <div class="customer-plate"><div><b>{{ customer.name }}</b><small>{{ customer.mood }}</small></div><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i><em>{{ game.orderCountdown }}</em></span></div>
+        <div class="guest-card">
+          <header><b>{{ customer.name }}</b><time v-if="customer.id === game.activeCustomerId">{{ game.orderCountdown }}</time></header>
+          <small>{{ customer.mood }}</small>
+          <p>{{ bubbleText(customer) }}</p>
+          <footer><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed }">{{ customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
+        </div>
       </button>
       <!-- The wait for the next guest is shown once, in the panel below the scene (with “Welcome now”). -->
     </div>
