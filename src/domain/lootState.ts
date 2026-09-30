@@ -44,6 +44,8 @@ export interface LootState {
   leaderboardClaimed: number;
   // Seasonal banner progress: draws on this season's banner, milestone boxes already paid, and the spark pick.
   season: { id: string; draws: number; rewarded: number[]; spark: boolean };
+  // The first bronze box a player opens always holds enough parts for a first upgrade.
+  firstBoxOpened: boolean;
 }
 
 export const createLoot = (): LootState => ({
@@ -51,7 +53,7 @@ export const createLoot = (): LootState => ({
   equipment: Object.fromEntries(REGIONS.map((region) => [region.id, Object.fromEntries(EQUIPMENT.map((item) => [item.id, newSlot()]))])),
   pity: { sinceRare: 0, sinceLegendary: 0 }, lastDraw: [],
   prestige: { stars: 0, earned: 0, count: 0, perks: {} }, runEarned: 0, levelRewarded: 1, log: [],
-  stats: {}, quests: { week: 0, progress: {}, claimed: [] }, achievements: [], tasted: [], regulars: {}, spoiledAt: 0, signatures: {}, weekly: { week: 0, score: 0 }, leaderboardClaimed: 0, season: { id: '', draws: 0, rewarded: [], spark: false }
+  stats: {}, quests: { week: 0, progress: {}, claimed: [] }, achievements: [], tasted: [], regulars: {}, spoiledAt: 0, signatures: {}, weekly: { week: 0, score: 0 }, leaderboardClaimed: 0, season: { id: '', draws: 0, rewarded: [], spark: false }, firstBoxOpened: false
 });
 
 const count = (value: unknown, max = 1_000_000) => Number.isFinite(value) && (value as number) > 0 ? Math.min(max, Math.floor(value as number)) : 0;
@@ -100,6 +102,8 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
     signatures: cleanSignatures(source.signatures),
     weekly: { week: count(source.weekly?.week, 1e6), score: count(source.weekly?.score, 1e9) },
     leaderboardClaimed: count(source.leaderboardClaimed, 1e6),
+    // Older saves that already opened boxes do not get the welcome bonus later.
+    firstBoxOpened: typeof source.firstBoxOpened === 'boolean' ? source.firstBoxOpened : count(source.stats?.boxes) > 0,
     season: {
       id: typeof source.season?.id === 'string' && /^\d{4}-\d{2}$/.test(source.season.id) ? source.season.id : '',
       draws: count(source.season?.draws, 1e5),

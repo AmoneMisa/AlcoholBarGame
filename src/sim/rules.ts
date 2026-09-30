@@ -2,7 +2,7 @@ import { INGREDIENTS, MODIFIERS, RECIPES, REGIONS, SUPPLIERS } from '../domain/c
 import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost, bottleSaleCrystalReward, bottleTotal, brandedServeCrystalReward } from '../domain/bottleCatalog';
 import { arrivalSkipCrystalCost, calendarDate, coins, specialtyFactor, supplierInCity, consecutiveDays, conversationCrystalReward, conversationDifficulty, crystalExchange, dailyCoinsFor, dailyCrystalsFor, quotePurchase, recipePurchase } from '../domain/economy';
 import { withArticle } from '../domain/english/articles';
-import { BAR_PROFILE_OPTIONS, DEFAULT_BARS, INTERIORS } from '../data/cosmetics/bars';
+import { BAR_PROFILE_OPTIONS, DEFAULT_BARS, INTERIORS, isEventInterior } from '../data/cosmetics/bars';
 import { consumeMix, generateCustomer, judgeMix, requiredRecipe } from '../domain/engine';
 import type { Customer, InventoryItem, Recipe, RegionId, Supplier } from '../domain/types';
 import { pourableBrand, replyToServe, serveName, serveRequestText, substitutesFor } from '../domain/brandServe';
@@ -15,7 +15,7 @@ import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL, economyAt, formatDeliveryTime, mar
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
-import { LootError, claimSpark, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
+import { LootError, orderDiscount, claimSpark, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
 import { usableIngredientIds } from '../domain/usableStock';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
@@ -443,14 +443,18 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         // About 170 successful orders reach level 25 and about 700 reach the level 50 cap.
         state.xp += xpGain(state, 100 + Math.min(state.streak * 2, 14), now);
         state.streak += 1;
-        track(state, 'serves', 1, now);
-        track(state, 'servesCoins', Math.floor(revenue + tip), now);
-        if (guest.mood === 'vip' || guest.specialRecipeRewardId) track(state, 'vips', 1, now);
-        let found = dropAfterServe(state, guest.mood === 'vip', !!guest.specialRecipeRewardId, random);
-        if (guest.signature) found += signatureServed(state, now);
-        if (guest.orderKind !== 'serve' && !guest.signature) found += tasteFirst(state, verdict.recipe.id, 'recipe', now);
-        if (guest.orderKind !== 'serve') found += earnLoyalty(state, guest.characterId, guest.name, verdict.recipe.id, guest.mood === 'vip');
-        for (const productId of Object.values(pourBrands)) found += tasteFirst(state, productId, 'brand', now);
+        // Hands-on play earns the Workshop rewards; Auto-serve is paid and gives XP, but no drops, quest progress or loyalty.
+        let found = '';
+        if (!auto) {
+          track(state, 'serves', 1, now);
+          track(state, 'servesCoins', Math.floor(revenue + tip), now);
+          if (guest.mood === 'vip' || guest.specialRecipeRewardId) track(state, 'vips', 1, now);
+          found = dropAfterServe(state, guest.mood === 'vip', !!guest.specialRecipeRewardId, random);
+          if (guest.signature) found += signatureServed(state, now);
+          if (guest.orderKind !== 'serve' && !guest.signature) found += tasteFirst(state, verdict.recipe.id, 'recipe', now);
+          if (guest.orderKind !== 'serve') found += earnLoyalty(state, guest.characterId, guest.name, verdict.recipe.id, guest.mood === 'vip');
+          for (const productId of Object.values(pourBrands)) found += tasteFirst(state, productId, 'brand', now);
+        }
         const serveProduct = serve ? ALCOHOL_PRODUCTS.find((item) => item.id === serve.productId) : undefined;
         const brandedPayment = serveProduct ? brandedServeCrystalReward(serveProduct) : 0;
         const specialPayment = guest.specialRecipeRewardId || guest.mood === 'vip' ? conversationCrystalReward(guest, verdict.recipe) : 0;
@@ -504,8 +508,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const quote = quotePurchase(marketFor(region, now, state.xp), cleanCart(action.cart, 99), supplier);
       if (!quote.lines.length) throw new RuleError('Add packs to your order first.');
       // Prestige trade contacts and an armed Supplier Voucher lower the final total.
-      const voucher = (state.loot.armed['voucher'] ?? 0) > 0;
-      const discount = lootBonuses(state, now).supplyFactor * (voucher ? .8 : 1);
+      const { factor: discount, voucher } = orderDiscount(state, now);
       if (discount < 1) quote.total = coins(quote.total * discount);
       for (const line of quote.lines) {
         const room = roomFor(state, state.regionId, line.ingredientId);
@@ -658,6 +661,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'buyInterior': {
       const interior = INTERIORS.find((item) => item.id === action.interiorId);
       if (!interior || interior.crystalCost <= 0 || state.ownedInteriorIds.includes(interior.id)) throw new RuleError('This background is not for sale.');
+      if (isEventInterior(interior.id)) throw new RuleError(`${interior.name} is a special event reward: find it in Gold and Choice boxes.`);
       if (state.crystals < interior.crystalCost) throw new RuleError(`You need ${interior.crystalCost} crystals for ${interior.name}.`);
       state.crystals -= interior.crystalCost;
       state.ownedInteriorIds.push(interior.id);
@@ -845,7 +849,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
   // Coins earned by serving and selling bottles decide the stars of the next Grand Opening.
   if (['serve', 'autoServe', 'sellBottle'].includes(action.type) && state.money > moneyBefore) state.loot.runEarned += Math.floor(state.money - moneyBefore);
   grantLevelBoxes(state);
-  addWeeklyScore(state, action.type === 'prestige' ? 0 : state.xp - xpBefore, now);
+  // Auto-serve XP does not count for the leaderboard: the ranking rewards hands-on service.
+  addWeeklyScore(state, action.type === 'prestige' || (action.type === 'serve' && action.auto) ? 0 : state.xp - xpBefore, now);
   if (!Number.isFinite(state.money) || state.money < 0) throw new RuleError('Not enough money.');
   if (!Number.isFinite(state.crystals) || state.crystals < 0) throw new RuleError('Not enough crystals.');
   return { moneyDelta: coins(state.money - moneyBefore), crystalDelta: state.crystals - crystalsBefore, audit: auditEntry(state, action),
@@ -943,8 +948,11 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
   // A signature cocktail's name is invented, so the spell checker cannot know it: it is swapped for a real drink
   // word while the grammar is checked, and put back in the correction.
   const signatureName = guest.signature?.name;
-  const mask = signatureName && /^[aeiou]/i.test(signatureName) ? 'Orange' : 'Mojito';
-  const nameRegex = signatureName ? new RegExp(signatureName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+'), 'i') : undefined;
+  // The mask is a real drink word that does not already occur in the sentence, so it can be swapped back unambiguously.
+  const maskChoices = signatureName && /^[aeiou]/i.test(signatureName) ? ['Orange', 'Olive', 'Oolong'] : ['Mojito', 'Daiquiri', 'Margarita'];
+  const mask = maskChoices.find((word) => !new RegExp(`\\b${word}\\b`, 'i').test(text)) ?? maskChoices[0]!;
+  // The name must stand alone: "Gin" is not found inside "begin".
+  const nameRegex = signatureName ? new RegExp(`(?<![\\p{L}\\p{N}])${signatureName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+')}(?![\\p{L}\\p{N}])`, 'iu') : undefined;
   const namesSignature = !!nameRegex && nameRegex.test(text);
   const checked = context.checkEnglish(nameRegex ? text.replace(nameRegex, mask) : text);
   const english = signatureName ? { ...checked, corrected: checked.corrected.replace(new RegExp(mask, 'g'), signatureName) } : checked;

@@ -65,6 +65,13 @@ const stepAmount = (row: { ingredientId: string; amount: number }, direction: 1 
 };
 const pickIngredient = (row: { ingredientId: string; amount: number }, id: string) => { row.ingredientId = id; row.amount = ingredient(id).pourStep * (ingredient(id).unit === 'ml' ? 3 : 1); };
 const addRow = () => { const free = usableList.value.find((item) => !draftItems.value.some((row) => row.ingredientId === item.id)); if (free && draftItems.value.length < MAX_ITEMS) draftItems.value.push({ ingredientId: free.id, amount: free.pourStep * (free.unit === 'ml' ? 3 : 1) }); };
+const defaultDraft = () => [{ ingredientId: 'gin', amount: 45 }, { ingredientId: 'lime-juice', amount: 20 }];
+// Each bar has its own signature: the draft follows the bar being managed.
+watch(() => game.regionId, () => {
+  draftName.value = saved.value?.name ?? '';
+  draftShake.value = saved.value?.needsShake ?? true;
+  draftItems.value = saved.value ? saved.value.items.map((item) => ({ ...item })) : defaultDraft();
+});
 const fame = computed(() => fameLevel(saved.value?.served ?? 0));
 // ---- Weekly leaderboard (online only) ----
 const board = ref<LeaderboardResult | null>(null);

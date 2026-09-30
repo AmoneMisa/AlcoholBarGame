@@ -57,3 +57,14 @@ Consumables (one per gift) and skin shards (5 / 10 / 20) can be sent to friends 
 **Friends-only view:** `POST /api/leaderboard { scope: 'friends' }` ranks the player and their *accepted* friends (pending requests and strangers never appear), including friends who have not scored yet (shown last, at 0). Friends appear under their own name or the nickname the player gave them; global rows still show only bar names. Weekly rewards stay tied to the global rank.
 
 **Week-end notification:** when the session is ready and every 30 minutes the app asks the leaderboard endpoint for last week's standing; if a reward is claimable it shows one "Weekly leaderboard" toast per week (`weeklyRewardNotice`, keyed by week) pointing to Workshop → Weekly. It has its own on/off switch in the notification settings and does nothing offline.
+
+## Special-event backgrounds
+Five of the most expensive backgrounds (`EVENT_INTERIOR_IDS`: Midnight Penthouse, Parisian salon, Cyberpunk night, Midnight marina, Metropolitan rooftop) can no longer be bought with crystals or gifted. They are special-event rewards found in **Gold** boxes (weight 8) and **Silver** boxes (weight 2), and therefore also in Choice boxes; the box picks one you do not own (all owned → 30 skin shards). Players who already bought one keep it. No city includes an event background, and the inventory's background picker marks them "★ Event · boxes".
+
+## Review follow-ups
+- The steeper XP curve is migrated (`migrateXpCurve`, `xpCurve: 2`): old saves keep their level and progress within it.
+- The guaranteed-parts welcome bonus belongs to the first *bronze* box only (`loot.firstBoxOpened`).
+- Auto-serve is paid and gives XP, but no drops, quest/achievement progress, loyalty, tasting rewards or leaderboard score.
+- Negotiated orders now obey storeroom capacity, the fridge's delivery time, prestige trade contacts and the Supplier Voucher (shared `orderDiscount`).
+- Signature-name matching uses whole words, and the spell-check mask never collides with a word in the sentence.
+- The leaderboard read no longer takes the player's row lock; "You got a box" is not shown for boxes that were merely loaded from the server; booster-ended toasts no longer grow the stored notification keys; the signature designer follows the managed bar.

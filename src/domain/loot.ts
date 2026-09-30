@@ -62,7 +62,7 @@ export type BoxKind = 'bronze' | 'silver' | 'gold' | 'choice';
 export const BOXES: { id: BoxKind; name: string; icon: string; crystalPrice?: number; description: string }[] = [
   { id: 'bronze', name: 'Bronze box', icon: '📦', crystalPrice: 30, description: 'Random: parts, coins and common consumables.' },
   { id: 'silver', name: 'Silver box', icon: '🎁', crystalPrice: 90, description: 'Random: better rolls, item shards and boosters.' },
-  { id: 'gold', name: 'Gold box', icon: '🏆', crystalPrice: 240, description: 'Random: crystals, skin shards, recipe cards and mystery bottles.' },
+  { id: 'gold', name: 'Gold box', icon: '🏆', crystalPrice: 240, description: 'Random: crystals, skin shards, recipe cards, mystery bottles and special-event backgrounds.' },
   { id: 'choice', name: 'Choice box', icon: '🧭', description: 'Pick one of three rewards. Earned from prestige, achievements and level milestones.' }
 ];
 export const boxDef = (id: string) => BOXES.find((item) => item.id === id);
@@ -75,7 +75,8 @@ export type Reward =
   | { kind: 'itemShards'; id: EquipmentId; amount: number }
   | { kind: 'consumable'; id: ConsumableId; amount: number }
   | { kind: 'recipeCard' }
-  | { kind: 'mysteryBottle' };
+  | { kind: 'mysteryBottle' }
+  | { kind: 'eventInterior' };   // a special-event background, picked at random from those you do not own
 
 interface Entry { weight: number; make: (level: number, random: () => number) => Reward; }
 const between = (random: () => number, min: number, max: number) => min + Math.floor(random() * (max - min + 1));
@@ -101,7 +102,8 @@ export const BOX_TABLES: Record<Exclude<BoxKind, 'choice'>, Entry[]> = {
     { weight: 10, make: consumable(['courier', 'golden-ice', 'voucher']) },
     { weight: 8, make: (_l, r) => ({ kind: 'skinShards', amount: between(r, 4, 9) }) },
     { weight: 6, make: (_l, r) => ({ kind: 'crystals', amount: between(r, 12, 25) }) },
-    { weight: 2, make: () => ({ kind: 'recipeCard' }) }
+    { weight: 2, make: () => ({ kind: 'recipeCard' }) },
+    { weight: 2, make: () => ({ kind: 'eventInterior' }) }
   ],
   gold: [
     { weight: 22, make: (_l, r) => ({ kind: 'crystals', amount: between(r, 30, 60) }) },
@@ -110,6 +112,7 @@ export const BOX_TABLES: Record<Exclude<BoxKind, 'choice'>, Entry[]> = {
     { weight: 14, make: () => ({ kind: 'recipeCard' }) },
     { weight: 10, make: () => ({ kind: 'mysteryBottle' }) },
     { weight: 8, make: consumable(['vip-magnet', 'scroll']) },
+    { weight: 8, make: () => ({ kind: 'eventInterior' }) },
     { weight: 8, make: (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 200, 350) * (1 + l / 25)) }) },
     { weight: 4, make: (_l, r) => ({ kind: 'parts', amount: between(r, 20, 30) }) }
   ]
@@ -143,6 +146,7 @@ export function describeReward(reward: Reward, names: { consumable: (id: string)
     case 'consumable': return `${reward.amount} × ${names.consumable(reward.id)}`;
     case 'recipeCard': return 'a recipe card';
     case 'mysteryBottle': return 'a mystery bottle';
+    case 'eventInterior': return 'a special event background';
   }
 }
 

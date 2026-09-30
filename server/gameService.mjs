@@ -95,11 +95,12 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       const player = await tx.findOrCreatePlayer(identity);
       const week = weekOf(now());
       const ownId = Number(player.id);
+      // Read-only: the state is read once, without the row lock that actions take.
+      const own = normalizePlayerState((await tx.readState(player.id)) ?? createInitialState(now()));
       let top;
       let mine;
       if (scope === 'friends') {
         // Friends only: accepted friends plus me, including friends with no score yet. Names are the friends' own names.
-        const own = normalizePlayerState((await tx.readState(player.id)) ?? createInitialState(now()));
         const friendIds = new Map();
         for (const row of await tx.listFriendships(player.id)) {
           if (row.status !== 'accepted') continue;
@@ -118,8 +119,7 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
         mine = await tx.weeklyStanding(week, ownId);
       }
       const previous = await tx.weeklyStanding(week - 1, Number(player.id));
-      const record = await tx.lockState(player.id);
-      const claimed = normalizePlayerState(record?.state ?? createInitialState(now())).loot.leaderboardClaimed;
+      const claimed = own.loot.leaderboardClaimed;
       const reward = previous ? leaderboardReward(previous.rank, previous.score) : undefined;
       return {
         ok: true, scope: scope === 'friends' ? 'friends' : 'global', week, endsAt: (week + 1) * WEEK_MS, minScore: MIN_WEEKLY_SCORE,

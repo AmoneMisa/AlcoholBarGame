@@ -48,6 +48,7 @@ function migrateLegacySave(saved: Record<string, any>): PlayerState {
   const state = createInitialState();
   if (Number.isFinite(saved.money) && saved.money >= 0) state.money = saved.money;
   if (Number.isFinite(saved.xp) && saved.xp >= 0) state.xp = saved.xp;
+  state.xpCurve = undefined; // the first local format used the original XP curve
   if (REGIONS.some((item) => item.id === saved.regionId)) state.regionId = saved.regionId;
   for (const region of REGIONS) {
     const profile = saved.bars?.[region.id];
@@ -101,6 +102,8 @@ export const useGameStore = defineStore('game', () => {
   const ownedBarIds = computed(() => state.value.ownedBarIds);
   const startingBarChosen = computed(() => state.value.startingBarChosen);
   const sessionReady = computed(() => mode.value !== 'connecting');
+  // Bumped when the first server state replaces the local one, so screens do not announce stored items as new.
+  const connectEpoch = ref(0);
   const ownedInteriorIds = computed(() => state.value.ownedInteriorIds ?? ['velvet']);
   const inventories = computed(() => state.value.inventories);
   const inventory = computed(() => state.value.inventories[state.value.regionId]);
@@ -268,6 +271,7 @@ export const useGameStore = defineStore('game', () => {
       playerFriendCode.value = session.player.friendCode;
       mode.value = 'online';
       adoptServerState(session.state, session.serverTime, session.state.message);
+      connectEpoch.value += 1;
       resetMix();
       void loadFriends();
     } catch {
@@ -522,7 +526,7 @@ export const useGameStore = defineStore('game', () => {
 
   const act = (action: GameAction) => dispatch(action);
   return {
-    loot, act, visibleInventory, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, renameFriend, visitFriend, giftFriend, friendVisits, connect,
+    loot, act, visibleInventory, connectEpoch, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, renameFriend, visitFriend, giftFriend, friendVisits, connect,
     economy, xpProgress, guestPriceFactor,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,

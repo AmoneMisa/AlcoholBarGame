@@ -1,14 +1,14 @@
-import { RECIPES, REGIONS } from '../domain/catalog';
+import { INGREDIENTS, RECIPES, REGIONS } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { coins } from '../domain/economy';
 import { COSMETICS } from '../domain/cosmetics';
+import { DUPLICATE_INTERIOR_SHARDS, EVENT_INTERIOR_IDS, INTERIORS } from '../data/cosmetics/bars';
 import { economyAt, levelFor, MAX_LEVEL } from '../domain/progression';
 import {
   BOOST_KINDS, BOXES, CONSUMABLES, DRAW_COST, DUPLICATE_SHARDS, EQUIPMENT, FEATURED_SHARE, PRESTIGE_LEVEL, PRESTIGE_PERKS, SHARD_CRAFT_COST, STARTING_COINS,
   TIER_ORDER, TIER_SHARD_COST, boxDef, choiceOptions, consumableDef, describeReward, equipmentDef, featuredIndex, levelCap, perkCost, prestigeStarsFor, rollBox, rollRarity,
   upgradeCostFor, type BoxKind, type EquipmentId, type PrestigePerkId, type Reward
 } from '../domain/loot';
-import { INGREDIENTS } from '../domain/catalog';
 import { SEASON_FEATURED_SHARE, SEASON_MILESTONES, SPARK_DRAWS, seasonAt } from '../domain/seasons';
 import { MIN_WEEKLY_SCORE, describeLeaderboardReward, leaderboardReward } from '../domain/leaderboard';
 import { FAME_PRICE_BONUS, FAME_STEPS, SIGNATURE_FEE, SIGNATURE_GUEST_CHANCE, SIGNATURE_LEVEL, SignatureError, fameLevel, validateSignature } from '../domain/signature';
@@ -87,6 +87,13 @@ export function grantReward(state: PlayerState, reward: Reward, random: () => nu
       addSpareCopy(state, recipe.id);
       return `a ${recipe.name} recipe card`;
     }
+    case 'eventInterior': {
+      const missing = EVENT_INTERIOR_IDS.filter((id) => !state.ownedInteriorIds.includes(id));
+      if (!missing.length) { loot.skinShards += DUPLICATE_INTERIOR_SHARDS; return `${DUPLICATE_INTERIOR_SHARDS} skin shards (you own every event background)`; }
+      const id = missing[Math.min(missing.length - 1, Math.floor(random() * missing.length))]!;
+      state.ownedInteriorIds.push(id);
+      return `the special event background “${INTERIORS.find((item) => item.id === id)!.name}”`;
+    }
     case 'mysteryBottle': {
       const product = randomBottle(random);
       const shelf = state.bottleInventories[state.regionId];
@@ -113,7 +120,8 @@ export function openBox(state: PlayerState, kind: string, random: () => number, 
     return;
   }
   // The very first box a player opens always holds enough parts for a first equipment upgrade.
-  const first = (state.loot.stats['boxes'] ?? 0) <= 1;
+  const first = kind === 'bronze' && !state.loot.firstBoxOpened;
+  if (kind === 'bronze') state.loot.firstBoxOpened = true;
   const reward: Reward = first ? { kind: 'parts', amount: 8 } : rollBox(kind as Exclude<BoxKind, 'choice'>, level, random);
   note(state, `${boxDef(kind)!.name}: ${grantReward(state, reward, random)}.`);
 }
@@ -553,4 +561,12 @@ export function claimLeaderboardReward(state: PlayerState, standing: Leaderboard
   for (const [kind, amount] of Object.entries(reward.boxes)) grantBox(state, kind as BoxKind, amount!);
   state.crystals += reward.crystals;
   note(state, `Leaderboard ${reward.tier} (rank ${standing.rank} of ${standing.size}): ${describeLeaderboardReward(reward)}.`);
+}
+
+// Delivery speed of the fridge in a specific bar (negotiated orders go to the bar that placed them).
+export const deliveryFactorFor = (state: PlayerState, regionId: string) => 1 - fridgeLevelOf(state, regionId) * equipmentDef('fridge')!.perLevel;
+// Prestige trade contacts and an armed Supplier Voucher lower the total of any supplier order.
+export function orderDiscount(state: PlayerState, now: number) {
+  const voucher = (state.loot.armed['voucher'] ?? 0) > 0;
+  return { factor: lootBonuses(state, now).supplyFactor * (voucher ? .8 : 1), voucher };
 }

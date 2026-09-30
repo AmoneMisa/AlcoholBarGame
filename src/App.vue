@@ -81,15 +81,23 @@ watch(() => game.sessionReady, (ready) => {
   notifications.push('loot', `New season: ${season.name}`, 'A seasonal style banner is live in the Workshop.', `season:${season.id}`);
 }, { immediate: true });
 const boxTotal = () => Object.values(game.loot.boxes).reduce((sum, count) => sum + count, 0);
+let boxEpoch = game.connectEpoch;
 watch(boxTotal, (next, previous) => {
+  // The first server state replaces the local one: boxes that were already waiting are not "new".
+  if (game.connectEpoch !== boxEpoch) { boxEpoch = game.connectEpoch; return; }
   if (previous !== undefined && next > previous) notifications.push('loot', 'You got a box', 'Open it in the Workshop.');
 });
 const boostNames: Record<string, string> = { 'happy-hour': 'Happy Hour', 'xp-boost': 'XP Booster', 'coin-boost': 'Coin Booster', 'tip-boost': 'Tip Booster' };
+const announcedBoosts = new Set<string>();   // in memory only: a stored key per booster would grow forever
 let boostTimer: ReturnType<typeof setInterval>;
 onMounted(() => {
   boostTimer = setInterval(() => {
     for (const [kind, until] of Object.entries(game.loot.boosts)) {
-      if (until <= Date.now() && until > Date.now() - 120_000) notifications.push('loot', `${boostNames[kind] ?? kind} ended`, 'Use another one from the Workshop.', `boost-ended:${kind}:${until}`);
+      const key = `${kind}:${until}`;
+      if (until <= Date.now() && until > Date.now() - 120_000 && !announcedBoosts.has(key)) {
+        announcedBoosts.add(key);
+        notifications.push('loot', `${boostNames[kind] ?? kind} ended`, 'Use another one from the Workshop.');
+      }
     }
   }, 15_000);
 });

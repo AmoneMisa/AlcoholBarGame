@@ -4,7 +4,6 @@ import type { BoxKind } from './loot';
 // a served drink pays the same XP at level 1 and at level 50). Weeks are UTC weeks (see domain/quests.ts).
 export const LEADERBOARD_SIZE = 20;
 export const MIN_WEEKLY_SCORE = 300;          // about three served drinks: the score needed to earn any reward
-export const LABEL_MAX = 32;
 
 export interface LeaderboardReward { boxes: Partial<Record<BoxKind, number>>; crystals: number; tier: string; }
 

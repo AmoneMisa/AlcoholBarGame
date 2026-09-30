@@ -613,3 +613,118 @@ test('Week-end notice appears only for a claimable reward, once per week key', a
   assert.equal(weeklyRewardNotice({ ...base, reward: null, claimable: false }), null, 'below the minimum score');
   assert.equal(weeklyRewardNotice(null), null, 'did not play last week');
 });
+
+test('Event backgrounds cannot be bought or gifted, come from boxes, and duplicates become shards', async () => {
+  const { EVENT_INTERIOR_IDS, INTERIORS: all, DUPLICATE_INTERIOR_SHARDS, DEFAULT_BARS: bars } = await import('../src/data/cosmetics/bars.ts');
+  const { giftPrice } = await import('../src/sim/gifts.ts');
+  const { BOX_TABLES, rollFromTable } = await import('../src/domain/loot.ts');
+  const { grantReward } = await import('../src/sim/loot.ts');
+  const cheapest = Math.min(...EVENT_INTERIOR_IDS.map((id) => all.find((item) => item.id === id).crystalCost));
+  assert.ok(cheapest >= 1800, 'only the high-cost backgrounds are events');
+  assert.ok(EVENT_INTERIOR_IDS.every((id) => Object.values(bars).every((bar) => bar.interior !== id)), 'no city includes an event background');
+  const state = fresh();
+  state.crystals = 1e6;
+  for (const id of EVENT_INTERIOR_IDS) {
+    assert.throws(() => run(state, { type: 'buyInterior', interiorId: id }), /special event/);
+    assert.equal(giftPrice({ kind: 'interior', interiorId: id }), undefined);
+  }
+  assert.equal(state.crystals, 1e6);
+  run(state, { type: 'buyInterior', interiorId: 'garden' });   // ordinary backgrounds are still for sale
+  // Gold and silver boxes can hold one.
+  assert.ok(BOX_TABLES.gold.some((entry) => entry.make(1, () => 0).kind === 'eventInterior'));
+  assert.ok(BOX_TABLES.silver.some((entry) => entry.make(1, () => 0).kind === 'eventInterior'));
+  // Granting picks a background the player does not own; once all are owned it pays skin shards.
+  const owned = new Set();
+  for (let i = 0; i < EVENT_INTERIOR_IDS.length; i++) {
+    const text = grantReward(state, { kind: 'eventInterior' }, () => 0);
+    assert.match(text, /special event background/);
+  }
+  assert.ok(EVENT_INTERIOR_IDS.every((id) => state.ownedInteriorIds.includes(id)));
+  const before = state.loot.skinShards;
+  assert.match(grantReward(state, { kind: 'eventInterior' }, () => 0), /skin shards/);
+  assert.equal(state.loot.skinShards, before + DUPLICATE_INTERIOR_SHARDS);
+  void owned; void rollFromTable;
+});
+
+test('Review fixes: XP curve migration, first-box bonus, auto-serve gating, whole-word signature names, negotiated storeroom limits', async () => {
+  const { migrateXpCurve } = await import('../src/sim/state.ts');
+  const { levelFor, xpForLevel: newXp } = await import('../src/domain/progression.ts');
+  const { RECIPES } = await import('../src/domain/catalog.ts');
+  // 1) A save on the old curve keeps its level and its progress inside the level.
+  const oldXp = (level) => { const s = level - 1; return 60 * s + 10 * s * (s - 1); };
+  const old = { xp: oldXp(9) + 70 };   // level 9, 70 of 220 XP in
+  migrateXpCurve(old);
+  assert.equal(levelFor(old.xp), 9);
+  assert.ok(old.xp > newXp(9) && old.xp < newXp(10));
+  assert.ok(Math.abs((old.xp - newXp(9)) / (newXp(10) - newXp(9)) - 70 / 220) < .01);
+  const maxed = { xp: oldXp(50) + 5000 }; migrateXpCurve(maxed);
+  assert.equal(levelFor(maxed.xp), 50);
+  const again = { xp: 500, xpCurve: 2 }; migrateXpCurve(again);
+  assert.equal(again.xp, 500, 'already migrated');
+  assert.equal(createInitialState(NOW).xpCurve, 2);
+
+  // 2) Only the welcome (first bronze) box carries the guaranteed parts; a gold box opened first does not use it up.
+  const box = fresh();
+  box.loot.boxes = { gold: 1, bronze: 1 };
+  run(box, { type: 'openBox', box: 'gold' }, () => 0);
+  assert.equal(box.loot.firstBoxOpened, false);
+  run(box, { type: 'openBox', box: 'bronze' }, () => 0);
+  assert.equal(box.loot.parts >= 8, true);
+  assert.equal(normalizeLoot({ stats: { boxes: 3 } }, 1).firstBoxOpened, true, 'older saves never get the bonus later');
+
+  // 3) Auto-serve is paid and gives XP, but no drops, stats or leaderboard score.
+  const auto = fresh();
+  auto.xp = xpForLevel(10);
+  const guest = auto.customers[0];
+  guest.modifierId = undefined; guest.orderKind = 'cocktail'; guest.orderRevealed = true;
+  for (const stock of auto.inventories['new-york']) stock.amount = 5000;
+  const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
+  const xpBefore = auto.xp;
+  run(auto, { type: 'serve', mix: recipe.ingredients.map((item) => ({ ...item })), shaken: true, pourBrands: {}, auto: true }, () => 0);
+  assert.ok(auto.xp > xpBefore && auto.money > 600);
+  assert.equal(auto.loot.stats.serves ?? 0, 0);
+  assert.equal(auto.loot.parts, 0);
+  assert.equal(auto.loot.weekly.score, 0);
+  assert.equal(auto.loot.tasted.length, 0);
+
+  // 4) A signature name called "Gin" is not found inside "begin"; the mask never collides with words in the sentence.
+  const sig = fresh();
+  sig.xp = xpForLevel(15); sig.money = 1000; sig.vipCooldownUntil = NOW + 1e12;
+  run(sig, { type: 'designSignature', name: 'Gin Fizz', items: [{ ingredientId: 'gin', amount: 45 }, { ingredientId: 'soda', amount: 60 }], needsShake: false });
+  sig.customers = []; sig.nextCustomerAt = 1;
+  applyAction(sig, { type: 'tick' }, { now: NOW + 10_000, random: () => 0, checkEnglish: (t) => ({ ok: true, corrected: t }), spawnCustomers: true });
+  const sg = sig.customers[0];
+  run(sig, { type: 'openConversation', customerId: sg.id });
+  const seen = [];
+  const talk = (text) => applyAction(sig, { type: 'say', text }, { now: NOW + 20_000, random: () => .5, checkEnglish: (t) => { seen.push(t); return { ok: true, corrected: t }; } });
+  talk('Let us begin, would you like a Mojito?');
+  assert.equal(sg.orderRevealed, false);
+  talk('Would you like a Mojito or our Gin Fizz?');
+  assert.match(seen.at(-1), /Daiquiri/, 'the mask avoids a word already in the sentence');
+  assert.equal(sg.orderRevealed, true);
+});
+
+test('Negotiated orders respect storeroom capacity, the fridge and order discounts', async () => {
+  const { REGIONS, INGREDIENTS } = await import('../src/domain/catalog.ts');
+  const { marketFor } = await import('../src/domain/progression.ts');
+  const state = createInitialState(NOW);
+  state.startingBarChosen = true; state.money = 1e6;
+  const offer = marketFor(REGIONS.find((item) => item.id === state.regionId), NOW, state.xp).find((item) => item.supplierId === 'global');
+  const cap = INGREDIENTS.find((item) => item.id === offer.ingredientId).unit === 'ml' ? 5000 : 120;
+  const packs = Math.ceil(cap / offer.quantity) + 2;
+  const deal = (cart) => { state.negotiation = undefined; state.lastNegotiatedAt = {}; run(state, { type: 'startNegotiation', supplierId: 'global', cart }); };
+  deal({ [offer.ingredientId]: packs });
+  assert.throws(() => run(state, { type: 'acceptDeal' }), /No room/);
+  assert.equal(state.money, 1e6, 'a refused deal costs nothing');
+  state.loot.equipment['new-york'].fridge.level = 10;
+  deal({ [offer.ingredientId]: 2 });
+  state.loot.prestige.perks.supply = 5;   // -10% supplier prices
+  state.loot.armed.voucher = 1;           // -20%
+  const quoted = state.negotiation;
+  void quoted;
+  run(state, { type: 'acceptDeal' });
+  assert.equal(state.loot.armed.voucher, undefined, 'the voucher is used up');
+  const order = state.deliveryOrders.at(-1);
+  assert.ok(order.total > 0);
+  assert.ok(order.dueAt - NOW < 86_400_000 * 10, 'delivery is scheduled');
+});

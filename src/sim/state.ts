@@ -3,7 +3,7 @@ import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
 import { CHARACTER_ART, CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { generateCustomer } from '../domain/engine';
-import { levelFor, levelPerks } from '../domain/progression';
+import { MAX_LEVEL, levelFor, levelPerks, xpForLevel } from '../domain/progression';
 import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../domain/types';
 import { buildProfile, shortWish, type CustomerReply, type Fact } from '../domain/conversation/customerTalk';
 import type { BottleConversationFacts } from '../domain/conversation/bottleTalk';
@@ -24,6 +24,8 @@ export type PopularityBoost = { kind: 'no-cooldown'; until: number } | { kind: '
 
 export interface PlayerState {
   version: 1;
+  // XP curve of this save (see migrateXpCurve); missing = the original, shallower curve.
+  xpCurve?: number;
   regionId: RegionId;
   money: number;
   crystals: number;
@@ -149,6 +151,7 @@ export function createInitialState(now = Date.now()): PlayerState {
   const starting = starterStock(knownRecipeIds);
   return {
     version: 1,
+    xpCurve: XP_CURVE_VERSION,
     regionId: 'new-york',
     money: 600,
     crystals: 0,
@@ -195,7 +198,23 @@ export function createInitialState(now = Date.now()): PlayerState {
 
 // JSON player snapshots are intentionally schema-light. Upgrade older snapshots in place whenever
 // they are loaded so adding a currency never invalidates an existing account.
+// The level curve was made steeper (about 700 served orders to level 50). A save on the old curve keeps its level and
+// its progress inside that level, so nobody is demoted or locked out of unlocked features.
+export const XP_CURVE_VERSION = 2;
+const oldXpForLevel = (level: number) => { const steps = Math.max(0, Math.min(MAX_LEVEL, level) - 1); return 60 * steps + 10 * steps * (steps - 1); };
+export function migrateXpCurve(state: Pick<PlayerState, 'xp' | 'xpCurve'>) {
+  if (state.xpCurve === XP_CURVE_VERSION) return;
+  state.xpCurve = XP_CURVE_VERSION;
+  if (!Number.isFinite(state.xp) || state.xp <= 0) { state.xp = 0; return; }
+  let level = 1;
+  while (level < MAX_LEVEL && state.xp >= oldXpForLevel(level + 1)) level++;
+  if (level >= MAX_LEVEL) { state.xp = xpForLevel(MAX_LEVEL); return; }
+  const progress = (state.xp - oldXpForLevel(level)) / (60 + (level - 1) * 20);
+  state.xp = Math.floor(xpForLevel(level) + progress * (xpForLevel(level + 1) - xpForLevel(level)));
+}
+
 export function normalizePlayerState(state: PlayerState) {
+  migrateXpCurve(state);
   state.crystals = Number.isFinite(state.crystals) && state.crystals >= 0 ? Math.floor(state.crystals) : 0;
   state.dailyLessonKey = typeof state.dailyLessonKey === 'string' ? state.dailyLessonKey : '';
   state.dailyLessonCompletedIds = Array.isArray(state.dailyLessonCompletedIds) ? [...new Set(state.dailyLessonCompletedIds.filter((id) => typeof id === 'string'))] : [];
