@@ -65,8 +65,10 @@ The English checker is an explainable short-conversation rule checker with a spe
 
 ## 3D bartender (prototype)
 
-The bartender is now a rigged 3D character rendered with three.js (`src/components/characters/Bartender3D.vue`), with the painted 2D character kept only as a fallback for devices without WebGL.
+The bartender is a rigged 3D "mannequin" rendered with three.js (`src/components/characters/Bartender3D.vue`); the painted 2D character remains only as a fallback for devices without WebGL.
 
-- **Model:** `public/assets/characters3d/bartender.glb`, built by `python scripts/blender/build_bartender.py` (needs `pip install bpy==4.2.0`). It contains one skeleton, face and body morph targets, 18 hair styles, 9 facial-hair styles, clothing parts and 13 animation clips.
-- **Customisation:** `src/domain/character3d.ts` maps the saved bar profile (face, eyes, brows, nose, lips, cheeks, body, bust, skin/hair/eye/lip colours, hair, beard, outfit) to morph weights, colours and visible meshes. `tests/character3d.test.mjs` checks every option against the real GLB.
-- **Not yet in 3D:** freckles, tattoos and scars, eyeliner, eyeshadow and blush (need textures); customers; the special outfits are recolours of the vest outfit.
+- **Two mannequins, one skeleton:** `bartender-female.glb` and `bartender-male.glb` (built by `python scripts/blender/build_bartender.py --gender both`, needs `pip install bpy==4.2.0`). Both share identical joints, so all 13 animation clips fit both; they differ in body volumes and default face.
+- **Everything is a separate, named mesh with its own material and UVs:** `body`, `head`, `ears`, and swappable slots `eyes_<shape>`, `brows_<shape>`, `nose_<shape>`, `mouth_<shape>`, `cheeks_<shape>`, `hair_<style>`, `beard_<style>`, `cloth_<part>`. Only the chosen mesh of each slot is shown. Face part shapes are defined in `src/data/character/faceParts.json`, shared by Blender and the game.
+- **Colours and textures:** materials are named by role (`skin_body`, `skin_head`, `hair`, `brow`, `lip`, `iris`, `shirt`, `vest`, ...). `src/domain/character3dTextures.ts` paints skin layers on canvases at runtime: skin tone (14 tones) and tan, blush, eyeshadow, eyeliner, freckles, scars, tattoos, plus hair-strand and cloth-weave textures. The UV layout is documented at the top of the Blender script.
+- **Customisation:** `src/domain/character3d.ts` maps the saved bar profile to morph weights, colours and visible meshes. `tests/character3d.test.mjs` checks every option against both real GLB files.
+- **Not yet in 3D:** customers; the special outfits are recolours of the vest outfit. Models are ~5.8 MB each (about 2.3 MB gzipped); meshopt compression is a possible next step.

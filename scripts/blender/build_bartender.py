@@ -1,13 +1,23 @@
-"""Builds the stylized, customizable bartender base model with Blender (bpy) and exports it as a GLB.
+"""Builds the male and female "mannequin" bases with Blender (bpy) and exports them as GLB files.
 
-The GLB carries: one skinned skeleton, morph targets (body / face shape keys), swappable hair, facial-hair and
-clothing meshes (named), materials named by role (skin, hair, ...) and a set of animation clips.
+A mannequin is a clean, neutral base that everything else plugs into:
+  * one shared skeleton (identical for both genders, so every animation clip fits both);
+  * separate named meshes per slot: body, head, eyes/iris/pupils, brows, nose, ears, lips, hair_*, beard_*, cloth_*;
+  * one material per role (skin_body, skin_head, hair, brow, lip, iris, ... shirt, vest, apron, pants, shoes) so each part can be
+    recoloured or given its own texture;
+  * UV maps laid out for painted texture layers (see UV LAYOUT below and src/domain/character3dTextures.ts);
+  * morph targets for face and body shape, and 13 animation clips.
+
+UV LAYOUT (must match src/domain/character3dTextures.ts)
+  head, hair, beards : front of the head is a planar projection into u 0..0.75 (x -> u, z -> v), the back of the head is u 0.75..1
+  body + clothes     : per-limb cylindrical cells in one atlas: torso u0-1 v.5-1, arm L u0-.25 v0-.5, arm R u.25-.5 v0-.5,
+                       leg L u.5-.75 v0-.5, leg R u.75-1 v0-.5
 
 Setup:  pip install bpy==4.2.0        (Blender as a Python module; Python 3.11)
-Run:    python scripts/blender/build_bartender.py [out.glb] [--render preview_prefix]
-Output: public/assets/characters3d/bartender.glb
+Run:    python scripts/blender/build_bartender.py [--gender male|female|both] [--render preview_prefix]
+Output: public/assets/characters3d/bartender-female.glb and bartender-male.glb
 """
-import math, sys
+import json, math, sys
 from pathlib import Path
 import bpy, bmesh
 from mathutils import Vector, Matrix, Quaternion, Euler
@@ -17,7 +27,15 @@ args = [a for a in sys.argv[1:]]
 render_prefix = None
 if '--render' in args:
     i = args.index('--render'); render_prefix = args[i + 1]; del args[i:i + 2]
-OUT = Path(args[0]) if args else ROOT / 'public/assets/characters3d/bartender.glb'
+GENDER = 'female'
+if '--gender' in args:
+    i = args.index('--gender'); GENDER = args[i + 1]; del args[i:i + 2]
+if GENDER == 'both':   # build each gender in a fresh Blender session
+    import subprocess
+    for g in ('female', 'male'):
+        subprocess.run([sys.executable, __file__, '--gender', g, *args], check=True)
+    sys.exit(0)
+OUT = Path(args[0]) if args else ROOT / f'public/assets/characters3d/bartender-{GENDER}.glb'
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
@@ -34,16 +52,26 @@ def material(name, color):
     mat.diffuse_color = (*color, 1)
     MATERIALS[name] = mat
     return mat
-for name, color in dict(skin=(.72, .47, .35), hair=(.16, .09, .07), sclera=(.95, .95, .93), iris=(.3, .18, .12), pupil=(.02, .02, .03),
+for name, color in dict(skin=(.72, .47, .35), skin_body=(.72, .47, .35), skin_head=(.72, .47, .35), brow=(.16, .09, .07), hair=(.16, .09, .07), sclera=(.95, .95, .93), iris=(.3, .18, .12), pupil=(.02, .02, .03),
                         lip=(.6, .33, .3), mouth=(.12, .02, .03), shirt=(.93, .92, .88), vest=(.35, .06, .12), apron=(.06, .35, .27),
                         pants=(.08, .08, .1), shoes=(.05, .04, .04), trim=(.75, .58, .25)).items():
     material(name, color)
 
-def new_object(name, bm_or_mesh, mat=None, collection=None):
+def apply_uv(bm, uv):
+    layer = bm.loops.layers.uv.verify()
+    for face in bm.faces:
+        for loop in face.loops:
+            loop[layer].uv = uv(face, loop.vert.co)
+
+def new_object(name, bm_or_mesh, mat=None, uv=None):
+    """uv: optional function (face, vertex position) -> (u, v), applied per face corner so islands can split."""
     if isinstance(bm_or_mesh, bmesh.types.BMesh):
+        if uv: apply_uv(bm_or_mesh, uv)
         mesh = bpy.data.meshes.new(name); bm_or_mesh.to_mesh(mesh); bm_or_mesh.free()
     else:
         mesh = bm_or_mesh
+        if uv:
+            bm = bmesh.new(); bm.from_mesh(mesh); apply_uv(bm, uv); bm.to_mesh(mesh); bm.free()
     obj = bpy.data.objects.new(name, mesh)
     scene.collection.objects.link(obj)
     if mat:
@@ -59,12 +87,46 @@ def sphere(name, center, radii, mat, segments=20, rings=12):
         v.co = Vector((v.co.x * radii[0] + center[0], v.co.y * radii[1] + center[1], v.co.z * radii[2] + center[2]))
     return new_object(name, bm, mat)
 
+# ---------------------------------------------------------------- UV layouts
+HEAD_W, HEAD_Z0, HEAD_H = .13, 1.605, .135
+def head_uv(face, co):
+    """Front of the head: planar x,z -> u 0..0.75. Back of the head: u 0.75..1. Chosen per face so a seam stays at the temples."""
+    centre_y = sum(v.co.y for v in face.verts) / len(face.verts)
+    u = max(0.0, min(1.0, co.x / HEAD_W * .5 + .5))
+    v = max(0.0, min(1.0, (co.z - HEAD_Z0) / HEAD_H * .5 + .5))
+    return (u * .74 + .005, v) if centre_y < .012 else (.755 + (1 - u) * .24, v)
+
+CELLS = {'torso': (0, .5, 1, 1), 'armL': (0, 0, .25, .5), 'armR': (.25, 0, .5, .5), 'legL': (.5, 0, .75, .5), 'legR': (.75, 0, 1, .5)}
+def body_cell(face):
+    c = sum((v.co for v in face.verts), Vector()) / len(face.verts)
+    if abs(c.x) > .215 and c.z > .75: return 'armL' if c.x > 0 else 'armR'
+    if c.z < .96 and abs(c.x) > .012: return 'legL' if c.x > 0 else 'legR'
+    return 'torso'
+def body_uv(face, co):
+    cell = body_cell(face)
+    centre = {'torso': (0, 0), 'armL': (.33, 0), 'armR': (-.33, 0), 'legL': (.1, 0), 'legR': (-.1, 0)}[cell]
+    z0, z1 = {'torso': (.9, 1.5), 'armL': (.75, 1.45), 'armR': (.75, 1.45), 'legL': (0, 1.0), 'legR': (0, 1.0)}[cell]
+    angle = math.atan2(co.x - centre[0], -(co.y - centre[1]))          # 0 at the front, +-pi at the back
+    face_angles = [math.atan2(v.co.x - centre[0], -(v.co.y - centre[1])) for v in face.verts]
+    if max(face_angles) - min(face_angles) > math.pi and angle < 0: angle += 2 * math.pi   # face crosses the back seam
+    u = max(0.0, min(1.0, angle / (2 * math.pi) + .5)); v = max(0.0, min(1.0, (co.z - z0) / (z1 - z0)))
+    x0, y0, x1, y1 = CELLS[cell]
+    return (x0 + u * (x1 - x0) * .98 + .01 * (x1 - x0), y0 + v * (y1 - y0) * .98 + .01 * (y1 - y0))
+
 # ---------------------------------------------------------------- body (skin modifier over a joint skeleton)
 JOINTS = {
     'hips': ((0, 0, .98), (.17, .12)), 'spine': ((0, 0, 1.12), (.155, .115)), 'chest': ((0, 0, 1.29), (.19, .125)), 'neck': ((0, 0, 1.44), (.055, .055)),
     'shoulder': ((.17, 0, 1.38), (.07, .07)), 'elbow': ((.31, 0, 1.13), (.052, .052)), 'wrist': ((.37, 0, .93), (.04, .04)), 'hand': ((.395, 0, .84), (.055, .045)),
     'hip': ((.09, 0, .93), (.09, .09)), 'knee': ((.1, 0, .52), (.07, .07)), 'ankle': ((.1, 0, .09), (.055, .055)), 'toe': ((.1, -.11, .035), (.055, .045))
 }
+# Same joint positions for both genders (so every animation fits both); only the volumes differ.
+RADII = {
+    'male':   dict(hips=(.155, .115), spine=(.16, .115), chest=(.205, .13), neck=(.062, .062), shoulder=(.078, .078), elbow=(.056, .056), wrist=(.043, .043), hand=(.06, .05),
+                   hip=(.095, .095), knee=(.075, .075), ankle=(.058, .058), toe=(.058, .048)),
+    'female': dict(hips=(.18, .125), spine=(.122, .10), chest=(.158, .115), neck=(.045, .045), shoulder=(.058, .058), elbow=(.045, .045), wrist=(.034, .034), hand=(.045, .038),
+                   hip=(.095, .095), knee=(.066, .066), ankle=(.048, .048), toe=(.05, .04)),
+}[GENDER]
+JOINTS = {key: (pos, RADII[key]) for key, (pos, _) in JOINTS.items()}
 EDGES = [('hips', 'spine'), ('spine', 'chest'), ('chest', 'neck'), ('chest', 'shoulder'), ('shoulder', 'elbow'), ('elbow', 'wrist'), ('wrist', 'hand'),
          ('hips', 'hip'), ('hip', 'knee'), ('knee', 'ankle'), ('ankle', 'toe')]
 
@@ -97,7 +159,7 @@ def build_body():
     dg = bpy.context.evaluated_depsgraph_get()
     final = bpy.data.meshes.new_from_object(obj.evaluated_get(dg))
     bpy.data.objects.remove(obj)
-    body = new_object('body', final, 'skin')
+    body = new_object('body', final, 'skin_body', uv=body_uv)
     return body
 
 def build_head():
@@ -110,30 +172,95 @@ def build_head():
         taper = .82 + .18 * math.sin(min(1, t * 1.25) * math.pi / 2)
         v.co = Vector((x * .108 * taper, y * .12 * (0.95 if z < -.4 else 1) , z * .135 + 1.605))
         if z < -.55: v.co.y -= (z + .55) * .02 * -1
-    return new_object('head', bm, 'skin')
+    return new_object('head', bm, 'skin_head', uv=head_uv)
 
 def ray_front(head, x, z, offset=0.0):
     origin = Vector((x, -1, z))
     hit, loc, normal, _ = head.ray_cast(origin, Vector((0, 1, 0)))
     return loc + normal * offset if hit else Vector((x, -.115, z))
 
+PARTS = json.loads((ROOT / 'src/data/character/faceParts.json').read_text())
+
+def add_ellipsoid(bm, centre, radii, material_index=0, segments=16, rings=10, warp=None):
+    geo = bmesh.ops.create_uvsphere(bm, u_segments=segments, v_segments=rings, radius=1.0)
+    for v in geo['verts']:
+        p = Vector((v.co.x * radii[0], v.co.y * radii[1], v.co.z * radii[2]))
+        v.co = warp(p) if warp else p
+        v.co += Vector(centre)
+    verts = set(geo['verts'])
+    for f in bm.faces:
+        if any(v in verts for v in f.verts): f.material_index = material_index
+    return geo['verts']
+
+def multi_object(name, bm, materials, uv=None):
+    obj = new_object(name, bm, None, uv=uv)
+    for m in materials: obj.data.materials.append(MATERIALS[m])
+    return obj
+
 def build_face(head):
+    """Every face feature is its own swappable mesh: eyes_<shape>, brows_<shape>, nose_<shape>, mouth_<shape>, cheeks_<shape>, plus one pair of ears."""
     parts = []
-    for side, sign in (('l', 1), ('r', -1)):
-        c = ray_front(head, .043 * sign, 1.625, -.003)
-        parts.append(sphere(f'eye_{side}', c, (.017, .011, .015), 'sclera', 16, 10))
-        parts.append(sphere(f'iris_{side}', c + Vector((0, -.008, 0)), (.0105, .005, .0105), 'iris', 14, 8))
-        parts.append(sphere(f'pupil_{side}', c + Vector((0, -.0115, 0)), (.005, .002, .005), 'pupil', 10, 6))
-        b = ray_front(head, .046 * sign, 1.66, .002)
-        brow = sphere(f'brow_{side}', b, (.03, .008, .008), 'hair', 12, 8)
-        parts.append(brow)
-        e = Vector((.107 * sign, .005, 1.6))
-        parts.append(sphere(f'ear_{side}', e, (.011, .02, .03), 'skin', 12, 8))
-    nose = ray_front(head, 0, 1.585, .006)
-    parts.append(sphere('nose', nose, (.017, .019, .023), 'skin', 14, 10))
-    lips = ray_front(head, 0, 1.543, .0)
-    parts.append(sphere('mouth_inner', lips + Vector((0, .003, 0)), (.03, .006, .01), 'mouth', 14, 8))
-    parts.append(sphere('lips', lips + Vector((0, -.003, 0)), (.031, .009, .011), 'lip', 16, 10))
+    # ---- eyes: sclera (0), iris (1), pupil (2), upper lid (3, skin) -- both eyes in one mesh
+    for name, p in PARTS['eyes'].items():
+        bm = bmesh.new()
+        for sign in (1, -1):
+            cx = (.043 + p['spacing'] * .006) * sign
+            c = ray_front(head, cx, 1.625, -.003)
+            tilt = lambda q, cx=cx, sign=sign: Vector((q.x, q.y, q.z + sign * (q.x) * p['tilt'] * .35))
+            rx, rz = .021 * p['size'], .0185 * p['size'] * p['narrow']
+            add_ellipsoid(bm, c, (rx, .011, rz), 0, 16, 10, tilt)
+            add_ellipsoid(bm, c + Vector((0, -.008, 0)), (.0135 * p['size'], .005, .0135 * p['size'] * min(1, p['narrow'] * 1.2)), 1, 14, 8, tilt)
+            add_ellipsoid(bm, c + Vector((0, -.0115, 0)), (.0065 * p['size'], .002, .0065 * p['size']), 2, 10, 6, tilt)
+            # upper lid: a slightly larger skin shell over the top of the eye; `lid` lowers its edge over the iris
+            lid_edge = c.z + .004 - p['lid'] * .011
+            lid = add_ellipsoid(bm, c + Vector((0, -.0005, 0)), (rx * 1.12, .0125, rz * 1.16), 3, 16, 10, tilt)
+            bmesh.ops.delete(bm, geom=[v for v in lid if v.co.z < lid_edge], context='VERTS')
+        parts.append(multi_object(f'eyes_{name}', bm, ['sclera', 'iris', 'pupil', 'skin_head'], uv=head_uv))
+    # ---- brows
+    for name, p in PARTS['brows'].items():
+        bm = bmesh.new()
+        for sign in (1, -1):
+            b = ray_front(head, .046 * sign, 1.652, .001)
+            def warp(q, sign=sign, p=p):
+                t = q.x / (.03 * p['length'] * 1.0 + 1e-9)
+                z = q.z + p['arch'] * .008 * (1 - min(1, abs(t) ** 2))
+                z += p['angle'] * .012 * (-t) * 1.0 if sign else 0      # angled: inner end lower
+                return Vector((q.x * p['length'], q.y, z))
+            add_ellipsoid(bm, b, (.028, .006, .0042 * p['thick']), 0, 12, 8, warp)
+        parts.append(multi_object(f'brows_{name}', bm, ['brow'], uv=head_uv))
+    # ---- nose
+    for name, p in PARTS['noses'].items():
+        bm = bmesh.new()
+        n = ray_front(head, 0, 1.585 + p['up'] * .004, .006)
+        add_ellipsoid(bm, n, (.017 * p['width'], .019 * p['size'], .023 * p['size']), 0, 14, 10)
+        add_ellipsoid(bm, n + Vector((0, .004, .018)), (.006 * p['width'], .004 + .003 * p['bridge'], .013), 0, 10, 6)     # bridge
+        for sign in (1, -1): add_ellipsoid(bm, n + Vector((sign * .013 * p['width'], .003, -.008 + p['up'] * .004)), (.008, .008, .007), 0, 8, 6)  # nostril wings
+        parts.append(multi_object(f'nose_{name}', bm, ['skin_head'], uv=head_uv))
+    # ---- mouth: upper + lower lip (0) and the dark inside (1)
+    for name, p in PARTS['mouths'].items():
+        bm = bmesh.new()
+        m = ray_front(head, 0, 1.543, .0)
+        top = p.get('top', 1.0)
+        add_ellipsoid(bm, m + Vector((0, .003, 0)), (.03 * p['width'], .006, .01), 1, 14, 8)
+        lift = lambda q, p=p: Vector((q.x, q.y, q.z + p['lift'] * .012 * (abs(q.x) / .03) ** 2))
+        add_ellipsoid(bm, m + Vector((0, -.003, .0045 * p['full'])), (.031 * p['width'], .0085 * p['full'], .0058 * p['full'] * top), 0, 16, 10, lift)
+        add_ellipsoid(bm, m + Vector((0, -.003, -.0045 * p['full'])), (.027 * p['width'], .009 * p['full'], .0065 * p['full'] * (2 - top)), 0, 16, 10, lift)
+        if p['bow'] > .6: add_ellipsoid(bm, m + Vector((0, -.008, .0085 * p['full'])), (.006, .004, .003 * p['bow']), 0, 8, 6)
+        parts.append(multi_object(f'mouth_{name}', bm, ['lip', 'mouth'], uv=head_uv))
+    # ---- cheeks: soft volume pads (skin, same UVs as the head so face texture layers continue over them)
+    for name, p in PARTS['cheeks'].items():
+        bm = bmesh.new()
+        if p['size'] > 0:
+            for sign in (1, -1):
+                c = ray_front(head, .066 * sign, 1.57 + p.get('height', 0) * .01, -.004)
+                add_ellipsoid(bm, c + Vector((0, .003, 0)), (.03 * p['size'], .005 + .006 * p['volume'], .026 * p['size']), 0, 12, 8)
+        else:
+            add_ellipsoid(bm, (0, 0, 0), (.0001, .0001, .0001), 0, 4, 3)   # keep a valid (invisible) mesh so the slot always exists
+        parts.append(multi_object(f'cheeks_{name}', bm, ['skin_head'], uv=head_uv))
+    # ---- ears
+    bm = bmesh.new()
+    for sign in (1, -1): add_ellipsoid(bm, Vector((.107 * sign, .005, 1.6)), (.011, .02, .03), 0, 12, 8)
+    parts.append(multi_object('ears', bm, ['skin_head'], uv=head_uv))
     return parts
 
 # ---------------------------------------------------------------- hair & facial hair
@@ -149,7 +276,7 @@ def hair_cap(name, top=.16, back=.0, front=-.005, height=1.6, spread=1.07, lift=
         v.co = Vector((x * .108 * taper * spread, y * .12 * spread + back, z * .135 * (1 + lift * 10) + 1.605 + lift + shift[2]))
         v.co.x += shift[0]; v.co.y += shift[1]
     # curved hairline: high on the forehead, lower at the back of the neck
-    dead = [v for v in bm.verts if (v.co.z - 1.605) / .135 < keep + .45 * max(0, -v.co.y / .12) - .25 * max(0, v.co.y / .12)]
+    dead = [v for v in bm.verts if (v.co.z - 1.605) / .135 < keep + .62 * max(0, -v.co.y / .12) - .25 * max(0, v.co.y / .12)]
     bmesh.ops.delete(bm, geom=dead, context='VERTS')
     return bm
 
@@ -209,7 +336,7 @@ def build_hair():
     bm = hair_cap('long-straight', keep=-.3, lift=.012, spread=1.07)
     for s in (1, -1): add_blob(bm, (s * .105, .03, 1.5), (.03, .07, .17))
     add_blob(bm, (0, .1, 1.45), (.1, .035, .22)); styles['long-straight'] = bm
-    return [new_object(f'hair_{name}', bm, 'hair') for name, bm in styles.items()]
+    return [new_object(f'hair_{name}', bm, 'hair', uv=head_uv) for name, bm in styles.items()]
 
 def build_beards(head):
     def shell(name, keep_fn, grow=.006, thick=1.0):
@@ -224,7 +351,7 @@ def build_beards(head):
             n = Vector((v.co.x / .108, v.co.y / .12, (v.co.z - 1.605) / .135)).normalized()
             v.co += Vector((n.x * grow, n.y * grow, n.z * grow))
         bmesh.ops.delete(bm, geom=[v for v in bm.verts if not keep_fn(v.co)], context='VERTS')
-        return new_object(name, bm, 'hair')
+        return new_object(name, bm, 'hair', uv=head_uv)
     lower = lambda co: co.z < 1.575 and co.y < .05 and co.z > 1.47
     beards = [
         shell('beard_stubble', lambda c: lower(c) and c.z < 1.56 and c.y < .03, .0015),
@@ -238,13 +365,13 @@ def build_beards(head):
     mus = lambda name, w, h, curl: None
     bm = bmesh.new()
     add_blob(bm, (0, -.117, 1.563), (.032, .01, .008), 12, 6)
-    beards.append(new_object('beard_moustache', bm, 'hair'))
+    beards.append(new_object('beard_moustache', bm, 'hair', uv=head_uv))
     bm = bmesh.new()
     add_blob(bm, (0, -.117, 1.563), (.03, .01, .008), 12, 6)
     for s in (1, -1):
         add_blob(bm, (s * .038, -.112, 1.563), (.012, .008, .006), 8, 6)
         add_blob(bm, (s * .052, -.106, 1.572), (.008, .007, .009), 8, 6)
-    beards.append(new_object('beard_handlebar', bm, 'hair'))
+    beards.append(new_object('beard_handlebar', bm, 'hair', uv=head_uv))
     return beards
 
 # ---------------------------------------------------------------- clothing (shells cut from the body)
@@ -284,7 +411,7 @@ def build_clothes(body):
 # ---------------------------------------------------------------- morph targets: pure functions of position, shared by every mesh
 def gauss(p, c, r): return math.exp(-((p - Vector(c)).length / r) ** 2)
 HEAD_Z = 1.6
-MORPHS = {
+MORPHS = {   # feature shapes (eyes, nose, mouth...) are separate part meshes; these morphs are expressions + head and body shape
     # body
     'broad':      lambda p: Vector((p.x * .16 * min(1, max(0, (p.z - 1.0) / .3)) * (1 if p.z > 1.0 else 0), 0, 0)) if p.z < 1.5 else Vector(),
     'slim':       lambda p: Vector((-p.x * .16, -p.y * .16, 0)) * (1 if p.z < 1.5 else 0),
@@ -299,37 +426,29 @@ MORPHS = {
     'cheeks':     lambda p: Vector((p.x * .13, p.y * .1, 0)) * (gauss(p, (.07, -.08, 1.57), .05) + gauss(p, (-.07, -.08, 1.57), .05)),
     'forehead':   lambda p: Vector((0, -.012, .006)) * gauss(p, (0, -.09, 1.68), .06),
     # features
-    'eyeSize':    lambda p: (p - Vector((math.copysign(.043, p.x), p.y, 1.625))) * .35 * gauss(p, (math.copysign(.043, p.x), -.1, 1.625), .028),
-    'eyeSpacing': lambda p: Vector((math.copysign(.006, p.x), 0, 0)) * gauss(p, (math.copysign(.043, p.x), -.1, 1.625), .03),
-    'eyeTilt':    lambda p: Vector((0, 0, math.copysign(1, p.x) * (p.x - math.copysign(.043, p.x)) * .55)) * gauss(p, (math.copysign(.043, p.x), -.1, 1.625), .03),
-    'eyeNarrow':  lambda p: Vector((0, 0, -(p.z - 1.625) * .55)) * gauss(p, (math.copysign(.043, p.x), -.1, 1.625), .03),
     'blink':      lambda p: Vector((0, 0, -(p.z - 1.625) * .9)) * gauss(p, (math.copysign(.043, p.x), -.1, 1.625), .03),
     'browRaise':  lambda p: Vector((0, 0, .012)) * gauss(p, (math.copysign(.046, p.x), -.108, 1.66), .04),
     'browAngry':  lambda p: Vector((0, 0, -math.copysign(1, p.x) * (abs(p.x) - .046) * .0 - (.012 if abs(p.x) < .046 else -.012) * .6)) * gauss(p, (math.copysign(.046, p.x), -.108, 1.66), .04),
-    'browThick':  lambda p: Vector((0, 0, (p.z - 1.66) * .7)) * gauss(p, (math.copysign(.046, p.x), -.108, 1.66), .04),
-    'noseSize':   lambda p: (p - Vector((0, -.118, 1.585))) * .4 * gauss(p, (0, -.118, 1.585), .03),
-    'noseWidth':  lambda p: Vector((p.x * .5, 0, 0)) * gauss(p, (0, -.118, 1.585), .03),
-    'noseUp':     lambda p: Vector((0, 0, .008)) * gauss(p, (0, -.118, 1.585), .03),
-    'lipFull':    lambda p: Vector((0, (p.y + .11) * .5, (p.z - 1.543) * .8)) * gauss(p, (0, -.11, 1.543), .03),
-    'lipWide':    lambda p: Vector((p.x * .3, 0, 0)) * gauss(p, (0, -.11, 1.543), .04),
     'smile':      lambda p: Vector((p.x * .05, 0, .011 * min(1, (abs(p.x) / .03) ** 2))) * gauss(p, (0, -.11, 1.543), .05),
     'mouthOpen':  lambda p: Vector((0, 0, -.014 if p.z < 1.543 else 0)) * gauss(p, (0, -.11, 1.535), .03) + Vector((0, 0, .0)),
-    'earSize':    lambda p: (p - Vector((math.copysign(.107, p.x), .005, 1.6))) * .5 * gauss(p, (math.copysign(.107, p.x), .005, 1.6), .04),
 }
 # morphs that only make sense on the head: skip them on other meshes cheaply via influence radius, the function returns ~0 elsewhere.
 BODY_MORPHS = {'broad', 'slim', 'curvy', 'muscular', 'bust'}
-HEAD_SHAPE_MORPHS = {'faceWidth', 'faceLength', 'jaw', 'chin', 'cheeks', 'forehead'}
+# Which morphs each kind of mesh carries (keeps the files small): the skull shape, plus expressions on the parts that move.
+SKULL = {'faceWidth', 'faceLength'}
+ALLOWED = {
+    'head': SKULL | {'jaw', 'chin', 'cheeks', 'forehead'}, 'eyes': SKULL | {'blink'}, 'brows': SKULL | {'browRaise', 'browAngry'}, 'nose': SKULL,
+    'mouth': SKULL | {'jaw', 'chin', 'smile', 'mouthOpen'}, 'cheeks': SKULL | {'cheeks'}, 'ears': SKULL, 'hair': SKULL, 'beard': SKULL | {'jaw', 'chin'},
+}
 def add_shape_keys(obj):
     mesh = obj.data
     is_body = obj.name == 'body' or obj.name.startswith('cloth_')
-    is_face_part = obj.name.split('_')[0] in ('eye', 'iris', 'pupil', 'brow', 'ear', 'nose', 'lips', 'mouth', 'head')
+    allowed = BODY_MORPHS if is_body else ALLOWED.get(obj.name.split('_')[0], set())
     coords = [v.co.copy() for v in mesh.vertices]
     obj.shape_key_add(name='Basis', from_mix=False)
     for name, fn in MORPHS.items():
-        if is_body != (name in BODY_MORPHS) and not (name in HEAD_SHAPE_MORPHS and not is_body):
+        if name not in allowed:
             continue
-        if not is_body and not is_face_part and name not in HEAD_SHAPE_MORPHS:
-            continue   # hair and beards follow the skull only
         deltas = [fn(co) for co in coords]
         if max((d.length for d in deltas), default=0) < 2e-4:
             continue
@@ -530,11 +649,12 @@ def render(path, frame_action=None, frame=0, view='front'):
 
 if render_prefix:
     keep = {'hair_short', 'hair_pompadour', 'beard_short-beard', 'cloth_shirt', 'cloth_vest', 'cloth_pants', 'cloth_shoes', 'beard_moustache'}
-    for o in list(hair) + list(beards) + list(clothes):
+    keep |= {'eyes_almond', 'brows_soft-arch', 'nose_soft', 'mouth_balanced', 'cheeks_soft', 'ears'}
+    for o in list(face) + list(hair) + list(beards) + list(clothes):
         o.hide_render = o.name not in keep
     render(f'{render_prefix}_front.png'); render(f'{render_prefix}_side.png', view='side'); render(f'{render_prefix}_head.png', view='head')
     render(f'{render_prefix}_pour.png', 'pour', 30); render(f'{render_prefix}_shake.png', 'shake', 6)
-    for o in list(hair) + list(beards) + list(clothes): o.hide_render = False
+    for o in list(face) + list(hair) + list(beards) + list(clothes): o.hide_render = False
     arm.animation_data.action = None
 
 # ---------------------------------------------------------------- export
@@ -544,3 +664,6 @@ for o in scene.objects: o.select_set(True)
 bpy.ops.export_scene.gltf(filepath=str(OUT), export_format='GLB', export_animations=True, export_animation_mode='ACTIONS', export_morph=True,
                           export_skins=True, export_apply=False, export_yup=True, export_image_format='NONE', export_cameras=False, export_lights=False)
 print('exported', OUT, OUT.stat().st_size // 1024, 'KB')
+sys.stdout.flush()
+import os
+os._exit(0)   # bpy can crash while tearing down; the file is already written

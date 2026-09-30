@@ -5,7 +5,8 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
-import { CLIP_FOR, EXPRESSION_MORPHS, rigFor, type Look3dInput } from '../../domain/character3d';
+import { CLIP_FOR, EXPRESSION_MORPHS, SLOT_PREFIXES, modelUrl, rigFor, type Gender, type Look3dInput } from '../../domain/character3d';
+import { paintBody, paintCloth, paintHair, paintHead } from '../../domain/character3dTextures';
 import type { CharacterExpression } from '../../domain/dialogue/types';
 import CharacterModel from './CharacterModel.vue';
 
@@ -13,18 +14,18 @@ const props = withDefaults(defineProps<{
   look: Look3dInput;
   animation?: string;
   expression?: CharacterExpression;
-  crop?: 'bust' | 'full';
+  crop?: 'head' | 'bust' | 'full';
 }>(), { animation: 'idle', expression: 'neutral', crop: 'bust' });
 
 const host = ref<HTMLDivElement>();
 const failed = ref(false);
 const rig = computed(() => rigFor(props.look));
 
-const MODEL_URL = '/assets/characters3d/bartender.glb';
-let modelPromise: Promise<THREE.Group & { animations: THREE.AnimationClip[] }> | undefined;
-function loadModel() {
-  modelPromise ??= new GLTFLoader().loadAsync(MODEL_URL).then((gltf) => Object.assign(gltf.scene, { animations: gltf.animations }));
-  return modelPromise;
+type Model = THREE.Group & { animations: THREE.AnimationClip[] };
+const models = new Map<Gender, Promise<Model>>();
+function loadModel(gender: Gender) {
+  if (!models.has(gender)) models.set(gender, new GLTFLoader().loadAsync(modelUrl(gender)).then((gltf) => Object.assign(gltf.scene, { animations: gltf.animations })));
+  return models.get(gender)!;
 }
 
 let renderer: THREE.WebGLRenderer | undefined;
@@ -63,17 +64,39 @@ function playClip(name: string) {
   current = clip;
 }
 
+// Skin, hair and cloth get painted texture layers; everything else is a plain colour.
+const textures = new Map<string, THREE.CanvasTexture>();
+function texture(role: string, canvas: HTMLCanvasElement) {
+  let map = textures.get(role);
+  if (!map) { map = new THREE.CanvasTexture(canvas); map.flipY = false; map.colorSpace = THREE.SRGBColorSpace; map.anisotropy = 4; textures.set(role, map); const material = materials.get(role); if (material) { material.map = map; material.needsUpdate = true; } }
+  else map.needsUpdate = true;
+  return map;
+}
+const headCanvas = document.createElement('canvas'); headCanvas.width = headCanvas.height = 512;
+const bodyCanvas = document.createElement('canvas'); bodyCanvas.width = bodyCanvas.height = 1024;
+let staticTextures = false;
+function paintTextures() {
+  paintHead(props.look, headCanvas); texture('skin_head', headCanvas);
+  paintBody(props.look, bodyCanvas); texture('skin_body', bodyCanvas);
+  materials.get('skin_head')?.color.set('#ffffff'); materials.get('skin_body')?.color.set('#ffffff');
+  if (!staticTextures) {
+    staticTextures = true;
+    texture('hair', paintHair()); texture('brow', paintHair());
+    texture('shirt', paintCloth('plain')); texture('vest', paintCloth('pinstripe')); texture('apron', paintCloth('plain')); texture('pants', paintCloth('plain'));
+  }
+}
+
 function morphIndex(mesh: THREE.SkinnedMesh, name: string) { return mesh.morphTargetDictionary?.[name]; }
 function applyLook() {
   if (!root) return;
   const next = rig.value;
-  for (const mesh of meshes) {
-    const name = mesh.name;
-    if (name.startsWith('cloth_')) mesh.visible = next.visible.has(name);
-    else if (name.startsWith('hair_')) mesh.visible = name === next.hair;
-    else if (name.startsWith('beard_')) mesh.visible = name === next.beard;
-  }
+  // Only the chosen mesh of each slot (hair, beard, eyes, brows, nose, mouth, cheeks, clothes) is shown.
+  // A slot part with several materials loads as a group of meshes (eyes_cat, eyes_cat_1, ...): match on the base name.
+  root.traverse((object) => {
+    if (SLOT_PREFIXES.some((prefix) => object.name.startsWith(prefix))) object.visible = next.visible.has(object.name.replace(/_\d+$/, ''));
+  });
   for (const [role, color] of Object.entries(next.colors)) materials.get(role)?.color.set(color);
+  paintTextures();
   root.scale.setScalar(next.scale);
   key.color.set(next.light);
   applyMorphs(0, 0);
@@ -105,8 +128,7 @@ function resize() {
 }
 function frameCamera() {
   // 'bust' frames head to hips (the bar hides the rest); 'full' shows the whole figure.
-  const span = props.crop === 'full' ? 1.95 : 1.05;
-  const centre = props.crop === 'full' ? .93 : 1.36;
+  const [span, centre] = { head: [.5, 1.66], bust: [1.05, 1.36], full: [1.95, .93] }[props.crop];
   const distance = span / 2 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
   camera.position.set(0, centre, distance * Math.max(1, 1 / camera.aspect * .55));
   camera.lookAt(0, centre, 0);
@@ -128,6 +150,46 @@ function tick() {
   frame++;
 }
 
+let ramp: THREE.DataTexture;
+let mountedGender: Gender | undefined;
+let mounting = false;
+// (Re)builds the character for the current gender: the male and female mannequins are separate models sharing one skeleton layout.
+async function mountModel() {
+  if (mounting) return;
+  mounting = true;
+  try {
+    const gender = rig.value.gender;
+    const model = await loadModel(gender);
+    if (disposed) return;
+    if (root) { scene.remove(root); mixer?.stopAllAction(); }
+    meshes.length = 0; actions = new Map(); current = undefined; mountedGender = gender;
+    root = cloneSkinned(model);
+    root.traverse((object) => {
+      const mesh = object as THREE.SkinnedMesh;
+      if (!mesh.isMesh) return;
+      const original = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]) as THREE.Material[];
+      const toon = original.map((item) => {
+        let material = materials.get(item.name);
+        if (!material) {
+          material = new THREE.MeshToonMaterial({ gradientMap: ramp });
+          materials.set(item.name, material);
+          const map = textures.get(item.name); if (map) material.map = map;
+        }
+        return material;
+      });
+      mesh.material = Array.isArray(mesh.material) ? toon : toon[0]!;
+      mesh.frustumCulled = false;
+      meshes.push(mesh);
+    });
+    scene.add(root);
+    mixer = new THREE.AnimationMixer(root);
+    for (const clip of model.animations) actions.set(clip.name, mixer.clipAction(clip));
+    applyLook();
+    playClip(props.animation);
+  } finally { mounting = false; }
+  if (mountedGender !== rig.value.gender) await mountModel();
+}
+
 onMounted(async () => {
   try {
     if (!host.value) return;
@@ -145,25 +207,9 @@ onMounted(async () => {
     const rim = new THREE.DirectionalLight('#8fb4ff', .9);
     rim.position.set(2, 1.5, -2);
     scene.add(rim);
-    const model = await loadModel();
+    ramp = toonRamp();
+    await mountModel();
     if (disposed) return;
-    root = cloneSkinned(model);
-    const ramp = toonRamp();
-    root.traverse((object) => {
-      const mesh = object as THREE.SkinnedMesh;
-      if (!mesh.isMesh) return;
-      const role = (mesh.material as THREE.Material).name;
-      let material = materials.get(role);
-      if (!material) { material = new THREE.MeshToonMaterial({ gradientMap: ramp }); materials.set(role, material); }
-      mesh.material = material;
-      mesh.frustumCulled = false;
-      meshes.push(mesh);
-    });
-    scene.add(root);
-    mixer = new THREE.AnimationMixer(root);
-    for (const clip of model.animations) actions.set(clip.name, mixer.clipAction(clip));
-    applyLook();
-    playClip(props.animation);
     resize();
     resizer = new ResizeObserver(resize);
     resizer.observe(host.value);
@@ -179,12 +225,13 @@ onBeforeUnmount(() => {
   resizer?.disconnect();
   mixer?.stopAllAction();
   for (const material of materials.values()) material.dispose();
+  for (const map of textures.values()) map.dispose();
   scene?.traverse((object) => { const mesh = object as THREE.Mesh; if (mesh.isMesh) mesh.geometry?.dispose(); });
   renderer?.dispose();
   renderer?.domElement.remove();
 });
 
-watch(rig, applyLook, { deep: true });
+watch(rig, () => { if (mountedGender && mountedGender !== rig.value.gender) void mountModel(); else applyLook(); }, { deep: true });
 watch(() => props.animation, playClip);
 watch(() => props.crop, resize);
 defineExpose({ frames: () => frame });

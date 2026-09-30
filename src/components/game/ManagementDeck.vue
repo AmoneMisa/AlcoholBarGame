@@ -188,7 +188,7 @@ function selectBartender(id: 'noa' | 'leo') {
       <div class="design-grid-new">
         <div class="mini-interior" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="game.barInteriorStyle"><span></span><b>{{ game.decor.name }}</b><i></i><em>{{ game.region.name }} · Saved automatically</em></div>
         <div class="bartender-custom">
-          <Bartender3D :look="{ ...game.decor, bartenderCharacter: selectedBartender }" crop="full" />
+          <Bartender3D :look="{ ...game.decor, bartenderCharacter: selectedBartender }" crop="bust" />
           <div class="bartender-selector" aria-label="Choose bartender">
             <button v-for="person in [{id:'noa',label:'Woman'},{id:'leo',label:'Man'}] as const" :key="person.id" :class="{ active: selectedBartender === person.id }" type="button" @click="selectBartender(person.id)">{{ person.label }}</button>
           </div>

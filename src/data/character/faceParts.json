@@ -1,0 +1,57 @@
+{
+  "_doc": "Parametric face parts. Read by scripts/blender/build_bartender.py (one mesh per entry: eyes_<name>, brows_<name>, nose_<name>, mouth_<name>, cheeks_<name>) and by src/domain/character3d*.ts. Keys match the option names of BarProfile (eyeShape, browShape, noseShape, lipShape, cheekShape).",
+  "eyes": {
+    "almond":   { "size": 1.0, "narrow": 0.85, "tilt": 0.15, "spacing": 0.0, "lid": 0.25 },
+    "round":    { "size": 1.2, "narrow": 1.15, "tilt": 0.0, "spacing": 0.1, "lid": 0.0 },
+    "hooded":   { "size": 1.0, "narrow": 0.8, "tilt": 0.0, "spacing": 0.0, "lid": 0.8 },
+    "upturned": { "size": 1.0, "narrow": 0.85, "tilt": 0.8, "spacing": 0.0, "lid": 0.2 },
+    "downturned": { "size": 1.0, "narrow": 0.9, "tilt": -0.8, "spacing": 0.0, "lid": 0.3 },
+    "deep-set": { "size": 0.9, "narrow": 0.8, "tilt": 0.0, "spacing": -0.4, "lid": 0.5 },
+    "monolid":  { "size": 0.95, "narrow": 0.65, "tilt": 0.2, "spacing": 0.0, "lid": 0.7 },
+    "wide":     { "size": 1.15, "narrow": 1.0, "tilt": 0.0, "spacing": 0.8, "lid": 0.0 },
+    "narrow":   { "size": 0.85, "narrow": 0.65, "tilt": 0.0, "spacing": -0.3, "lid": 0.35 },
+    "cat":      { "size": 1.0, "narrow": 0.8, "tilt": 1.0, "spacing": 0.1, "lid": 0.3 }
+  },
+  "brows": {
+    "soft-arch": { "thick": 1.0, "arch": 0.5, "angle": 0.0, "length": 1.0, "raise": 0.2 },
+    "high-arch": { "thick": 0.9, "arch": 1.2, "angle": 0.0, "length": 1.0, "raise": 0.8 },
+    "straight":  { "thick": 1.0, "arch": 0.0, "angle": 0.0, "length": 1.0, "raise": 0.0 },
+    "rounded":   { "thick": 1.0, "arch": 0.8, "angle": 0.0, "length": 0.9, "raise": 0.3 },
+    "feathered": { "thick": 0.7, "arch": 0.4, "angle": 0.0, "length": 1.1, "raise": 0.1 },
+    "bold":      { "thick": 1.8, "arch": 0.3, "angle": 0.0, "length": 1.05, "raise": 0.0 },
+    "slim":      { "thick": 0.5, "arch": 0.6, "angle": 0.0, "length": 1.0, "raise": 0.2 },
+    "angled":    { "thick": 1.1, "arch": 0.2, "angle": 0.6, "length": 1.0, "raise": 0.0 },
+    "short":     { "thick": 1.0, "arch": 0.3, "angle": 0.0, "length": 0.7, "raise": 0.0 },
+    "long":      { "thick": 0.9, "arch": 0.3, "angle": 0.0, "length": 1.3, "raise": 0.0 }
+  },
+  "noses": {
+    "straight": { "size": 1.0, "width": 1.0, "up": 0.0, "bridge": 0.5 },
+    "button":   { "size": 0.75, "width": 1.0, "up": 0.7, "bridge": 0.2 },
+    "aquiline": { "size": 1.2, "width": 0.8, "up": -0.2, "bridge": 1.0 },
+    "wide":     { "size": 1.0, "width": 1.5, "up": 0.0, "bridge": 0.4 },
+    "narrow":   { "size": 1.0, "width": 0.7, "up": 0.0, "bridge": 0.6 },
+    "turned-up": { "size": 0.9, "width": 1.0, "up": 1.0, "bridge": 0.2 },
+    "roman":    { "size": 1.25, "width": 1.0, "up": -0.1, "bridge": 1.1 },
+    "soft":     { "size": 0.95, "width": 1.05, "up": 0.1, "bridge": 0.3 }
+  },
+  "mouths": {
+    "balanced":   { "full": 1.0, "width": 1.0, "bow": 0.3, "lift": 0.0 },
+    "full":       { "full": 1.5, "width": 1.0, "bow": 0.4, "lift": 0.0 },
+    "thin":       { "full": 0.6, "width": 1.0, "bow": 0.1, "lift": 0.0 },
+    "cupid":      { "full": 1.1, "width": 0.9, "bow": 1.0, "lift": 0.0 },
+    "wide":       { "full": 1.0, "width": 1.35, "bow": 0.2, "lift": 0.1 },
+    "small":      { "full": 0.9, "width": 0.7, "bow": 0.3, "lift": 0.0 },
+    "top-heavy":  { "full": 1.2, "width": 1.0, "bow": 0.6, "lift": 0.0, "top": 1.5 },
+    "bottom-heavy": { "full": 1.2, "width": 1.0, "bow": 0.2, "lift": 0.0, "top": 0.7 },
+    "bowed":      { "full": 1.1, "width": 1.0, "bow": 0.8, "lift": 0.1 },
+    "soft":       { "full": 1.2, "width": 0.95, "bow": 0.4, "lift": 0.15 }
+  },
+  "cheeks": {
+    "soft":    { "size": 1.0, "volume": 0.5 },
+    "defined": { "size": 0.7, "volume": 0.25 },
+    "high":    { "size": 0.9, "volume": 0.6, "height": 1.0 },
+    "round":   { "size": 1.4, "volume": 0.9 },
+    "hollow":  { "size": 0.0, "volume": 0.0 },
+    "full":    { "size": 1.6, "volume": 1.0 }
+  }
+}
