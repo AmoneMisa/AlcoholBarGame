@@ -9,6 +9,7 @@ import {
   upgradeCostFor, type BoxKind, type EquipmentId, type PrestigePerkId, type Reward
 } from '../domain/loot';
 import { INGREDIENTS } from '../domain/catalog';
+import { MIN_WEEKLY_SCORE, describeLeaderboardReward, leaderboardReward } from '../domain/leaderboard';
 import { FAME_PRICE_BONUS, FAME_STEPS, SIGNATURE_FEE, SIGNATURE_GUEST_CHANCE, SIGNATURE_LEVEL, SignatureError, fameLevel, validateSignature } from '../domain/signature';
 import { usableIngredientIds } from '../domain/usableStock';
 import { SPOIL_MAX_DAYS, SPOIL_START_LEVEL, capacityFor, isPerishable, spoiledAmount } from '../domain/warehouse';
@@ -493,3 +494,23 @@ export function signatureServed(state: PlayerState, now: number) {
   return ` ${signature.name} reached fame level ${after} (+${Math.round(FAME_PRICE_BONUS * after * 100)}% price) and earned a ${boxDef(kind)!.name}!`;
 }
 export { FAME_STEPS };
+
+// ---- Weekly leaderboard ----
+// The score is the XP gained this UTC week. It restarts when the week changes and is never lowered.
+export function addWeeklyScore(state: PlayerState, xpGained: number, now: number) {
+  const week = weekOf(now);
+  if (state.loot.weekly.week !== week) state.loot.weekly = { week, score: 0 };
+  if (xpGained > 0) state.loot.weekly.score += Math.floor(xpGained);
+}
+export interface LeaderboardStanding { week: number; rank: number; size: number; score: number; }
+export function claimLeaderboardReward(state: PlayerState, standing: LeaderboardStanding | undefined, now: number) {
+  if (!standing) throw new LootError('The leaderboard is only available online.');
+  if (standing.week !== weekOf(now) - 1) throw new LootError('Only last week’s result can be claimed.');
+  if (state.loot.leaderboardClaimed >= standing.week) throw new LootError('Last week’s reward was already claimed.');
+  const reward = leaderboardReward(standing.rank, standing.score);
+  if (!reward) throw new LootError(`You needed ${MIN_WEEKLY_SCORE} XP last week to earn a leaderboard reward.`);
+  state.loot.leaderboardClaimed = standing.week;
+  for (const [kind, amount] of Object.entries(reward.boxes)) grantBox(state, kind as BoxKind, amount!);
+  state.crystals += reward.crystals;
+  note(state, `Leaderboard ${reward.tier} (rank ${standing.rank} of ${standing.size}): ${describeLeaderboardReward(reward)}.`);
+}

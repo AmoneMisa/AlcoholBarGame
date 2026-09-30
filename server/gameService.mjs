@@ -3,6 +3,8 @@ import { createInitialState, normalizePlayerState, publicState } from '../src/si
 import { receiveGift } from '../src/sim/gifts';
 import { payForGift, publicBar } from '../src/sim/gifts';
 import { calendarDate } from '../src/domain/economy';
+import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE, describeLeaderboardReward, leaderboardReward } from '../src/domain/leaderboard';
+import { weekOf, WEEK_MS } from '../src/domain/quests';
 
 // Server-authoritative game: every request loads the player's state with a row lock, applies exactly one
 // validated action with the shared rules and the server clock, and stores the result together with a coin
@@ -62,7 +64,9 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
           giftTarget = await tx.getPlayer(recipientId);
           if (!giftTarget) throw new RuleError('That friend player code was not found.');
         }
-        result = applyAction(next, action, context());
+        // Last week's rank comes from the database, never from the client.
+        const standing = action.type === 'claimLeaderboardReward' ? await tx.weeklyStanding(weekOf(now()) - 1, Number(player.id)) : undefined;
+        result = applyAction(next, action, { ...context(), leaderboard: standing ?? undefined });
         if (action.type === 'giftCosmetic' && giftTarget) await tx.addGift({ fromId:Number(player.id),toId:Number(giftTarget.id),payload:{ kind:'cosmetic-copy',cosmeticId:action.cosmeticId } });
       } catch (error) {
         if (!(error instanceof RuleError)) throw error;
@@ -74,12 +78,33 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
         return { status: 409, body: refused };
       }
       await tx.saveState(player.id, next, (record?.version ?? 0) + 1);
+      // Only written when the week's score actually moved (most actions earn no XP).
+      if (result.weekly && result.weekly.score > 0 && (result.weekly.score !== state.loot.weekly.score || result.weekly.week !== state.loot.weekly.week)) await tx.setWeeklyScore(Number(player.id), result.weekly.week, result.weekly);
       if (result.moneyDelta !== 0) await tx.addLedger(player.id, { requestId, action: action.type, delta: result.moneyDelta, balance: next.money });
       if (result.crystalDelta !== 0) await tx.addCrystalLedger(player.id, { requestId, action: action.type, delta: result.crystalDelta, balance: next.crystals });
       if (result.audit) await tx.addLootLedger(player.id, { requestId, ...result.audit });
       const response = { ok: true, message: next.message, state: publicState(next), serverTime: now() };
       await tx.saveRequest(player.id, requestId, response);
       return { status: 200, body: response };
+    });
+  }
+
+  // The weekly leaderboard: the top bars by XP earned this week, the player's own rank, and last week's claimable reward.
+  async function leaderboard(identity) {
+    return repository.transaction(async (tx) => {
+      const player = await tx.findOrCreatePlayer(identity);
+      const week = weekOf(now());
+      const top = await tx.topWeekly(week, LEADERBOARD_SIZE);
+      const mine = await tx.weeklyStanding(week, Number(player.id));
+      const previous = await tx.weeklyStanding(week - 1, Number(player.id));
+      const record = await tx.lockState(player.id);
+      const claimed = normalizePlayerState(record?.state ?? createInitialState(now())).loot.leaderboardClaimed;
+      const reward = previous ? leaderboardReward(previous.rank, previous.score) : undefined;
+      return {
+        ok: true, week, endsAt: (week + 1) * WEEK_MS, minScore: MIN_WEEKLY_SCORE,
+        top: top.map((row) => ({ rank: row.rank, label: row.label, level: row.level, score: row.score, me: row.playerId === Number(player.id) })),
+        me: mine, previous: previous ? { ...previous, tier: reward?.tier ?? null, reward: reward ? describeLeaderboardReward(reward) : null, claimable: !!reward && claimed < previous.week } : null
+      };
     });
   }
 
@@ -192,5 +217,5 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
     });
   }
 
-  return { session, act, friends, addFriend, answerFriend, labelFriend, visitFriend, sendGift };
+  return { session, act, leaderboard, friends, addFriend, answerFriend, labelFriend, visitFriend, sendGift };
 }

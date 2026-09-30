@@ -36,6 +36,13 @@ export function connectSession() {
   return post<SessionResult>('/api/session', {});
 }
 
+export interface LeaderboardResult {
+  ok: boolean; week: number; endsAt: number; minScore: number;
+  top: { rank: number; label: string; level: number; score: number; me: boolean }[];
+  me: { rank: number; size: number; score: number } | null;
+  previous: { week: number; rank: number; size: number; score: number; tier: string | null; reward: string | null; claimable: boolean } | null;
+}
+export const fetchLeaderboard = () => post<LeaderboardResult>('/api/leaderboard', {});
 export const fetchFriends = () => post<SocialResult>('/api/friends', {});
 export const requestFriend = (code:string) => post<SocialResult>('/api/friends/add', { code });
 export const answerFriendRequest = (code:string, accept:boolean) => post<SocialResult>('/api/friends/answer', { code, accept });

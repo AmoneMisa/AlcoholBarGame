@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { fetchLeaderboard, type LeaderboardResult } from '../../telegram/api';
+import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE, leaderboardReward, describeLeaderboardReward } from '../../domain/leaderboard';
 import { RECIPES } from '../../domain/catalog';
 import { COSMETICS } from '../../domain/cosmetics';
 import {
@@ -16,8 +18,8 @@ import { featuredLegendary } from '../../sim/loot';
 import { useGameStore } from '../../stores/game';
 
 const game = useGameStore();
-const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'signature' | 'prestige'>('equipment');
-const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['signature', 'Signature'], ['prestige', 'Grand Opening']] as const;
+const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'signature' | 'weekly' | 'prestige'>('equipment');
+const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['signature', 'Signature'], ['weekly', 'Weekly'], ['prestige', 'Grand Opening']] as const;
 const scrollRecipe = ref('');
 const names = { consumable: (id: string) => consumableDef(id)?.name ?? id, equipment: (id: string) => equipmentDef(id)?.name ?? id };
 const cap = (id: string) => levelCap(game.loot.equipment[game.regionId]![id]!.tier, game.loot.prestige.perks.cap ?? 0);
@@ -63,6 +65,20 @@ const stepAmount = (row: { ingredientId: string; amount: number }, direction: 1 
 const pickIngredient = (row: { ingredientId: string; amount: number }, id: string) => { row.ingredientId = id; row.amount = ingredient(id).pourStep * (ingredient(id).unit === 'ml' ? 3 : 1); };
 const addRow = () => { const free = usableList.value.find((item) => !draftItems.value.some((row) => row.ingredientId === item.id)); if (free && draftItems.value.length < MAX_ITEMS) draftItems.value.push({ ingredientId: free.id, amount: free.pourStep * (free.unit === 'ml' ? 3 : 1) }); };
 const fame = computed(() => fameLevel(saved.value?.served ?? 0));
+// ---- Weekly leaderboard (online only) ----
+const board = ref<LeaderboardResult | null>(null);
+const boardError = ref('');
+const boardLoading = ref(false);
+async function loadBoard() {
+  if (game.mode !== 'online') return;
+  boardLoading.value = true; boardError.value = '';
+  try { board.value = await fetchLeaderboard(); } catch (error) { boardError.value = (error as Error).message; }
+  boardLoading.value = false;
+}
+watch(tab, (next) => { if (next === 'weekly') void loadBoard(); });
+watch(() => game.loot.leaderboardClaimed, () => { if (tab.value === 'weekly') void loadBoard(); });
+const daysLeft = computed(() => board.value ? Math.max(0, Math.ceil((board.value.endsAt - Date.now()) / 86_400_000)) : 0);
+const rewardTable = [1, 2, 4, 11, 30].map((rank) => ({ rank, reward: leaderboardReward(rank, MIN_WEEKLY_SCORE)! }));
 const runStars = computed(() => prestigeStarsFor(game.loot.runEarned));
 const effectText = (id: string) => {
   const item = equipmentDef(id)!;
@@ -210,6 +226,36 @@ const boostLeft = (id: string) => {
       </template>
     </div>
 
+    <div v-else-if="tab === 'weekly'" class="draw">
+      <article v-if="game.mode !== 'online'" class="card"><h3>🏆 Weekly leaderboard</h3><p>The leaderboard needs an online account. Open the game from Telegram to compete.</p></article>
+      <template v-else>
+        <article class="card">
+          <h3>🏆 This week's top bars</h3>
+          <p>Score = XP you earn this week (serving, English, lessons). A drink pays the same XP at every level, so newcomers can win. Resets in {{ daysLeft }} day{{ daysLeft === 1 ? '' : 's' }}.</p>
+          <p v-if="boardLoading">Loading…</p><p v-if="boardError" class="sig-error">{{ boardError }}</p>
+          <ol v-if="board" class="board">
+            <li v-for="row in board.top" :key="row.rank" :class="{ me: row.me }"><b>{{ row.rank }}</b><span>{{ row.label }}<small> · level {{ row.level }}</small></span><em>{{ row.score }}</em></li>
+            <li v-if="!board.top.length" class="empty">Nobody has scored yet this week. Serve a drink to take the lead.</li>
+          </ol>
+          <p v-if="board?.me">You are <b>#{{ board.me.rank }}</b> of {{ board.me.size }} with {{ board.me.score }} XP.<template v-if="board.me.rank > LEADERBOARD_SIZE"> The list shows the top {{ LEADERBOARD_SIZE }}.</template></p>
+          <p v-else-if="board">You have no score this week yet.</p>
+          <button type="button" @click="loadBoard">Refresh</button>
+        </article>
+        <article class="card">
+          <h3>🎁 Last week's reward</h3>
+          <template v-if="board?.previous">
+            <p>You finished <b>#{{ board.previous.rank }}</b> of {{ board.previous.size }} with {{ board.previous.score }} XP<template v-if="board.previous.tier"> — {{ board.previous.tier }}</template>.</p>
+            <p v-if="board.previous.reward">Reward: {{ board.previous.reward }}</p>
+            <p v-else>You need {{ MIN_WEEKLY_SCORE }} XP in a week to earn a reward.</p>
+            <button type="button" :disabled="!board.previous.claimable" @click="game.act({ type: 'claimLeaderboardReward' })">{{ board.previous.claimable ? 'Claim reward' : board.previous.reward ? 'Claimed' : 'No reward' }}</button>
+          </template>
+          <p v-else>You did not play last week. Score at least {{ MIN_WEEKLY_SCORE }} XP this week to earn a reward next week.</p>
+          <h3>Reward tiers</h3>
+          <ul class="results"><li v-for="tier in rewardTable" :key="tier.rank">{{ tier.reward.tier }}: {{ describeLeaderboardReward(tier.reward) }}</li></ul>
+        </article>
+      </template>
+    </div>
+
     <div v-else-if="tab === 'regulars'" class="grid">
       <p class="hint">Guests remember you. Every drink you serve earns loyalty (+1, +1 for VIPs, +1 for their favourite drink). Loyalty levels at {{ REGULAR_LEVELS.join(' / ') }} points pay rewards, and a regular pays {{ Math.round((REGULAR_FAVORITE_BONUS - 1) * 100) }}% more for their favourite. Level rewards: {{ REGULAR_REWARDS.map((reward) => [reward.box && reward.box + ' box', reward.parts && reward.parts + ' parts', reward.skinShards && reward.skinShards + ' skin shards', reward.crystals && reward.crystals + ' crystals'].filter(Boolean).join(' + ')).join(' → ') }}.</p>
       <article v-for="item in metRegulars" :key="item.art.id" class="card">
@@ -250,5 +296,6 @@ const boostLeft = (id: string) => {
 .card progress{width:100%;accent-color:#e7b556}.row{display:flex;flex-wrap:wrap;gap:6px}.card button,.crafts button{padding:8px 10px;border:1px solid #a97938;border-radius:8px;background:#5f3d1c;color:#ffe9bd;font-weight:800;font-size:11px;cursor:pointer}.card button:disabled,.crafts button:disabled{opacity:.4;cursor:default}
 .results{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:11px}.results li{padding:5px 8px;border-radius:7px;background:#17253a}.results li.rare,.crafts .rare{border-color:#3f86b8;color:#bfe2ff}.results li.legendary,.crafts .legendary{background:#4a3210;color:#ffe0a0}
 .crafts{display:flex;flex-wrap:wrap;gap:5px;max-height:260px;overflow:auto}input[type=text],.card>input{padding:8px;border:1px solid #40536c;border-radius:8px;background:#0c1625;color:#fff}.sig-row{align-items:center}.sig-row select{flex:1;min-width:120px}.sig-row b{min-width:58px;text-align:center;color:#fff0c8}.sig-error{color:#f2a0a0}.card label{color:#c7d3e0;font-size:11px}
+.board{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:12px}.board li{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;padding:6px 8px;border-radius:7px;background:#17253a}.board li.me{background:#4a3210;color:#ffe0a0}.board li b{color:#f4d08e}.board li em{font-style:normal;color:#fff0c8}.board .empty{display:block;color:#93a5b9}
 .hint{grid-column:1/-1;margin:0;color:#93a5b9;font-size:11px}small{color:#e4b35c}
 </style>

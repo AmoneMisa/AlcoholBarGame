@@ -15,7 +15,7 @@ import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL, economyAt, formatDeliveryTime, mar
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
-import { LootError, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
+import { LootError, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
 import { usableIngredientIds } from '../domain/usableStock';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
@@ -74,6 +74,7 @@ export type GameAction =
   | { type: 'craftSkin'; cosmeticId: string }
   | { type: 'prestige' }
   | { type: 'designSignature'; name: string; items: { ingredientId: string; amount: number }[]; needsShake: boolean }
+  | { type: 'claimLeaderboardReward' }
   | { type: 'claimQuest'; questId: string }
   | { type: 'claimAchievement'; id: string }
   | { type: 'buyPrestigePerk'; perk: string };
@@ -87,6 +88,8 @@ export interface RuleContext {
   checkEnglish: (text: string) => { ok: boolean; corrected: string; note?: string };
   // Offline practice spawns guests locally; online clients wait for the server's guest.
   spawnCustomers?: boolean;
+  // Last week's final standing, looked up by the server (never sent by the client).
+  leaderboard?: import('./loot').LeaderboardStanding;
 }
 
 const MAX_REWARDED_SENTENCES = 6;
@@ -303,6 +306,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
   if (!action || typeof action !== 'object' || typeof action.type !== 'string') throw new RuleError('Unknown action.');
   advanceClock(state, context);
   const moneyBefore = state.money;
+  const xpBefore = state.xp;
   const crystalsBefore = state.crystals;
   const guest = currentCustomer(state);
   const region = REGIONS.find((item) => item.id === state.regionId)!;
@@ -803,6 +807,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'craftSkin':
     case 'prestige':
     case 'designSignature':
+    case 'claimLeaderboardReward':
     case 'claimQuest':
     case 'claimAchievement':
     case 'buyPrestigePerk': {
@@ -819,6 +824,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           case 'craftSkin': craftSkin(state, action.cosmeticId); break;
           case 'prestige': prestige(state, now); break;
           case 'designSignature': designSignature(state, { name: action.name, items: action.items, needsShake: action.needsShake }); break;
+          case 'claimLeaderboardReward': claimLeaderboardReward(state, context.leaderboard, now); break;
           case 'claimQuest': claimQuest(state, action.questId, now); break;
           case 'claimAchievement': claimAchievement(state, action.id); break;
           case 'buyPrestigePerk': buyPrestigePerk(state, action.perk); break;
@@ -836,13 +842,15 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
   // Coins earned by serving and selling bottles decide the stars of the next Grand Opening.
   if (['serve', 'autoServe', 'sellBottle'].includes(action.type) && state.money > moneyBefore) state.loot.runEarned += Math.floor(state.money - moneyBefore);
   grantLevelBoxes(state);
+  addWeeklyScore(state, action.type === 'prestige' ? 0 : state.xp - xpBefore, now);
   if (!Number.isFinite(state.money) || state.money < 0) throw new RuleError('Not enough money.');
   if (!Number.isFinite(state.crystals) || state.crystals < 0) throw new RuleError('Not enough crystals.');
-  return { moneyDelta: coins(state.money - moneyBefore), crystalDelta: state.crystals - crystalsBefore, audit: auditEntry(state, action) };
+  return { moneyDelta: coins(state.money - moneyBefore), crystalDelta: state.crystals - crystalsBefore, audit: auditEntry(state, action),
+    weekly: { week: state.loot.weekly.week, score: state.loot.weekly.score, label: state.bars[state.regionId].name, level: levelFor(state.xp) } };
 }
 
 // Loot actions leave a trail (what was rolled, pity, prestige) for the server's loot ledger.
-const AUDITED = new Set<GameAction['type']>(['openBox', 'pickReward', 'buyBox', 'buyConsumable', 'drawStyle', 'craftSkin', 'prestige', 'buyPrestigePerk', 'claimQuest', 'claimAchievement']);
+const AUDITED = new Set<GameAction['type']>(['openBox', 'pickReward', 'buyBox', 'buyConsumable', 'drawStyle', 'craftSkin', 'prestige', 'buyPrestigePerk', 'claimLeaderboardReward', 'claimQuest', 'claimAchievement']);
 export interface LootAudit { action: string; message: string; detail: Record<string, unknown>; }
 function auditEntry(state: PlayerState, action: GameAction): LootAudit | undefined {
   if (!AUDITED.has(action.type)) return undefined;

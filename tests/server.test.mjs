@@ -340,3 +340,61 @@ test('Friends can gift consumables and skin shards; limits, ownership and friend
   assert.equal(after.skinShards, 2);
   assert.equal((await service.sendGift(strangerId, b.player.friendCode, { kind: 'skin-shards', amount: 5 })).body.ok, false, 'strangers cannot gift');
 });
+
+test('Weekly leaderboard: ranks by XP earned this week, shows bar names only, and pays last week\'s reward once from the server rank', async () => {
+  const { weekOf, WEEK_MS } = await import('../src/domain/quests.ts');
+  const { dailyLessonsFor } = await import('../src/domain/dailyLessons.ts');
+  const { calendarDate } = await import('../src/domain/economy.ts');
+  let clock = Date.UTC(2026, 8, 30, 12);
+  const { repository, service } = makeService(() => clock);
+  const a = identity(1001), b = identity(1002), c = identity(1003);
+  const sa = await service.session(a), sb = await service.session(b), sc = await service.session(c);
+  const lessons = dailyLessonsFor(calendarDate(new Date(clock)));
+  for (const [who, count] of [[a, 3], [b, 2], [c, 1]]) for (const lesson of lessons.slice(0, count)) {
+    assert.equal((await act(service, { type: 'completeDailyLesson', lessonId: lesson.id, answer: lesson.answer }, requestId(), who)).ok, true);
+  }
+  const week = weekOf(clock);
+  let board = await service.leaderboard(a);
+  assert.deepEqual(board.top.map((row) => row.me), [true, false, false]);
+  assert.ok(board.top[0].score > board.top[1].score && board.top[1].score > board.top[2].score);
+  assert.equal(board.me.rank, 1);
+  assert.equal(board.top[0].label, repository.states.get(sa.player.id).state.bars['new-york'].name);
+  assert.doesNotMatch(JSON.stringify(board), /Player 100/, 'account names are never exposed');
+  assert.equal((await service.leaderboard(c)).me.rank, 3);
+
+  // Set known final scores for the week, then move to the next week.
+  await repository.transaction(async (tx) => {
+    await tx.setWeeklyScore(Number(sa.player.id), week, { score: 500, label: 'Bar A', level: 5 });
+    await tx.setWeeklyScore(Number(sb.player.id), week, { score: 400, label: 'Bar B', level: 5 });
+    await tx.setWeeklyScore(Number(sc.player.id), week, { score: 100, label: 'Bar C', level: 5 });
+  });
+  clock += WEEK_MS;
+  board = await service.leaderboard(a);
+  assert.equal(board.top.length, 0, 'a new week starts empty');
+  assert.equal(board.previous.rank, 1);
+  assert.equal(board.previous.claimable, true);
+  assert.equal(board.previous.tier, 'Champion');
+
+  // A client cannot dictate its rank.
+  const forged = await service.act(b, { requestId: requestId(), action: { type: 'claimLeaderboardReward', standing: { week: week, rank: 1, size: 1, score: 9999 } } });
+  assert.equal(forged.body.ok, true);
+  assert.equal(repository.states.get(sb.player.id).state.loot.boxes.gold ?? 0, 0, 'rank 2 gets podium rewards, not champion');
+  assert.equal(repository.states.get(sb.player.id).state.loot.boxes.silver, 1);
+  const crystalsB = repository.states.get(sb.player.id).state.crystals;
+  assert.ok(crystalsB >= 30 && crystalsB < 60, 'podium crystals (plus lesson crystals), not the champion 60');
+
+  const first = await act(service, { type: 'claimLeaderboardReward' }, requestId(), a);
+  assert.equal(first.ok, true);
+  const stateA = repository.states.get(sa.player.id).state;
+  assert.equal(stateA.loot.boxes.choice, 1);
+  assert.equal(stateA.loot.boxes.gold, 1);
+  assert.ok(stateA.crystals >= 60);
+  assert.equal((await act(service, { type: 'claimLeaderboardReward' }, requestId(), a)).ok, false, 'claimed once');
+  assert.equal((await act(service, { type: 'claimLeaderboardReward' }, requestId(), c)).ok, false, 'too low a score');
+  assert.equal((await service.leaderboard(a)).previous.claimable, false);
+  assert.ok(repository.lootLedger.some((entry) => entry.action === 'claimLeaderboardReward'));
+
+  // Two weeks later last week is empty for everyone: nothing to claim.
+  clock += WEEK_MS;
+  assert.equal((await act(service, { type: 'claimLeaderboardReward' }, requestId(), a)).ok, false);
+});

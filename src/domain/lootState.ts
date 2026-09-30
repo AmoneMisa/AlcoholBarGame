@@ -38,6 +38,9 @@ export interface LootState {
   giftsSent?: { day: string; count: number };
   // One signature cocktail per bar, invented by the player.
   signatures: Record<string, Signature | undefined>;
+  // XP earned in the current UTC week (the leaderboard score) and the last week whose reward was claimed.
+  weekly: { week: number; score: number };
+  leaderboardClaimed: number;
 }
 
 export const createLoot = (): LootState => ({
@@ -45,7 +48,7 @@ export const createLoot = (): LootState => ({
   equipment: Object.fromEntries(REGIONS.map((region) => [region.id, Object.fromEntries(EQUIPMENT.map((item) => [item.id, newSlot()]))])),
   pity: { sinceRare: 0, sinceLegendary: 0 }, lastDraw: [],
   prestige: { stars: 0, earned: 0, count: 0, perks: {} }, runEarned: 0, levelRewarded: 1, log: [],
-  stats: {}, quests: { week: 0, progress: {}, claimed: [] }, achievements: [], tasted: [], regulars: {}, spoiledAt: 0, signatures: {}
+  stats: {}, quests: { week: 0, progress: {}, claimed: [] }, achievements: [], tasted: [], regulars: {}, spoiledAt: 0, signatures: {}, weekly: { week: 0, score: 0 }, leaderboardClaimed: 0
 });
 
 const count = (value: unknown, max = 1_000_000) => Number.isFinite(value) && (value as number) > 0 ? Math.min(max, Math.floor(value as number)) : 0;
@@ -92,6 +95,8 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
     regulars: counts(source.regulars, CUSTOMER_ART_BY_SLOT),
     spoiledAt: count(source.spoiledAt, 1e14),
     signatures: cleanSignatures(source.signatures),
+    weekly: { week: count(source.weekly?.week, 1e6), score: count(source.weekly?.score, 1e9) },
+    leaderboardClaimed: count(source.leaderboardClaimed, 1e6),
     giftsSent: typeof source.giftsSent?.day === 'string' ? { day: source.giftsSent.day.slice(0, 10), count: count(source.giftsSent.count, 1000) } : undefined,
     log: Array.isArray(source.log) ? source.log.filter((line) => typeof line === 'string').slice(0, 20) : []
   };

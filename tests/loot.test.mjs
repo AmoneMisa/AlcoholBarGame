@@ -95,15 +95,15 @@ test('Boosters last for their duration and cannot stack; charges arm once', () =
 });
 
 test('Golden Ice pays more and always tips on the next perfect serve, and is used up', () => {
+  // Both serves start from the same guest, so only Golden Ice can make the difference.
+  const base = fresh();
+  const guest = base.customers[0];
+  guest.modifierId = undefined; guest.orderKind = 'cocktail'; guest.orderRevealed = true;
+  for (const stock of base.inventories['new-york']) stock.amount = 5000;
+  const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
   const serve = (armed) => {
-    const state = fresh();
+    const state = structuredClone(base);
     if (armed) state.loot.armed['golden-ice'] = 1;
-    const guest = state.customers[0];
-    guest.modifierId = undefined;
-    guest.orderKind = 'cocktail';
-    guest.orderRevealed = true;
-    const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
-    for (const stock of state.inventories['new-york']) stock.amount = 5000;
     run(state, { type: 'serve', mix: recipe.ingredients.map((item) => ({ ...item })), shaken: true, pourBrands: {} });
     return state;
   };

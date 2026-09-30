@@ -40,3 +40,10 @@ Consumables (one per gift) and skin shards (5 / 10 / 20) can be sent to friends 
 - **Guests:** about 15 % of arriving guests come for it. They only say they heard about the house special; the bartender must bring it up in the English conversation (by name or "the house special") before the order is confirmed and the drink can be served. The snapshot (`Customer.signature`, `orderRecipeId = 'signature'`) is hidden from the client until then, judged by `requiredRecipe`, and cannot be swapped. The invented name is masked for the spell checker, and a signature talk counts as difficulty 3 for the perfect-English reward.
 - **Fame:** serves at 10 / 30 / 60 raise price by 5 % per level and pay a bronze / silver / choice box. Achievement: serve it 50 times.
 - Saved signatures are re-validated when loaded; the price is always recomputed.
+
+## Weekly leaderboard
+`domain/leaderboard.ts`, `sim/loot.ts`, `server/gameService.mjs`, `database/migrations/006_weekly_scores.sql`.
+- **Score** = XP earned in the current UTC week (`loot.weekly`, measured as the XP change of each action, so it follows every XP source, and ignores prestige resets). A drink pays the same XP at any level, so newcomers compete with veterans.
+- **Storage:** one `weekly_scores` row per player per week, upserted by the server after an action that changed the score (it only ever goes up). The public label is the **bar name**, never the account name. Ties are won by whoever reached the score first.
+- **API:** `POST /api/leaderboard` returns the top 20, the player's rank, and last week's standing with a `claimable` reward.
+- **Rewards** (claim once, for the previous week only, needs 300 XP): Champion #1 choice + gold box + 60 crystals; Podium #2-3 choice + silver + 30; Top 10 gold + 15; Top 25 silver; everyone else with 300 XP a bronze box. The rank is looked up by the server (`RuleContext.leaderboard`) and is never read from the client's action; offline practice has no leaderboard.

@@ -26,6 +26,10 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
     } catch (error) { next(error); }
   });
 
+  app.post('/api/leaderboard', auth, limiter, async (request, response, next) => {
+    try { response.json(await service.leaderboard(request.identity)); } catch (error) { next(error); }
+  });
+
   app.post('/api/friends', auth, limiter, async (request, response, next) => {
     try { response.json(await service.friends(request.identity)); } catch (error) { next(error); }
   });
