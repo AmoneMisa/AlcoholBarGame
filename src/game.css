@@ -1327,3 +1327,4 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
 .sound-toggles button .ui-icon { width: 16px; height: 16px; }
 .sound-toggles button small { font-size: 8px; letter-spacing: .08em; }
 .sound-toggles button.off { color: #6b778b; }
+.bartender-custom .bartender3d { min-height:390px; }

@@ -62,3 +62,11 @@ Source: https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_1
 This is a local game economy, not a server-authoritative economy: saves and daily claims use local storage and the device calendar. Clearing storage or changing the device clock can affect progression. Cross-device syncing and anti-cheat require a backend.
 
 The English checker is an explainable short-conversation rule checker with a spelling dictionary, not a general-purpose language model. Customer replies are generated from recipe/taste rules. Portraits use sprite motion rather than frame-by-frame facial animation. Some ingredient art remains hand-authored SVG and the playable glass remains CSS geometry; these are intentionally code-native assets, not a 3D fluid simulation. The HUD clock is a static evening-shift indicator.
+
+## 3D bartender (prototype)
+
+The bartender is now a rigged 3D character rendered with three.js (`src/components/characters/Bartender3D.vue`), with the painted 2D character kept only as a fallback for devices without WebGL.
+
+- **Model:** `public/assets/characters3d/bartender.glb`, built by `python scripts/blender/build_bartender.py` (needs `pip install bpy==4.2.0`). It contains one skeleton, face and body morph targets, 18 hair styles, 9 facial-hair styles, clothing parts and 13 animation clips.
+- **Customisation:** `src/domain/character3d.ts` maps the saved bar profile (face, eyes, brows, nose, lips, cheeks, body, bust, skin/hair/eye/lip colours, hair, beard, outfit) to morph weights, colours and visible meshes. `tests/character3d.test.mjs` checks every option against the real GLB.
+- **Not yet in 3D:** freckles, tattoos and scars, eyeliner, eyeshadow and blush (need textures); customers; the special outfits are recolours of the vest outfit.

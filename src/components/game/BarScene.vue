@@ -11,11 +11,25 @@ import { haptic } from '../../telegram/webapp';
 import BottleModel from '../cocktails/BottleModel.vue';
 import GlassModel from '../cocktails/GlassModel.vue';
 import CharacterModel from '../characters/CharacterModel.vue';
+import Bartender3D from '../characters/Bartender3D.vue';
 import CityEvent from './CityEvent.vue';
 import { INTERIORS, shelfStyleFor } from '../../data/cosmetics/bars';
 import { sceneLayout } from '../../data/cosmetics/barLines';
 
 const game = useGameStore();
+
+// The bartender acts out what the player does: pour, shake, serve; talk while a guest is in conversation.
+const oneShot = ref<string>();
+let oneShotTimer: ReturnType<typeof setTimeout> | undefined;
+function act(name: string, ms: number) {
+  oneShot.value = name;
+  clearTimeout(oneShotTimer);
+  oneShotTimer = setTimeout(() => { oneShot.value = undefined; }, ms);
+}
+const bartenderAnimation = computed(() => oneShot.value ?? (game.conversationCustomerId ? 'talk' : 'idle'));
+watch(() => game.currentMix.reduce((sum, item) => sum + item.amount, 0), (now, before) => { if (now > before) act('pour', 1800); else if (now === 0 && before > 0) act('serve', 2000); });
+watch(() => game.shaken, (now) => { if (now) act('shake', 2200); });
+onBeforeUnmount(() => clearTimeout(oneShotTimer));
 withDefaults(defineProps<{ active?: boolean }>(), { active: true });
 const glassTarget = ref<HTMLElement>();
 // Everything lives in the painting: our bottles stand on the background's own back-bar planks, the bartender
@@ -381,7 +395,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div class="bartender-layer">
-      <CharacterModel role="bartender" :character-id="game.decor.bartenderCharacter ?? 'noa'" :outfit="game.decor.bartender" :face-style="game.decor.face" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :skin-detail="game.decor.skinDetail" :skin-tone="game.decor.skinTone" :tan-level="game.decor.tanLevel" :bust="game.decor.bust" :pose="game.decor.pose" :eye-shape="game.decor.eyeShape" :brow-shape="game.decor.browShape" :nose-shape="game.decor.noseShape" :lip-shape="game.decor.lipShape" :cheek-shape="game.decor.cheekShape" :eye-color="game.decor.eyeColor" :eyeliner="game.decor.eyeliner" :eyeshadow="game.decor.eyeshadow" :lip-color="game.decor.lipColor" :blush="game.decor.blush" :facial-hair="game.decor.facialHair" animation="idle" />
+      <Bartender3D crop="full" :look="game.decor" :animation="bartenderAnimation" :expression="game.hasCustomer ? 'smile' : 'neutral'" />
       <span class="name-ribbon">{{ (game.decor.bartenderNickname || (game.decor.bartenderCharacter === 'leo' ? 'Leo' : 'Noa')).toUpperCase() }} · BARTENDER</span>
     </div>
     <div class="bar-line-tint" aria-hidden="true"></div>

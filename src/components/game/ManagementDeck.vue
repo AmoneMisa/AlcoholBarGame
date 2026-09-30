@@ -11,7 +11,7 @@ import { useGameStore } from '../../stores/game';
 import BottleModel from '../cocktails/BottleModel.vue';
 import RecipeMastery from '../cocktails/RecipeMastery.vue';
 import GlassModel from '../cocktails/GlassModel.vue';
-import CharacterModel from '../characters/CharacterModel.vue';
+import Bartender3D from '../characters/Bartender3D.vue';
 import PairingAdvisor from '../PairingAdvisor.vue';
 import MarketPanel from './MarketPanel.vue';
 import { useGuide } from '../../composables/useGuide';
@@ -188,7 +188,7 @@ function selectBartender(id: 'noa' | 'leo') {
       <div class="design-grid-new">
         <div class="mini-interior" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="game.barInteriorStyle"><span></span><b>{{ game.decor.name }}</b><i></i><em>{{ game.region.name }} · Saved automatically</em></div>
         <div class="bartender-custom">
-          <CharacterModel role="bartender" :character-id="selectedBartender" :outfit="game.decor.bartender" :face-style="game.decor.face" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :skin-detail="game.decor.skinDetail" :skin-tone="game.decor.skinTone" :tan-level="game.decor.tanLevel" :bust="game.decor.bust" :pose="game.decor.pose" :eye-shape="game.decor.eyeShape" :brow-shape="game.decor.browShape" :nose-shape="game.decor.noseShape" :lip-shape="game.decor.lipShape" :cheek-shape="game.decor.cheekShape" :eye-color="game.decor.eyeColor" :eyeliner="game.decor.eyeliner" :eyeshadow="game.decor.eyeshadow" :lip-color="game.decor.lipColor" :blush="game.decor.blush" :facial-hair="game.decor.facialHair" />
+          <Bartender3D :look="{ ...game.decor, bartenderCharacter: selectedBartender }" crop="full" />
           <div class="bartender-selector" aria-label="Choose bartender">
             <button v-for="person in [{id:'noa',label:'Woman'},{id:'leo',label:'Man'}] as const" :key="person.id" :class="{ active: selectedBartender === person.id }" type="button" @click="selectBartender(person.id)">{{ person.label }}</button>
           </div>
