@@ -1,59 +1,79 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { RECIPES } from '../../domain/catalog';
 import { useGameStore } from '../../stores/game';
+import { NOTIFICATION_EVENTS, useNotificationsStore } from '../../stores/notifications';
 import UiIcon from '../ui/UiIcon.vue';
 
 const game = useGameStore();
+const notifications = useNotificationsStore();
 const inviteStatus = ref('');
-const giftRecipient = ref('');
-const spareRecipes = computed(() => RECIPES.map((recipe) => ({ recipe, quantity: game.recipeCopies[recipe.id] ?? 0 })).filter((item) => item.quantity > 0));
-const spareCosmetics = computed(() => game.cosmetics.map((cosmetic) => ({ cosmetic, quantity:game.cosmeticCopies[cosmetic.id] ?? 0 })).filter((item) => item.quantity > 0));
+const searchCode = ref(new URLSearchParams(location.search).get('friend') ?? '');
+const labels = ref<Record<string,string>>({});
+const giftOpen = ref(false);
+const accepted = computed(() => game.friends.filter((friend) => friend.status === 'accepted'));
+const incoming = computed(() => game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'incoming'));
+const outgoing = computed(() => game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'outgoing'));
+const recipeCards = computed(() => RECIPES.map((recipe) => ({ recipe, quantity:game.recipeCopies[recipe.id] ?? 0 })).filter((item) => item.quantity > 0));
+const styleItems = computed(() => game.cosmetics.map((cosmetic) => ({ cosmetic, quantity:game.cosmeticCopies[cosmetic.id] ?? 0 })).filter((item) => item.quantity > 0));
 
 async function shareInvite() {
-  const url = typeof window === 'undefined' ? '' : window.location.href.split('?')[0]!;
-  const text = `Join me in Alcohol Lingo and build your own bar. I’m playing at ${game.decor.name}.`;
-  try {
-    if (navigator.share) await navigator.share({ title: 'Alcohol Lingo', text, url });
-    else {
-      await navigator.clipboard.writeText(`${text} ${url}`);
-      inviteStatus.value = 'Invite link copied.';
-    }
-  } catch (error) {
-    if ((error as Error).name !== 'AbortError') inviteStatus.value = 'Could not share the link on this device.';
-  }
+  const app = new URL(`${location.origin}${import.meta.env.BASE_URL}`);
+  app.searchParams.set('friend',game.playerFriendCode);
+  const text = `Join my bar in Alcohol Lingo. My friend code is ${game.playerFriendCode}.`;
+  const telegramShare = `https://t.me/share/url?url=${encodeURIComponent(app.toString())}&text=${encodeURIComponent(text)}`;
+  if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(telegramShare);
+  else window.open(telegramShare,'_blank','noopener,noreferrer');
+  inviteStatus.value = 'Telegram invitation opened.';
 }
+async function add() {
+  if (await game.addFriend(searchCode.value)) searchCode.value = '';
+}
+async function saveLabel(code:string,current:string) {
+  await game.renameFriend(code,labels.value[code] ?? current);
+}
+onMounted(async () => {
+  await game.loadFriends();
+  for (const friend of game.friends) labels.value[friend.code] = friend.customName;
+});
 </script>
 
 <template>
   <section class="friends-page game-panel">
     <header class="friends-hero">
-      <div><small>YOUR BAR CIRCLE{{ game.playerId ? ` · PLAYER ${game.playerId}` : '' }}</small><h2>Friends</h2><p>Invite friends to practise English, compare bars and exchange spare recipe cards and cosmetics.</p></div>
-      <button type="button" @click="shareInvite"><UiIcon name="friends" /><span><b>Invite a friend</b><small>Send the game link</small></span></button>
+      <div><small>YOUR BAR CIRCLE</small><h2>Friends</h2><p>Visit friends, send a gift from their bar and grow each other’s popularity.</p></div>
+      <button type="button" @click="shareInvite"><UiIcon name="friends" /><span><b>Invite in Telegram</b><small>Share the game and your code</small></span></button>
     </header>
     <p v-if="inviteStatus" class="friend-status" aria-live="polite">{{ inviteStatus }}</p>
+
+    <div class="friend-tools">
+      <article class="friend-code"><small>YOUR PERMANENT FRIEND CODE</small><b>{{ game.playerFriendCode || '—' }}</b><span>This numeric code never changes.</span></article>
+      <form @submit.prevent="add"><label for="friend-search">FIND A PLAYER</label><div><input id="friend-search" v-model="searchCode" inputmode="numeric" pattern="[0-9]*" maxlength="12" placeholder="Numeric friend code" /><button type="submit">Send request</button></div></form>
+      <article class="popularity"><small>POPULARITY</small><b>{{ game.popularity }} / 30</b><progress :value="Math.min(game.popularity,30)" max="30"></progress><p>Each first visit of the day gives the bar owner +1.</p><div><button type="button" :disabled="game.popularity < 30 || !!game.popularityBoost" @click="game.activatePopularityBoost('no-cooldown')">15 min · no guest cooldown</button><button type="button" :disabled="game.popularity < 30 || !!game.popularityBoost" @click="game.activatePopularityBoost('vip-run')">3–5 VIP guests</button></div></article>
+    </div>
+
+    <section v-if="incoming.length" class="request-list"><header><small>NEW REQUESTS</small><h3>Confirm who joins your circle</h3></header><article v-for="friend in incoming" :key="friend.code"><span><b>{{ friend.nickname }}</b><small>Code {{ friend.code }}</small></span><button type="button" @click="game.answerFriend(friend.code,true)">Accept</button><button class="quiet" type="button" @click="game.answerFriend(friend.code,false)">Decline</button></article></section>
+    <p v-if="outgoing.length" class="pending-line">Waiting for: {{ outgoing.map((friend) => friend.nickname).join(', ') }}</p>
+
     <div class="friends-layout">
       <section class="friends-list">
-        <header><div><small>FRIEND LIST</small><h3>Your people</h3></div><span>0 connected</span></header>
-        <div class="friends-empty"><UiIcon name="friends" /><h3>No friends connected yet</h3><p>Send an invitation from this screen. Friends linked to your account will be shown here with their bar, level and online status.</p><button type="button" @click="shareInvite">Share invitation</button></div>
+        <header><div><small>FRIEND LIST</small><h3>Your people</h3></div><span>{{ accepted.length }} connected</span></header>
+        <div v-if="accepted.length" class="friend-cards"><article v-for="friend in accepted" :key="friend.code"><div><b>{{ friend.nickname }}</b><small v-if="friend.customName">{{ friend.customName }}</small><em>Code {{ friend.code }}</em></div><div class="friend-alias"><input v-model="labels[friend.code]" maxlength="28" :placeholder="friend.customName || 'Add a one-line name'" :aria-label="`Custom name for ${friend.nickname}`" /><button type="button" @click="saveLabel(friend.code,friend.customName)">Save</button></div><button class="visit" type="button" @click="game.visitFriend(friend.code)">Visit bar</button></article></div>
+        <div v-else class="friends-empty"><UiIcon name="friends" /><h3>No friends connected yet</h3><p>Find each other by the permanent numeric code, then confirm the incoming request.</p><button type="button" @click="shareInvite">Invite in Telegram</button></div>
       </section>
-      <aside class="friend-recipes">
-        <small>RECIPE GIFTS</small><h3>Spare cards</h3><p>Duplicate cards remain in your inventory and can be gifted after a friend is connected.</p>
-        <div v-if="spareRecipes.length"><article v-for="item in spareRecipes.slice(0,6)" :key="item.recipe.id"><span>{{ item.recipe.name }}</span><b>×{{ item.quantity }}</b></article></div>
-        <p v-else class="no-spares">No spare recipe cards yet. VIP customers, daily lessons and gifts can drop duplicates.</p>
-        <div class="cosmetic-gifts">
-          <small>STYLE GIFTS</small><h3>Duplicate cosmetics</h3><p>Enter a friend code or nickname, then send one duplicate won in the daily style draw.</p>
-          <input v-model="giftRecipient" inputmode="numeric" maxlength="12" placeholder="Friend player code" aria-label="Friend player code" />
-          <article v-for="item in spareCosmetics" :key="item.cosmetic.id"><span><b>{{ item.cosmetic.label }}</b><small>{{ item.cosmetic.key.replace(/([A-Z])/g,' $1') }}{{ item.cosmetic.character ? ` · ${item.cosmetic.character === 'noa' ? 'woman' : 'man'}` : '' }}</small></span><strong>×{{ item.quantity }}</strong><button type="button" :disabled="!giftRecipient.trim()" @click="game.giftCosmetic(item.cosmetic.id,giftRecipient)">Gift</button></article>
-          <p v-if="!spareCosmetics.length" class="no-spares">No duplicate cosmetics yet. The first copy unlocks the style; later copies can be gifted.</p>
-        </div>
+
+      <aside v-if="game.visitedFriend" class="friend-visit">
+        <small>VISITING NOW</small><h3>{{ game.visitedFriend.nickname }}</h3><p v-if="game.visitedFriend.customName">{{ game.visitedFriend.customName }}</p><strong>{{ game.visitedFriend.name }} · level {{ game.visitedFriend.level }}</strong><ul><li>{{ game.visitedFriend.recipes }} recipes</li><li>{{ game.visitedFriend.interiors }} interiors</li></ul>
+        <button class="gift-toggle" type="button" @click="giftOpen=!giftOpen"><UiIcon name="gift" /> Send a gift</button>
+        <div v-if="giftOpen" class="gift-inventory"><small>CHOOSE FROM YOUR INVENTORY</small><article v-for="item in recipeCards" :key="item.recipe.id"><span>{{ item.recipe.name }} <b>×{{ item.quantity }}</b></span><button type="button" @click="game.giftFriend({kind:'recipe-copy',recipeId:item.recipe.id})">Send</button></article><article v-for="item in styleItems" :key="item.cosmetic.id"><span>{{ item.cosmetic.label }} <b>×{{ item.quantity }}</b></span><button type="button" @click="game.giftFriend({kind:'cosmetic-copy',cosmeticId:item.cosmetic.id})">Send</button></article><p v-if="!recipeCards.length&&!styleItems.length">No giftable recipe cards or styles in your inventory.</p></div>
       </aside>
+      <aside v-else class="visit-empty"><UiIcon name="pin" /><h3>Choose a friend to visit</h3><p>Their current bar appears here. The first visit each day adds one popularity to their account.</p></aside>
     </div>
+    <section class="notification-settings"><header><small>NOTIFICATIONS</small><h3>Choose every event separately</h3></header><label v-for="event in NOTIFICATION_EVENTS" :key="event.id"><span><b>{{ event.label }}</b><small>{{ event.detail }}</small></span><input type="checkbox" :checked="notifications.prefs[event.id]" @change="notifications.setEnabled(event.id,($event.target as HTMLInputElement).checked)" /></label></section>
   </section>
 </template>
 
 <style scoped>
-.friends-page{overflow:hidden}.friends-hero{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px;background:radial-gradient(circle at 10% 20%,#4f334b,#16243a 66%);border-bottom:1px solid #354762}.friends-hero small,.friends-list small,.friend-recipes>small{color:#e4b35c;font-size:9px;font-weight:900;letter-spacing:.13em}.friends-hero h2{margin:5px 0;font:700 29px Georgia,serif}.friends-hero p{margin:0;color:#bdc8d6;font-size:13px}.friends-hero>button{display:flex;min-width:205px;align-items:center;gap:10px;padding:12px 15px;border:1px solid #b78649;border-radius:12px;background:#3b2b1f;color:#fff0ce;text-align:left;cursor:pointer}.friends-hero>button .ui-icon{width:29px;height:29px;color:#f2bd58}.friends-hero>button b,.friends-hero>button small{display:block}.friends-hero>button small{margin-top:2px;color:#c8aa76;letter-spacing:0}.friend-status{margin:10px 14px 0;padding:8px 10px;border:1px solid #3e7756;border-radius:8px;background:#173425;color:#b9e5c6;font-size:11px}.friends-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(250px,.7fr);gap:12px;padding:14px}.friends-list,.friend-recipes{min-height:320px;padding:16px;border:1px solid #354762;border-radius:13px;background:#111c2d}.friends-list>header{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #304159;padding-bottom:10px}.friends-list h3,.friend-recipes h3{margin:4px 0;font:700 20px Georgia,serif}.friends-list>header span{color:#95a7bb;font-size:10px}.friends-empty{display:grid;min-height:240px;place-items:center;align-content:center;text-align:center}.friends-empty>.ui-icon{width:48px;height:48px;color:#6f829a}.friends-empty h3{margin:10px 0 4px}.friends-empty p{max-width:440px;margin:0;color:#9eafc1;font-size:12px;line-height:1.5}.friends-empty button{margin-top:14px;padding:10px 16px;border:1px solid #9a6a2a;border-radius:9px;background:#6d4922;color:#fff0ce;font-weight:900;cursor:pointer}.friend-recipes>p{color:#9eafc1;font-size:11px;line-height:1.5}.friend-recipes>div{display:grid;gap:6px;margin-top:12px}.friend-recipes article{display:flex;justify-content:space-between;gap:8px;padding:9px;border:1px solid #34465e;border-radius:8px;background:#17253a;font-size:11px}.friend-recipes article b{color:#f2bd58}.no-spares{padding:12px;border:1px dashed #40516a;border-radius:9px}.friend-recipes .no-spares{color:#93a5b9}
-.cosmetic-gifts{margin-top:18px;padding-top:14px;border-top:1px solid #34465e}.cosmetic-gifts>small{color:#e4b35c;font-size:9px;font-weight:900;letter-spacing:.13em}.cosmetic-gifts>p{color:#9eafc1;font-size:11px;line-height:1.45}.cosmetic-gifts>input{box-sizing:border-box;width:100%;min-height:42px;padding:9px 11px;border:1px solid #40536c;border-radius:9px;background:#0c1625;color:#fff}.cosmetic-gifts article{align-items:center}.cosmetic-gifts article span{display:grid;gap:2px}.cosmetic-gifts article span small{color:#93a5b9;font-size:8px}.cosmetic-gifts article button{padding:7px 9px;border:1px solid #a97938;border-radius:7px;background:#5f3d1c;color:#ffe9bd;font-weight:800}.cosmetic-gifts article button:disabled{opacity:.4}.cosmetic-gifts article strong{color:#f2bd58}
-@media(max-width:760px){.friends-hero{display:grid;padding:16px 12px}.friends-hero>button{width:100%;min-width:0}.friends-layout{grid-template-columns:1fr;padding:10px}.friends-list,.friend-recipes{min-height:0;padding:13px}.friends-empty{min-height:220px}}
+.friends-page{overflow:hidden}.friends-hero{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px;background:radial-gradient(circle at 10% 20%,#4f334b,#16243a 66%);border-bottom:1px solid #354762}.friends-page small{color:#e4b35c;font-size:9px;font-weight:900;letter-spacing:.12em}.friends-hero h2{margin:5px 0;font:700 29px Georgia,serif}.friends-hero p,.popularity p{margin:0;color:#bdc8d6;font-size:12px}.friends-hero>button,.gift-toggle{display:flex;align-items:center;gap:9px;padding:11px 14px;border:1px solid #b78649;border-radius:11px;background:#3b2b1f;color:#fff0ce;text-align:left;cursor:pointer}.friends-hero>button .ui-icon,.gift-toggle .ui-icon{width:26px;height:26px;color:#f2bd58}.friends-hero>button b,.friends-hero>button small{display:block}.friend-status,.pending-line{margin:10px 14px 0;padding:8px 10px;border:1px solid #3e7756;border-radius:8px;background:#173425;color:#b9e5c6;font-size:11px}.friend-tools{display:grid;grid-template-columns:.7fr 1.15fr 1.4fr;gap:10px;padding:14px}.friend-tools>article,.friend-tools>form,.request-list,.friends-list,.friend-visit,.visit-empty{padding:14px;border:1px solid #354762;border-radius:13px;background:#111c2d}.friend-code{display:grid;align-content:center;gap:4px}.friend-code b{color:#fff0c8;font:700 25px Georgia,serif;letter-spacing:.12em}.friend-code span{color:#91a2b5;font-size:10px}.friend-tools form label{display:block;margin-bottom:8px;color:#e4b35c;font-size:9px;font-weight:900;letter-spacing:.12em}.friend-tools form>div,.friend-alias{display:flex;gap:6px}.friend-tools input,.friend-alias input{min-width:0;flex:1;padding:9px;border:1px solid #40536c;border-radius:8px;background:#0c1625;color:#fff}.friend-tools button,.request-list button,.friend-alias button,.visit,.gift-inventory button{padding:8px 10px;border:1px solid #a97938;border-radius:8px;background:#5f3d1c;color:#ffe9bd;font-weight:800;cursor:pointer}.popularity b{display:block;margin:4px 0;color:#fff0c8;font-size:18px}.popularity progress{width:100%;accent-color:#e7b556}.popularity>div{display:flex;gap:6px;margin-top:9px}.popularity button{flex:1;font-size:9px}.popularity button:disabled,.gift-inventory button:disabled{opacity:.4}.request-list{margin:0 14px}.request-list h3,.friends-list h3,.friend-visit h3,.visit-empty h3{margin:4px 0;font:700 20px Georgia,serif}.request-list article{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:7px;padding:8px 0;border-top:1px solid #304159}.request-list article span,.friend-cards article>div:first-child{display:grid;gap:2px}.request-list .quiet{border-color:#4c5d73;background:#18263a}.friends-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(250px,.7fr);gap:12px;padding:14px}.friends-list>header{display:flex;justify-content:space-between;border-bottom:1px solid #304159;padding-bottom:10px}.friends-list>header span{color:#95a7bb;font-size:10px}.friend-cards{display:grid;gap:8px;margin-top:10px}.friend-cards article{display:grid;grid-template-columns:minmax(110px,.7fr) minmax(170px,1fr) auto;align-items:center;gap:8px;padding:10px;border:1px solid #34465e;border-radius:9px;background:#17253a}.friend-cards small{color:#b9c6d5;letter-spacing:0;text-transform:none}.friend-cards em{color:#8294aa;font-size:8px;font-style:normal}.friends-empty,.visit-empty{display:grid;min-height:230px;place-items:center;align-content:center;text-align:center}.friends-empty>.ui-icon,.visit-empty>.ui-icon{width:46px;height:46px;color:#71849b}.friends-empty p,.visit-empty p{max-width:390px;color:#9eafc1;font-size:12px;line-height:1.5}.friends-empty button{padding:10px 16px;border:1px solid #9a6a2a;border-radius:9px;background:#6d4922;color:#fff0ce;font-weight:900}.friend-visit>p{margin:0;color:#b9c6d5}.friend-visit>strong{display:block;margin:8px 0;color:#f4d08e}.friend-visit ul{padding-left:18px;color:#aebdce;font-size:11px}.gift-toggle{width:100%;justify-content:center}.gift-inventory{display:grid;gap:5px;margin-top:10px}.gift-inventory article{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px;border:1px solid #34465e;border-radius:8px;background:#17253a;font-size:10px}.gift-inventory article b{color:#f2bd58}.gift-inventory>p{color:#93a5b9;font-size:10px;line-height:1.4}.notification-settings{margin:0 14px 14px;padding:14px;border:1px solid #354762;border-radius:13px;background:#111c2d}.notification-settings h3{margin:4px 0 10px;font:700 20px Georgia,serif}.notification-settings label{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid #2d4059}.notification-settings label span{display:grid;gap:2px}.notification-settings label small{color:#91a2b5;letter-spacing:0;text-transform:none}.notification-settings input{width:20px;height:20px;accent-color:#dca94e}
+@media(max-width:760px){.friends-hero{display:grid;padding:16px 12px}.friends-hero>button{width:100%}.friend-tools{grid-template-columns:1fr;padding:10px}.popularity>div{display:grid}.request-list{margin:0 10px}.request-list article{grid-template-columns:1fr auto}.request-list article .quiet{grid-column:2}.friends-layout{grid-template-columns:1fr;padding:10px}.friend-cards article{grid-template-columns:1fr}.friend-alias{width:100%}.visit{width:100%}}
 </style>

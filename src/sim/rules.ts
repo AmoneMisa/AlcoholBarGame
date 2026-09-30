@@ -2,7 +2,7 @@ import { INGREDIENTS, MODIFIERS, RECIPES, REGIONS, SUPPLIERS } from '../domain/c
 import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost, bottleSaleCrystalReward, bottleTotal, brandedServeCrystalReward } from '../domain/bottleCatalog';
 import { arrivalSkipCrystalCost, calendarDate, coins, specialtyFactor, supplierInCity, consecutiveDays, conversationCrystalReward, crystalExchange, dailyCoinsFor, dailyCrystalsFor, quotePurchase, recipePurchase } from '../domain/economy';
 import { withArticle } from '../domain/english/articles';
-import { BAR_PROFILE_OPTIONS, INTERIORS } from '../data/cosmetics/bars';
+import { BAR_PROFILE_OPTIONS, DEFAULT_BARS, INTERIORS } from '../data/cosmetics/bars';
 import { consumeMix, generateCustomer, judgeMix, requiredRecipe } from '../domain/engine';
 import type { Customer, InventoryItem, Recipe, RegionId, Supplier } from '../domain/types';
 import { pourableBrand, replyToServe, serveName, serveRequestText, substitutesFor } from '../domain/brandServe';
@@ -44,6 +44,7 @@ export type GameAction =
   | { type: 'setDecor'; key: string; value: string }
   | { type: 'spinCosmeticRoulette' }
   | { type: 'giftCosmetic'; cosmeticId: string; recipient: string }
+  | { type: 'activatePopularityBoost'; boost: 'no-cooldown' | 'vip-run' }
   | { type: 'selectCustomer'; customerId: string }
   | { type: 'openConversation'; customerId: string }
   | { type: 'closeConversation' }
@@ -149,7 +150,18 @@ const priceFactorOf = (guest: Customer | undefined, marketFactor: number) => gue
 
 // Higher levels bring guests sooner; city events (Hot Time, storms...) speed them up or slow them down.
 function nextArrival(state: PlayerState, now: number, random: () => number) {
+  if (state.popularityBoost?.kind === 'no-cooldown' && state.popularityBoost.until > now) return now + 1000;
   return now + Math.round((nextCustomerArrival(now, random) - now) * economyOf(state, now).arrival);
+}
+
+function makeVipCustomer(state: PlayerState, level: number, priceFactor: number) {
+  const vip = withUniqueLook(generateCustomer(level, knownRecipes(state), .35, priceFactor), []);
+  vip.mood = 'vip';
+  vip.greeting = 'Good evening. I was told this bar is exceptional.';
+  vip.patience = orderTimeSeconds('vip', vip.orderKind);
+  vip.patienceRemaining = vip.patience;
+  vip.priceFactor = priceFactor;
+  return vip;
 }
 
 function makeArrivingCustomer(state: PlayerState, now: number, random: () => number) {
@@ -157,6 +169,11 @@ function makeArrivingCustomer(state: PlayerState, now: number, random: () => num
   const economy = economyOf(state, now);
   const priceFactor = economy.guestPriceFactor;
   const priced = (customer: Customer) => { customer.priceFactor = priceFactor; return customer; };
+  if (state.popularityBoost?.kind === 'vip-run' && state.popularityBoost.remaining > 0) {
+    state.popularityBoost.remaining -= 1;
+    if (state.popularityBoost.remaining <= 0) state.popularityBoost = undefined;
+    return makeVipCustomer(state, level, priceFactor);
+  }
   if (canWelcomeVip(now, state.vipCooldownUntil, random, economy.vipChance)) {
     state.vipCooldownUntil = now + Math.round((nextVipAvailability(now, random) - now) * economy.vipCooldown);
     const locked = lockedRecipes(state);
@@ -164,12 +181,7 @@ function makeArrivingCustomer(state: PlayerState, now: number, random: () => num
     // VIPs usually teach something new, but can also bring duplicate cards needed for mastery.
     const recipeRewards = learnedAdvanced.length && random() < .35 ? learnedAdvanced : (locked.length ? locked : learnedAdvanced);
     if (vipCarriesRecipe(recipeRewards.length > 0, random)) return priced(withUniqueLook(makeSpecialCustomer(recipeRewards[Math.floor(random() * recipeRewards.length)]!, level), []));
-    const vip = withUniqueLook(generateCustomer(level, knownRecipes(state), .35, priceFactor), []);
-    vip.mood = 'vip';
-    vip.greeting = 'Good evening. I was told this bar is exceptional.';
-    vip.patience = orderTimeSeconds('vip', vip.orderKind);
-    vip.patienceRemaining = vip.patience;
-    return priced(vip);
+    return makeVipCustomer(state, level, priceFactor);
   }
   return priced(withUniqueLook(generateCustomer(level, knownRecipes(state), .35, priceFactor), []));
 }
@@ -220,6 +232,7 @@ export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now
   state.conversations ??= {};
   const now = context.now;
   const random = context.random ?? Math.random;
+  if (state.popularityBoost?.kind === 'no-cooldown' && state.popularityBoost.until <= now) state.popularityBoost = undefined;
   processDeliveries(state, now);
   autoRestock(state, now);
   if (!state.customers.length) {
@@ -626,6 +639,9 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.ownedBarIds = [action.regionId];
       state.regionId = action.regionId;
       state.startingBarChosen = true;
+      const starterInterior = DEFAULT_BARS[action.regionId].interior;
+      state.bars[action.regionId].interior = starterInterior;
+      if (!state.ownedInteriorIds.includes(starterInterior)) state.ownedInteriorIds.push(starterInterior);
       // The starter guests now drink in the chosen city, at its prices.
       const cityRate = economyOf(state, now).guestPriceFactor;
       for (const waiting of state.customers) waiting.priceFactor = cityRate;
@@ -647,6 +663,9 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       }
       state.ownedBarIds.push(action.regionId);
       state.regionId = action.regionId;
+      const includedInterior = DEFAULT_BARS[action.regionId].interior;
+      state.bars[action.regionId].interior = includedInterior;
+      if (!state.ownedInteriorIds.includes(includedInterior)) state.ownedInteriorIds.push(includedInterior);
       state.message = `${REGIONS.find((item) => item.id === action.regionId)!.name} bar unlocked.`;
       break;
     }
@@ -695,6 +714,22 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.cosmeticGiftLog.unshift({ cosmeticId:reward.id,recipient,at:now });
       state.cosmeticGiftLog = state.cosmeticGiftLog.slice(0,30);
       state.message = `${reward.label} sent to ${recipient}.`;
+      break;
+    }
+    case 'activatePopularityBoost': {
+      if (state.popularity < 30) throw new RuleError('You need 30 popularity to activate a guest boost.');
+      if (state.popularityBoost) throw new RuleError('A popularity boost is already active.');
+      state.popularity -= 30;
+      if (action.boost === 'no-cooldown') {
+        state.popularityBoost = { kind: 'no-cooldown', until: now + 15 * 60 * 1000 };
+        if (!state.customers.length) state.nextCustomerAt = now + 1000;
+        state.message = 'Popularity boost active: guests arrive without cooldown for 15 minutes.';
+      } else if (action.boost === 'vip-run') {
+        const remaining = 3 + Math.floor(random() * 3);
+        state.popularityBoost = { kind: 'vip-run', remaining };
+        if (!state.customers.length) state.nextCustomerAt = now + 1000;
+        state.message = `Popularity boost active: the next ${remaining} guests are VIPs.`;
+      } else throw new RuleError('Unknown popularity boost.');
       break;
     }
 

@@ -9,6 +9,7 @@ declare global {
         ready?: () => void;
         expand?: () => void;
         showAlert?: (message: string) => void;
+        openTelegramLink?: (url: string) => void;
         HapticFeedback?: { impactOccurred?: (style: string) => void };
       };
     };

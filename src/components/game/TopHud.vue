@@ -4,7 +4,7 @@ import { CRYSTAL_EXCHANGE_BUNDLES } from '../../domain/economy';
 import { useGameStore } from '../../stores/game';
 import UiIcon from '../ui/UiIcon.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
-import { musicOn, musicVolume, sfxOn, sfxVolume } from '../../audio/index';
+import { musicOn, musicVolume, sfxOn, sfxVolume, speechOn, speechVolume } from '../../audio/index';
 defineEmits<{ design:[] }>();
 
 const game = useGameStore();
@@ -12,13 +12,14 @@ const exchangeOpen = ref(false);
 const volumeOpen = ref(false);
 const percent = (value: number) => `${Math.round(value * 100)}%`;
 // Dragging a slider up from zero also turns that channel back on.
-function setVolume(channel: 'music' | 'sfx', event: Event) {
+function setVolume(channel: 'music' | 'sfx' | 'speech', event: Event) {
   const value = Number((event.target as HTMLInputElement).value) / 100;
   if (channel === 'music') { musicVolume.value = value; if (value > 0) musicOn.value = true; }
-  else { sfxVolume.value = value; if (value > 0) sfxOn.value = true; }
+  else if (channel === 'sfx') { sfxVolume.value = value; if (value > 0) sfxOn.value = true; }
+  else { speechVolume.value = value; if (value > 0) speechOn.value = true; }
 }
-const soundSilent = computed(() => (!musicOn.value || musicVolume.value === 0) && (!sfxOn.value || sfxVolume.value === 0));
-const soundSummary = computed(() => soundSilent.value ? 'Muted' : [musicOn.value && musicVolume.value > 0 && 'Music', sfxOn.value && sfxVolume.value > 0 && 'FX'].filter(Boolean).join(' · '));
+const soundSilent = computed(() => (!musicOn.value || musicVolume.value === 0) && (!sfxOn.value || sfxVolume.value === 0) && (!speechOn.value || speechVolume.value === 0));
+const soundSummary = computed(() => soundSilent.value ? 'Muted' : [musicOn.value && musicVolume.value > 0 && 'Music', sfxOn.value && sfxVolume.value > 0 && 'FX', speechOn.value && speechVolume.value > 0 && 'Voice'].filter(Boolean).join(' · '));
 const xpPercent = computed(() => game.xpProgress.percent);
 function exchange(crystals: number) {
   if (game.exchangeCrystals(crystals)) exchangeOpen.value = false;
@@ -74,6 +75,12 @@ onUnmounted(() => {
             <input type="range" min="0" max="100" step="5" aria-labelledby="volume-sfx" :value="Math.round(sfxVolume * 100)" :style="{ '--fill': percent(sfxVolume) }" :aria-valuetext="sfxOn ? percent(sfxVolume) : 'Muted'" @input="setVolume('sfx', $event)" />
             <output>{{ sfxOn ? percent(sfxVolume) : 'Off' }}</output>
             <button type="button" :aria-pressed="!sfxOn" aria-label="Mute sound effects" @click="sfxOn = !sfxOn">{{ sfxOn ? 'Mute' : 'Unmute' }}</button>
+          </div>
+          <div class="volume-row" :class="{ off: !speechOn }">
+            <span id="volume-speech"><UiIcon name="chat" /> English voice</span>
+            <input type="range" min="0" max="100" step="5" aria-labelledby="volume-speech" :value="Math.round(speechVolume * 100)" :style="{ '--fill': percent(speechVolume) }" :aria-valuetext="speechOn ? percent(speechVolume) : 'Muted'" @input="setVolume('speech', $event)" />
+            <output>{{ speechOn ? percent(speechVolume) : 'Off' }}</output>
+            <button type="button" :aria-pressed="!speechOn" aria-label="Mute English voice" @click="speechOn = !speechOn">{{ speechOn ? 'Mute' : 'Unmute' }}</button>
           </div>
         </PopoverPanel>
       </div>

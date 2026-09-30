@@ -1,4 +1,4 @@
-export const PAINTED_BOTTLE_ATLAS = '/assets/drinks/bottles/painted-bottles-v3.webp';
+export const PAINTED_BOTTLE_ATLAS = '/assets/drinks/bottles/painted-bottles-v4.webp';
 export const PAINTED_BOTTLE_COLUMNS = 6;
 export const PAINTED_BOTTLE_ROWS = 4;
 

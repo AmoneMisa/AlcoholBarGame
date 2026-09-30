@@ -252,7 +252,7 @@ const itemCount = computed(() => game.currentMix.reduce((sum, item) => sum + (IN
 const fill = computed(() => Math.min(91, totalAmount.value / 240 * 91));
 const ice = computed(() => game.currentMix.find((item) => item.ingredientId === 'ice')?.amount ?? 0);
 const hasBubbles = computed(() => game.currentMix.some((item) => ['soda', 'tonic', 'ginger-beer', 'grapefruit-soda', 'sparkling-wine'].includes(item.ingredientId)));
-const garnish = computed(() => game.currentMix.some((item) => item.ingredientId === 'mint') ? 'mint' : game.currentMix.some((item) => ['lime-wedge', 'orange', 'pineapple-wedge'].includes(item.ingredientId)) ? 'citrus' : '');
+const garnish = computed(() => ['mint', 'lime-wedge', 'orange', 'pineapple-wedge'].find((id) => game.currentMix.some((item) => item.ingredientId === id)) ?? '');
 const selectedIngredient = computed(() => INGREDIENTS.find((item) => item.id === draggingIngredientId.value));
 const selectedAmount = computed(() => draggingIngredientId.value ? game.currentMix.find((item) => item.ingredientId === draggingIngredientId.value)?.amount : undefined);
 

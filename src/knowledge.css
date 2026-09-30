@@ -114,7 +114,6 @@
 .progress-brand { display:block;color:#ffd98a;font-size:10px;font-style:normal;font-weight:700; }
 .progress-brand.need { color:#ff9f93; }
 .progress-brand.hint { color:#8fb7e0;font-weight:600; }
-.action-prop .pour-brand { width:100%;height:100%; }
 
 /* Account connection status in the top bar. */
 .sync-badge { margin-left:8px;padding:1px 7px;border-radius:999px;background:#24344d;color:#a9d3ff;font-size:9px;font-style:normal;font-weight:900;letter-spacing:.06em;text-transform:uppercase; }

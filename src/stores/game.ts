@@ -17,7 +17,8 @@ import { checkText } from '../domain/english/checker';
 import { advanceClock, applyAction, RuleError, type GameAction } from '../sim/rules';
 import { createInitialState, levelFor, normalizePlayerState, type PlayerState } from '../sim/state';
 import { playSfx } from '../audio/index';
-import { connectSession, sendAction } from '../telegram/api';
+import { answerFriendRequest, connectSession, fetchFriends, requestFriend, saveFriendLabel, sendAction, sendFriendGift, visitFriendBar, type FriendBar, type FriendSummary } from '../telegram/api';
+import type { GiftRequest } from '../sim/gifts';
 
 // The client side of a server-authoritative game.
 // Online: every action is applied locally for an instant response, then sent to the server; the server's
@@ -69,6 +70,9 @@ export const useGameStore = defineStore('game', () => {
   const mode = ref<'connecting' | 'online' | 'offline'>('connecting');
   const playerName = ref('');
   const playerId = ref(0);
+  const playerFriendCode = ref('');
+  const friends = ref<FriendSummary[]>([]);
+  const visitedFriend = ref<FriendBar>();
   const serverOffset = ref(0);
   const clientNow = () => Date.now() + serverOffset.value;
   const nowMs = ref(clientNow());
@@ -95,6 +99,7 @@ export const useGameStore = defineStore('game', () => {
   const bars = computed(() => state.value.bars);
   const ownedBarIds = computed(() => state.value.ownedBarIds);
   const startingBarChosen = computed(() => state.value.startingBarChosen);
+  const sessionReady = computed(() => mode.value !== 'connecting');
   const ownedInteriorIds = computed(() => state.value.ownedInteriorIds ?? ['velvet']);
   const inventories = computed(() => state.value.inventories);
   const inventory = computed(() => state.value.inventories[state.value.regionId]);
@@ -255,13 +260,47 @@ export const useGameStore = defineStore('game', () => {
       const session = await connectSession();
       playerName.value = session.player.name;
       playerId.value = session.player.id;
+      playerFriendCode.value = session.player.friendCode;
       mode.value = 'online';
       adoptServerState(session.state, session.serverTime, session.state.message);
       resetMix();
+      void loadFriends();
     } catch {
       mode.value = 'offline';
       message.value = 'Offline practice: progress is saved on this device only.';
     }
+  }
+
+  async function loadFriends() {
+    if (mode.value !== 'online') { friends.value = []; return false; }
+    try {
+      const result = await fetchFriends();
+      if (!result.ok) throw new Error(result.error);
+      friends.value = result.friends ?? [];
+      playerFriendCode.value = result.friendCode ?? playerFriendCode.value;
+      return true;
+    } catch (error) { message.value = (error as Error).message || 'Could not load friends.'; return false; }
+  }
+  async function addFriend(code:string) {
+    try { const result = await requestFriend(code); if (!result.ok) throw new Error(result.error); message.value = result.message ?? 'Friend request sent.'; await loadFriends(); return true; }
+    catch (error) { message.value = (error as Error).message; return false; }
+  }
+  async function answerFriend(code:string, accept:boolean) {
+    try { const result = await answerFriendRequest(code,accept); if (!result.ok) throw new Error(result.error); message.value = result.message ?? ''; await loadFriends(); return true; }
+    catch (error) { message.value = (error as Error).message; return false; }
+  }
+  async function renameFriend(code:string,label:string) {
+    try { const result = await saveFriendLabel(code,label); if (!result.ok) throw new Error(result.error); if (result.state) adoptServerState(result.state, clientNow(), result.message); await loadFriends(); return true; }
+    catch (error) { message.value = (error as Error).message; return false; }
+  }
+  async function visitFriend(code:string) {
+    try { const result = await visitFriendBar(code); if (!result.ok || !result.friend) throw new Error(result.error); if (result.state) adoptServerState(result.state, clientNow()); visitedFriend.value = result.friend; message.value = result.rewarded ? `Visited ${result.friend.nickname}. They received +1 popularity.` : `Visiting ${result.friend.nickname}. Today’s popularity was already awarded.`; return true; }
+    catch (error) { message.value = (error as Error).message; return false; }
+  }
+  async function giftFriend(gift:GiftRequest) {
+    if (!visitedFriend.value) return false;
+    try { const result = await sendFriendGift(visitedFriend.value.code,gift); if (!result.ok) throw new Error(result.error); if (result.state) adoptServerState(result.state,clientNow(),result.message); return true; }
+    catch (error) { message.value = (error as Error).message; return false; }
   }
 
   // ---- Clock ----
@@ -434,6 +473,7 @@ export const useGameStore = defineStore('game', () => {
   const upgradeRecipe = (recipeId: string) => dispatch({ type: 'upgradeRecipe', recipeId });
   const recipeLevels = computed(() => state.value.recipeLevels ?? {});
   const recipeCopies = computed(() => state.value.recipeCopies ?? {});
+  const friendVisits = computed(() => state.value.friendVisits ?? {});
   const recipePrice = (recipeId: string) => {
     const recipe = RECIPES.find((item) => item.id === recipeId)!;
     return recipePurchase(recipe, RECIPES.indexOf(recipe));
@@ -449,6 +489,9 @@ export const useGameStore = defineStore('game', () => {
   const exchangeCrystals = (crystals: number) => dispatch({ type: 'exchangeCrystals', crystals });
   const spinCosmeticRoulette = () => dispatch({ type:'spinCosmeticRoulette' });
   const giftCosmetic = (cosmeticId:string, recipient:string) => dispatch({ type:'giftCosmetic', cosmeticId, recipient });
+  const activatePopularityBoost = (boost:'no-cooldown'|'vip-run') => dispatch({ type:'activatePopularityBoost', boost });
+  const popularity = computed(() => state.value.popularity ?? 0);
+  const popularityBoost = computed(() => state.value.popularityBoost);
   const canUseCosmetic = (key:string,value:string) => ownsCosmetic(state.value.ownedCosmeticIds ?? [],key,value,state.value.bars[state.value.regionId].bartenderCharacter);
   const refreshDailyGift = () => { nowMs.value = clientNow(); };
   const renameBar = (name: string) => dispatch({ type: 'renameBar', name });
@@ -473,12 +516,12 @@ export const useGameStore = defineStore('game', () => {
   void connect();
 
   return {
-    mode, playerName, playerId, connect,
+    mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, renameFriend, visitFriend, giftFriend, friendVisits, connect,
     economy, xpProgress, guestPriceFactor,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
-    regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, ownedInteriorIds, barBackground, barInteriorStyle,
-    cosmetics:COSMETICS, ownedCosmeticIds, cosmeticCopies, cosmeticRouletteAvailable, cosmeticRouletteResult, cosmeticGiftLog, canUseCosmetic, spinCosmeticRoulette, giftCosmetic,
+    regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, sessionReady, ownedInteriorIds, barBackground, barInteriorStyle,
+    cosmetics:COSMETICS, ownedCosmeticIds, cosmeticCopies, cosmeticRouletteAvailable, cosmeticRouletteResult, cosmeticGiftLog, canUseCosmetic, spinCosmeticRoulette, giftCosmetic, popularity, popularityBoost, activatePopularityBoost,
     inventories, inventory, bottleInventories, bottleInventory, currentMix, shaken, customers, activeCustomerId, customer, hasCustomer, recipe, mixJudge,
     knownRecipeIds, recipeUnlockSources, knownRecipes, lockedRecipes, dailyGiftAvailable, dailyGiftResult, loginStreak, upcomingLoginDay, dailyCoinReward, dailyCrystalReward,
     dailyLessons, dailyLessonCompletedIds, dailyLessonsComplete, dailyLessonResult, learningStreak, learningStreakForToday, learningBonusPercent, completeDailyLesson,

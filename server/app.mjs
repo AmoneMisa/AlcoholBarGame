@@ -26,6 +26,25 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
     } catch (error) { next(error); }
   });
 
+  app.post('/api/friends', auth, limiter, async (request, response, next) => {
+    try { response.json(await service.friends(request.identity)); } catch (error) { next(error); }
+  });
+  app.post('/api/friends/add', auth, limiter, async (request, response, next) => {
+    try { const result = await service.addFriend(request.identity, request.body?.code); response.status(result.status).json(result.body); } catch (error) { next(error); }
+  });
+  app.post('/api/friends/answer', auth, limiter, async (request, response, next) => {
+    try { const result = await service.answerFriend(request.identity, request.body?.code, request.body?.accept === true); response.status(result.status).json(result.body); } catch (error) { next(error); }
+  });
+  app.post('/api/friends/label', auth, limiter, async (request, response, next) => {
+    try { const result = await service.labelFriend(request.identity, request.body?.code, request.body?.label); response.status(result.status).json(result.body); } catch (error) { next(error); }
+  });
+  app.post('/api/friends/visit', auth, limiter, async (request, response, next) => {
+    try { const result = await service.visitFriend(request.identity, request.body?.code); response.status(result.status).json(result.body); } catch (error) { next(error); }
+  });
+  app.post('/api/friends/gift', auth, limiter, async (request, response, next) => {
+    try { const result = await service.sendGift(request.identity, request.body?.code, request.body?.gift); response.status(result.status).json(result.body); } catch (error) { next(error); }
+  });
+
   return app;
 }
 

@@ -19,6 +19,7 @@ export interface ChatLine { id: number; speaker: 'customer' | 'bartender'; text:
 export interface Transcript { lines: ChatLine[]; facts: Fact[]; bottleFacts: BottleConversationFacts; expression: CustomerReply['expression']; attempts: number; correct: number; perfectRewardClaimed?: boolean; }
 
 export interface DeliveryOrder { id: string; supplier: string; barId: RegionId; dueAt: number; items: InventoryItem[]; total: number; }
+export type PopularityBoost = { kind: 'no-cooldown'; until: number } | { kind: 'vip-run'; remaining: number };
 
 export interface PlayerState {
   version: 1;
@@ -68,8 +69,11 @@ export interface PlayerState {
   // Recipe mastery (1–5, see sim/recipes.ts) and duplicate cards used by mastery or friend gifts.
   recipeLevels?: Record<string, number>;
   recipeCopies?: Record<string, number>;
+  popularity: number;
+  popularityBoost?: PopularityBoost;
   // Day of the last rewarded visit to each friend's bar.
   friendVisits?: Record<string, string>;
+  friendLabels?: Record<string, string>;
   conversations: Record<string, Transcript>;
   message: string;
 }
@@ -143,6 +147,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     cosmeticGiftLog: [],
     knownRecipeIds,
     recipeUnlockSources: Object.fromEntries(knownRecipeIds.map((id) => [id, 'starter'])),
+    popularity: 0,
     dailyGiftClaimedKey: '',
     loginStreak: 0,
     dailyGiftResult: 'A new gift is available today.',
@@ -181,6 +186,15 @@ export function normalizePlayerState(state: PlayerState) {
   state.tradeLog = Array.isArray(state.tradeLog)
     ? state.tradeLog.filter((entry) => entry !== 'Each city bar now keeps its own stock.').slice(0, 40)
     : [];
+  state.popularity = Number.isFinite(state.popularity) ? Math.max(0, Math.floor(state.popularity)) : 0;
+  if (state.popularityBoost?.kind === 'no-cooldown') {
+    if (!Number.isFinite(state.popularityBoost.until)) state.popularityBoost = undefined;
+  } else if (state.popularityBoost?.kind === 'vip-run') {
+    const remaining = Math.max(0, Math.floor(state.popularityBoost.remaining));
+    state.popularityBoost = remaining ? { kind: 'vip-run', remaining } : undefined;
+  } else state.popularityBoost = undefined;
+  state.friendVisits = state.friendVisits && typeof state.friendVisits === 'object' ? state.friendVisits : {};
+  state.friendLabels = state.friendLabels && typeof state.friendLabels === 'object' ? state.friendLabels : {};
   state.customers = Array.isArray(state.customers) ? state.customers : [];
   for (const customer of state.customers) {
     customer.smoker ??= [...customer.id].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 7 === 0;
@@ -190,7 +204,15 @@ export function normalizePlayerState(state: PlayerState) {
     ? [...new Set(state.ownedBarIds.filter((id) => validRegions.has(id)))]
     : [validRegions.has(state.regionId) ? state.regionId : 'new-york'];
   if (!state.ownedBarIds.length) state.ownedBarIds = ['new-york'];
-  state.startingBarChosen = typeof state.startingBarChosen === 'boolean' ? state.startingBarChosen : true;
+  // A short-lived release stored `false` for players who already had progress,
+  // reopening onboarding on their next visit. Preserve onboarding only for a
+  // genuinely untouched account; older/migrated accounts default to complete.
+  const hasAccountProgress = state.xp > 0
+    || state.loginStreak > 1
+    || state.ownedBarIds.length > 1;
+  state.startingBarChosen = typeof state.startingBarChosen === 'boolean'
+    ? state.startingBarChosen || hasAccountProgress
+    : true;
   if (!state.ownedBarIds.includes(state.regionId)) state.regionId = state.ownedBarIds[0]!;
   const validInteriors = new Set(INTERIORS.map((item) => item.id));
   state.ownedInteriorIds = Array.isArray(state.ownedInteriorIds)
@@ -206,10 +228,17 @@ export function normalizePlayerState(state: PlayerState) {
     const saved = state.bars[region.id] as Partial<BarProfile> | undefined;
     state.bars[region.id] = { ...structuredClone(DEFAULT_BARS[region.id]), ...saved };
     const bar = state.bars[region.id];
+    const defaultInterior = DEFAULT_BARS[region.id].interior;
+    // Locked city cards always preview that city's included interior. Opening a
+    // bar grants this background; paid custom backgrounds stay player-owned.
+    if (!state.ownedBarIds.includes(region.id)) bar.interior = defaultInterior;
     // `base` was an editor-only wooden mannequin. It must never be presented
     // as a wearable look, including for old local saves.
     if ((bar.bartender as string) === 'base') bar.bartender = 'vest';
-    if (!state.ownedInteriorIds.includes(bar.interior)) bar.interior = 'velvet';
+    if (state.ownedBarIds.includes(region.id) && !state.ownedInteriorIds.includes(bar.interior)) {
+      bar.interior = defaultInterior;
+      if (!state.ownedInteriorIds.includes(defaultInterior)) state.ownedInteriorIds.push(defaultInterior);
+    }
     if (['relaxed'].includes(bar.pose as string)) bar.pose = 'neutral';
     if (['hip'].includes(bar.pose as string)) bar.pose = 'confident';
     if (['lean','crossed'].includes(bar.pose as string)) bar.pose = 'working';

@@ -1,7 +1,7 @@
 // Read a word or sentence aloud. Pre-rendered neural voice clips (public/assets/voice, see
 // scripts/generate_voice.py) are played first; anything without a clip falls back to the
 // device's built-in English voice.
-import { duckMusic } from '../../audio/engine';
+import { duckMusic, speechOn, speechVolume } from '../../audio/engine';
 let manifest: Promise<Record<string, string>> | undefined;
 let player: HTMLAudioElement | undefined;
 
@@ -17,23 +17,31 @@ export function canSpeak() {
 }
 
 function speakWithDevice(text: string) {
+  if (!speechOn.value || speechVolume.value <= 0) return false;
   if (!('speechSynthesis' in window)) {
     const win: Window = window;
     const message = 'Voice playback is not available in this browser. Update Telegram or open the game in Chrome.';
     if (win.Telegram?.WebApp?.showAlert) win.Telegram.WebApp.showAlert(message);
     else win.alert(message);
-    return;
+    return false;
   }
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'en-GB';
   utterance.rate = .9;
+  utterance.volume = speechVolume.value;
   const voice = window.speechSynthesis.getVoices().find((item) => item.lang.startsWith('en-GB')) ?? window.speechSynthesis.getVoices().find((item) => item.lang.startsWith('en'));
   if (voice) utterance.voice = voice;
+  const restore = () => duckMusic(false);
+  utterance.onend = restore;
+  utterance.onerror = restore;
+  duckMusic(true);
   window.speechSynthesis.speak(utterance);
+  return true;
 }
 
 export function speak(text: string) {
+  if (!speechOn.value || speechVolume.value <= 0) return false;
   if (!canSpeak()) { speakWithDevice(text); return false; }
   const key = text.trim();
   void loadManifest().then(async (clips) => {
@@ -44,6 +52,7 @@ export function speak(text: string) {
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       player = new Audio(`${import.meta.env.BASE_URL}assets/voice/${file}`);
       const clip = player;
+      clip.volume = speechVolume.value;
       const restore = () => duckMusic(false);
       clip.addEventListener('ended', restore);
       clip.addEventListener('pause', restore);

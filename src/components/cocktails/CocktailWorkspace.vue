@@ -41,7 +41,9 @@ function serve() {
       <span>{{ game.customer.orderRevealed ? 'Choice confirmed' : 'Ask · match · recommend' }}</span>
     </header>
     <div v-if="!game.customer.orderRevealed || !activeBottle" class="bottle-consultation-empty">
-      <div class="sealed-bottle-placeholder"><i></i><b>?</b></div>
+      <div class="sealed-bottle-placeholder" aria-hidden="true">
+        <img src="/assets/drinks/bottles/mystery-sealed-bottle.webp" alt="" draggable="false" />
+      </div>
       <div><small>THE CUSTOMER NEEDS FULL, SEALED BOTTLES</small><h3>Discover the complete request</h3><p>Ask how many bottles they need, their total budget, preferred alcohol type and flavour, and whether they have a favourite brand.</p><p class="talk-hint">Tap {{ game.customer.name }}’s speech bubble in the bar to talk.</p></div>
     </div>
     <div v-else class="confirmed-bottle-station">

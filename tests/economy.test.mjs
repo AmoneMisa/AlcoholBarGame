@@ -9,6 +9,7 @@ import { applyAction, advanceClock } from '../src/sim/rules.ts';
 import { createInitialState, normalizePlayerState } from '../src/sim/state.ts';
 import { recipeCardsRequired } from '../src/sim/recipes.ts';
 import { DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus } from '../src/domain/dailyLessons.ts';
+import { DEFAULT_BARS } from '../src/data/cosmetics/bars.ts';
 
 const context = (now) => ({ now, random: () => .5, checkEnglish: (text) => ({ ok: true, corrected: text }) });
 
@@ -63,13 +64,16 @@ test('Completing the daily set can drop a random recipe at the configured low ch
 test('The first bar is chosen freely; expansion starts at level 25, then costs coins and crystals', () => {
   const now = Date.now();const state = createInitialState(now);
   assert.equal(state.startingBarChosen,false);assert.deepEqual(state.ownedBarIds,['new-york']);
+  assert.equal(new Set(Object.values(state.bars).map((bar) => bar.interior)).size,6,'the welcome screen previews six different interiors');
   applyAction(state,{type:'chooseStartingBar',regionId:'berlin'},context(now));
   assert.deepEqual(state.ownedBarIds,['berlin']);assert.equal(state.regionId,'berlin');
+  assert.equal(state.bars.berlin.interior,DEFAULT_BARS.berlin.interior);assert.ok(state.ownedInteriorIds.includes(DEFAULT_BARS.berlin.interior));
   assert.throws(() => applyAction(state,{type:'switchBar',regionId:'london'},context(now)),/Purchase/);
   assert.throws(() => applyAction(state,{type:'buyBar',regionId:'london'},context(now)),new RegExp(`level ${BAR_PURCHASE_LEVEL}`));
   state.xp = xpForLevel(BAR_PURCHASE_LEVEL);state.money = SECOND_BAR_COIN_COST;
   applyAction(state,{type:'buyBar',regionId:'london'},context(now));
   assert.ok(state.ownedBarIds.includes('london'));assert.equal(state.money,0);assert.equal(state.regionId,'london');
+  assert.equal(state.bars.london.interior,DEFAULT_BARS.london.interior);assert.ok(state.ownedInteriorIds.includes(DEFAULT_BARS.london.interior));
   assert.equal(barUnlockPrice(state.ownedBarIds).currency,'crystals');
   state.crystals = barUnlockPrice(state.ownedBarIds).amount;
   applyAction(state,{type:'buyBar',regionId:'tokyo'},context(now));
