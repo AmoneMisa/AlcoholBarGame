@@ -8,6 +8,7 @@ import { judgeMix } from '../domain/engine';
 import { economyAt, levelProgress, marketFor } from '../domain/progression';
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { dailyLessonsFor, learningStreakBonus } from '../domain/dailyLessons';
+import { COSMETICS, canUseCosmetic as ownsCosmetic } from '../domain/cosmetics';
 import { negotiatedQuote } from '../sim/trade';
 import type { Customer, InventoryItem, RegionId, SupplierOffer } from '../domain/types';
 import { pourableBrand } from '../domain/brandServe';
@@ -66,6 +67,7 @@ export const useGameStore = defineStore('game', () => {
   const state = ref<PlayerState>(loadOffline() ?? createInitialState());
   const mode = ref<'connecting' | 'online' | 'offline'>('connecting');
   const playerName = ref('');
+  const playerId = ref(0);
   const serverOffset = ref(0);
   const clientNow = () => Date.now() + serverOffset.value;
   const nowMs = ref(clientNow());
@@ -111,6 +113,11 @@ export const useGameStore = defineStore('game', () => {
   const tradeLog = computed(() => state.value.tradeLog);
   const nextCustomerAt = computed(() => state.value.nextCustomerAt);
   const vipCooldownUntil = computed(() => state.value.vipCooldownUntil);
+  const ownedCosmeticIds = computed(() => state.value.ownedCosmeticIds ?? []);
+  const cosmeticCopies = computed(() => state.value.cosmeticCopies ?? {});
+  const cosmeticRouletteAvailable = computed(() => state.value.cosmeticRouletteKey !== today.value);
+  const cosmeticRouletteResult = computed(() => state.value.cosmeticRouletteResult);
+  const cosmeticGiftLog = computed(() => state.value.cosmeticGiftLog ?? []);
 
   // Decor edits (Design screen) go through a validated action; the proxy keeps `game.decor.wall = 'x'` working.
   const decor = computed<BarProfile>(() => new Proxy(state.value.bars[state.value.regionId], {
@@ -162,7 +169,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: mode.value !== 'online' });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson','spinCosmeticRoulette','giftCosmetic']);
 
   function saveOffline() {
     if (mode.value === 'online') return;
@@ -217,6 +224,7 @@ export const useGameStore = defineStore('game', () => {
     try {
       const session = await connectSession();
       playerName.value = session.player.name;
+      playerId.value = session.player.id;
       mode.value = 'online';
       adoptServerState(session.state, session.serverTime, session.state.message);
       resetMix();
@@ -402,6 +410,9 @@ export const useGameStore = defineStore('game', () => {
   const claimDailyGift = () => dispatch({ type: 'claimDaily' });
   const completeDailyLesson = (lessonId: string, answer: string) => dispatch({ type: 'completeDailyLesson', lessonId, answer });
   const exchangeCrystals = (crystals: number) => dispatch({ type: 'exchangeCrystals', crystals });
+  const spinCosmeticRoulette = () => dispatch({ type:'spinCosmeticRoulette' });
+  const giftCosmetic = (cosmeticId:string, recipient:string) => dispatch({ type:'giftCosmetic', cosmeticId, recipient });
+  const canUseCosmetic = (key:string,value:string) => ownsCosmetic(state.value.ownedCosmeticIds ?? [],key,value,state.value.bars[state.value.regionId].bartenderCharacter);
   const refreshDailyGift = () => { nowMs.value = clientNow(); };
   const renameBar = (name: string) => dispatch({ type: 'renameBar', name });
   const renameBartender = (name: string) => dispatch({ type: 'renameBartender', name });
@@ -425,11 +436,12 @@ export const useGameStore = defineStore('game', () => {
   void connect();
 
   return {
-    mode, playerName, connect,
+    mode, playerName, playerId, connect,
     economy, xpProgress, guestPriceFactor,
     upgradeRecipe, recipeLevels, recipeCopies,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, ownedInteriorIds, barBackground, barInteriorStyle,
+    cosmetics:COSMETICS, ownedCosmeticIds, cosmeticCopies, cosmeticRouletteAvailable, cosmeticRouletteResult, cosmeticGiftLog, canUseCosmetic, spinCosmeticRoulette, giftCosmetic,
     inventories, inventory, bottleInventories, bottleInventory, currentMix, shaken, customers, activeCustomerId, customer, hasCustomer, recipe, mixJudge,
     knownRecipeIds, recipeUnlockSources, knownRecipes, lockedRecipes, dailyGiftAvailable, dailyGiftResult, loginStreak, upcomingLoginDay, dailyCoinReward, dailyCrystalReward,
     dailyLessons, dailyLessonCompletedIds, dailyLessonsComplete, dailyLessonResult, learningStreak, learningStreakForToday, learningBonusPercent, completeDailyLesson,

@@ -11,6 +11,7 @@ import { ALCOHOL_PRODUCTS,bottleRestockCrystalCost } from '../src/domain/bottleC
 import { recipePurchase } from '../src/domain/economy.ts';
 import { requiredRecipe } from '../src/domain/engine.ts';
 import { createTelegramBot, TelegramBotError } from '../server/telegramBot.mjs';
+import { COSMETICS } from '../src/domain/cosmetics.ts';
 
 const BOT_TOKEN = '123456:TEST-token-for-unit-tests';
 
@@ -30,6 +31,25 @@ function makeService(now = () => Date.now()) {
   const repository = createMemoryRepository();
   return { repository, service: createGameService({ repository, checkEnglish, now }) };
 }
+
+test('A duplicate roulette cosmetic is transferred to another real player account', async () => {
+  const { repository,service } = makeService(() => Date.UTC(2026,8,30));
+  const senderIdentity = identity(301);
+  const recipientIdentity = identity(302);
+  const sender = await service.session(senderIdentity);
+  const recipient = await service.session(recipientIdentity);
+  const cosmetic = COSMETICS[0];
+  const row = repository.states.get(sender.player.id);
+  row.state.ownedCosmeticIds.push(cosmetic.id);
+  row.state.cosmeticCopies[cosmetic.id] = 1;
+  repository.states.set(sender.player.id,row);
+  const sent = await act(service,{type:'giftCosmetic',cosmeticId:cosmetic.id,recipient:String(recipient.player.id)},requestId(),senderIdentity);
+  assert.equal(sent.ok,true);
+  assert.equal(sent.state.cosmeticCopies[cosmetic.id],0);
+  const received = await service.session(recipientIdentity);
+  assert.ok(received.state.ownedCosmeticIds.includes(cosmetic.id));
+  assert.match(received.state.message,/gave you/i);
+});
 async function act(service, action, id = requestId(), who = identity()) {
   return (await service.act(who, { requestId: id, action })).body;
 }

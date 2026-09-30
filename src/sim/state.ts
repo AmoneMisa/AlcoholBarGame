@@ -30,6 +30,11 @@ export interface PlayerState {
   ownedBarIds: RegionId[];
   startingBarChosen: boolean;
   ownedInteriorIds: string[];
+  ownedCosmeticIds: string[];
+  cosmeticCopies: Record<string, number>;
+  cosmeticRouletteKey: string;
+  cosmeticRouletteResult: string;
+  cosmeticGiftLog: { cosmeticId:string; recipient:string; at:number }[];
   knownRecipeIds: string[];
   recipeUnlockSources: Record<string, UnlockSource>;
   dailyGiftClaimedKey: string;
@@ -72,6 +77,10 @@ export function withUniqueLook(customer: Customer, others: Customer[]) {
   if (!customer.characterId || used.has(customer.characterId)) customer.characterId = CUSTOMER_ART_BY_SLOT.find((id) => !used.has(id));
   if (!customer.specialRecipeRewardId) customer.name = CHARACTER_ART.find((art) => art.id === customer.characterId)?.name ?? customer.name;
   customer.wish = wishFor(customer);
+  // A stable trait keeps the same guest consistent after save/reload. Smoking
+  // guests get an ashtray in the scene; dialogue must never offer them an
+  // incompatible “I don't smoke” identity answer.
+  customer.smoker ??= [...customer.id].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 7 === 0;
   return customer;
 }
 
@@ -113,6 +122,11 @@ export function createInitialState(now = Date.now()): PlayerState {
     ownedBarIds: ['new-york'],
     startingBarChosen: false,
     ownedInteriorIds: ['velvet'],
+    ownedCosmeticIds: [],
+    cosmeticCopies: {},
+    cosmeticRouletteKey: '',
+    cosmeticRouletteResult: 'Your daily style draw is ready.',
+    cosmeticGiftLog: [],
     knownRecipeIds,
     recipeUnlockSources: Object.fromEntries(knownRecipeIds.map((id) => [id, 'starter'])),
     dailyGiftClaimedKey: '',
@@ -153,6 +167,10 @@ export function normalizePlayerState(state: PlayerState) {
   state.tradeLog = Array.isArray(state.tradeLog)
     ? state.tradeLog.filter((entry) => entry !== 'Each city bar now keeps its own stock.').slice(0, 40)
     : [];
+  state.customers = Array.isArray(state.customers) ? state.customers : [];
+  for (const customer of state.customers) {
+    customer.smoker ??= [...customer.id].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 7 === 0;
+  }
   const validRegions = new Set(REGIONS.map((region) => region.id));
   state.ownedBarIds = Array.isArray(state.ownedBarIds)
     ? [...new Set(state.ownedBarIds.filter((id) => validRegions.has(id)))]
@@ -164,6 +182,11 @@ export function normalizePlayerState(state: PlayerState) {
   state.ownedInteriorIds = Array.isArray(state.ownedInteriorIds)
     ? [...new Set(['velvet', ...state.ownedInteriorIds.filter((id) => validInteriors.has(id as never))])]
     : ['velvet'];
+  state.ownedCosmeticIds = Array.isArray(state.ownedCosmeticIds) ? [...new Set(state.ownedCosmeticIds.filter((id) => typeof id === 'string'))] : [];
+  state.cosmeticCopies = state.cosmeticCopies && typeof state.cosmeticCopies === 'object' ? state.cosmeticCopies : {};
+  state.cosmeticRouletteKey = typeof state.cosmeticRouletteKey === 'string' ? state.cosmeticRouletteKey : '';
+  state.cosmeticRouletteResult = typeof state.cosmeticRouletteResult === 'string' ? state.cosmeticRouletteResult : 'Your daily style draw is ready.';
+  state.cosmeticGiftLog = Array.isArray(state.cosmeticGiftLog) ? state.cosmeticGiftLog.slice(0, 30) : [];
   state.bars ??= structuredClone(DEFAULT_BARS);
   for (const region of REGIONS) {
     const saved = state.bars[region.id] as Partial<BarProfile> | undefined;

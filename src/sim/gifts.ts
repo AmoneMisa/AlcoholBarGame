@@ -3,6 +3,7 @@ import { calendarDate, coins, recipePurchase } from '../domain/economy';
 import { INTERIORS } from '../data/cosmetics/bars';
 import { addSpareCopy, isStarterRecipe, recipeCopies, recipeLevel } from './recipes';
 import { levelFor, type PlayerState } from './state';
+import { COSMETICS } from '../domain/cosmetics';
 
 // Gifts between friends and visits to a friend's bar. The sender pays when a gift is sent; the receiver's game
 // changes only when they claim it. Both steps run on the server.
@@ -12,12 +13,14 @@ export class GiftError extends Error {}
 export type GiftRequest =
   | { kind: 'recipe'; recipeId: string }        // buy a recipe card for a friend
   | { kind: 'recipe-copy'; recipeId: string }   // give one of your spare recipe cards
-  | { kind: 'interior'; interiorId: string };   // buy a bar background for a friend
+  | { kind: 'interior'; interiorId: string }    // buy a bar background for a friend
+  | { kind: 'cosmetic-copy'; cosmeticId: string };
 export type Gift = GiftRequest;
 
 export const VISIT_REWARD = 20;
 
 export function giftLabel(gift: Gift) {
+  if (gift.kind === 'cosmetic-copy') return `${COSMETICS.find((item) => item.id === gift.cosmeticId)?.label ?? 'A'} cosmetic`;
   if (gift.kind === 'interior') return `${INTERIORS.find((item) => item.id === gift.interiorId)?.name ?? 'A new'} background`;
   const recipe = RECIPES.find((item) => item.id === gift.recipeId);
   return `${recipe?.name ?? 'A'} recipe card`;
@@ -26,6 +29,7 @@ export function giftLabel(gift: Gift) {
 // What sending costs, for the gift screen and the rules.
 export function giftPrice(gift: GiftRequest) {
   if (gift.kind === 'recipe-copy') return { currency: 'card' as const, amount: 1 };
+  if (gift.kind === 'cosmetic-copy') return { currency:'cosmetic' as const,amount:1 };
   if (gift.kind === 'recipe') {
     const recipe = RECIPES.find((item) => item.id === gift.recipeId);
     return recipe ? recipePurchase(recipe, RECIPES.indexOf(recipe)) : undefined;
@@ -38,6 +42,13 @@ export function giftPrice(gift: GiftRequest) {
 export function payForGift(state: PlayerState, request: unknown): Gift {
   const gift = request as Partial<GiftRequest> | undefined;
   if (!gift || typeof gift !== 'object') throw new GiftError('Choose a gift.');
+  if (gift.kind === 'cosmetic-copy') {
+    const cosmetic = COSMETICS.find((item) => item.id === gift.cosmeticId);
+    if (!cosmetic) throw new GiftError('Unknown cosmetic item.');
+    if ((state.cosmeticCopies[cosmetic.id] ?? 0) < 1) throw new GiftError(`You have no spare ${cosmetic.label}.`);
+    state.cosmeticCopies[cosmetic.id] = (state.cosmeticCopies[cosmetic.id] ?? 0) - 1;
+    return { kind:'cosmetic-copy',cosmeticId:cosmetic.id };
+  }
   if (gift.kind === 'recipe' || gift.kind === 'recipe-copy') {
     const recipe = RECIPES.find((item) => item.id === gift.recipeId);
     if (!recipe) throw new GiftError('Unknown recipe.');
@@ -72,6 +83,16 @@ function charge(state: PlayerState, currency: 'coins' | 'crystals', amount: numb
 
 // Applies a claimed gift to the receiver. Something they already have becomes a spare card or a crystal refund.
 export function receiveGift(state: PlayerState, gift: Gift, from: string) {
+  if (gift.kind === 'cosmetic-copy') {
+    const cosmetic = COSMETICS.find((item) => item.id === gift.cosmeticId);
+    if (!cosmetic) return `${from}'s cosmetic gift could not be opened.`;
+    if (state.ownedCosmeticIds.includes(cosmetic.id)) {
+      state.cosmeticCopies[cosmetic.id] = (state.cosmeticCopies[cosmetic.id] ?? 0) + 1;
+      return `You already own ${cosmetic.label}: ${from}'s gift is now a spare you can send on.`;
+    }
+    state.ownedCosmeticIds.push(cosmetic.id);
+    return `${from} gave you the ${cosmetic.label} style!`;
+  }
   if (gift.kind === 'interior') {
     const interior = INTERIORS.find((item) => item.id === gift.interiorId);
     if (!interior) return `${from}'s gift could not be opened.`;

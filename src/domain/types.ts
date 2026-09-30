@@ -82,6 +82,7 @@ export interface Customer {
   serveRequest?: import('./brandServe').ServeRequest;
   bottleRequest?: BottleRequest;
   selectedBottleId?: string;
+  smoker?: boolean;
 }
 
 export interface AlcoholProduct {

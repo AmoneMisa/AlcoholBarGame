@@ -1,5 +1,6 @@
 import { applyAction, advanceClock, RuleError } from '../src/sim/rules';
-import { createInitialState, publicState } from '../src/sim/state';
+import { createInitialState, normalizePlayerState, publicState } from '../src/sim/state';
+import { receiveGift } from '../src/sim/gifts';
 
 // Server-authoritative game: every request loads the player's state with a row lock, applies exactly one
 // validated action with the shared rules and the server clock, and stores the result together with a coin
@@ -15,8 +16,13 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
     return repository.transaction(async (tx) => {
       const player = await tx.findOrCreatePlayer(identity);
       const record = await tx.lockState(player.id);
-      const state = record?.state ?? createInitialState(now());
+      const state = normalizePlayerState(record?.state ?? createInitialState(now()));
       advanceClock(state, context());
+      const pending = await tx.listGifts(player.id);
+      for (const gift of pending) {
+        const claimed = await tx.takeGift(gift.id, player.id);
+        if (claimed) state.message = receiveGift(state, claimed.payload, claimed.fromName);
+      }
       await tx.saveState(player.id, state, (record?.version ?? 0) + 1);
       return { ok: true, player: { id: player.id, name: player.name }, state: publicState(state), serverTime: now() };
     });
@@ -34,11 +40,19 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       if (replay) return { status: 200, body: replay };
 
       const record = await tx.lockState(player.id);
-      const state = record?.state ?? createInitialState(now());
+      const state = normalizePlayerState(record?.state ?? createInitialState(now()));
       const next = structuredClone(state);
       let result;
       try {
+        let giftTarget;
+        if (action.type === 'giftCosmetic') {
+          const recipientId = Number(action.recipient);
+          if (!Number.isSafeInteger(recipientId) || recipientId <= 0 || recipientId === Number(player.id)) throw new RuleError('Enter a valid friend player code.');
+          giftTarget = await tx.getPlayer(recipientId);
+          if (!giftTarget) throw new RuleError('That friend player code was not found.');
+        }
         result = applyAction(next, action, context());
+        if (action.type === 'giftCosmetic' && giftTarget) await tx.addGift({ fromId:Number(player.id),toId:Number(giftTarget.id),payload:{ kind:'cosmetic-copy',cosmeticId:action.cosmeticId } });
       } catch (error) {
         if (!(error instanceof RuleError)) throw error;
         // The action was refused; time still passes, but nothing the client asked for happens.

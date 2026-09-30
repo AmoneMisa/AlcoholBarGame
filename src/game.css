@@ -1178,9 +1178,9 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
 /* Guests sit on the painted stools, in front of the counter. */
 .bar-scene .bar-cast { display: block !important; inset: 0 !important; }
 .bar-scene .scene-customer { position: absolute !important; top: 0 !important; bottom: 0 !important; width: calc(var(--guest-h) * .72) !important; min-width: 0 !important; height: auto !important; transform: translateX(-50%) !important; }
-.bar-scene .scene-customer .art-character { top: auto !important; right: 0 !important; left: 0 !important; bottom: calc(100% - var(--seat-top) - var(--guest-h) * .03) !important; height: var(--guest-h) !important; }
+.bar-scene .scene-customer .art-character { top: auto !important; right: 0 !important; left: 0 !important; bottom: calc(100% - var(--back) - 2px) !important; height: var(--guest-h) !important; }
 .bar-scene .scene-customer.active .art-character { transform: none; }
-.bar-scene .speech-bubble { top: auto !important; bottom: calc(100% - var(--seat-top) + var(--guest-h) - 8px) !important; }
+.bar-scene .speech-bubble { top: auto !important; bottom: calc(100% - var(--back) + var(--guest-h) * .72) !important; }
 .bar-scene .customer-plate { top: calc(var(--seat-top) + 6px) !important; right: 4% !important; bottom: auto !important; left: 4% !important; }
 @media (max-width: 760px) {
   .bar-scene .bartender-layer { display: block !important; }
@@ -1192,7 +1192,9 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
 .bar-scene .scene-customer.bubble-left .speech-bubble::after { right: 17px; left: auto; }
 @media (max-width: 760px) { .bar-scene .speech-bubble { width: 136px !important; left: 64% !important; } .bar-scene .scene-customer.bubble-left .speech-bubble { right: 64% !important; } }
 .bar-scene .customer-plate { top: min(calc(var(--seat-top) + 6px), calc(100% - 86px)) !important; }
-.bar-scene .speech-bubble { bottom: calc(100% - var(--seat-top) + var(--guest-h) * .22) !important; }
+.bar-scene .speech-bubble { bottom: calc(100% - var(--back) + var(--guest-h) * .48) !important; }
+.customer-ashtray { position:absolute;z-index:12;top:calc(var(--back) - 6px);left:72%;width:34px;height:11px;transform:translate(-50%,-50%);border:2px solid #aeb5bd;border-radius:50%;background:radial-gradient(ellipse,#1d252d 0 38%,#78818a 42% 55%,#c8d0d5 58% 70%,#555d65 72%);box-shadow:0 4px 5px #0008;pointer-events:none; }
+.customer-ashtray i { position:absolute;right:4px;top:-2px;width:20px;height:3px;border-radius:3px;background:linear-gradient(90deg,#e5d6bc 0 68%,#93402c 70% 82%,#dedede 84%);transform:rotate(-8deg);box-shadow:0 0 3px #d68a58; }
 /* The city event chip moves away from a shelf painted on the right. */
 .bar-scene.shelf-right.is-building .city-event.compact { right: auto !important; left: 22px !important; }
 @media (max-width: 760px) { .bar-scene .live-glass-copy { top: auto !important; bottom: -20px !important; } }
@@ -1249,3 +1251,72 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:hidden}
 .design-options i[data-skin-tone='porcelain']{--tone:#f0c7b5}.design-options i[data-skin-tone='fair']{--tone:#dca58a}.design-options i[data-skin-tone='warm']{--tone:#b97858}.design-options i[data-skin-tone='olive']{--tone:#a36f4f}.design-options i[data-skin-tone='brown']{--tone:#82523d}.design-options i[data-skin-tone='deep']{--tone:#54362d}
 .bar-scene .bartender-layer:has(>.character-leo .character-composite.showing-base),
 .bar-scene .bartender-layer:has(>.character-noa .character-composite.showing-base){width:calc(var(--bt-h) * .572)!important}
+
+/* Parametric face builder. The painted portrait is covered by a neutral head
+   whose colour follows SKIN TONE; every feature below is independently shaped. */
+.role-bartender { --face-top:3.5%;--face-width:24%;--face-height:25%; }
+.role-bartender.character-leo { --face-top:.5%;--face-width:23%;--face-height:25%; }
+.role-bartender .modular-face { position:absolute;z-index:20;top:var(--face-top);left:var(--face-center-x,50%);display:block;width:var(--face-width);height:var(--face-height);transform:translateX(-50%);border:0;border-radius:48% 48% 45% 45% / 42% 42% 56% 56%;background:transparent;box-shadow:none; }
+/* Keep the painterly light and anatomy from the body atlas, but wash its bare
+   head with the selected skin tone. Features above are still independent. */
+.role-bartender .modular-face::before { content:'';position:absolute;z-index:0;inset:0;border-radius:inherit;background:radial-gradient(ellipse at 32% 30%,#fff2,transparent 34%),var(--skin-custom);opacity:.24;mix-blend-mode:color;filter:brightness(var(--skin-tan,1)); }
+.role-bartender.custom-face-heart .modular-face { border-radius:49% 49% 58% 58% / 38% 38% 67% 67%;clip-path:polygon(4% 10%,20% 1%,50% 5%,80% 1%,96% 10%,100% 54%,86% 82%,50% 100%,14% 82%,0 54%); }
+.role-bartender.custom-face-square .modular-face { border-radius:35% 35% 28% 28% / 32% 32% 22% 22%; }
+.role-bartender.custom-face-round .modular-face { width:calc(var(--face-width) * 1.05);height:calc(var(--face-height) * .94);border-radius:50%; }
+.role-bartender.custom-face-diamond .modular-face { clip-path:polygon(50% 0,88% 13%,100% 52%,72% 90%,50% 100%,28% 90%,0 52%,12% 13%); }
+.role-bartender.custom-face-long .modular-face { width:calc(var(--face-width) * .89);height:calc(var(--face-height) * 1.08); }
+.role-bartender.custom-face-soft .modular-face { border-radius:50% 50% 48% 48% / 44% 44% 60% 60%;box-shadow:inset 7px 1px 14px #fff3,inset -7px -2px 12px #5b26191c,0 2px 4px #0003; }
+.role-bartender.custom-face-angular .modular-face { clip-path:polygon(17% 2%,83% 2%,98% 25%,92% 71%,69% 96%,50% 100%,31% 96%,8% 71%,2% 25%); }
+.role-bartender.custom-face-mature .modular-face { box-shadow:inset 7px 1px 10px #fff1,inset -9px -2px 15px #3b170f30,0 2px 4px #0004; }
+.role-bartender.custom-face-mature .modular-face::after { content:'';position:absolute;inset:27% 11% 13%;background:linear-gradient(160deg,transparent 47%,#5a2d2528 48% 49%,transparent 50%),linear-gradient(20deg,transparent 49%,#5a2d2522 50% 51%,transparent 52%); }
+.role-bartender.custom-face-sculpted .modular-face { clip-path:polygon(15% 2%,85% 2%,98% 30%,88% 73%,63% 98%,50% 100%,37% 98%,12% 73%,2% 30%);box-shadow:inset 10px 0 10px #fff2,inset -12px 0 12px #30120d38; }
+.modular-face i { position:absolute;display:block;box-sizing:border-box; }
+.face-ear { display:none!important;z-index:-1;top:34%;width:10%;height:27%;border:1px solid #5b2d2330;border-radius:50%;background:var(--skin-custom); }
+.face-ear-left { left:-6%; }.face-ear-right { right:-6%; }
+.face-eye { z-index:4;top:35%;width:22%;height:5.5%;overflow:visible;border:0;border-bottom:1px solid #3c251f99;border-radius:58% 42% 54% 46%;background:#f4e2dc28;box-shadow:0 -3px 5px var(--shadow-color); }
+.face-eye-left { left:17%; }.face-eye-right { right:17%;transform:scaleX(-1); }
+.face-eye b { position:absolute;top:50%;left:50%;width:34%;aspect-ratio:1;transform:translate(-50%,-50%);border:1px solid #2c211d88;border-radius:50%;background:radial-gradient(circle,#101015 0 24%,var(--iris-color) 27% 69%,#251a16 72%);box-shadow:inset 0 0 1px #fff9;opacity:.78; }
+.feature-eyes-round .face-eye { height:7%;border-radius:50%; }.feature-eyes-hooded .face-eye { height:4.5%;border-radius:60% 42% 50% 38%;box-shadow:0 -3px 4px var(--shadow-color),inset 0 2px 0 #69423755; }
+.feature-eyes-upturned .face-eye { transform:rotate(-7deg); }.feature-eyes-upturned .face-eye-right { transform:scaleX(-1) rotate(-7deg); }
+.feature-eyes-downturned .face-eye { transform:rotate(7deg); }.feature-eyes-downturned .face-eye-right { transform:scaleX(-1) rotate(7deg); }
+.feature-eyes-deep-set .face-eye { box-shadow:0 -7px 7px #40211f66,0 -6px 8px var(--shadow-color); }
+.feature-eyes-monolid .face-eye { height:3.5%;border-radius:70% 30% 60% 40%;background:#ead4ca; }
+.feature-eyes-wide .face-eye { width:25%; }.feature-eyes-wide .face-eye-left { left:13%; }.feature-eyes-wide .face-eye-right { right:13%; }
+.feature-eyes-narrow .face-eye { height:3.5%;width:23%; }.feature-eyes-cat .face-eye { height:5%;clip-path:polygon(0 58%,18% 22%,82% 18%,100% 0,92% 74%,20% 100%); }
+.face-eye::after { content:'';position:absolute;z-index:5;inset:-25% -8%;border-top:1px solid transparent;border-radius:50%;pointer-events:none; }
+.liner-fine .face-eye::after { border-top:2px solid #21151b; }.liner-winged .face-eye::after { right:-25%;border-top:3px solid #201319;transform:skewX(-18deg); }
+.liner-smoky .face-eye::after { border-top:5px solid #241720cc;filter:blur(1px); }.liner-graphic .face-eye::after { inset:-45% -24%;border:2px solid #21151b;border-bottom:0;clip-path:polygon(0 70%,72% 0,100% 25%,72% 23%,12% 100%); }
+.liner-double-wing .face-eye::after { right:-27%;border-top:3px double #21151b;border-bottom:2px solid #21151b;transform:skewX(-18deg); }
+.face-brow { z-index:6;top:26%;width:23%;height:5%;border-top:3px solid var(--hair-custom);border-radius:50%;filter:drop-shadow(0 1px 1px #0004); }
+.face-brow-left { left:16%;transform:rotate(-5deg); }.face-brow-right { right:16%;transform:rotate(5deg); }
+.feature-brows-high-arch .face-brow { top:22%;height:11%;border-radius:70% 70% 20% 20%; }.feature-brows-straight .face-brow { height:3%;border-radius:10%; }
+.feature-brows-rounded .face-brow { height:9%;border-radius:70%; }.feature-brows-feathered .face-brow { border-top-style:dashed;border-top-width:5px; }
+.feature-brows-bold .face-brow { border-top-width:7px; }.feature-brows-slim .face-brow { border-top-width:2px; }
+.feature-brows-angled .face-brow-left { transform:rotate(-12deg); }.feature-brows-angled .face-brow-right { transform:rotate(12deg); }
+.feature-brows-short .face-brow { width:20%; }.feature-brows-short .face-brow-left { left:18%; }.feature-brows-short .face-brow-right { right:18%; }
+.feature-brows-long .face-brow { width:32%; }.feature-brows-long .face-brow-left { left:8%; }.feature-brows-long .face-brow-right { right:8%; }
+.face-nose { z-index:5;top:45%;left:46%;width:8%;height:17%;border-right:1px solid #64382d62;border-bottom:1px solid #64382d55;border-radius:20% 35% 50% 30%;box-shadow:2px 1px 3px #5a281b1c; }
+.feature-nose-button .face-nose { top:47%;height:21%;width:14%;left:43%;border-radius:50%; }.feature-nose-aquiline .face-nose { transform:skewX(-12deg);height:29%; }
+.feature-nose-wide .face-nose { left:40%;width:20%; }.feature-nose-narrow .face-nose { left:47%;width:7%; }.feature-nose-turned-up .face-nose { top:48%;height:19%;transform:rotate(-8deg); }
+.feature-nose-roman .face-nose { height:31%;border-right-width:3px;transform:skewX(8deg); }.feature-nose-soft .face-nose { border-color:#71463844;box-shadow:3px 2px 7px #6b352329; }
+.face-lips { z-index:7;top:70%;left:39%;width:22%;height:4.5%;border-radius:60% 60% 55% 55% / 62% 62% 40% 40%;background:linear-gradient(180deg,var(--lip-color) 0 43%,#5b2d3255 46% 54%,var(--lip-color) 57%);box-shadow:0 0 0 2px color-mix(in srgb,var(--skin-custom) 55%,transparent),inset 0 1px 1px #fff3;opacity:.86; }
+.feature-lips-full .face-lips { height:7%;top:73%; }.feature-lips-thin .face-lips { height:3%;top:76%; }.feature-lips-cupid .face-lips { clip-path:polygon(0 45%,30% 19%,42% 33%,50% 8%,58% 33%,70% 19%,100% 45%,75% 87%,50% 100%,25% 87%); }
+.feature-lips-wide .face-lips { left:27%;width:46%; }.feature-lips-small .face-lips { left:40%;width:20%; }.feature-lips-top-heavy .face-lips { clip-path:polygon(0 48%,30% 8%,50% 25%,70% 8%,100% 48%,77% 78%,50% 88%,23% 78%); }
+.feature-lips-bottom-heavy .face-lips { clip-path:polygon(0 37%,30% 18%,50% 31%,70% 18%,100% 37%,75% 95%,50% 100%,25% 95%); }.feature-lips-bowed .face-lips { border-radius:35% 35% 55% 55%;transform:scaleX(.88); }
+.face-cheek { z-index:2;top:55%;width:25%;height:22%;border-radius:50%;background:radial-gradient(circle,var(--blush-color),transparent 70%); }
+.face-cheek-left { left:7%; }.face-cheek-right { right:7%; }.feature-cheeks-defined .face-cheek { box-shadow:inset 0 -3px 0 #52241e38;transform:skewY(-12deg); }
+.feature-cheeks-high .face-cheek { top:49%; }.feature-cheeks-round .face-cheek { width:29%;height:25%; }.feature-cheeks-hollow .face-cheek { background:linear-gradient(165deg,transparent 40%,#4e241f42 50%,transparent 62%); }.feature-cheeks-full .face-cheek { background:radial-gradient(circle,var(--blush-color),#fff1 58%,transparent 73%); }
+.blush-draped .face-cheek { top:47%;width:31%;height:27%; }.blush-none .face-cheek { --blush-color:transparent; }
+.face-facial-hair { z-index:9;left:7%;bottom:-5%;width:86%;height:54%;background:var(--facial-hair-art) center bottom/contain no-repeat;filter:drop-shadow(0 1px 1px #0008); }
+.face-facial-hair::after { content:'';position:absolute;inset:0;background:var(--hair-custom);opacity:.68;mix-blend-mode:color;mask:var(--facial-hair-mask) center bottom/contain no-repeat;-webkit-mask:var(--facial-hair-mask) center bottom/contain no-repeat; }
+.role-bartender .modular-hair { z-index:30; }
+.design-options i[data-eye-color] { border:1px solid #ffffff33;border-radius:50%;background:var(--eye-swatch)!important; }
+.design-options i[data-eye-color='brown']{--eye-swatch:#4b2f25}.design-options i[data-eye-color='hazel']{--eye-swatch:#7a6a32}.design-options i[data-eye-color='green']{--eye-swatch:#4f764b}.design-options i[data-eye-color='blue']{--eye-swatch:#4e7896}.design-options i[data-eye-color='gray']{--eye-swatch:#76808a}.design-options i[data-eye-color='amber']{--eye-swatch:#a66c27}.design-options i[data-eye-color='violet']{--eye-swatch:#76548d}.design-options i[data-eye-color='black']{--eye-swatch:#17151a}
+.outfit-selector button.special::before { content:'✦ ';color:#f6c75a; }
+.design-options button.locked,.outfit-selector button.locked { opacity:.55;filter:saturate(.45);cursor:not-allowed; }
+.design-options button>em,.outfit-selector button>em { margin-right:3px;font-style:normal; }
+.design-options .cosmetic-roulette { grid-column:1/-1;border-color:#a57534;background:radial-gradient(circle at 12% 20%,#54322f,#18243a 68%); }
+.cosmetic-roulette>div { display:grid!important;grid-template-columns:1fr auto;align-items:center;gap:10px!important; }
+.cosmetic-roulette p { margin:0;color:#d9c6a4;font-size:11px;line-height:1.4; }
+.cosmetic-roulette button { min-width:180px;border-color:#d19a3d!important;background:#8e5e22!important;color:#fff3cf!important; }
+@media(max-width:760px){.cosmetic-roulette>div{grid-template-columns:1fr!important}.cosmetic-roulette button{width:100%;min-width:0}.design-options .face-builder{grid-column:1/-1}.design-options .face-builder>div{display:flex;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px;scroll-snap-type:x proximity}.design-options .face-builder button{flex:0 0 auto;min-width:78px;scroll-snap-align:start}}

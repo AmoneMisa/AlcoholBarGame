@@ -13,6 +13,9 @@ import { arrivalSkipCrystalCost,CRYSTAL_EXCHANGE_BUNDLES,crystalExchange,dailyCo
 import { CHARACTER_ART,CUSTOMER_ART_BY_SLOT } from '../src/data/cosmetics/artCatalog.ts';
 import { INTERIORS,COUNTER_MATERIALS,HAIR_STYLES,SKIN_DETAILS } from '../src/data/cosmetics/bars.ts';
 import { useGameStore } from '../src/stores/game.ts';
+import { COSMETICS } from '../src/domain/cosmetics.ts';
+import { applyAction,RuleError } from '../src/sim/rules.ts';
+import { createInitialState,withUniqueLook } from '../src/sim/state.ts';
 import {
   CUSTOMER_ARRIVAL_MIN_MS,CUSTOMER_ARRIVAL_MAX_MS,VIP_COOLDOWN_MIN_MS,VIP_COOLDOWN_MAX_MS,
   VIP_CHANCE,VIP_RECIPE_CHANCE,canWelcomeVip,nextCustomerArrival,nextVipAvailability,orderTimeSeconds,vipCarriesRecipe
@@ -22,6 +25,33 @@ const saves = new Map();
 globalThis.localStorage = { getItem:key => saves.get(key) ?? null,setItem:(key,value) => saves.set(key,value) };
 globalThis.window = { setTimeout,clearTimeout };
 function freshGame() { saves.clear();setActivePinia(createPinia());return useGameStore(); }
+
+test('Daily style draw unlocks modular face parts and duplicate cosmetics can be gifted',() => {
+  const state = createInitialState(Date.UTC(2026,8,30));
+  const context = { now:Date.UTC(2026,8,30),random:()=>0,checkEnglish:(text)=>({ok:true,corrected:text}) };
+  const first = COSMETICS.find((item) => item.character === 'noa');
+  assert.ok(first);
+  assert.throws(() => applyAction(state,{type:'setDecor',key:first.key,value:first.value},context),RuleError);
+  applyAction(state,{type:'spinCosmeticRoulette'},context);
+  assert.equal(state.ownedCosmeticIds.length,1);
+  assert.throws(() => applyAction(state,{type:'spinCosmeticRoulette'},context),RuleError,'one draw per day');
+  state.ownedCosmeticIds = COSMETICS.map((item) => item.id);
+  state.cosmeticRouletteKey = '';
+  applyAction(state,{type:'spinCosmeticRoulette'},context);
+  const duplicate = COSMETICS[0];
+  assert.equal(state.cosmeticCopies[duplicate.id],1);
+  applyAction(state,{type:'giftCosmetic',cosmeticId:duplicate.id,recipient:'NightFox'},context);
+  assert.equal(state.cosmeticCopies[duplicate.id],0);
+  assert.equal(state.cosmeticGiftLog[0].recipient,'NightFox');
+});
+
+test('Customer smoking trait is stable and never injected as incompatible dialogue text',() => {
+  const guest = generateCustomer(2,RECIPES.slice(0,10));
+  guest.id = 'stable-guest';
+  const first = withUniqueLook(guest,[]).smoker;
+  assert.equal(withUniqueLook(guest,[]).smoker,first);
+  assert.doesNotMatch(`${guest.greeting} ${guest.request} ${guest.wish}`,/I don['’]t smoke/i);
+});
 
 test('The complete 64-cocktail book is valid and includes alcohol strength',() => {
   assert.equal(RECIPES.length,64);

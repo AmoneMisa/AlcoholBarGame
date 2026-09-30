@@ -14,6 +14,7 @@ import { canWelcomeVip, nextCustomerArrival, nextVipAvailability, orderTimeSecon
 import { economyAt, marketFor } from '../domain/progression';
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
+import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
 import { DELIVERY_DAY_MS, levelFor, normalizePlayerState, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
@@ -41,6 +42,8 @@ export type GameAction =
   | { type: 'renameBar'; name: string }
   | { type: 'renameBartender'; name: string }
   | { type: 'setDecor'; key: string; value: string }
+  | { type: 'spinCosmeticRoulette' }
+  | { type: 'giftCosmetic'; cosmeticId: string; recipient: string }
   | { type: 'selectCustomer'; customerId: string }
   | { type: 'openConversation'; customerId: string }
   | { type: 'closeConversation' }
@@ -589,7 +592,33 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const allowed = (BAR_PROFILE_OPTIONS as Record<string, readonly string[]>)[action.key];
       if (!allowed || !allowed.includes(action.value)) throw new RuleError('That style is not available.');
       if (action.key === 'interior' && !state.ownedInteriorIds.includes(action.value)) throw new RuleError('Purchase this background before using it.');
+      if (!canUseCosmetic(state.ownedCosmeticIds, action.key, action.value, state.bars[state.regionId].bartenderCharacter)) throw new RuleError('Unlock this style in the daily roulette first.');
       (state.bars[state.regionId] as unknown as Record<string, string>)[action.key] = action.value;
+      break;
+    }
+    case 'spinCosmeticRoulette': {
+      const today = calendarDate(new Date(now));
+      if (state.cosmeticRouletteKey === today) throw new RuleError('Today’s style draw is already claimed.');
+      const locked = COSMETICS.filter((entry) => !state.ownedCosmeticIds.includes(entry.id));
+      const pool = locked.length ? locked : COSMETICS;
+      const reward = pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))]!;
+      state.cosmeticRouletteKey = today;
+      if (state.ownedCosmeticIds.includes(reward.id)) state.cosmeticCopies[reward.id] = (state.cosmeticCopies[reward.id] ?? 0) + 1;
+      else state.ownedCosmeticIds.push(reward.id);
+      state.cosmeticRouletteResult = `${reward.label} ${reward.character ? `for ${reward.character === 'noa' ? 'woman' : 'man'}` : ''} unlocked${state.cosmeticCopies[reward.id] ? ' as a giftable duplicate' : ''}.`;
+      state.message = state.cosmeticRouletteResult;
+      break;
+    }
+    case 'giftCosmetic': {
+      const reward = COSMETICS.find((entry) => entry.id === action.cosmeticId);
+      const recipient = cleanText(action.recipient, 32);
+      if (!reward) throw new RuleError('Unknown cosmetic item.');
+      if (!recipient) throw new RuleError('Enter your friend’s code or nickname.');
+      if ((state.cosmeticCopies[reward.id] ?? 0) < 1) throw new RuleError('Only duplicate cosmetic items can be gifted.');
+      state.cosmeticCopies[reward.id] = (state.cosmeticCopies[reward.id] ?? 0) - 1;
+      state.cosmeticGiftLog.unshift({ cosmeticId:reward.id,recipient,at:now });
+      state.cosmeticGiftLog = state.cosmeticGiftLog.slice(0,30);
+      state.message = `${reward.label} sent to ${recipient}.`;
       break;
     }
 
