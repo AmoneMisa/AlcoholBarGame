@@ -65,7 +65,9 @@ export const SKIN_TONES = ['porcelain','fair','warm','olive','brown','deep'] as 
 export const TAN_LEVELS = ['none','sun-kissed','deep'] as const;
 export const BUST_OPTIONS = ['petite','balanced','full'] as const;
 export const POSES = ['neutral','confident','working'] as const;
-export const BARTENDER_OUTFITS = ['vest','shirt','apron','biker','special-gala','special-cyberpunk','special-steampunk','special-post-apocalypse','special-historical','special-fantasy','special-masquerade'] as const;
+// Recolours the main garment of the current outfit ('natural' keeps the original look).
+export const OUTFIT_COLORS = ['natural','black','white','red','blue','green','plum','sand'] as const;
+export const BARTENDER_OUTFITS = ['vest','shirt','apron','biker','tee-skirt','suit-jeans','bunny','kimono','baggy-tee','streetwear','special-gala','special-cyberpunk','special-steampunk','special-post-apocalypse','special-historical','special-fantasy','special-masquerade'] as const;
 export const BAR_PROFILE_OPTIONS = {
   wall:WALLS,counter:COUNTER_MATERIALS,counterColor:COUNTER_COLORS,counterSize:COUNTER_SIZES,
   lighting:HIGHLIGHTS,highlightStrength:HIGHLIGHT_STRENGTHS,shelf:SHELF_STYLES,bartenderCharacter:['noa','leo'] as const,
@@ -73,7 +75,7 @@ export const BAR_PROFILE_OPTIONS = {
   hairStyle:HAIR_STYLES,hairColor:HAIR_COLORS,bodyShape:BODY_SHAPES,skinDetail:SKIN_DETAILS,skinTone:SKIN_TONES,tanLevel:TAN_LEVELS,
   bust:BUST_OPTIONS,pose:POSES,eyeShape:EYE_SHAPES,browShape:BROW_SHAPES,noseShape:NOSE_SHAPES,lipShape:LIP_SHAPES,
   cheekShape:CHEEK_SHAPES,eyeColor:EYE_COLORS,eyeliner:EYELINER_OPTIONS,eyeshadow:EYESHADOW_OPTIONS,lipColor:LIP_COLORS,
-  blush:BLUSH_OPTIONS,facialHair:FACIAL_HAIR_OPTIONS
+  blush:BLUSH_OPTIONS,facialHair:FACIAL_HAIR_OPTIONS,outfitColor:OUTFIT_COLORS
 } as const;
 
 export interface BarProfile {
@@ -108,12 +110,13 @@ export interface BarProfile {
   lipColor: typeof LIP_COLORS[number];
   blush: typeof BLUSH_OPTIONS[number];
   facialHair: typeof FACIAL_HAIR_OPTIONS[number];
+  outfitColor: typeof OUTFIT_COLORS[number];
   // Back-bar cabinet; missing or 'auto' follows the background.
   shelf?: typeof SHELF_STYLES[number];
 }
 
-const femaleStyle = { face:'soft',hairStyle:'updo',hairColor:'espresso',bodyShape:'curvy',skinDetail:'clean',skinTone:'warm',tanLevel:'sun-kissed',bust:'balanced',pose:'confident',eyeShape:'almond',browShape:'soft-arch',noseShape:'soft',lipShape:'full',cheekShape:'high',eyeColor:'hazel',eyeliner:'winged',eyeshadow:'bronze',lipColor:'rose',blush:'soft',facialHair:'clean' } as const;
-const maleStyle = { face:'angular',hairStyle:'slick',hairColor:'chestnut',bodyShape:'muscular',skinDetail:'tattoo-bold',skinTone:'warm',tanLevel:'sun-kissed',bust:'balanced',pose:'neutral',eyeShape:'hooded',browShape:'bold',noseShape:'straight',lipShape:'balanced',cheekShape:'defined',eyeColor:'brown',eyeliner:'none',eyeshadow:'none',lipColor:'bare',blush:'none',facialHair:'short-beard' } as const;
+const femaleStyle = { outfitColor:'natural',face:'soft',hairStyle:'updo',hairColor:'espresso',bodyShape:'curvy',skinDetail:'clean',skinTone:'warm',tanLevel:'sun-kissed',bust:'balanced',pose:'confident',eyeShape:'almond',browShape:'soft-arch',noseShape:'soft',lipShape:'full',cheekShape:'high',eyeColor:'hazel',eyeliner:'winged',eyeshadow:'bronze',lipColor:'rose',blush:'soft',facialHair:'clean' } as const;
+const maleStyle = { outfitColor:'natural',face:'angular',hairStyle:'slick',hairColor:'chestnut',bodyShape:'muscular',skinDetail:'tattoo-bold',skinTone:'warm',tanLevel:'sun-kissed',bust:'balanced',pose:'neutral',eyeShape:'hooded',browShape:'bold',noseShape:'straight',lipShape:'balanced',cheekShape:'defined',eyeColor:'brown',eyeliner:'none',eyeshadow:'none',lipColor:'bare',blush:'none',facialHair:'short-beard' } as const;
 export const DEFAULT_BARS: Record<RegionId, BarProfile> = {
   'new-york': { name:'The Velvet Hour',wall:'neon',counter:'classic',counterColor:'ruby',counterSize:'standard',lighting:'amber',highlightStrength:'medium',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'vest',interior:'velvet',...femaleStyle },
   london: { name:'Juniper & Oak',wall:'emerald',counter:'walnut',counterColor:'espresso',counterSize:'grand',lighting:'amber',highlightStrength:'soft',bartenderCharacter:'leo',bartenderNickname:'Leo',bartender:'shirt',interior:'speakeasy',...maleStyle },

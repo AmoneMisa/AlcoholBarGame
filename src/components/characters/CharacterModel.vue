@@ -35,6 +35,7 @@ const props = withDefaults(defineProps<{
   lipColor?: string;
   blush?: string;
   facialHair?: string;
+  outfitColor?: string;
   seed?: string;
   animation?: 'enter' | 'approach' | 'idle' | 'listen' | 'talk' | 'think' | 'react-angry' | 'react-happy' | 'receive' | 'pay' | 'leave' | 'reach' | 'grab' | 'pour' | 'shake' | 'stir' | 'garnish' | 'serve';
 }>(), {
@@ -80,7 +81,7 @@ const castStyle = computed(() => {
 
 <template>
   <div class="art-character" :style="{ '--figure-drop': figureDrop }" :class="[`role-${role}`, `character-${characterId}`, `expression-${expression}`, `motion-${animation}`, `body-${look.body}`, `skin-${look.skin}`, `hair-${look.hair}`, `face-${look.face}`, `outfit-${outfit}`, `accessory-${accessory}`, `glasses-${look.glasses}`, `hat-${look.hat}`, `vip-${look.vip}`, `custom-pose-${pose}`, mood]" :aria-label="`${art.name}, ${expression}`">
-    <Bartender3D v-if="role === 'bartender' && characterId === 'noa' && !outfit.startsWith('special-') && !modelFailed" v-bind="props" @error="modelFailed = true" />
+    <Bartender3D v-if="role === 'bartender' && (characterId === 'noa' || characterId === 'leo') && !outfit.startsWith('special-') && !modelFailed" v-bind="props" :key="characterId" @error="modelFailed = true" />
     <img v-else-if="art.asset" class="bartender-art" :src="art.asset" :alt="art.name" draggable="false" />
     <div v-else-if="role === 'customer'" class="character-sprite customer-art" :style="castStyle" role="img" :aria-label="art.name"></div>
     <div v-else class="character-composite" role="img" :aria-label="art.name">

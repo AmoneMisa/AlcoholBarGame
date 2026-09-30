@@ -1,31 +1,38 @@
 # Blender bartender integration
 
-Noa uses `public/assets/characters/3d/amber.glb` for the standard outfits, in the bar and in Design. Leo and the special outfits keep their illustrated artwork.
+Both bartenders are real-time 3D in the bar and in Design: Noa (`amber.glb`) and Leo (`leo.glb`). Special outfits (`special-*`) keep their illustrated artwork. If WebGL or a model fails to load, the illustrated character is shown instead.
 
 ## Source models (Desktop `Models` folder, read only)
 
-- **Female_Leather_Suit.Fbx**: base body, hair parts, eyes, teeth, leather jacket + skirt, strap boots. It is a low-poly version of the same character, so it is the base.
-- **Amber.Fbx**: jeans, cropped tee, leather jacket, boots and brows. They are refitted onto the base body (scale, then a push-out pass so nothing sinks into the skin).
+- **Noa**: `Female_Leather_Suit.Fbx` is the low-poly base (body, hair, leather jacket + skirt split at the waist so each can be mixed with the tee or jeans, strap boots). `Amber.Fbx` adds jeans, cropped tee, jacket, boots and brows, refitted onto the base body. `SKM_Hair.fbx` + `Textures/T_Hair_*.tga` add a long hairstyle.
+- **Leo**: `Hassan+V1.blend` (body, plaid shirt, jeans, biker jeans, boots, blowback hair, brows, four 3D beard meshes). Only the metre-scale copies are used; the centimetre duplicates lost their textures.
 
 ## Editable features
 
-- **Face**: eyes (wide / narrow), eyebrows (arch / inner), nose (wide, narrow, turned-up, button, straight), cheeks (high, full, round, hollow), mouth (full, thin, wide, small) are shape keys. Hair parts (updo, bun, bob, pixie) and hair/eye colours are swappable.
-- **Makeup and beard**: lipstick, eyeshadow, eyeliner, blush and facial hair are a face-projected shader (surface effect, not a groom).
-- **Clothes**: Leather jacket, Cropped tee, Work apron, Leather & skirt (new `biker` outfit).
-- **Body**: five presets deform the body and every garment together.
-- The apron is generated in Blender by wrapping a grid onto the torso, so it follows the body and the body morphs.
+| | Noa | Leo |
+|---|---|---|
+| Hair | updo, bun, bob, pixie, waves | slick, buzz |
+| Facial hair | - | stubble (painted), short beard, full beard, goatee, moustache, soul patch (real meshes) |
+| Makeup | lipstick, eyeshadow, eyeliner, blush | - |
+| Clothes | cropped tee + jeans, leather jacket, tee & skirt, jacket & jeans, leather set, bunny suit, kimono, baggy tee, streetwear | plaid shirt, biker jeans |
+| Face | eyes, nose, cheeks, mouth and colours (Noa's brows are painted on her skin) | eyes, brows, nose, cheeks, mouth and colours |
+| Outfit colour | natural, black, white, red, blue, green, plum, sand: recolours the outfit's main garment and keeps its shading | same |
+
+Each bartender has **one fixed body shape** baked into the body and every garment (slim and cute for Noa, lean and muscular for Leo), so there are no body morphs and the models are smaller. The Design screen has three tabs (Bar, Clothes, Character). The preview turns about 40° each way and sways on its own so clothes and hair can be judged. The work apron was removed; older saves that used it show the plain shirt look.
 
 ## Budget (mobile)
 
-About 65k vertices in total (body 11k, each garment ~3k, hair cards ~7k each) and about 11 MB, down from about 400k vertices and 15 MB. Textures are at most 2048 (head skin) and 1024 elsewhere; eyes, teeth and tongue use 512.
+About 70k vertices per character. `amber.glb` is about 9 MB and `leo.glb` about 10 MB. Textures are at most 2048 (Noa's head skin), 1536 (Leo's head skin) and 1024 elsewhere; eyes and beards use 512. Hair cards are never decimated (it destroys their alpha edges).
 
 ## Rebuild
 
 ```powershell
-& 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background --factory-startup --disable-autoexec --python scripts/export_bartender.py -- --source 'C:\Users\kubai\Desktop\Models'
+$blender = 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe'
+& $blender --background --factory-startup --disable-autoexec --python scripts/export_bartender.py -- --source 'C:\Users\kubai\Desktop\Models' --character female
+& $blender --background --factory-startup --disable-autoexec --python scripts/export_bartender.py -- --source 'C:\Users\kubai\Desktop\Models' --character male
 ```
 
-Outputs: `assets-src/characters/imported/bartender.blend`, the GLB and `manifest.json`. The arms are relaxed by a skin-weight-driven rotation at export time, so the GLB has no rig. Source assets are user supplied and keep their original licences.
+Outputs: the GLBs, plus editable `.blend` projects and a build report under the git-ignored `assets-src/`. Noa's arms are relaxed by a skin-weight-driven rotation; Leo's are posed through his real rig, so his shirt deforms with its own weights. No rig ships in the GLB. Source assets are user supplied and keep their original licences.
 
 ## Verify
 
@@ -34,4 +41,12 @@ pnpm build
 pnpm test
 ```
 
-The asset tests check the GLB structure, embedded textures, required pieces, shared body morphs, face UVs, the vertex/file-size budget and editor-value compatibility with saved profiles. The dev API process must be restarted after changing `src/data/cosmetics/bars.ts`.
+The asset tests check each GLB's structure, parts, shared body morphs, face UVs, metre scale, the vertex/file-size budget, and that every editor value is valid for saved profiles. Restart the dev API process after changing `src/data/cosmetics/bars.ts`.
+
+## Garments from other bodies
+
+The bunny suit comes with the nude body it was sculpted on, so it is warped onto Noa with a smooth displacement field (arms and legs follow their own axes; skin-tight pieces are snapped to her surface). The kimono, baggy tee and streetwear set are stand-alone meshes: they are decimated, given one flat recolourable material each, and pushed outside her body. Known roughness: the upper sleeves of the kimono and baggy tee bunch at the shoulders, and the streetwear set has small gaps at the chest.
+
+## Not usable
+
+`GoldenDressGirl` and `WhiteTechwearGirl` are single fused sculpts (body, hair and clothes in one connected mesh, textures missing), so they cannot be split into garments. `Survival_Character` uses a different rig and body, so its clothes do not fit Leo. `Loose_Biker_Boots` (Hassan) leaves the toes bare.

@@ -212,18 +212,35 @@ header.top-hud { grid-template-columns: minmax(230px, 1fr) auto 130px; }
   .recipe-item-inventory > div{grid-template-columns:1fr 1fr;padding:8px}.recipe-item-inventory article{grid-template-columns:54px minmax(0,1fr)}.recipe-item-inventory .glass-model.glass-painted{width:54px;height:62px}
   .region-cards > article{grid-template-rows:95px auto auto auto auto 42px}.region-cards > article img{height:95px}
 }
-.design-deck .bartender-custom > .art-character{position:relative;inset:auto;display:block;height:480px;min-height:480px;width:min(100%,360px);padding:0;aspect-ratio:auto;background:radial-gradient(ellipse at 50% 40%,#453044,#121b2b 75%)}
-.design-deck .bartender-custom > .avatar-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:12px}
 .design-deck .avatar-help{padding:0 12px}
-@media(max-width:760px){.design-deck .design-preview{position:relative;top:auto;height:240px}.design-deck .bartender-custom > .art-character{height:440px;min-height:440px}}
 
 /* Design tabs: Bar / Clothes / Character. The bar preview is only on the Bar tab, so it can never cover the character. */
 .design-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:10px 12px 0}
 .design-tabs button{min-height:42px;padding:8px 10px;border:1px solid #465064;border-radius:10px;background:#141f31;color:#d6c5b0;font-size:13px;font-weight:700}
 .design-tabs button.active{border-color:#d8aa57;background:#4a3219;color:#ffe2a8}
 .design-tabs button:focus-visible{outline:2px solid #d8aa57;outline-offset:2px}
-.design-deck .bartender-custom > .art-character{position:sticky;top:calc(var(--hud-h,0px) + 6px);z-index:20;height:clamp(260px,46vh,460px);min-height:0;width:min(100%,360px);margin:0 auto 10px;box-shadow:0 10px 18px #0009}
-.design-deck .bartender-custom{overflow:clip!important}
 .design-deck .design-tab-clothes,.design-deck .design-tab-character{display:grid;gap:8px;min-width:0}
 .design-deck .design-tab-character .avatar-help{margin:0}
-@media(max-width:760px){.design-deck .bartender-custom > .art-character{height:clamp(240px,42vh,380px);min-height:0}}
+
+/* Avatar stage: mobile first. The viewer is pinned at the top on a solid band so options scroll cleanly underneath it. */
+.design-deck .bartender-custom{overflow:clip!important;display:grid;gap:10px;min-height:0!important}
+.avatar-stage{position:sticky;top:calc(var(--hud-h,0px) + 6px);z-index:20;padding:0 0 6px;background:#0d1626;border-radius:14px}
+.avatar-stage > .art-character{position:relative!important;inset:auto!important;display:block;width:100%!important;height:clamp(250px,44vh,420px)!important;min-height:0!important;aspect-ratio:auto!important;margin:0!important;padding:0;overflow:hidden;border-radius:14px;background:radial-gradient(ellipse at 50% 40%,#453044,#121b2b 75%);box-shadow:0 10px 18px #0009}
+/* Illustrated (2D) bartender: show the whole figure inside the same frame. */
+.avatar-stage .bartender-art{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;object-fit:contain!important;object-position:center top!important;transform:none!important}
+.design-deck .design-tab-clothes,.design-deck .design-tab-character{display:grid;gap:10px;min-width:0}
+.design-deck .design-tab-character .avatar-help{margin:0;padding:0 2px}
+.design-deck .avatar-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:0}
+.design-deck .outfit-selector{display:flex;flex-wrap:wrap;gap:6px;overflow:visible}
+.design-deck .outfit-selector button{flex:1 1 calc(50% - 6px)}
+/* Wider screens: viewer on the left, options on the right. */
+@media(min-width:900px){
+  .design-deck .bartender-custom{grid-template-columns:minmax(300px,400px) minmax(0,1fr);align-items:start;gap:18px}
+  .avatar-stage{grid-column:1;grid-row:1 / span 3}
+  .avatar-stage > .art-character{height:clamp(380px,68vh,600px)!important}
+  .design-deck .design-tab-clothes,.design-deck .design-tab-character{grid-column:2}
+  .design-deck .avatar-options{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+/* Win over per-character sizing rules (.character-leo etc.) so every bartender fills the stage. */
+.design-deck .avatar-stage{display:block!important;padding:0 0 6px!important}
+.design-deck .avatar-stage > .art-character.art-character{width:100%!important;max-width:none!important;flex:none}

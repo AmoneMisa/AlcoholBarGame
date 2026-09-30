@@ -1304,10 +1304,3 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:clip}
 /* Imported Blender character editor. */
 .avatar-help{margin:8px 0;color:#bdc6d4;font-size:12px;line-height:1.5}
 .avatar-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;padding:12px 0}
-.avatar-options label{display:grid;gap:6px;font-size:12px;color:#d6c5b0}
-.avatar-options select{width:100%;min-width:0;min-height:40px;padding:8px;color:#f0e7dc;background:#182232;border:1px solid #465064;border-radius:8px}
-.avatar-options select{color-scheme:dark}
-.avatar-options option{background:#182232;color:#f0e7dc}
-.avatar-options option:checked{background:#8a5d22;color:#fff}
-.avatar-options option:disabled{color:#7d8696}
-.avatar-options select:focus-visible{outline:2px solid #d8aa57;outline-offset:2px}

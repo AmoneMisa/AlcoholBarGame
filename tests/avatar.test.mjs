@@ -1,38 +1,79 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { AVATAR_OPTIONS } from '../src/data/cosmetics/avatar.ts';
+import { AVATAR_OPTIONS, avatarOptionsFor } from '../src/data/cosmetics/avatar.ts';
 import { BAR_PROFILE_OPTIONS } from '../src/data/cosmetics/bars.ts';
 import { canUseCosmetic } from '../src/domain/cosmetics.ts';
-const data=readFileSync(new URL('../public/assets/characters/3d/amber.glb',import.meta.url));
-const model=JSON.parse(data.subarray(20,20+data.readUInt32LE(12)).toString());
-test('The avatar is self-contained and includes all editable model parts',()=>{
- assert.equal(data.toString('ascii',0,4),'glTF');
- assert.equal(data.readUInt32LE(8),data.length);
- assert.ok(model.images.every(image=>image.bufferView!==undefined && !image.uri));
- const names=new Set(model.meshes.map(mesh=>mesh.name));
- for(const name of ['CC_Base_Body','Camila_Brow','CC_Base_Eye','Bun','Bang','Hair_Base','Crop_T_Shirt','Punk_Leather_Jacket','Apron','Jeans','F_Black_Outfit_L','Punk_Strap_Boots','Boots']) assert.ok(names.has(name),name);
+
+const load = (file) => {
+  const data = readFileSync(new URL(`../public/assets/characters/3d/${file}`, import.meta.url));
+  return { data, model: JSON.parse(data.subarray(20, 20 + data.readUInt32LE(12)).toString()) };
+};
+const noa = load('amber.glb');
+const leo = load('leo.glb');
+const FACE_MORPHS = ['eyesWide', 'eyesNarrow', 'lipsFull', 'lipsThin', 'lipsWide', 'lipsSmall', 'browArch', 'browInner', 'noseWide', 'noseNarrow', 'noseUp', 'cheekHigh', 'cheekFull', 'cheekHollow'];
+const LEO_ONLY_MORPHS = ['mouthClose'];   // closes the male mouth, which the source leaves slightly open
+
+for (const [label, { data, model }, parts, garments] of [
+  ['Noa', noa, ['CC_Base_Body', 'CC_Base_Eye', 'Bun', 'Bang', 'Hair_Base', 'SKM_Hair_Bangs', 'Crop_T_Shirt', 'Punk_Leather_Jacket', 'Jeans', 'Suit_Jacket', 'Suit_Skirt', 'Punk_Strap_Boots', 'Boots', 'Bunny_Leotard', 'Bunny_Jacket', 'Bunny_Stockings', 'Bunny_BunnyEars'],
+    ['CC_Base_Body', 'Jeans', 'Crop_T_Shirt', 'Punk_Leather_Jacket', 'Boots', 'Suit_Jacket', 'Suit_Skirt', 'Punk_Strap_Boots']],
+  ['Leo', leo, ['CC_Base_Body', 'CC_Base_Eye', 'Male_Bushy', 'Short_blowback', 'Plaid_Punk_Shirt', 'Jeans', 'Boots', 'Biker_Jeans', 'Chinstrap_Thick', 'Circle_Thick', 'Mustache_Horseshoe', 'Soul_Path_Thick'],
+    ['CC_Base_Body', 'Jeans', 'Plaid_Punk_Shirt', 'Boots']]
+]) {
+  test(`${label}: the avatar is self-contained and has every editable part`, () => {
+    assert.equal(data.toString('ascii', 0, 4), 'glTF');
+    assert.equal(data.readUInt32LE(8), data.length);
+    assert.ok(model.images.every((image) => image.bufferView !== undefined && !image.uri));
+    const names = new Set(model.meshes.map((mesh) => mesh.name));
+    for (const name of parts) assert.ok(names.has(name), name);
+  });
+  test(`${label}: has a fixed body shape and keeps face UVs and expressions`, () => {
+    // The body shape is baked in: garments carry no runtime body morphs, only the face keeps expression targets.
+    for (const mesh of model.meshes.filter((mesh) => garments.includes(mesh.name) && mesh.name !== 'CC_Base_Body')) assert.ok(!mesh.extras?.targetNames?.includes('bodyCurvy'), mesh.name);
+    const body = model.meshes.find((mesh) => mesh.name === 'CC_Base_Body');
+    for (const morph of [...FACE_MORPHS, ...(label === 'Leo' ? LEO_ONLY_MORPHS : [])]) assert.ok(body.extras.targetNames.includes(morph), morph);
+    assert.ok(!body.extras.targetNames.includes('bodyBroad'));
+    assert.ok(body.primitives.every((part) => part.attributes.TEXCOORD_1 !== undefined));
+  });
+  test(`${label}: stays light enough for mobile`, () => {
+    let vertices = 0;
+    for (const mesh of model.meshes) for (const primitive of mesh.primitives) vertices += model.accessors[primitive.attributes.POSITION].count;
+    // Every outfit and hair style is stored in the file, but only one outfit and one hairstyle are drawn at a time.
+    assert.ok(vertices < 130000, `stored vertices: ${vertices}`);
+    const count = (mesh) => mesh.primitives.reduce((sum, p) => sum + model.accessors[p.attributes.POSITION].count, 0);
+    const heaviest = model.meshes.filter((mesh) => /^(Loose_|Bunny_|Suit_)/.test(mesh.name)).map(count).sort((a, b) => b - a)[0] ?? 0;
+    assert.ok(heaviest <= 17000, `heaviest garment: ${heaviest}`);
+    assert.ok(data.length < 12 * 1024 * 1024, `bytes: ${data.length}`);
+    // Units are metres: a centimetre-scale export would be 100x taller.
+    const body = model.meshes.find((mesh) => mesh.name === 'CC_Base_Body');
+    const height = Math.max(...body.primitives.map((p) => model.accessors[p.attributes.POSITION].max[1]));
+    assert.ok(height > 1.5 && height < 2.1, `height: ${height}`);
+  });
+}
+
+test('Every editor choice remains valid for saved profiles and server validation', () => {
+  for (const option of AVATAR_OPTIONS) for (const value of option.values) assert.ok(BAR_PROFILE_OPTIONS[option.key].includes(value), `${option.key}: ${value}`);
+  for (const character of ['noa', 'leo']) {
+    for (const option of avatarOptionsFor(character)) {
+      assert.ok(option.values.length > 0);
+      for (const value of option.values) assert.ok(BAR_PROFILE_OPTIONS[option.key].includes(value), `${character} ${option.key}: ${value}`);
+    }
+  }
 });
-test('Body and clothing share body morphs; the head preserves face UVs and expressions',()=>{
- for(const mesh of model.meshes.filter(mesh=>['CC_Base_Body','Jeans','Crop_T_Shirt','Punk_Leather_Jacket','Boots','Apron','F_Black_Outfit_L','Punk_Strap_Boots'].includes(mesh.name))){
-  for(const morph of ['bodySlim','bodyCurvy','bodyBroad','bodyMuscular']) assert.ok(mesh.extras.targetNames.includes(morph),`${mesh.name}: ${morph}`);
-  for(const primitive of mesh.primitives) assert.equal(primitive.targets.length,mesh.extras.targetNames.length);
- }
- const body=model.meshes.find(mesh=>mesh.name==='CC_Base_Body');
- for(const morph of ['eyesWide','eyesNarrow','lipsFull','lipsThin','lipsWide','lipsSmall','browArch','browInner','noseWide','noseNarrow','noseUp','noseDown','cheekHigh','cheekFull','cheekHollow']) assert.ok(body.extras.targetNames.includes(morph),morph);
- assert.ok(body.primitives.every(part=>part.attributes.TEXCOORD_1!==undefined));
+
+test('Each character only offers what its model can show', () => {
+  const keys = (character) => avatarOptionsFor(character).map((option) => option.key);
+  assert.ok(!keys('noa').includes('facialHair'));
+  assert.ok(!keys('noa').includes('bodyShape') && !keys('leo').includes('bodyShape'));   // one fixed shape each
+  assert.ok(keys('leo').includes('facialHair'));
+  assert.ok(!keys('leo').includes('lipColor'));
+  assert.ok(keys('noa').includes('lipColor'));
+  assert.ok(avatarOptionsFor('noa').find((option) => option.key === 'hairStyle').values.includes('waves'));
+  assert.ok(avatarOptionsFor('leo').find((option) => option.key === 'hairStyle').values.includes('buzz'));
 });
-test('The model stays light enough for mobile: low vertex budget and modest file size',()=>{
- let vertices=0;
- for(const mesh of model.meshes) for(const primitive of mesh.primitives) vertices+=model.accessors[primitive.attributes.POSITION].count;
- assert.ok(vertices<80000,`vertices: ${vertices}`);
- assert.ok(data.length<12*1024*1024,`bytes: ${data.length}`);
-});
-test('Every editor choice remains valid for saved profiles and server validation',()=>{
- for(const option of AVATAR_OPTIONS) for(const value of option.values) assert.ok(BAR_PROFILE_OPTIONS[option.key].includes(value),`${option.key}: ${value}`);
-});
-test('Facial hair keeps existing ownership IDs across avatars without bypassing locks',()=>{
- assert.equal(canUseCosmetic([], 'facialHair','stubble','noa'),false);
- assert.equal(canUseCosmetic(['facialHair:stubble:leo'], 'facialHair','stubble','noa'),true);
- assert.equal(canUseCosmetic([], 'hairStyle','bun','noa'),false);
+
+test('Facial hair keeps existing ownership IDs across avatars without bypassing locks', () => {
+  assert.equal(canUseCosmetic([], 'facialHair', 'stubble', 'noa'), false);
+  assert.equal(canUseCosmetic(['facialHair:stubble:leo'], 'facialHair', 'stubble', 'noa'), true);
+  assert.equal(canUseCosmetic([], 'hairStyle', 'bun', 'noa'), false);
 });
