@@ -9,7 +9,7 @@ import type { CharacterExpression } from '../../domain/dialogue/types';
 import { useGameStore } from '../../stores/game';
 import { haptic } from '../../telegram/webapp';
 import BottleModel from '../cocktails/BottleModel.vue';
-import GlassModel from '../cocktails/GlassModel.vue';
+import Glass3D from '../props/Glass3D.vue';
 import CharacterModel from '../characters/CharacterModel.vue';
 import Bartender3D from '../characters/Bartender3D.vue';
 import CityEvent from './CityEvent.vue';
@@ -202,7 +202,10 @@ const itemCount = computed(() => game.currentMix.reduce((sum, item) => sum + (IN
 const fill = computed(() => Math.min(91, totalAmount.value / 240 * 91));
 const ice = computed(() => game.currentMix.find((item) => item.ingredientId === 'ice')?.amount ?? 0);
 const hasBubbles = computed(() => game.currentMix.some((item) => ['soda', 'tonic', 'ginger-beer', 'grapefruit-soda', 'sparkling-wine'].includes(item.ingredientId)));
-const garnish = computed(() => game.currentMix.some((item) => item.ingredientId === 'mint') ? 'mint' : game.currentMix.some((item) => ['lime-wedge', 'orange', 'pineapple-wedge'].includes(item.ingredientId)) ? 'citrus' : '');
+const garnish = computed(() => {
+  const has = (id: string) => game.currentMix.some((item) => item.ingredientId === id);
+  return has('mint') ? 'mint' : has('lime-wedge') ? 'lime' : has('orange') ? 'orange' : has('pineapple-wedge') ? 'pineapple' : '';
+});
 const selectedIngredient = computed(() => INGREDIENTS.find((item) => item.id === draggingIngredientId.value));
 const selectedAmount = computed(() => draggingIngredientId.value ? game.currentMix.find((item) => item.ingredientId === draggingIngredientId.value)?.amount : undefined);
 
@@ -415,8 +418,7 @@ onBeforeUnmount(() => {
     <div v-if="buildingEnabled" ref="glassTarget" class="live-glass-station" :class="{ 'drag-over': dragOverGlass }">
       <div class="live-glass-copy"><b>{{ dragOverGlass ? 'POURING' : totalAmount ? `${totalAmount} ML` : 'YOUR GLASS' }}</b><small>{{ itemCount ? `+ ${itemCount} fresh item${itemCount === 1 ? '' : 's'}` : 'Drag bottle over the glass' }}</small></div>
       <div class="live-glass-wrap">
-        <div v-if="dragOverGlass" class="live-pour-stream" :style="{ '--stream-color': selectedIngredient ? colorMap[selectedIngredient.id] : liquidColor }"></div>
-        <GlassModel type="highball" :fill="fill" :color="liquidColor" :ice="ice" :garnish="garnish" :bubbles="hasBubbles" animation="idle" />
+        <Glass3D type="highball" :fill="fill" :color="liquidColor" :ice="ice" :garnish="garnish" :bubbles="hasBubbles" :pouring="dragOverGlass ? (selectedIngredient ? colorMap[selectedIngredient.id] ?? liquidColor : liquidColor) : undefined" :shaking="oneShot === 'shake'" />
         <button class="fresh-plus" type="button" :aria-expanded="freshPickerOpen" aria-label="Add fruit, ice, herb, or garnish" @click="freshPickerOpen = !freshPickerOpen"><span>+</span><small>fresh</small></button>
       </div>
       <div v-if="freshPickerOpen" class="fresh-picker" role="dialog" aria-label="Choose fresh ingredient">
@@ -425,7 +427,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div v-if="draggingIngredientId && selectedIngredient" class="drag-bottle-ghost" :class="{ pouring: dragOverGlass }" :style="{ left: `${pointerX}px`, top: `${pointerY}px` }" aria-hidden="true">
-      <BottleModel :ingredient="selectedIngredient" :amount="selectedAmount" /><i v-if="dragOverGlass" :style="{ '--stream-color': colorMap[selectedIngredient.id] ?? '#d7c88c' }"></i>
+      <BottleModel :ingredient="selectedIngredient" :amount="selectedAmount" />
     <b class="ghost-name">{{ selectedIngredient.name }} · {{ pourable(selectedIngredient.id) }} ml</b></div>
     <div class="scene-status"><span :class="{ waiting: !game.hasCustomer }"></span>{{ game.message }}<b v-if="game.hasCustomer">{{ game.orderTimerPaused ? 'Paused in dialogue' : game.orderCountdown }}</b></div>
   </section>

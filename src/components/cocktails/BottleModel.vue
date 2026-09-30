@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { ingredientBottleArtIndex, paintedBottleSpriteStyle } from '../../domain/bottleArt';
 import type { Ingredient } from '../../domain/types';
-import IngredientArt from './IngredientArt.vue';
+import PropThumb from '../props/PropThumb.vue';
 
 const props = defineProps<{ ingredient: Ingredient; active?: boolean; amount?: number }>();
 // Every ingredient maps to exactly one picture: a bottle cell, an ingredient cell, or vector art.
@@ -28,7 +28,7 @@ const modelClass = computed(() => kind.value === 'ingredient' || vectorFruit.inc
 
 <template>
   <div class="bottle-visual painted-model" :class="[{ active }, modelClass]" aria-hidden="true">
-    <IngredientArt v-if="kind === 'vector'" class="model-sprite" :id="ingredient.id" />
+    <PropThumb v-if="kind === 'vector'" class="model-sprite" :kind="`item:${ingredient.id}`" :size="192" :label="ingredient.name" />
     <span v-else class="model-sprite" :style="spriteStyle"></span>
     <b v-if="amount">{{ amount }}</b>
   </div>

@@ -75,6 +75,15 @@ The bartender is a rigged 3D "mannequin" rendered with three.js (`src/components
 - **Size:** each model is ~1.7 MB after meshopt compression (the build script runs `gltf-transform` if it is installed: `npm i -g @gltf-transform/cli`; the game loads it with three's `MeshoptDecoder`).
 - **Not yet in 3D:** customers.
 
+## 3D bar props
+
+The glass, the pour stream, the shaker and the orange / salt icons are 3D now (no more CSS glass or SVG art):
+
+- `scripts/blender/build_props.py` builds `public/assets/props3d/bar-props.glb` (~100 KB): 10 glass types (profiles in `src/data/props/glasses.json`), a liquid volume per glass, ice, garnishes (lime, orange, mint, pineapple, cherry), the cobbler shaker, an orange and a salt shaker.
+- `Glass3D.vue` is the live glass on the bar: liquid clipped at the fill level (stays level when the glass tilts), ice, bubbles, garnish, a 3D pour stream while a bottle is over the glass, and the shaker taking over while shaking.
+- `PropThumb.vue` shows cached still renders of any prop (one shared WebGL context), used by `GlassModel` and `BottleModel`.
+- Bottles and cocktail pictures stay painted 2D art; `IngredientArt.vue` (SVG) is gone.
+
 ## Deploy to the server
 
 `.github/workflows/docker-master.yml` now has a `deploy` job that runs after tests, build and image publish on every push to `master`. It uses the GitHub environment **Production**:
