@@ -34,7 +34,7 @@ watch(() => game.regionId, () => {
 const ingredientById = (id: string) => INGREDIENTS.find((item) => item.id === id)!;
 const bottleById = (id: string) => ALCOHOL_PRODUCTS.find((item) => item.id === id)!;
 const uiCategory = (ingredient: Ingredient) => ingredient.category === 'spirit' ? 'spirit' : ingredient.category === 'mixer' && !['sugar-syrup', 'coconut-cream', 'milk', 'coconut-milk'].includes(ingredient.id) ? 'mixer' : 'fresh';
-const visibleStock = computed(() => game.inventory.filter((stock) => stockCategory.value === 'all' || uiCategory(ingredientById(stock.ingredientId)) === stockCategory.value));
+const visibleStock = computed(() => game.visibleInventory.filter((stock) => stockCategory.value === 'all' || uiCategory(ingredientById(stock.ingredientId)) === stockCategory.value));
 const { openGuide } = useGuide();
 // What to do with each ingredient of the open recipe (pour, top up, garnish…), from the recipe card.
 const formulaActions = computed(() => selectedRecipe.value ? new Map(recipeCard(selectedRecipe.value).lines.filter((line) => line.ingredientId).map((line) => [line.ingredientId!, line.action])) : new Map<string, string>());

@@ -13,7 +13,7 @@ const category = ref('all');
 const ingredient = (id:string) => INGREDIENTS.find((item) => item.id === id)!;
 const group = (id:string) => ingredient(id).category === 'spirit' ? 'spirit' : ingredient(id).category === 'mixer' && !['sugar-syrup','coconut-cream'].includes(id) ? 'mixer' : 'fresh';
 const offers = computed(() => game.market.filter((offer) => offer.supplierId === game.selectedSupplier && (category.value === 'all' || group(offer.ingredientId) === category.value)));
-const stock = computed(() => game.inventory.filter((item) => category.value === 'all' || group(item.ingredientId) === category.value));
+const stock = computed(() => game.visibleInventory.filter((item) => category.value === 'all' || group(item.ingredientId) === category.value));
 const available = (id:string) => Math.max(0,(game.inventory.find((item) => item.ingredientId === id)?.amount ?? 0) - (game.currentMix.find((item) => item.ingredientId === id)?.amount ?? 0));
 const buyback = (id:string,quantity:number) => (ingredient(id).basePrice * quantity * game.region.marketFactor * .55 * game.economy.buybackFactor(id)).toFixed(2);
 const offerFor = (id:string) => game.market.find((offer) => offer.supplierId === game.selectedSupplier && offer.ingredientId === id);

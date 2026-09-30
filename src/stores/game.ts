@@ -9,6 +9,7 @@ import { economyAt, levelProgress, marketFor } from '../domain/progression';
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { dailyLessonsFor, learningStreakBonus } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic as ownsCosmetic } from '../domain/cosmetics';
+import { usableIngredientIds } from '../domain/usableStock';
 import { negotiatedQuote } from '../sim/trade';
 import type { Customer, InventoryItem, RegionId, SupplierOffer } from '../domain/types';
 import { pourableBrand } from '../domain/brandServe';
@@ -103,6 +104,9 @@ export const useGameStore = defineStore('game', () => {
   const ownedInteriorIds = computed(() => state.value.ownedInteriorIds ?? ['velvet']);
   const inventories = computed(() => state.value.inventories);
   const inventory = computed(() => state.value.inventories[state.value.regionId]);
+  // Rows worth showing: in stock, or needed by a recipe the player knows (unusable empty rows stay hidden).
+  const usableIngredients = computed(() => usableIngredientIds(state.value.knownRecipeIds));
+  const visibleInventory = computed(() => inventory.value.filter((item) => item.amount > 0 || usableIngredients.value.has(item.ingredientId)));
   const bottleInventories = computed(() => state.value.bottleInventories);
   const bottleInventory = computed(() => state.value.bottleInventories[state.value.regionId]);
   const customers = computed(() => state.value.customers);
@@ -518,7 +522,7 @@ export const useGameStore = defineStore('game', () => {
 
   const act = (action: GameAction) => dispatch(action);
   return {
-    loot, act, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, renameFriend, visitFriend, giftFriend, friendVisits, connect,
+    loot, act, visibleInventory, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, renameFriend, visitFriend, giftFriend, friendVisits, connect,
     economy, xpProgress, guestPriceFactor,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,

@@ -7,6 +7,7 @@ import { levelFor, levelPerks } from '../domain/progression';
 import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../domain/types';
 import { buildProfile, shortWish, type CustomerReply, type Fact } from '../domain/conversation/customerTalk';
 import type { BottleConversationFacts } from '../domain/conversation/bottleTalk';
+import { usableIngredientIds } from '../domain/usableStock';
 import { createLoot, normalizeLoot, type LootState } from '../domain/lootState';
 
 // The complete, serializable game state of one player. The server owns it; the client only displays it
@@ -111,8 +112,10 @@ export function publicState(state: PlayerState): PlayerState {
   return view;
 }
 
-const makeBarInventory = (barIndex: number) => STARTING_INVENTORY.map((item, ingredientIndex) => {
+// Only ingredients of the starter recipes are stocked; every other row starts empty (and stays hidden until it is needed).
+const makeBarInventory = (barIndex: number, usable: ReadonlySet<string>) => STARTING_INVENTORY.map((item, ingredientIndex) => {
   const ingredient = INGREDIENTS.find((entry) => entry.id === item.ingredientId)!;
+  if (!usable.has(item.ingredientId)) return { ...item, amount: 0 };
   const factor = .48 + ((barIndex * 3 + ingredientIndex) % 6) * .11;
   const floor = ingredient.unit === 'ml' ? 90 : 4;
   return { ...item, amount: Math.max(floor, Math.round(item.amount * factor)) };
@@ -132,6 +135,7 @@ export function createInitialState(now = Date.now()): PlayerState {
   }
   const firstGuest = starterGuests[0]!;
   const knownRecipeIds = RECIPES.slice(0, BASIC_RECIPE_COUNT).map((recipe) => recipe.id);
+  const usable = usableIngredientIds(knownRecipeIds);
   return {
     version: 1,
     regionId: 'new-york',
@@ -160,7 +164,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     learningStreak: 0,
     lastLearningDayKey: '',
     dailyLessonResult: 'Complete today’s three lessons to grow your learning streak.',
-    inventories: Object.fromEntries(REGIONS.map((region, index) => [region.id, makeBarInventory(index)])) as Record<RegionId, InventoryItem[]>,
+    inventories: Object.fromEntries(REGIONS.map((region, index) => [region.id, makeBarInventory(index, usable)])) as Record<RegionId, InventoryItem[]>,
     bottleInventories: Object.fromEntries(REGIONS.map((region, barIndex) => [region.id, ALCOHOL_PRODUCTS.map((product, productIndex) => ({
       productId: product.id, quantity: 1 + ((barIndex + productIndex * 2) % 4)
     }))])) as Record<RegionId, BottleInventoryItem[]>,

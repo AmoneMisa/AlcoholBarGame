@@ -231,3 +231,24 @@ test('Serving tracks stats, pays the tasting reward only the first time, and que
   assert.throws(() => run(state, { type: 'claimQuest', questId: quest.id }), /already claimed/);
   assert.throws(() => run(state, { type: 'claimQuest', questId: 'q-fake' }), /not active/);
 });
+
+test('New players start with stock only for their starter recipes; other rows are empty and auto-supply ignores them', async () => {
+  const { RECIPES, INGREDIENTS } = await import('../src/domain/catalog.ts');
+  const { usableIngredientIds } = await import('../src/domain/usableStock.ts');
+  const state = createInitialState(NOW);
+  const usable = usableIngredientIds(state.knownRecipeIds);
+  for (const stock of state.inventories['new-york']) {
+    if (usable.has(stock.ingredientId)) assert.ok(stock.amount > 0, `${stock.ingredientId} is stocked`);
+    else assert.equal(stock.amount, 0, `${stock.ingredientId} starts empty`);
+  }
+  assert.equal(state.inventories.london.length, INGREDIENTS.length, 'every row still exists so deliveries can land');
+  // Auto-supply must not order ingredients the player cannot use yet.
+  state.startingBarChosen = true; state.xp = 1e6; state.money = 1e6; state.autoSupply = true;
+  run(state, { type: 'tick' });
+  const ordered = state.deliveryOrders.flatMap((order) => order.items.map((item) => item.ingredientId));
+  assert.ok(ordered.every((id) => usable.has(id)));
+  // Learning a recipe makes its ingredients usable.
+  const locked = RECIPES.find((recipe) => !state.knownRecipeIds.includes(recipe.id) && recipe.ingredients.some((item) => !usable.has(item.ingredientId)));
+  state.knownRecipeIds.push(locked.id);
+  assert.ok(locked.ingredients.every((item) => usableIngredientIds(state.knownRecipeIds).has(item.ingredientId)));
+});
