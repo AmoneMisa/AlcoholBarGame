@@ -15,7 +15,7 @@ import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL, economyAt, formatDeliveryTime, mar
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
-import { LootError, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
+import { LootError, claimSpark, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
 import { usableIngredientIds } from '../domain/usableStock';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
@@ -70,7 +70,8 @@ export type GameAction =
   | { type: 'buyBox'; box: string; quantity?: number }
   | { type: 'buyConsumable'; id: string; quantity?: number }
   | { type: 'useConsumable'; id: string; recipeId?: string }
-  | { type: 'drawStyle'; count: 1 | 10 }
+  | { type: 'drawStyle'; count: 1 | 10; banner?: 'standard' | 'seasonal' }
+  | { type: 'claimSpark'; cosmeticId: string }
   | { type: 'craftSkin'; cosmeticId: string }
   | { type: 'prestige' }
   | { type: 'designSignature'; name: string; items: { ingredientId: string; amount: number }[]; needsShake: boolean }
@@ -804,6 +805,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'buyConsumable':
     case 'useConsumable':
     case 'drawStyle':
+    case 'claimSpark':
     case 'craftSkin':
     case 'prestige':
     case 'designSignature':
@@ -820,7 +822,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           case 'buyBox': buyBox(state, action.box, action.quantity); break;
           case 'buyConsumable': buyConsumable(state, action.id, action.quantity); break;
           case 'useConsumable': useConsumable(state, action.id, action.recipeId, now); break;
-          case 'drawStyle': drawStyle(state, action.count, now, random); break;
+          case 'drawStyle': drawStyle(state, action.count, action.banner, now, random); break;
+          case 'claimSpark': claimSpark(state, action.cosmeticId, now); break;
           case 'craftSkin': craftSkin(state, action.cosmeticId); break;
           case 'prestige': prestige(state, now); break;
           case 'designSignature': designSignature(state, { name: action.name, items: action.items, needsShake: action.needsShake }); break;
@@ -850,12 +853,12 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
 }
 
 // Loot actions leave a trail (what was rolled, pity, prestige) for the server's loot ledger.
-const AUDITED = new Set<GameAction['type']>(['openBox', 'pickReward', 'buyBox', 'buyConsumable', 'drawStyle', 'craftSkin', 'prestige', 'buyPrestigePerk', 'claimLeaderboardReward', 'claimQuest', 'claimAchievement']);
+const AUDITED = new Set<GameAction['type']>(['openBox', 'pickReward', 'buyBox', 'buyConsumable', 'drawStyle', 'claimSpark', 'craftSkin', 'prestige', 'buyPrestigePerk', 'claimLeaderboardReward', 'claimQuest', 'claimAchievement']);
 export interface LootAudit { action: string; message: string; detail: Record<string, unknown>; }
 function auditEntry(state: PlayerState, action: GameAction): LootAudit | undefined {
   if (!AUDITED.has(action.type)) return undefined;
   const detail: Record<string, unknown> = {};
-  if (action.type === 'drawStyle') Object.assign(detail, { results: state.loot.lastDraw, pity: state.loot.pity });
+  if (action.type === 'drawStyle') Object.assign(detail, { banner: (action as { banner?: string }).banner ?? 'standard', results: state.loot.lastDraw, pity: state.loot.pity, season: state.loot.season });
   else if (action.type === 'prestige') Object.assign(detail, { prestige: state.loot.prestige });
   else if (action.type === 'openBox' && state.loot.pendingChoice) Object.assign(detail, { offered: state.loot.pendingChoice });
   return { action: action.type, message: state.message, detail };

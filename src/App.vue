@@ -59,6 +59,12 @@ watch(() => game.friends.filter((friend) => friend.status === 'pending' && frien
   if (next && next !== previous) notifications.push('friendRequest','New friend request','Open Friends to accept or decline.',`friend-request:${next}`);
 });
 // Workshop: a new box to open, and boosters that have just run out.
+import { seasonAt } from './domain/seasons';
+watch(() => game.sessionReady, (ready) => {
+  if (!ready) return;
+  const season = seasonAt(Date.now());
+  notifications.push('loot', `New season: ${season.name}`, 'A seasonal style banner is live in the Workshop.', `season:${season.id}`);
+}, { immediate: true });
 const boxTotal = () => Object.values(game.loot.boxes).reduce((sum, count) => sum + count, 0);
 watch(boxTotal, (next, previous) => {
   if (previous !== undefined && next > previous) notifications.push('loot', 'You got a box', 'Open it in the Workshop.');

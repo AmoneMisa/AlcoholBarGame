@@ -14,6 +14,7 @@ import { FAME_PRICE_BONUS, FAME_STEPS, MAX_ITEMS, SIGNATURE_FEE, SIGNATURE_GUEST
 import { usableIngredientIds } from '../../domain/usableStock';
 import { CHARACTER_ART } from '../../data/cosmetics/artCatalog';
 import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipeId, isRegularId, nextRegularStep, regularLevel } from '../../domain/regulars';
+import { SEASON_FEATURED_SHARE, SEASON_MILESTONES, SPARK_DRAWS, seasonAt } from '../../domain/seasons';
 import { featuredLegendary } from '../../sim/loot';
 import { useGameStore } from '../../stores/game';
 
@@ -79,6 +80,14 @@ watch(tab, (next) => { if (next === 'weekly') void loadBoard(); });
 watch(() => game.loot.leaderboardClaimed, () => { if (tab.value === 'weekly') void loadBoard(); });
 const daysLeft = computed(() => board.value ? Math.max(0, Math.ceil((board.value.endsAt - Date.now()) / 86_400_000)) : 0);
 const rewardTable = [1, 2, 4, 11, 30].map((rank) => ({ rank, reward: leaderboardReward(rank, MIN_WEEKLY_SCORE)! }));
+// ---- Seasonal banner ----
+const banner = ref<'standard' | 'seasonal'>('seasonal');
+const season = computed(() => seasonAt(Date.now()));
+const seasonFeatured = computed(() => season.value.featuredIds.map((id) => COSMETICS.find((item) => item.id === id)!).filter(Boolean));
+const seasonDraws = computed(() => game.loot.season.id === season.value.id ? game.loot.season.draws : 0);
+const seasonRewarded = computed(() => game.loot.season.id === season.value.id ? game.loot.season.rewarded : []);
+const sparkUsed = computed(() => game.loot.season.id === season.value.id && game.loot.season.spark);
+const seasonDaysLeft = computed(() => Math.max(0, Math.ceil((season.value.endsAt - Date.now()) / 86_400_000)));
 const runStars = computed(() => prestigeStarsFor(game.loot.runEarned));
 const effectText = (id: string) => {
   const item = equipmentDef(id)!;
@@ -155,12 +164,20 @@ const boostLeft = (id: string) => {
     <div v-else-if="tab === 'draw'" class="draw">
       <article class="card">
         <h3>✨ Style draw</h3>
+        <div class="row"><button type="button" :class="{ picked: banner === 'seasonal' }" @click="banner = 'seasonal'">{{ season.name }} banner</button><button type="button" :class="{ picked: banner === 'standard' }" @click="banner = 'standard'">Standard banner</button></div>
+        <template v-if="banner === 'seasonal'">
+          <p><b>{{ season.name }}</b> — {{ season.tagline }} Ends in {{ seasonDaysLeft }} day{{ seasonDaysLeft === 1 ? '' : 's' }}. Featured Legendary styles win {{ Math.round(SEASON_FEATURED_SHARE * 100) }}% of Legendary pulls: <b>{{ seasonFeatured.map((item) => item.label).join(' and ') }}</b>.</p>
+          <progress :value="Math.min(seasonDraws, SPARK_DRAWS)" :max="SPARK_DRAWS"></progress>
+          <p>{{ seasonDraws }} / {{ SPARK_DRAWS }} season draws. Milestones: <template v-for="step in SEASON_MILESTONES" :key="step.draws"><span :class="{ gotit: seasonRewarded.includes(step.draws) }">{{ step.draws }} → {{ step.label }}</span> · </template>{{ SPARK_DRAWS }} → pick a featured style (Spark).</p>
+          <div v-if="seasonDraws >= SPARK_DRAWS && !sparkUsed" class="row"><button v-for="item in seasonFeatured" :key="item.id" type="button" :disabled="game.ownedCosmeticIds.includes(item.id)" @click="game.act({ type: 'claimSpark', cosmeticId: item.id })">Spark: {{ item.label }}{{ item.character ? ` (${item.character})` : '' }}</button></div>
+          <p v-else-if="sparkUsed">You used this season’s Spark.</p>
+        </template>
         <p>Odds: Common {{ DRAW_ODDS.common * 100 }}% · Rare {{ DRAW_ODDS.rare * 100 }}% · Legendary {{ DRAW_ODDS.legendary * 100 }}%. A Rare is guaranteed in every ten draws and a Legendary within {{ LEGENDARY_PITY }}.</p>
-        <p v-if="featured">This week's featured Legendary: <b>{{ featured.label }}</b> (half of all Legendary wins).</p>
+        <p v-if="featured && banner === 'standard'">This week's featured Legendary: <b>{{ featured.label }}</b> (half of all Legendary wins).</p>
         <p>Pity: {{ game.loot.pity.sinceLegendary }} / {{ LEGENDARY_PITY }} · duplicates give {{ DUPLICATE_SHARDS.common }} / {{ DUPLICATE_SHARDS.rare }} / {{ DUPLICATE_SHARDS.legendary }} skin shards.</p>
         <div class="row">
-          <button type="button" :disabled="game.crystals < DRAW_COST.single" @click="game.act({ type: 'drawStyle', count: 1 })">Draw ×1 · {{ DRAW_COST.single }}</button>
-          <button type="button" :disabled="game.crystals < DRAW_COST.ten" @click="game.act({ type: 'drawStyle', count: 10 })">Draw ×10 · {{ DRAW_COST.ten }}</button>
+          <button type="button" :disabled="game.crystals < DRAW_COST.single" @click="game.act({ type: 'drawStyle', count: 1, banner })">Draw ×1 · {{ DRAW_COST.single }}</button>
+          <button type="button" :disabled="game.crystals < DRAW_COST.ten" @click="game.act({ type: 'drawStyle', count: 10, banner })">Draw ×10 · {{ DRAW_COST.ten }}</button>
         </div>
         <ul v-if="game.loot.lastDraw.length" class="results"><li v-for="(result, index) in game.loot.lastDraw" :key="index" :class="result.rarity">{{ result.label }}<small v-if="result.duplicate"> · duplicate +{{ result.shards }} shards</small></li></ul>
       </article>
@@ -297,5 +314,6 @@ const boostLeft = (id: string) => {
 .results{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:11px}.results li{padding:5px 8px;border-radius:7px;background:#17253a}.results li.rare,.crafts .rare{border-color:#3f86b8;color:#bfe2ff}.results li.legendary,.crafts .legendary{background:#4a3210;color:#ffe0a0}
 .crafts{display:flex;flex-wrap:wrap;gap:5px;max-height:260px;overflow:auto}input[type=text],.card>input{padding:8px;border:1px solid #40536c;border-radius:8px;background:#0c1625;color:#fff}.sig-row{align-items:center}.sig-row select{flex:1;min-width:120px}.sig-row b{min-width:58px;text-align:center;color:#fff0c8}.sig-error{color:#f2a0a0}.card label{color:#c7d3e0;font-size:11px}
 .board{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:12px}.board li{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;padding:6px 8px;border-radius:7px;background:#17253a}.board li.me{background:#4a3210;color:#ffe0a0}.board li b{color:#f4d08e}.board li em{font-style:normal;color:#fff0c8}.board .empty{display:block;color:#93a5b9}
+.card button.picked{border-color:#ffd27a;background:#7a4d12}.gotit{color:#8fd1a0;text-decoration:line-through}
 .hint{grid-column:1/-1;margin:0;color:#93a5b9;font-size:11px}small{color:#e4b35c}
 </style>

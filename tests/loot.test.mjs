@@ -534,3 +534,69 @@ test('The house special can also be asked for as "the house special"; wrong dish
   talk('An Amber Sour is nice.');
   assert.match(seen.at(-1), /An Orange/);
 });
+
+test('Seasons: one per UTC month, two featured legendaries, all twelve covered once a year', async () => {
+  const { seasonAt } = await import('../src/domain/seasons.ts');
+  const { COSMETICS: all } = await import('../src/domain/cosmetics.ts');
+  const legendary = all.filter((item) => item.rarity === 'legendary').map((item) => item.id);
+  const featured = [];
+  for (let month = 0; month < 12; month++) {
+    const season = seasonAt(Date.UTC(2026, month, 15, 12));
+    assert.equal(season.id, `2026-${String(month + 1).padStart(2, '0')}`);
+    assert.equal(season.featuredIds.length, 2);
+    assert.equal(season.startsAt, Date.UTC(2026, month, 1));
+    assert.equal(season.endsAt, Date.UTC(2026, month + 1, 1));
+    featured.push(...season.featuredIds);
+  }
+  assert.equal(new Set(featured).size, legendary.length, 'every legendary is featured once a year');
+  assert.ok(featured.every((id) => legendary.includes(id)));
+  assert.equal(seasonAt(Date.UTC(2026, 8, 30, 23, 59, 59)).id, '2026-09');
+  assert.equal(seasonAt(Date.UTC(2026, 9, 1)).id, '2026-10');
+});
+
+test('Season banner: rate-up, draw counting, milestone boxes once, spark pick, monthly reset', async () => {
+  const { seasonAt, SPARK_DRAWS, SEASON_MILESTONES } = await import('../src/domain/seasons.ts');
+  const season = seasonAt(NOW);
+  const state = fresh();
+  state.crystals = 1e6;
+  assert.throws(() => run(state, { type: 'drawStyle', count: 1, banner: 'nonsense' }), /Unknown banner/);
+  // The standard banner never counts toward the season.
+  run(state, { type: 'drawStyle', count: 1 }, () => .9);
+  assert.equal(state.loot.season.draws, 0);
+  // With random() = 0 every pull is legendary and lands on a featured style (0 < 0.75).
+  const before = new Set(state.ownedCosmeticIds);
+  run(state, { type: 'drawStyle', count: 1, banner: 'seasonal' }, () => 0);
+  assert.equal(state.loot.season.draws, 1);
+  assert.ok(season.featuredIds.includes(state.loot.lastDraw[0].id), 'the first pull is a featured legendary');
+  assert.equal(state.loot.lastDraw[0].rarity, 'legendary');
+  void before;
+  // random() just below 1 never takes the rate-up: a featured style can still come from the normal pool, but the share is 75%.
+  for (let i = 0; i < 9; i++) run(state, { type: 'drawStyle', count: 1, banner: 'seasonal' }, () => .9);
+  assert.equal(state.loot.season.draws, 10);
+  assert.equal(state.loot.boxes.silver, 1, 'milestone 10 pays a silver box once');
+  run(state, { type: 'drawStyle', count: 10, banner: 'seasonal' }, () => .9);
+  assert.equal(state.loot.boxes.silver, 1);
+  assert.equal(state.loot.season.rewarded.length, 1);
+  // Draws across a milestone in one ten-draw still pay it.
+  state.loot.season.draws = 25;
+  run(state, { type: 'drawStyle', count: 10, banner: 'seasonal' }, () => .9);
+  assert.equal(state.loot.boxes.gold, 1);
+  assert.deepEqual([...state.loot.season.rewarded].sort((a, b) => a - b), [10, 30].filter((step) => SEASON_MILESTONES.some((m) => m.draws === step)));
+
+  // Spark needs enough draws, a featured style you do not own, and works once.
+  const target = season.featuredIds.find((id) => !state.ownedCosmeticIds.includes(id)) ?? season.featuredIds[0];
+  state.ownedCosmeticIds = state.ownedCosmeticIds.filter((id) => id !== target);
+  assert.throws(() => run(state, { type: 'claimSpark', cosmeticId: target }), /first/);
+  state.loot.season.draws = SPARK_DRAWS;
+  assert.throws(() => run(state, { type: 'claimSpark', cosmeticId: COSMETICS.find((item) => item.rarity === 'common').id }), /featured styles/);
+  run(state, { type: 'claimSpark', cosmeticId: target });
+  assert.ok(state.ownedCosmeticIds.includes(target));
+  assert.throws(() => run(state, { type: 'claimSpark', cosmeticId: target }), /already/);
+
+  // A new month starts fresh.
+  run(state, { type: 'drawStyle', count: 1, banner: 'seasonal' }, () => .9, Date.UTC(2026, 9, 2));
+  assert.equal(state.loot.season.id, '2026-10');
+  assert.equal(state.loot.season.draws, 1);
+  assert.equal(state.loot.season.spark, false);
+  assert.equal(normalizeLoot({ season: { id: 'bad', draws: -5, rewarded: [10, 999], spark: 'yes' } }, 1).season.rewarded.length, 1);
+});

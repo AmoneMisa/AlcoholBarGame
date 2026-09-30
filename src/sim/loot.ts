@@ -9,6 +9,7 @@ import {
   upgradeCostFor, type BoxKind, type EquipmentId, type PrestigePerkId, type Reward
 } from '../domain/loot';
 import { INGREDIENTS } from '../domain/catalog';
+import { SEASON_FEATURED_SHARE, SEASON_MILESTONES, SPARK_DRAWS, seasonAt } from '../domain/seasons';
 import { MIN_WEEKLY_SCORE, describeLeaderboardReward, leaderboardReward } from '../domain/leaderboard';
 import { FAME_PRICE_BONUS, FAME_STEPS, SIGNATURE_FEE, SIGNATURE_GUEST_CHANCE, SIGNATURE_LEVEL, SignatureError, fameLevel, validateSignature } from '../domain/signature';
 import { usableIngredientIds } from '../domain/usableStock';
@@ -210,20 +211,34 @@ export const featuredLegendary = (now: number) => {
   const legendary = COSMETICS.filter((item) => item.rarity === 'legendary');
   return legendary[featuredIndex(now, legendary.length)];
 };
-export function drawStyle(state: PlayerState, count: unknown, now: number, random: () => number) {
+export type Banner = 'standard' | 'seasonal';
+// The season's progress restarts when the UTC month changes.
+function currentSeason(state: PlayerState, now: number) {
+  const season = seasonAt(now);
+  if (state.loot.season.id !== season.id) state.loot.season = { id: season.id, draws: 0, rewarded: [], spark: false };
+  return season;
+}
+export function drawStyle(state: PlayerState, count: unknown, banner: unknown, now: number, random: () => number) {
   if (count !== 1 && count !== 10) throw new LootError('Choose a single draw or a ten-draw.');
+  if (banner !== undefined && banner !== 'standard' && banner !== 'seasonal') throw new LootError('Unknown banner.');
+  const seasonal = banner === 'seasonal';
   const cost = count === 1 ? DRAW_COST.single : DRAW_COST.ten;
   if (state.crystals < cost) throw new LootError(`You need ${cost} crystals for this draw.`);
   state.crystals -= cost;
   const loot = state.loot;
+  const season = currentSeason(state, now);
   const results: DrawResult[] = [];
-  const featured = featuredLegendary(now);
+  const weekly = featuredLegendary(now);
+  const featuredList = seasonal ? season.featuredIds.map((id) => COSMETICS.find((item) => item.id === id)!).filter(Boolean) : weekly ? [weekly] : [];
+  const share = seasonal ? SEASON_FEATURED_SHARE : FEATURED_SHARE;
   for (let pull = 0; pull < count; pull++) {
     const rarity = rollRarity(loot.pity, random);
     loot.pity.sinceRare = rarity === 'common' ? loot.pity.sinceRare + 1 : 0;
     loot.pity.sinceLegendary = rarity === 'legendary' ? 0 : loot.pity.sinceLegendary + 1;
     const pool = COSMETICS.filter((item) => item.rarity === rarity);
-    const reward = rarity === 'legendary' && featured && random() < FEATURED_SHARE ? featured : pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))]!;
+    const reward = rarity === 'legendary' && featuredList.length && random() < share
+      ? featuredList[Math.min(featuredList.length - 1, Math.floor(random() * featuredList.length))]!
+      : pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))]!;
     const duplicate = state.ownedCosmeticIds.includes(reward.id);
     const shards = duplicate ? DUPLICATE_SHARDS[rarity] : 0;
     if (duplicate) loot.skinShards += shards; else state.ownedCosmeticIds.push(reward.id);
@@ -232,7 +247,32 @@ export function drawStyle(state: PlayerState, count: unknown, now: number, rando
   loot.lastDraw = results;
   track(state, 'draws', count, now);
   const best = results.find((item) => item.rarity === 'legendary') ?? results.find((item) => item.rarity === 'rare') ?? results[0]!;
-  note(state, `Style draw: ${results.map((item) => item.label).join(', ')}${results.some((item) => item.duplicate) ? ` (duplicates became ${results.reduce((sum, item) => sum + item.shards, 0)} skin shards)` : ''}. Best: ${best.label}.`);
+  let text = `${seasonal ? `${season.name} banner` : 'Style draw'}: ${results.map((item) => item.label).join(', ')}${results.some((item) => item.duplicate) ? ` (duplicates became ${results.reduce((sum, item) => sum + item.shards, 0)} skin shards)` : ''}. Best: ${best.label}.`;
+  if (seasonal) {
+    const before = loot.season.draws;
+    loot.season.draws += count;
+    for (const step of SEASON_MILESTONES) {
+      if (before < step.draws && loot.season.draws >= step.draws && !loot.season.rewarded.includes(step.draws)) {
+        loot.season.rewarded.push(step.draws);
+        grantBox(state, step.box);
+        text += ` Season milestone ${step.draws} draws: ${step.label}!`;
+      }
+    }
+    if (before < SPARK_DRAWS && loot.season.draws >= SPARK_DRAWS) text += ' You can now pick a featured style for free (Spark).';
+  }
+  note(state, text);
+}
+// Spark: after SPARK_DRAWS banner draws in a season the player may take one of that season's featured styles.
+export function claimSpark(state: PlayerState, cosmeticId: unknown, now: number) {
+  const season = currentSeason(state, now);
+  if (state.loot.season.draws < SPARK_DRAWS) throw new LootError(`Draw ${SPARK_DRAWS} times on the season banner first (now ${state.loot.season.draws}).`);
+  if (state.loot.season.spark) throw new LootError('You already used this season’s Spark.');
+  const item = COSMETICS.find((entry) => entry.id === cosmeticId);
+  if (!item || !season.featuredIds.includes(item.id)) throw new LootError('Pick one of this season’s featured styles.');
+  if (state.ownedCosmeticIds.includes(item.id)) throw new LootError('You already own this style.');
+  state.loot.season.spark = true;
+  state.ownedCosmeticIds.push(item.id);
+  note(state, `${item.label} claimed with Spark!`);
 }
 export function craftSkin(state: PlayerState, cosmeticId: unknown) {
   const item = COSMETICS.find((entry) => entry.id === cosmeticId);

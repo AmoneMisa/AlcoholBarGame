@@ -47,3 +47,9 @@ Consumables (one per gift) and skin shards (5 / 10 / 20) can be sent to friends 
 - **Storage:** one `weekly_scores` row per player per week, upserted by the server after an action that changed the score (it only ever goes up). The public label is the **bar name**, never the account name. Ties are won by whoever reached the score first.
 - **API:** `POST /api/leaderboard` returns the top 20, the player's rank, and last week's standing with a `claimable` reward.
 - **Rewards** (claim once, for the previous week only, needs 300 XP): Champion #1 choice + gold box + 60 crystals; Podium #2-3 choice + silver + 30; Top 10 gold + 15; Top 25 silver; everyone else with 300 XP a bronze box. The rank is looked up by the server (`RuleContext.leaderboard`) and is never read from the client's action; offline practice has no leaderboard.
+
+## Seasonal banners
+`domain/seasons.ts`, `drawStyle` / `claimSpark` in `sim/loot.ts`. One season per UTC month (themed name), computed from the server clock.
+- **Banner:** the Style draw tab has a Season banner and a Standard banner (same costs, same odds and pity). On the season banner two featured legendary styles win 75 % of Legendary pulls (the standard banner's weekly featured style wins 50 %). The twelve legendaries rotate so each is featured once a year; nothing is ever locked to a season, and every style can also be crafted from skin shards.
+- **Progress** (`loot.season`, resets each month): season draws pay a silver box at 10, a gold box at 30 and a choice box at 60 (paid once, also inside a ten-draw). After 80 draws the player may pick one featured style for free (Spark, once per season; refused if already owned).
+- A "New season" notification is shown once per season. Draws are audited with their banner and season progress.
