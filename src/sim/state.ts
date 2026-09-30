@@ -3,10 +3,11 @@ import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
 import { CHARACTER_ART, CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { generateCustomer } from '../domain/engine';
-import { levelPerks } from '../domain/progression';
+import { levelFor, levelPerks } from '../domain/progression';
 import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../domain/types';
 import { buildProfile, shortWish, type CustomerReply, type Fact } from '../domain/conversation/customerTalk';
 import type { BottleConversationFacts } from '../domain/conversation/bottleTalk';
+import { createLoot, normalizeLoot, type LootState } from '../domain/lootState';
 
 // The complete, serializable game state of one player. The server owns it; the client only displays it
 // (and, in offline practice mode, simulates it locally with the same rules).
@@ -70,6 +71,8 @@ export interface PlayerState {
   recipeLevels?: Record<string, number>;
   recipeCopies?: Record<string, number>;
   popularity: number;
+  // Equipment, materials, consumables, boxes, style-draw pity and prestige (see sim/loot.ts).
+  loot: LootState;
   popularityBoost?: PopularityBoost;
   // Day of the last rewarded visit to each friend's bar.
   friendVisits?: Record<string, string>;
@@ -148,6 +151,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     knownRecipeIds,
     recipeUnlockSources: Object.fromEntries(knownRecipeIds.map((id) => [id, 'starter'])),
     popularity: 0,
+    loot: createLoot(),
     dailyGiftClaimedKey: '',
     loginStreak: 0,
     dailyGiftResult: 'A new gift is available today.',
@@ -186,6 +190,7 @@ export function normalizePlayerState(state: PlayerState) {
   state.tradeLog = Array.isArray(state.tradeLog)
     ? state.tradeLog.filter((entry) => entry !== 'Each city bar now keeps its own stock.').slice(0, 40)
     : [];
+  state.loot = normalizeLoot(state.loot, levelFor(state.xp));
   state.popularity = Number.isFinite(state.popularity) ? Math.max(0, Math.floor(state.popularity)) : 0;
   if (state.popularityBoost?.kind === 'no-cooldown') {
     if (!Number.isFinite(state.popularityBoost.until)) state.popularityBoost = undefined;

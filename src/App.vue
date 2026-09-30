@@ -9,6 +9,7 @@ import LearningPage from './components/learning/LearningPage.vue';
 import GuideSheet from './components/knowledge/GuideSheet.vue';
 import UiIcon from './components/ui/UiIcon.vue';
 import FriendsPage from './components/friends/FriendsPage.vue';
+import WorkshopPage from './components/workshop/WorkshopPage.vue';
 import StartingBarPicker from './components/game/StartingBarPicker.vue';
 import NotificationToasts from './components/ui/NotificationToasts.vue';
 import { useGameStore } from './stores/game';
@@ -29,6 +30,7 @@ const nav = [
   { id: 'design', label: 'Design', mark: 'brush' },
   { id: 'regions', label: 'Cities', mark: 'pin' },
   { id: 'advisor', label: 'Pairings', mark: 'pair' },
+  { id: 'workshop', label: 'Workshop', mark: 'stock' },
   { id: 'friends', label: 'Friends', mark: 'friends' }
 ];
 
@@ -78,7 +80,8 @@ function selectView(id: string) {
       </section>
       <LearningPage v-if="view === 'english'" />
       <FriendsPage v-if="view === 'friends'" />
-      <ManagementDeck v-show="view !== 'service' && view !== 'english' && view !== 'friends'" :active-view="managementView" />
+      <WorkshopPage v-if="view === 'workshop'" />
+      <ManagementDeck v-show="view !== 'service' && view !== 'english' && view !== 'friends' && view !== 'workshop'" :active-view="managementView" />
     </main>
     <ConversationPopup v-if="game.conversationCustomerId" />
     <GuideSheet />

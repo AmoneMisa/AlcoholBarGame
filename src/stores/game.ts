@@ -123,6 +123,7 @@ export const useGameStore = defineStore('game', () => {
   const cosmeticCopies = computed(() => state.value.cosmeticCopies ?? {});
   const cosmeticRouletteAvailable = computed(() => state.value.cosmeticRouletteKey !== today.value);
   const cosmeticRouletteResult = computed(() => state.value.cosmeticRouletteResult);
+  const loot = computed(() => state.value.loot);
   const cosmeticGiftLog = computed(() => state.value.cosmeticGiftLog ?? []);
 
   // Decor edits (Design screen) go through a validated action; the proxy keeps `game.decor.wall = 'x'` working.
@@ -177,7 +178,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: mode.value !== 'online' });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson','spinCosmeticRoulette','giftCosmetic']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson','spinCosmeticRoulette','giftCosmetic','openBox','pickReward','drawStyle','prestige']);
 
   function saveOffline() {
     if (mode.value === 'online') return;
@@ -515,8 +516,9 @@ export const useGameStore = defineStore('game', () => {
 
   void connect();
 
+  const act = (action: GameAction) => dispatch(action);
   return {
-    mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, renameFriend, visitFriend, giftFriend, friendVisits, connect,
+    loot, act, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, renameFriend, visitFriend, giftFriend, friendVisits, connect,
     economy, xpProgress, guestPriceFactor,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,

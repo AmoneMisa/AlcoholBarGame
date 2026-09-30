@@ -15,6 +15,7 @@ import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL, economyAt, formatDeliveryTime, mar
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
+import { LootError, buyBox, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
 import { DELIVERY_DAY_MS, levelFor, normalizePlayerState, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
@@ -60,7 +61,18 @@ export type GameAction =
   | { type: 'offerSimilar'; customerId: string }
   | { type: 'rejectCustomer'; customerId: string }
   | { type: 'setAutoSupply'; enabled: boolean }
-  | { type: 'autoServe' };
+  | { type: 'autoServe' }
+  | { type: 'upgradeEquipment'; item: string }
+  | { type: 'promoteEquipment'; item: string }
+  | { type: 'openBox'; box: string }
+  | { type: 'pickReward'; index: number }
+  | { type: 'buyBox'; box: string; quantity?: number }
+  | { type: 'buyConsumable'; id: string; quantity?: number }
+  | { type: 'useConsumable'; id: string; recipeId?: string }
+  | { type: 'drawStyle'; count: 1 | 10 }
+  | { type: 'craftSkin'; cosmeticId: string }
+  | { type: 'prestige' }
+  | { type: 'buyPrestigePerk'; perk: string };
 
 export class RuleError extends Error {}
 
@@ -109,10 +121,11 @@ const economyOf = (state: PlayerState, now: number) => {
 // Tips are a chance: the level sets the base rate, VIP and wealthy guests are more generous.
 function rollTip(state: PlayerState, guest: Customer, now: number, random: () => number) {
   const bonus = guest.mood === 'vip' || guest.mood === 'wealthy' ? .2 : 0;
-  return random() < Math.min(.95, economyOf(state, now).tipChance + bonus);
+  const loot = lootBonuses(state, now);
+  return loot.alwaysTips || random() < Math.min(.95, economyOf(state, now).tipChance + bonus + loot.tipChance);
 }
 // Delivery time in days after the level's delivery perk.
-const deliveryDaysFor = (state: PlayerState, supplier: Supplier, now: number) => supplier.deliveryDays * economyOf(state, now).delivery;
+const deliveryDaysFor = (state: PlayerState, supplier: Supplier, now: number) => supplier.deliveryDays * economyOf(state, now).delivery * lootBonuses(state, now).deliveryFactor;
 
 // Auto-supply (level 5+): anything running low is reordered, one pack from the cheapest supplier that sells it,
 // paying normal prices and delivery fees. Nothing is ordered twice while a delivery for it is on the way.
@@ -151,7 +164,7 @@ const priceFactorOf = (guest: Customer | undefined, marketFactor: number) => gue
 // Higher levels bring guests sooner; city events (Hot Time, storms...) speed them up or slow them down.
 function nextArrival(state: PlayerState, now: number, random: () => number) {
   if (state.popularityBoost?.kind === 'no-cooldown' && state.popularityBoost.until > now) return now + 1000;
-  return now + Math.round((nextCustomerArrival(now, random) - now) * economyOf(state, now).arrival);
+  return now + Math.round((nextCustomerArrival(now, random) - now) * economyOf(state, now).arrival * lootBonuses(state, now).arrivalFactor);
 }
 
 function makeVipCustomer(state: PlayerState, level: number, priceFactor: number) {
@@ -188,6 +201,10 @@ function makeArrivingCustomer(state: PlayerState, now: number, random: () => num
 
 function welcomeNextCustomer(state: PlayerState, now: number, random: () => number) {
   const arrival = makeArrivingCustomer(state, now, random);
+  // The sound system keeps guests happy for longer.
+  const patienceFactor = lootBonuses(state, now).patienceFactor;
+  arrival.patience = Math.round(arrival.patience * patienceFactor);
+  arrival.patienceRemaining = Math.round(arrival.patienceRemaining * patienceFactor);
   state.customers = [arrival];
   state.activeCustomerId = arrival.id;
   state.nextCustomerAt = 0;
@@ -338,7 +355,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.money = coins(state.money + revenue + tip);
       const crystalPayment = bottleSaleCrystalReward(product, request.quantity);
       state.crystals += crystalPayment;
-      state.xp += 110 + Math.min(state.streak * 2, 14);
+      state.xp += xpGain(state, 110 + Math.min(state.streak * 2, 14), now);
       state.streak += 1;
       const note = `Sold ${request.quantity} × ${product.name} for ${revenue.toFixed(2)} coins and ${crystalPayment} crystals.${tip ? ` Tip +${tip}.` : ' No tip this time.'}`;
       scheduleNextCustomer(state, now, random);
@@ -388,22 +405,29 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         if (product && (bottleStock(state, product.id)?.quantity ?? 0) <= 0) throw new RuleError(`There is no ${product.brand} on the shelf. Offer another brand in the conversation.`);
         if (product && pourBrands[product.ingredientId] !== product.id) throw new RuleError(`The guest asked for ${product.brand}. Choose that brand before you pour.`);
       }
-      state.inventories[state.regionId] = consumeMix(inventoryOf(state), mix);
+      const stockBefore = inventoryOf(state).map((item) => ({ ...item }));
+      // The ice machine saves a little liquid from stock on every pour (whole millilitres, never below 1).
+      const saved = lootBonuses(state, now).liquidSaved;
+      const poured = saved > 0 ? mix.map((item) => INGREDIENTS.find((entry) => entry.id === item.ingredientId)?.unit === 'ml' ? { ...item, amount: Math.max(1, Math.round(item.amount * (1 - saved))) } : item) : mix;
+      state.inventories[state.regionId] = consumeMix(inventoryOf(state), poured);
       const verdict = judgeMix(mix, guest, action.shaken === true);
       if (verdict.success) {
         // Upgraded recipes earn more: +6% price and +10% tips per level.
         const mastery = recipeBonus(guest.orderKind === 'serve' ? 1 : recipeLevel(state, verdict.recipe.id));
         // City signature cocktails earn a premium in their city (brand serves are not cocktails).
         const specialty = guest.orderKind === 'serve' ? 1 : specialtyFactor(state.regionId, verdict.recipe.id);
-        const revenue = coins(verdict.recipe.price * priceFactorOf(guest, region.marketFactor) * mastery.pay * specialty);
+        const golden = !auto && (state.loot.armed['golden-ice'] ?? 0) > 0;
+        if (golden) delete state.loot.armed['golden-ice'];
+        const revenue = coins(verdict.recipe.price * priceFactorOf(guest, region.marketFactor) * mastery.pay * specialty * lootBonuses(state, now).payFactor * (golden ? 1.5 : 1));
         const bonus = guest.orderKind === 'serve' ? undefined : signatureBonus(verdict.recipe.id, pourBrands);
         // Tips are a chance, never a given; drinks made with Auto-serve are paid but never tipped.
-        const tipped = !auto && rollTip(state, guest, now, random);
+        const tipped = !auto && (golden || rollTip(state, guest, now, random));
         const tip = tipped ? Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .2 : .1) * economyOf(state, now).tips * mastery.tips) + (bonus ? 2 : 0) : 0;
         state.money = coins(state.money + revenue + tip);
         // About 60 successful orders reach level 25: roughly four medium two-hour play days.
-        state.xp += 100 + Math.min(state.streak * 2, 14);
+        state.xp += xpGain(state, 100 + Math.min(state.streak * 2, 14), now);
         state.streak += 1;
+        const found = dropAfterServe(state, guest.mood === 'vip', !!guest.specialRecipeRewardId, random);
         const serveProduct = serve ? ALCOHOL_PRODUCTS.find((item) => item.id === serve.productId) : undefined;
         const brandedPayment = serveProduct ? brandedServeCrystalReward(serveProduct) : 0;
         const specialPayment = guest.specialRecipeRewardId || guest.mood === 'vip' ? conversationCrystalReward(guest, verdict.recipe) : 0;
@@ -418,7 +442,13 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           : !tip ? `Perfect service. No tip this time.${crystalNote}`
           : bonus ? `Perfect service — classic touch with ${bonus}! Tip +${tip} coins.${crystalNote}` : `Perfect service. Tip +${tip} coins.${crystalNote}`;
         scheduleNextCustomer(state, now, random);
-        state.message = note;
+        state.message = note + found;
+      } else if ((state.loot.armed['second-chance'] ?? 0) > 0) {
+        // Second Chance: the ingredients come back and the streak survives.
+        delete state.loot.armed['second-chance'];
+        state.inventories[state.regionId] = stockBefore;
+        guest.patienceRemaining = Math.max(0, guest.patienceRemaining - 60);
+        state.message = 'Wrong drink — Second Chance refunded your ingredients and kept your streak.';
       } else {
         state.streak = 0;
         guest.patienceRemaining = Math.max(0, guest.patienceRemaining - 60);
@@ -450,7 +480,12 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       // Prices come from the server's own market for this bar, day, level and city event, never from the client.
       const quote = quotePurchase(marketFor(region, now, state.xp), cleanCart(action.cart, 99), supplier);
       if (!quote.lines.length) throw new RuleError('Add packs to your order first.');
+      // Prestige trade contacts and an armed Supplier Voucher lower the final total.
+      const voucher = (state.loot.armed['voucher'] ?? 0) > 0;
+      const discount = lootBonuses(state, now).supplyFactor * (voucher ? .8 : 1);
+      if (discount < 1) quote.total = coins(quote.total * discount);
       if (state.money < quote.total) throw new RuleError('You do not have enough money.');
+      if (voucher) { delete state.loot.armed['voucher']; state.message = 'Supplier Voucher used: 20% off.'; }
       state.money = coins(state.money - quote.total);
       const days = deliveryDaysFor(state, supplier, now);
       state.deliveryOrders.push({ id: crypto.randomUUID(), supplier: supplier.name, barId: state.regionId, dueAt: now + Math.round(days * DELIVERY_DAY_MS),
@@ -511,6 +546,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       } else {
         state.dailyGiftResult = `Day ${state.loginStreak}: +${reward} coins${crystalReward ? ` and +${crystalReward} crystals` : ''}. Come back tomorrow to grow your streak.`;
       }
+      state.dailyGiftResult += dailyStreakBox(state);
       state.message = state.dailyGiftResult;
       break;
     }
@@ -606,7 +642,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const quantity = cleanAmount(action.quantity ?? 1, 10);
       const unitCost = product ? bottleRestockCrystalCost(product) : 0;
       if (!product || !unitCost || !quantity) throw new RuleError('This bottle is not available in the crystal reserve market.');
-      const cost = unitCost * quantity;
+      const cost = Math.max(1, Math.ceil(unitCost * quantity * lootBonuses(state, now).bottleCostFactor));
       if (state.crystals < cost) throw new RuleError(`You need ${cost} crystals to restock ${quantity} × ${product.name}.`);
       state.crystals -= cost;
       const stock = bottleStock(state, product.id);
@@ -733,9 +769,44 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       break;
     }
 
+    case 'upgradeEquipment':
+    case 'promoteEquipment':
+    case 'openBox':
+    case 'pickReward':
+    case 'buyBox':
+    case 'buyConsumable':
+    case 'useConsumable':
+    case 'drawStyle':
+    case 'craftSkin':
+    case 'prestige':
+    case 'buyPrestigePerk': {
+      try {
+        switch (action.type) {
+          case 'upgradeEquipment': upgradeEquipment(state, action.item); break;
+          case 'promoteEquipment': promoteEquipment(state, action.item); break;
+          case 'openBox': openBox(state, action.box, random); break;
+          case 'pickReward': pickChoice(state, action.index, random); break;
+          case 'buyBox': buyBox(state, action.box, action.quantity); break;
+          case 'buyConsumable': buyConsumable(state, action.id, action.quantity); break;
+          case 'useConsumable': useConsumable(state, action.id, action.recipeId, now); break;
+          case 'drawStyle': drawStyle(state, action.count, now, random); break;
+          case 'craftSkin': craftSkin(state, action.cosmeticId); break;
+          case 'prestige': prestige(state, now); break;
+          case 'buyPrestigePerk': buyPrestigePerk(state, action.perk); break;
+        }
+      } catch (error) {
+        if (error instanceof LootError) throw new RuleError(error.message);
+        throw error;
+      }
+      break;
+    }
+
     default: throw new RuleError('Unknown action.');
   }
 
+  // Coins earned by serving and selling bottles decide the stars of the next Grand Opening.
+  if (['serve', 'autoServe', 'sellBottle'].includes(action.type) && state.money > moneyBefore) state.loot.runEarned += Math.floor(state.money - moneyBefore);
+  grantLevelBoxes(state);
   if (!Number.isFinite(state.money) || state.money < 0) throw new RuleError('Not enough money.');
   if (!Number.isFinite(state.crystals) || state.crystals < 0) throw new RuleError('Not enough crystals.');
   return { moneyDelta: coins(state.money - moneyBefore), crystalDelta: state.crystals - crystalsBefore };
