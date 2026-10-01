@@ -292,7 +292,7 @@ watch(() => ({...props}),update);
 onMounted(async () => {
   try {
     renderer = new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, (navigator.hardwareConcurrency ?? 8) <= 4 || ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8) <= 2 ? 1 : 1.5));
     renderer.outputColorSpace=THREE.SRGBColorSpace;
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure=1.15;

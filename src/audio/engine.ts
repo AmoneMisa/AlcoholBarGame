@@ -27,6 +27,9 @@ function loadPrefs(): Prefs {
   } catch { return { music: MUSIC_DEFAULT, sfx: true, speech: true, musicVolume: 1, sfxVolume: 1, speechVolume: 1 }; }
 }
 
+// Phones with few cores or little memory get shorter reverbs, so the audio thread and the game both stay smooth.
+export const LOW_POWER = typeof navigator !== 'undefined' && ((navigator.hardwareConcurrency ?? 8) <= 4 || ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8) <= 2);
+
 const prefs = loadPrefs();
 export const musicOn = ref(prefs.music);
 export const sfxOn = ref(prefs.sfx);
@@ -97,7 +100,7 @@ export function audioContext() {
   // Music sits in a hall; effects sit in a small room.
   musicSendBus = ctx.createGain();
   const hall = ctx.createConvolver();
-  hall.buffer = makeImpulse(ctx, 2.8, 2.2, .55);
+  hall.buffer = makeImpulse(ctx, LOW_POWER ? 1.6 : 2.8, 2.2, .55);
   const hallLevel = ctx.createGain();
   hallLevel.gain.value = .5;
   musicSendBus.connect(hall).connect(hallLevel).connect(musicBus);
