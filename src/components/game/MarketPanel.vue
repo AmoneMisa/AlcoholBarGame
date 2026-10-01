@@ -33,11 +33,15 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
 
 <template>
   <article class="game-panel market-panel">
-    <header class="panel-heading"><div><small>TRADE FLOOR · {{ game.region.name }}</small><h2>Stock your next shift</h2></div><span>{{ game.money.toFixed(2) }} coins</span></header>
+    <header class="panel-heading"><div><small>TRADE FLOOR · {{ game.region.name }}</small><h2>Stock your next shift</h2></div></header>
     <!-- Level perks live on the bar scene's city chip; the market only shows what changes buying here. -->
     <div class="auto-supply" :class="{ locked: game.level < AUTO_SUPPLY_LEVEL, on: game.autoSupply }">
       <div><b>Auto-supply</b><small>{{ game.level < AUTO_SUPPLY_LEVEL ? `Unlocks at level ${AUTO_SUPPLY_LEVEL}` : 'Reorders anything that runs low from the cheapest supplier, with normal prices and delivery fees.' }}</small></div>
       <button type="button" role="switch" :aria-checked="game.autoSupply" :disabled="game.level < AUTO_SUPPLY_LEVEL" @click="game.setAutoSupply(!game.autoSupply)">{{ game.level < AUTO_SUPPLY_LEVEL ? `Lv ${AUTO_SUPPLY_LEVEL}` : game.autoSupply ? 'On' : 'Off' }}</button>
+    </div>
+    <div class="top-up-row">
+      <div><b>Top up low stock</b><small>Orders everything that is running low from the cheapest supplier, in one tap. Deliveries still take time.</small></div>
+      <button type="button" @click="game.topUp()">Top up</button>
     </div>
     <TradeTalk />
     <div class="market-modes"><button :class="{active:mode === 'buy'}" type="button" @click="mode = 'buy'">Buy supplies</button><button :class="{active:mode === 'sell'}" type="button" @click="mode = 'sell'">Sell stock</button><span>City prices {{ game.region.marketFactor.toFixed(2) }}× · prices change each shift</span></div>

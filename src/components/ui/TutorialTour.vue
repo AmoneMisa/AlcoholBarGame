@@ -19,7 +19,7 @@ const STEPS: Step[] = [
   { id: 'market', title: 'Stock and deliveries', text: 'Buy ingredients, bottles and food in the Market. Deliveries can be late, damaged or wrong. Report a problem politely, in English, and the supplier will help.', view: 'market' },
   { id: 'hud', title: 'Coins, crystals and servers', text: 'Coins buy stock and upgrades. Crystals unlock recipes and styles. From level 8 you can hire servers: they earn coins while you are away, but never as much as you.', view: 'service', target: '.hud-resources' },
   { id: 'rules', title: 'House rules and events', text: 'Every city has its own rules, such as checking ID or paying by card only. Open Rules to read them: inspectors count every rule you break. Special nights, like ladies’ night or happy hour, change who comes and what they pay.', view: 'service', target: '.house-rules-button' },
-  { id: 'done', title: 'You are ready!', text: 'Start with the first guest. Small mistakes are fine: every sentence you try makes your English better. Have a good shift!', view: 'service' }
+  { id: 'done', title: 'You are ready!', text: 'Open Training (the graduation cap in the header) for a guide and a risk-free practice of every mechanic. Small mistakes are fine: every sentence you try makes your English better. Have a good shift!', view: 'service' }
 ];
 
 const open = ref(false);

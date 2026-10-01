@@ -20,6 +20,7 @@ import { actsIn } from '../domain/social/acts';
 import { enjoyingOpening, openingFor, socialReply, voice, type Expression } from '../domain/social/talk';
 import { ensureSocial, genderOf, rollSocial } from '../domain/social/generate';
 import { guestLine, hasSituation, matchChoice, overdue, pickSituation, resolveChoice, resolveIgnored, startSituation, visibleChoices, type Resolution } from './situations';
+import { endTraining, finishGuide, isPractice, noteTraining, startTraining, tidyTraining } from './training';
 import { accrueStaff, hireStaff, upgradeStaff } from './staff';
 import { applyPromo, barEventFor, tickBarEvent } from './events';
 import { adjustPitch, askPitch, cancelPitch, pitchChance, startPitch } from './pitch';
@@ -76,6 +77,11 @@ export type GameAction =
   | { type: 'giveAshtray'; customerId: string }
   | { type: 'cleanAshtrays' }
   | { type: 'setTour'; value: 'done' | 'skipped' }
+  // The training academy and one-tap restock.
+  | { type: 'startTraining'; moduleId: string }
+  | { type: 'endTraining' }
+  | { type: 'trainingDone'; moduleId: string }
+  | { type: 'topUp' }
   | { type: 'hireStaff' }
   | { type: 'upgradeStaff'; index: number }
   // Offering a guest another drink or some food: start the offer, talk, then ask (the chance is shown and changes as you talk).
@@ -149,15 +155,17 @@ const deliveryDaysFor = (state: PlayerState, supplier: Supplier, now: number) =>
 // Auto-supply (level 5+): anything running low is reordered, one pack from the cheapest supplier that sells it,
 // paying normal prices and delivery fees. Nothing is ordered twice while a delivery for it is on the way.
 const LOW_STOCK = { ml: 150, piece: 4 } as const;
-function autoRestock(state: PlayerState, now: number) {
-  if (!state.autoSupply || levelFor(state.xp) < AUTO_SUPPLY_LEVEL) return;
+// Orders what is running low from the cheapest suppliers. Automatic (from level 5, when switched on) or by the player with one tap.
+function autoRestock(state: PlayerState, now: number, manual = false): number {
+  if (!manual && (!state.autoSupply || levelFor(state.xp) < AUTO_SUPPLY_LEVEL)) return 0;
+  let ordered = 0;
   const region = REGIONS.find((item) => item.id === state.regionId)!;
   const pending = new Set(state.deliveryOrders.filter((order) => order.barId === state.regionId).flatMap((order) => order.items.map((item) => item.ingredientId)));
   const low = inventoryOf(state).filter((stock) => {
     const ingredient = INGREDIENTS.find((item) => item.id === stock.ingredientId);
     return ingredient && !pending.has(stock.ingredientId) && stock.amount < (ingredient.unit === 'ml' ? LOW_STOCK.ml : LOW_STOCK.piece);
   });
-  if (!low.length) return;
+  if (!low.length) return 0;
   const market = marketFor(region, now, state.xp);
   const carts = new Map<string, Record<string, number>>();
   for (const stock of low) {
@@ -168,13 +176,15 @@ function autoRestock(state: PlayerState, now: number) {
     const supplier = supplierInCity(SUPPLIERS.find((item) => item.id === supplierId)!, region.marketFactor);
     const quote = quotePurchase(market, cart, supplier);
     if (!quote.lines.length) continue;
-    if (state.money < quote.total) { state.message = `Auto-supply paused: ${quote.total.toFixed(2)} coins needed for ${supplier.name}.`; continue; }
+    if (state.money < quote.total) { state.message = `${manual ? 'Top-up' : 'Auto-supply'} paused: ${quote.total.toFixed(2)} coins needed for ${supplier.name}.`; continue; }
+    ordered++;
     state.money = coins(state.money - quote.total);
     const days = deliveryDaysFor(state, supplier, now);
     state.deliveryOrders.push({ id: crypto.randomUUID(), supplier: supplier.name, barId: state.regionId, dueAt: now + Math.round(days * DELIVERY_DAY_MS),
       items: quote.lines.map((line) => ({ ingredientId: line.ingredientId, amount: line.amount })), total: quote.total });
-    log(state, `Auto-supply ordered ${quote.lines.map((line) => INGREDIENTS.find((item) => item.id === line.ingredientId)?.name).join(', ')} from ${supplier.name} for ${quote.total.toFixed(2)} coins.`);
+    log(state, `${manual ? 'Top-up' : 'Auto-supply'} ordered ${quote.lines.map((line) => INGREDIENTS.find((item) => item.id === line.ingredientId)?.name).join(', ')} from ${supplier.name} for ${quote.total.toFixed(2)} coins.`);
   }
+  return ordered;
 }
 
 // What this guest pays relative to catalog prices (fixed when they walked in, so budgets always match).
@@ -473,19 +483,20 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const revenue = coins(verdict.recipe.price * priceFactorOf(guest, region.marketFactor) * mastery.pay * specialty);
         const bonus = guest.orderKind === 'serve' ? undefined : signatureBonus(verdict.recipe.id, pourBrands);
         // Tips are a chance, never a given; drinks made with Auto-serve are paid but never tipped.
-        const tipped = !auto && rollTip(state, guest, now, random);
+        const tipped = !auto && !guest.training && rollTip(state, guest, now, random);
         const tip = tipped ? Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .2 : .1) * economyOf(state, now).tips * mastery.tips) + (bonus ? 2 : 0) : 0;
         // Sometimes the guest has a problem with paying: then the bill is held until it is sorted out.
         // A drink made with damaged or old goods can bring a complaint instead.
         const promo = applyPromo(state, guest, verdict.recipe, now);
         const complaint = !promo.free && lowGradeUsed.size && random() < (lowGradeUsed.has('expiring') ? .4 : .2) ? situationById('complaint-quality') : undefined;
-        const payTrouble = promo.free ? undefined : complaint ?? pickSituation(state, guest, 'payment', random);
+        const payTrouble = promo.free || guest.training ? undefined : complaint ?? pickSituation(state, guest, 'payment', random);
         if (!payTrouble && !promo.free) state.money = coins(state.money + revenue + tip);
         // About 60 successful orders reach level 25: roughly four medium two-hour play days.
         state.xp += 100 + Math.min(state.streak * 2, 14);
         state.streak += 1;
         const serveProduct = serve ? ALCOHOL_PRODUCTS.find((item) => item.id === serve.productId) : undefined;
         ensureSocial(guest, now).lastDrink = serveProduct ? { productId: serveProduct.id } : { recipeId: verdict.recipe.id };
+        if (guest.training) noteTraining(state, 'served');
         const brandedPayment = serveProduct ? brandedServeCrystalReward(serveProduct) : 0;
         const specialPayment = guest.specialRecipeRewardId || guest.mood === 'vip' ? conversationCrystalReward(guest, verdict.recipe) : 0;
         const crystalPayment = brandedPayment + specialPayment;
@@ -856,6 +867,21 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       addLine(transcript, 'customer', voice(target, result.text, transcript.lines.length));
       break;
     }
+    case 'startTraining': {
+      try { startTraining(state, String(action.moduleId), now, random); } catch (error) { throw new RuleError((error as Error).message); }
+      break;
+    }
+    case 'endTraining': endTraining(state); state.message = 'Practice ended.'; break;
+    case 'trainingDone': {
+      try { finishGuide(state, String(action.moduleId)); } catch (error) { throw new RuleError((error as Error).message); }
+      break;
+    }
+    case 'topUp': {
+      const ordered = autoRestock(state, now, true);
+      if (!ordered) throw new RuleError(state.message.includes('paused') ? state.message : 'Nothing is running low, or an order for it is already on the way.');
+      noteTraining(state, 'toppedUp');
+      break;
+    }
     case 'setTour':
       state.tour = action.value === 'done' ? 'done' : 'skipped';
       break;
@@ -891,6 +917,19 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     default: throw new RuleError('Unknown action.');
   }
 
+  // Training academy: note what the player did. A practice guest never pays and never brings crystals.
+  const practising = guest && isPractice(guest) && ['serve', 'situationChoice', 'pitchAsk', 'say', 'autoServe'].includes(action.type);
+  if (practising) { state.money = moneyBefore; state.crystals = crystalsBefore; }
+  switch (action.type) {
+    case 'say': if (guest && isPractice(guest)) { noteTraining(state, 'asked'); if (guest.orderRevealed) noteTraining(state, 'confirmed'); } break;
+    case 'giveWater': noteTraining(state, 'water'); break;
+    case 'giveAshtray': noteTraining(state, 'ashtray'); break;
+    case 'pitchAsk': noteTraining(state, 'offered'); break;
+    case 'buy': noteTraining(state, 'bought'); break;
+    case 'situationChoice': if (guest && isPractice(guest) && !hasSituation(guest)) noteTraining(state, 'situationSolved'); break;
+    default: break;
+  }
+  tidyTraining(state);
   if (!Number.isFinite(state.money) || state.money < 0) throw new RuleError('Not enough money.');
   if (!Number.isFinite(state.crystals) || state.crystals < 0) throw new RuleError('Not enough crystals.');
   return { moneyDelta: coins(state.money - moneyBefore), crystalDelta: state.crystals - crystalsBefore };

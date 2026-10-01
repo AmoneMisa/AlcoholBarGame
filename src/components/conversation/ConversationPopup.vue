@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { CHAT_GUIDE } from '../../domain/training';
 import SpeakTrainer from '../learning/SpeakTrainer.vue';
 import { voiceProfileOf } from '../../domain/social/origin';
 import { guestVoice, speakLine } from '../../audio/index';
 import { FOODS } from '../../domain/foods';
+const foodAssetBase = `${import.meta.env.BASE_URL}assets/drinks/food/`;
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { CUSTOMER_ART_BY_SLOT } from '../../data/cosmetics/artCatalog';
 import { MODIFIERS, RECIPES } from '../../domain/catalog';
@@ -91,6 +93,7 @@ const templates = computed(() => {
 // How the guest feels, how drunk they are, and what they are waiting for.
 const social = computed(() => customer.value?.social);
 const offerOpen = ref(false);
+const guideOpen = ref(false);
 const offerKind = ref<'drink' | 'food'>('food');
 const offer = computed(() => customer.value ? game.offerChance(customer.value.id) : undefined);
 const offerName = computed(() => {
@@ -334,8 +337,13 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
             <label class="rapport" title="How much this guest likes you tonight">Likes you <span><i :style="{ width: social.rapport + '%' }"></i></span></label>
           </div>
         </div>
+        <button type="button" class="talk-help" :aria-expanded="guideOpen" aria-label="How does this screen work?" @click="guideOpen = !guideOpen">?</button>
         <CloseButton class="talk-close" label="Close conversation" @click="game.closeConversation()" />
       </header>
+      <section v-if="guideOpen" class="chat-guide" aria-label="Conversation guide">
+        <header><b>How conversations work</b><button type="button" @click="guideOpen = false">Close</button></header>
+        <ol><li v-for="step in CHAT_GUIDE" :key="step.title"><b>{{ step.title }}.</b> {{ step.text }}</li></ol>
+      </section>
       <div class="talk-extras">
       <section v-if="situation" class="situation-panel" :class="'sev-' + situation.severity" aria-label="Situation">
         <header><b>{{ situation.icon }} {{ situation.title }}</b><button type="button" class="situation-type" @click="composerOpen = !composerOpen">{{ composerOpen ? 'Hide typing' : 'Type it yourself' }}</button></header>
@@ -357,7 +365,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         <template v-if="!social.pitch">
           <div class="offer-items">
             <template v-if="offerKind === 'food'">
-              <button v-for="item in foodsInStock" :key="item.id" type="button" @click="startOffer('food', item.id)">{{ item.name }} · {{ item.price }}</button>
+              <button v-for="item in foodsInStock" :key="item.id" class="food-offer-button" type="button" @click="startOffer('food', item.id)"><img :src="`${foodAssetBase}${item.id}.webp`" alt="" />{{ item.name }} · {{ item.price }}</button>
               <small v-if="!foodsInStock.length">No food in stock. Buy some from the local or fresh supplier.</small>
             </template>
             <template v-else>

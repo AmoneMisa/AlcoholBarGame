@@ -13,6 +13,7 @@ import BottleModel from '../cocktails/BottleModel.vue';
 import GlassModel from '../cocktails/GlassModel.vue';
 import CharacterModel from '../characters/CharacterModel.vue';
 import CityEvent from './CityEvent.vue';
+import TrainingStrip from './TrainingStrip.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
 import UiIcon from '../ui/UiIcon.vue';
 import { INTERIORS, shelfStyleFor } from '../../data/cosmetics/bars';
@@ -460,11 +461,12 @@ onBeforeUnmount(() => {
         <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="faceOf(customer)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
         <div class="guest-card">
           <header><b>{{ customer.name }}</b><time v-if="customer.id === game.activeCustomerId">{{ game.orderCountdown }}</time></header>
-          <small class="guest-badges"><span v-for="badge in badges(customer)" :key="badge.label" :title="badge.label">{{ badge.icon }}</span><i v-if="!customer.social">{{ customer.mood }}</i><i v-else>{{ customer.social.phase === 'enjoying' ? 'enjoying' : EMOTION_LABEL[customer.social.emotion].toLowerCase() }}</i></small>
+          <small class="guest-badges"><span v-if="customer.training" title="Practice guest">🎓</span><span v-for="badge in badges(customer)" :key="badge.label" :title="badge.label">{{ badge.icon }}</span><i v-if="!customer.social">{{ customer.mood }}</i><i v-else>{{ customer.social.phase === 'enjoying' ? 'enjoying' : EMOTION_LABEL[customer.social.emotion].toLowerCase() }}</i></small>
           <p>{{ bubbleText(customer) }}</p>
           <footer><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customer.social?.phase === 'enjoying' ? 'Enjoying the drink' : customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
         </div>
       </button>
+      <TrainingStrip />
       <button type="button" class="house-rules-button" :aria-expanded="rulesOpen" @click="rulesOpen = !rulesOpen">📜 Rules<i v-if="game.ruleViolations" class="rules-count" :title="`${game.ruleViolations} rule breaks so far`">{{ game.ruleViolations }}</i></button>
       <PopoverPanel v-if="rulesOpen" class="house-rules-panel" eyebrow="HOUSE RULES" :title="`Rules in ${game.region.name}`" close-label="Close house rules" @close="rulesOpen = false">
         <p class="rules-note">These are game rules for practice, not legal advice. Explain them politely to guests. Inspectors count every rule you break{{ game.ruleViolations ? ` (so far: ${game.ruleViolations})` : '' }}.</p>

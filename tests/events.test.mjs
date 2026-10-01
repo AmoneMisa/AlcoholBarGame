@@ -191,3 +191,98 @@ test('The tour choice is saved on the account state', () => {
   applyAction(state, { type: 'setTour', value: 'done' }, context());
   assert.equal(state.tour, 'done');
 });
+
+// ---- Training academy ----
+const academy = () => { const state = createInitialState(NOW); state.nextCustomerAt = 0; state.customers = []; return state; };
+const doAction = (state, action, now = NOW, random = () => .5) => applyAction(state, action, { now, random, checkEnglish, spawnCustomers: false });
+
+test('Every lesson has a guide, and practice lessons say what to do', async () => {
+  const { TRAINING_MODULES, NEED_LABEL } = await import('../src/domain/training.ts');
+  assert.ok(TRAINING_MODULES.length >= 9);
+  for (const module of TRAINING_MODULES) {
+    assert.ok(module.guide.length >= 3 && module.title && module.summary, module.id);
+    for (const step of module.guide) assert.ok(step.text.length > 40, `${module.id}: ${step.title}`);
+    for (const need of module.practice?.needs ?? []) assert.ok(NEED_LABEL[need], need);
+  }
+  assert.equal(new Set(TRAINING_MODULES.map((module) => module.id)).size, TRAINING_MODULES.length);
+});
+
+test('Training: talk lesson — a practice guest, a question and the right drink finish it once, with a reward', () => {
+  const state = academy();
+  doAction(state, { type: 'startTraining', moduleId: 'talk' });
+  const guest = state.customers.find((item) => item.training);
+  assert.ok(guest && state.training.active.moduleId === 'talk');
+  doAction(state, { type: 'openConversation', customerId: guest.id });
+  const xp = state.xp, crystals = state.crystals;
+  doAction(state, { type: 'say', text: 'Do you like sweet drinks?' });
+  assert.ok(!state.training.done.includes('talk'), 'asking alone does not finish it');
+  const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
+  doAction(state, { type: 'say', text: `Would you like ${/^[aeiou]/i.test(recipe.name) ? 'an' : 'a'} ${recipe.name}?` });
+  assert.ok(state.training.done.includes('talk'), 'naming the drink finished the lesson');
+  assert.equal(state.xp >= xp + 50, true);
+  assert.equal(state.crystals, crystals + 2);
+  // The same lesson again gives no second reward.
+  doAction(state, { type: 'startTraining', moduleId: 'talk' });
+  assert.equal(state.customers.filter((item) => item.training).length, 1, 'only one practice guest at a time');
+});
+
+test('Training: mix lesson — serving the practice drink pays nothing', () => {
+  const state = academy();
+  doAction(state, { type: 'startTraining', moduleId: 'mix' });
+  const guest = state.customers.find((item) => item.training);
+  const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
+  for (const part of recipe.ingredients) state.inventories[state.regionId].find((stock) => stock.ingredientId === part.ingredientId).amount += 1000;
+  const money = state.money;
+  doAction(state, { type: 'serve', mix: recipe.ingredients.map((item) => ({ ...item })), shaken: true, pourBrands: {} });
+  assert.ok(state.training.done.includes('mix'));
+  assert.equal(state.money, money, 'a practice drink pays nothing');
+});
+
+test('Training: care lesson needs water and an ashtray; offer lesson needs an offer; situation lesson ends with a solved problem', () => {
+  const care = academy();
+  doAction(care, { type: 'startTraining', moduleId: 'care' });
+  const smoker = care.customers.find((item) => item.training);
+  care.ashtrays = { clean: 3, dirty: 0 };
+  doAction(care, { type: 'giveWater', customerId: smoker.id });
+  assert.ok(!care.training.done.includes('care'));
+  doAction(care, { type: 'giveAshtray', customerId: smoker.id });
+  assert.ok(care.training.done.includes('care'));
+
+  const offer = academy();
+  doAction(offer, { type: 'startTraining', moduleId: 'offer' });
+  const hungry = offer.customers.find((item) => item.training);
+  doAction(offer, { type: 'pitchStart', customerId: hungry.id, kind: 'food', itemId: 'fries' });
+  doAction(offer, { type: 'pitchAsk', customerId: hungry.id });
+  assert.ok(offer.training.done.includes('offer'));
+
+  const problem = academy();
+  doAction(problem, { type: 'startTraining', moduleId: 'situation' });
+  const payer = problem.customers.find((item) => item.training);
+  assert.ok(payer.social.event, 'the problem has started');
+  const money = problem.money;
+  doAction(problem, { type: 'situationChoice', customerId: payer.id, choiceId: 'partial' });
+  assert.ok(problem.training.done.includes('situation') || !payer.social.event);
+  assert.equal(problem.money, money, 'practice money is not kept');
+});
+
+test('Training: top-up buys what is low in one tap, and guide-only lessons finish with "Got it"', () => {
+  const state = academy();
+  state.money = 5000;
+  state.inventories[state.regionId].find((item) => item.ingredientId === 'ice').amount = 0;
+  doAction(state, { type: 'startTraining', moduleId: 'market' });
+  const orders = state.deliveryOrders.length;
+  doAction(state, { type: 'topUp' });
+  assert.ok(state.deliveryOrders.length > orders, 'an order was placed');
+  assert.ok(state.training.progress.market.includes('toppedUp'));
+  assert.throws(() => doAction(state, { type: 'trainingDone', moduleId: 'market' }), /practice/);
+  doAction(state, { type: 'trainingDone', moduleId: 'staff' });
+  assert.ok(state.training.done.includes('staff'));
+});
+
+test('Ending a practice removes the practice guest', () => {
+  const state = academy();
+  doAction(state, { type: 'startTraining', moduleId: 'talk' });
+  doAction(state, { type: 'endTraining' });
+  assert.equal(state.customers.filter((item) => item.training).length, 0);
+  assert.equal(state.training.active, undefined);
+});

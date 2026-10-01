@@ -5,12 +5,16 @@ import { useGameStore } from '../../stores/game';
 import UiIcon from '../ui/UiIcon.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
 import { MAX_STAFF, MAX_STAFF_LEVEL, STAFF_PROFILES, STAFF_UNLOCK_LEVELS, hireCost, teamShare, upgradeCost } from '../../domain/staff';
+import { TRAINING_MODULES } from '../../domain/training';
+import AcademyPanel from './AcademyPanel.vue';
 import { musicOn, musicVolume, sfxOn, sfxVolume, speechOn, speechVolume, voiceMode } from '../../audio/index';
-defineEmits<{ design:[] }>();
+defineEmits<{ design:[]; goto:[view: string] }>();
 
 const game = useGameStore();
 const exchangeOpen = ref(false);
 const staffOpen = ref(false);
+const academyOpen = ref(false);
+const lessonsLeft = computed(() => TRAINING_MODULES.length - game.training.done.length);
 const startTour = () => window.dispatchEvent(new Event('barlingo:tour'));
 const slots = computed(() => Array.from({ length: MAX_STAFF }, (_, index) => ({ index, profile: STAFF_PROFILES[index]!, unlockAt: STAFF_UNLOCK_LEVELS[index]!, member: game.staff[index], open: game.level >= STAFF_UNLOCK_LEVELS[index]! })));
 const teamPercent = computed(() => Math.round(teamShare(game.staff) * 100));
@@ -70,6 +74,10 @@ onUnmounted(() => {
           <p>This exchange only works from crystals to coins and cannot be reversed.</p>
           <button v-for="bundle in CRYSTAL_EXCHANGE_BUNDLES" :key="bundle.crystals" type="button" :disabled="game.crystals < bundle.crystals" @click="exchange(bundle.crystals)"><span><UiIcon name="crystal" /><b>{{ bundle.crystals }}</b></span><i>→</i><span><UiIcon name="coin" /><b>{{ bundle.coins.toLocaleString('en-US') }}</b></span></button>
         </PopoverPanel>
+      </div>
+      <div class="academy-resource">
+        <button class="staff-open" type="button" :aria-expanded="academyOpen" aria-label="Open the training academy" @click="academyOpen = !academyOpen"><span class="staff-icons"><i class="hired">🎓</i></span><span><small>TRAINING</small><b>{{ lessonsLeft ? `${lessonsLeft} to do` : 'All done' }}</b></span></button>
+        <AcademyPanel v-if="academyOpen" @close="academyOpen = false" @goto="(view) => $emit('goto', view)" />
       </div>
       <div class="staff-resource">
         <button class="staff-open" type="button" :aria-expanded="staffOpen" :aria-label="`Servers: ${game.staff.length} of ${MAX_STAFF} hired`" @click="staffOpen = !staffOpen"><span class="staff-icons"><i v-for="slot in slots" :key="slot.index" :class="{ hired: !!slot.member, locked: !slot.open }"><UiIcon name="server" /></i></span><span><small>SERVERS</small><b>{{ game.staff.length ? `${teamPercent}% of you` : 'Hire' }}</b></span></button>

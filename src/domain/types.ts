@@ -83,6 +83,8 @@ export interface Customer {
   bottleRequest?: BottleRequest;
   selectedBottleId?: string;
   smoker?: boolean;
+  /** A practice guest from the training academy: pays nothing, gives no crystals, has no random problems. */
+  training?: boolean;
   // Feelings, liking, drunkenness, needs and story: see social/model.ts. Missing on guests saved before it existed.
   social?: import('./social/model').GuestSocial;
 }

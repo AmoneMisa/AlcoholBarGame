@@ -181,7 +181,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: mode.value !== 'online' });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson','spinCosmeticRoulette','giveAshtray','cleanAshtrays','pitchStart','pitchAsk','pitchCancel','hireStaff','upgradeStaff','giveWater','callTaxi','askToLeave','situationChoice','reportIssue','discardStock']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson','spinCosmeticRoulette','giveAshtray','cleanAshtrays','pitchStart','pitchAsk','pitchCancel','hireStaff','upgradeStaff','startTraining','giveWater','callTaxi','askToLeave','situationChoice','reportIssue','discardStock']);
 
   function saveOffline() {
     if (mode.value === 'online') return;
@@ -505,6 +505,11 @@ export const useGameStore = defineStore('game', () => {
   // Players who are already well into the game never need the tour.
   const tourSeen = computed(() => !!state.value.tour || state.value.xp >= 150);
   const setTour = (value: 'done' | 'skipped') => dispatch({ type: 'setTour', value });
+  const training = computed(() => state.value.training ?? { done: [], progress: {} } as import('../sim/training').TrainingState);
+  const startTraining = (moduleId: string) => dispatch({ type: 'startTraining', moduleId });
+  const endTraining = () => dispatch({ type: 'endTraining' });
+  const trainingDone = (moduleId: string) => dispatch({ type: 'trainingDone', moduleId });
+  const topUp = () => dispatch({ type: 'topUp' });
   const staff = computed(() => state.value.staff ?? []);
   const hireStaff = () => dispatch({ type: 'hireStaff' });
   const upgradeStaff = (index: number) => dispatch({ type: 'upgradeStaff', index });
@@ -608,6 +613,6 @@ export const useGameStore = defineStore('game', () => {
     pourBrands, brandOnShelf, shelfBrandsFor, setPourBrand,
     selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, tickGameClock, welcomeNextCustomer, offerSimilarOrder, rejectCustomer, buy, sell, switchBar, isBarOwned, nextBarPrice, barPurchaseLevel:BAR_PURCHASE_LEVEL, chooseStartingBar, buyBar, transferStock,
     supplier, localSuppliers, purchaseCart, saleCart, purchaseQuote, saleQuote, saleRevenue, deliveryOrders, deliveryCountdown, selectSupplier, checkoutPurchase, checkoutSale, renameBar, renameBartender,
-    buyRecipe, recipePrice, buyInterior, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, giveAshtray, giveWater, callTaxi, pitchStart, pitchAsk, pitchCancel, tourSeen, setTour, staff, hireStaff, upgradeStaff, barEvent, offerChance, houseRules, ruleViolations, askToLeave, cleanAshtrays, ashtrays, situationOf, answerSituation, deliveryIssues, quarantine, lowGrade, reportIssue, discardStock, buyCrystalPack, buyingCrystals, starterPackAvailable, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
+    buyRecipe, recipePrice, buyInterior, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, giveAshtray, giveWater, callTaxi, pitchStart, pitchAsk, pitchCancel, training, startTraining, endTraining, trainingDone, topUp, tourSeen, setTour, staff, hireStaff, upgradeStaff, barEvent, offerChance, houseRules, ruleViolations, askToLeave, cleanAshtrays, ashtrays, situationOf, answerSituation, deliveryIssues, quarantine, lowGrade, reportIssue, discardStock, buyCrystalPack, buyingCrystals, starterPackAvailable, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
   };
 });

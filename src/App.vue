@@ -84,7 +84,7 @@ function selectView(id: string) {
 
 <template>
   <div class="velvet-app">
-    <TopHud @design="selectView('design')" />
+    <TopHud @design="selectView('design')" @goto="selectView" />
     <main>
       <section v-show="view === 'service'" class="service-layout">
         <BarScene :active="view === 'service'" />

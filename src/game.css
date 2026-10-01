@@ -1342,3 +1342,8 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:clip}
 .rule-row small { display:block;opacity:.8; }
 
 .how-to-play { width:100%;margin-top:8px;padding:8px 10px;border:1px solid #5a6b86;border-radius:10px;background:#1d283b;color:inherit;font-size:12px;cursor:pointer; }
+
+.top-up-row { display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0;padding:8px 12px;border:1px solid #43536b;border-radius:12px;background:#131f31; }
+.top-up-row small { display:block;opacity:.75;font-size:11px; }
+.top-up-row button { padding:7px 14px;border:1px solid #e0a14a;border-radius:10px;background:#a9702b;color:#fff6e0;font-weight:700;cursor:pointer; }
+.academy-resource { position: relative; }
