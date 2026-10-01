@@ -113,3 +113,38 @@ test('A situation comes at least every 12 guests and never before the 4th guest'
   assert.ok(Math.min(...seen) >= 4, 'never within 3 guests of the last');
   assert.ok(Math.max(...seen) <= 12, 'always within 12 guests');
 });
+
+test('Servers: opened by level, trained one by one, paid only for time away and capped at 85% of the player', async () => {
+  const staff = await import('../src/domain/staff.ts');
+  const { accrueStaff } = await import('../src/sim/staff.ts');
+  const { state } = guestIn();
+  state.money = 10000000;
+  state.xp = 1e9;
+  for (let index = 0; index < 4; index++) applyAction(state, { type: 'hireStaff' }, context());
+  assert.equal(state.staff.length, 4);
+  assert.throws(() => applyAction(state, { type: 'hireStaff' }, context()), /whole team/);
+  assert.ok(staff.teamShare(state.staff) < .85, 'untrained servers are weaker');
+  for (let round = 0; round < 4; round++) for (let index = 0; index < 4; index++) applyAction(state, { type: 'upgradeStaff', index }, context());
+  assert.equal(staff.teamShare(state.staff), .85);
+  assert.throws(() => applyAction(state, { type: 'upgradeStaff', index: 0 }, context()), /fully trained/);
+
+  const market = { averagePrice: 10, arrival: 1 };
+  state.staffAt = NOW;
+  assert.equal(accrueStaff(state, NOW + 60_000, () => .5, market), undefined, 'a short pause is not an absence');
+  const crystals = state.crystals, money = state.money;
+  state.staffAt = NOW;
+  assert.match(accrueStaff(state, NOW + 4 * 3600_000, () => .5, market), /your team served/);
+  assert.ok(state.money > money);
+  assert.equal(state.crystals, crystals, 'servers never bring crystals');
+  const day = { ...state, staffAt: NOW };
+  const capped = state.money;
+  accrueStaff(day, NOW + 72 * 3600_000, () => .5, market);
+  assert.ok(day.money - capped <= (8 * 3600_000 / (62.5 * 60_000)) * 10 * .85 * 1.15 + 1, 'a long absence pays at most eight hours');
+});
+
+test('A low-level bar cannot hire the next server', () => {
+  const { state } = guestIn();
+  state.money = 100000;
+  state.xp = 0;
+  assert.throws(() => applyAction(state, { type: 'hireStaff' }, context()), /higher bar level/);
+});

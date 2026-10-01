@@ -1318,3 +1318,14 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:clip}
 
 .game-nav button { position: relative; }
 .nav-badge { position: absolute; top: 2px; right: 8px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: #d9534f; color: #fff; font: 700 10px/16px system-ui, sans-serif; font-style: normal; text-align: center; }
+
+.staff-resource { position: relative; }
+.staff-open { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid #43536b; border-radius: 12px; background: #131f31; color: inherit; cursor: pointer; }
+.staff-icons { display: inline-flex; gap: 2px; }
+.staff-icons i { font-style: normal; font-size: 15px; opacity: .45; }
+.staff-icons i.hired { opacity: 1; }
+.staff-panel p { margin: 0 0 8px; font-size: 12px; opacity: .85; }
+.staff-row { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid #304159; }
+.staff-face { font-size: 24px; }
+.staff-text { display: grid; gap: 1px; }
+.staff-text small { opacity: .75; }

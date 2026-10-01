@@ -4,11 +4,15 @@ import { CRYSTAL_EXCHANGE_BUNDLES, STAR_CRYSTAL_PACKS } from '../../domain/econo
 import { useGameStore } from '../../stores/game';
 import UiIcon from '../ui/UiIcon.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
+import { MAX_STAFF, MAX_STAFF_LEVEL, STAFF_PROFILES, STAFF_UNLOCK_LEVELS, hireCost, teamShare, upgradeCost } from '../../domain/staff';
 import { musicOn, musicVolume, sfxOn, sfxVolume, speechOn, speechVolume, voiceMode } from '../../audio/index';
 defineEmits<{ design:[] }>();
 
 const game = useGameStore();
 const exchangeOpen = ref(false);
+const staffOpen = ref(false);
+const slots = computed(() => Array.from({ length: MAX_STAFF }, (_, index) => ({ index, profile: STAFF_PROFILES[index]!, unlockAt: STAFF_UNLOCK_LEVELS[index]!, member: game.staff[index], open: game.level >= STAFF_UNLOCK_LEVELS[index]! })));
+const teamPercent = computed(() => Math.round(teamShare(game.staff) * 100));
 const volumeOpen = ref(false);
 const percent = (value: number) => `${Math.round(value * 100)}%`;
 // Dragging a slider up from zero also turns that channel back on.
@@ -64,6 +68,18 @@ onUnmounted(() => {
           <h4 class="crystal-shop-title">Exchange for coins</h4>
           <p>This exchange only works from crystals to coins and cannot be reversed.</p>
           <button v-for="bundle in CRYSTAL_EXCHANGE_BUNDLES" :key="bundle.crystals" type="button" :disabled="game.crystals < bundle.crystals" @click="exchange(bundle.crystals)"><span><UiIcon name="crystal" /><b>{{ bundle.crystals }}</b></span><i>→</i><span><UiIcon name="coin" /><b>{{ bundle.coins.toLocaleString('en-US') }}</b></span></button>
+        </PopoverPanel>
+      </div>
+      <div class="staff-resource">
+        <button class="staff-open" type="button" :aria-expanded="staffOpen" :aria-label="`Servers: ${game.staff.length} of ${MAX_STAFF} hired`" @click="staffOpen = !staffOpen"><span class="staff-icons"><i v-for="slot in slots" :key="slot.index" :class="{ hired: !!slot.member, locked: !slot.open }">{{ slot.member ? slot.profile.icon : slot.open ? '➕' : '🔒' }}</i></span><span><small>SERVERS</small><b>{{ game.staff.length ? `${teamPercent}% of you` : 'Hire' }}</b></span></button>
+        <PopoverPanel v-if="staffOpen" class="staff-panel" eyebrow="SERVERS" title="Your team" close-label="Close servers" @close="staffOpen = false">
+          <p>Servers work for you while you are away and earn up to {{ Math.round(MAX_STAFF * 21.25) }}% of what you would earn serving alone with all four fully trained. They never bring crystals or tips.</p>
+          <article v-for="slot in slots" :key="slot.index" class="staff-row">
+            <span class="staff-face">{{ slot.profile.icon }}</span>
+            <span class="staff-text"><b>{{ slot.profile.name }} · {{ slot.profile.role }}</b><small v-if="slot.member">Level {{ slot.member.level }} / {{ MAX_STAFF_LEVEL }}</small><small v-else-if="slot.open">{{ slot.profile.about }}</small><small v-else>Opens at bar level {{ slot.unlockAt }}</small></span>
+            <button v-if="slot.member" type="button" :disabled="slot.member.level >= MAX_STAFF_LEVEL || game.money < upgradeCost(slot.index, slot.member.level)" @click="game.upgradeStaff(slot.index)">{{ slot.member.level >= MAX_STAFF_LEVEL ? 'Max' : `Train ${upgradeCost(slot.index, slot.member.level)}` }}</button>
+            <button v-else-if="slot.open && slot.index === game.staff.length" type="button" :disabled="game.money < hireCost(slot.index)" @click="game.hireStaff()">Hire {{ hireCost(slot.index) }}</button>
+          </article>
         </PopoverPanel>
       </div>
       <button class="daily-hud-gift" type="button" :disabled="!game.dailyGiftAvailable" @click="game.claimDailyGift()"><UiIcon name="gift" /><span><small>LOGIN STREAK {{ game.upcomingLoginDay }}</small><b>{{ game.dailyGiftAvailable ? `+${game.dailyCoinReward}${game.dailyCrystalReward ? ` · ◆${game.dailyCrystalReward}` : ''}` : 'Claimed' }}</b></span></button>

@@ -20,6 +20,7 @@ import { actsIn } from '../domain/social/acts';
 import { enjoyingOpening, openingFor, socialReply, voice, type Expression } from '../domain/social/talk';
 import { ensureSocial, genderOf, rollSocial } from '../domain/social/generate';
 import { guestLine, hasSituation, matchChoice, overdue, pickSituation, resolveChoice, resolveIgnored, startSituation, visibleChoices, type Resolution } from './situations';
+import { accrueStaff, hireStaff, upgradeStaff } from './staff';
 import { applyPromo, barEventFor, tickBarEvent } from './events';
 import { adjustPitch, askPitch, cancelPitch, pitchChance, startPitch } from './pitch';
 import { pitchActsIn } from '../domain/social/pitchActs';
@@ -75,6 +76,8 @@ export type GameAction =
   // Looking after the people at the bar: each names the guest it is for.
   | { type: 'giveAshtray'; customerId: string }
   | { type: 'cleanAshtrays' }
+  | { type: 'hireStaff' }
+  | { type: 'upgradeStaff'; index: number }
   // Offering a guest another drink or some food: start the offer, talk, then ask (the chance is shown and changes as you talk).
   | { type: 'pitchStart'; customerId: string; kind: 'drink' | 'food'; itemId: string }
   | { type: 'pitchAsk'; customerId: string }
@@ -287,6 +290,10 @@ export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now
   expireStock(state, now);
   const night = tickBarEvent(state, now, random);
   if (night) state.message = night;
+  const known = knownRecipes(state);
+  const economy = economyOf(state, now);
+  const team = accrueStaff(state, now, random, { averagePrice: known.length ? known.reduce((sum, recipe) => sum + recipe.price, 0) / known.length * economy.guestPriceFactor : 0, arrival: economy.arrival * (barEventFor(state, now)?.effects.arrival ?? 1) });
+  if (team) state.message = team;
   autoRestock(state, now);
   const guests = guestContext(state, now, random);
   tickGuests(state, guests, Math.max(0, (now - state.lastClockAt) / 1000));
@@ -859,6 +866,12 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const result = askPitch(state, target, now, random);
       const transcript = ensureTranscript(state, target);
       addLine(transcript, 'customer', voice(target, result.text, transcript.lines.length));
+      break;
+    }
+    case 'hireStaff':
+    case 'upgradeStaff': {
+      try { state.message = action.type === 'hireStaff' ? hireStaff(state) : upgradeStaff(state, Number(action.index)); }
+      catch (error) { throw new RuleError((error as Error).message); }
       break;
     }
     case 'cleanAshtrays': {
