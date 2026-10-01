@@ -47,7 +47,7 @@ const english = computed(() => props.profile.englishPercent === undefined ? '—
 
     <section class="profile-achievements">
       <h3>{{ profile.picked ? 'Chosen achievements' : 'Latest achievements' }}<slot name="achievements-action" /></h3>
-      <ul v-if="profile.shown.length"><li v-for="item in profile.shown" :key="item.id">🏅 {{ item.name }}</li></ul>
+      <ul v-if="profile.shown.length"><li v-for="item in profile.shown" :key="item.id" :class="`tier-${item.tier}`" :title="item.name"><span class="medal">🏅</span><span><b>{{ item.seriesName }}</b><small>{{ item.tierName }}</small></span></li></ul>
       <p v-else class="empty">No achievements yet.</p>
     </section>
   </section>
@@ -72,7 +72,12 @@ ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; ga
 .profile-bars li { padding: 6px 12px; border-radius: 10px; background: #17253a; border: 1px solid #2d4059; }
 .profile-bars li.favourite { border-color: #e0a14a; }
 .profile-bars li small { margin-left: 8px; color: #9eafc1; }
-.profile-achievements li { padding: 6px 12px; border-radius: 10px; background: #2a2418; border: 1px solid #6b5a2e; }
+.profile-achievements li { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 10px; background: #2a2418; border: 1px solid #6b5a2e; }
+.profile-achievements li small { display: block; font-size: 11px; opacity: .85; }
+.profile-achievements li.tier-1 { border-color: #a8672f; }
+.profile-achievements li.tier-2 { border-color: #b9c3d0; }
+.profile-achievements li.tier-3 { border-color: #f0c24b; background: #3a2f16; }
+.profile-achievements li.tier-4 { border-color: #7fe0f0; background: #17323a; }
 .empty { margin: 0; color: #9eafc1; font-size: 13px; }
 @media (max-width: 560px) { .profile-head { grid-template-columns: 72px 1fr; } .profile-actions { grid-column: 1 / -1; justify-content: flex-start; } .profile-avatar { width: 72px; height: 92px; } }
 </style>

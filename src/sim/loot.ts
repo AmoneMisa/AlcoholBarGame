@@ -17,7 +17,7 @@ import { SPOIL_MAX_DAYS, SPOIL_START_LEVEL, capacityFor, isPerishable, spoiledAm
 import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipeId, regularLevel } from '../domain/regulars';
 import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import type { Customer } from '../domain/types';
-import { ACHIEVEMENTS, TASTING_REWARD, achievementById, questById, questsForWeek, weekOf, type StatId } from '../domain/quests';
+import { ACHIEVEMENTS, TASTING_REWARD, achievementById, achievementSeries, questById, questsForWeek, weekOf, type StatId } from '../domain/quests';
 import type { DrawResult } from '../domain/lootState';
 import { createLoot } from '../domain/lootState';
 import { addSpareCopy, isStarterRecipe } from './recipes';
@@ -390,6 +390,8 @@ export function claimAchievement(state: PlayerState, id: unknown) {
   const goal = achievementById(String(id));
   if (!goal) throw new LootError('Unknown achievement.');
   if (state.loot.achievements.includes(goal.id)) throw new LootError('Achievement reward already claimed.');
+  const before = achievementSeries(goal.series).find((item) => item.tier === goal.tier - 1);
+  if (before && !state.loot.achievements.includes(before.id)) throw new LootError(`Claim ${before.tierName} first.`);
   if (goalProgress(state, goal.stat) < goal.target) throw new LootError('This achievement is not finished yet.');
   state.loot.achievements.push(goal.id);
   state.crystals += goal.crystals;

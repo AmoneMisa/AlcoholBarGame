@@ -728,3 +728,28 @@ test('Negotiated orders respect storeroom capacity, the fridge and order discoun
   assert.ok(order.total > 0);
   assert.ok(order.dueAt - NOW < 86_400_000 * 10, 'delivery is scheduled');
 });
+
+test('Achievements have four tiers per series that must be claimed in order, and the profile shows the highest tier', async () => {
+  const { ACHIEVEMENTS, achievementSeries, bestTiers } = await import('../src/domain/quests.ts');
+  const { buildPlayerProfile } = await import('../src/domain/profile.ts');
+  const series = new Set(ACHIEVEMENTS.map((item) => item.series));
+  for (const name of series) {
+    const tiers = achievementSeries(name);
+    assert.equal(tiers.length, 4, `${name} has four tiers`);
+    assert.deepEqual(tiers.map((item) => item.tier), [1, 2, 3, 4]);
+    assert.equal(tiers.every((item, index) => index === 0 || item.target > tiers[index - 1].target), true, `${name} targets rise`);
+  }
+  assert.equal(new Set(ACHIEVEMENTS.map((item) => item.id)).size, ACHIEVEMENTS.length, 'ids are unique');
+  const state = fresh();
+  state.loot.stats.serves = 500;
+  assert.throws(() => run(state, { type: 'claimAchievement', id: 'a-serve-100' }), /Bronze first/);
+  run(state, { type: 'claimAchievement', id: 'a-serve-10' });
+  run(state, { type: 'claimAchievement', id: 'a-serve-100' });
+  run(state, { type: 'claimAchievement', id: 'a-serve-500' });
+  assert.throws(() => run(state, { type: 'claimAchievement', id: 'a-serve-2000' }), /not finished/);
+  assert.deepEqual(bestTiers(state.loot.achievements).map((item) => item.id), ['a-serve-500']);
+  const profile = buildPlayerProfile({ served: 1, servedByBar: {}, languageStats: { sentences: 0, correct: 0 }, ownedBarIds: [], loot: state.loot, featuredAchievements: ['a-serve-10'] });
+  assert.equal(profile.shown.length, 1);
+  assert.equal(profile.shown[0].tierName, 'Gold');
+  assert.equal(profile.achievementCount, 3);
+});

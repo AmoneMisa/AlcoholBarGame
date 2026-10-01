@@ -95,7 +95,7 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
     levelRewarded: Math.max(1, count(source.levelRewarded, 50) || currentLevel),
     stats: counts(source.stats, ['serves', 'servesCoins', 'vips', 'bottles', 'boxes', 'draws', 'upgrades', 'tasted', 'perfectTalks', 'lessons', 'signatures']),
     quests: { week: count(source.quests?.week, 1e6), progress: counts(source.quests?.progress), claimed: Array.isArray(source.quests?.claimed) ? source.quests!.claimed.filter((id) => typeof id === 'string').slice(0, 10) : [] },
-    achievements: Array.isArray(source.achievements) ? [...new Set(source.achievements.filter((id) => typeof id === 'string'))].slice(0, 50) : [],
+    achievements: Array.isArray(source.achievements) ? [...new Set(source.achievements.filter((id) => typeof id === 'string'))].slice(0, 80) : [],
     tasted: Array.isArray(source.tasted) ? [...new Set(source.tasted.filter((id) => typeof id === 'string'))].slice(0, 400) : [],
     regulars: counts(source.regulars, CUSTOMER_ART_BY_SLOT),
     spoiledAt: count(source.spoiledAt, 1e14),

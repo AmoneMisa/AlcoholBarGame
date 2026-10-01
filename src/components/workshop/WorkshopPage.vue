@@ -35,6 +35,12 @@ const quests = computed(() => questsForWeek(week.value).map((quest) => {
   return { quest, progress: current ? game.loot.quests.progress[quest.stat] ?? 0 : 0, claimed: current && game.loot.quests.claimed.includes(quest.id) };
 }));
 const stat = (id: string) => game.loot.stats[id] ?? 0;
+// One card per achievement series: the next tier to claim, and the four tiers as pips.
+const achievementRows = computed(() => [...new Set(ACHIEVEMENTS.map((item) => item.series))].map((series) => {
+  const tiers = ACHIEVEMENTS.filter((item) => item.series === series).map((item) => ({ ...item, done: game.loot.achievements.includes(item.id) }));
+  const next = tiers.find((item) => !item.done);
+  return { series, seriesName: tiers[0]!.seriesName, tiers, goal: next ?? tiers[tiers.length - 1]!, finished: !next };
+}));
 const cosmeticKind = (key: string) => key.replace(/([A-Z])/g, ' $1').toLowerCase();
 const started = computed(() => [
   { label: 'Open your welcome box in the Boxes tab', done: (game.loot.stats.boxes ?? 0) >= 1 },
@@ -212,12 +218,13 @@ const boostLeft = (id: string) => {
         <h3>🍷 Tasting log</h3>
         <p>{{ stat('tasted') }} recipes and {{ game.loot.tasted.length - stat('tasted') }} brands tasted. Serving a recipe for the first time gives parts and skin shards; a new brand gives a shard.</p>
       </article>
-      <article v-for="goal in ACHIEVEMENTS" :key="goal.id" class="card">
-        <h3>🏅 Achievement</h3>
-        <p>{{ goal.name }}</p>
-        <progress :value="Math.min(stat(goal.stat), goal.target)" :max="goal.target"></progress>
-        <b>{{ Math.min(stat(goal.stat), goal.target) }} / {{ goal.target }} · +{{ goal.crystals }} crystals + {{ goal.box }} box</b>
-        <button type="button" :disabled="game.loot.achievements.includes(goal.id) || stat(goal.stat) < goal.target" @click="game.act({ type: 'claimAchievement', id: goal.id })">{{ game.loot.achievements.includes(goal.id) ? 'Claimed' : 'Claim' }}</button>
+      <article v-for="row in achievementRows" :key="row.series" class="card">
+        <h3>🏅 {{ row.seriesName }}</h3>
+        <p>{{ row.goal.name }}</p>
+        <p class="tiers"><span v-for="tier in row.tiers" :key="tier.id" :class="['tier', `tier-${tier.tier}`, { done: tier.done }]" :title="`${tier.tierName}: ${tier.target}`">{{ tier.tierName }}</span></p>
+        <progress :value="Math.min(stat(row.goal.stat), row.goal.target)" :max="row.goal.target"></progress>
+        <b>{{ Math.min(stat(row.goal.stat), row.goal.target) }} / {{ row.goal.target }} · +{{ row.goal.crystals }} crystals + {{ row.goal.box }} box</b>
+        <button type="button" :disabled="row.finished || stat(row.goal.stat) < row.goal.target" @click="game.act({ type: 'claimAchievement', id: row.goal.id })">{{ row.finished ? 'All tiers claimed' : `Claim ${row.goal.tierName}` }}</button>
       </article>
     </div>
 
@@ -311,6 +318,13 @@ const boostLeft = (id: string) => {
 </template>
 
 <style scoped>
+.tiers { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0; }
+.tier { padding: 1px 8px; border-radius: 999px; border: 1px solid #4a5a72; font-size: 11px; opacity: .5; }
+.tier.done { opacity: 1; font-weight: 700; }
+.tier-1.done { border-color: #a8672f; color: #e9b27d; }
+.tier-2.done { border-color: #b9c3d0; color: #e4ebf3; }
+.tier-3.done { border-color: #f0c24b; color: #ffe08a; }
+.tier-4.done { border-color: #7fe0f0; color: #bff3fb; }
 .workshop{overflow:hidden}.workshop-hero{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding:22px;background:radial-gradient(circle at 10% 20%,#4f334b,#16243a 66%);border-bottom:1px solid #354762}
 .workshop-hero small{color:#e4b35c;font-size:9px;font-weight:900;letter-spacing:.12em}.workshop-hero h2{margin:5px 0;font:700 29px Georgia,serif}.workshop-hero p{margin:0;color:#bdc8d6;font-size:12px}
 .workshop-hero dl{display:flex;gap:14px;margin:0}.workshop-hero dt{color:#91a2b5;font-size:9px;letter-spacing:.1em;text-transform:uppercase}.workshop-hero dd{margin:2px 0 0;color:#fff0c8;font:700 20px Georgia,serif}

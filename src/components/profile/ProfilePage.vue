@@ -50,7 +50,7 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
       <header><b>Choose up to {{ FEATURED_MAX }} achievements to show on your profile</b></header>
       <label v-for="item in earned" :key="item.id" :class="{ on: chosen.includes(item.id) }">
         <input type="checkbox" :checked="chosen.includes(item.id)" :disabled="!chosen.includes(item.id) && chosen.length >= FEATURED_MAX" @change="toggle(item.id)" />
-        <span>🏅 {{ item.name }}</span>
+        <span>🏅 {{ item.seriesName }} · {{ item.tierName }}</span>
       </label>
       <footer>
         <button type="button" class="primary" @click="save">Save ({{ chosen.length }} / {{ FEATURED_MAX }})</button>

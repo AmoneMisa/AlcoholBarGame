@@ -1,4 +1,4 @@
-import { ACHIEVEMENTS, achievementById } from './quests';
+import { ACHIEVEMENTS, achievementById, bestTiers } from './quests';
 import type { RegionId } from './types';
 
 // The player profile: what a visitor (or the player) sees about a bar. Built only from the saved state, on the server
@@ -15,7 +15,7 @@ export interface ProfileStats {
   featuredAchievements?: string[];
 }
 
-export interface ProfileAchievement { id: string; name: string }
+export interface ProfileAchievement { id: string; name: string; series: string; seriesName: string; tier: number; tierName: string }
 
 export interface PlayerProfile {
   /** Drinks served and bottles sold, all bars together. */
@@ -34,14 +34,18 @@ export interface PlayerProfile {
   picked: boolean;
 }
 
-const named = (ids: string[]) => ids.map((id) => achievementById(id)).filter((goal): goal is NonNullable<typeof goal> => !!goal).map((goal) => ({ id: goal.id, name: goal.name }));
+// Every series is shown once, at the highest tier the player has earned.
+const named = (ids: string[]): ProfileAchievement[] => bestTiers(ids).map((goal) => ({ id: goal.id, name: goal.name, series: goal.series, seriesName: goal.seriesName, tier: goal.tier, tierName: goal.tierName }));
 
 export function buildPlayerProfile(state: ProfileStats): PlayerProfile {
   const byBar = Object.fromEntries(Object.entries(state.servedByBar ?? {}).filter(([, count]) => count > 0));
   const favorite = Object.entries(byBar).sort((a, b) => b[1] - a[1])[0]?.[0];
   const earned = state.loot.achievements.filter((id) => !!achievementById(id));
   const picked = (state.featuredAchievements ?? []).filter((id) => earned.includes(id)).slice(0, FEATURED_MAX);
-  const shown = named(picked.length ? picked : earned.slice(-FEATURED_MAX).reverse());
+  const best = named(earned);
+  // A picked achievement shows at the highest tier of its series, even if a higher one was earned after the pick.
+  const pickedBest = [...new Set(picked.map((id) => achievementById(id)!.series))].map((series) => best.find((item) => item.series === series)!);
+  const shown = picked.length ? pickedBest : best.slice(-FEATURED_MAX).reverse();
   const { sentences, correct } = state.languageStats;
   return {
     served: state.served,
@@ -57,5 +61,5 @@ export function buildPlayerProfile(state: ProfileStats): PlayerProfile {
   };
 }
 
-/** What the player can choose to show: every achievement they have earned. */
+/** What the player can choose to show: the highest tier earned in every series. */
 export const earnedAchievements = (state: Pick<ProfileStats, 'loot'>): ProfileAchievement[] => named(state.loot.achievements);
