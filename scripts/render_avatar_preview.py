@@ -13,6 +13,8 @@ male='male' in sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else False
 bpy.ops.wm.open_mainfile(filepath=str(root/'assets-src/characters/imported'/('bartender_male.blend' if male else 'bartender.blend')))
 keep={'CC_Base_Body','CC_Base_Eye','Jeans','Boots'}
 keep |= {'Short_blowback','Male_Bushy','Chinstrap_Thick','Plaid_Punk_Shirt'} if male else {'Bun','Bang','Hair_Base','Real_Hair','Crop_T_Shirt','Punk_Leather_Jacket'}
+if '--jacket' in sys.argv:
+ keep.discard('Plaid_Punk_Shirt'); keep.update({'Mens_Jacket','Jacket_Shirt'})
 for obj in bpy.context.scene.objects:
  obj.hide_render=obj.type=='MESH' and obj.name not in keep
  if obj.type=='MESH' and obj.data.shape_keys:
@@ -44,6 +46,8 @@ z=1.655 if male else 1.58
 def aim(obj,target): obj.rotation_euler=(Vector(target)-obj.location).to_track_quat('-Z','Y').to_euler()
 bpy.ops.object.camera_add(location=(.12,-2.2,z+.04)); camera=bpy.context.object
 camera.data.type='ORTHO'; camera.data.ortho_scale=.48; aim(camera,(0,0,z)); scene.camera=camera
+if '--full' in sys.argv:
+ camera.location=(.3,-3,1.15); camera.data.ortho_scale=2.05; aim(camera,(0,0,.93))
 for location,power,size in [((-1,-2,3),160,2),((1,-1,2),80,2),((1,1,2.5),120,1.5)]:
  bpy.ops.object.light_add(type='AREA',location=location); light=bpy.context.object
  light.data.energy=power; light.data.shape='DISK'; light.data.size=size; aim(light,(0,0,z))
@@ -51,4 +55,5 @@ scene.view_settings.view_transform='AgX'
 out=root/'docs/screenshots'/('avatar-leo-source.png' if male else 'avatar-noa-source.png')
 if '--blink' in sys.argv: out=out.with_stem(out.stem+'-blink')
 elif '--round' in sys.argv: out=out.with_stem(out.stem+'-round')
+if '--jacket' in sys.argv: out=out.with_stem(out.stem+'-jacket')
 scene.render.filepath=str(out); bpy.ops.render.render(write_still=True)

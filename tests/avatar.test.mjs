@@ -18,8 +18,8 @@ const LEO_ONLY_MORPHS = ['mouthClose'];   // closes the male mouth, which the so
 for (const [label, { data, model }, parts, garments] of [
   ['Noa', noa, ['CC_Base_Body', 'CC_Base_Eye', 'Bun', 'Bang', 'Hair_Base', 'SKM_Hair_Bangs', 'Crop_T_Shirt', 'Punk_Leather_Jacket', 'Jeans', 'Suit_Jacket', 'Suit_Skirt', 'Punk_Strap_Boots', 'Boots', 'Bunny_Leotard', 'Bunny_Jacket', 'Bunny_Stockings', 'Bunny_BunnyEars'],
     ['CC_Base_Body', 'Jeans', 'Crop_T_Shirt', 'Punk_Leather_Jacket', 'Boots', 'Suit_Jacket', 'Suit_Skirt', 'Punk_Strap_Boots']],
-  ['Leo', leo, ['CC_Base_Body', 'CC_Base_Eye', 'Male_Bushy', 'Short_blowback', 'Plaid_Punk_Shirt', 'Jeans', 'Boots', 'Biker_Jeans', 'Chinstrap_Thick', 'Circle_Thick', 'Mustache_Horseshoe', 'Soul_Path_Thick'],
-    ['CC_Base_Body', 'Jeans', 'Plaid_Punk_Shirt', 'Boots']]
+  ['Leo', leo, ['CC_Base_Body', 'CC_Base_Eye', 'Male_Bushy', 'Short_blowback', 'Plaid_Punk_Shirt', 'Mens_Jacket', 'Jeans', 'Boots', 'Biker_Jeans', 'Chinstrap_Thick', 'Circle_Thick', 'Mustache_Horseshoe', 'Soul_Path_Thick'],
+    ['CC_Base_Body', 'Jeans', 'Plaid_Punk_Shirt', 'Mens_Jacket', 'Boots']]
 ]) {
   test(`${label}: the avatar is self-contained and has every editable part`, () => {
     assert.equal(data.toString('ascii', 0, 4), 'glTF');
@@ -58,6 +58,16 @@ for (const [label, { data, model }, parts, garments] of [
     assert.ok(height > 1.5 && height < 2.1, `height: ${height}`);
   });
 }
+
+test('Leo jacket preserves separate leather, lining and metal materials', () => {
+  const jacket=leo.model.meshes.find((mesh)=>mesh.name==='Mens_Jacket');
+  assert.ok(leo.model.meshes.some((mesh)=>mesh.name==='Jacket_Shirt'),'fitted shirt insert must accompany the open jacket');
+  const used=jacket.primitives.map((part)=>leo.model.materials[part.material]);
+  for(const name of ['Leather','Lining','Metal']) assert.ok(used.some((material)=>material.name==='Cloth_Jacket_'+name));
+  const leather=used.find((material)=>material.name==='Cloth_Jacket_Leather');
+  assert.ok(leather.normalTexture && leather.pbrMetallicRoughness.baseColorTexture);
+  assert.ok(!jacket.extras?.targetNames?.length,'jacket fit is baked, without facial expressions');
+});
 
 test('Every editor choice remains valid for saved profiles and server validation', () => {
   for (const option of AVATAR_OPTIONS) for (const value of option.values) assert.ok(BAR_PROFILE_OPTIONS[option.key].includes(value), `${option.key}: ${value}`);

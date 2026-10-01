@@ -6,6 +6,7 @@ Both bartenders are real-time 3D in the bar and in Design: Noa (`amber.glb`) and
 
 - **Noa**: `Female_Leather_Suit.Fbx` is the low-poly base (body, hair, leather jacket + skirt split at the waist so each can be mixed with the tee or jeans, strap boots). `Amber.Fbx` adds jeans, cropped tee, jacket, boots and brows, refitted onto the base body. `SKM_Hair.fbx` + `Textures/T_Hair_*.tga` add a long hairstyle.
 - **Leo**: `Hassan+V1.blend` (body, plaid shirt, jeans, biker jeans, boots, blowback hair, brows, four 3D beard meshes). Only the metre-scale copies are used; the centimetre duplicates lost their textures.
+- **Leo's leather jacket**: `Men Jacket/Jacket.obj` and its `Texture` directory. The original quilted jacket is reduced and fitted by `scripts/bartender_clothes.py`, preserving separate leather, fabric lining and metal hardware. Its sleeve pose follows Leo's relaxed arms. A trimmed copy of his source plaid shirt supplies the visible collar and chest without intersecting rolled sleeves.
 
 ## Editable features
 
@@ -14,7 +15,7 @@ Both bartenders are real-time 3D in the bar and in Design: Noa (`amber.glb`) and
 | Hair | updo, bun, bob, pixie, waves | slick, buzz |
 | Facial hair | - | stubble (painted), short beard, full beard, goatee, moustache, soul patch (real meshes) |
 | Makeup | lipstick, eyeshadow, eyeliner, blush | - |
-| Clothes | cropped tee + jeans, leather jacket, tee & skirt, jacket & jeans, leather set, bunny suit, kimono, baggy tee, streetwear | plaid shirt, biker jeans |
+| Clothes | cropped tee + jeans, leather jacket, tee & skirt, jacket & jeans, leather set, bunny suit, kimono, baggy tee, streetwear | leather jacket with plaid shirt and jeans, plaid shirt, biker jeans |
 | Face | eyes, nose, cheeks, mouth and colours (Noa's brows are painted on her skin) | eyes, brows, nose, cheeks, mouth and colours |
 | Outfit colour | natural, black, white, red, blue, green, plum, sand: recolours the outfit's main garment and keeps its shading | same |
 
@@ -46,6 +47,8 @@ pnpm test
 The asset tests check each GLB's structure, parts, fixed body shapes, neutral expression defaults, face UVs, metre scale, the vertex/file-size budget, and that every editor value is valid for saved profiles. Idle tests cover motion bounds, brief blinks and stopping when paused. Restart the dev API process after changing `src/data/cosmetics/bars.ts`.
 
 For a source-material close-up after rebuilding, run Blender with `--python scripts/render_avatar_preview.py -- female` (or `male`). This writes an image under `docs/screenshots`; it does not exercise the runtime makeup or animation shaders. Idle motion adds breathing, small head turns and blinks; eye presets fade during blinks so they do not prevent eyelids closing. Pausing or reduced-motion preferences disable idle motion.
+
+Use `-- male --jacket --full` for a full-body jacket fit check. The jacket uses the existing `vest` ownership ID, now labelled Leather jacket for Leo, preserving saved selections and unlocks.
 
 ## Garments from other bodies
 

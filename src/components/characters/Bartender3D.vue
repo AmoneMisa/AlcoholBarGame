@@ -36,7 +36,7 @@ let dragX: number | undefined;
 // Which outfits show each swappable garment. Body, hair and face parts always show.
 const OUTFIT_PARTS: Record<string, string[]> = {
   Jeans: ['vest', 'shirt', 'suit-jeans', 'baggy-tee'], Crop_T_Shirt: ['vest', 'shirt', 'tee-skirt'], Boots: ['vest', 'shirt', 'biker', 'tee-skirt', 'suit-jeans', 'baggy-tee'],
-  Plaid_Punk_Shirt: ['vest', 'shirt', 'biker'], Biker_Jeans: ['biker'], Punk_Leather_Jacket: ['vest'], Loose_Kimono: ['kimono'], Loose_BaggyTee: ['baggy-tee'], Loose_Streetwear: ['streetwear'],
+  Plaid_Punk_Shirt: ['shirt', 'biker'], Mens_Jacket: ['vest'], Jacket_Shirt: ['vest'], Biker_Jeans: ['biker'], Punk_Leather_Jacket: ['vest'], Loose_Kimono: ['kimono'], Loose_BaggyTee: ['baggy-tee'], Loose_Streetwear: ['streetwear'],
   Bunny_Leotard: ['bunny'], Bunny_Vest: ['bunny'], Bunny_Collar: ['bunny'], Bunny_Jacket: ['bunny'], Bunny_Gloves: ['bunny'], Bunny_Stockings: ['bunny'], Bunny_BunnyEars: ['bunny'], Bunny_Tail: ['bunny'], Bunny_Pads_Nipples: ['bunny'], Bunny_Pads_Vagina: ['bunny'],
   Suit_Jacket: ['biker', 'suit-jeans'], Suit_Skirt: ['biker', 'tee-skirt'], Punk_Strap_Boots: ['biker']
 };
@@ -132,7 +132,7 @@ function idleMaterial(material: THREE.MeshStandardMaterial) {
   material.customProgramCacheKey = () => `${previousKey}:idle-v1`;
 }
 // The garment that defines an outfit can be recoloured; its own shading (plaid, leather grain, folds) is kept.
-const RECOLOURABLE = /^(Loose_\w+|DeluxeBunnysuit|Female_T_Shirt|Punk_Leather_jacket|F_Black_Outfit_L|Plaid_Punk_Shirt|Biker_Jeans)$/;
+const RECOLOURABLE = /^(Loose_\w+|Cloth_Jacket_Leather|DeluxeBunnysuit|Female_T_Shirt|Punk_Leather_jacket|F_Black_Outfit_L|Plaid_Punk_Shirt|Biker_Jeans)$/;
 function garmentColour(material: THREE.MeshStandardMaterial) {
   material.onBeforeCompile = shader => {
     shader.uniforms.garmentTint = uniforms.garmentTint; shader.uniforms.garmentAmount = uniforms.garmentAmount;

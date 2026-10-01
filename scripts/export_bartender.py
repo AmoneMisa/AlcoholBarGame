@@ -497,6 +497,11 @@ if MALE:
     for v in key.data: shorten(v.co)
   obj.data.update()
 
+if MALE:
+ sys.path.insert(0,str(ROOT/'scripts'))
+ from bartender_clothes import add_mens_jacket
+ add_mens_jacket(opts.source,body)
+
 # Face projection for procedural makeup, placed from this body's own eye position.
 eye=bpy.data.objects['CC_Base_Eye']
 eye_pts=[v.co for v in eye.data.vertices]
@@ -534,6 +539,7 @@ def to_jpeg(img):
 for mat in bpy.data.materials:
  if not mat.use_nodes or mat.users==0: continue
  nodes=mat.node_tree.nodes
+ if mat.name.startswith('Cloth_Jacket_'): continue  # already packed, sized and wired by the garment importer
  images=[n.image for n in nodes if n.type=='TEX_IMAGE' and n.image and n.image.size[0]>0]
  diffuse=next((i for i in images if 'Diffuse' in i.name or 'BaseColor' in i.name or 'basecolor' in i.name.lower()),None)
  opacity=next((i for i in images if 'Opacity' in i.name or 'opacity' in i.name.lower()),None)

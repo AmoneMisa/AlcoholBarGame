@@ -48,9 +48,9 @@ const targetRegions = computed(() => REGIONS.filter((region) => region.id !== ga
 const barUnits = (id: RegionId) => game.inventories[id].reduce((sum, stock) => sum + stock.amount, 0);
 const barBottles = (id: RegionId) => game.bottleInventories[id].reduce((sum, stock) => sum + stock.quantity, 0);
 const selectedBartender = computed(() => game.decor.bartenderCharacter ?? 'noa');
-const visibleOutfits = computed(() => selectedBartender.value === 'noa' ? ['vest','shirt','tee-skirt','suit-jeans','biker','bunny','kimono','baggy-tee','streetwear'] as const : ['shirt','biker'] as const);
+const visibleOutfits = computed(() => selectedBartender.value === 'noa' ? ['vest','shirt','tee-skirt','suit-jeans','biker','bunny','kimono','baggy-tee','streetwear'] as const : ['vest','shirt','biker'] as const);
 const outfitLabel = (outfit: string) => ({
-  vest:selectedBartender.value === 'leo' ? 'Velvet vest' : 'Leather jacket',shirt:selectedBartender.value === 'leo' ? 'Plaid shirt' : 'Cropped tee',biker:selectedBartender.value === 'leo' ? 'Biker jeans' : 'Leather set','tee-skirt':'Tee & skirt','suit-jeans':'Jacket & jeans',bunny:'Bunny suit',kimono:'Kimono','baggy-tee':'Baggy tee',streetwear:'Streetwear',
+  vest:'Leather jacket',shirt:selectedBartender.value === 'leo' ? 'Plaid shirt' : 'Cropped tee',biker:selectedBartender.value === 'leo' ? 'Biker jeans' : 'Leather set','tee-skirt':'Tee & skirt','suit-jeans':'Jacket & jeans',bunny:'Bunny suit',kimono:'Kimono','baggy-tee':'Baggy tee',streetwear:'Streetwear',
   'special-gala':'Midnight gown','special-cyberpunk':'Cyberpunk','special-steampunk':'Steampunk','special-post-apocalypse':'Wasteland','special-historical':'Historical','special-fantasy':'Fantasy','special-masquerade':'Masquerade'
 }[outfit] ?? outfit);
 const isRecipeKnown = (id: string) => game.knownRecipeIds.includes(id);
