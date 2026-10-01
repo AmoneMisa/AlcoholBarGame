@@ -41,7 +41,7 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
     </div>
     <div class="top-up-row">
       <div><b>Top up low stock</b><small>Orders everything that is running low from the cheapest supplier, in one tap. Deliveries still take time.</small></div>
-      <button type="button" @click="game.topUp()">Top up</button>
+      <button type="button" data-guide="top-up" @click="game.topUp()">Top up</button>
     </div>
     <TradeTalk />
     <div class="market-modes"><button :class="{active:mode === 'buy'}" type="button" @click="mode = 'buy'">Buy supplies</button><button :class="{active:mode === 'sell'}" type="button" @click="mode = 'sell'">Sell stock</button><span>City prices {{ game.region.marketFactor.toFixed(2) }}× · prices change each shift</span></div>
@@ -57,7 +57,7 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
         <article v-for="offer in mode === 'buy' ? offers : []" :key="offer.ingredientId" class="market-product">
           <BottleModel :ingredient="ingredient(offer.ingredientId)" />
           <div class="market-product-copy"><small>{{ offer.quality }} · {{ packageDescription(offer.ingredientId, offer.quantity) }}</small><h3>{{ ingredient(offer.ingredientId).name }}</h3><span>{{ available(offer.ingredientId) }} {{ ingredient(offer.ingredientId).unit }} in stock</span><span class="stock-conversion">1 {{ buyUnit(offer.ingredientId) }} adds {{ offer.quantity }} {{ ingredient(offer.ingredientId).unit }} to stock</span><b>{{ offer.price.toFixed(2) }} coins <del v-if="offer.discountPercent">{{ offer.listPrice.toFixed(2) }}</del></b><em v-if="offer.discountPercent">Today’s deal −{{ offer.discountPercent }}%</em></div>
-          <div class="pack-stepper"><button type="button" :aria-label="`Remove one ${ingredient(offer.ingredientId).name} ${buyUnit(offer.ingredientId)}`" @click="adjust(offer.ingredientId,-1)">−</button><input v-model.number="game.purchaseCart[offer.ingredientId]" type="number" min="0" max="99" :placeholder="'0'" :aria-label="`${ingredient(offer.ingredientId).name} ${buyUnit(offer.ingredientId, true)}`" /><button type="button" :aria-label="`Add one ${ingredient(offer.ingredientId).name} ${buyUnit(offer.ingredientId)}`" @click="adjust(offer.ingredientId,1)">+</button><small>{{ buyUnit(offer.ingredientId, true) }}</small></div>
+          <div class="pack-stepper"><button type="button" :aria-label="`Remove one ${ingredient(offer.ingredientId).name} ${buyUnit(offer.ingredientId)}`" @click="adjust(offer.ingredientId,-1)">−</button><input v-model.number="game.purchaseCart[offer.ingredientId]" type="number" min="0" max="99" :placeholder="'0'" :aria-label="`${ingredient(offer.ingredientId).name} ${buyUnit(offer.ingredientId, true)}`" /><button type="button" data-guide="market-plus" :aria-label="`Add one ${ingredient(offer.ingredientId).name} ${buyUnit(offer.ingredientId)}`" @click="adjust(offer.ingredientId,1)">+</button><small>{{ buyUnit(offer.ingredientId, true) }}</small></div>
         </article>
         <article v-for="item in mode === 'sell' ? stock : []" :key="item.ingredientId" class="market-product">
           <BottleModel :ingredient="ingredient(item.ingredientId)" />
@@ -73,16 +73,16 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
           <dl><div><dt>Supplies</dt><dd>{{ game.purchaseQuote.subtotal.toFixed(2) }}</dd></div><div><dt>Bulk discount {{ game.purchaseQuote.discountRate * 100 }}%</dt><dd>−{{ game.purchaseQuote.discount.toFixed(2) }}</dd></div><div><dt>Delivery</dt><dd>{{ game.purchaseQuote.delivery ? game.purchaseQuote.delivery.toFixed(2) : 'Free' }}</dd></div><div class="checkout-total"><dt>Total coins</dt><dd>{{ game.purchaseQuote.total.toFixed(2) }}</dd></div></dl>
           <div class="delivery-progress"><span>{{ game.purchaseQuote.freeDeliveryRemaining ? `${game.purchaseQuote.freeDeliveryRemaining.toFixed(2)} more coins for free delivery` : 'Free delivery unlocked' }}</span><progress :max="game.supplier.freeDeliveryAt" :value="game.purchaseQuote.subtotal - game.purchaseQuote.discount"></progress></div>
           <p class="discount-help">5+ supplier units: 5% off · 10+: 10% off<br />Arrives in {{ game.supplier.deliveryDays }} shifts.</p>
-          <button class="secondary-button negotiate-button" type="button" :disabled="!game.purchaseQuote.lines.length" title="Talk to the sales rep in English to lower the price" @click="game.startNegotiation()">Negotiate price</button>
-          <button class="primary-button" type="button" :disabled="!game.purchaseQuote.lines.length || game.purchaseQuote.total > game.money" @click="game.checkoutPurchase()">Place order</button>
-          <button class="checkout-clear" type="button" @click="game.purchaseCart = {}">Clear order</button>
+          <button class="secondary-button negotiate-button" type="button" :disabled="!game.purchaseQuote.lines.length" title="Talk to the sales rep in English to lower the price" @click="game.startNegotiation()">Negotiate</button>
+          <button class="primary-button" type="button" data-guide="market-order" :disabled="!game.purchaseQuote.lines.length || game.purchaseQuote.total > game.money" @click="game.checkoutPurchase()">Place order</button>
+          <button class="checkout-clear" type="button" @click="game.purchaseCart = {}">Clear</button>
         </template>
         <template v-else>
           <small>STOCK BUYBACK</small><h3>Sell by volume</h3><p>Liquids are sold from open stock in 5 ml steps. Fresh items are sold one piece at a time. Payment is immediate.</p>
           <div v-for="line in game.saleQuote" :key="line.ingredientId" class="checkout-line"><span>{{ ingredient(line.ingredientId).name }} · {{ line.quantity }} {{ ingredient(line.ingredientId).unit }}</span><b>{{ line.revenue.toFixed(2) }}</b></div>
           <dl><div class="checkout-total"><dt>Receive coins</dt><dd>{{ game.saleRevenue.toFixed(2) }}</dd></div></dl>
-          <button class="primary-button" type="button" :disabled="!game.saleQuote.length || game.saleQuote.some(line => line.quantity > line.available)" @click="game.checkoutSale()">Sell selected stock</button>
-          <button class="checkout-clear" type="button" @click="sellAll">Select all unused stock</button><button class="checkout-clear" type="button" @click="game.saleCart = {}">Clear selection</button>
+          <button class="primary-button" type="button" :disabled="!game.saleQuote.length || game.saleQuote.some(line => line.quantity > line.available)" @click="game.checkoutSale()">Sell</button>
+          <button class="checkout-clear" type="button" @click="sellAll">Select all</button><button class="checkout-clear" type="button" @click="game.saleCart = {}">Clear</button>
         </template>
         <p class="trade-feedback" aria-live="polite">{{ game.message }}</p>
       </aside>

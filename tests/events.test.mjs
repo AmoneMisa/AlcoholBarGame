@@ -286,3 +286,61 @@ test('Ending a practice removes the practice guest', () => {
   assert.equal(state.customers.filter((item) => item.training).length, 0);
   assert.equal(state.training.active, undefined);
 });
+
+// ---- Guide pointer ----
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+const sourceFiles = (dir) => readdirSync(dir).flatMap((name) => { const path = join(dir, name); return statSync(path).isDirectory() ? sourceFiles(path) : [path]; });
+
+test('Every thing the guide points at exists in a component (so a layout change cannot silently break a pointer)', async () => {
+  const { GUIDE_ATTRIBUTES } = await import('../src/guide/pointer.ts');
+  const vue = sourceFiles('src').filter((path) => path.endsWith('.vue')).map((path) => readFileSync(path, 'utf8')).join('\n');
+  const guideCode = ['src/guide/practice.ts', 'src/components/ui/TutorialTour.vue'].map((path) => readFileSync(path, 'utf8')).join('\n');
+  const dynamic = vue.split('\n').filter((line) => line.includes(':data-guide')).join('\n');
+  for (const name of GUIDE_ATTRIBUTES) {
+    if (name.startsWith('data-guide-')) { assert.ok(vue.includes(`:${name}=`), `${name} is set on an element`); continue; }
+    const set = vue.includes(`data-guide="${name}"`) || dynamic.includes(`'${name}'`) || (name.startsWith('nav-') && vue.includes(`id: '${name.slice(4)}'`));
+    assert.ok(set, `data-guide="${name}" exists in a component`);
+  }
+  // Every name used by a lesson or the tour is in the list.
+  for (const match of guideCode.matchAll(/selector\('([a-z-]+)'\)/g)) assert.ok(GUIDE_ATTRIBUTES.includes(match[1]), `${match[1]} is a known guide target`);
+});
+
+const practiceBase = { seen: [], guestHere: true, convOpen: false, mix: [], shaken: false, placedWords: 0, onBar: true, onMarket: false,
+  recipe: { name: 'Mojito', needsShake: true, ingredients: [{ id: 'white-rum', name: 'White rum', amount: 45 }, { id: 'mint', name: 'Mint', amount: 6 }] } };
+
+test('The practice pointer follows what the player has done: talk, care, offer, situation', async () => {
+  const { practicePointer } = await import('../src/guide/practice.ts');
+  const first = (ctx) => practicePointer({ ...practiceBase, ...ctx });
+  assert.match(first({ moduleId: 'talk' }).candidates[0].target, /practice-guest/);
+  assert.equal(first({ moduleId: 'talk', convOpen: true }).candidates.at(-1).gesture, 'type', 'typing is the last way');
+  assert.match(first({ moduleId: 'talk', convOpen: true, seen: ['asked'] }).instruction, /Would you like a Mojito/);
+  assert.match(first({ moduleId: 'care', convOpen: true }).candidates[0].target, /give-water/);
+  assert.match(first({ moduleId: 'care', convOpen: true, seen: ['water'] }).candidates[0].target, /give-ashtray/);
+  assert.match(first({ moduleId: 'offer', convOpen: true }).candidates.map((item) => item.target).join(), /offer-ask.*offer-item.*offer-open/);
+  assert.match(first({ moduleId: 'situation', convOpen: true }).candidates[0].target, /situation-choice/);
+  assert.equal(first({ moduleId: 'talk', convOpen: true, seen: ['asked', 'confirmed'] }), undefined, 'nothing left to do');
+});
+
+test('The practice pointer for mixing: close the talk, drag each bottle, shake, serve', async () => {
+  const { practicePointer } = await import('../src/guide/practice.ts');
+  const at = (ctx) => practicePointer({ ...practiceBase, moduleId: 'mix', ...ctx });
+  assert.match(at({ convOpen: true }).candidates[0].target, /talk-close/);
+  const drag = at({}).candidates.find((item) => item.gesture === 'drag');
+  assert.equal(drag.target, '[data-guide-ingredient="white-rum"]');
+  assert.equal(drag.to, '[data-guide="glass"]');
+  assert.match(drag.label, /45 more/);
+  assert.match(at({ mix: [{ id: 'white-rum', amount: 45 }] }).candidates.map((item) => item.target).join(), /data-guide-ingredient="mint"/, 'next ingredient');
+  const poured = [{ id: 'white-rum', amount: 45 }, { id: 'mint', amount: 6 }];
+  assert.match(at({ mix: poured }).candidates[0].target, /shake/);
+  assert.match(at({ mix: poured, shaken: true }).candidates[0].target, /serve/);
+  assert.match(at({ onBar: false }).candidates[0].target, /nav-service/);
+});
+
+test('The practice pointer for the market: open it, add, order, top up', async () => {
+  const { practicePointer } = await import('../src/guide/practice.ts');
+  const at = (ctx) => practicePointer({ ...practiceBase, moduleId: 'market', guestHere: false, ...ctx });
+  assert.match(at({}).candidates[0].target, /nav-market/);
+  assert.match(at({ onMarket: true }).candidates.map((item) => item.target).join(), /market-order.*market-plus/);
+  assert.match(at({ onMarket: true, seen: ['bought'] }).candidates[0].target, /top-up/);
+});

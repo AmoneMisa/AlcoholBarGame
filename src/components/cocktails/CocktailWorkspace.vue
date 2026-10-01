@@ -75,8 +75,8 @@ function serve() {
     </div>
     <footer class="workspace-actions compact-actions">
       <button class="secondary-button" type="button" @click="game.resetMix">Clear</button>
-      <button class="secondary-button" type="button" @click="shake">Shake</button>
-      <button class="primary-button" type="button" :disabled="game.serving" @click="serve">Serve drink <span>→</span></button>
+      <button class="secondary-button" type="button" data-guide="shake" @click="shake">Shake</button>
+      <button class="primary-button" type="button" data-guide="serve" :disabled="game.serving" @click="serve">Serve drink <span>→</span></button>
     </footer>
   </section>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { CHAT_GUIDE } from '../../domain/training';
+import { CHAT_GUIDE, type ChatGuideStep } from '../../domain/training';
+import { setPointer } from '../../guide/pointer';
 import SpeakTrainer from '../learning/SpeakTrainer.vue';
 import { voiceProfileOf } from '../../domain/social/origin';
 import { guestVoice, speakLine } from '../../audio/index';
@@ -94,6 +95,16 @@ const templates = computed(() => {
 const social = computed(() => customer.value?.social);
 const offerOpen = ref(false);
 const guideOpen = ref(false);
+// "Show me" circles the part of the screen a guide item explains, for a few seconds.
+let helpTimer: ReturnType<typeof setTimeout> | undefined;
+function showMe(step: ChatGuideStep) {
+  if (!step.show) return;
+  setPointer('help', [{ target: `[data-guide="${step.show.name}"]`, gesture: step.show.gesture, label: step.show.label }]);
+  if (helpTimer) clearTimeout(helpTimer);
+  helpTimer = setTimeout(() => setPointer('help', undefined), 6000);
+}
+watch(guideOpen, (open) => { if (!open) setPointer('help', undefined); });
+onBeforeUnmount(() => { if (helpTimer) clearTimeout(helpTimer); setPointer('help', undefined); });
 const offerKind = ref<'drink' | 'food'>('food');
 const offer = computed(() => customer.value ? game.offerChance(customer.value.id) : undefined);
 const offerName = computed(() => {
@@ -338,11 +349,11 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           </div>
         </div>
         <button type="button" class="talk-help" :aria-expanded="guideOpen" aria-label="How does this screen work?" @click="guideOpen = !guideOpen">?</button>
-        <CloseButton class="talk-close" label="Close conversation" @click="game.closeConversation()" />
+        <CloseButton class="talk-close" data-guide="talk-close" label="Close conversation" @click="game.closeConversation()" />
       </header>
       <section v-if="guideOpen" class="chat-guide" aria-label="Conversation guide">
         <header><b>How conversations work</b><button type="button" @click="guideOpen = false">Close</button></header>
-        <ol><li v-for="step in CHAT_GUIDE" :key="step.title"><b>{{ step.title }}.</b> {{ step.text }}</li></ol>
+        <ol><li v-for="step in CHAT_GUIDE" :key="step.title"><b>{{ step.title }}.</b> {{ step.text }} <button v-if="step.show" type="button" class="show-me" @click="showMe(step)">Show me</button></li></ol>
       </section>
       <div class="talk-extras">
       <section v-if="situation" class="situation-panel" :class="'sev-' + situation.severity" aria-label="Situation">
@@ -351,7 +362,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         <small class="situation-hint">Choose what to say:</small>
         <div class="situation-choices">
           <div v-for="choice in situation.choices" :key="choice.id" class="situation-choice">
-            <button type="button" @click="game.answerSituation(customer.id, choice.id)"><span>{{ choice.say }}</span></button>
+            <button type="button" data-guide="situation-choice" @click="game.answerSituation(customer.id, choice.id)"><span>{{ choice.say }}</span></button>
             <button type="button" class="choice-speak" aria-label="Listen" title="Listen" @click="speak(choice.say)">🔊</button>
             <SpeakTrainer :text="choice.say" compact />
           </div>
@@ -365,11 +376,11 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         <template v-if="!social.pitch">
           <div class="offer-items">
             <template v-if="offerKind === 'food'">
-              <button v-for="item in foodsInStock" :key="item.id" class="food-offer-button" type="button" @click="startOffer('food', item.id)"><img :src="`${foodAssetBase}${item.id}.webp`" alt="" />{{ item.name }} · {{ item.price }}</button>
+              <button v-for="item in foodsInStock" :key="item.id" class="food-offer-button" data-guide="offer-item" type="button" @click="startOffer('food', item.id)"><img :src="`${foodAssetBase}${item.id}.webp`" alt="" />{{ item.name }} · {{ item.price }}</button>
               <small v-if="!foodsInStock.length">No food in stock. Buy some from the local or fresh supplier.</small>
             </template>
             <template v-else>
-              <button v-for="item in game.knownRecipes" :key="item.id" type="button" @click="startOffer('drink', item.id)">{{ item.name }}</button>
+              <button v-for="item in game.knownRecipes" :key="item.id" type="button" data-guide="offer-item" @click="startOffer('drink', item.id)">{{ item.name }}</button>
             </template>
           </div>
         </template>
@@ -378,14 +389,14 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <div class="chance-meter" role="meter" :aria-valuenow="Math.round(offer.chance * 100)" aria-valuemin="0" aria-valuemax="100"><i :style="{ width: Math.round(offer.chance * 100) + '%' }" /><span>{{ Math.round(offer.chance * 100) }}% chance</span></div>
           <ul class="chance-parts"><li v-for="part in offer.parts" :key="part.label" :class="part.value < 0 ? 'minus' : 'plus'"><span>{{ part.label }}</span><b>{{ part.value > 0 ? '+' : '' }}{{ Math.round(part.value * 100) }}%</b></li></ul>
           <small>Talk to raise it: tell its story, say how it pairs, offer a discount or a free taste. Do not push.</small>
-          <div class="offer-buttons"><button type="button" class="primary" @click="game.pitchAsk(customer.id)">Make the offer</button><button type="button" @click="game.pitchCancel(customer.id)">Cancel</button></div>
+          <div class="offer-buttons"><button type="button" class="primary" data-guide="offer-ask" @click="game.pitchAsk(customer.id)">Make the offer</button><button type="button" @click="game.pitchCancel(customer.id)">Cancel</button></div>
         </template>
       </section>
-      <div v-if="social" class="talk-actions" aria-label="Look after this guest">
-        <button type="button" :class="{ wanted: needNow === 'ashtray' }" :disabled="social.ashtray === 'given' || game.ashtrays.clean < 1" :title="social.ashtray === 'given' ? 'Already has one' : game.ashtrays.clean + ' clean ashtrays'" @click="game.giveAshtray(customer.id)">🚬 Ashtray</button>
-        <button type="button" :class="{ wanted: needNow === 'water' }" @click="game.giveWater(customer.id)">💧 Water</button>
+      <div v-if="social" class="talk-actions" data-guide="talk-actions" aria-label="Look after this guest">
+        <button type="button" data-guide="give-ashtray" :class="{ wanted: needNow === 'ashtray' }" :disabled="social.ashtray === 'given' || game.ashtrays.clean < 1" :title="social.ashtray === 'given' ? 'Already has one' : game.ashtrays.clean + ' clean ashtrays'" @click="game.giveAshtray(customer.id)">🚬 Ashtray</button>
+        <button type="button" data-guide="give-water" :class="{ wanted: needNow === 'water' }" @click="game.giveWater(customer.id)">💧 Water</button>
         <button type="button" :class="{ wanted: needNow === 'taxi' }" :disabled="!!social.taxiAt" @click="game.callTaxi(customer.id)">🚕 Call a taxi</button>
-        <button type="button" :class="{ wanted: social.hungry }" @click="offerOpen = !offerOpen">🍽️ Offer</button>
+        <button type="button" data-guide="offer-open" :class="{ wanted: social.hungry }" @click="offerOpen = !offerOpen">🍽️ Offer</button>
         <span class="leave-group">Ask to leave
           <button type="button" :title="leaveHint('gentle')" @click="game.askToLeave(customer.id, 'gentle')">Kindly</button>
           <button type="button" :title="leaveHint('firm')" @click="game.askToLeave(customer.id, 'firm')">Firmly</button>
@@ -430,7 +441,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <button type="button" class="secondary-button" @click="learning.toggleSaved(activeWord.word)">{{ learning.savedWords.includes(activeWord.word) ? '★ Saved to my words' : '☆ Save to my words' }}</button>
         </div>
 
-        <aside v-if="!situation" class="talk-clues">
+        <aside v-if="!situation" class="talk-clues" data-guide="clue-board">
           <template v-if="bottleOrder">
             <small>CUSTOMER REQUEST</small>
             <div class="clue-chips">
@@ -520,20 +531,20 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
             <button v-for="tile in pickedTiles" :key="tile.id" type="button" class="word-tile placed" @click="pick(tile.id)">{{ tile.text }}</button>
             <span v-if="!pickedTiles.length">Tap words to build a question…</span>
           </div>
-          <div class="word-bank">
+          <div class="word-bank" data-guide="tile-bank">
             <button v-for="tile in tiles" :key="tile.id" type="button" class="word-tile" :class="{ used: picked.includes(tile.id) }" :disabled="picked.includes(tile.id)" @click="pick(tile.id)">{{ tile.text }}</button>
           </div>
           <div class="compose-actions">
-            <button class="secondary-button" type="button" @click="nextTemplate">New question ↻</button>
+            <button class="secondary-button" type="button" data-guide="new-question" @click="nextTemplate">New question ↻</button>
             <button class="secondary-button" type="button" :disabled="!picked.length" @click="picked = []">Clear</button>
-            <button class="primary-button compact" type="button" :disabled="!picked.length || customerTyping" @click="send(builtSentence)">Check & send</button>
+            <button class="primary-button compact" type="button" data-guide="talk-send" :disabled="!picked.length || customerTyping" @click="send(builtSentence)">Check & send</button>
           </div>
         </template>
 
         <template v-else>
-          <div class="phrase-ideas"><button v-for="idea in phraseIdeas" :key="idea" type="button" @click="suggest(idea)">{{ idea }}</button></div>
+          <div class="phrase-ideas"><button v-for="idea in phraseIdeas" :key="idea" type="button" data-guide="phrase-idea" @click="suggest(idea)">{{ idea }}</button></div>
           <form class="type-row" @submit.prevent="send(draft)">
-            <input ref="input" v-model="draft" type="text" autocomplete="off" autocapitalize="sentences" spellcheck="false" placeholder="Ask a question, e.g. Do you like sour drinks?" @input="feedback = undefined" />
+            <input ref="input" data-guide="talk-input" v-model="draft" type="text" autocomplete="off" autocapitalize="sentences" spellcheck="false" placeholder="Ask a question, e.g. Do you like sour drinks?" @input="feedback = undefined" />
             <button class="primary-button compact" type="submit" :disabled="!draft.trim() || customerTyping">Check & send</button>
           </form>
         </template>

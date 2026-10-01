@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import GuidePointer from './components/ui/GuidePointer.vue';
 import TutorialTour from './components/ui/TutorialTour.vue';
 import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue';
 import CocktailWorkspace from './components/cocktails/CocktailWorkspace.vue';
@@ -97,10 +98,11 @@ function selectView(id: string) {
     <ConversationPopup v-if="game.conversationCustomerId" />
     <GuideSheet />
     <NotificationToasts />
+    <GuidePointer />
     <TutorialTour :ready="game.sessionReady && game.startingBarChosen" :seen="game.tourSeen" @view="selectView" @finish="game.setTour" />
     <StartingBarPicker v-if="game.sessionReady && !game.startingBarChosen" />
     <nav class="game-nav" aria-label="Game views">
-      <button v-for="item in nav" :key="item.id" :class="{ active: view === item.id }" type="button" @click="selectView(item.id)"><UiIcon :name="item.mark" /><b>{{ item.label }}</b><i v-if="badges[item.id]" class="nav-badge" :aria-label="`${badges[item.id]} waiting`">{{ badges[item.id] }}</i></button>
+      <button v-for="item in nav" :key="item.id" :class="{ active: view === item.id }" :data-guide="'nav-' + item.id" type="button" @click="selectView(item.id)"><UiIcon :name="item.mark" /><b>{{ item.label }}</b><i v-if="badges[item.id]" class="nav-badge" :aria-label="`${badges[item.id]} waiting`">{{ badges[item.id] }}</i></button>
     </nav>
   </div>
 </template>

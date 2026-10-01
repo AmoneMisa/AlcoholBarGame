@@ -76,7 +76,7 @@ onUnmounted(() => {
         </PopoverPanel>
       </div>
       <div class="academy-resource">
-        <button class="staff-open" type="button" :aria-expanded="academyOpen" aria-label="Open the training academy" @click="academyOpen = !academyOpen"><span class="staff-icons"><i class="hired">🎓</i></span><span><small>TRAINING</small><b>{{ lessonsLeft ? `${lessonsLeft} to do` : 'All done' }}</b></span></button>
+        <button class="staff-open" data-guide="academy" type="button" :aria-expanded="academyOpen" aria-label="Open the training academy" @click="academyOpen = !academyOpen"><span class="staff-icons"><i class="hired">🎓</i></span><span><small>TRAINING</small><b>{{ lessonsLeft ? `${lessonsLeft} to do` : 'All done' }}</b></span></button>
         <AcademyPanel v-if="academyOpen" @close="academyOpen = false" @goto="(view) => $emit('goto', view)" />
       </div>
       <div class="staff-resource">

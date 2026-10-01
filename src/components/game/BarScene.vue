@@ -443,7 +443,7 @@ onBeforeUnmount(() => {
       <div v-for="row in shelfRows" :key="row.id" class="pshelf-row" :style="row.style">
         <small class="pshelf-label">{{ row.label }}</small>
         <div :ref="(element) => trackLine(row.id, element as HTMLElement | null)" class="pshelf-bottles" @scroll="markEdges($event.currentTarget as HTMLElement)">
-          <button v-for="ingredient in row.bottles" :key="ingredient.id" type="button" :title="`${ingredient.name} · ${pourable(ingredient.id)} ml`" :class="{ empty: pourable(ingredient.id) < 5, poured: game.currentMix.some((item) => item.ingredientId === ingredient.id) }" :aria-disabled="pourable(ingredient.id) < 5" :aria-label="`Drag ${ingredient.name} to the glass, ${pourable(ingredient.id)} ml left`" @pointerdown="beginBottleDrag(ingredient.id, $event)" @keydown.enter.prevent="addLiquid(ingredient.id)" @keydown.space.prevent="addLiquid(ingredient.id)">
+          <button v-for="ingredient in row.bottles" :key="ingredient.id" type="button" :data-guide-ingredient="ingredient.id" :title="`${ingredient.name} · ${pourable(ingredient.id)} ml`" :class="{ empty: pourable(ingredient.id) < 5, poured: game.currentMix.some((item) => item.ingredientId === ingredient.id) }" :aria-disabled="pourable(ingredient.id) < 5" :aria-label="`Drag ${ingredient.name} to the glass, ${pourable(ingredient.id)} ml left`" @pointerdown="beginBottleDrag(ingredient.id, $event)" @keydown.enter.prevent="addLiquid(ingredient.id)" @keydown.space.prevent="addLiquid(ingredient.id)">
             <BottleModel :ingredient="ingredient" :amount="game.currentMix.find((item) => item.ingredientId === ingredient.id)?.amount" />
             <span>{{ ingredient.name }}</span>
           </button>
@@ -457,7 +457,7 @@ onBeforeUnmount(() => {
     </div>
     <div v-if="!preview" ref="castRef" class="bar-cast" @scroll.passive="onGuestScroll">
       <!-- Only the figure and the card take taps; the rest of the guest's column lets presses reach the shelves. -->
-      <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" :style="customerStyle(index)" :aria-label="`Talk to ${customer.name}`" @click="game.openConversation(customer.id)">
+      <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :data-guide="customer.training ? 'practice-guest' : 'guest'" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" :style="customerStyle(index)" :aria-label="`Talk to ${customer.name}`" @click="game.openConversation(customer.id)">
         <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="faceOf(customer)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
         <div class="guest-card">
           <header><b>{{ customer.name }}</b><time v-if="customer.id === game.activeCustomerId">{{ game.orderCountdown }}</time></header>
@@ -467,30 +467,30 @@ onBeforeUnmount(() => {
         </div>
       </button>
       <TrainingStrip />
-      <button type="button" class="house-rules-button" :aria-expanded="rulesOpen" @click="rulesOpen = !rulesOpen">📜 Rules<i v-if="game.ruleViolations" class="rules-count" :title="`${game.ruleViolations} rule breaks so far`">{{ game.ruleViolations }}</i></button>
+      <button type="button" class="house-rules-button" data-guide="rules-button" :aria-expanded="rulesOpen" @click="rulesOpen = !rulesOpen"><UiIcon class="inline-icon" name="book" /> Rules<i v-if="game.ruleViolations" class="rules-count" :title="`${game.ruleViolations} rule breaks so far`">{{ game.ruleViolations }}</i></button>
       <PopoverPanel v-if="rulesOpen" class="house-rules-panel" eyebrow="HOUSE RULES" :title="`Rules in ${game.region.name}`" close-label="Close house rules" @close="rulesOpen = false">
         <p class="rules-note">These are game rules for practice, not legal advice. Explain them politely to guests. Inspectors count every rule you break{{ game.ruleViolations ? ` (so far: ${game.ruleViolations})` : '' }}.</p>
         <article v-for="rule in game.houseRules" :key="rule.id" class="rule-row"><span class="rule-icon">{{ rule.icon }}</span><span><b>{{ rule.title }}</b><small>{{ rule.text }}</small></span></article>
       </PopoverPanel>
       <div v-if="game.barEvent" class="bar-event" :class="game.barEvent.mood"><b>{{ game.barEvent.icon }} {{ game.barEvent.title }}</b><span>{{ game.barEvent.description }}</span></div>
-      <button v-if="game.ashtrays.dirty" type="button" class="clean-ashtrays" @click="game.cleanAshtrays()">🧹 Clean {{ game.ashtrays.dirty }} ashtray{{ game.ashtrays.dirty === 1 ? '' : 's' }}</button>
+      <button v-if="game.ashtrays.dirty" type="button" class="clean-ashtrays" @click="game.cleanAshtrays()"><UiIcon class="inline-icon" name="brush" /> Clean {{ game.ashtrays.dirty }} ashtray{{ game.ashtrays.dirty === 1 ? '' : 's' }}</button>
       <!-- The wait for the next guest is shown once, in the panel below the scene (with “Welcome now”). -->
     </div>
     <template v-if="guestsOverflow && !preview">
       <button class="guest-nudge prev" type="button" aria-label="Show earlier guests" :disabled="guestScroll <= 2" @click="nudgeGuests(-1)"><UiIcon name="chevron-left" /></button>
       <button class="guest-nudge next" type="button" aria-label="Show more guests" :disabled="guestScroll >= phoneTrack!.content - phoneTrack!.zone - 2" @click="nudgeGuests(1)"><UiIcon name="chevron-right" /></button>
     </template>
-    <div v-if="buildingEnabled && !preview" ref="glassTarget" class="live-glass-station" :class="{ 'drag-over': dragOverGlass }">
+    <div v-if="buildingEnabled && !preview" ref="glassTarget" class="live-glass-station" data-guide="glass" :class="{ 'drag-over': dragOverGlass }">
       <div v-if="dragOverGlass || totalAmount || itemCount" class="live-glass-copy"><b>{{ dragOverGlass ? 'POURING' : totalAmount ? `${totalAmount} ML` : 'FRESH' }}</b><small v-if="itemCount">+ {{ itemCount }} fresh item{{ itemCount === 1 ? '' : 's' }}</small></div>
       <div class="live-glass-wrap">
         <div v-if="dragOverGlass" class="live-pour-stream" :style="{ '--stream-color': selectedIngredient ? colorMap[selectedIngredient.id] : liquidColor }"></div>
         <GlassModel type="highball" :fill="fill" :color="liquidColor" :ice="ice" :garnish="garnish" :bubbles="hasBubbles" animation="idle" />
-        <button class="fresh-plus" type="button" :aria-expanded="freshPickerOpen" aria-label="Add fruit, ice, herb, or garnish" @click="freshPickerOpen = !freshPickerOpen"><UiIcon name="plus" /></button>
+        <button class="fresh-plus" data-guide="fresh-plus" type="button" :aria-expanded="freshPickerOpen" aria-label="Add fruit, ice, herb, or garnish" @click="freshPickerOpen = !freshPickerOpen"><UiIcon name="plus" /></button>
       </div>
       <!-- Rendered on <body>: the glass station is scaled down on phones, which would shrink and trap a fixed popup. -->
       <Teleport to="body">
         <PopoverPanel v-if="freshPickerOpen" class="fresh-picker" eyebrow="FRESH INGREDIENTS" title="Add to the glass" close-label="Close fresh ingredients" @close="freshPickerOpen = false">
-          <div><button v-for="ingredient in freshIngredients" :key="ingredient.id" type="button" @click="addFresh(ingredient.id)"><BottleModel :ingredient="ingredient" /><span>{{ ingredient.name }}</span><small>+1</small></button></div>
+          <div><button v-for="ingredient in freshIngredients" :key="ingredient.id" type="button" :data-guide-fresh="ingredient.id" @click="addFresh(ingredient.id)"><BottleModel :ingredient="ingredient" /><span>{{ ingredient.name }}</span><small>+1</small></button></div>
         </PopoverPanel>
       </Teleport>
     </div>
