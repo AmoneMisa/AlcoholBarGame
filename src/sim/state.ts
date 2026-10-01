@@ -17,7 +17,7 @@ export const DELIVERY_DAY_MS = 24 * 60 * 60 * 1000;
 export type UnlockSource = 'starter' | 'shop' | 'special-client' | 'daily-gift' | 'daily-lesson' | 'friend-gift';
 export interface ChatLine { id: number; speaker: 'customer' | 'bartender'; text: string; note?: string; ok?: boolean; }
 // One conversation with one guest. Only what has been said is stored here — never the hidden order.
-export interface Transcript { lines: ChatLine[]; facts: Fact[]; bottleFacts: BottleConversationFacts; expression: CustomerReply['expression']; attempts: number; correct: number; perfectRewardClaimed?: boolean; }
+export interface Transcript { lines: ChatLine[]; facts: Fact[]; /** Drinks and bottles the guest already said no to: they are not suggested again. */ rejected?: string[]; bottleFacts: BottleConversationFacts; expression: CustomerReply['expression']; attempts: number; correct: number; perfectRewardClaimed?: boolean; }
 
 export interface DeliveryOrder { id: string; supplier: string; barId: RegionId; dueAt: number; items: InventoryItem[]; total: number; }
 export type PopularityBoost = { kind: 'no-cooldown'; until: number } | { kind: 'vip-run'; remaining: number };

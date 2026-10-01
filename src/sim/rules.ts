@@ -1102,8 +1102,14 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
       state.message += ` Perfect English: +${reward} crystals.`;
     }
   }
-  if (reply.wrongGuess) guest.patienceRemaining = Math.max(1, guest.patienceRemaining - 30);
+  if (reply.wrongGuess) {
+    guest.patienceRemaining = Math.max(1, guest.patienceRemaining - 30);
+    const refused = guest.orderKind === 'bottle' ? findBottleMention(heard)?.id : findRecipeMention(heard, RECIPES)?.id;
+    if (refused && !(transcript.rejected ??= []).includes(refused)) transcript.rejected.push(refused);
+  }
   // A drunk guest sounds drunk.
-  addLine(transcript, 'customer', voice(guest, reply.text, turn));
+  // Answers that give a clue are not dressed up with local words: the learner must read them clearly.
+  const clue = !!reply.facts.length || !!reply.bottleFacts || !!reply.wrongGuess || !!reply.confirmed;
+  addLine(transcript, 'customer', voice(guest, reply.text, turn, !clue));
   transcript.expression = reply.expression;
 }

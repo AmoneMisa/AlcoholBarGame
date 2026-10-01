@@ -137,11 +137,12 @@ export function replyToBottle(text: string, customer: Customer, facts: BottleCon
       return { text:`Yes, ${request.quantity} bottle${request.quantity === 1 ? '' : 's'} of ${offered.name} fit perfectly. ${total} coins is within my budget.`,expression:'very-happy',facts:[],confirmed:true,selectedBottleId:offered.id };
     }
     const total = bottleTotal(offered, request.quantity, marketFactor);
-    const reason = total > request.budget ? `That would cost ${total} coins, which is over my budget.`
-      : offered.type !== request.type ? `I would prefer ${ALCOHOL_TYPE_LABELS[request.type].toLowerCase()}.`
-        : request.preferredBrand && normalize(offered.brand) !== normalize(request.preferredBrand) ? `I am looking for ${request.preferredBrand}.`
-          : `I want something ${request.tastes.join(' and ')}.`;
-    return { text:`Not this one, please. ${reason}`,expression:'disappointed',facts:[],wrongGuess:true };
+    // What the guest says is what the bartender learns, so the same question is not asked again.
+    const refused = total > request.budget ? { reason: `That would cost ${total} coins, which is over my budget.`, learned: { budget: request.budget } }
+      : offered.type !== request.type ? { reason: `I would prefer ${ALCOHOL_TYPE_LABELS[request.type].toLowerCase()}, not ${ALCOHOL_TYPE_LABELS[offered.type].toLowerCase()}.`, learned: { type: request.type } }
+        : request.preferredBrand && normalize(offered.brand) !== normalize(request.preferredBrand) ? { reason: `I am looking for ${request.preferredBrand}.`, learned: { preferredBrand: request.preferredBrand } }
+          : { reason: `I want something ${request.tastes.join(' and ')}.`, learned: { tastes: [...request.tastes] } };
+    return { text:`Not this one, please. ${refused.reason}`,expression:'disappointed',facts:[],wrongGuess:true,bottleFacts:refused.learned };
   }
   if ((words.includes('how') && words.includes('many')) || words.includes('quantity')) {
     return { text:`I need ${request.quantity} sealed bottle${request.quantity === 1 ? '' : 's'}.`,expression:'smile',facts:[],bottleFacts:{quantity:request.quantity} };
@@ -154,7 +155,9 @@ export function replyToBottle(text: string, customer: Customer, facts: BottleCon
     return { text:answer,expression:'thinking',facts:[],bottleFacts:{preferredBrand:request.preferredBrand ?? ''} };
   }
   if (words.includes('type') || words.includes('alcohol') || words.some((word) => ['whiskey','bourbon','liqueur','champagne','vodka','gin','rum','tequila','aperitif','vermouth','port','cognac','brandy','beer','soju','sake','cider','sambuca','sangria','infusion','tincture','nastoyka','настойка','настойки','fruit','herbal','specialty','curacao','curaçao','alcohol-free'].includes(word))) {
-    return { text:`I would prefer ${ALCOHOL_TYPE_LABELS[request.type].toLowerCase()}.`,expression:'smile',facts:[],bottleFacts:{type:request.type} };
+    const named = (Object.keys(ALCOHOL_TYPE_LABELS) as AlcoholType[]).find((type) => type !== request.type && words.includes(ALCOHOL_TYPE_LABELS[type].toLowerCase().split(' ')[0]!));
+    const wanted = ALCOHOL_TYPE_LABELS[request.type].toLowerCase();
+    return { text: named ? `No, not ${ALCOHOL_TYPE_LABELS[named].toLowerCase()}. I would prefer ${wanted}.` : `I would prefer ${wanted}.`,expression:'smile',facts:[],bottleFacts:{type:request.type} };
   }
   if (words.includes('gift') || words.includes('party') || words.includes('occasion') || (words.includes('what') && words.includes('for'))) {
     return { text:`It is for a ${request.occasion}.`,expression:'smile',facts:[],bottleFacts:{occasion:request.occasion} };

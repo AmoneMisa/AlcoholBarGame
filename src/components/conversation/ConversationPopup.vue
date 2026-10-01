@@ -52,11 +52,11 @@ const pending = ref('');
 const confirmed = computed(() => !!customer.value?.orderRevealed);
 const bottleOrder = computed(() => customer.value?.orderKind === 'bottle');
 const conversationRecipes = computed(() => customer.value?.specialRecipeRewardId ? [...game.knownRecipes,...game.lockedRecipes.filter((item) => item.id === customer.value?.specialRecipeRewardId)] : game.knownRecipes);
-const candidates = computed(() => conversationRecipes.value.filter((item) => matchesFacts(item, talk.value?.facts ?? [])));
+const candidates = computed(() => conversationRecipes.value.filter((item) => matchesFacts(item, talk.value?.facts ?? []) && !talk.value?.rejected?.includes(item.id)));
 const bottleRecommendations = computed(() => {
   const quantity = talk.value?.bottleFacts.quantity ?? 1;
   return rankBottles(talk.value?.bottleFacts ?? {}, game.guestPriceFactor).filter(({ product }) =>
-    (game.bottleInventory.find((stock) => stock.productId === product.id)?.quantity ?? 0) >= quantity
+    (game.bottleInventory.find((stock) => stock.productId === product.id)?.quantity ?? 0) >= quantity && !talk.value?.rejected?.includes(product.id)
   );
 });
 const confirmedBottle = computed(() => ALCOHOL_PRODUCTS.find((item) => item.id === customer.value?.selectedBottleId));

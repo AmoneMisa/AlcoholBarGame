@@ -1,7 +1,7 @@
 import type { Customer } from '../types';
 import type { CustomerReply } from '../conversation/customerTalk';
 import { actsIn, isLeaveAct, type Act } from './acts';
-import { localize } from './origin';
+import { localize, originOf, spellFor } from './origin';
 import { drunkStage, type DrunkStage, type Emotion, type GuestSocial, type TalkTopic } from './model';
 
 // How guests talk like people. Every line exists in several variants and the guest picks one by a stable hash, so a
@@ -203,11 +203,11 @@ export const TAXI_ACCEPTED = ['Thank you so much. You are really kind.', 'A taxi
 export const TAXI_ARRIVED = ['The taxi is here. Thank you for everything! Good night.', 'My taxi is outside. Thanks for looking after me!'];
 
 // ---- Making a drunk guest sound drunk (readable: stretched vowels, hiccups, slips of the tongue) ----
-export function voice(customer: Customer, line: string, turn: number) {
+export function voice(customer: Customer, line: string, turn: number, local = true) {
   const social = customer.social;
   if (!social) return line;
   // Where the guest comes from changes the spelling and adds a local word now and then.
-  const text = localize(customer, line, turn);
+  const text = local ? localize(customer, line, turn) : spellFor(originOf(customer), line);
   const seed = `${customer.id}:${turn}`;
   const stage = stageOf(social);
   if (stage === 'sober') return social.emotion === 'tired' && hash(seed) % 3 === 0 && !text.startsWith('…') ? `Hmm… ${text.charAt(0).toLowerCase()}${text.slice(1)}` : text;

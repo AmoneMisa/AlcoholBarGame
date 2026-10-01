@@ -163,3 +163,22 @@ test('Asking about allergies is understood: a guest with one says so, and then t
   assert.match(socialReply(calm, ['offerFood'], 1).text, /not hungry/);
   assert.ok(other);
 });
+
+test('A guest who said no to a drink or a bottle is not offered it again, and her answer teaches the bartender', async () => {
+  const { ALCOHOL_PRODUCTS } = await import('../src/domain/bottleCatalog.ts');
+  const { bottleQuestionTemplates, rankBottles } = await import('../src/domain/conversation/bottleTalk.ts');
+  const wanted = ALCOHOL_PRODUCTS.find((item) => item.type === 'cognac');
+  const vodka = ALCOHOL_PRODUCTS.find((item) => item.type === 'vodka');
+  const { state, guest } = guestIn();
+  Object.assign(guest, { orderKind: 'bottle', orderRevealed: false, greeting: 'Hello!', bottleRequest: { productId: wanted.id, quantity: 1, budget: 500, type: 'cognac', tastes: wanted.tastes.slice(0, 1), occasion: 'party' } });
+  guest.social.phase = 'ordering';
+  applyAction(state, { type: 'openConversation', customerId: guest.id }, context());
+  applyAction(state, { type: 'say', text: `Would you like ${vodka.name}?` }, context());
+  const talk = state.conversations[guest.id];
+  assert.match(talk.lines.at(-1).text, /cognac/i, 'she says what she wants instead');
+  assert.equal(talk.bottleFacts.type, 'cognac', 'the type is now known');
+  assert.ok(talk.rejected.includes(vodka.id));
+  const suggestions = bottleQuestionTemplates(talk.bottleFacts, rankBottles(talk.bottleFacts).filter((item) => !talk.rejected.includes(item.product.id)));
+  assert.ok(!suggestions.some((item) => item.text.includes(vodka.name)));
+  assert.ok(!suggestions.some((item) => /Which type of alcohol/.test(item.text)), 'the type question is not asked again');
+});
