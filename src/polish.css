@@ -278,4 +278,7 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .sound-rows .ui-btn { border-radius: 10px; font-size: 12px; }
 .daily-lesson-card footer > button { min-height: 38px; padding: 0 14px; border-radius: 10px; font-size: 13px; }
 .daily-lesson-card small, .daily-learning-head small { font-size: 10px; }
-.trade-checkout .ui-btn + .ui-btn { margin-top: 8px; }
+/* Checkout buttons are stacked with a clear gap between them (Negotiate, Place order, Clear). */
+.trade-checkout .ui-btn { margin-top: 12px; }
+.trade-checkout .ui-btn.negotiate-button { margin-top: 12px; }
+.trade-checkout .ui-btn-secondary.ui-btn-sm { margin-top: 8px; }
