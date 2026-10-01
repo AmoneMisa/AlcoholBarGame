@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import GuidePointer from './components/ui/GuidePointer.vue';
 import TutorialTour from './components/ui/TutorialTour.vue';
-import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue';
+import PopularityBar from './components/game/PopularityBar.vue';
+import { computed, defineAsyncComponent, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import CocktailWorkspace from './components/cocktails/CocktailWorkspace.vue';
 import BarScene from './components/game/BarScene.vue';
 import TopHud from './components/game/TopHud.vue';
@@ -41,7 +42,9 @@ const nav = [
   { id: 'regions', label: 'Cities', mark: 'pin' },
   { id: 'advisor', label: 'Pairings', mark: 'pair' },
   { id: 'workshop', label: 'Workshop', mark: 'stock' },
-  { id: 'friends', label: 'Friends', mark: 'friends' }
+  { id: 'friends', label: 'Friends', mark: 'friends' },
+  { id: 'profile', label: 'Character', mark: 'face-happy' },
+  { id: 'settings', label: 'Settings', mark: 'settings' }
 ];
 
 // Music follows the bar's interior; taps on buttons get a soft click.
@@ -128,6 +131,8 @@ const badges = computed<Record<string, number>>(() => ({
 
 function selectView(id: string) {
   view.value = id;
+  // The tab bar scrolls sideways: keep the chosen tab in sight.
+  nextTick(() => document.querySelector('.game-nav button.active')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }));
   if (id !== 'service' && id !== 'english' && id !== 'friends' && id !== 'workshop' && id !== 'profile' && id !== 'settings') { managementView.value = id; managementOpened.value = true; }
 }
 </script>
@@ -137,6 +142,7 @@ function selectView(id: string) {
     <TopHud @design="selectView('design')" @goto="selectView" />
     <main>
       <section v-show="view === 'service'" class="service-layout">
+        <PopularityBar />
         <BarScene :active="view === 'service'" />
         <CocktailWorkspace />
       </section>

@@ -166,7 +166,7 @@ function when(at: number) {
         <button type="button" :class="{ active: topic === 'all' }" @click="topic = 'all'">All</button>
         <button v-for="item in topics" :key="item" type="button" :class="{ active: topic === item }" @click="topic = item">{{ item }}</button>
         <button type="button" :class="{ active: topic === 'saved' }" @click="topic = 'saved'"><UiIcon class="inline-icon" name="star-fill" /> Saved ({{ learning.savedWords.length }})</button>
-        <UiInput v-model="search" type="search" placeholder="Search a word or meaning…" aria-label="Search words" />
+        <UiInput label="Search words" v-model="search" type="search" placeholder="Search a word or meaning…" aria-label="Search words" />
       </div>
       <div class="vocab-grid">
         <article v-for="entry in words" :key="entry.word" class="vocab-card" :class="{ known: learning.knownWords.includes(entry.word) }">

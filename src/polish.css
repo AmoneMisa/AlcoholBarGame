@@ -126,3 +126,57 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .bar-name-editor .ui-input, .bartender-name-editor .ui-input { min-height: var(--ctl-h); }
 .staff-row .ui-reason { grid-column: 1 / -1; }
 .settings-page .volume-panel.static { position: static; width: auto; max-height: none; overflow: visible; padding: 0; border: 0; background: transparent; box-shadow: none; display: grid; gap: 8px; }
+
+/* ==== Rows of tabs scroll sideways by swipe or drag; the page can always scroll past the bottom navigation ==== */
+.workshop-tabs, .learning-tabs, .category-tabs, .bar-switcher, .design-tabs, .job-switch, .market-modes, .bar-chips, .tabs-scroll { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; scrollbar-width: none; cursor: grab; }
+.workshop-tabs::-webkit-scrollbar, .learning-tabs::-webkit-scrollbar, .category-tabs::-webkit-scrollbar, .bar-switcher::-webkit-scrollbar, .design-tabs::-webkit-scrollbar, .job-switch::-webkit-scrollbar, .market-modes::-webkit-scrollbar { display: none; }
+.workshop-tabs button, .learning-tabs button, .category-tabs button { flex: 0 0 auto; }
+.velvet-app { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
+
+/* The Rules button and its panel sit inside the guest layer, which lets clicks through to the scene: they need clicks */
+.house-rules-button, .house-rules-panel, .house-rules-panel * { pointer-events: auto; }
+
+/* The count on "My mistakes" sits on the corner of the tab, not on its words */
+.learning-tabs button em { top: -6px; right: -4px; box-shadow: 0 0 0 2px #0f1a2b; }
+.learning-tabs { padding-top: 14px; }
+
+/* "Practise next": a label, then one link with an arrow */
+.stat-focus dd { margin: 4px 0 0; }
+.stat-focus dd button { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; color: #ffd98a; font: 700 14px/1.3 Inter, system-ui, sans-serif; text-align: left; cursor: pointer; }
+.stat-focus dd button .ui-icon { width: 16px; height: 16px; flex: none; }
+
+/* ==== Compact cards: market products, recipes, "how to get recipes" ==== */
+.market-search, .recipe-search { padding: 8px 12px 0; max-width: 520px; }
+.market-products { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+.market-product { grid-template-columns: 54px minmax(0, 1fr) auto; min-height: 0; gap: 4px 10px; padding: 8px 10px; }
+.market-product > .bottle-visual { width: 54px; height: 70px; }
+.market-product-copy h3 { margin: 2px 0; font-size: 15px; }
+.market-product-copy b { margin-top: 3px; }
+.market-product-copy em { margin-top: 3px; }
+.pack-stepper, .sell-quantity { grid-column: auto; flex-wrap: nowrap; }
+.pack-stepper button, .sell-quantity button { min-width: 34px; min-height: var(--ctl-h-sm); font-size: 16px; }
+.pack-stepper input, .sell-quantity input { width: 52px; min-height: var(--ctl-h-sm); font-size: 13px; }
+@media (max-width: 520px) { .market-product { grid-template-columns: 54px minmax(0, 1fr); } .pack-stepper, .sell-quantity { grid-column: 1 / -1; } }
+
+.recipe-cards { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; padding: 10px 12px; }
+.recipe-cards button { grid-template-columns: 72px minmax(0, 1fr); min-height: 0; gap: 10px; padding: 8px 10px; }
+.recipe-cards .glass-model.glass-painted, .recipe-cards .glass-model { width: 72px; height: 84px; flex: none; transform: none; }
+.recipe-card-copy { display: grid; gap: 2px; text-align: left; }
+.recipe-card-copy b { font-size: 16px; }
+.recipe-card-copy p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0; font-size: 11px; }
+.recipe-card-copy small, .recipe-card-copy span { font-size: 10px; }
+
+.unlock-guide { grid-template-columns: 1.4fr repeat(3, 1fr); gap: 0; margin: 10px 12px 0; padding: 4px; border: 1px solid #354962; border-radius: 12px; background: #142238; }
+.unlock-guide > div { min-height: 0; padding: 8px 12px; border: 0; border-left: 1px solid #2c3d57; border-radius: 0; background: transparent; }
+.unlock-guide > .unlock-intro { border-left: 0; }
+.unlock-guide h3 { margin: 2px 0; font-size: 16px; }
+.unlock-guide p, .unlock-guide span { margin: 0; font-size: 11px; line-height: 1.35; }
+.unlock-guide > div > b { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-right: 6px; border-radius: 50%; background: #d9a74c; color: #1b1405; font-size: 12px; }
+.unlock-guide > div > strong { font-size: 13px; }
+@media (max-width: 760px) { .unlock-guide { grid-template-columns: 1fr; } .unlock-guide > div { border-left: 0; border-top: 1px solid #2c3d57; } .unlock-guide > .unlock-intro { border-top: 0; } }
+
+/* ==== The tab bar holds every screen: one row that scrolls sideways, on every screen size ==== */
+.game-nav { display: flex; max-width: 900px; justify-content: flex-start; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; touch-action: pan-x; }
+.game-nav::-webkit-scrollbar { display: none; }
+.game-nav button { flex: 0 0 66px; min-width: 66px; }
+@media (max-width: 420px) { .game-nav { display: flex; } .game-nav button { flex: 0 0 60px; min-width: 60px; } }

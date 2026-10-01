@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import UiButton from '../ui/UiButton.vue';
+import WorkshopStock from './WorkshopStock.vue';
+import SpeakButton from '../ui/SpeakButton.vue';
 import UiInput from '../ui/UiInput.vue';
 import CrystalAmount from '../ui/CrystalAmount.vue';
 import PanelHeading from '../ui/PanelHeading.vue';
@@ -32,9 +34,25 @@ import { BAR_PROFILE_OPTIONS } from '../../data/cosmetics/bars';
 
 withDefaults(defineProps<{ activeView?: string }>(), { activeView: 'inventory' });
 const game = useGameStore();
-const stockCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh' | 'food'>('all');
+const stockCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh' | 'food' | 'items' | 'shards' | 'cards'>('all');
+// Tabs for Workshop items, shards and cards appear only when the player owns something of that kind.
+const stockTabs = computed(() => {
+  const loot = game.loot;
+  const tabs: { id: typeof stockCategory.value; label: string }[] = [{ id: 'all', label: 'All' }, { id: 'spirit', label: 'Spirits' }, { id: 'mixer', label: 'Mixers' }, { id: 'fresh', label: 'Fresh' }, { id: 'food', label: 'Food' }];
+  const hasItems = loot.parts > 0 || Object.values(loot.boxes).some((n) => n > 0) || Object.values(loot.consumables).some((n) => n > 0) || Object.values(game.circle.keepsakes).some((n) => n > 0);
+  const hasShards = loot.skinShards > 0 || Object.values(loot.itemShards).some((n) => n > 0) || Object.values(game.circle.shards).some((n) => n > 0);
+  if (hasItems) tabs.push({ id: 'items', label: 'Items' });
+  if (hasShards) tabs.push({ id: 'shards', label: 'Shards' });
+  if (recipeCardInventory.value.length) tabs.push({ id: 'cards', label: 'Cards' });
+  return tabs;
+});
+const isStockKind = computed(() => ['all', 'spirit', 'mixer', 'fresh', 'food'].includes(stockCategory.value));
 const selectedRecipeId = ref<string | null>(null);
 const recipeMode = ref<'library' | 'shop'>('library');
+const recipeSearch = ref('');
+const matchesSearch = (name: string) => !recipeSearch.value.trim() || name.toLowerCase().includes(recipeSearch.value.trim().toLowerCase());
+const libraryRecipes = computed(() => RECIPES.filter((recipe) => matchesSearch(recipe.name)));
+const shopRecipes = computed(() => game.lockedRecipes.filter((recipe) => matchesSearch(recipe.name)));
 const transferIngredientId = ref(INGREDIENTS[0]!.id);
 const barName = ref(game.decor.name);
 const bartenderNickname = ref(game.decor.bartenderNickname ?? (game.decor.bartenderCharacter === 'leo' ? 'Leo' : 'Noa'));
@@ -134,7 +152,7 @@ function selectBartender(id: 'noa' | 'leo') {
       </div>
       <div class="inventory-tools">
         <div class="category-tabs inventory-filter">
-          <button v-for="category in ['all','spirit','mixer','fresh','food'] as const" :key="category" :class="{ active: stockCategory === category }" type="button" @click="stockCategory = category">{{ category === 'spirit' ? 'Spirits' : category === 'mixer' ? 'Mixers' : category === 'fresh' ? 'Fresh & food' : 'All' }}</button>
+          <button v-for="tab in stockTabs" :key="tab.id" :class="{ active: stockCategory === tab.id }" type="button" @click="stockCategory = tab.id">{{ tab.label }}</button>
         </div>
         <div v-if="targetRegions.length" class="transfer-console">
           <div><small>MOVE BETWEEN BARS</small><b>Stock transfer</b></div>
@@ -145,7 +163,8 @@ function selectBartender(id: 'noa' | 'leo') {
         </div>
         <p v-else class="transfer-locked">Unlock a second bar at level {{ game.barPurchaseLevel }} to rotate stock between locations.</p>
       </div>
-      <div class="inventory-cards">
+      <WorkshopStock v-if="stockCategory === 'items' || stockCategory === 'shards'" :kind="stockCategory" />
+      <div v-if="isStockKind" class="inventory-cards">
         <div v-for="stock in visibleStock" :key="stock.ingredientId" class="inventory-card">
           <BottleModel :ingredient="ingredientById(stock.ingredientId)" />
           <div><b>{{ ingredientById(stock.ingredientId).name }}</b><small>{{ stock.amount }} / {{ capacityOf(stock.ingredientId) }} {{ ingredientById(stock.ingredientId).unit }}<template v-if="isPerishable(ingredientById(stock.ingredientId))"> · fresh, spoils</template></small></div>
@@ -155,7 +174,7 @@ function selectBartender(id: 'noa' | 'leo') {
         </div>
       </div>
       <DeliveryProblems />
-      <section v-if="stockCategory === 'all' && recipeCardInventory.length" class="recipe-item-inventory">
+      <section v-if="(stockCategory === 'all' || stockCategory === 'cards') && recipeCardInventory.length" class="recipe-item-inventory">
         <header><div><small>COLLECTIBLE ITEMS</small><h3>Recipe cards</h3></div><span>Duplicates are spent on mastery upgrades.</span></header>
         <div><article v-for="item in recipeCardInventory" :key="item.recipe.id"><GlassModel :art-index="RECIPES.indexOf(item.recipe)" :recipe-id="item.recipe.id" type="coupe" /><span><small>RECIPE ITEM</small><b>{{ item.recipe.name }}</b><em>Owned ×{{ item.quantity }}</em></span><strong>×{{ item.quantity }}</strong></article></div>
       </section>
@@ -178,21 +197,22 @@ function selectBartender(id: 'noa' | 'leo') {
       <template v-if="!selectedRecipe">
         <PanelHeading eyebrow="RECIPE ACADEMY" title="Learn, collect & master" :aside="`${game.knownRecipes.length} / ${RECIPES.length} learned`" />
         <section class="unlock-guide">
-          <div class="unlock-intro"><small>HOW THE RECIPE BOOK GROWS</small><h3>Ten classics start your journey</h3><p>Every cocktail appears in the catalog. Advanced lessons stay locked until you discover them, then reveal the complete story, guest profile, ingredients and cooking path.</p></div>
+          <div class="unlock-intro"><small>HOW THE RECIPE BOOK GROWS</small><h3>Ten classics to start</h3><p>The rest stay locked until you find them. Three ways to get a recipe:</p></div>
           <div><b>1</b><strong>Recipe shop</strong><span>Spend service earnings on a recipe you want next.</span></div>
           <div><b>2</b><strong>Special client</strong><span>Serve their secret order correctly and they teach it to you.</span></div>
           <div><b>3</b><strong>Daily gift</strong><span>A recipe card may come with the login reward — open it from the gift button at the top.</span></div>
         </section>
 
         <div class="recipe-mode-tabs"><button :class="{ active: recipeMode === 'library' }" type="button" @click="recipeMode = 'library'">All recipes · {{ RECIPES.length }}</button><button :class="{ active: recipeMode === 'shop' }" type="button" @click="recipeMode = 'shop'">Learn locked · {{ game.lockedRecipes.length }}</button></div>
+        <div class="recipe-search"><UiInput v-model="recipeSearch" label="Find a recipe" placeholder="Type a name, e.g. Mojito" autocomplete="off" /></div>
         <div v-if="recipeMode === 'library'" class="recipe-cards">
-          <button v-for="recipe in RECIPES" :key="recipe.id" :class="{ locked: !isRecipeKnown(recipe.id) }" type="button" @click="isRecipeKnown(recipe.id) ? selectedRecipeId = recipe.id : recipeMode = 'shop'">
+          <button v-for="recipe in libraryRecipes" :key="recipe.id" :class="{ locked: !isRecipeKnown(recipe.id) }" type="button" @click="isRecipeKnown(recipe.id) ? selectedRecipeId = recipe.id : recipeMode = 'shop'">
             <GlassModel :type="RECIPES.indexOf(recipe) % 3 === 0 ? 'highball' : RECIPES.indexOf(recipe) % 3 === 1 ? 'coupe' : 'rocks'" :art-index="RECIPES.indexOf(recipe)" :recipe-id="recipe.id" />
             <div class="recipe-card-copy"><small>{{ isRecipeKnown(recipe.id) ? recipe.origin : 'LOCKED LESSON' }}</small><b>{{ recipe.name }}</b><em v-if="isCitySpecialty(game.regionId, recipe.id)" class="specialty-badge">{{ game.region.name }} specialty · +{{ Math.round(SPECIALTY_PREMIUM * 100) }}%</em><p>{{ isRecipeKnown(recipe.id) ? recipe.story : 'Discover this recipe to reveal its story, ingredients and cooking path.' }}</p><span v-if="isRecipeKnown(recipe.id)">{{ recipe.ingredients.length }} ingredients · {{ recipe.needsShake ? 'Shake' : 'Build / stir' }} · {{ recipeAlcoholLabel(recipe) }}</span><span v-else>{{ recipeAlcoholLabel(recipe) }} · shop · special client · daily gift</span><em>{{ isRecipeKnown(recipe.id) ? 'Open lesson' : 'Need to learn first' }}</em></div>
           </button>
         </div>
         <div v-else class="recipe-shop-grid">
-          <article v-for="recipe in game.lockedRecipes" :key="recipe.id" class="locked-recipe-card">
+          <article v-for="recipe in shopRecipes" :key="recipe.id" class="locked-recipe-card">
             <div class="locked-art"><GlassModel :art-index="RECIPES.indexOf(recipe)" :recipe-id="recipe.id" type="coupe" /><span>LOCKED</span></div>
             <div><small>ADVANCED RECIPE</small><h3>{{ recipe.name }}</h3><p>{{ recipeAlcoholLabel(recipe) }} · {{ recipe.tastingNotes.join(' · ') }}</p><span>Unlock the full history, guest profile and method.</span></div>
             <button type="button" @click="game.buyRecipe(recipe.id)">Buy for {{ recipePriceLabel(recipe.id) }}</button>
@@ -204,7 +224,7 @@ function selectBartender(id: 'noa' | 'leo') {
         <div class="recipe-detail-page">
           <aside class="recipe-hero-art"><GlassModel :art-index="RECIPES.indexOf(selectedRecipe)" :recipe-id="selectedRecipe.id" type="coupe" /><div><small>TASTING PROFILE · {{ recipeAlcoholLabel(selectedRecipe) }}</small><div class="tasting-badges"><span v-for="note in selectedRecipe.tastingNotes" :key="note">{{ note }}</span></div></div></aside>
           <RecipeMastery :recipe="selectedRecipe" />
-          <section class="recipe-story"><small>THE STORY</small><h3>A drink with a past</h3><p>{{ selectedRecipe.story }}</p><button type="button" class="guide-open" @click="openGuide('cocktail', selectedRecipe.id)">Full history, method &amp; why choose it <UiIcon class="inline-icon" name="arrow-right" /></button><div class="occasion-block"><small>WHEN IT IS A GOOD CHOICE</small><div><span v-for="occasion in selectedRecipe.occasions" :key="occasion">{{ occasion }}</span></div></div></section>
+          <section class="recipe-story"><small>THE STORY</small><h3>A drink with a past <SpeakButton :text="selectedRecipe.name" /></h3><p>{{ selectedRecipe.story }} <SpeakButton :text="selectedRecipe.story" /></p><button type="button" class="guide-open" @click="openGuide('cocktail', selectedRecipe.id)">Full history, method &amp; why choose it <UiIcon class="inline-icon" name="arrow-right" /></button><div class="occasion-block"><small>WHEN IT IS A GOOD CHOICE</small><div><span v-for="occasion in selectedRecipe.occasions" :key="occasion">{{ occasion }}</span></div></div></section>
           <section class="recipe-formula"><small>WHAT YOU NEED</small><h3>Bar formula</h3><div v-for="part in selectedRecipe.ingredients" :key="part.ingredientId" class="formula-ingredient-card"><div class="formula-icon"><BottleModel :ingredient="ingredientById(part.ingredientId)" /></div><b class="formula-name">{{ ingredientById(part.ingredientId).name }}</b><span class="formula-amount">{{ part.amount }} {{ ingredientById(part.ingredientId).unit }}</span><small class="formula-action">{{ formulaActions.get(part.ingredientId) }}</small><button type="button" class="guide-open" :aria-label="`About ${ingredientById(part.ingredientId).name}`" @click="openGuide('ingredient', part.ingredientId)">About</button></div></section>
           <section class="recipe-method"><small>COOKING PATH</small><h3>{{ selectedRecipe.needsShake ? 'Shake and serve' : 'Build with control' }}</h3><ol><li v-for="(step, index) in selectedRecipe.method" :key="step"><b>{{ index + 1 }}</b><span>{{ step }}</span></li></ol></section>
         </div>

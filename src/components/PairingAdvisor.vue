@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import UiInput from './ui/UiInput.vue';
 import OptionSelect from './game/OptionSelect.vue';
+import SpeakButton from './ui/SpeakButton.vue';
 import { computed, ref } from 'vue';
 import PairingPrinciples from './PairingPrinciples.vue';
 import { BAR_PAIRINGS } from '../data/pairings/barPairings';
@@ -110,7 +111,7 @@ const opts = (values: readonly string[], any = false) => [...(any ? [{ value: ''
     </div>
 
     <div v-if="mode === 'food' || mode === 'drink'" class="pairing-controls">
-      <UiInput v-model="search" placeholder="Search wine, beer, spirit, tea, coffee, mocktail…" />
+      <UiInput label="Search drinks" v-model="search" placeholder="Search wine, beer, spirit, tea, coffee, mocktail…" />
       <OptionSelect label="Drink" v-model="selectedBeverage" :options="profiles.map((profile) => ({ value: profile.id, label: `${profile.name} · ${profile.style} · ${profile.abv_class}` }))" />
     </div>
 
@@ -130,8 +131,8 @@ const opts = (values: readonly string[], any = false) => [...(any ? [{ value: ''
 
     <div v-if="mode === 'food'" class="pairing-results">
       <div v-for="item in foodResults" :key="item.beverage + item.food" class="pairing-result" :data-band="item.band">
-        <div><small>PAIR WITH</small><b>{{ item.food }}</b><span>{{ item.relationship }}</span></div>
-        <strong>{{ item.score }}</strong><section><small>WHY IT WORKS</small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests who enjoy {{ selectedProfile?.style.replaceAll('_', ' ') }} {{ selectedProfile?.family }} and {{ item.relationship }} food pairings.</p></section>
+        <div><small>PAIR WITH</small><b>{{ item.food }} <SpeakButton :text="item.food" /></b><span>{{ item.relationship }}</span></div>
+        <strong>{{ item.score }}</strong><section><small>WHY IT WORKS <SpeakButton :text="item.why" /></small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests who enjoy {{ selectedProfile?.style.replaceAll('_', ' ') }} {{ selectedProfile?.family }} and {{ item.relationship }} food pairings.</p></section>
         <PairingPrinciples :item="item" kind="food" />
       </div>
     </div>
@@ -155,7 +156,7 @@ const opts = (values: readonly string[], any = false) => [...(any ? [{ value: ''
 
     <div v-else class="pairing-results">
       <div v-for="item in cigarResults" :key="item.cigar_body + item.cigar_note + item.beverage" class="pairing-result" :data-band="item.band">
-        <div><small>PAIR WITH</small><b>{{ partnerName(item.beverage) }}</b><span>{{ item.alcoholic ? 'alcoholic' : 'non-alcoholic' }}</span></div>
+        <div><small>PAIR WITH</small><b>{{ partnerName(item.beverage) }} <SpeakButton :text="partnerName(item.beverage)" /></b><span>{{ item.alcoholic ? 'alcoholic' : 'non-alcoholic' }}</span></div>
         <strong>{{ item.score }}</strong><section><small>WHY IT WORKS</small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests smoking a {{ cigarBody }} cigar with {{ cigarNote }} notes.</p></section>
         <PairingPrinciples :item="item" kind="cigar" />
       </div>

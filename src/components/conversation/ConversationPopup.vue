@@ -546,7 +546,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         <template v-else>
           <div class="phrase-ideas"><button v-for="idea in phraseIdeas" :key="idea" type="button" data-guide="phrase-idea" @click="suggest(idea)">{{ idea }}</button></div>
           <form class="type-row" @submit.prevent="send(draft)">
-            <UiInput ref="input" data-guide="talk-input" v-model="draft" type="text" autocomplete="off" autocapitalize="sentences" spellcheck="false" placeholder="Ask a question, e.g. Do you like sour drinks?" @input="feedback = undefined" />
+            <UiInput label="Your question or answer" ref="input" data-guide="talk-input" v-model="draft" type="text" autocomplete="off" autocapitalize="sentences" spellcheck="false" placeholder="Ask a question, e.g. Do you like sour drinks?" @input="feedback = undefined" />
             <button class="primary-button compact" type="submit" :disabled="!draft.trim() || customerTyping">Check & send</button>
           </form>
         </template>

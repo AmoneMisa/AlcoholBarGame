@@ -1,4 +1,5 @@
 import { createApp, type Component } from 'vue';
+import { installDragScroll } from './ui/dragScroll';
 import { createPinia } from 'pinia';
 import { initTelegram } from './telegram/webapp';
 import { hydrateCocktailCatalog } from './domain/recipeApi';
@@ -24,5 +25,6 @@ if (studio && new URLSearchParams(window.location.search).has('studio')) {
   clearTimeout(abortTimer);
   initTelegram();
   const { default: App } = await import('./App.vue');
+  installDragScroll();
   createApp(App).use(createPinia()).mount('#app');
 }

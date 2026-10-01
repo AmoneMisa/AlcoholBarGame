@@ -261,7 +261,7 @@ const boostLeft = (id: string) => {
         <article class="card">
           <h3>🍹 Design your signature</h3>
           <p>Some guests will come asking for your house special (about {{ Math.round(SIGNATURE_GUEST_CHANCE * 100) }}% of arrivals) without naming it: open the conversation and offer it in English, by name or as “the house special”. Developing or changing it costs {{ SIGNATURE_FEE }} coins and restarts its fame.</p>
-          <UiInput v-model="draftName" maxlength="24" placeholder="Cocktail name" />
+          <UiInput label="Cocktail name" v-model="draftName" maxlength="24" placeholder="Cocktail name" />
           <div v-for="(row, index) in draftItems" :key="index" class="row sig-row">
             <OptionSelect label="Ingredient" :model-value="row.ingredientId" :options="usableList.map((item) => ({ value: item.id, label: item.name }))" @update:model-value="(value: string) => pickIngredient(row, value)" />
             <UiButton variant="primary" @click="stepAmount(row, -1)">−</UiButton><b>{{ row.amount }} {{ ingredient(row.ingredientId).unit === 'ml' ? 'ml' : '×' }}</b><UiButton variant="primary" @click="stepAmount(row, 1)">+</UiButton>
@@ -335,7 +335,7 @@ const boostLeft = (id: string) => {
         <h3>🏛️ Grand Opening</h3>
         <p>At level {{ PRESTIGE_LEVEL }} you can reopen your bars: coins, XP, stock and equipment reset. Recipes, styles, crystals, parts and boxes stay, and you earn prestige stars for permanent perks plus a Choice box.</p>
         <b>Opened {{ game.loot.prestige.count }} times · this run earns {{ runStars }} stars</b>
-        <UiButton variant="primary" :disabled="game.level < PRESTIGE_LEVEL" @click="game.act({ type: 'prestige' })">{{ game.level < PRESTIGE_LEVEL ? `Reach level ${PRESTIGE_LEVEL} (now ${game.level})` : 'Start a Grand Opening' }}</UiButton>
+        <p class="hint-line">Starting a Grand Opening resets your business, so it lives in Settings, behind a confirmation.</p>
       </article>
       <article v-for="perk in PRESTIGE_PERKS" :key="perk.id" class="card">
         <h3>{{ perk.name }} <b>{{ game.loot.prestige.perks[perk.id] ?? 0 }} / {{ perk.maxRank }}</b></h3>

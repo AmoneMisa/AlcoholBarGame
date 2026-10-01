@@ -7,14 +7,25 @@ import BottleModel from '../cocktails/BottleModel.vue';
 import UiIcon from '../ui/UiIcon.vue';
 import { AUTO_SUPPLY_LEVEL, formatDeliveryTime } from '../../domain/progression';
 import TradeTalk from './TradeTalk.vue';
+import UiButton from '../ui/UiButton.vue';
+import UiInput from '../ui/UiInput.vue';
+import SpeakButton from '../ui/SpeakButton.vue';
+import ConfirmDialog from '../ui/ConfirmDialog.vue';
 
 const game = useGameStore();
 const mode = ref<'buy'|'sell'>('buy');
 const category = ref('all');
+// The two stock-saving helpers ask first: a top-up shows what it would order, auto-supply explains what it will do.
+const confirm = ref<'' | 'top-up' | 'auto'>('');
+const topUp = computed(() => (confirm.value === 'top-up' ? game.topUpPreview() : { orders: [], total: 0 } as ReturnType<typeof game.topUpPreview>));
+const openTopUp = () => { confirm.value = 'top-up'; };
+function doTopUp() { confirm.value = ''; game.topUp(); }
 const ingredient = (id:string) => INGREDIENTS.find((item) => item.id === id)!;
 const group = (id:string) => ingredient(id).category === 'spirit' ? 'spirit' : ingredient(id).category === 'mixer' && !['sugar-syrup','coconut-cream'].includes(id) ? 'mixer' : 'fresh';
-const offers = computed(() => game.market.filter((offer) => offer.supplierId === game.selectedSupplier && (category.value === 'all' || group(offer.ingredientId) === category.value)));
-const stock = computed(() => game.visibleInventory.filter((item) => category.value === 'all' || group(item.ingredientId) === category.value));
+const search = ref('');
+const byName = (id: string) => !search.value.trim() || ingredient(id).name.toLowerCase().includes(search.value.trim().toLowerCase());
+const offers = computed(() => game.market.filter((offer) => offer.supplierId === game.selectedSupplier && (category.value === 'all' || group(offer.ingredientId) === category.value) && byName(offer.ingredientId)));
+const stock = computed(() => game.visibleInventory.filter((item) => (category.value === 'all' || group(item.ingredientId) === category.value) && byName(item.ingredientId)));
 const available = (id:string) => Math.max(0,(game.inventory.find((item) => item.ingredientId === id)?.amount ?? 0) - (game.currentMix.find((item) => item.ingredientId === id)?.amount ?? 0));
 const buyback = (id:string,quantity:number) => (ingredient(id).basePrice * quantity * game.region.marketFactor * .55 * game.economy.buybackFactor(id)).toFixed(2);
 const offerFor = (id:string) => game.market.find((offer) => offer.supplierId === game.selectedSupplier && offer.ingredientId === id);
@@ -38,12 +49,22 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
     <!-- Level perks live on the bar scene's city chip; the market only shows what changes buying here. -->
     <div class="auto-supply" :class="{ locked: game.level < AUTO_SUPPLY_LEVEL, on: game.autoSupply }">
       <div><b>Auto-supply</b><small>{{ game.level < AUTO_SUPPLY_LEVEL ? `Unlocks at level ${AUTO_SUPPLY_LEVEL}` : 'Reorders anything that runs low from the cheapest supplier, with normal prices and delivery fees.' }}</small></div>
-      <button type="button" role="switch" :aria-checked="game.autoSupply" :disabled="game.level < AUTO_SUPPLY_LEVEL" @click="game.setAutoSupply(!game.autoSupply)">{{ game.level < AUTO_SUPPLY_LEVEL ? `Lv ${AUTO_SUPPLY_LEVEL}` : game.autoSupply ? 'On' : 'Off' }}</button>
+      <UiButton :variant="game.autoSupply ? 'solid' : 'secondary'" role="switch" :aria-checked="game.autoSupply" :reason="game.level < AUTO_SUPPLY_LEVEL ? `Auto-supply unlocks at level ${AUTO_SUPPLY_LEVEL}.` : ''" @click="game.autoSupply ? game.setAutoSupply(false) : (confirm = 'auto')">{{ game.level < AUTO_SUPPLY_LEVEL ? `Lv ${AUTO_SUPPLY_LEVEL}` : game.autoSupply ? 'On' : 'Off' }}</UiButton>
     </div>
     <div class="top-up-row">
       <div><b>Top up low stock</b><small>Orders everything that is running low from the cheapest supplier, in one tap. Deliveries still take time.</small></div>
-      <button type="button" data-guide="top-up" @click="game.topUp()">Top up</button>
+      <UiButton variant="solid" data-guide="top-up" @click="openTopUp">Top up</UiButton>
     </div>
+    <ConfirmDialog v-if="confirm === 'top-up'" title="Top up low stock?" confirm-label="Place the orders" :reason="topUp.orders.length ? (game.money < topUp.total ? `Not enough coins: you need ${topUp.total.toFixed(2)}, you have ${Math.floor(game.money)}.` : '') : 'Nothing is running low, or an order is already on its way.'" @cancel="confirm = ''" @confirm="doTopUp">
+      <p v-if="topUp.orders.length">This orders everything that is running low from the cheapest supplier, one pack of each. Nothing changes until you confirm.</p>
+      <p v-else>Nothing needs ordering right now.</p>
+      <ul v-if="topUp.orders.length"><li v-for="order in topUp.orders" :key="order.supplier"><span>{{ order.supplier }}: {{ order.items.map((item) => ingredient(item.ingredientId).name).join(', ') }}</span><b>{{ order.total.toFixed(2) }} coins</b></li></ul>
+      <p v-if="topUp.orders.length"><b>Total {{ topUp.total.toFixed(2) }} coins.</b> Deliveries still take time{{ topUp.days !== undefined ? ` (about ${formatDeliveryTime(topUp.days)})` : '' }}.</p>
+    </ConfirmDialog>
+    <ConfirmDialog v-if="confirm === 'auto'" title="Turn on auto-supply?" confirm-label="Turn on" @cancel="confirm = ''" @confirm="game.setAutoSupply(true); confirm = ''">
+      <p>While it is on, anything that runs low is reordered automatically from the cheapest supplier, with normal prices and delivery fees.</p>
+      <p>It spends coins without asking each time. If you do not have enough coins, it pauses. You can turn it off here whenever you like.</p>
+    </ConfirmDialog>
     <TradeTalk />
     <div class="market-modes"><button :class="{active:mode === 'buy'}" type="button" @click="mode = 'buy'">Buy supplies</button><button :class="{active:mode === 'sell'}" type="button" @click="mode = 'sell'">Sell stock</button><span>City prices {{ game.region.marketFactor.toFixed(2) }}× · prices change each shift</span></div>
     <div v-if="mode === 'buy'" class="supplier-picker polished-suppliers">
@@ -53,11 +74,12 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
       </button>
     </div>
     <div class="category-tabs market-filter"><button v-for="item in ['all','spirit','mixer','fresh']" :key="item" :class="{active:category === item}" type="button" @click="category = item">{{ {all:'All',spirit:'Spirits',mixer:'Mixers',fresh:'Fresh & food'}[item] }}</button></div>
+    <div class="market-search"><UiInput v-model="search" label="Find a product" placeholder="Type a name, e.g. rum or lime" autocomplete="off" /></div>
     <div class="market-trading-layout">
       <div class="market-products">
         <article v-for="offer in mode === 'buy' ? offers : []" :key="offer.ingredientId" class="market-product">
           <BottleModel :ingredient="ingredient(offer.ingredientId)" />
-          <div class="market-product-copy"><small>{{ offer.quality }} · {{ packageDescription(offer.ingredientId, offer.quantity) }}</small><h3>{{ ingredient(offer.ingredientId).name }}</h3><span>{{ available(offer.ingredientId) }} {{ ingredient(offer.ingredientId).unit }} in stock</span><span class="stock-conversion">1 {{ buyUnit(offer.ingredientId) }} adds {{ offer.quantity }} {{ ingredient(offer.ingredientId).unit }} to stock</span><b>{{ offer.price.toFixed(2) }} coins <del v-if="offer.discountPercent">{{ offer.listPrice.toFixed(2) }}</del></b><em v-if="offer.discountPercent">Today’s deal −{{ offer.discountPercent }}%</em></div>
+          <div class="market-product-copy"><small>{{ offer.quality }} · {{ packageDescription(offer.ingredientId, offer.quantity) }}</small><h3>{{ ingredient(offer.ingredientId).name }} <SpeakButton :text="ingredient(offer.ingredientId).name" /></h3><span>{{ available(offer.ingredientId) }} {{ ingredient(offer.ingredientId).unit }} in stock</span><span class="stock-conversion">1 {{ buyUnit(offer.ingredientId) }} adds {{ offer.quantity }} {{ ingredient(offer.ingredientId).unit }} to stock</span><b>{{ offer.price.toFixed(2) }} coins <del v-if="offer.discountPercent">{{ offer.listPrice.toFixed(2) }}</del></b><em v-if="offer.discountPercent">Today’s deal −{{ offer.discountPercent }}%</em></div>
           <div class="pack-stepper"><button type="button" :aria-label="`Remove one ${ingredient(offer.ingredientId).name} ${buyUnit(offer.ingredientId)}`" @click="adjust(offer.ingredientId,-1)">−</button><input v-model.number="game.purchaseCart[offer.ingredientId]" type="number" min="0" max="99" :placeholder="'0'" :aria-label="`${ingredient(offer.ingredientId).name} ${buyUnit(offer.ingredientId, true)}`" /><button type="button" data-guide="market-plus" :aria-label="`Add one ${ingredient(offer.ingredientId).name} ${buyUnit(offer.ingredientId)}`" @click="adjust(offer.ingredientId,1)">+</button><small>{{ buyUnit(offer.ingredientId, true) }}</small></div>
         </article>
         <article v-for="item in mode === 'sell' ? stock : []" :key="item.ingredientId" class="market-product">

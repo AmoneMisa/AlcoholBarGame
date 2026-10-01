@@ -8,14 +8,12 @@ import { INTERIORS } from '../../data/cosmetics/bars';
 import { CONSUMABLES } from '../../domain/loot';
 import { SHARD_GIFT_AMOUNTS } from '../../sim/gifts';
 import { useGameStore } from '../../stores/game';
-import { NOTIFICATION_EVENTS, useNotificationsStore } from '../../stores/notifications';
 import CharacterModel from '../characters/CharacterModel.vue';
 import ProfileCard from '../profile/ProfileCard.vue';
 import UiIcon from '../ui/UiIcon.vue';
 
 const PRESTIGE_GOAL = 30;
 const game = useGameStore();
-const notifications = useNotificationsStore();
 const status = ref('');
 const code = ref(new URLSearchParams(location.search).get('friend') ?? '');
 const renaming = ref('');
@@ -93,7 +91,7 @@ onMounted(() => { void game.loadFriends(); });
       <form class="card" @submit.prevent="sendRequest">
         <small>ADD A FRIEND</small>
         <label for="friend-code-input">Enter their friend code</label>
-        <div class="row"><UiInput id="friend-code-input" v-model="code" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="ABCD-1234" /><UiButton variant="solid" type="submit"><UiIcon name="user-plus" />Send</UiButton></div>
+        <div class="row"><UiInput label="Friend code" id="friend-code-input" v-model="code" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="ABCD-1234" /><UiButton variant="solid" type="submit"><UiIcon name="user-plus" />Send</UiButton></div>
         <p>They must accept before you can visit each other.</p>
       </form>
       <article class="prestige card">
@@ -137,7 +135,7 @@ onMounted(() => { void game.loadFriends(); });
           <UiButton variant="secondary" size="sm" aria-label="Remove friend" title="Remove friend" @click="remove(friend.code, friendName(friend))"><UiIcon name="trash" /></UiButton>
         </div>
         <form v-if="renaming === friend.code" class="rename" @submit.prevent="saveRename">
-          <UiInput v-model="draftName" maxlength="28" :placeholder="`Name for ${friend.nickname}`" :aria-label="`Custom name for ${friend.nickname}`" />
+          <UiInput label="Custom name" v-model="draftName" maxlength="28" :placeholder="`Name for ${friend.nickname}`" :aria-label="`Custom name for ${friend.nickname}`" />
           <UiButton variant="solid" type="submit">Save</UiButton><UiButton variant="secondary" @click="renaming = ''">Cancel</UiButton>
         </form>
       </article>
@@ -172,10 +170,6 @@ onMounted(() => { void game.loadFriends(); });
       </div>
     </section>
 
-    <section class="card notification-settings">
-      <header><small>NOTIFICATIONS</small><h3>Choose what to be told about</h3></header>
-      <label v-for="event in NOTIFICATION_EVENTS" :key="event.id"><span><b>{{ event.label }}</b><small>{{ event.detail }}</small></span><input type="checkbox" :checked="notifications.prefs[event.id]" @change="notifications.setEnabled(event.id, ($event.target as HTMLInputElement).checked)" /></label>
-    </section>
   </section>
 </template>
 
@@ -237,10 +231,5 @@ form.card { display: grid; align-content: start; gap: 8px; }
 .gifts > article span { display: grid; gap: 2px; }
 .gifts > article small { color: #93a5b9; font-size: 11px; font-weight: 500; letter-spacing: 0; }
 .gifts > article button { flex: none; min-width: 72px; }
-.notification-settings { display: grid; gap: 2px; }
-.notification-settings label { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid #2d4059; }
-.notification-settings label span { display: grid; gap: 2px; }
-.notification-settings label small { color: #91a2b5; font-weight: 500; letter-spacing: 0; text-transform: none; }
-.notification-settings input { flex: none; width: 22px; height: 22px; min-height: 0; accent-color: #dca94e; }
 @media (min-width: 900px) { .friend-list > article { grid-template-columns: 1fr auto; align-items: center; } .rename { grid-column: 1 / -1; } }
 </style>

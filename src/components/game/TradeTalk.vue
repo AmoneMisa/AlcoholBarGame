@@ -146,7 +146,7 @@ function accept() {
 
       <footer class="haggle-compose">
         <form @submit.prevent="send()">
-          <UiInput ref="input" v-model="draft" type="text" maxlength="240" :disabled="done || agreed || waiting" :placeholder="agreed ? 'The price is agreed.' : done ? 'No offers left.' : 'Write to ' + seller.name + ' in English…'" autocomplete="off" />
+          <UiInput label="Your reply" ref="input" v-model="draft" type="text" maxlength="240" :disabled="done || agreed || waiting" :placeholder="agreed ? 'The price is agreed.' : done ? 'No offers left.' : 'Write to ' + seller.name + ' in English…'" autocomplete="off" />
           <UiButton variant="primary" type="submit" :disabled="!draft.trim() || done || agreed || waiting">Say</UiButton>
         </form>
         <div class="haggle-actions">

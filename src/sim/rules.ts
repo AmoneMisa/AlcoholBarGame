@@ -220,6 +220,17 @@ function autoRestock(state: PlayerState, now: number, manual = false): number {
   return ordered;
 }
 
+/** What "Top up" would order right now (nothing changes): per supplier, the items and the price. */
+export interface TopUpPreview { orders: { supplier: string; items: { ingredientId: string; amount: number }[]; total: number }[]; total: number; days?: number }
+export function previewTopUp(state: PlayerState, now: number): TopUpPreview {
+  const copy = JSON.parse(JSON.stringify(state)) as PlayerState;
+  const before = new Set(copy.deliveryOrders.map((order) => order.id));
+  autoRestock(copy, now, true);
+  const orders = copy.deliveryOrders.filter((order) => !before.has(order.id)).map((order) => ({ supplier: order.supplier, items: order.items.map((item) => ({ ingredientId: item.ingredientId, amount: item.amount })), total: order.total }));
+  const days = orders.length ? (copy.deliveryOrders.filter((order) => !before.has(order.id)).map((order) => order.dueAt).sort((a, b) => a - b)[0]! - now) / DELIVERY_DAY_MS : undefined;
+  return { orders, total: orders.reduce((sum, order) => sum + order.total, 0), days };
+}
+
 // What this guest pays relative to catalog prices (fixed when they walked in, so budgets always match).
 const priceFactorOf = (guest: Customer | undefined, marketFactor: number) => guest?.priceFactor ?? marketFactor;
 

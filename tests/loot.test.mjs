@@ -808,3 +808,19 @@ test('Equipment of another owned bar can be upgraded without switching, and only
   assert.throws(() => run(state, { type: 'upgradeEquipment', item: 'shaker', regionId: 'berlin' }), /do not own/);
   assert.throws(() => run(state, { type: 'upgradeEquipment', item: 'shaker', regionId: 'nowhere' }), /do not own/);
 });
+
+test('Top-up preview shows what would be ordered without changing anything, and matches the real top-up', async () => {
+  const { previewTopUp } = await import('../src/sim/rules.ts');
+  const state = fresh();
+  for (const stock of state.inventories[state.regionId].slice(0, 3)) stock.amount = 0;
+  state.money = 100000;
+  const money = state.money, orders = state.deliveryOrders.length;
+  const preview = previewTopUp(state, NOW);
+  assert.ok(preview.orders.length > 0 && preview.total > 0, 'low stock gives an order');
+  assert.equal(state.money, money, 'a preview never spends');
+  assert.equal(state.deliveryOrders.length, orders);
+  run(state, { type: 'topUp' });
+  assert.equal(state.deliveryOrders.length, orders + preview.orders.length);
+  assert.ok(Math.abs((money - state.money) - preview.total) < 0.01, 'the real total equals the preview');
+  assert.equal(previewTopUp(state, NOW).orders.length, 0, 'nothing more to order while the delivery is on its way');
+});

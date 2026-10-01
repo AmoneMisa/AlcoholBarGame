@@ -23,7 +23,7 @@ import type { Customer, InventoryItem, RegionId, SupplierOffer } from '../domain
 import { pourableBrand } from '../domain/brandServe';
 import { formatCountdown } from '../domain/customerTiming';
 import { checkText } from '../domain/english/checker';
-import { advanceClock, applyAction, RuleError, type GameAction } from '../sim/rules';
+import { advanceClock, applyAction, previewTopUp, RuleError, type GameAction } from '../sim/rules';
 import { createInitialState, levelFor, normalizePlayerState, type PlayerState } from '../sim/state';
 import { playSfx } from '../audio/index';
 import { answerFriendRequest, claimFriendGifts, connectSession, createStarInvoice, fetchFriends, removeFriendLink, requestFriend, saveFriendLabel, sendAction, sendFriendGift, visitFriendBar, type FriendBar, type FriendSummary } from '../telegram/api';
@@ -586,6 +586,7 @@ export const useGameStore = defineStore('game', () => {
   const endTraining = () => dispatch({ type: 'endTraining' });
   const trainingDone = (moduleId: string) => dispatch({ type: 'trainingDone', moduleId });
   const topUp = () => dispatch({ type: 'topUp' });
+  const topUpPreview = () => previewTopUp(state.value, clientNow());
   // The servers of the bar being managed: every bar has its own team.
   const staff = computed(() => state.value.staffByBar?.[state.value.regionId] ?? []);
   // The Circle: people who joined, shards, keepsakes and who works in this bar.
@@ -685,7 +686,7 @@ export const useGameStore = defineStore('game', () => {
 
   const act = (action: GameAction) => dispatch(action);
   return {
-    circle, crewBonus, recruitCompanion, giveKeepsake, buyKeepsake, assignCompanion, dismissCompanion, achievementStat, profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, act, visibleInventory, connectEpoch,
+    topUpPreview, circle, crewBonus, recruitCompanion, giveKeepsake, buyKeepsake, assignCompanion, dismissCompanion, achievementStat, profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, act, visibleInventory, connectEpoch,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, sessionReady, ownedInteriorIds, barBackground, barInteriorStyle,

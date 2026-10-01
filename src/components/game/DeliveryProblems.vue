@@ -46,7 +46,7 @@ function send(id: string) {
             <UiButton variant="secondary" size="sm" v-for="phrase in CLAIM_PHRASES[issue.kind]" :key="phrase" @click="text[issue.id] = phrase">{{ phrase }}</UiButton>
           </div>
           <div class="row">
-            <UiInput v-model="text[issue.id]" type="text" maxlength="200" placeholder="Write it in English…" @keyup.enter="send(issue.id)" />
+            <UiInput label="Message to the supplier" v-model="text[issue.id]" type="text" maxlength="200" placeholder="Write it in English…" @keyup.enter="send(issue.id)" />
             <UiButton variant="secondary" size="sm" aria-label="Listen" :disabled="!text[issue.id]" @click="speak(text[issue.id]!)"><UiIcon name="speaker" /></UiButton>
             <UiButton variant="primary" :disabled="!text[issue.id]?.trim()" @click="send(issue.id)">Send</UiButton>
           </div>

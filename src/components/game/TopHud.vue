@@ -5,11 +5,9 @@ import { useGameStore } from '../../stores/game';
 import UiIcon from '../ui/UiIcon.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
 import UiButton from '../ui/UiButton.vue';
-import SoundControls from '../settings/SoundControls.vue';
 import { MAX_STAFF, MAX_STAFF_LEVEL, STAFF_PROFILES, STAFF_UNLOCK_LEVELS, hireCost, teamShare, upgradeCost } from '../../domain/staff';
 import { TRAINING_MODULES } from '../../domain/training';
 import AcademyPanel from './AcademyPanel.vue';
-import { musicOn, musicVolume, sfxOn, sfxVolume, speechOn, speechVolume } from '../../audio/index';
 defineEmits<{ design:[]; goto:[view: string] }>();
 
 const game = useGameStore();
@@ -25,12 +23,9 @@ const staffReason = (slot: { index: number; member?: { level: number }; open: bo
   return game.money < hireCost(slot.index) ? `Not enough coins: hiring costs ${hireCost(slot.index)}, you have ${Math.floor(game.money)}.` : '';
 };
 const teamPercent = computed(() => Math.round(teamShare(game.staff) * 100));
-const volumeOpen = ref(false);
 // Only one header panel is open at a time, so they never pile up on top of each other.
-const panels = { exchange: exchangeOpen, staff: staffOpen, academy: academyOpen, volume: volumeOpen };
+const panels = { exchange: exchangeOpen, staff: staffOpen, academy: academyOpen };
 for (const [name, flag] of Object.entries(panels)) watch(flag, (open) => { if (open) for (const [other, ref] of Object.entries(panels)) if (other !== name) ref.value = false; });
-const soundSilent = computed(() => (!musicOn.value || musicVolume.value === 0) && (!sfxOn.value || sfxVolume.value === 0) && (!speechOn.value || speechVolume.value === 0));
-const soundSummary = computed(() => soundSilent.value ? 'Muted' : [musicOn.value && musicVolume.value > 0 && 'Music', sfxOn.value && sfxVolume.value > 0 && 'FX', speechOn.value && speechVolume.value > 0 && 'Voice'].filter(Boolean).join(' · '));
 const xpPercent = computed(() => game.xpProgress.percent);
 function exchange(crystals: number) {
   if (game.exchangeCrystals(crystals)) exchangeOpen.value = false;
@@ -94,13 +89,6 @@ onUnmounted(() => {
         </PopoverPanel>
       </div>
       <button class="daily-hud-gift" :class="{ ready: game.dailyGiftAvailable }" type="button" :aria-expanded="game.dailyOpen" aria-label="Daily reward and login streak" @click="game.dailyOpen = true"><UiIcon name="gift" /><span><small>DAY {{ game.dailyGiftAvailable ? game.upcomingLoginDay : game.loginStreak }}</small><b>{{ game.dailyGiftAvailable ? 'Claim' : 'Done' }}</b></span></button>
-      <div class="sound-resource">
-        <button class="sound-open" type="button" :class="{ off: soundSilent }" :aria-expanded="volumeOpen" :aria-label="`Sound: ${soundSummary}. Open volume settings`" @click="volumeOpen = !volumeOpen"><UiIcon :name="soundSilent ? 'speaker-off' : 'speaker'" /><span><small>SOUND</small><b>{{ soundSummary }}</b></span></button>
-        <PopoverPanel v-if="volumeOpen" class="volume-panel" eyebrow="SOUND" title="Volume" close-label="Close volume settings" @close="volumeOpen = false">
-          <SoundControls id-prefix="hud" />
-          <UiButton block icon="settings" @click="volumeOpen = false; $emit('goto', 'settings')">More settings</UiButton>
-        </PopoverPanel>
-      </div>
     </div>
     <div class="shift-card"><small>LIVE SERVICE</small><b>{{ game.hasCustomer ? game.orderCountdown : game.nextCustomerCountdown }}</b><span>{{ game.hasCustomer ? 'Order time' : 'Next arrival' }}</span></div>
   </header>
