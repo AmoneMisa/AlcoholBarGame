@@ -401,9 +401,9 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         </template>
       </section>
       <div v-if="social" class="talk-actions" data-guide="talk-actions" aria-label="Look after this guest">
-        <button type="button" data-guide="give-ashtray" :class="{ wanted: needNow === 'ashtray' }" :disabled="social.ashtray === 'given' || game.ashtrays.clean < 1" :title="social.ashtray === 'given' ? 'Already has one' : game.ashtrays.clean + ' clean ashtrays'" @click="game.giveAshtray(customer.id)"><img class="ashtray-inline" :src="ashtrayArt" alt="" /> Ashtray</button>
-        <button type="button" data-guide="give-water" :class="{ wanted: needNow === 'water' }" @click="game.giveWater(customer.id)">💧 Water</button>
-        <button type="button" :class="{ wanted: needNow === 'taxi' }" :disabled="!!social.taxiAt" @click="game.callTaxi(customer.id)">🚕 Call a taxi</button>
+        <button v-if="needNow === 'ashtray'" type="button" data-guide="give-ashtray" class="wanted" :disabled="social.ashtray === 'given' || game.ashtrays.clean < 1" :title="social.ashtray === 'given' ? 'Already has one' : game.ashtrays.clean + ' clean ashtrays'" @click="game.giveAshtray(customer.id)"><img class="ashtray-inline" :src="ashtrayArt" alt="" /> Ashtray</button>
+        <button v-if="needNow === 'water'" type="button" data-guide="give-water" class="wanted" @click="game.giveWater(customer.id)">💧 Water</button>
+        <button v-if="needNow === 'taxi'" type="button" class="wanted" :disabled="!!social.taxiAt" @click="game.callTaxi(customer.id)">🚕 Call a taxi</button>
         <button type="button" data-guide="offer-open" :class="{ wanted: social.hungry }" @click="offerOpen = !offerOpen">🍽️ Offer</button>
         <span class="leave-group">Ask to leave
           <button type="button" :title="leaveHint('gentle')" @click="game.askToLeave(customer.id, 'gentle')">Kindly</button>
