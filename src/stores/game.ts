@@ -12,6 +12,7 @@ import { economyAt, levelProgress, marketFor } from '../domain/progression';
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { dailyLessonsFor, learningStreakBonus } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic as ownsCosmetic } from '../domain/cosmetics';
+import { usableIngredientIds } from '../domain/usableStock';
 import { negotiatedQuote } from '../sim/trade';
 import type { Customer, InventoryItem, RegionId, SupplierOffer } from '../domain/types';
 import { pourableBrand } from '../domain/brandServe';
@@ -52,6 +53,7 @@ function migrateLegacySave(saved: Record<string, any>): PlayerState {
   const state = createInitialState();
   if (Number.isFinite(saved.money) && saved.money >= 0) state.money = saved.money;
   if (Number.isFinite(saved.xp) && saved.xp >= 0) state.xp = saved.xp;
+  state.xpCurve = undefined; // the first local format used the original XP curve
   if (REGIONS.some((item) => item.id === saved.regionId)) state.regionId = saved.regionId;
   for (const region of REGIONS) {
     const profile = saved.bars?.[region.id];
@@ -108,9 +110,14 @@ export const useGameStore = defineStore('game', () => {
   const ownedBarIds = computed(() => state.value.ownedBarIds);
   const startingBarChosen = computed(() => state.value.startingBarChosen);
   const sessionReady = computed(() => mode.value !== 'connecting');
+  // Bumped when the first server state replaces the local one, so screens do not announce stored items as new.
+  const connectEpoch = ref(0);
   const ownedInteriorIds = computed(() => state.value.ownedInteriorIds ?? ['velvet']);
   const inventories = computed(() => state.value.inventories);
   const inventory = computed(() => state.value.inventories[state.value.regionId]);
+  // Rows worth showing: in stock, or needed by a recipe the player knows (unusable empty rows stay hidden).
+  const usableIngredients = computed(() => usableIngredientIds(state.value.knownRecipeIds));
+  const visibleInventory = computed(() => inventory.value.filter((item) => item.amount > 0 || usableIngredients.value.has(item.ingredientId)));
   const bottleInventories = computed(() => state.value.bottleInventories);
   const bottleInventory = computed(() => state.value.bottleInventories[state.value.regionId]);
   const customers = computed(() => state.value.customers);
@@ -131,6 +138,7 @@ export const useGameStore = defineStore('game', () => {
   const cosmeticCopies = computed(() => state.value.cosmeticCopies ?? {});
   const cosmeticRouletteAvailable = computed(() => state.value.cosmeticRouletteKey !== today.value);
   const cosmeticRouletteResult = computed(() => state.value.cosmeticRouletteResult);
+  const loot = computed(() => state.value.loot);
   const cosmeticGiftLog = computed(() => state.value.cosmeticGiftLog ?? []);
 
   // Decor edits (Design screen) go through a validated action; the proxy keeps `game.decor.wall = 'x'` working.
@@ -185,7 +193,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: mode.value !== 'online' });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson','spinCosmeticRoulette','giveAshtray','cleanAshtrays','pitchStart','pitchAsk','pitchCancel','hireStaff','upgradeStaff','startTraining','giveWater','callTaxi','askToLeave','situationChoice','reportIssue','discardStock']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson', 'spinCosmeticRoulette', 'giveAshtray', 'cleanAshtrays', 'pitchStart', 'pitchAsk', 'pitchCancel', 'hireStaff', 'upgradeStaff', 'startTraining', 'giveWater', 'callTaxi', 'askToLeave', 'situationChoice', 'reportIssue', 'discardStock', 'openBox', 'pickReward', 'drawStyle', 'prestige', 'claimLeaderboardReward']);
 
   function saveOffline() {
     if (mode.value === 'online') return;
@@ -290,6 +298,7 @@ export const useGameStore = defineStore('game', () => {
       starterPackAvailable.value = session.starterPackAvailable !== false;
       adoptServerState(session.state, session.serverTime, session.state.message);
       if (session.received?.length) showRewards('Gifts from friends', session.received.map((text) => ({ kind: 'gift', text })));
+      connectEpoch.value += 1;
       resetMix();
       void loadFriends();
     } catch {
@@ -654,9 +663,9 @@ export const useGameStore = defineStore('game', () => {
 
   void connect();
 
+  const act = (action: GameAction) => dispatch(action);
   return {
-    mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen,
-    economy, xpProgress, guestPriceFactor, nowMs,
+    mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, act, visibleInventory, connectEpoch,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, sessionReady, ownedInteriorIds, barBackground, barInteriorStyle,

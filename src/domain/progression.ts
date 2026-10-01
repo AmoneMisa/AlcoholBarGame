@@ -7,12 +7,13 @@ import type { Region, RegionId } from './types';
 
 // ---- Levels ----
 export const MAX_LEVEL = 50;
-// XP needed to go from `level` to the next one: 60, 80, 100, …
-const stepFor = (level: number) => 60 + (level - 1) * 20;
+// XP needed to go from `level` to the next one: 60, 130, 200, … The cap (level 50) takes about 700 served orders.
+const STEP_GROWTH = 70;
+const stepFor = (level: number) => 60 + (level - 1) * STEP_GROWTH;
 // Total XP at which a level starts (level 1 starts at 0 XP).
 export function xpForLevel(level: number) {
   const steps = Math.max(0, Math.min(MAX_LEVEL, level) - 1);
-  return 60 * steps + 10 * steps * (steps - 1);
+  return 60 * steps + (STEP_GROWTH / 2) * steps * (steps - 1);
 }
 export function levelFor(xp: number) {
   let level = 1;

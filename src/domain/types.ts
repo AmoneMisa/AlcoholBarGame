@@ -87,6 +87,8 @@ export interface Customer {
   training?: boolean;
   // Feelings, liking, drunkenness, needs and story: see social/model.ts. Missing on guests saved before it existed.
   social?: import('./social/model').GuestSocial;
+  // A guest who came for the bar's own signature cocktail (see domain/signature.ts).
+  signature?: import('./signature').SignatureSnapshot;
 }
 
 export interface AlcoholProduct {

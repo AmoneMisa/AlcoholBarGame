@@ -403,3 +403,162 @@ test('Every cocktail name can be said to a guest without being "corrected" into 
     assert.ok(result.ok && result.corrected === sentence, `"${sentence}" became "${result.corrected}"`);
   }
 });
+
+test('Loot actions are audited, replayed request ids never charge twice, and concurrent draws cannot overspend', async () => {
+  const { repository, service } = makeService(() => Date.UTC(2026, 8, 30));
+  const who = identity(801);
+  const session = await service.session(who);
+  const row = repository.states.get(session.player.id);
+  row.state.crystals = 60; // enough for one 50-crystal draw only
+  row.state.loot.boxes = { bronze: 2 };
+  repository.states.set(session.player.id, row);
+
+  // A replayed request returns the stored answer instead of acting twice.
+  const id = requestId();
+  const first = await act(service, { type: 'openBox', box: 'bronze' }, id, who);
+  const replay = await act(service, { type: 'openBox', box: 'bronze' }, id, who);
+  assert.equal(first.ok, true);
+  assert.deepEqual(replay, first);
+  assert.equal(repository.states.get(session.player.id).state.loot.boxes.bronze, 1);
+
+  // Two simultaneous draws with money for one: exactly one succeeds.
+  const results = await Promise.all([
+    act(service, { type: 'drawStyle', count: 1 }, requestId(), who),
+    act(service, { type: 'drawStyle', count: 1 }, requestId(), who)
+  ]);
+  assert.equal(results.filter((item) => item.ok).length, 1);
+  assert.equal(repository.states.get(session.player.id).state.crystals, 10);
+
+  const draws = repository.lootLedger.filter((entry) => entry.action === 'drawStyle');
+  assert.equal(draws.length, 1);
+  assert.equal(draws[0].detail.results.length, 1);
+  assert.ok(repository.lootLedger.some((entry) => entry.action === 'openBox'));
+  assert.equal(repository.crystalLedger.filter((entry) => entry.action === 'drawStyle').reduce((sum, entry) => sum + entry.delta, 0), -50);
+});
+
+test('Friends can gift consumables and skin shards; limits, ownership and friendship are enforced', async () => {
+  const { repository, service } = makeService(() => Date.UTC(2026, 8, 30, 12));
+  const aId = identity(901), bId = identity(902), strangerId = identity(903);
+  const a = await service.session(aId); const b = await service.session(bId); await service.session(strangerId);
+  const row = repository.states.get(a.player.id);
+  row.state.loot.consumables = { 'golden-ice': 1 };
+  row.state.loot.skinShards = 12;
+  repository.states.set(a.player.id, row);
+  const addFriendResult = await service.addFriend(aId, b.player.friendCode);
+  assert.ok(addFriendResult.status < 400);
+  await service.answerFriend(bId, a.player.friendCode, true);
+  await service.visitFriend(aId, b.player.friendCode);
+
+  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'consumable', id: 'courier' })).body.ok, false, 'not owned');
+  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'skin-shards', amount: 7 })).body.ok, false, 'invalid amount');
+  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'skin-shards', amount: 20 })).body.ok, false, 'not enough shards');
+  const sent = await service.sendGift(aId, b.player.friendCode, { kind: 'consumable', id: 'golden-ice' });
+  assert.equal(sent.body.ok, true);
+  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'skin-shards', amount: 10 })).body.ok, true);
+  const received = await service.session(bId);
+  assert.equal(received.state.loot.consumables['golden-ice'], 1);
+  assert.equal(received.state.loot.skinShards, 10);
+  const after = repository.states.get(a.player.id).state.loot;
+  assert.equal(after.consumables['golden-ice'], undefined);
+  assert.equal(after.skinShards, 2);
+  assert.equal((await service.sendGift(strangerId, b.player.friendCode, { kind: 'skin-shards', amount: 5 })).body.ok, false, 'strangers cannot gift');
+});
+
+test('Weekly leaderboard: ranks by XP earned this week, shows bar names only, and pays last week\'s reward once from the server rank', async () => {
+  const { weekOf, WEEK_MS } = await import('../src/domain/quests.ts');
+  const { dailyLessonsFor } = await import('../src/domain/dailyLessons.ts');
+  const { calendarDate } = await import('../src/domain/economy.ts');
+  let clock = Date.UTC(2026, 8, 30, 12);
+  const { repository, service } = makeService(() => clock);
+  const a = identity(1001), b = identity(1002), c = identity(1003);
+  const sa = await service.session(a), sb = await service.session(b), sc = await service.session(c);
+  const lessons = dailyLessonsFor(calendarDate(new Date(clock)));
+  for (const [who, count] of [[a, 3], [b, 2], [c, 1]]) for (const lesson of lessons.slice(0, count)) {
+    assert.equal((await act(service, { type: 'completeDailyLesson', lessonId: lesson.id, answer: lesson.answer }, requestId(), who)).ok, true);
+  }
+  const week = weekOf(clock);
+  let board = await service.leaderboard(a);
+  assert.deepEqual(board.top.map((row) => row.me), [true, false, false]);
+  assert.ok(board.top[0].score > board.top[1].score && board.top[1].score > board.top[2].score);
+  assert.equal(board.me.rank, 1);
+  assert.equal(board.top[0].label, repository.states.get(sa.player.id).state.bars['new-york'].name);
+  assert.doesNotMatch(JSON.stringify(board), /Player 100/, 'account names are never exposed');
+  assert.equal((await service.leaderboard(c)).me.rank, 3);
+
+  // Set known final scores for the week, then move to the next week.
+  await repository.transaction(async (tx) => {
+    await tx.setWeeklyScore(Number(sa.player.id), week, { score: 500, label: 'Bar A', level: 5 });
+    await tx.setWeeklyScore(Number(sb.player.id), week, { score: 400, label: 'Bar B', level: 5 });
+    await tx.setWeeklyScore(Number(sc.player.id), week, { score: 100, label: 'Bar C', level: 5 });
+  });
+  clock += WEEK_MS;
+  board = await service.leaderboard(a);
+  assert.equal(board.top.length, 0, 'a new week starts empty');
+  assert.equal(board.previous.rank, 1);
+  assert.equal(board.previous.claimable, true);
+  assert.equal(board.previous.tier, 'Champion');
+
+  // A client cannot dictate its rank.
+  const forged = await service.act(b, { requestId: requestId(), action: { type: 'claimLeaderboardReward', standing: { week: week, rank: 1, size: 1, score: 9999 } } });
+  assert.equal(forged.body.ok, true);
+  assert.equal(repository.states.get(sb.player.id).state.loot.boxes.gold ?? 0, 0, 'rank 2 gets podium rewards, not champion');
+  assert.equal(repository.states.get(sb.player.id).state.loot.boxes.silver, 1);
+  const crystalsB = repository.states.get(sb.player.id).state.crystals;
+  assert.ok(crystalsB >= 30 && crystalsB < 60, 'podium crystals (plus lesson crystals), not the champion 60');
+
+  const first = await act(service, { type: 'claimLeaderboardReward' }, requestId(), a);
+  assert.equal(first.ok, true);
+  const stateA = repository.states.get(sa.player.id).state;
+  assert.equal(stateA.loot.boxes.choice, 1);
+  assert.equal(stateA.loot.boxes.gold, 1);
+  assert.ok(stateA.crystals >= 60);
+  assert.equal((await act(service, { type: 'claimLeaderboardReward' }, requestId(), a)).ok, false, 'claimed once');
+  assert.equal((await act(service, { type: 'claimLeaderboardReward' }, requestId(), c)).ok, false, 'too low a score');
+  assert.equal((await service.leaderboard(a)).previous.claimable, false);
+  assert.ok(repository.lootLedger.some((entry) => entry.action === 'claimLeaderboardReward'));
+
+  // Two weeks later last week is empty for everyone: nothing to claim.
+  clock += WEEK_MS;
+  assert.equal((await act(service, { type: 'claimLeaderboardReward' }, requestId(), a)).ok, false);
+});
+
+test('Friends-only leaderboard lists me and accepted friends (even unscored), never strangers or pending requests', async () => {
+  const { weekOf } = await import('../src/domain/quests.ts');
+  const clock = Date.UTC(2026, 8, 30, 12);
+  const { repository, service } = makeService(() => clock);
+  const me = identity(1101), friend = identity(1102), quiet = identity(1103), stranger = identity(1104), pending = identity(1105);
+  const sMe = await service.session(me), sFriend = await service.session(friend), sQuiet = await service.session(quiet), sStranger = await service.session(stranger), sPending = await service.session(pending);
+  for (const other of [friend, quiet]) {
+    const target = other === friend ? sFriend : sQuiet;
+    assert.ok((await service.addFriend(me, target.player.friendCode)).status < 400);
+    await service.answerFriend(other, sMe.player.friendCode, true);
+  }
+  await service.addFriend(me, sPending.player.friendCode); // never answered
+  const week = weekOf(clock);
+  await repository.transaction(async (tx) => {
+    await tx.setWeeklyScore(Number(sMe.player.id), week, { score: 200, label: 'My Bar', level: 4 });
+    await tx.setWeeklyScore(Number(sFriend.player.id), week, { score: 900, label: 'Friend Bar', level: 9 });
+    await tx.setWeeklyScore(Number(sStranger.player.id), week, { score: 5000, label: 'Stranger Bar', level: 30 });
+    await tx.setWeeklyScore(Number(sPending.player.id), week, { score: 4000, label: 'Pending Bar', level: 30 });
+  });
+  const global = await service.leaderboard(me);
+  assert.equal(global.scope, 'global');
+  assert.equal(global.top[0].label, 'Stranger Bar');
+
+  const board = await service.leaderboard(me, 'friends');
+  assert.equal(board.scope, 'friends');
+  assert.deepEqual(board.top.map((row) => row.rank), [1, 2, 3]);
+  assert.equal(board.top[0].score, 900, 'the friend leads');
+  assert.equal(board.top[0].label, 'Player 1102', 'friends show their own names');
+  assert.equal(board.top[1].me, true);
+  assert.equal(board.top[2].score, 0, 'an unscored friend is still listed, last');
+  assert.deepEqual(board.me, { week, rank: 2, size: 3, score: 200 });
+  assert.doesNotMatch(JSON.stringify(board), /Stranger|Pending/);
+
+  // A player with no friends sees only themselves.
+  const alone = await service.leaderboard(stranger, 'friends');
+  assert.equal(alone.top.length, 1);
+  assert.equal(alone.top[0].me, true);
+  // Unknown scopes fall back to the global board.
+  assert.equal((await service.leaderboard(me, 'bogus')).scope, 'global');
+});

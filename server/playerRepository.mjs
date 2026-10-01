@@ -56,6 +56,29 @@ function pgTx(client) {
     async addLedger(playerId, entry) {
       await client.query('INSERT INTO coin_ledger (player_id, request_id, action, delta, balance) VALUES ($1, $2, $3, $4, $5)', [playerId, entry.requestId, entry.action, entry.delta, entry.balance]);
     },
+    async setWeeklyScore(playerId, week, entry) {
+      await client.query(`INSERT INTO weekly_scores (week, player_id, score, label, level) VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT (week, player_id) DO UPDATE SET score = GREATEST(weekly_scores.score, EXCLUDED.score), label = EXCLUDED.label, level = EXCLUDED.level,
+          updated_at = CASE WHEN EXCLUDED.score > weekly_scores.score THEN now() ELSE weekly_scores.updated_at END`, [week, playerId, entry.score, entry.label, entry.level]);
+    },
+    async topWeekly(week, limit) {
+      const { rows } = await client.query('SELECT player_id, score, label, level FROM weekly_scores WHERE week = $1 ORDER BY score DESC, updated_at ASC, player_id ASC LIMIT $2', [week, limit]);
+      return rows.map((row, index) => ({ playerId: Number(row.player_id), rank: index + 1, score: row.score, label: row.label, level: row.level }));
+    },
+    async weeklyFor(week, playerIds) {
+      const { rows } = await client.query('SELECT player_id, score, label, level FROM weekly_scores WHERE week = $1 AND player_id = ANY($2::bigint[]) ORDER BY score DESC, updated_at ASC, player_id ASC', [week, playerIds]);
+      return rows.map((row) => ({ playerId: Number(row.player_id), score: row.score, label: row.label, level: row.level }));
+    },
+    async weeklyStanding(week, playerId) {
+      const { rows: [row] } = await client.query(`SELECT s.score,
+          (SELECT COUNT(*) FROM weekly_scores o WHERE o.week = s.week AND (o.score > s.score OR (o.score = s.score AND (o.updated_at < s.updated_at OR (o.updated_at = s.updated_at AND o.player_id < s.player_id))))) + 1 AS rank,
+          (SELECT COUNT(*) FROM weekly_scores o WHERE o.week = s.week) AS size
+        FROM weekly_scores s WHERE s.week = $1 AND s.player_id = $2`, [week, playerId]);
+      return row ? { week, rank: Number(row.rank), size: Number(row.size), score: row.score } : null;
+    },
+    async addLootLedger(playerId, entry) {
+      await client.query('INSERT INTO loot_ledger (player_id, request_id, action, message, detail) VALUES ($1, $2, $3, $4, $5::jsonb)', [playerId, entry.requestId, entry.action, entry.message, JSON.stringify(entry.detail ?? {})]);
+    },
     async addCrystalLedger(playerId, entry) {
       await client.query('INSERT INTO crystal_ledger (player_id, request_id, action, delta, balance) VALUES ($1, $2, $3, $4, $5)', [playerId, entry.requestId, entry.action, entry.delta, entry.balance]);
     },
@@ -126,6 +149,10 @@ export function createMemoryRepository() {
   let nextGiftId = 1;
   const crystalLedger = [];
   const starPurchases = new Map();
+  const lootLedger = [];
+  const weekly = new Map();   // `${week}:${playerId}` → { week, playerId, score, label, level, order }
+  let weeklyOrder = 0;
+  const weeklyRows = (week) => [...weekly.values()].filter((row) => row.week === week).sort((a, b) => b.score - a.score || a.order - b.order);
   let queue = Promise.resolve();
   let nextId = 1;
   const tx = {
@@ -146,6 +173,20 @@ export function createMemoryRepository() {
       starPurchases.set(purchase.chargeId, { playerId, ...purchase });
       return true;
     },
+    async setWeeklyScore(playerId, week, entry) {
+      const key = `${week}:${playerId}`;
+      const old = weekly.get(key);
+      if (old && entry.score <= old.score) { old.label = entry.label; old.level = entry.level; return; }
+      weekly.set(key, { week, playerId, score: entry.score, label: entry.label, level: entry.level, order: ++weeklyOrder });
+    },
+    async topWeekly(week, limit) { return weeklyRows(week).slice(0, limit).map((row, index) => ({ playerId: row.playerId, rank: index + 1, score: row.score, label: row.label, level: row.level })); },
+    async weeklyFor(week, playerIds) { return weeklyRows(week).filter((row) => playerIds.includes(row.playerId)).map((row) => ({ playerId: row.playerId, score: row.score, label: row.label, level: row.level })); },
+    async weeklyStanding(week, playerId) {
+      const rows = weeklyRows(week);
+      const index = rows.findIndex((row) => row.playerId === playerId);
+      return index < 0 ? null : { week, rank: index + 1, size: rows.length, score: rows[index].score };
+    },
+    async addLootLedger(playerId, entry) { lootLedger.push({ playerId, ...structuredClone(entry) }); },
     async getPlayer(id) {
       for (const player of players.values()) if (player.id === id) return { id: player.id, name: player.name };
       return null;
@@ -179,6 +220,8 @@ export function createMemoryRepository() {
     ledger,
     crystalLedger,
     starPurchases,
+    lootLedger,
+    weekly,
     // Stored (full, secret) states by player id — for tests.
     states,
     // Transactions run one at a time, like row locks for a single player.

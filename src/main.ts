@@ -1,12 +1,14 @@
-import { createApp } from 'vue';
+import { createApp, type Component } from 'vue';
 import { createPinia } from 'pinia';
 import { initTelegram } from './telegram/webapp';
 import { hydrateCocktailCatalog } from './domain/recipeApi';
 
 // The bundled catalogue is identical to the database seed, so a slow or failing API must not delay the game:
 // wait briefly for the fresh list, then start with what we have.
-if (new URLSearchParams(window.location.search).has('studio')) {
-  const { default: CharacterStudio } = await import('./components/characters/CharacterStudio.vue');
+// The character studio (?studio) is an optional tool: a build without its file still works.
+const studio = Object.values(import.meta.glob('./components/characters/CharacterStudio.vue'))[0] as (() => Promise<{ default: Component }>) | undefined;
+if (studio && new URLSearchParams(window.location.search).has('studio')) {
+  const { default: CharacterStudio } = await studio();
   createApp(CharacterStudio).mount('#app');
 } else {
   await Promise.all([

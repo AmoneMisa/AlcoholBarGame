@@ -1,6 +1,7 @@
 import { INGREDIENTS, REGIONS, SUPPLIERS } from '../domain/catalog';
 import { coins, quotePurchase } from '../domain/economy';
 import { marketFor } from '../domain/progression';
+import { deliveryFactorFor, orderDiscount, roomFor } from './loot';
 import type { RegionId } from '../domain/types';
 import type { PlayerState } from './state';
 import { supplierInfoReply } from './tradeTalk';
@@ -274,15 +275,23 @@ export function acceptDeal(state: PlayerState, now: number, dayMs: number) {
   if (!negotiation) throw new TradeError('There is no deal to accept.');
   const quote = negotiatedQuote(state, negotiation, now);
   if (!quote.base.lines.length) throw new TradeError('The order is empty.');
-  if (state.money < quote.total) throw new TradeError('You do not have enough money.');
-  state.money = coins(state.money - quote.total);
+  // Storeroom capacity, the fridge and the order discounts apply to negotiated orders exactly as to normal ones.
+  for (const line of quote.base.lines) {
+    const room = roomFor(state, quote.barId, line.ingredientId);
+    if (line.amount > room) throw new TradeError(`No room for ${INGREDIENTS.find((item) => item.id === line.ingredientId)!.name}: the storeroom has space for ${room} more. A better fridge raises capacity.`);
+  }
+  const discount = orderDiscount(state, now);
+  const total = discount.factor < 1 ? coins(quote.total * discount.factor) : quote.total;
+  if (state.money < total) throw new TradeError('You do not have enough money.');
+  state.money = coins(state.money - total);
+  if (discount.voucher) delete state.loot.armed['voucher'];
   state.deliveryOrders.push({
-    id: crypto.randomUUID(), supplier: quote.supplier.name, barId: quote.barId, dueAt: now + quote.supplier.deliveryDays * dayMs,
-    items: quote.base.lines.map((line) => ({ ingredientId: line.ingredientId, amount: line.amount })), total: quote.total
+    id: crypto.randomUUID(), supplier: quote.supplier.name, barId: quote.barId, dueAt: now + Math.round(quote.supplier.deliveryDays * dayMs * deliveryFactorFor(state, quote.barId)),
+    items: quote.base.lines.map((line) => ({ ingredientId: line.ingredientId, amount: line.amount })), total
   });
   state.lastNegotiatedAt = { ...(state.lastNegotiatedAt ?? {}), [negotiation.supplierId]: now };
   const bar = REGIONS.find((item) => item.id === quote.barId)!.name;
-  const note = `Negotiated ${quote.base.packs} packs from ${quote.supplier.name}: ${quote.total.toFixed(2)} coins (${Math.round(quote.discountRate * 100)}% off${quote.surcharge ? `, +${Math.round(quote.surcharge * 100)}% surcharge` : ''}), delivery to ${bar}.`;
+  const note = `Negotiated ${quote.base.packs} packs from ${quote.supplier.name}: ${total.toFixed(2)} coins (${Math.round(quote.discountRate * 100)}% off${quote.surcharge ? `, +${Math.round(quote.surcharge * 100)}% surcharge` : ''}), delivery to ${bar}.`;
   state.tradeLog = [note, ...state.tradeLog].slice(0, 40);
   state.message = note;
   state.negotiation = undefined;

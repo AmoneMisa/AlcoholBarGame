@@ -7,6 +7,7 @@ import BarScene from './components/game/BarScene.vue';
 import TopHud from './components/game/TopHud.vue';
 import GuideSheet from './components/knowledge/GuideSheet.vue';
 import UiIcon from './components/ui/UiIcon.vue';
+const WorkshopPage = defineAsyncComponent(() => import('./components/workshop/WorkshopPage.vue'));
 import NotificationToasts from './components/ui/NotificationToasts.vue';
 import RewardPopup from './components/ui/RewardPopup.vue';
 import DailyRewardPopup from './components/ui/DailyRewardPopup.vue';
@@ -37,6 +38,7 @@ const nav = [
   { id: 'design', label: 'Design', mark: 'brush' },
   { id: 'regions', label: 'Cities', mark: 'pin' },
   { id: 'advisor', label: 'Pairings', mark: 'pair' },
+  { id: 'workshop', label: 'Workshop', mark: 'stock' },
   { id: 'friends', label: 'Friends', mark: 'friends' }
 ];
 
@@ -64,6 +66,50 @@ watch(() => game.customers.map((customer) => customer.id).join(','),(next,previo
 watch(() => game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'incoming').map((friend) => friend.code).join(','),(next,previous) => {
   if (next && next !== previous) notifications.push('friendRequest','New friend request','Open Friends to accept or decline.',`friend-request:${next}`);
 });
+// Workshop: a new box to open, and boosters that have just run out.
+import { seasonAt } from './domain/seasons';
+import { weeklyRewardNotice } from './domain/leaderboard';
+import { fetchLeaderboard } from './telegram/api';
+// Online only: when a new week has started and last week paid a reward, tell the player once.
+async function checkWeeklyReward() {
+  if (game.mode !== 'online') return;
+  try {
+    const board = await fetchLeaderboard();
+    const notice = weeklyRewardNotice(board.previous);
+    if (notice) notifications.push('leaderboard', notice.title, notice.text, notice.key);
+  } catch { /* offline or rate-limited: try again later */ }
+}
+let weeklyTimer: ReturnType<typeof setInterval>;
+onMounted(() => { weeklyTimer = setInterval(() => void checkWeeklyReward(), 30 * 60_000); });
+onUnmounted(() => clearInterval(weeklyTimer));
+watch(() => game.sessionReady, (ready) => { if (ready) void checkWeeklyReward(); }, { immediate: true });
+watch(() => game.sessionReady, (ready) => {
+  if (!ready) return;
+  const season = seasonAt(Date.now());
+  notifications.push('loot', `New season: ${season.name}`, 'A seasonal style banner is live in the Workshop.', `season:${season.id}`);
+}, { immediate: true });
+const boxTotal = () => Object.values(game.loot.boxes).reduce((sum, count) => sum + count, 0);
+let boxEpoch = game.connectEpoch;
+watch(boxTotal, (next, previous) => {
+  // The first server state replaces the local one: boxes that were already waiting are not "new".
+  if (game.connectEpoch !== boxEpoch) { boxEpoch = game.connectEpoch; return; }
+  if (previous !== undefined && next > previous) notifications.push('loot', 'You got a box', 'Open it in the Workshop.');
+});
+const boostNames: Record<string, string> = { 'happy-hour': 'Happy Hour', 'xp-boost': 'XP Booster', 'coin-boost': 'Coin Booster', 'tip-boost': 'Tip Booster' };
+const announcedBoosts = new Set<string>();   // in memory only: a stored key per booster would grow forever
+let boostTimer: ReturnType<typeof setInterval>;
+onMounted(() => {
+  boostTimer = setInterval(() => {
+    for (const [kind, until] of Object.entries(game.loot.boosts)) {
+      const key = `${kind}:${until}`;
+      if (until <= Date.now() && until > Date.now() - 120_000 && !announcedBoosts.has(key)) {
+        announcedBoosts.add(key);
+        notifications.push('loot', `${boostNames[kind] ?? kind} ended`, 'Use another one from the Workshop.');
+      }
+    }
+  }, 15_000);
+});
+onUnmounted(() => clearInterval(boostTimer));
 watch(() => game.message,(message,previous) => {
   if (!message || message === previous) return;
   if (/visited your bar/i.test(message)) notifications.push('friendVisit','A friend visited',message,`visit:${message}`);
@@ -94,7 +140,8 @@ function selectView(id: string) {
       </section>
       <LearningPage v-if="view === 'english'" />
       <FriendsPage v-if="view === 'friends'" />
-      <ManagementDeck v-if="managementOpened" v-show="view !== 'service' && view !== 'english' && view !== 'friends'" :active-view="managementView" />
+      <WorkshopPage v-if="view === 'workshop'" />
+      <ManagementDeck v-if="managementOpened" v-show="view !== 'service' && view !== 'english' && view !== 'friends' && view !== 'workshop'" :active-view="managementView" />
     </main>
     <ConversationPopup v-if="game.conversationCustomerId" />
     <GuideSheet />

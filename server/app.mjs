@@ -41,6 +41,8 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
     }
   });
 
+  route('/api/leaderboard', (request) => service.leaderboard(who(request), request.body?.scope === 'friends' ? 'friends' : 'global'));
+
   route('/api/friends', (request) => service.friends(who(request)));
   route('/api/friends/add', (request) => service.addFriend(who(request), request.body?.code));
   route('/api/friends/answer', (request) => service.answerFriend(who(request), request.body?.code, request.body?.accept === true));

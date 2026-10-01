@@ -19,11 +19,11 @@ test('A new bar starts at level 1 and levels follow a rising XP curve', () => {
   assert.equal(state.xp, 0);
   assert.equal(levelFor(state.xp), 1);
   assert.equal(xpForLevel(2), 60);
-  assert.equal(xpForLevel(3), 140);
+  assert.equal(xpForLevel(3), 190);
   assert.equal(levelFor(59), 1);
   assert.equal(levelFor(60), 2);
   assert.equal(levelFor(139), 2);
-  assert.deepEqual(levelProgress(100), { level: 2, into: 40, needed: 80, percent: 50 });
+  assert.deepEqual(levelProgress(125), { level: 2, into: 65, needed: 130, percent: 50 });
   for (let level = 2; level < 50; level++) assert.ok(xpForLevel(level + 1) - xpForLevel(level) > xpForLevel(level) - xpForLevel(level - 1));
 });
 

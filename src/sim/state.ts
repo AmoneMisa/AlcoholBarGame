@@ -4,11 +4,12 @@ import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
 import { CHARACTER_ART, CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { generateCustomer } from '../domain/engine';
-import { levelPerks } from '../domain/progression';
+import { MAX_LEVEL, levelFor, levelPerks, xpForLevel } from '../domain/progression';
 import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../domain/types';
 import { buildProfile, shortWish, type CustomerReply, type Fact } from '../domain/conversation/customerTalk';
 import type { BottleConversationFacts } from '../domain/conversation/bottleTalk';
 import { ensureSocial, rollSocial } from '../domain/social/generate';
+import { createLoot, normalizeLoot, type LootState } from '../domain/lootState';
 
 // The complete, serializable game state of one player. The server owns it; the client only displays it
 // (and, in offline practice mode, simulates it locally with the same rules).
@@ -27,6 +28,8 @@ const TRAINING_IDS = TRAINING_MODULES.map((module) => module.id);
 
 export interface PlayerState {
   version: 1;
+  // XP curve of this save (see migrateXpCurve); missing = the original, shallower curve.
+  xpCurve?: number;
   regionId: RegionId;
   money: number;
   crystals: number;
@@ -74,6 +77,8 @@ export interface PlayerState {
   recipeLevels?: Record<string, number>;
   recipeCopies?: Record<string, number>;
   popularity: number;
+  // Equipment, materials, consumables, boxes, style-draw pity and prestige (see sim/loot.ts).
+  loot: LootState;
   popularityBoost?: PopularityBoost;
   // Clean and dirty ashtrays: guests who smoke ask for one, and it must be cleaned after they leave.
   ashtrays?: { clean: number; dirty: number };
@@ -124,7 +129,7 @@ export function withUniqueLook(customer: Customer, others: Customer[]) {
 
 export function wishFor(customer: Customer) {
   if (customer.orderKind === 'bottle') return 'Some sealed bottles, please.';
-  if (customer.orderKind === 'serve' || customer.specialRecipeRewardId) return customer.request;
+  if (customer.orderKind === 'serve' || customer.specialRecipeRewardId || customer.signature) return customer.request;
   const recipe = RECIPES.find((item) => item.id === customer.orderRecipeId);
   return recipe ? shortWish(buildProfile(recipe)) : 'Something nice, please.';
 }
@@ -138,18 +143,32 @@ export function publicState(state: PlayerState): PlayerState {
     if (event) event.data = Object.fromEntries(Object.entries(event.data).filter(([key]) => !key.startsWith('_')));
   }
   view.customers = view.customers.map((customer) => customer.orderRevealed ? customer : {
-    ...customer, orderRecipeId: '', modifierId: undefined, bottleRequest: undefined, budget: 0,
+    ...customer, orderRecipeId: '', modifierId: undefined, bottleRequest: undefined, budget: 0, signature: undefined,
     wish: customer.wish ?? wishFor(customer), request: customer.wish ?? wishFor(customer)
   });
   return view;
 }
 
-const makeBarInventory = (barIndex: number) => STARTING_INVENTORY.map((item, ingredientIndex) => {
-  const ingredient = INGREDIENTS.find((entry) => entry.id === item.ingredientId)!;
-  const factor = .48 + ((barIndex * 3 + ingredientIndex) % 6) * .11;
-  const floor = ingredient.unit === 'ml' ? 90 : 4;
-  return { ...item, amount: Math.max(floor, Math.round(item.amount * factor)) };
-});
+// A new bar is stocked for about STARTER_SERVES orders across the starter recipes (a few levels), and no more:
+// three of the biggest single pour of each ingredient at the least, so any starter drink can be made three times.
+// Ingredients no starter recipe uses start empty and stay hidden until a recipe needs them.
+export const STARTER_SERVES = 14;
+// Demand varies with which drinks guests ask for: 60% slack on the average, and at least three of the biggest pour.
+const STARTER_SAFETY = 1.6;
+const STARTER_POURS = 3;
+export function starterStock(recipeIds: readonly string[]) {
+  const recipes = RECIPES.filter((recipe) => recipeIds.includes(recipe.id));
+  const stock = new Map<string, number>();
+  for (const item of INGREDIENTS) {
+    const parts = recipes.flatMap((recipe) => recipe.ingredients.filter((part) => part.ingredientId === item.id).map((part) => part.amount));
+    if (!parts.length) { stock.set(item.id, 0); continue; }
+    const average = parts.reduce((sum, amount) => sum + amount, 0) / recipes.length;
+    const wanted = Math.max(Math.ceil(average * STARTER_SERVES * STARTER_SAFETY), Math.max(...parts) * STARTER_POURS);
+    stock.set(item.id, item.unit === 'ml' ? Math.ceil(wanted / 5) * 5 : wanted);
+  }
+  return stock;
+}
+const makeBarInventory = (stock: ReadonlyMap<string, number>) => STARTING_INVENTORY.map((item) => ({ ...item, amount: stock.get(item.ingredientId) ?? 0 }));
 
 // A new player opens to a full row, so the bar feels alive and there is practice waiting right away.
 export const STARTER_GUESTS = 5;
@@ -168,8 +187,10 @@ export function createInitialState(now = Date.now()): PlayerState {
   }
   const firstGuest = starterGuests[0]!;
   const knownRecipeIds = RECIPES.slice(0, BASIC_RECIPE_COUNT).map((recipe) => recipe.id);
+  const starting = starterStock(knownRecipeIds);
   return {
     version: 1,
+    xpCurve: XP_CURVE_VERSION,
     regionId: 'new-york',
     money: 600,
     crystals: 0,
@@ -187,6 +208,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     knownRecipeIds,
     recipeUnlockSources: Object.fromEntries(knownRecipeIds.map((id) => [id, 'starter'])),
     popularity: 0,
+    loot: { ...createLoot(), boxes: { bronze: 1 } },
     dailyGiftClaimedKey: '',
     loginStreak: 0,
     dailyGiftResult: 'A new gift is available today.',
@@ -195,7 +217,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     learningStreak: 0,
     lastLearningDayKey: '',
     dailyLessonResult: 'Complete today’s three lessons to grow your learning streak.',
-    inventories: Object.fromEntries(REGIONS.map((region, index) => [region.id, makeBarInventory(index)])) as Record<RegionId, InventoryItem[]>,
+    inventories: Object.fromEntries(REGIONS.map((region) => [region.id, makeBarInventory(starting)])) as Record<RegionId, InventoryItem[]>,
     bottleInventories: Object.fromEntries(REGIONS.map((region, barIndex) => [region.id, ALCOHOL_PRODUCTS.map((product, productIndex) => ({
       productId: product.id, quantity: 1 + ((barIndex + productIndex * 2) % 4)
     }))])) as Record<RegionId, BottleInventoryItem[]>,
@@ -215,7 +237,23 @@ export function createInitialState(now = Date.now()): PlayerState {
 
 // JSON player snapshots are intentionally schema-light. Upgrade older snapshots in place whenever
 // they are loaded so adding a currency never invalidates an existing account.
+// The level curve was made steeper (about 700 served orders to level 50). A save on the old curve keeps its level and
+// its progress inside that level, so nobody is demoted or locked out of unlocked features.
+export const XP_CURVE_VERSION = 2;
+const oldXpForLevel = (level: number) => { const steps = Math.max(0, Math.min(MAX_LEVEL, level) - 1); return 60 * steps + 10 * steps * (steps - 1); };
+export function migrateXpCurve(state: Pick<PlayerState, 'xp' | 'xpCurve'>) {
+  if (state.xpCurve === XP_CURVE_VERSION) return;
+  state.xpCurve = XP_CURVE_VERSION;
+  if (!Number.isFinite(state.xp) || state.xp <= 0) { state.xp = 0; return; }
+  let level = 1;
+  while (level < MAX_LEVEL && state.xp >= oldXpForLevel(level + 1)) level++;
+  if (level >= MAX_LEVEL) { state.xp = xpForLevel(MAX_LEVEL); return; }
+  const progress = (state.xp - oldXpForLevel(level)) / (60 + (level - 1) * 20);
+  state.xp = Math.floor(xpForLevel(level) + progress * (xpForLevel(level + 1) - xpForLevel(level)));
+}
+
 export function normalizePlayerState(state: PlayerState) {
+  migrateXpCurve(state);
   state.crystals = Number.isFinite(state.crystals) && state.crystals >= 0 ? Math.floor(state.crystals) : 0;
   state.dailyLessonKey = typeof state.dailyLessonKey === 'string' ? state.dailyLessonKey : '';
   state.dailyLessonCompletedIds = Array.isArray(state.dailyLessonCompletedIds) ? [...new Set(state.dailyLessonCompletedIds.filter((id) => typeof id === 'string'))] : [];
@@ -225,6 +263,7 @@ export function normalizePlayerState(state: PlayerState) {
   state.tradeLog = Array.isArray(state.tradeLog)
     ? state.tradeLog.filter((entry) => entry !== 'Each city bar now keeps its own stock.').slice(0, 40)
     : [];
+  state.loot = normalizeLoot(state.loot, levelFor(state.xp));
   state.popularity = Number.isFinite(state.popularity) ? Math.max(0, Math.floor(state.popularity)) : 0;
   if (state.popularityBoost?.kind === 'no-cooldown') {
     if (!Number.isFinite(state.popularityBoost.until)) state.popularityBoost = undefined;
@@ -303,5 +342,5 @@ export function normalizePlayerState(state: PlayerState) {
   return state;
 }
 
-// Levels follow a rising XP curve (60, 80, 100… XP per level) — see domain/progression.ts.
+// Levels follow a rising XP curve (60, 130, 200… XP per level) — see domain/progression.ts.
 export { levelFor } from '../domain/progression';

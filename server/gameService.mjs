@@ -4,6 +4,8 @@ import { createInitialState, levelFor, normalizePlayerState, publicState } from 
 import { payForGift, publicBar, receiveGift } from '../src/sim/gifts';
 import { calendarDate, starCrystalPack } from '../src/domain/economy';
 import { friendCodeFor, playerIdFromCode } from './friendCode.mjs';
+import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE, describeLeaderboardReward, leaderboardReward } from '../src/domain/leaderboard';
+import { weekOf, WEEK_MS } from '../src/domain/quests';
 
 // Server-authoritative game: every request loads the player's state with a row lock, applies exactly one
 // validated action with the shared rules and the server clock, and stores the result together with a coin
@@ -34,7 +36,9 @@ async function resolveFriend(tx, player, code) {
 }
 
 export function createGameService({ repository, checkEnglish, now = () => Date.now() }) {
-  const context = () => ({ now: now(), checkEnglish, spawnCustomers: true });
+  // Loot rolls use the operating system's secure random source, never Math.random.
+  const secureRandom = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
+  const context = () => ({ now: now(), random: secureRandom, checkEnglish, spawnCustomers: true });
 
   async function session(identity) {
     return repository.transaction(async (tx) => {
@@ -67,7 +71,9 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       const next = structuredClone(state);
       let result;
       try {
-        result = applyAction(next, action, context());
+        // Last week's rank comes from the database, never from the client.
+        const standing = action.type === 'claimLeaderboardReward' ? await tx.weeklyStanding(weekOf(now()) - 1, Number(player.id)) : undefined;
+        result = applyAction(next, action, { ...context(), leaderboard: standing ?? undefined });
       } catch (error) {
         if (!(error instanceof RuleError)) throw error;
         // The action was refused; time still passes, but nothing the client asked for happens.
@@ -78,11 +84,54 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
         return { status: 409, body: refused };
       }
       await tx.saveState(player.id, next, (record?.version ?? 0) + 1);
+      // Only written when the week's score actually moved (most actions earn no XP).
+      if (result.weekly && result.weekly.score > 0 && (result.weekly.score !== state.loot.weekly.score || result.weekly.week !== state.loot.weekly.week)) await tx.setWeeklyScore(Number(player.id), result.weekly.week, result.weekly);
       if (result.moneyDelta !== 0) await tx.addLedger(player.id, { requestId, action: action.type, delta: result.moneyDelta, balance: next.money });
       if (result.crystalDelta !== 0) await tx.addCrystalLedger(player.id, { requestId, action: action.type, delta: result.crystalDelta, balance: next.crystals });
+      if (result.audit) await tx.addLootLedger(player.id, { requestId, ...result.audit });
       const response = { ok: true, message: next.message, state: publicState(next), serverTime: now() };
       await tx.saveRequest(player.id, requestId, response);
       return { status: 200, body: response };
+    });
+  }
+
+  // The weekly leaderboard: the top bars by XP earned this week, the player's own rank, and last week's claimable reward.
+  async function leaderboard(identity, scope = 'global') {
+    return repository.transaction(async (tx) => {
+      const player = await tx.findOrCreatePlayer(identity);
+      const week = weekOf(now());
+      const ownId = Number(player.id);
+      // Read-only: the state is read once, without the row lock that actions take.
+      const own = normalizePlayerState((await tx.readState(player.id)) ?? createInitialState(now()));
+      let top;
+      let mine;
+      if (scope === 'friends') {
+        // Friends only: accepted friends plus me, including friends with no score yet. Names are the friends' own names.
+        const friendIds = new Map();
+        for (const row of await tx.listFriendships(player.id)) {
+          if (row.status !== 'accepted') continue;
+          const otherId = Number(row.playerId) === ownId ? Number(row.friendId) : Number(row.playerId);
+          friendIds.set(otherId, own.friendLabels?.[String(otherId)] || row.name);
+        }
+        const scored = new Map((await tx.weeklyFor(week, [ownId, ...friendIds.keys()])).map((row) => [row.playerId, row]));
+        const entries = [ownId, ...friendIds.keys()].map((id) => ({ playerId: id, score: scored.get(id)?.score ?? 0, label: id === ownId ? (scored.get(id)?.label ?? own.bars[own.regionId].name) : (friendIds.get(id) || scored.get(id)?.label || 'Friend'), level: scored.get(id)?.level ?? null, order: [...scored.keys()].indexOf(id) }));
+        // Stable order: higher score first; equal scores keep the database order (who got there first); unscored last.
+        entries.sort((a, b) => b.score - a.score || (a.order < 0) - (b.order < 0) || a.order - b.order || a.playerId - b.playerId);
+        top = entries.slice(0, 50).map((row, index) => ({ playerId: row.playerId, rank: index + 1, score: row.score, label: row.label, level: row.level }));
+        const at = entries.findIndex((row) => row.playerId === ownId);
+        mine = at < 0 ? null : { week, rank: at + 1, size: entries.length, score: entries[at].score };
+      } else {
+        top = await tx.topWeekly(week, LEADERBOARD_SIZE);
+        mine = await tx.weeklyStanding(week, ownId);
+      }
+      const previous = await tx.weeklyStanding(week - 1, Number(player.id));
+      const claimed = own.loot.leaderboardClaimed;
+      const reward = previous ? leaderboardReward(previous.rank, previous.score) : undefined;
+      return {
+        ok: true, scope: scope === 'friends' ? 'friends' : 'global', week, endsAt: (week + 1) * WEEK_MS, minScore: MIN_WEEKLY_SCORE,
+        top: top.map((row) => ({ rank: row.rank, label: row.label, level: row.level, score: row.score, me: row.playerId === Number(player.id) })),
+        me: mine, previous: previous ? { ...previous, tier: reward?.tier ?? null, reward: reward ? describeLeaderboardReward(reward) : null, claimable: !!reward && claimed < previous.week } : null
+      };
     });
   }
 
@@ -204,7 +253,7 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
       if (state.friendVisits[String(targetId)] !== calendarDate(new Date(now()))) return { status: 403, body: { ok: false, error: 'Visit this friend’s bar first — gifts are handed over during a visit.' } };
       try {
-        const paid = payForGift(state, gift);
+        const paid = payForGift(state, gift, now());
         await tx.addGift({ fromId: Number(player.id), toId: targetId, payload: paid });
         state.message = `Gift sent to ${target.name}.`;
       } catch (error) {
@@ -284,5 +333,5 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
   // Request ids only need to survive long enough for a retry; older rows are pure bloat.
   const pruneRequests = (olderThanMs = 7 * 24 * 60 * 60 * 1000) => repository.transaction((tx) => tx.pruneRequests(now() - olderThanMs));
 
-  return { pruneRequests, session, act, friends, addFriend, answerFriend, removeFriend, labelFriend, visitFriend, sendGift, claimGifts, startStarPurchase, approveStarCheckout, fulfilStarPayment };
+  return { pruneRequests, session, act, leaderboard, friends, addFriend, answerFriend, removeFriend, labelFriend, visitFriend, sendGift, claimGifts, startStarPurchase, approveStarCheckout, fulfilStarPayment };
 }

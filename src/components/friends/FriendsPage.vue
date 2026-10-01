@@ -3,6 +3,8 @@ import PanelHeading from '../ui/PanelHeading.vue';
 import { computed, nextTick, onMounted, ref } from 'vue';
 import { RECIPES } from '../../domain/catalog';
 import { INTERIORS } from '../../data/cosmetics/bars';
+import { CONSUMABLES } from '../../domain/loot';
+import { SHARD_GIFT_AMOUNTS } from '../../sim/gifts';
 import { useGameStore } from '../../stores/game';
 import { NOTIFICATION_EVENTS, useNotificationsStore } from '../../stores/notifications';
 import CharacterModel from '../characters/CharacterModel.vue';
@@ -22,6 +24,8 @@ const outgoing = computed(() => game.friends.filter((friend) => friend.status ==
 // Gifts are spare copies from the player's own inventory: recipe cards and duplicate styles.
 const recipeCards = computed(() => RECIPES.map((recipe) => ({ recipe, quantity: game.recipeCopies[recipe.id] ?? 0 })).filter((item) => item.quantity > 0));
 const styleItems = computed(() => game.cosmetics.map((cosmetic) => ({ cosmetic, quantity: game.cosmeticCopies[cosmetic.id] ?? 0 })).filter((item) => item.quantity > 0));
+const itemGifts = computed(() => CONSUMABLES.map((item) => ({ id: item.id, name: item.name, quantity: game.loot.consumables[item.id] ?? 0 })).filter((item) => item.quantity > 0));
+const shardGifts = SHARD_GIFT_AMOUNTS;
 const visit = computed(() => game.visitedFriend);
 const visitBar = computed(() => visit.value?.bar as Record<string, string> | undefined);
 const visitBackground = computed(() => INTERIORS.find((item) => item.id === visitBar.value?.interior)?.asset ?? INTERIORS[0]!.asset);
@@ -152,7 +156,9 @@ onMounted(() => { void game.loadFriends(); });
         <header><UiIcon name="gift" /><div><small>GIFT FROM YOUR INVENTORY</small><p>Only spare copies can be given away — you keep everything else.</p></div></header>
         <article v-for="item in recipeCards" :key="item.recipe.id"><span><b>{{ item.recipe.name }}</b><small>Recipe card · you have {{ item.quantity }}</small></span><button class="gold" type="button" @click="gift({ kind: 'recipe-copy', recipeId: item.recipe.id })">Give</button></article>
         <article v-for="item in styleItems" :key="item.cosmetic.id"><span><b>{{ item.cosmetic.label }}</b><small>Style · you have {{ item.quantity }}</small></span><button class="gold" type="button" @click="gift({ kind: 'cosmetic-copy', cosmeticId: item.cosmetic.id })">Give</button></article>
-        <p v-if="!recipeCards.length && !styleItems.length" class="empty">You have no spare cards or styles yet. Duplicates from VIP guests, lessons and the daily style draw show up here.</p>
+        <article v-for="item in itemGifts" :key="item.id"><span><b>{{ item.name }}</b><small>Workshop item · you have {{ item.quantity }}</small></span><button class="gold" type="button" @click="gift({ kind: 'consumable', id: item.id })">Give</button></article>
+        <article v-for="amount in shardGifts" :key="amount"><span><b>{{ amount }} skin shards</b><small>You have {{ game.loot.skinShards }}</small></span><button class="gold" type="button" :disabled="game.loot.skinShards < amount" @click="gift({ kind: 'skin-shards', amount })">Give</button></article>
+        <p v-if="!recipeCards.length && !styleItems.length && !itemGifts.length" class="empty">You have no spare cards or styles yet. Duplicates from VIP guests, lessons and the daily style draw show up here.</p>
       </div>
     </section>
 
