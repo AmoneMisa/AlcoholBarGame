@@ -63,6 +63,20 @@ export interface GuestSocial {
   ate?: string[];
   /** The guest has already steered the chat back to the order once. */
   nudged?: boolean;
+  /** The story the guest told, and how deep the bartender has asked (0 = just told, 3 = everything). */
+  thread?: { topic: TalkTopic; kind: 'good' | 'bad'; depth: number };
+  /** The guest asked the bartender a question and waits for the answer. */
+  asked?: boolean;
+  /** Something the guest said on their own, shown in their bubble for a while. */
+  murmur?: { text: string; until: number };
+  /** When the guest next says something on their own, and how many times they have. */
+  chatterAt?: number;
+  chatterCount?: number;
+  /** The last thing said on their own, and whether they already offered to tell more of their story. */
+  lastChatter?: string;
+  offeredStory?: boolean;
+  /** When the bartender last talked to this guest. */
+  spokenAt?: number;
   /** Drinks counted towards a promotion tonight. */
   promo?: { drinks: number; wine: number };
   /** An offer in progress: another drink or some food, and how the dialogue has changed the chance. */

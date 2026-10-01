@@ -205,11 +205,11 @@ export function matchChoice(state: PlayerState, guest: Customer, text: string): 
 }
 
 const SERVICES = [
-  { said: /(call|phone|dial|ring).*(103|ambulance|doctor|paramedics)|103/, reply: /(103|ambulance)/ },
-  { said: /(call|phone|dial|ring).*(102|police|policeman)|102/, reply: /(102|police)/ },
-  { said: /(call|phone|dial|ring).*(101|fire brigade|firefighters)|101/, reply: /(101|fire brigade|fire extinguisher)/ },
-  { said: /(call|phone|dial|ring).*(104|gas)|104/, reply: /(104|gas)/ },
-  { said: /(call|phone|dial|ring).*112|112/, reply: /(112)/ }
+  { said: /\b(call|phone|dial|ring)\b.*\b(103|ambulance|doctor|paramedics)\b|\b103\b/, reply: /\b(103|ambulance)\b/ },
+  { said: /\b(call|phone|dial|ring)\b.*\b(102|police|policeman)\b|\b102\b/, reply: /\b(102|police)\b/ },
+  { said: /\b(call|phone|dial|ring)\b.*\b(101|fire brigade|firefighters)\b|\b101\b/, reply: /\b(101|fire brigade|fire extinguisher)\b/ },
+  { said: /\b(call|phone|dial|ring)\b.*\b(104|gas)\b|\b104\b/, reply: /\b(104|gas)\b/ },
+  { said: /\b(call|phone|dial|ring)\b.*\b112\b|\b112\b/, reply: /\b(112)\b/ }
 ];
 
 export function resolveIgnored(state: PlayerState, guest: Customer, now: number, random: () => number): Resolution | undefined {

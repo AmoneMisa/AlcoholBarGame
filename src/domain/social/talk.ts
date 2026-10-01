@@ -2,6 +2,7 @@ import type { Customer } from '../types';
 import type { CustomerReply } from '../conversation/customerTalk';
 import { actsIn, isLeaveAct, type Act } from './acts';
 import { localize, originOf, spellFor } from './origin';
+import { PERSONA_ACTS, personaAnswer, reactToAnswer, threadAnswer, type PersonaAct, type ThreadAct } from './alive';
 import { drunkStage, type DrunkStage, type Emotion, type GuestSocial, type TalkTopic } from './model';
 
 // How guests talk like people. Every line exists in several variants and the guest picks one by a stable hash, so a
@@ -18,6 +19,10 @@ export interface SocialReply {
   told?: boolean;
   /** Which small-talk topic this answered, so it is not repeated. */
   chatted?: string;
+  /** The guest has just told a story the bartender can ask more about. */
+  thread?: { topic: TalkTopic; kind: 'good' | 'bad' };
+  /** The guest asked the bartender something and waits for the answer. */
+  asked?: boolean;
   /** Acts that need a roll or an effect from the rules. */
   intent?: 'leave-gentle' | 'leave-firm' | 'leave-rude' | 'refuse';
 }
@@ -187,7 +192,6 @@ const COMPLIMENT: { good: string[]; bad: string[] } = {
   good: ['Ha, thank you! You made my night.', 'Oh, thank you! You are very kind.', 'You are sweet. Thank you!', 'Stop it, you are making me blush!', 'That is really nice to hear. Thanks!'],
   bad: ['Flattery… but thanks. It did make me smile a little.', 'You are sweet. OK, that helped a little.', 'Hmm. Thank you. I needed that.']
 };
-const JOBS = ['I am a nurse.', 'I work in a bank.', 'I am a teacher.', 'I drive a delivery van.', 'I am an engineer.', 'I am a student.', 'I work in a restaurant kitchen.', 'I am a web designer.'];
 const TOPIC_CHAT: Record<'weather' | 'sports' | 'music' | 'travel', { match: string[]; other: string[] }> = {
   weather: { match: ['Yes! The weather is all I can think about tonight.'], other: ['Yes, the weather is strange this week.', 'True. I never know what to wear these days.'] },
   sports: { match: ['I love sports! Do you follow a team?'], other: ['Not really my thing, but I watch the big matches.', 'I only watch when my friends invite me.'] },
@@ -276,6 +280,8 @@ const rapportBy = (social: GuestSocial, value: number) => Math.round(value * (so
 
 export function socialReply(customer: Customer, acts: Act[], turn: number): SocialReply | undefined {
   const social = customer.social;
+  // A guest who asked the bartender a question reacts to whatever comes back, in a human way.
+  if (social && social.asked && (!acts.length || ['weather', 'sports', 'music', 'travel'].includes(acts[0]!))) return { text: reactToAnswer(`${customer.id}:${turn}`), expression: 'smile', rapport: 3 };
   if (!social || !acts.length) return undefined;
   const seed = `${customer.id}:${turn}`;
   const emotion = social.emotion;
@@ -292,10 +298,10 @@ export function socialReply(customer: Customer, acts: Act[], turn: number): Soci
   if (main === 'offerWater') return { text: choose(WATER[stage], seed), expression: 'smile', rapport: 3 };
   if (main === 'offerAshtray') return { text: choose(customer.smoker ? ASHTRAY.smoker : ASHTRAY.other, seed), expression: 'smile', rapport: customer.smoker ? 6 : 1 };
 
-  if (main === 'askProblem') {
+  if (main === 'askProblem' || (main === 'askMore' && !social.thread && !social.told)) {
     const group = bad(emotion) ? 'bad' : 'good';
     if (social.told) return { text: choose(REPEAT_STORY, seed), expression: 'thinking', rapport: 2 };
-    return { text: choose(STORIES[social.topic][group], seed), expression: group === 'bad' ? 'disappointed' : 'very-happy', rapport: rapportBy(social, 8), told: true, chatted: 'story' };
+    return { text: choose(STORIES[social.topic][group], seed), expression: group === 'bad' ? 'disappointed' : 'very-happy', rapport: rapportBy(social, 8), told: true, chatted: 'story', thread: { topic: social.topic, kind: group } };
   }
   if (main === 'empathy') {
     // Good news deserves a happy reply; sad news needs comfort. Rapport rises either way.
@@ -305,7 +311,15 @@ export function socialReply(customer: Customer, acts: Act[], turn: number): Soci
   if (main === 'compliment') return { text: choose(bad(emotion) ? COMPLIMENT.bad : COMPLIMENT.good, seed), expression: 'happy', rapport: rapportBy(social, 5) };
   if (main === 'howAreYou' && social.chatted.includes('how')) return { text: choose(REPEAT_HOW[emotion], seed), expression: 'smile', rapport: rapportBy(social, 3) };
   if (main === 'howAreYou') return { text: choose(HOW_ARE_YOU[emotion], seed), expression: bad(emotion) ? 'thinking' : 'smile', rapport: rapportBy(social, 6), chatted: 'how' };
-  if (main === 'askWork') return { text: `${choose(JOBS, customer.id)} And you? Do you like being a bartender?`, expression: 'smile', rapport: rapportBy(social, 4), chatted: 'work' };
+  if ((PERSONA_ACTS as string[]).includes(main)) {
+    // The guest has a life that stays the same all evening: the same job, hobby, home town and pet.
+    const answer = personaAnswer(customer, main as PersonaAct);
+    return { text: answer.text, expression: 'smile', rapport: rapportBy(social, main === 'askWork' ? 4 : 5), chatted: main === 'askWork' ? 'work' : main, asked: answer.asks };
+  }
+  if (main === 'askWhy' || main === 'askMore' || main === 'askHow' || main === 'askWho') {
+    const answer = threadAnswer(customer, social, main as ThreadAct);
+    return { text: answer.text, expression: social.thread ? (bad(emotion) ? 'disappointed' : 'happy') : 'thinking', rapport: rapportBy(social, answer.rapport), chatted: 'thread' };
+  }
   if (main === 'askName') return { text: `I am ${customer.name}. Nice to meet you!`, expression: 'smile', rapport: rapportBy(social, 3) };
   if (main === 'askAllergy') {
     // Asking is always good service. A guest with an allergy says so, and now the bartender knows.
@@ -331,7 +345,7 @@ export function socialReply(customer: Customer, acts: Act[], turn: number): Soci
   if (main === 'weather' || main === 'sports' || main === 'music' || main === 'travel') {
     const matches = (social.topic === main) || (main === 'sports' && social.topic === 'sports');
     const bank = TOPIC_CHAT[main];
-    if (matches && !social.told) return { text: choose(STORIES[social.topic][bad(emotion) ? 'bad' : 'good'], seed), expression: bad(emotion) ? 'disappointed' : 'very-happy', rapport: rapportBy(social, 8), told: true, chatted: main };
+    if (matches && !social.told) return { text: choose(STORIES[social.topic][bad(emotion) ? 'bad' : 'good'], seed), expression: bad(emotion) ? 'disappointed' : 'very-happy', rapport: rapportBy(social, 8), told: true, chatted: main, thread: { topic: social.topic, kind: bad(emotion) ? 'bad' : 'good' } };
     return { text: choose(matches ? bank.match : bank.other, seed), expression: 'smile', rapport: rapportBy(social, 3), chatted: main };
   }
   return undefined;

@@ -21,6 +21,7 @@ import { backToOrder, enjoyingOpening, openingFor, socialReply, voice, type Expr
 import { ensureSocial, genderOf, rollSocial } from '../domain/social/generate';
 import { guestLine, hasSituation, matchChoice, overdue, pickSituation, resolveChoice, resolveIgnored, startSituation, visibleChoices, type Resolution } from './situations';
 import { endTraining, finishGuide, isPractice, noteTraining, startTraining, tidyTraining } from './training';
+import { collectChatter, reactionToServed } from './chatter';
 import { accrueStaff, hireStaff, upgradeStaff } from './staff';
 import { applyPromo, barEventFor, tickBarEvent } from './events';
 import { adjustPitch, askPitch, cancelPitch, pitchChance, startPitch } from './pitch';
@@ -307,6 +308,11 @@ export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now
   autoRestock(state, now);
   const guests = guestContext(state, now, random);
   tickGuests(state, guests, Math.max(0, (now - state.lastClockAt) / 1000));
+  // Guests who sit at the bar say things on their own; if the chat is already open the line appears in it.
+  for (const item of collectChatter(state, now, random)) {
+    const talk = state.conversations?.[item.guest.id];
+    if (talk) addLine(talk, 'customer', voice(item.guest, item.text, talk.lines.length));
+  }
   for (const waiting of [...state.customers]) {
     if (!overdue(waiting, now)) continue;
     const resolution = resolveIgnored(state, waiting, now, random);
@@ -496,6 +502,10 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         state.streak += 1;
         const serveProduct = serve ? ALCOHOL_PRODUCTS.find((item) => item.id === serve.productId) : undefined;
         ensureSocial(guest, now).lastDrink = serveProduct ? { productId: serveProduct.id } : { recipeId: verdict.recipe.id };
+        // A word about the drink, in the bubble and (if the chat is open) in the conversation.
+        const reaction = guest.training ? undefined : reactionToServed(guest, now, `${guest.id}:${state.streak}`);
+        const openTalk = state.conversations?.[guest.id];
+        if (reaction && openTalk) addLine(openTalk, 'customer', voice(guest, reaction, openTalk.lines.length));
         if (guest.training) noteTraining(state, 'served');
         const brandedPayment = serveProduct ? brandedServeCrystalReward(serveProduct) : 0;
         const specialPayment = guest.specialRecipeRewardId || guest.mood === 'vip' ? conversationCrystalReward(guest, verdict.recipe) : 0;
@@ -1040,6 +1050,7 @@ function ensureTranscript(state: PlayerState, guest: Customer, now = state.lastC
 
 function say(state: PlayerState, guest: Customer, text: string, context: RuleContext, marketFactor: number) {
   const transcript = ensureTranscript(state, guest);
+  if (guest.social) guest.social.spokenAt = context.now;
   const english = context.checkEnglish(text);
   transcript.attempts++;
   state.languageStats.sentences++;

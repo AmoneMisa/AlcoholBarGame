@@ -77,7 +77,7 @@ export function localize(customer: Pick<Customer, 'id' | 'characterId' | 'social
   const roll = hash(`${key(customer)}:${turn}:local`) % 100;
   if (roll < 14 && /^[A-Z]/.test(result) && !/^(Hmm|…)/.test(result)) {
     const opener = origin.openers[hash(`${turn}:o`) % origin.openers.length]!;
-    result = `${opener} ${/^I/.test(result) ? result : result.charAt(0).toLowerCase() + result.slice(1)}`;
-  } else if (roll >= 94 && /[.!]$/.test(result) && result.length < 90 && ['happy', 'relaxed', 'excited'].includes(customer.social?.emotion ?? '')) result = `${result} ${origin.remarks[hash(`${turn}:r`) % origin.remarks.length]}`;
+    result = `${opener} ${/^I(\s|’|')/.test(result) ? result : result.charAt(0).toLowerCase() + result.slice(1)}`;
+  } else if (roll >= 94 && /[.!]$/.test(result) && result.length < 90 && ['happy', 'relaxed', 'excited'].includes(customer.social?.emotion ?? '') && !customer.social?.thread) result = `${result} ${origin.remarks[hash(`${turn}:r`) % origin.remarks.length]}`;
   return result;
 }

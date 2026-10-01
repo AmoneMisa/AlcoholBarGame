@@ -231,7 +231,7 @@ export function checkSentence(input: string): CheckResult {
     // Missing article: "Would you like sweet cocktail?" -> "a sweet cocktail".
     if (COUNTABLE.has(word.lower)) {
       let back = i - 1;
-      while (back >= 0 && ADJECTIVES.has(lowerAt(back))) back--;
+      while (back >= 0 && ADJECTIVES.has(lowerAt(back)) && !DETERMINERS.has(lowerAt(back))) back--;
       const trigger = lowerAt(back);
       if (back >= 0 && ARTICLE_TRIGGERS.has(trigger) && !DETERMINERS.has(trigger) && next?.lower !== 'of') {
         const firstWord = at(back + 1)!;
@@ -281,7 +281,9 @@ export function checkSentence(input: string): CheckResult {
   }
   // Wh-questions may end with a preposition: "What are you looking for?", "Who is it for?".
   const endPrepositionOk = WH_WORDS.has(first) && ['for', 'with', 'to', 'of', 'about', 'from', 'at', 'in', 'on'].includes(lowerAt(words.length - 1));
-  if (!broken && words.length > 1 && DANGLING_END.has(lowerAt(words.length - 1)) && !endPrepositionOk) {
+  // “Tell me more.” “Would you like some more?” “One more.”: here “more” is a whole answer.
+  const moreOk = lowerAt(words.length - 1) === 'more' && ['me', 'some', 'any', 'one', 'no', 'much', 'us', 'them', 'bit', 'little', 'want', 'like', 'need', 'ask', 'a'].includes(lowerAt(words.length - 2));
+  if (!broken && words.length > 1 && DANGLING_END.has(lowerAt(words.length - 1)) && !endPrepositionOk && !moreOk) {
     structure('ends-early', `The sentence ends too early: “${at(words.length - 1)!.text}” needs more words after it.`, at(words.length - 1)!, at(words.length - 1)!);
   }
 

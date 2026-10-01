@@ -4,6 +4,7 @@
 
 export type Act =
   | 'greet' | 'howAreYou' | 'askProblem' | 'empathy' | 'compliment' | 'askWork' | 'weather' | 'sports' | 'music' | 'travel' | 'askName'
+  | 'askHobby' | 'askFrom' | 'askPet' | 'askPlans' | 'askFirst' | 'askFamily' | 'askWhy' | 'askMore' | 'askHow' | 'askWho'
   | 'askAllergy' | 'offerWater' | 'offerFood' | 'offerAnother' | 'offerTaxi' | 'offerAshtray'
   | 'refuse' | 'leaveGentle' | 'leaveFirm' | 'leaveRude' | 'rude'
   | 'apology' | 'thanks' | 'goodbye' | 'checkIn';
@@ -19,12 +20,22 @@ const RULES: [Act, RegExp][] = [
   ['refuse', /\b((have|you've|you have) had enough|no more (alcohol|drinks?)|(can't|cannot|won't) (serve|give) you (any )?more|i (can't|cannot|won't) serve you|stop (drinking|serving)|not (serving|going to serve) you)\b/],
   ['leaveGentle', /\b((it is|it's) (time|late)|(time|better|should|maybe) (to |you )?(go|leave)( home)?|go home|closing (time|soon)|we('re| are) closing|would you (like|mind) (to )?(leav|go)|get some (rest|sleep)|home (safe|safely)|walk you (out|home)|call it a night)\b/],
   ['offerTaxi', /\b(taxi|cab|uber|get you home|get home (safe|safely))\b/],
-  ['askProblem', /\b(what('s| is) (wrong|the matter)|what happened|(are you|you) (ok|okay|alright)\b|you (look|seem) (sad|upset|tired|angry|worried|nervous|down|stressed)|want to talk|tell me (about it|more)|bad day)\b/],
+  ['askProblem', /\b(what('s| is) (wrong|the matter)|what happened|(are you|you) (ok|okay|alright)\b|you (look|seem) (sad|upset|tired|angry|worried|nervous|down|stressed)|want to talk|tell me about it|bad day)\b/],
   ['empathy', /\b(sorry to hear|that sounds (hard|bad|terrible|difficult|awful|tough|stressful|great|wonderful|amazing|lovely)|i understand|cheer up|it will be (ok|okay|fine|better)|congratulations|well done|happy for you|i'm here for you|i am here (for you|to listen)|poor you|hang in there|take your time)\b/],
   ['compliment', /\b((nice|lovely|beautiful|great|cool) (smile|dress|jacket|shirt|hair|style|voice|name|watch|shoes|bag|coat)|you look (great|nice|beautiful|handsome|lovely|good)|i (love|like) your)\b/],
   ['howAreYou', /\b(how are you|how('s| is) your (day|evening|night|week)|how was your (day|evening|week|night)|how('s| is) it going|how do you feel)\b/],
-  ['checkIn', /(everything (is )?(ok|okay|alright|fine|good)|is it (ok|okay|good|fine)|how is your drink|are you enjoying|enjoying (your|the) drink)/],
-  ['askWork', /\b(what do you do|where do you work|what('s| is) your job|what is your job)\b/],
+  ['checkIn', /\b(everything (is )?(ok|okay|alright|fine|good)|is it (ok|okay|good|fine)|how is your drink|are you enjoying|enjoying (your|the) drink)\b/],
+  ['askWork', /\b(what do you do(?! (in|for|on|after|at|when))|where do you work|what('s| is) your job|what is your job)\b/],
+  ['askMore', /\b(tell me more|go on|what else|and then|what happened (next|then|after)|what did (he|she|they|you) (say|do)|then what)\b/],
+  ['askHow', /\b(how did it (go|end)|how was it|what (will|are) you (going to )?do|what did you do|how did (he|she|they) (react|take it))\b/],
+  ['askWho', /\bwho (is|was|did|said|were)\b/],
+  ['askWhy', /\b(why|what made you|how come|what caused)\b/],
+  ['askHobby', /\b(hobby|hobbies|free time|for fun|what do you like to do|on (the )?weekends?)\b/],
+  ['askFrom', /\b(where (are|do) you (from|live)|which (city|country)|are you from)\b/],
+  ['askPet', /\b(pets?|dogs?|cats?|puppy|kitten)\b/],
+  ['askPlans', /\b(plans|this weekend|tomorrow|next week|later tonight|after (work|this))\b/],
+  ['askFirst', /\b(been here before|first time|come here often|regular|often come)\b/],
+  ['askFamily', /\b(family|brother|sister|kids|children|married|wife|husband|girlfriend|boyfriend|parents|mother|father)\b/],
   ['askName', /\b(what('s| is) your name|nice to meet you)\b/],
   ['askAllergy', /\b(allerg\w*|gluten|lactose|intoleran\w*|anything (i|you) (should|must|can't|cannot) (avoid|eat)|any (food )?restrictions?)\b/],
   ['offerAshtray', /\b(ashtray|cigarette|lighter|smoking)\b/],

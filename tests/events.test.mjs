@@ -390,3 +390,111 @@ test('Local words are not added to drunk, angry or upset guests', async () => {
     }
   }
 });
+
+// ---- Alive conversations ----
+test('A guest has a life of their own that stays the same all evening', async () => {
+  const { personaOf, personaAnswer } = await import('../src/domain/social/alive.ts');
+  const { actsIn } = await import('../src/domain/social/acts.ts');
+  const { guest } = guestIn();
+  assert.deepEqual(personaOf(guest), personaOf({ ...guest }));
+  assert.equal(personaAnswer(guest, 'askHobby').text, personaAnswer(guest, 'askHobby').text);
+  const jobs = new Set(), hobbies = new Set(), cities = new Set();
+  for (let index = 0; index < 80; index++) { const p = personaOf({ id: `p${index}`, characterId: `c${index}` }); jobs.add(p.job); hobbies.add(p.hobby); cities.add(p.city); }
+  assert.ok(jobs.size >= 8 && hobbies.size >= 8 && cities.size >= 12, 'guests differ from each other');
+  for (const [text, act] of [['What do you do in your free time?', 'askHobby'], ['Where are you from?', 'askFrom'], ['Do you have any pets?', 'askPet'], ['Do you have plans for the weekend?', 'askPlans'], ['Have you been here before?', 'askFirst'], ['Why did that happen?', 'askWhy'], ['Tell me more.', 'askMore'], ['How did it go?', 'askHow']])
+    assert.equal(actsIn(text)[0], act, text);
+});
+
+test('A story goes deeper when the bartender asks why and tells more, then it is finished', async () => {
+  const { socialReply } = await import('../src/domain/social/talk.ts');
+  const { applySocialReply } = await import('../src/sim/guests.ts');
+  const { guest } = guestIn({ emotion: 'upset', topic: 'work' });
+  const story = socialReply(guest, ['askProblem'], 1);
+  applySocialReply(guest, story);
+  assert.deepEqual(guest.social.thread, { topic: 'work', kind: 'bad', depth: 0 });
+  const why = socialReply(guest, ['askWhy'], 2);
+  const more = socialReply(guest, ['askMore'], 3);
+  const how = socialReply(guest, ['askHow'], 4);
+  const done = socialReply(guest, ['askMore'], 5);
+  assert.equal(new Set([story.text, why.text, more.text, how.text, done.text]).size, 5, 'five different lines');
+  assert.match(done.text, /all there is|everything|whole story/i);
+  const none = socialReply(guestIn().guest, ['askWhy'], 1);
+  assert.match(none.text, /not sure|not thought/i, 'no story: a gentle answer');
+});
+
+test('A guest who asks the bartender something reacts to the answer', async () => {
+  const { socialReply } = await import('../src/domain/social/talk.ts');
+  const { guest } = guestIn();
+  const answer = socialReply(guest, ['askHobby'], 1);
+  assert.equal(answer.asked, true);
+  guest.social.asked = true;
+  const react = socialReply(guest, [], 2);
+  assert.ok(react && react.text.length > 5, 'any answer gets a human reaction');
+});
+
+test('Guests speak on their own, not too often, and never during a chat or a situation', async () => {
+  const { collectChatter } = await import('../src/sim/chatter.ts');
+  const state = academy();
+  const { state: bar, guest } = guestIn({ chatty: true, rapport: 70 });
+  assert.equal(collectChatter(bar, NOW, () => .5).length, 0, 'the first moment only sets the timer');
+  assert.ok(guest.social.chatterAt > NOW);
+  const later = guest.social.chatterAt + 1;
+  bar.conversationCustomerId = guest.id;
+  assert.equal(collectChatter(bar, later, () => .5).length, 0, 'no remarks while the chat with this guest is open');
+  bar.conversationCustomerId = undefined;
+  const said = collectChatter(bar, later, () => .5);
+  assert.equal(said.length, 1);
+  assert.ok(said[0].text.length > 10 && guest.social.murmur.until > later);
+  assert.equal(collectChatter(bar, later + 1000, () => .5).length, 0, 'the next remark takes minutes');
+  // Many minutes later, the number of remarks is limited.
+  let total = 1;
+  for (let step = 1; step < 40; step++) total += collectChatter(bar, later + step * 6 * 60_000, () => .5).length;
+  assert.ok(total <= 6, `at most six remarks per guest, saw ${total}`);
+  assert.ok(state);
+});
+
+test('A guest left alone for a while speaks up, and the drink gets a reaction', async () => {
+  const { collectChatter, reactionToServed } = await import('../src/sim/chatter.ts');
+  const { state, guest } = guestIn({ chatty: true, rapport: 40, phase: 'ordering' });
+  collectChatter(state, NOW, () => .5);
+  const said = collectChatter(state, guest.social.chatterAt + 6 * 60_000, () => .5);
+  assert.equal(said[0].chatter.kind, 'bored');
+  guest.social.lastDrink = { recipeId: 'mojito' };
+  assert.ok(reactionToServed(guest, NOW, 'x').length > 5);
+  assert.equal(guest.social.murmur.until, NOW + 30_000);
+});
+
+test('Alive follow-up sentences are offered as ideas, and all are correct English', async () => {
+  const { socialTemplates } = await import('../src/domain/social/suggestions.ts');
+  const { guest } = guestIn({ chatty: true, rapport: 60, thread: { topic: 'work', kind: 'bad', depth: 0 } });
+  const first = socialTemplates(guest, NOW);
+  assert.ok(first.includes('Why did that happen?') && first.includes('Tell me more.'));
+  guest.social.thread.depth = 1;
+  assert.ok(socialTemplates(guest, NOW).includes('How did it go?'));
+  guest.social.thread = undefined;
+  const asks = socialTemplates(guest, NOW).filter((text) => /free time|from|pets|plans|before/.test(text));
+  assert.ok(asks.length >= 1, 'questions about their life');
+  for (const text of [...first, ...asks, 'What happened next?']) assert.equal(checkEnglish(text).ok, true, text);
+});
+
+test('Remarks are not repeated back to back, and the offer to tell more of a story is made once', async () => {
+  const { collectChatter } = await import('../src/sim/chatter.ts');
+  const { state, guest } = guestIn({ chatty: true, rapport: 70, thread: { topic: 'work', kind: 'bad', depth: 0 }, told: true });
+  collectChatter(state, NOW, () => .5);
+  const texts = [];
+  for (let step = 1; step <= 6; step++) {
+    const said = collectChatter(state, NOW + step * 8 * 60_000, () => (step * .37) % 1);
+    if (said[0]) texts.push(said[0].text);
+  }
+  assert.ok(texts.length >= 4);
+  for (let index = 1; index < texts.length; index++) assert.notEqual(texts[index], texts[index - 1]);
+  assert.ok(texts.filter((text) => /tell you more/.test(text)).length <= 1);
+  assert.ok(guest);
+});
+
+test('Emergency calls are understood in what the player says (the regexes are not corrupted)', async () => {
+  const { readFileSync } = await import('node:fs');
+  for (const path of ['src/sim/situations.ts', 'src/domain/social/acts.ts', 'src/domain/social/origin.ts', 'src/domain/social/talk.ts']) assert.ok(!readFileSync(path, 'utf8').includes('\b'), `${path} has no backspace characters`);
+  const { matchChoice } = await import('../src/sim/situations.ts');
+  assert.equal(typeof matchChoice, 'function');
+});

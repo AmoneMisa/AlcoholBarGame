@@ -54,6 +54,8 @@ export function applySocialReply(guest: Customer, reply: SocialReply) {
   social.rapport = clampPercent(social.rapport + reply.rapport);
   if (reply.emotion) social.emotion = reply.emotion;
   if (reply.told) social.told = true;
+  if (reply.thread) social.thread = { ...reply.thread, depth: 0 };
+  social.asked = !!reply.asked;
   if (reply.chatted && !social.chatted.includes(reply.chatted)) social.chatted.push(reply.chatted);
   // Being rude to a guest makes them angry; being kind to an angry guest is how you calm them.
   if (social.rapport < 22 && social.emotion !== 'angry') social.emotion = 'angry';
