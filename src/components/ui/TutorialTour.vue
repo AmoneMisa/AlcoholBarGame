@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import UiIcon from './UiIcon.vue';
+import UiButton from './UiButton.vue';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { setPointer, selector, type PointerSpec } from '../../guide/pointer';
 import { useGameStore } from '../../stores/game';
@@ -47,7 +48,7 @@ const STEPS: Step[] = [
   { id: 'english', title: 'The English tab', text: 'Here you find words, phrases for every job, and daily quests. Quests give XP, crystals and sometimes a new recipe.',
     action: 'Open the English tab.', point: [{ target: selector('nav-english'), gesture: 'tap', label: '{Tap} English' }], until: () => shown('.learning-page') },
   { id: 'market', title: 'Stock and deliveries', text: 'Buy ingredients, bottles and food in the Market. Deliveries can be late, damaged or wrong. Report a problem politely, in English, and the supplier will help.',
-    action: 'Open the Market tab.', point: [{ target: selector('nav-market'), gesture: 'tap', label: '{Tap} Market' }], until: () => shown(selector('top-up')) },
+    action: 'Open Manage, then the Market tab.', point: [{ target: selector('nav-market'), gesture: 'tap', label: '{Tap} Market' }, { target: selector('nav-manage'), gesture: 'tap', label: '{Tap} Manage' }], until: () => shown(selector('top-up')) },
   { id: 'hud', title: 'Coins, crystals and servers', text: 'Coins buy stock and upgrades. Crystals unlock recipes and styles. From level 8 you can hire servers: they earn coins while you are away, but never as much as you. The graduation cap opens Training.', view: 'service',
     action: 'Open Training to see the lessons.', point: [{ target: selector('academy'), gesture: 'tap', label: '{Tap} Training' }], until: () => shown('.academy-panel') },
   { id: 'rules', title: 'House rules and events', text: 'Every city has its own rules, such as checking ID or paying by card only. Inspectors count every rule you break. Special nights, like ladies’ night or happy hour, change who comes and what they pay.', view: 'service',
@@ -162,15 +163,15 @@ onBeforeUnmount(() => {
     <div v-if="rect" class="tour-spot" :style="{ top: rect.top + 'px', left: rect.left + 'px', width: rect.width + 'px', height: rect.height + 'px' }" />
     <div v-else-if="!step.point" class="tour-dim" />
     <section ref="cardEl" class="tour-card" :class="{ compact: slim }" :style="cardTop !== undefined ? { top: cardTop + 'px', bottom: 'auto' } : undefined">
-      <header><small>Step {{ index + 1 }} of {{ STEPS.length }}</small><button v-if="step.point" type="button" class="tour-why" @click="expanded = !expanded; $nextTick(place)">{{ expanded ? 'Hide details' : 'Why?' }}</button><button type="button" class="tour-skip" @click="finish('skipped')">Skip tour <UiIcon class="inline-icon" name="close" /></button></header>
+      <header><small>Step {{ index + 1 }} of {{ STEPS.length }}</small><UiButton v-if="step.point" size="sm" variant="ghost" @click="expanded = !expanded; $nextTick(place)">{{ expanded ? 'Hide details' : 'Why?' }}</UiButton><UiButton size="sm" variant="ghost" icon="close" @click="finish('skipped')">Skip tour</UiButton></header>
       <h3 v-if="!slim">{{ step.title }}</h3>
       <p v-if="!slim">{{ step.text }}</p>
       <p v-if="step.action" class="tour-action"><UiIcon class="inline-icon" name="pointer" /> {{ step.action }}</p>
       <ul v-if="step.tips?.length && !slim"><li v-for="tip in step.tips" :key="tip">{{ tip }}</li></ul>
       <div v-if="!step.point" class="tour-dots" aria-hidden="true"><i v-for="(item, at) in STEPS" :key="item.id" :class="{ on: at === index, past: at < index }" /></div>
       <footer>
-        <button type="button" :disabled="index === 0" @click="back">Back</button>
-        <button type="button" class="primary" @click="next">{{ last ? 'Start playing' : waiting || step.point ? 'Skip step' : 'Next' }}</button>
+        <UiButton :size="slim ? 'sm' : 'md'" :disabled="index === 0" @click="back">Back</UiButton>
+        <UiButton :size="slim ? 'sm' : 'md'" variant="solid" @click="next">{{ last ? 'Start playing' : waiting || step.point ? 'Skip step' : 'Next' }}</UiButton>
       </footer>
     </section>
   </div>
@@ -184,10 +185,8 @@ onBeforeUnmount(() => {
 .tour-card.compact { width: min(94vw, 400px); padding: 8px 12px; }
 .tour-card.compact p { font-size: 12.5px; line-height: 1.35; }
 .tour-card.compact footer { gap: 6px; }
-.tour-card.compact footer button { padding: 5px 12px; font-size: 13px; }
 .tour-card header { gap: 8px; }
 .tour-card header small { margin-right: auto; }
-.tour-card .tour-why { justify-self: start; padding: 2px 8px; border: 0; background: transparent; color: #9fb4d0; font-size: 12px; text-decoration: underline; }
 .tour-card header { display: flex; justify-content: space-between; align-items: center; }
 .tour-card small { color: #e4b35c; letter-spacing: .08em; font-weight: 700; }
 .tour-card h3 { margin: 0; font: 700 20px Georgia, serif; }
@@ -199,8 +198,5 @@ onBeforeUnmount(() => {
 .tour-dots i.past { background: #8a7345; }
 .tour-dots i.on { background: #f0c35a; }
 .tour-card footer { display: flex; justify-content: space-between; gap: 8px; }
-.tour-card button { padding: 8px 14px; border: 1px solid #5a6b86; border-radius: 10px; background: #1d283b; color: inherit; font-weight: 700; cursor: pointer; }
-.tour-card button.primary { background: #a9702b; border-color: #e0a14a; color: #fff6e0; }
-.tour-card button:disabled { opacity: .4; cursor: default; }
-.tour-card .tour-skip { padding: 4px 10px; font-size: 12px; background: transparent; }
+.tour-card footer .ui-btn:last-child { flex: 1; }
 </style>

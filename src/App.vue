@@ -2,7 +2,9 @@
 import GuidePointer from './components/ui/GuidePointer.vue';
 import TutorialTour from './components/ui/TutorialTour.vue';
 import PopularityBar from './components/game/PopularityBar.vue';
-import { computed, defineAsyncComponent, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import SectionTabs from './components/ui/SectionTabs.vue';
+import BarChips from './components/game/BarChips.vue';
 import CocktailWorkspace from './components/cocktails/CocktailWorkspace.vue';
 import BarScene from './components/game/BarScene.vue';
 import TopHud from './components/game/TopHud.vue';
@@ -32,20 +34,34 @@ const view = ref('service');
 const managementView = ref('inventory');
 // The management screens stay mounted once opened, so edits and scroll positions survive switching tabs.
 const managementOpened = ref(false);
+// The bottom bar has five tabs. Screens that belong together are tabs inside one screen; the bar and the character
+// open from the header (tap the bar name, or the bar icon).
 const nav = [
   { id: 'service', label: 'Service', mark: 'glass' },
   { id: 'english', label: 'English', mark: 'chat' },
-  { id: 'inventory', label: 'Inventory', mark: 'stock' },
-  { id: 'market', label: 'Market', mark: 'basket' },
-  { id: 'recipes', label: 'Recipes', mark: 'book' },
-  { id: 'design', label: 'Design', mark: 'brush' },
-  { id: 'regions', label: 'Cities', mark: 'pin' },
-  { id: 'advisor', label: 'Pairings', mark: 'pair' },
-  { id: 'workshop', label: 'Workshop', mark: 'stock' },
+  { id: 'manage', label: 'Manage', mark: 'stock' },
   { id: 'friends', label: 'Friends', mark: 'friends' },
-  { id: 'profile', label: 'Character', mark: 'face-happy' },
   { id: 'settings', label: 'Settings', mark: 'settings' }
 ];
+const SECTIONS: Record<string, { id: string; label: string }[]> = {
+  english: [{ id: 'learn', label: 'Learn' }, { id: 'recipes', label: 'Recipes' }, { id: 'advisor', label: 'Pairings' }],
+  manage: [{ id: 'market', label: 'Market' }, { id: 'inventory', label: 'Inventory' }, { id: 'workshop', label: 'Workshop' }],
+  bar: [{ id: 'regions', label: 'Bars' }, { id: 'design', label: 'Design' }],
+  character: [{ id: 'profile', label: 'Profile' }, { id: 'look', label: 'Look' }]
+};
+const sub = reactive<Record<string, string>>({ english: 'learn', manage: 'market', bar: 'regions', character: 'profile' });
+// Older names (the tour, the training lessons and the header use them) lead to the right tab.
+const LEGACY: Record<string, [string, string]> = {
+  inventory: ['manage', 'inventory'], market: ['manage', 'market'], workshop: ['manage', 'workshop'],
+  recipes: ['english', 'recipes'], advisor: ['english', 'advisor'], regions: ['bar', 'regions'], design: ['bar', 'design'], profile: ['character', 'profile']
+};
+// Which part of the big management screen shows in each tab.
+const DECK: Record<string, Record<string, string>> = {
+  english: { recipes: 'recipes', advisor: 'advisor' }, manage: { market: 'market', inventory: 'inventory' }, bar: { regions: 'regions', design: 'design' }, character: { look: 'design' }
+};
+const deckView = computed(() => DECK[view.value]?.[sub[view.value] ?? ''] ?? '');
+const designSection = computed(() => (view.value === 'bar' ? 'bar' : view.value === 'character' ? 'character' : undefined));
+const sectionTabs = computed(() => (SECTIONS[view.value] ?? []).map((tab) => ({ ...tab, badge: view.value === 'bar' && tab.id === 'design' && game.cosmeticRouletteAvailable ? 1 : undefined })));
 
 // Music follows the bar's interior; taps on buttons get a soft click.
 watch(() => game.decor.interior, (id) => setMusicInterior(id), { immediate: true });
@@ -124,17 +140,16 @@ watch(() => game.message,(message,previous) => {
 const badges = computed<Record<string, number>>(() => ({
   service: (game.barEvent ? 1 : 0) + game.deliveryIssues.filter((issue) => issue.status === 'open').length,
   english: game.dailyLessonsComplete ? 0 : 1,
-  market: game.economy.event ? 1 : 0,
-  design: game.cosmeticRouletteAvailable ? 1 : 0,
+  manage: game.economy.event ? 1 : 0,
   friends: game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'incoming').length
 }));
 
 function selectView(id: string) {
-  view.value = id;
-  // The tab bar scrolls sideways: keep the chosen tab in sight.
-  nextTick(() => document.querySelector('.game-nav button.active')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }));
-  if (id !== 'service' && id !== 'english' && id !== 'friends' && id !== 'workshop' && id !== 'profile' && id !== 'settings') { managementView.value = id; managementOpened.value = true; }
+  const legacy = LEGACY[id];
+  if (legacy) { view.value = legacy[0]; sub[legacy[0]] = legacy[1]; } else view.value = id;
 }
+// The management screen keeps the part it showed last, so switching tabs never blanks it.
+watch(deckView, (part) => { if (part) { managementView.value = part; managementOpened.value = true; } }, { immediate: true });
 </script>
 
 <template>
@@ -146,12 +161,14 @@ function selectView(id: string) {
         <BarScene :active="view === 'service'" />
         <CocktailWorkspace />
       </section>
-      <LearningPage v-if="view === 'english'" />
+      <SectionTabs v-if="sectionTabs.length" v-model="sub[view]" :tabs="sectionTabs" :label="view" />
+      <BarChips v-if="view === 'bar'" />
+      <LearningPage v-if="view === 'english' && sub.english === 'learn'" />
       <FriendsPage v-if="view === 'friends'" />
-      <WorkshopPage v-if="view === 'workshop'" />
-      <ProfilePage v-if="view === 'profile'" />
+      <WorkshopPage v-if="view === 'manage' && sub.manage === 'workshop'" />
+      <ProfilePage v-if="view === 'character' && sub.character === 'profile'" />
       <SettingsPage v-if="view === 'settings'" @goto="selectView" />
-      <ManagementDeck v-if="managementOpened" v-show="view !== 'service' && view !== 'english' && view !== 'friends' && view !== 'workshop' && view !== 'profile' && view !== 'settings'" :active-view="managementView" />
+      <ManagementDeck v-if="managementOpened" v-show="!!deckView" :active-view="managementView" :design-section="designSection" />
     </main>
     <ConversationPopup v-if="game.conversationCustomerId" />
     <GuideSheet />

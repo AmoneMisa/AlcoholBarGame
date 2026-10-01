@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 const props = withDefaults(defineProps<{ type?: 'rocks' | 'highball' | 'collins' | 'coupe' | 'martini' | 'wine' | 'flute' | 'beer' | 'shot' | 'tiki'; fill?: number; color?: string; ice?: number; garnish?: string; bubbles?: boolean; animation?: string; artIndex?: number; recipeId?: string }>(), { type: 'highball', fill: 0, color: '#e7b64f', ice: 0, garnish: '' });
 const newCocktailArt = new Set(['blue-lagoon', 'champagne-cocktail', 'tommys-margarita', 'batanga', 'rusty-nail', 'whiskey-smash', 'mamie-taylor', 'bronx', 'martinez', 'bijou', 'last-word', 'blue-hawaii', 'ti-punch', 'greyhound', 'queens-park-swizzle', 'singapore-sling']);
 const hasArt = computed(() => props.artIndex !== undefined || (props.recipeId && newCocktailArt.has(props.recipeId)));
@@ -34,6 +34,9 @@ const garnishStyle = computed(() => {
     backgroundPosition: `${(column / 3) * 100}% ${row * 100}%`
   };
 });
+// The glass outline picture. If it cannot be loaded (a missing file), a drawn glass takes its place instead of a broken-image box.
+const shellOk = ref(true);
+const shellUrl = `${import.meta.env.BASE_URL}assets/drinks/glass/live-highball-v1.webp`;
 </script>
 
 <template>
@@ -46,7 +49,8 @@ const garnishStyle = computed(() => {
       </div>
       <span v-if="ice" class="glass-ice-art" :style="{ '--ice-level': Math.min(ice, 6) }"></span>
       <span v-if="garnish" class="glass-garnish-art" :data-garnish="garnish" :style="garnishStyle"></span>
-      <img class="glass-shell-art" src="/assets/drinks/glass/live-highball-v1.webp" alt="" draggable="false" />
+      <img v-if="shellOk" class="glass-shell-art" :src="shellUrl" alt="" draggable="false" @error="shellOk = false" />
+      <span v-else class="glass-shell-art glass-shell-fallback" aria-hidden="true"></span>
       <span class="glass-measures"><i></i><i></i><i></i></span>
     </div>
   </div>

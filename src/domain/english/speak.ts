@@ -2,6 +2,7 @@
 // scripts/generate_voice.py) are played first; anything without a clip falls back to the
 // device's built-in English voice.
 import { duckMusic, speechOn, speechVolume } from '../../audio/engine';
+import { forDeviceVoice } from './pronounce';
 let manifest: Promise<Record<string, string>> | undefined;
 let player: HTMLAudioElement | undefined;
 
@@ -26,7 +27,7 @@ function speakWithDevice(text: string) {
     return false;
   }
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
+  const utterance = new SpeechSynthesisUtterance(forDeviceVoice(text));
   utterance.lang = 'en-GB';
   utterance.rate = .9;
   utterance.volume = speechVolume.value;

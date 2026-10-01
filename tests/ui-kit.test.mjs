@@ -26,3 +26,12 @@ test('The standard form buttons use UiButton', () => {
     assert.ok(raw.length <= 2, `${name} still has raw buttons: ${raw.map((tag) => tag.slice(0, 50)).join(' | ')}`);
   }
 });
+
+test('The device voice gets drink words respelled so they sound right', async () => {
+  const { forDeviceVoice } = await import('../src/domain/english/pronounce.ts');
+  assert.equal(forDeviceVoice('Orange liqueur'), 'Orange lih-kyur');
+  assert.equal(forDeviceVoice('Do you like liqueurs, or Pinot Noir?'), 'Do you like lih-kyurz, or pee-noh nwahr?');
+  assert.equal(forDeviceVoice('A bright Mojito'), 'A bright moh-hee-toh');
+  assert.equal(forDeviceVoice('Nothing special here'), 'Nothing special here');
+  assert.equal(forDeviceVoice('reliqueurish'), 'reliqueurish', 'only whole words');
+});

@@ -32,7 +32,7 @@ import CharacterModel from '../characters/CharacterModel.vue';
 import { avatarOptionsFor, avatarLabel, type AvatarOption, type AvatarOptionKey } from '../../data/cosmetics/avatar';
 import { BAR_PROFILE_OPTIONS } from '../../data/cosmetics/bars';
 
-withDefaults(defineProps<{ activeView?: string }>(), { activeView: 'inventory' });
+const props = withDefaults(defineProps<{ activeView?: string; designSection?: 'bar' | 'character' }>(), { activeView: 'inventory' });
 const game = useGameStore();
 const stockCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh' | 'food' | 'items' | 'shards' | 'cards'>('all');
 // Tabs for Workshop items, shards and cards appear only when the player owns something of that kind.
@@ -86,6 +86,9 @@ const isInteriorOwned = (id: string) => game.ownedInteriorIds.includes(id);
 const cosmeticLocked = (key:string,value:string) => !game.canUseCosmetic(key,value);
 const DESIGN_TABS = [{ id: 'bar', label: 'Bar' }, { id: 'clothes', label: 'Clothes' }, { id: 'character', label: 'Character' }] as const;
 const designTab = ref<typeof DESIGN_TABS[number]['id']>('bar');
+// Inside the Bar screen the design is only the bar; inside the Character screen it is only clothes and character.
+const designTabsShown = computed(() => (props.designSection === 'bar' ? [] : props.designSection === 'character' ? DESIGN_TABS.filter((tab) => tab.id !== 'bar') : [...DESIGN_TABS]));
+watch(() => props.designSection, (section) => { if (section === 'bar') designTab.value = 'bar'; else if (section === 'character' && designTab.value === 'bar') designTab.value = 'clothes'; }, { immediate: true });
 const avatarOptions = computed(() => avatarOptionsFor(selectedBartender.value));
 const clothesOptions = computed(() => avatarOptions.value.filter((option) => option.key === 'outfitColor'));
 const characterOptions = computed(() => avatarOptions.value.filter((option) => option.key !== 'outfitColor'));
@@ -233,7 +236,7 @@ function selectBartender(id: 'noa' | 'leo') {
 
     <article v-show="activeView === 'design'" class="game-panel design-deck">
       <PanelHeading eyebrow="PERSONALIZE" title="Bar & bartender" aside="Live preview" />
-      <div class="design-tabs" role="tablist" aria-label="Design sections"><button v-for="tab in DESIGN_TABS" :key="tab.id" role="tab" type="button" :aria-selected="designTab === tab.id" :class="{ active: designTab === tab.id }" @click="designTab = tab.id">{{ tab.label }}</button></div>
+      <div v-if="designTabsShown.length" class="design-tabs" role="tablist" aria-label="Design sections"><button v-for="tab in designTabsShown" :key="tab.id" role="tab" type="button" :aria-selected="designTab === tab.id" :class="{ active: designTab === tab.id }" @click="designTab = tab.id">{{ tab.label }}</button></div>
       <div class="design-grid-new">
         <!-- Bar: the real bar scene in preview mode, pinned while the options scroll. -->
         <div v-show="designTab === 'bar'" class="design-tab-bar">

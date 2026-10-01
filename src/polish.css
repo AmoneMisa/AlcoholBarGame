@@ -197,3 +197,21 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .auto-supply > div:first-child { flex: 1 1 320px; }
 .auto-supply-actions { flex-wrap: nowrap; flex: 0 0 auto; }
 @media (max-width: 560px) { .auto-supply-actions { flex-wrap: wrap; width: 100%; margin-left: 0; } }
+
+/* A drawn glass when the glass picture is missing */
+.glass-shell-fallback { position: absolute; inset: 4% 20% 0; border: 2px solid rgba(214, 235, 248, .65); border-top-width: 1px; border-radius: 3px 3px 16px 16px; background: linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.04) 45%, rgba(255,255,255,.16)); box-shadow: inset 0 0 12px rgba(255,255,255,.12); pointer-events: none; }
+.supply-auto { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1px solid #354762; border-radius: 10px; background: #0f1a2b; cursor: pointer; }
+.supply-auto.off { opacity: .6; cursor: not-allowed; }
+.supply-auto input { flex: none; width: 20px; height: 20px; margin-top: 2px; accent-color: #dca94e; }
+.supply-auto span { display: grid; gap: 2px; }
+.supply-auto b { font-size: 14px; }
+.supply-auto small { color: #9eafc1; font-size: 12px; }
+
+/* ==== The five-tab bottom bar, and the bar name in the header as a button ==== */
+.game-nav { max-width: 640px; }
+.game-nav button { flex: 1 1 0; min-width: 0; }
+.venue-name { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; position: relative; }
+.venue-name b { font: 700 24px Georgia, serif; }
+.venue-name .ui-icon { width: 16px; height: 16px; color: #c2a668; flex: none; }
+.venue-name:focus-visible { outline: 2px solid #ffd35a; outline-offset: 2px; border-radius: 6px; }
+.venue-dot { width: 9px; height: 9px; border-radius: 50%; background: #d9534f; }

@@ -1,4 +1,5 @@
 import { ref, watch } from 'vue';
+import { forDeviceVoice } from '../domain/english/pronounce';
 import { audioContext, noise, sfxDestination, sfxReverbSend, speechOn, speechVolume } from './engine';
 
 // Guest voices. Each guest has their own voice, built from a few short vowel-like syllables (the way characters
@@ -96,7 +97,7 @@ export function guestVoice(profile: VoiceProfile, text: string) {
 export function speakLine(text: string, who: 'guest' | 'bartender', profile?: VoiceProfile) {
   if (voiceMode.value !== 'speech' || !speechOn.value || speechVolume.value <= 0 || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
   const feel = FEELING[profile?.emotion ?? 'relaxed'] ?? FEELING.relaxed!;
-  const utterance = new SpeechSynthesisUtterance(text);
+  const utterance = new SpeechSynthesisUtterance(forDeviceVoice(text));
   utterance.lang = profile?.lang ?? 'en-GB';
   utterance.volume = speechVolume.value;
   const voices = window.speechSynthesis.getVoices().filter((item) => item.lang.startsWith('en'));

@@ -15,11 +15,17 @@ import ConfirmDialog from '../ui/ConfirmDialog.vue';
 const game = useGameStore();
 const mode = ref<'buy'|'sell'>('buy');
 const category = ref('all');
-// The two stock-saving helpers ask first: a top-up shows what it would order, auto-supply explains what it will do.
-const confirm = ref<'' | 'top-up' | 'auto'>('');
-const topUp = computed(() => (confirm.value === 'top-up' ? game.topUpPreview() : { orders: [], total: 0 } as ReturnType<typeof game.topUpPreview>));
-const openTopUp = () => { confirm.value = 'top-up'; };
-function doTopUp() { confirm.value = ''; game.topUp(); }
+// One window for supplies: it shows what a top-up would order now and the switch for doing it automatically.
+const confirm = ref(false);
+const autoChoice = ref(false);
+const topUp = computed(() => (confirm.value ? game.topUpPreview() : { orders: [], total: 0 } as ReturnType<typeof game.topUpPreview>));
+const openSupply = () => { autoChoice.value = game.autoSupply; confirm.value = true; };
+function doSupply() {
+  const orders = topUp.value.orders.length;
+  confirm.value = false;
+  if (autoChoice.value !== game.autoSupply) game.setAutoSupply(autoChoice.value);
+  if (orders) game.topUp();
+}
 const ingredient = (id:string) => INGREDIENTS.find((item) => item.id === id)!;
 const group = (id:string) => ingredient(id).category === 'spirit' ? 'spirit' : ingredient(id).category === 'mixer' && !['sugar-syrup','coconut-cream'].includes(id) ? 'mixer' : 'fresh';
 const search = ref('');
@@ -47,23 +53,22 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
   <article class="game-panel market-panel">
     <PanelHeading :eyebrow="`TRADE FLOOR · ${game.region.name}`" title="Stock your next shift" />
     <!-- Level perks live on the bar scene's city chip; the market only shows what changes buying here. -->
-    <!-- One supply card: "Top up now" and the automatic switch use the same logic (reorder what runs low from the cheapest supplier). -->
+    <!-- One supply card, one button: the window shows what would be ordered now and lets the player keep it automatic. -->
     <div class="auto-supply" :class="{ on: game.autoSupply }">
-      <div><b>Auto-supply</b><small>Reorders anything that runs low from the cheapest supplier, at normal prices and delivery fees. Top up now does it once; the switch does it for you all the time.{{ game.level < AUTO_SUPPLY_LEVEL ? ` The switch unlocks at level ${AUTO_SUPPLY_LEVEL}.` : '' }}</small></div>
-      <div class="auto-supply-actions">
-        <UiButton variant="solid" data-guide="top-up" @click="openTopUp">Top up now</UiButton>
-        <UiButton :variant="game.autoSupply ? 'primary' : 'secondary'" role="switch" :aria-checked="game.autoSupply" :disabled="game.level < AUTO_SUPPLY_LEVEL" :title="game.level < AUTO_SUPPLY_LEVEL ? `Unlocks at level ${AUTO_SUPPLY_LEVEL}` : ''" @click="game.autoSupply ? game.setAutoSupply(false) : (confirm = 'auto')">{{ game.level < AUTO_SUPPLY_LEVEL ? `Auto · Lv ${AUTO_SUPPLY_LEVEL}` : game.autoSupply ? 'Auto: On' : 'Auto: Off' }}</UiButton>
-      </div>
+      <div><b>Supply</b><small>{{ game.autoSupply ? 'Auto-supply is on: anything that runs low is reordered for you.' : 'Reorders what runs low from the cheapest supplier, at normal prices and delivery fees.' }}</small></div>
+      <UiButton variant="solid" data-guide="top-up" @click="openSupply">Supply low stock</UiButton>
     </div>
-    <ConfirmDialog v-if="confirm === 'top-up'" title="Top up low stock?" confirm-label="Place the orders" :disabled="!topUp.orders.length" :reason="topUp.orders.length && game.money < topUp.total ? `Not enough coins: you need ${topUp.total.toFixed(2)}, you have ${Math.floor(game.money)}.` : ''" @cancel="confirm = ''" @confirm="doTopUp">
-      <p v-if="topUp.orders.length">This orders everything that is running low from the cheapest supplier, one pack of each. Nothing changes until you confirm.</p>
-      <p v-else>Nothing is running low, or an order is already on its way. Nothing to order now.</p>
-      <ul v-if="topUp.orders.length"><li v-for="order in topUp.orders" :key="order.supplier"><span>{{ order.supplier }}: {{ order.items.map((item) => ingredient(item.ingredientId).name).join(', ') }}</span><b>{{ order.total.toFixed(2) }} coins</b></li></ul>
-      <p v-if="topUp.orders.length"><b>Total {{ topUp.total.toFixed(2) }} coins.</b> Deliveries still take time{{ topUp.days !== undefined ? ` (about ${formatDeliveryTime(topUp.days)})` : '' }}.</p>
-    </ConfirmDialog>
-    <ConfirmDialog v-if="confirm === 'auto'" title="Turn on auto-supply?" confirm-label="Turn on" @cancel="confirm = ''" @confirm="game.setAutoSupply(true); confirm = ''">
-      <p>While it is on, anything that runs low is reordered automatically from the cheapest supplier, with normal prices and delivery fees.</p>
-      <p>It spends coins without asking each time. If you do not have enough coins, it pauses. You can turn it off here whenever you like.</p>
+    <ConfirmDialog v-if="confirm" title="Supply low stock" :confirm-label="topUp.orders.length ? 'Place the orders' : 'Save'" :disabled="!topUp.orders.length && autoChoice === game.autoSupply" :reason="topUp.orders.length && game.money < topUp.total ? `Not enough coins: you need ${topUp.total.toFixed(2)}, you have ${Math.floor(game.money)}.` : ''" @cancel="confirm = false" @confirm="doSupply">
+      <template v-if="topUp.orders.length">
+        <p>These are running low. This orders one pack of each from the cheapest supplier. Nothing changes until you confirm.</p>
+        <ul><li v-for="order in topUp.orders" :key="order.supplier"><span>{{ order.supplier }}: {{ order.items.map((item) => ingredient(item.ingredientId).name).join(', ') }}</span><b>{{ order.total.toFixed(2) }} coins</b></li></ul>
+        <p><b>Total {{ topUp.total.toFixed(2) }} coins.</b> Deliveries still take time{{ topUp.days !== undefined ? ` (about ${formatDeliveryTime(topUp.days)})` : '' }}.</p>
+      </template>
+      <p v-else>Nothing is running low, or an order is already on its way.</p>
+      <label class="supply-auto" :class="{ off: game.level < AUTO_SUPPLY_LEVEL }">
+        <input v-model="autoChoice" type="checkbox" :disabled="game.level < AUTO_SUPPLY_LEVEL" />
+        <span><b>Keep doing this automatically</b><small>{{ game.level < AUTO_SUPPLY_LEVEL ? `Unlocks at level ${AUTO_SUPPLY_LEVEL}.` : 'From now on anything that runs low is reordered without asking. It pauses when coins run out.' }}</small></span>
+      </label>
     </ConfirmDialog>
     <TradeTalk />
     <div class="market-modes"><button :class="{active:mode === 'buy'}" type="button" @click="mode = 'buy'">Buy supplies</button><button :class="{active:mode === 'sell'}" type="button" @click="mode = 'sell'">Sell stock</button><span>City prices {{ game.region.marketFactor.toFixed(2) }}× · prices change each shift</span></div>
