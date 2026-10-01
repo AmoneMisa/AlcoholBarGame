@@ -9,6 +9,7 @@ import GuideSheet from './components/knowledge/GuideSheet.vue';
 import UiIcon from './components/ui/UiIcon.vue';
 const WorkshopPage = defineAsyncComponent(() => import('./components/workshop/WorkshopPage.vue'));
 const ProfilePage = defineAsyncComponent(() => import('./components/profile/ProfilePage.vue'));
+const SettingsPage = defineAsyncComponent(() => import('./components/settings/SettingsPage.vue'));
 import NotificationToasts from './components/ui/NotificationToasts.vue';
 import RewardPopup from './components/ui/RewardPopup.vue';
 import DailyRewardPopup from './components/ui/DailyRewardPopup.vue';
@@ -127,7 +128,7 @@ const badges = computed<Record<string, number>>(() => ({
 
 function selectView(id: string) {
   view.value = id;
-  if (id !== 'service' && id !== 'english' && id !== 'friends' && id !== 'workshop' && id !== 'profile') { managementView.value = id; managementOpened.value = true; }
+  if (id !== 'service' && id !== 'english' && id !== 'friends' && id !== 'workshop' && id !== 'profile' && id !== 'settings') { managementView.value = id; managementOpened.value = true; }
 }
 </script>
 
@@ -143,7 +144,8 @@ function selectView(id: string) {
       <FriendsPage v-if="view === 'friends'" />
       <WorkshopPage v-if="view === 'workshop'" />
       <ProfilePage v-if="view === 'profile'" />
-      <ManagementDeck v-if="managementOpened" v-show="view !== 'service' && view !== 'english' && view !== 'friends' && view !== 'workshop' && view !== 'profile'" :active-view="managementView" />
+      <SettingsPage v-if="view === 'settings'" @goto="selectView" />
+      <ManagementDeck v-if="managementOpened" v-show="view !== 'service' && view !== 'english' && view !== 'friends' && view !== 'workshop' && view !== 'profile' && view !== 'settings'" :active-view="managementView" />
     </main>
     <ConversationPopup v-if="game.conversationCustomerId" />
     <GuideSheet />

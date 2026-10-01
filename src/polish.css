@@ -120,3 +120,20 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 }
 .staff-row { grid-template-columns: 34px 1fr auto; }
 .staff-reason { grid-column: 1 / -1; margin: 2px 0 0 !important; padding: 5px 8px; border: 1px solid #8a5a3a; border-radius: 8px; background: #2a1b17; color: #ffcfae; font-size: 11px !important; opacity: 1 !important; }
+
+/* ==== One height for buttons, inputs and selects; text and icons centred ==== */
+:root { --ctl-h: 40px; }
+.how-to-play, .volume-panel .volume-row > button, .top-up-row button, .staff-row button, .currency-exchange button, .card button, .bar-chips button, .settings-card button,
+.bar-name-editor button, .circle .person button:not(.story-toggle), .circle .crew button, .opt-trigger, .academy-body button, .profile-actions button, .pick-button {
+  box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: var(--ctl-h); padding-block: 0; line-height: 1.2; text-align: center;
+}
+.how-to-play .ui-icon, .settings-card button .ui-icon, .more-settings .ui-icon, .academy-body button .ui-icon { flex: none; width: 20px; height: 20px; }
+.how-to-play { width: 100%; }
+.how-to-play span, .settings-button-main span { display: inline-block; }
+.opt-select .opt-trigger { min-height: var(--ctl-h); }
+.bar-name-editor input, .pairing-controls input, input[data-guide="talk-input"], .friend-code-input, .search-input { box-sizing: border-box; min-height: var(--ctl-h); padding-block: 0; line-height: 1.2; }
+.bar-name-editor { align-items: end; }
+.circle .gifts button { min-height: 34px; min-width: 40px; }
+.circle .keep button { min-height: 32px; }
+.circle .story-toggle { min-height: 34px; }
+.settings-page .volume-panel.static { position: static; width: auto; max-height: none; overflow: visible; padding: 0; border: 0; background: transparent; box-shadow: none; display: grid; gap: 8px; }

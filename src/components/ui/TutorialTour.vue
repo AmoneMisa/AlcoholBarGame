@@ -7,7 +7,7 @@ import { useGameStore } from '../../stores/game';
 // A short guided tour for new players. Steps that ask for an action show the exact thing to press (a circle on the
 // real button and a hand that shows the gesture) and move on by themselves when the player has done it; "Skip step"
 // is always there. The tour can be skipped at any time, never comes back on its own once it is finished or
-// skipped, and can be replayed from the Sound panel (the "How to play" button).
+// skipped, and can be replayed from the Settings page (the "How to play" button).
 
 interface Step {
   id: string; title: string; text: string; view?: string; target?: string; tips?: string[];
@@ -26,7 +26,7 @@ const game = useGameStore();
 const shown = (css: string) => { const element = document.querySelector<HTMLElement>(css); return !!element && element.getBoundingClientRect().width > 1; };
 
 const STEPS: Step[] = [
-  { id: 'welcome', title: 'Welcome to BarLingo!', text: 'You run a bar, and you learn real English while you serve. This tour takes about a minute. You can skip it at any time and replay it later from the Sound panel.', view: 'service' },
+  { id: 'welcome', title: 'Welcome to BarLingo!', text: 'You run a bar, and you learn real English while you serve. This tour takes about a minute. You can skip it at any time and replay it later from Settings.', view: 'service' },
   { id: 'guests', title: 'Your guests', text: 'Guests arrive at the bar one by one. Each has a mood, a wish, and sometimes a problem.', view: 'service',
     action: 'Tap a guest to open the conversation.', point: [{ target: selector('guest'), gesture: 'tap', label: '{Tap} a guest to talk' }], until: () => !!game.conversationCustomerId },
   { id: 'talk', title: 'Talk to find the order', text: 'Ask in English what the guest likes: "Do you like sweet drinks?" The guest answers with clues. The checker corrects your English.',

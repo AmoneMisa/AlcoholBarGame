@@ -4,11 +4,10 @@ import { CRYSTAL_EXCHANGE_BUNDLES, STAR_CRYSTAL_PACKS } from '../../domain/econo
 import { useGameStore } from '../../stores/game';
 import UiIcon from '../ui/UiIcon.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
-import OptionSelect from './OptionSelect.vue';
 import { MAX_STAFF, MAX_STAFF_LEVEL, STAFF_PROFILES, STAFF_UNLOCK_LEVELS, hireCost, teamShare, upgradeCost } from '../../domain/staff';
 import { TRAINING_MODULES } from '../../domain/training';
 import AcademyPanel from './AcademyPanel.vue';
-import { musicOn, musicVolume, sfxOn, sfxVolume, speechOn, speechVolume, voiceMode } from '../../audio/index';
+import { musicOn, musicVolume, sfxOn, sfxVolume, speechOn, speechVolume } from '../../audio/index';
 defineEmits<{ design:[]; goto:[view: string] }>();
 
 const game = useGameStore();
@@ -16,7 +15,6 @@ const exchangeOpen = ref(false);
 const staffOpen = ref(false);
 const academyOpen = ref(false);
 const lessonsLeft = computed(() => TRAINING_MODULES.length - game.training.done.length);
-const startTour = () => window.dispatchEvent(new Event('barlingo:tour'));
 const slots = computed(() => Array.from({ length: MAX_STAFF }, (_, index) => ({ index, profile: STAFF_PROFILES[index]!, unlockAt: STAFF_UNLOCK_LEVELS[index]!, member: game.staff[index], open: game.level >= STAFF_UNLOCK_LEVELS[index]! })));
 // Why a hire or training button is off, said in words under the row.
 const staffReason = (slot: { index: number; member?: { level: number }; open: boolean }) => {
@@ -89,7 +87,7 @@ onUnmounted(() => {
         <button class="staff-open" data-guide="academy" type="button" :aria-expanded="academyOpen" aria-label="Open the training academy" @click="academyOpen = !academyOpen"><span class="staff-icons"><i class="hired"><UiIcon name="cap" /></i></span><span><small>TRAINING</small><b>{{ lessonsLeft ? `${lessonsLeft} to do` : 'All done' }}</b></span></button>
         <AcademyPanel v-if="academyOpen" @close="academyOpen = false" @goto="(view) => $emit('goto', view)" />
       </div>
-      <div class="staff-resource">
+      <div v-if="game.level >= STAFF_UNLOCK_LEVELS[0]!" class="staff-resource">
         <button class="staff-open" type="button" :aria-expanded="staffOpen" :aria-label="`Servers: ${game.staff.length} of ${MAX_STAFF} hired`" @click="staffOpen = !staffOpen"><span class="staff-icons"><i v-for="slot in slots" :key="slot.index" :class="{ hired: !!slot.member, locked: !slot.open }"><UiIcon name="server" /></i></span><span><small>SERVERS</small><b>{{ game.staff.length ? `${teamPercent}% of you` : 'Hire' }}</b></span></button>
         <PopoverPanel v-if="staffOpen" class="staff-panel" padded eyebrow="SERVERS" :title="`Your team in ${game.region.name}`" close-label="Close servers" @close="staffOpen = false">
           <p>Every bar has its own servers. They work for you while you are away and earn up to {{ Math.round(MAX_STAFF * 21.25) }}% of what you would earn serving alone with all four fully trained. They never bring crystals or tips.</p>
@@ -124,8 +122,7 @@ onUnmounted(() => {
             <output>{{ speechOn ? percent(speechVolume) : 'Off' }}</output>
             <button type="button" :aria-pressed="!speechOn" aria-label="Mute English voice" @click="speechOn = !speechOn">{{ speechOn ? 'Mute' : 'Unmute' }}</button>
           </div>
-          <button type="button" class="how-to-play" @click="volumeOpen = false; startTour()"><UiIcon class="inline-icon" name="help" /> How to play (replay the tour)</button>
-          <OptionSelect label="Guest voices" v-model="voiceMode" :options="[{ value: 'murmur', label: 'Murmur' }, { value: 'speech', label: 'Read aloud' }, { value: 'off', label: 'Off' }]" />
+          <button type="button" class="how-to-play more-settings" @click="volumeOpen = false; $emit('goto', 'settings')"><UiIcon name="settings" /><span>More settings</span></button>
         </PopoverPanel>
       </div>
     </div>
