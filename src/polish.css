@@ -180,3 +180,20 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .game-nav::-webkit-scrollbar { display: none; }
 .game-nav button { flex: 0 0 66px; min-width: 66px; }
 @media (max-width: 420px) { .game-nav { display: flex; } .game-nav button { flex: 0 0 60px; min-width: 60px; } }
+
+/* One supply card */
+.auto-supply { flex-wrap: wrap; }
+.auto-supply-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+
+/* Recipe cards: image on the left, the words on the right, nothing runs off the card, every card the same height */
+.recipe-cards { grid-auto-rows: 1fr; }
+.recipe-cards button { align-items: start; justify-content: stretch; text-align: left; overflow: hidden; }
+.recipe-cards .glass-model, .recipe-cards .glass-model.glass-painted { align-self: center; }
+.recipe-card-copy { min-width: 0; align-content: start; justify-items: start; text-align: left; }
+.recipe-card-copy small { text-transform: uppercase; letter-spacing: .03em; line-height: 1.25; }
+.recipe-card-copy .specialty-badge { width: auto; max-width: 100%; box-sizing: border-box; font-size: 9px; margin: 2px 0; white-space: normal; line-height: 1.2; }
+.recipe-card-copy p, .recipe-card-copy span { max-width: 100%; overflow-wrap: anywhere; }
+.recipe-card-copy > em:last-child { margin-top: 2px; font-style: normal; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; font-size: 10px; color: #ffd98a; }
+.auto-supply > div:first-child { flex: 1 1 320px; }
+.auto-supply-actions { flex-wrap: nowrap; flex: 0 0 auto; }
+@media (max-width: 560px) { .auto-supply-actions { flex-wrap: wrap; width: 100%; margin-left: 0; } }

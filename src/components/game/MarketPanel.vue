@@ -47,17 +47,17 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
   <article class="game-panel market-panel">
     <PanelHeading :eyebrow="`TRADE FLOOR · ${game.region.name}`" title="Stock your next shift" />
     <!-- Level perks live on the bar scene's city chip; the market only shows what changes buying here. -->
-    <div class="auto-supply" :class="{ locked: game.level < AUTO_SUPPLY_LEVEL, on: game.autoSupply }">
-      <div><b>Auto-supply</b><small>{{ game.level < AUTO_SUPPLY_LEVEL ? `Unlocks at level ${AUTO_SUPPLY_LEVEL}` : 'Reorders anything that runs low from the cheapest supplier, with normal prices and delivery fees.' }}</small></div>
-      <UiButton :variant="game.autoSupply ? 'solid' : 'secondary'" role="switch" :aria-checked="game.autoSupply" :reason="game.level < AUTO_SUPPLY_LEVEL ? `Auto-supply unlocks at level ${AUTO_SUPPLY_LEVEL}.` : ''" @click="game.autoSupply ? game.setAutoSupply(false) : (confirm = 'auto')">{{ game.level < AUTO_SUPPLY_LEVEL ? `Lv ${AUTO_SUPPLY_LEVEL}` : game.autoSupply ? 'On' : 'Off' }}</UiButton>
+    <!-- One supply card: "Top up now" and the automatic switch use the same logic (reorder what runs low from the cheapest supplier). -->
+    <div class="auto-supply" :class="{ on: game.autoSupply }">
+      <div><b>Auto-supply</b><small>Reorders anything that runs low from the cheapest supplier, at normal prices and delivery fees. Top up now does it once; the switch does it for you all the time.{{ game.level < AUTO_SUPPLY_LEVEL ? ` The switch unlocks at level ${AUTO_SUPPLY_LEVEL}.` : '' }}</small></div>
+      <div class="auto-supply-actions">
+        <UiButton variant="solid" data-guide="top-up" @click="openTopUp">Top up now</UiButton>
+        <UiButton :variant="game.autoSupply ? 'primary' : 'secondary'" role="switch" :aria-checked="game.autoSupply" :disabled="game.level < AUTO_SUPPLY_LEVEL" :title="game.level < AUTO_SUPPLY_LEVEL ? `Unlocks at level ${AUTO_SUPPLY_LEVEL}` : ''" @click="game.autoSupply ? game.setAutoSupply(false) : (confirm = 'auto')">{{ game.level < AUTO_SUPPLY_LEVEL ? `Auto · Lv ${AUTO_SUPPLY_LEVEL}` : game.autoSupply ? 'Auto: On' : 'Auto: Off' }}</UiButton>
+      </div>
     </div>
-    <div class="top-up-row">
-      <div><b>Top up low stock</b><small>Orders everything that is running low from the cheapest supplier, in one tap. Deliveries still take time.</small></div>
-      <UiButton variant="solid" data-guide="top-up" @click="openTopUp">Top up</UiButton>
-    </div>
-    <ConfirmDialog v-if="confirm === 'top-up'" title="Top up low stock?" confirm-label="Place the orders" :reason="topUp.orders.length ? (game.money < topUp.total ? `Not enough coins: you need ${topUp.total.toFixed(2)}, you have ${Math.floor(game.money)}.` : '') : 'Nothing is running low, or an order is already on its way.'" @cancel="confirm = ''" @confirm="doTopUp">
+    <ConfirmDialog v-if="confirm === 'top-up'" title="Top up low stock?" confirm-label="Place the orders" :disabled="!topUp.orders.length" :reason="topUp.orders.length && game.money < topUp.total ? `Not enough coins: you need ${topUp.total.toFixed(2)}, you have ${Math.floor(game.money)}.` : ''" @cancel="confirm = ''" @confirm="doTopUp">
       <p v-if="topUp.orders.length">This orders everything that is running low from the cheapest supplier, one pack of each. Nothing changes until you confirm.</p>
-      <p v-else>Nothing needs ordering right now.</p>
+      <p v-else>Nothing is running low, or an order is already on its way. Nothing to order now.</p>
       <ul v-if="topUp.orders.length"><li v-for="order in topUp.orders" :key="order.supplier"><span>{{ order.supplier }}: {{ order.items.map((item) => ingredient(item.ingredientId).name).join(', ') }}</span><b>{{ order.total.toFixed(2) }} coins</b></li></ul>
       <p v-if="topUp.orders.length"><b>Total {{ topUp.total.toFixed(2) }} coins.</b> Deliveries still take time{{ topUp.days !== undefined ? ` (about ${formatDeliveryTime(topUp.days)})` : '' }}.</p>
     </ConfirmDialog>

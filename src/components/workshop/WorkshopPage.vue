@@ -265,7 +265,7 @@ const boostLeft = (id: string) => {
           <div v-for="(row, index) in draftItems" :key="index" class="row sig-row">
             <OptionSelect label="Ingredient" :model-value="row.ingredientId" :options="usableList.map((item) => ({ value: item.id, label: item.name }))" @update:model-value="(value: string) => pickIngredient(row, value)" />
             <UiButton variant="primary" @click="stepAmount(row, -1)">−</UiButton><b>{{ row.amount }} {{ ingredient(row.ingredientId).unit === 'ml' ? 'ml' : '×' }}</b><UiButton variant="primary" @click="stepAmount(row, 1)">+</UiButton>
-            <UiButton variant="primary" :disabled="draftItems.length <= 2" @click="draftItems.splice(index, 1)">✕</UiButton>
+            <UiButton variant="secondary" size="sm" icon="close" aria-label="Remove this ingredient" :disabled="draftItems.length <= 2" @click="draftItems.splice(index, 1)" />
           </div>
           <div class="row"><UiButton variant="primary" :disabled="draftItems.length >= MAX_ITEMS" @click="addRow">Add ingredient</UiButton><label><input v-model="draftShake" type="checkbox" /> Needs shaking</label></div>
           <b>Guests would pay {{ preview.price.toFixed(2) }} coins</b>
