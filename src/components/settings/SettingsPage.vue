@@ -5,8 +5,7 @@ import { APP_BUILT, APP_VERSION, formatBuilt } from '../../version';
 import OptionSelect from '../game/OptionSelect.vue';
 import UiButton from '../ui/UiButton.vue';
 import ConfirmDialog from '../ui/ConfirmDialog.vue';
-import { computed, ref } from 'vue';
-import { PRESTIGE_LEVEL, prestigeStarsFor } from '../../domain/loot';
+import { ref } from 'vue';
 import { useGameStore } from '../../stores/game';
 import SoundControls from './SoundControls.vue';
 import { NOTIFICATION_EVENTS, useNotificationsStore } from '../../stores/notifications';
@@ -14,11 +13,6 @@ import { NOTIFICATION_EVENTS, useNotificationsStore } from '../../stores/notific
 // Everything the player sets once and rarely touches again: sound, guest voices, help and the version of the game.
 const notifications = useNotificationsStore();
 const game = useGameStore();
-// The Grand Opening (prestige) wipes the business and starts over. It lives here, behind an agreement, not on the main page.
-const asking = ref(false);
-const stars = computed(() => prestigeStarsFor(game.loot.runEarned));
-const wipeReason = computed(() => game.level >= PRESTIGE_LEVEL ? '' : `Available from level ${PRESTIGE_LEVEL} (you are level ${game.level}).`);
-function grandOpening() { asking.value = false; game.act({ type: 'prestige' }); }
 // Resetting the whole account works at any level, and only after the player agrees.
 const resetting = ref(false);
 const agreed = ref(false);
@@ -57,12 +51,6 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
       <UiButton variant="primary" icon="help" @click="replayTour">How to play (replay the tour)</UiButton>
     </section>
 
-    <section class="settings-card">
-      <h3>Grand Opening</h3>
-      <p>Reopens your bars from scratch: coins, XP, stock and equipment levels are reset. Recipes, styles, crystals, parts, boxes, friends and the bars you own stay. You earn prestige stars for permanent bonuses and a Choice box. Opened {{ game.loot.prestige.count }} times so far.</p>
-      <UiButton variant="secondary" class="settings-action" :reason="wipeReason" @click="asking = true">Start a Grand Opening…</UiButton>
-    </section>
-
     <section class="settings-card danger-zone">
       <h3>Reset my account</h3>
       <p>Deletes all your progress and starts the game again from the beginning, at any level: bars, recipes, styles, crystals, equipment, friends' gifts you have not opened and your stats. Your friends list stays. This cannot be undone.</p>
@@ -72,14 +60,6 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
     <ConfirmDialog v-if="resetting" title="Delete all my progress?" confirm-label="Delete everything" danger :disabled="!agreed" @cancel="resetting = false" @confirm="wipeAccount">
       <p>Everything you have built will be deleted <b>forever</b>: level {{ game.level }}, {{ game.knownRecipes.length }} recipes, your bars, styles, crystals and equipment. There is no way to get it back.</p>
       <UiCheckbox v-model="agreed" tone="danger" label="I understand that my progress will be deleted and cannot be restored." />
-    </ConfirmDialog>
-
-    <ConfirmDialog v-if="asking" title="Start over?" confirm-label="Yes, reset my bars" danger @cancel="asking = false" @confirm="grandOpening">
-      <p>This <b>resets your business</b> and cannot be undone. You will earn <b>{{ stars }} prestige stars</b> and a Choice box.</p>
-      <ul>
-        <li><span>Reset</span><b>coins, XP, stock, equipment levels</b></li>
-        <li><span>Kept</span><b>recipes, styles, crystals, parts, boxes, friends, owned bars</b></li>
-      </ul>
     </ConfirmDialog>
 
     <section class="settings-card">

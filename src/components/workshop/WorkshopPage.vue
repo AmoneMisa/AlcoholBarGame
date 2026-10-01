@@ -26,7 +26,7 @@ import { useGameStore } from '../../stores/game';
 
 const game = useGameStore();
 const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'circle' | 'signature' | 'weekly' | 'prestige'>('equipment');
-const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['circle', 'Circle'], ['signature', 'Signature'], ['weekly', 'Weekly'], ['prestige', 'Grand Opening']] as const;
+const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['circle', 'Circle'], ['signature', 'Signature'], ['weekly', 'Weekly']] as const;
 const scrollRecipe = ref('');
 const names = { consumable: (id: string) => consumableDef(id)?.name ?? id, equipment: (id: string) => equipmentDef(id)?.name ?? id };
 // Equipment is kept per bar. The bar shown here can be picked without leaving the page.
@@ -336,7 +336,7 @@ const boostLeft = (id: string) => {
         <h3>🏛️ Grand Opening</h3>
         <p>At level {{ PRESTIGE_LEVEL }} you can reopen your bars: coins, XP, stock and equipment reset. Recipes, styles, crystals, parts and boxes stay, and you earn prestige stars for permanent perks plus a Choice box.</p>
         <b>Opened {{ game.loot.prestige.count }} times · this run earns {{ runStars }} stars</b>
-        <p class="hint-line">Starting a Grand Opening resets your business, so it lives in Settings, behind a confirmation.</p>
+
       </article>
       <article v-for="perk in PRESTIGE_PERKS" :key="perk.id" class="card">
         <h3>{{ perk.name }} <b>{{ game.loot.prestige.perks[perk.id] ?? 0 }} / {{ perk.maxRank }}</b></h3>
