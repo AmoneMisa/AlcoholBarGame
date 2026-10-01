@@ -354,7 +354,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         <CloseButton class="talk-close" data-guide="talk-close" label="Close conversation" @click="game.closeConversation()" />
       </header>
       <section v-if="guideOpen" class="chat-guide" aria-label="Conversation guide">
-        <header><b>How conversations work</b><button type="button" @click="guideOpen = false">Close</button></header>
+        <header><b>How conversations work</b><CloseButton label="Close the guide" size="sm" @click="guideOpen = false" /></header>
         <ol><li v-for="step in CHAT_GUIDE" :key="step.title"><b>{{ step.title }}.</b> {{ step.text }} <button v-if="step.show" type="button" class="show-me" @click="showMe(step)">Show me</button></li></ol>
       </section>
       <div class="talk-extras">

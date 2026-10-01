@@ -209,3 +209,16 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .venue-dot { width: 9px; height: 9px; border-radius: 50%; background: #d9534f; }
 /* rows that hold an input and a button line them up at the bottom edge */
 .friends-page .row { align-items: flex-end; }
+
+/* Conversation: the help (?) and close buttons sit together in the top right corner, whatever the width. */
+.talk-popup { position: relative; }
+.talk-header { display: flex; align-items: center; gap: 14px; padding-right: 100px; }
+.talk-header .talk-portrait { flex: none; }
+.talk-header .talk-title { min-width: 0; flex: 1; }
+.talk-header .talk-help, .talk-header .talk-close { position: absolute; top: 12px; }
+.talk-header .talk-close { right: 12px; }
+.talk-header .talk-help { right: 56px; width: 36px; height: 36px; display: grid; place-items: center; padding: 0; }
+@media (max-width: 720px) { .talk-header { gap: 10px; padding-right: 96px; } }
+/* The help sits on top of the conversation instead of pushing it down. */
+.chat-guide { position: absolute; left: 10px; right: 10px; top: 64px; z-index: 40; max-height: calc(100% - 80px); overflow: auto; padding: 12px 14px; border: 1px solid #5d7494; border-radius: 14px; background: #16233a; box-shadow: 0 18px 50px #000d; }
+.chat-guide > header { position: sticky; top: -12px; margin: -12px -14px 6px; padding: 10px 14px; background: #16233a; border-radius: 14px 14px 0 0; }
