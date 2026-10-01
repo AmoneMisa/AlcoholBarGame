@@ -183,6 +183,14 @@ const deliveryDaysFor = (state: PlayerState, supplier: Supplier, now: number) =>
 // Auto-supply (level 5+): anything running low is reordered, one pack from the cheapest supplier that sells it,
 // paying normal prices and delivery fees. Nothing is ordered twice while a delivery for it is on the way.
 const LOW_STOCK = { ml: 150, piece: 4 } as const;
+// Pays for a quote and puts the delivery on its way (shared by a manual order and by Top-up / Auto-supply). Returns the days it takes.
+function placeDeliveryOrder(state: PlayerState, supplier: ReturnType<typeof supplierInCity>, quote: ReturnType<typeof quotePurchase>, now: number) {
+  state.money = coins(state.money - quote.total);
+  const days = deliveryDaysFor(state, supplier, now);
+  state.deliveryOrders.push({ id: crypto.randomUUID(), supplier: supplier.name, barId: state.regionId, dueAt: now + Math.round(days * DELIVERY_DAY_MS),
+    items: quote.lines.map((line) => ({ ingredientId: line.ingredientId, amount: line.amount })), total: quote.total });
+  return days;
+}
 // Orders what is running low from the cheapest suppliers. Automatic (from level 5, when switched on) or by the player with one tap.
 function autoRestock(state: PlayerState, now: number, manual = false): number {
   if (!manual && (!state.autoSupply || levelFor(state.xp) < AUTO_SUPPLY_LEVEL)) return 0;
@@ -208,10 +216,7 @@ function autoRestock(state: PlayerState, now: number, manual = false): number {
     if (!quote.lines.length) continue;
     if (state.money < quote.total) { state.message = `${manual ? 'Top-up' : 'Auto-supply'} paused: ${quote.total.toFixed(2)} coins needed for ${supplier.name}.`; continue; }
     ordered++;
-    state.money = coins(state.money - quote.total);
-    const days = deliveryDaysFor(state, supplier, now);
-    state.deliveryOrders.push({ id: crypto.randomUUID(), supplier: supplier.name, barId: state.regionId, dueAt: now + Math.round(days * DELIVERY_DAY_MS),
-      items: quote.lines.map((line) => ({ ingredientId: line.ingredientId, amount: line.amount })), total: quote.total });
+    placeDeliveryOrder(state, supplier, quote, now);
     log(state, `${manual ? 'Top-up' : 'Auto-supply'} ordered ${quote.lines.map((line) => INGREDIENTS.find((item) => item.id === line.ingredientId)?.name).join(', ')} from ${supplier.name} for ${quote.total.toFixed(2)} coins.`);
   }
   return ordered;
@@ -668,10 +673,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       }
       if (state.money < quote.total) throw new RuleError('You do not have enough money.');
       if (voucher) { delete state.loot.armed['voucher']; state.message = 'Supplier Voucher used: 20% off.'; }
-      state.money = coins(state.money - quote.total);
-      const days = deliveryDaysFor(state, supplier, now);
-      state.deliveryOrders.push({ id: crypto.randomUUID(), supplier: supplier.name, barId: state.regionId, dueAt: now + Math.round(days * DELIVERY_DAY_MS),
-        items: quote.lines.map((line) => ({ ingredientId: line.ingredientId, amount: line.amount })), total: quote.total });
+      const days = placeDeliveryOrder(state, supplier, quote, now);
       log(state, `Ordered ${quote.packs} packs from ${supplier.name} for ${quote.total.toFixed(2)} coins. Delivery in ${formatDeliveryTime(days)}.`);
       break;
     }
