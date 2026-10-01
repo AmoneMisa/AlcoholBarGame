@@ -16,11 +16,12 @@ import { CHARACTER_ART } from '../../data/cosmetics/artCatalog';
 import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipeId, isRegularId, nextRegularStep, regularLevel } from '../../domain/regulars';
 import { SEASON_FEATURED_SHARE, SEASON_MILESTONES, SPARK_DRAWS, seasonAt } from '../../domain/seasons';
 import { featuredLegendary } from '../../sim/loot';
+import CompanionsPanel from './CompanionsPanel.vue';
 import { useGameStore } from '../../stores/game';
 
 const game = useGameStore();
-const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'signature' | 'weekly' | 'prestige'>('equipment');
-const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['signature', 'Signature'], ['weekly', 'Weekly'], ['prestige', 'Grand Opening']] as const;
+const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'circle' | 'signature' | 'weekly' | 'prestige'>('equipment');
+const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['circle', 'Circle'], ['signature', 'Signature'], ['weekly', 'Weekly'], ['prestige', 'Grand Opening']] as const;
 const scrollRecipe = ref('');
 const names = { consumable: (id: string) => consumableDef(id)?.name ?? id, equipment: (id: string) => equipmentDef(id)?.name ?? id };
 const cap = (id: string) => levelCap(game.loot.equipment[game.regionId]![id]!.tier, game.loot.prestige.perks.cap ?? 0);
@@ -137,7 +138,7 @@ const boostLeft = (id: string) => {
         <progress :value="slot(item.id).level" :max="10"></progress>
         <div class="row">
           <button type="button" :disabled="slot(item.id).level >= cap(item.id)" @click="game.act({ type: 'upgradeEquipment', item: item.id })">
-            Upgrade · {{ upgradeCostFor(slot(item.id).level).coins }} coins + {{ upgradeCostFor(slot(item.id).level).parts }} parts
+            Upgrade · {{ upgradeCostFor(slot(item.id).level).coins }} coins + {{ Math.max(1, Math.ceil(upgradeCostFor(slot(item.id).level).parts * (1 - game.crewBonus('upgrade')))) }} parts
           </button>
           <button v-if="TIER_SHARD_COST[slot(item.id).tier]" type="button" :disabled="(game.loot.itemShards[item.id] ?? 0) < TIER_SHARD_COST[slot(item.id).tier]!" @click="game.act({ type: 'promoteEquipment', item: item.id })">
             Raise tier · {{ game.loot.itemShards[item.id] ?? 0 }}/{{ TIER_SHARD_COST[slot(item.id).tier] }} shards
@@ -289,6 +290,8 @@ const boostLeft = (id: string) => {
         </article>
       </template>
     </div>
+
+    <CompanionsPanel v-else-if="tab === 'circle'" />
 
     <div v-else-if="tab === 'regulars'" class="grid">
       <p class="hint">Guests remember you. Every drink you serve earns loyalty (+1, +1 for VIPs, +1 for their favourite drink). Loyalty levels at {{ REGULAR_LEVELS.join(' / ') }} points pay rewards, and a regular pays {{ Math.round((REGULAR_FAVORITE_BONUS - 1) * 100) }}% more for their favourite. Level rewards: {{ REGULAR_REWARDS.map((reward) => [reward.box && reward.box + ' box', reward.parts && reward.parts + ' parts', reward.skinShards && reward.skinShards + ' skin shards', reward.crystals && reward.crystals + ' crystals'].filter(Boolean).join(' + ')).join(' → ') }}.</p>

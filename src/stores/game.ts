@@ -1,5 +1,7 @@
 import { computed, ref, toRaw } from 'vue';
 import { statValue } from '../domain/achievementStats';
+import { companionBonus, emptyCompanions } from '../sim/companions';
+import type { BonusId } from '../domain/companions';
 import type { StatId } from '../domain/quests';
 import { buildPlayerProfile, earnedAchievements as earnedAchievementList } from '../domain/profile';
 import { rulesFor } from '../domain/situations/houseRules';
@@ -586,6 +588,14 @@ export const useGameStore = defineStore('game', () => {
   const topUp = () => dispatch({ type: 'topUp' });
   // The servers of the bar being managed: every bar has its own team.
   const staff = computed(() => state.value.staffByBar?.[state.value.regionId] ?? []);
+  // The Circle: people who joined, shards, keepsakes and who works in this bar.
+  const crewBonus = (bonus: BonusId) => companionBonus(state.value, bonus);
+  const circle = computed(() => state.value.companions ?? emptyCompanions());
+  const recruitCompanion = (id: string) => dispatch({ type: 'recruitCompanion', id });
+  const giveKeepsake = (id: string, kind: string) => dispatch({ type: 'giveKeepsake', id, kind });
+  const buyKeepsake = (kind: string, quantity = 1) => dispatch({ type: 'buyKeepsake', kind, quantity });
+  const assignCompanion = (id: string) => dispatch({ type: 'assignCompanion', id });
+  const dismissCompanion = (id: string) => dispatch({ type: 'dismissCompanion', id });
   const hireStaff = () => dispatch({ type: 'hireStaff' });
   const upgradeStaff = (index: number) => dispatch({ type: 'upgradeStaff', index });
   const giveWater = (customerId: string) => dispatch({ type: 'giveWater', customerId });
@@ -675,7 +685,7 @@ export const useGameStore = defineStore('game', () => {
 
   const act = (action: GameAction) => dispatch(action);
   return {
-    achievementStat, profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, act, visibleInventory, connectEpoch,
+    circle, crewBonus, recruitCompanion, giveKeepsake, buyKeepsake, assignCompanion, dismissCompanion, achievementStat, profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, act, visibleInventory, connectEpoch,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, sessionReady, ownedInteriorIds, barBackground, barInteriorStyle,

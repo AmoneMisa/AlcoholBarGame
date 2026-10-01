@@ -18,6 +18,8 @@ import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipe
 import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import type { Customer } from '../domain/types';
 import { statValue } from '../domain/achievementStats';
+import { companionBonus, joinCompanion, addKeepsakes } from './companions';
+import { companionJoiningWith, keepsakeFor } from '../domain/companions';
 import { ACHIEVEMENTS, TASTING_REWARD, achievementById, achievementSeries, questById, questsForWeek, weekOf, type StatId } from '../domain/quests';
 import type { DrawResult } from '../domain/lootState';
 import { createLoot } from '../domain/lootState';
@@ -49,17 +51,24 @@ export const equipmentLevel = (state: PlayerState, id: EquipmentId, regionId = s
 const effect = (state: PlayerState, id: EquipmentId) => equipmentLevel(state, id) * equipmentDef(id)!.perLevel;
 
 export function lootBonuses(state: PlayerState, now: number) {
+  // People of the Circle who work in this bar add their own bonus on top of the equipment.
+  const c = (bonus: Parameters<typeof companionBonus>[1]) => companionBonus(state, bonus);
   return {
-    tipChance: effect(state, 'shaker'),
-    liquidSaved: effect(state, 'ice-machine'),
-    deliveryFactor: 1 - effect(state, 'fridge'),
-    patienceFactor: 1 + effect(state, 'speakers'),
+    tipChance: effect(state, 'shaker') + c('tips'),
+    liquidSaved: effect(state, 'ice-machine') + c('saved'),
+    deliveryFactor: Math.max(.2, 1 - effect(state, 'fridge') - c('delivery')),
+    patienceFactor: 1 + effect(state, 'speakers') + c('patience'),
+    bottleSaleFactor: 1 + c('bottles'),
+    staffFactor: 1 + c('staff'),
+    crystalFactor: 1 + c('crystals'),
+    upgradeDiscount: c('upgrade'),
+    tasteParts: c('parts'),
     // Cash register, prestige name and the Coin Booster multiply what guests pay.
-    payFactor: (1 + effect(state, 'register')) * (1 + perkRank(state, 'pay') * .015) * (boostActive(state, 'coin-boost', now) ? 1.25 : 1),
-    supplyFactor: 1 - perkRank(state, 'supply') * .02,
-    bottleCostFactor: 1 - effect(state, 'cellar'),
-    xpFactor: boostActive(state, 'xp-boost', now) ? 1.5 : 1,
-    arrivalFactor: boostActive(state, 'happy-hour', now) ? .5 : 1,
+    payFactor: (1 + effect(state, 'register') + c('pay')) * (1 + perkRank(state, 'pay') * .015) * (boostActive(state, 'coin-boost', now) ? 1.25 : 1),
+    supplyFactor: 1 - perkRank(state, 'supply') * .02 - c('supply'),
+    bottleCostFactor: 1 - effect(state, 'cellar') - c('restock'),
+    xpFactor: (boostActive(state, 'xp-boost', now) ? 1.5 : 1) * (1 + c('xp')),
+    arrivalFactor: (boostActive(state, 'happy-hour', now) ? .5 : 1) * (1 - c('arrival')),
     alwaysTips: boostActive(state, 'tip-boost', now)
   };
 }
@@ -198,9 +207,10 @@ export function upgradeEquipment(state: PlayerState, id: string, now: number) {
   if (slot.level >= cap) throw new LootError(TIER_SHARD_COST[slot.tier] ? 'Raise the item’s tier with shards to unlock more levels.' : 'This item is at its top level.');
   const cost = upgradeCostFor(slot.level);
   if (state.money < cost.coins) throw new LootError(`You need ${cost.coins} coins.`);
-  if (state.loot.parts < cost.parts) throw new LootError(`You need ${cost.parts} workshop parts.`);
+  const partsCost = Math.max(1, Math.ceil(cost.parts * (1 - companionBonus(state, 'upgrade'))));
+  if (state.loot.parts < partsCost) throw new LootError(`You need ${partsCost} workshop parts.`);
   state.money = coins(state.money - cost.coins);
-  state.loot.parts -= cost.parts;
+  state.loot.parts -= partsCost;
   slot.level += 1;
   track(state, 'upgrades', 1, now);
   note(state, `${equipmentDef(id)!.name} is now level ${slot.level} in this bar.`);
@@ -383,9 +393,12 @@ export function claimQuest(state: PlayerState, questId: unknown, now: number) {
   if (state.loot.quests.claimed.includes(quest.id)) throw new LootError('Quest reward already claimed.');
   if ((state.loot.quests.progress[quest.stat] ?? 0) < quest.target) throw new LootError('This quest is not finished yet.');
   state.loot.quests.claimed.push(quest.id);
-  state.crystals += quest.crystals;
+  const crystals = Math.round(quest.crystals * (1 + companionBonus(state, 'crystals')));
+  state.crystals += crystals;
   grantBox(state, quest.box);
-  note(state, `Quest done: ${quest.name}. +${quest.crystals} crystals and a ${boxDef(quest.box)!.name}.`);
+  const keepsake = keepsakeFor(quest.id + week);
+  addKeepsakes(state, keepsake, 1);
+  note(state, `Quest done: ${quest.name}. +${crystals} crystals, a ${boxDef(quest.box)!.name} and a keepsake.`);
 }
 export function claimAchievement(state: PlayerState, id: unknown) {
   const goal = achievementById(String(id));
@@ -395,9 +408,15 @@ export function claimAchievement(state: PlayerState, id: unknown) {
   if (before && !state.loot.achievements.includes(before.id)) throw new LootError(`Claim ${before.tierName} first.`);
   if (goalProgress(state, goal.stat) < goal.target) throw new LootError('This achievement is not finished yet.');
   state.loot.achievements.push(goal.id);
-  state.crystals += goal.crystals;
+  const crystals = Math.round(goal.crystals * (1 + companionBonus(state, 'crystals')));
+  state.crystals += crystals;
   grantBox(state, goal.box);
-  note(state, `Achievement: ${goal.name}. +${goal.crystals} crystals and a ${boxDef(goal.box)!.name}.`);
+  // Higher tiers bring more keepsakes, and some achievements bring a person to the bar.
+  const keepsakes = goal.tier >= 3 ? 2 : 1;
+  addKeepsakes(state, keepsakeFor(goal.id), keepsakes);
+  const joining = companionJoiningWith(goal.id);
+  const joined = joining ? ` ${joinCompanion(state, joining.id)}` : '';
+  note(state, `Achievement: ${goal.name}. +${crystals} crystals, a ${boxDef(goal.box)!.name} and ${keepsakes} keepsake${keepsakes > 1 ? 's' : ''}.${joined}`);
 }
 // First time a recipe is served (or a brand poured) pays a small one-time reward.
 export function tasteFirst(state: PlayerState, key: string, kind: 'recipe' | 'brand', now: number) {
@@ -406,9 +425,10 @@ export function tasteFirst(state: PlayerState, key: string, kind: 'recipe' | 'br
   state.loot.tasted.push(id);
   if (kind === 'recipe') {
     track(state, 'tasted', 1, now);
-    state.loot.parts += TASTING_REWARD.parts;
+    const extra = Math.round(companionBonus(state, 'parts'));
+    state.loot.parts += TASTING_REWARD.parts + extra;
     state.loot.skinShards += TASTING_REWARD.skinShards;
-    return ` First time serving this recipe: +${TASTING_REWARD.parts} parts, +${TASTING_REWARD.skinShards} skin shards.`;
+    return ` First time serving this recipe: +${TASTING_REWARD.parts + extra} parts, +${TASTING_REWARD.skinShards} skin shards.`;
   }
   state.loot.skinShards += TASTING_REWARD.brandShards;
   return ` New brand poured: +${TASTING_REWARD.brandShards} skin shard.`;
@@ -531,7 +551,7 @@ export function applySignatureGuest(state: PlayerState, guest: Customer, random:
   guest.wish = guest.request;
   guest.budget = signature.price * 1.5 + 4;
 }
-export const signatureFameFactor = (state: PlayerState) => 1 + FAME_PRICE_BONUS * fameLevel(state.loot.signatures[state.regionId]?.served ?? 0);
+export const signatureFameFactor = (state: PlayerState) => 1 + FAME_PRICE_BONUS * (1 + companionBonus(state, 'fame')) * fameLevel(state.loot.signatures[state.regionId]?.served ?? 0);
 export function signatureServed(state: PlayerState, now: number) {
   const signature = state.loot.signatures[state.regionId];
   if (!signature) return '';

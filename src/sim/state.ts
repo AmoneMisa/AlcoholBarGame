@@ -4,6 +4,7 @@ import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
 import { CHARACTER_ART, CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { generateCustomer } from '../domain/engine';
+import { BOND_STEPS, COMPANIONS, KEEPSAKE_IDS, MAX_BOND, companionSlots } from '../domain/companions';
 import { MAX_LEVEL, levelFor, levelPerks, xpForLevel } from '../domain/progression';
 import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../domain/types';
 import { buildProfile, shortWish, type CustomerReply, type Fact } from '../domain/conversation/customerTalk';
@@ -107,6 +108,8 @@ export interface PlayerState {
   // Training academy: finished lessons, what was done in the lesson that is on, and the practice that is running.
   training?: import('./training').TrainingState;
   // Servers hired (up to four), when their work was last counted, and what they have earned in all.
+  // The Circle: companions who joined, shards, keepsakes and who works where (see sim/companions.ts).
+  companions?: import('./companions').CompanionState;
   staffByBar?: Record<string, { level: number }[]>;
   staffAtByBar?: Record<string, number>;
   staffEarned?: number;
@@ -324,6 +327,7 @@ export function normalizePlayerState(state: PlayerState) {
     state.training = { done: Array.isArray(state.training.done) ? state.training.done.filter((id) => known.has(id)) : [], progress: state.training.progress && typeof state.training.progress === 'object' ? state.training.progress : {}, active: state.training.active && known.has(state.training.active.moduleId) ? state.training.active : undefined };
   }
   if (state.tour !== 'done' && state.tour !== 'skipped') delete state.tour;
+  state.companions = normalizeCompanions(state.companions);
   // Servers belong to a bar. Older saves had one team: it stays in the bar that was being managed.
   const legacy = state as unknown as { staff?: unknown; staffAt?: unknown };
   const teams: Record<string, { level: number }[]> = {};
@@ -368,3 +372,26 @@ export function normalizePlayerState(state: PlayerState) {
 
 // Levels follow a rising XP curve (60, 130, 200… XP per level) — see domain/progression.ts.
 export { levelFor } from '../domain/progression';
+
+// The Circle in a save: only known people and keepsakes, whole non-negative numbers, and nobody in two bars.
+function normalizeCompanions(input: unknown): import('./companions').CompanionState {
+  const source = (input && typeof input === 'object' ? input : {}) as Partial<import('./companions').CompanionState>;
+  const whole = (value: unknown, max: number) => Number.isFinite(value) && (value as number) > 0 ? Math.min(max, Math.floor(value as number)) : 0;
+  const owned: Record<string, number> = {};
+  const shards: Record<string, number> = {};
+  const keepsakes: Record<string, number> = {};
+  for (const companion of COMPANIONS) {
+    const points = (source.owned as Record<string, unknown> | undefined)?.[companion.id];
+    if (points !== undefined) owned[companion.id] = whole(points, BOND_STEPS[MAX_BOND - 1]!);
+    else { const have = whole((source.shards as Record<string, unknown> | undefined)?.[companion.id], companion.shards); if (have) shards[companion.id] = have; }
+  }
+  for (const id of KEEPSAKE_IDS) { const have = whole((source.keepsakes as Record<string, unknown> | undefined)?.[id], 999); if (have) keepsakes[id] = have; }
+  const placed = new Set<string>();
+  const assigned: Record<string, string[]> = {};
+  for (const region of REGIONS) {
+    const list = (source.assigned as Record<string, unknown> | undefined)?.[region.id];
+    assigned[region.id] = (Array.isArray(list) ? list : []).filter((id): id is string => typeof id === 'string' && id in owned && !placed.has(id)).slice(0, companionSlots(MAX_LEVEL)).map((id) => { placed.add(id); return id; });
+  }
+  const visits = source.visits && typeof source.visits.day === 'string' && source.visits.counts && typeof source.visits.counts === 'object' ? { day: source.visits.day, counts: Object.fromEntries(Object.entries(source.visits.counts).map(([id, count]) => [id, whole(count, 99)])) } : { day: '', counts: {} };
+  return { owned, shards, keepsakes, assigned, visits };
+}

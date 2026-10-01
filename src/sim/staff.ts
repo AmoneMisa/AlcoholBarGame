@@ -3,6 +3,7 @@ import { REGIONS } from '../domain/catalog';
 import { MAX_STAFF, MAX_STAFF_LEVEL, STAFF_AWAY_CAP_MS, STAFF_AWAY_MIN_MS, STAFF_PROFILES, hireCost, teamShare, unlockedSlots, upgradeCost, type StaffMember } from '../domain/staff';
 import { CUSTOMER_ARRIVAL_MAX_MS, CUSTOMER_ARRIVAL_MIN_MS } from '../domain/customerTiming';
 import { levelFor, type PlayerState } from './state';
+import { companionBonus } from './companions';
 
 // Hiring and upgrading servers, and what they earn while the player is away (see domain/staff.ts).
 // Every bar has its own team (up to four servers), hired and trained there.
@@ -47,7 +48,7 @@ export function accrueStaff(state: PlayerState, now: number, random: () => numbe
   const worked = Math.min(away, STAFF_AWAY_CAP_MS);
   const meanGap = ((CUSTOMER_ARRIVAL_MIN_MS + CUSTOMER_ARRIVAL_MAX_MS) / 2) * Math.max(.2, market.arrival);
   const guests = (worked / meanGap) * (.85 + random() * .3);
-  const earned = coins(guests * market.averagePrice * teamShare(staff));
+  const earned = coins(guests * market.averagePrice * teamShare(staff) * (1 + companionBonus(state, 'staff', regionId)));
   if (earned <= 0) return undefined;
   state.money = coins(state.money + earned);
   state.xp += Math.round(guests * 20 * teamShare(staff));

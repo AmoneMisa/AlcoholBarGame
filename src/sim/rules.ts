@@ -27,6 +27,7 @@ import { endTraining, finishGuide, isPractice, noteTraining, startTraining, tidy
 import { collectChatter, reactionToServed } from './chatter';
 import { addStat, raiseStat, syncDerivedStats } from '../domain/achievementStats';
 import { accrueStaff, hireStaff, upgradeStaff } from './staff';
+import { CompanionError, assignCompanion, buyKeepsake, companionVisit, dismissCompanion, giveKeepsake, recruitCompanion } from './companions';
 import { applyPromo, barEventFor, tickBarEvent } from './events';
 import { adjustPitch, askPitch, cancelPitch, pitchChance, startPitch } from './pitch';
 import { pitchActsIn } from '../domain/social/pitchActs';
@@ -87,6 +88,11 @@ export type GameAction =
   | { type: 'endTraining' }
   | { type: 'trainingDone'; moduleId: string }
   | { type: 'topUp' }
+  | { type: 'recruitCompanion'; id: string }
+  | { type: 'giveKeepsake'; id: string; kind: string }
+  | { type: 'buyKeepsake'; kind: string; quantity?: number }
+  | { type: 'assignCompanion'; id: string }
+  | { type: 'dismissCompanion'; id: string }
   | { type: 'hireStaff' }
   | { type: 'upgradeStaff'; index: number }
   // Offering a guest another drink or some food: start the offer, talk, then ask (the chance is shown and changes as you talk).
@@ -471,14 +477,15 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       if (revenue > request.budget) throw new RuleError(`The ${revenue} coin total is over the customer’s ${request.budget} coin budget.`);
       stock.quantity -= request.quantity;
       const tip = rollTip(state, guest, now, random) ? Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .08 : .03) * economyOf(state, now).tips) : 0;
-      state.money = coins(state.money + revenue + tip);
+      const paid = coins(revenue * lootBonuses(state, now).bottleSaleFactor);
+      state.money = coins(state.money + paid + tip);
       const crystalPayment = bottleSaleCrystalReward(product, request.quantity);
       state.crystals += crystalPayment;
       state.xp += xpGain(state, 110 + Math.min(state.streak * 2, 14), now);
       state.streak += 1;
       track(state, 'bottles', request.quantity, now);
       countServed(state);
-      const note = `Sold ${request.quantity} × ${product.name} for ${revenue.toFixed(2)} coins and ${crystalPayment} crystals.${tip ? ` Tip +${tip}.` : ' No tip this time.'}`;
+      const note = `Sold ${request.quantity} × ${product.name} for ${paid.toFixed(2)} coins and ${crystalPayment} crystals.${tip ? ` Tip +${tip}.` : ' No tip this time.'}`;
       scheduleNextCustomer(state, now, random);
       state.message = note;
       break;
@@ -570,6 +577,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           if (guest.signature) found += signatureServed(state, now);
           if (guest.orderKind !== 'serve' && !guest.signature) found += tasteFirst(state, verdict.recipe.id, 'recipe', now);
           if (guest.orderKind !== 'serve') found += earnLoyalty(state, guest.characterId, guest.name, verdict.recipe.id, guest.mood === 'vip');
+          // A person of the Circle at the bar: shards if they have not joined yet, bond points if they have.
+          if (!guest.training) found += companionVisit(state, guest.characterId, { eventId: barEventFor(state, now)?.id }, now, random);
           for (const productId of Object.values(pourBrands)) found += tasteFirst(state, productId, 'brand', now);
         }
         const serveProduct = serve ? ALCOHOL_PRODUCTS.find((item) => item.id === serve.productId) : undefined;
@@ -993,6 +1002,22 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'setTour':
       state.tour = action.value === 'done' ? 'done' : 'skipped';
       break;
+    case 'recruitCompanion':
+    case 'giveKeepsake':
+    case 'buyKeepsake':
+    case 'assignCompanion':
+    case 'dismissCompanion': {
+      try {
+        state.message = action.type === 'recruitCompanion' ? recruitCompanion(state, action.id)
+          : action.type === 'giveKeepsake' ? giveKeepsake(state, action.id, action.kind)
+          : action.type === 'buyKeepsake' ? buyKeepsake(state, action.kind, action.quantity)
+          : action.type === 'assignCompanion' ? assignCompanion(state, action.id) : dismissCompanion(state, action.id);
+      } catch (error) {
+        if (error instanceof CompanionError) throw new RuleError(error.message);
+        throw error;
+      }
+      break;
+    }
     case 'hireStaff':
     case 'upgradeStaff': {
       try { state.message = action.type === 'hireStaff' ? hireStaff(state) : upgradeStaff(state, Number(action.index)); }

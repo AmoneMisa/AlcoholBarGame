@@ -2,7 +2,7 @@ import type { BoxKind } from './loot';
 
 // Weekly quests and lifetime achievements. Both read the same counters (`loot.stats`), which only server rules increase.
 export const STAT_IDS = ['serves', 'servesCoins', 'vips', 'bottles', 'boxes', 'draws', 'upgrades', 'tasted', 'perfectTalks', 'lessons', 'signatures',
-  'coinsSpent', 'crystalsSpent', 'backgrounds', 'bars', 'skins', 'visitedBy', 'visitedFriends', 'prestiges', 'giftsSent', 'giftsGot', 'barUpgrades', 'level', 'staffHired', 'staffLevels', 'loginDays'] as const;
+  'coinsSpent', 'crystalsSpent', 'backgrounds', 'bars', 'skins', 'visitedBy', 'visitedFriends', 'prestiges', 'giftsSent', 'giftsGot', 'barUpgrades', 'level', 'staffHired', 'staffLevels', 'loginDays', 'companions', 'bonds'] as const;
 export type StatId = typeof STAT_IDS[number];
 export interface Goal { id: string; name: string; stat: StatId; target: number; box: BoxKind; crystals: number; }
 
@@ -55,7 +55,9 @@ const SERIES: { stat: StatId; name: string; rows: Row[] }[] = [
   { stat: 'level', name: 'Rising star', rows: [['a-level-15', 'Rising star: reach level 15', 15, 'silver', 25], ['a-level-25', 'Established: reach level 25', 25, 'silver', 45], ['a-level-40', 'Renowned: reach level 40', 40, 'choice', 80], ['a-level-50', 'Legend: reach level 50', 50, 'choice', 150]] },
   { stat: 'staffHired', name: 'Employer', rows: [['a-staff-1', 'First hire: hire 1 server', 1, 'bronze', 10], ['a-staff-4', 'Small staff: hire 4 servers in all bars', 4, 'silver', 20], ['a-staff-12', 'Busy bars: hire 12 servers in all bars', 12, 'silver', 40], ['a-staff-24', 'Full house: a full team of 4 in all 6 bars', 24, 'choice', 100]] },
   { stat: 'staffLevels', name: 'Trainer', rows: [['a-train-5', 'Trainer: 5 server levels in all bars', 5, 'bronze', 10], ['a-train-20', 'Coach: 20 server levels in all bars', 20, 'silver', 25], ['a-train-60', 'Mentor: 60 server levels in all bars', 60, 'silver', 50], ['a-train-120', 'Grand master: every server fully trained in every bar', 120, 'choice', 100]] },
-  { stat: 'loginDays', name: 'Loyal player', rows: [['a-login-3', 'Coming back: 3 days in a row', 3, 'bronze', 8], ['a-login-7', 'A full week: 7 days in a row', 7, 'silver', 25], ['a-login-14', 'Two weeks: 14 days in a row', 14, 'silver', 45], ['a-login-30', 'A whole month: 30 days in a row', 30, 'choice', 100]] }
+  { stat: 'loginDays', name: 'Loyal player', rows: [['a-login-3', 'Coming back: 3 days in a row', 3, 'bronze', 8], ['a-login-7', 'A full week: 7 days in a row', 7, 'silver', 25], ['a-login-14', 'Two weeks: 14 days in a row', 14, 'silver', 45], ['a-login-30', 'A whole month: 30 days in a row', 30, 'choice', 100]] },
+  { stat: 'companions', name: 'Inner circle', rows: [['a-circle-1', 'New friend: 1 person joins your circle', 1, 'bronze', 10], ['a-circle-4', 'Good company: 4 people in your circle', 4, 'silver', 30], ['a-circle-8', 'Full table: 8 people in your circle', 8, 'silver', 60], ['a-circle-15', 'Everyone is here: all 15 people in your circle', 15, 'choice', 150]] },
+  { stat: 'bonds', name: 'Close bonds', rows: [['a-bond-1', 'Trusted: 1 person at bond level 4', 1, 'bronze', 15], ['a-bond-3', 'Three trusted friends', 3, 'silver', 35], ['a-bond-6', 'Six trusted friends', 6, 'silver', 70], ['a-bond-15', 'Bonded with all 15 people', 15, 'choice', 200]] }
 ];
 export const ACHIEVEMENTS: Achievement[] = SERIES.flatMap((series) => series.rows.map(([id, name, target, box, crystals], index) => ({ id, name, stat: series.stat, target, box, crystals, series: series.stat, tier: index + 1, tierName: TIER_NAMES[index]!, seriesName: series.name })));
 export const achievementById = (id: string) => ACHIEVEMENTS.find((item) => item.id === id);
