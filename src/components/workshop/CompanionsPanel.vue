@@ -88,7 +88,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
 
     <div class="people">
       <article v-for="item in cards" :key="item.person.id" class="person card" :class="{ joined: item.joined }">
-        <header @click="toggle(item.person.id)">
+        <header :class="{ clickable: item.joined }" @click="item.joined && toggle(item.person.id)">
           <span class="face"><CharacterModel role="customer" :character-id="item.person.id" :seed="item.person.id" mood="friendly" /></span>
           <span class="who">
             <b>{{ companionName(item.person.id) }}</b>
@@ -126,21 +126,24 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
           <UiButton block variant="primary" :reason="item.shards < item.person.shards ? `Not enough shards: you need ${item.person.shards}, you have ${item.shards}. Serve ${companionName(item.person.id)} as a guest to collect more.` : ''" @click="game.recruitCompanion(item.person.id)">Invite to your circle</UiButton>
         </template>
 
-        <section v-if="open === item.person.id" class="story">
+        <section v-if="item.joined && open === item.person.id" class="story">
           <blockquote>“{{ item.person.quote }}”</blockquote>
           <p>{{ item.person.intro }}</p>
           <template v-for="(chapter, index) in item.person.chapters" :key="index">
             <p v-if="item.bond > index"><b>{{ BOND_NAMES[index + 1] }}.</b> {{ chapter }}</p>
-            <p v-else class="locked">🔒 Chapter {{ index + 1 }} opens at bond level {{ index + 1 }}{{ index ? ` (${BOND_STEPS[index]} points)` : '' }}.</p>
+            <p v-else class="locked">🔒 Chapter {{ index + 1 }} opens at <b>{{ BOND_NAMES[index + 1] }}</b>{{ index ? ` (${BOND_STEPS[index]} bond points)` : '' }}.</p>
           </template>
         </section>
-        <UiButton size="sm" variant="ghost" @click="toggle(item.person.id)">{{ open === item.person.id ? 'Hide story' : 'Read story' }}</UiButton>
+        <UiButton v-if="item.joined" size="sm" variant="ghost" @click="toggle(item.person.id)">{{ open === item.person.id ? 'Hide story' : `Read story · ${item.bond} of ${item.person.chapters.length} chapters open` }}</UiButton>
+        <p v-else class="meta locked-story">🔒 Their story opens when they join your circle, a chapter for each grade.</p>
       </article>
     </div>
   </div>
 </template>
 
 <style scoped>
+.locked-story { color: #7d8ba1; }
+header.clickable { cursor: pointer; }
 .first-steps ol { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; line-height: 1.4; }
 .links { display: grid; gap: 4px; margin: 4px 0 8px; padding: 0; list-style: none; }
 .links li { display: grid; gap: 1px; padding: 6px 8px; border: 1px dashed #4a5b75; border-radius: 9px; font-size: 12px; }
