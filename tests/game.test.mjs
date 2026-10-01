@@ -344,7 +344,7 @@ test('Every bartender and seller phrase lesson is correct English, and every job
       assert.equal(lesson.parts.map((part) => part.text).join(' '), lesson.text, `${group.id}: parts must spell the whole phrase`);
     }
   }
-  for (const job of ['bar', 'shop']) {
+  for (const job of ['bar', 'shop', 'buyer']) {
     assert.ok(PHRASE_GROUPS.filter((group) => group.context === job).length >= 5, `${job} phrase groups`);
     assert.ok(VOCABULARY.filter((entry) => TOPIC_CONTEXT[entry.topic] === job).length >= 15, `${job} words`);
   }
@@ -386,6 +386,8 @@ test('Every bartender and seller lesson phrase is understood by a customer in it
   const profile = buildProfile(RECIPES.find((recipe) => recipe.id === 'mojito'));
   const notUnderstood = /don’t understand|Please ask about quantity/;
   for (const group of PHRASE_GROUPS) {
+    // Buyer lessons are answered by a supplier's sales rep: see the negotiation test in trade.test.mjs.
+    if (group.context === 'buyer') continue;
     const confirmed = ['serve', 'shop-pay'].includes(group.id);
     for (const lesson of group.lessons) {
       const bottle = group.context === 'shop';
@@ -499,4 +501,19 @@ test('Actions keep working after one delivery arrives while another is still on 
   assert.equal(game.deliveryOrders.length,1,'the faster delivery arrived');
   assert.equal(game.chooseStartingBar('london'),true,'later actions still apply (the state can still be copied and saved)');
   assert.equal(game.regionId,'london');
+});
+
+test('The newer vocabulary is complete: sentences are correct English and every topic belongs to a job', async () => {
+  const { MORE_VOCABULARY } = await import('../src/domain/english/vocabularyMore.ts');
+  const { VOCABULARY, VOCAB_TOPICS, TOPIC_CONTEXT } = await import('../src/domain/english/vocabulary.ts');
+  assert.ok(MORE_VOCABULARY.length >= 70, 'at least 70 new words, found ' + MORE_VOCABULARY.length);
+  for (const topic of VOCAB_TOPICS) assert.ok(['bar', 'shop', 'buyer', 'both'].includes(TOPIC_CONTEXT[topic]), topic + ' has a job');
+  for (const entry of MORE_VOCABULARY) {
+    assert.ok(VOCAB_TOPICS.includes(entry.topic), entry.word + ': known topic');
+    assert.ok(entry.ipa.startsWith('/') && entry.ipa.endsWith('/'), entry.word + ': pronunciation in slashes');
+    assert.ok(entry.meaning.length > 8 && entry.example.length > 8, entry.word + ': meaning and example');
+    const result = checkText(entry.example);
+    assert.equal(result.ok, true, entry.word + ': “' + entry.example + '” ' + JSON.stringify(result.issues.map((item) => item.message)));
+  }
+  assert.equal(new Set(VOCABULARY.map((entry) => entry.word.toLowerCase())).size, VOCABULARY.length, 'no duplicate words, ignoring case');
 });

@@ -107,3 +107,29 @@ test('Every suggested bargaining phrase is correct English, including statement 
   }
   assert.equal(checkEnglish('You like rum?').ok, false, 'a statement used as a question is still corrected');
 });
+
+test('Every buyer phrase lesson works in a real negotiation: it is good English and the supplier answers it', async () => {
+  const { PHRASE_GROUPS } = await import('../src/domain/english/phrases.ts');
+  const groups = PHRASE_GROUPS.filter((group) => group.context === 'buyer');
+  assert.ok(groups.length >= 5, 'delivery, package, standing orders, discounts and invoices');
+  for (const group of groups) {
+    for (const lesson of group.lessons) {
+      const state = openDeal(6);
+      say(state, lesson.text);
+      const [spoken, answer] = state.negotiation.lines.slice(-2);
+      assert.equal(spoken.ok, true, group.id + ': “' + lesson.text + '” is not accepted as good English');
+      assert.doesNotMatch(answer.text, /We can talk about the price, the order size|quite understand/, group.id + ': “' + lesson.text + '” → “' + answer.text + '”');
+    }
+  }
+});
+
+test('The seller quotes the real delivery time, and standing orders and regular customers count as loyalty', () => {
+  const state = openDeal(6);
+  say(state, 'When will my order arrive?');
+  assert.match(state.negotiation.lines.at(-1).text, /Delivery usually takes 3 days/, 'Global Drinks delivers in three days');
+  say(state, 'We would like the same order every week, please.');
+  assert.ok(state.negotiation.tactics.includes('loyalty'));
+  const other = openDeal(6);
+  say(other, 'Could you match the price of another supplier, please?');
+  assert.ok(other.negotiation.tactics.includes('ask') && other.negotiation.tactics.includes('competitor'));
+});

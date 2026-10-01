@@ -72,7 +72,7 @@
 .learning-stats i { position:absolute;left:0;bottom:0;height:3px;background:linear-gradient(90deg,#e4b35c,#5fcf7c); }
 .stat-focus dd button { padding:0;border:0;background:none;color:#ffd98a;font:700 14px Inter,sans-serif;text-align:left;cursor:pointer; }
 
-.job-switch { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px 14px 0;background:#0f1a2b; }
+.job-switch { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:12px 14px 0;background:#0f1a2b; }
 .job-switch button { display:grid;gap:2px;padding:10px 14px;border:1px solid #33445e;border-radius:12px;background:#15223a;color:#dbe3ee;text-align:left;cursor:pointer; }
 .job-switch button b { font:700 16px Georgia,serif; }
 .job-switch button small { color:#8796ab;font-size:11px; }
@@ -80,6 +80,7 @@
 .job-tag { display:inline-block;margin-bottom:4px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase; }
 .job-tag.bar { background:#3a2c1c;color:#ffd98a; }
 .job-tag.shop { background:#16324a;color:#a9d3ff; }
+.job-tag.buyer { background:#23361f;color:#b9e59a; }
 .learning-tabs { display:flex;gap:6px;overflow-x:auto;padding:10px 14px;border-bottom:1px solid #2c3b53;background:#0f1a2b;scrollbar-width:none; }
 .learning-tabs::-webkit-scrollbar { display:none; }
 .learning-tabs button { position:relative;display:grid;flex:0 0 auto;min-width:118px;padding:8px 14px;border:1px solid #33445e;border-radius:11px;background:#15223a;color:#dbe3ee;text-align:left;cursor:pointer; }

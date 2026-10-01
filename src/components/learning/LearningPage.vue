@@ -40,9 +40,10 @@ function submitDailyLesson(id: string) {
 // Job: bartender, shop seller, or both. Filters words, phrases and flashcards.
 const job = ref<WorkContext | 'all'>('all');
 const jobs: { id: WorkContext | 'all'; label: string; hint: string }[] = [
-  { id: 'all', label: 'Everything', hint: 'Bar + shop' },
+  { id: 'all', label: 'Everything', hint: 'Bar, shop and suppliers' },
   { id: 'bar', label: CONTEXT_LABEL.bar, hint: 'Serve drinks, talk to guests' },
-  { id: 'shop', label: CONTEXT_LABEL.shop, hint: 'Sell products, take payment' }
+  { id: 'shop', label: CONTEXT_LABEL.shop, hint: 'Sell products, take payment' },
+  { id: 'buyer', label: CONTEXT_LABEL.buyer, hint: 'Order, receive, get discounts' }
 ];
 const inJob = (topicName: VocabTopic) => job.value === 'all' || TOPIC_CONTEXT[topicName] === 'both' || TOPIC_CONTEXT[topicName] === job.value;
 const topics = computed(() => VOCAB_TOPICS.filter(inJob));
@@ -115,8 +116,8 @@ function when(at: number) {
     <header class="learning-hero">
       <div>
         <small>ENGLISH ACADEMY</small>
-        <h2>English for the bar and the shop</h2>
-        <p>Learn the words and phrases you need behind the bar and at the shop counter — serving guests, selling products, talking about prices and taking payment. Learn it here, then use it with your customers.</p>
+        <h2>English for the bar, the shop and your suppliers</h2>
+        <p>Learn the words and phrases you need behind the bar, at the shop counter and on the phone with suppliers — checking ID, taking bookings, serving guests, receiving deliveries, setting up regular orders and asking for discounts. Learn it here, then use it with your customers and sellers.</p>
       </div>
       <dl class="learning-stats">
         <div><dt>Words known</dt><dd>{{ knownCount }}<span>/ {{ vocabulary.length }}</span></dd><i :style="{ width: knownCount / Math.max(1, vocabulary.length) * 100 + '%' }"></i></div>

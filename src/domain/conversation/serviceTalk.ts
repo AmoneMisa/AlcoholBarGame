@@ -1,5 +1,6 @@
 import type { Customer } from '../types';
 import type { CustomerReply } from './customerTalk';
+import { moreIntents } from './serviceTalkMore';
 
 // Service small talk shared by cocktail guests and bottle-shop customers: offering help, occasions,
 // serving, prices, deals, stock, ID checks, payment, bag, receipt, delivery and returns.
@@ -24,9 +25,10 @@ function pickFor(customer: Customer, options: string[]) {
 const reply = (text: string, expression: CustomerReply['expression'] = 'smile'): CustomerReply => ({ text, expression, facts: [] });
 
 // `statement`: only for sentences that are not questions (so “stronger, but not sweet?” stays a taste question).
-interface Intent { test: RegExp; answer: (context: ServiceContext) => CustomerReply; statement?: boolean; drinkOnly?: boolean; }
+export interface Intent { test: RegExp; answer: (context: ServiceContext) => CustomerReply; statement?: boolean; drinkOnly?: boolean; }
 
 const INTENTS: Intent[] = [
+  ...moreIntents(pickFor, reply),
   // Age check before anything about alcohol words, so “can’t sell alcohol without ID” is not read as an alcohol question.
   { test: /\b(can(no|'|’)t|cannot) sell\b.*\bwithout\b/i, answer: () => reply('OK, I understand. Maybe a soft drink instead, then.', 'neutral') },
   { test: /\b(id|passport|identification|driving licen[cs]e)\b|how old are you/i, answer: ({ customer }) => reply(pickFor(customer, ['Sure, here you are.', 'Of course — here is my ID.', 'Yes, here is my passport.'])) },

@@ -243,3 +243,22 @@ test('City economy: every specialty is a real recipe, specialties pay a premium,
   const dear = supplierInCity(courier, REGIONS.find((region) => region.id === 'new-york').marketFactor);
   assert.ok(cheap.deliveryFee < dear.deliveryFee && cheap.freeDeliveryAt < dear.freeDeliveryAt);
 });
+
+test('Daily lessons: the bank is large and unique, and the correct answer is shuffled but always among the choices', () => {
+  const seen = new Map();
+  const positions = new Set();
+  for (let day = 1; day <= 300; day++) {
+    const key = '2027-' + String(1 + Math.floor(day / 28)).padStart(2, '0') + '-' + String(1 + (day % 28)).padStart(2, '0');
+    for (const lesson of dailyLessonsFor(key)) {
+      assert.equal(lesson.choices.length, 3);
+      assert.ok(lesson.choices.includes(lesson.answer), lesson.id + ': the answer must be one of the choices');
+      assert.equal(new Set(lesson.choices).size, 3, lesson.id + ': choices are different');
+      assert.deepEqual(lesson.choices, dailyLessonsFor(key).find((item) => item.id === lesson.id).choices, 'the shuffle is stable for a day');
+      if (seen.has(lesson.id)) assert.equal(seen.get(lesson.id), lesson.prompt, 'lesson ids are unique');
+      seen.set(lesson.id, lesson.prompt);
+      positions.add(lesson.choices.indexOf(lesson.answer));
+    }
+  }
+  assert.ok(seen.size >= 45, 'at least 45 different lessons, saw ' + seen.size);
+  assert.deepEqual([...positions].sort(), [0, 1, 2], 'the right answer is not always first');
+});

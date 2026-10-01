@@ -1,0 +1,116 @@
+import type { VocabEntry } from './vocabulary';
+
+// More words for real situations: checking age and documents, receiving deliveries and packages, standing orders,
+// discounts and invoices, bookings and events, and serving alcohol responsibly. Same format as vocabulary.ts.
+
+const w = (
+  word: string, ipa: string, pos: VocabEntry['pos'], topic: VocabEntry['topic'], level: VocabEntry['level'],
+  meaning: string, example: string, extra: Partial<Pick<VocabEntry, 'opposite' | 'related' | 'note' | 'forms'>> = {}
+): VocabEntry => ({ word, ipa, pos, topic, level, meaning, example, ...extra });
+
+export const MORE_VOCABULARY: VocabEntry[] = [
+  // ---- Age & documents ----
+  w('age', '/eɪdʒ/', 'noun', 'Age & documents', 'A1', 'How old a person is.', 'You must show your age with an ID.', { related: ['adult', 'date of birth'] }),
+  w('date of birth', '/ˌdeɪt əv ˈbɜːθ/', 'phrase', 'Age & documents', 'A2', 'The day, month and year when a person was born.', 'Please write your date of birth here.', { related: ['age', 'birthday'] }),
+  w('adult', '/ˈædʌlt/', 'noun', 'Age & documents', 'A2', 'A person who is old enough by law, usually eighteen or older.', 'Only adults can buy alcohol.', { opposite: 'minor' }),
+  w('underage', '/ˌʌndərˈeɪdʒ/', 'adjective', 'Age & documents', 'B1', 'Too young by law to buy or drink alcohol.', 'We cannot serve underage guests.', { opposite: 'of age' }),
+  w('legal age', '/ˌliːɡl ˈeɪdʒ/', 'phrase', 'Age & documents', 'A2', 'The age when the law allows you to buy alcohol.', 'The legal age for alcohol here is twenty-one.', { note: 'It is eighteen in many countries and twenty-one in others.' }),
+  w('passport', '/ˈpɑːspɔːt/', 'noun', 'Age & documents', 'A1', 'A small book that proves who you are and where you are from.', 'Do you have a passport with you?', { related: ['ID', 'document'] }),
+  w('driving licence', '/ˈdraɪvɪŋ ˌlaɪsns/', 'noun', 'Age & documents', 'A2', 'A card that allows you to drive and also shows your age.', 'A driving licence is a good proof of age.', { note: 'American spelling: driver’s license.' }),
+  w('photo ID', '/ˌfəʊtəʊ aɪ ˈdiː/', 'noun', 'Age & documents', 'A2', 'An identity card with your photo on it.', 'Please show me a photo ID.', { related: ['ID', 'passport'] }),
+  w('document', '/ˈdɒkjumənt/', 'noun', 'Age & documents', 'A2', 'An official paper or card with important information.', 'Do you have another document with your date of birth?', { related: ['ID', 'passport'] }),
+  w('proof', '/pruːf/', 'noun', 'Age & documents', 'B1', 'Something that shows a fact is true.', 'I need proof of age, please.', { related: ['ID'] }),
+  w('valid', '/ˈvælɪd/', 'adjective', 'Age & documents', 'B1', 'Correct and accepted. A valid ID has not expired.', 'Your ID is valid until next year.', { opposite: 'expired' }),
+  w('expired', '/ɪkˈspaɪəd/', 'adjective', 'Age & documents', 'B1', 'No longer valid because the date has passed.', 'Sorry, your passport has expired.', { opposite: 'valid' }),
+  w('original', '/əˈrɪdʒənl/', 'adjective', 'Age & documents', 'B1', 'The real one, not a copy.', 'We only accept the original document.', { opposite: 'copy' }),
+  w('copy', '/ˈkɒpi/', 'noun', 'Age & documents', 'A2', 'A second version made from the original.', 'A copy of the passport is not enough.', { opposite: 'original', forms: ['copies'] }),
+  w('check', '/tʃek/', 'verb', 'Age & documents', 'A2', 'To look carefully to be sure something is correct.', 'I need to check your ID.', { forms: ['checks', 'checked', 'checking'] }),
+  w('show', '/ʃəʊ/', 'verb', 'Age & documents', 'A1', 'To let someone see something.', 'Please show me your ID.', { forms: ['shows', 'showed', 'shown', 'showing'] }),
+  w('licence', '/ˈlaɪsns/', 'noun', 'Age & documents', 'B1', 'An official paper that allows you to do something, such as sell alcohol.', 'The bar has a licence to sell alcohol.', { note: 'American spelling: license.' }),
+  w('signature', '/ˈsɪɡnətʃə/', 'noun', 'Age & documents', 'B1', 'Your name written by your own hand.', 'I need your signature here.', { related: ['sign'] }),
+  w('sign', '/saɪn/', 'verb', 'Age & documents', 'A2', 'To write your name on a paper to agree or confirm.', 'Please sign here.', { forms: ['signs', 'signed', 'signing'] }),
+
+  // ---- Delivery & packages ----
+  w('package', '/ˈpækɪdʒ/', 'noun', 'Delivery & packages', 'A2', 'A box or parcel that is sent to someone.', 'A package from Global Drinks is at the door.', { related: ['parcel', 'box'], forms: ['packages'] }),
+  w('parcel', '/ˈpɑːsl/', 'noun', 'Delivery & packages', 'B1', 'A package wrapped for posting or delivery.', 'The courier left a parcel for you.', { related: ['package'], forms: ['parcels'] }),
+  w('box', '/bɒks/', 'noun', 'Delivery & packages', 'A1', 'A container with flat sides.', 'Two boxes of tonic arrived today.', { forms: ['boxes'] }),
+  w('crate', '/kreɪt/', 'noun', 'Delivery & packages', 'B1', 'A strong box for carrying bottles.', 'We ordered three crates of soda.', { forms: ['crates'] }),
+  w('pallet', '/ˈpælət/', 'noun', 'Delivery & packages', 'B1', 'A flat wooden base that carries many boxes at once.', 'The driver left a pallet at the back door.', { forms: ['pallets'] }),
+  w('courier', '/ˈkʊriə/', 'noun', 'Delivery & packages', 'B1', 'A person or company that delivers packages.', 'The courier is waiting outside.', { related: ['driver'] }),
+  w('driver', '/ˈdraɪvə/', 'noun', 'Delivery & packages', 'A2', 'A person who drives a car or a truck.', 'The driver needs a signature.', { forms: ['drivers'] }),
+  w('tracking number', '/ˈtrækɪŋ ˌnʌmbə/', 'noun', 'Delivery & packages', 'B1', 'A code that shows where your package is.', 'Can you send me the tracking number?', { related: ['package', 'courier'] }),
+  w('arrive', '/əˈraɪv/', 'verb', 'Delivery & packages', 'A2', 'To reach a place.', 'When will the order arrive?', { forms: ['arrives', 'arrived', 'arriving'] }),
+  w('deliver', '/dɪˈlɪvə/', 'verb', 'Delivery & packages', 'A2', 'To bring goods to a person or a place.', 'Can you deliver it before noon?', { forms: ['delivers', 'delivered', 'delivering'], related: ['delivery'] }),
+  w('receive', '/rɪˈsiːv/', 'verb', 'Delivery & packages', 'A2', 'To get something that someone sends or gives.', 'We received the boxes this morning.', { forms: ['receives', 'received', 'receiving'] }),
+  w('late', '/leɪt/', 'adjective', 'Delivery & packages', 'A1', 'After the expected time.', 'The delivery is two days late.', { opposite: 'on time' }),
+  w('on time', '/ˌɒn ˈtaɪm/', 'phrase', 'Delivery & packages', 'A2', 'At the right time, not late.', 'Thank you for delivering on time.', { opposite: 'late' }),
+  w('damaged', '/ˈdæmɪdʒd/', 'adjective', 'Delivery & packages', 'B1', 'Broken or spoiled.', 'One box is damaged.', { related: ['broken', 'leak'] }),
+  w('missing', '/ˈmɪsɪŋ/', 'adjective', 'Delivery & packages', 'B1', 'Not there. Lost or not sent.', 'Two bottles are missing from the box.' ),
+  w('fragile', '/ˈfrædʒaɪl/', 'adjective', 'Delivery & packages', 'B1', 'Easy to break.', 'Glass bottles are fragile.', { related: ['damaged'] }),
+  w('leak', '/liːk/', 'verb', 'Delivery & packages', 'B1', 'To let liquid come out by mistake.', 'The box is wet. A bottle is leaking.', { forms: ['leaks', 'leaked', 'leaking'] }),
+  w('replacement', '/rɪˈpleɪsmənt/', 'noun', 'Delivery & packages', 'B1', 'A new item that you get instead of a broken one.', 'We will send a replacement tomorrow.', { related: ['refund'] }),
+  w('unload', '/ʌnˈləʊd/', 'verb', 'Delivery & packages', 'B1', 'To take goods out of a truck or a van.', 'Please help me unload the truck.', { forms: ['unloads', 'unloaded', 'unloading'] }),
+  w('heavy', '/ˈhevi/', 'adjective', 'Delivery & packages', 'A1', 'Weighs a lot.', 'The crate is heavy.' ),
+
+  // ---- Orders & schedules ----
+  w('standing order', '/ˌstændɪŋ ˈɔːdə/', 'phrase', 'Orders & schedules', 'B1', 'An order that repeats by itself on a regular schedule.', 'We have a standing order for tonic every Monday.', { related: ['schedule', 'weekly'] }),
+  w('schedule', '/ˈʃedjuːl/', 'noun', 'Orders & schedules', 'B1', 'A plan that says when things happen.', 'What is your delivery schedule?', { forms: ['schedules'] }),
+  w('weekly', '/ˈwiːkli/', 'adjective', 'Orders & schedules', 'A2', 'Happening every week.', 'We have a weekly order.', { related: ['monthly', 'daily'] }),
+  w('monthly', '/ˈmʌnθli/', 'adjective', 'Orders & schedules', 'A2', 'Happening every month.', 'Our monthly order is bigger.', { related: ['weekly'] }),
+  w('repeat', '/rɪˈpiːt/', 'verb', 'Orders & schedules', 'A2', 'To do something again.', 'Please repeat the same order.', { forms: ['repeats', 'repeated', 'repeating'] }),
+  w('cancel', '/ˈkænsl/', 'verb', 'Orders & schedules', 'A2', 'To stop an order or a plan.', 'I would like to cancel my order.', { forms: ['cancels', 'cancelled', 'cancelling'] }),
+  w('pause', '/pɔːz/', 'verb', 'Orders & schedules', 'B1', 'To stop for a time and start again later.', 'Can we pause the order for a month?', { forms: ['pauses', 'paused', 'pausing'] }),
+  w('quantity', '/ˈkwɒntəti/', 'noun', 'Orders & schedules', 'B1', 'How many or how much of something.', 'What quantity do you need?', { forms: ['quantities'] }),
+  w('case', '/keɪs/', 'noun', 'Orders & schedules', 'A2', 'A box of bottles, often twelve.', 'We buy five cases of soda every week.', { forms: ['cases'] }),
+  w('in advance', '/ɪn ədˈvɑːns/', 'phrase', 'Orders & schedules', 'B1', 'Before the time it is needed.', 'Please order three days in advance.'),
+  w('notice', '/ˈnəʊtɪs/', 'noun', 'Orders & schedules', 'B1', 'A warning that you give before something changes.', 'We need two days notice to change an order.'),
+  w('minimum', '/ˈmɪnɪməm/', 'adjective', 'Orders & schedules', 'B1', 'The smallest amount that is allowed.', 'The minimum order is five packs.', { opposite: 'maximum' }),
+
+  // ---- Deals & discounts ----
+  w('offer', '/ˈɒfə/', 'noun', 'Deals & discounts', 'A2', 'A special price or deal.', 'Do you have a special offer today?', { forms: ['offers'] }),
+  w('bulk', '/bʌlk/', 'noun', 'Deals & discounts', 'B1', 'A large amount. Buying in bulk means buying a lot at once.', 'We buy in bulk to save money.'),
+  w('loyalty card', '/ˈlɔɪəlti kɑːd/', 'noun', 'Deals & discounts', 'B1', 'A card that gives points or discounts to regular customers.', 'Do you have a loyalty card?'),
+  w('regular customer', '/ˌreɡjələ ˈkʌstəmə/', 'phrase', 'Deals & discounts', 'A2', 'A customer who comes or buys often.', 'Regular customers get a better price.', { related: ['loyalty card'] }),
+  w('percent', '/pəˈsent/', 'noun', 'Deals & discounts', 'A2', 'A part of one hundred.', 'We give ten percent off.'),
+  w('half price', '/ˌhɑːf ˈpraɪs/', 'phrase', 'Deals & discounts', 'A2', 'Fifty percent cheaper than the normal price.', 'Cocktails are half price at happy hour.'),
+  w('price list', '/ˈpraɪs lɪst/', 'noun', 'Deals & discounts', 'A2', 'A paper that shows the price of every product.', 'Could you send me your price list?'),
+  w('match', '/mætʃ/', 'verb', 'Deals & discounts', 'B1', 'To make something the same as another.', 'Can you match the other supplier’s price?', { forms: ['matches', 'matched', 'matching'] }),
+  w('negotiate', '/nɪˈɡəʊʃieɪt/', 'verb', 'Deals & discounts', 'B1', 'To talk to reach an agreement about a price or terms.', 'I would like to negotiate the price.', { forms: ['negotiates', 'negotiated', 'negotiating', 'negotiation'] }),
+  w('deal', '/diːl/', 'noun', 'Deals & discounts', 'A2', 'An agreement about a price or other terms.', 'That is a good deal.', { forms: ['deals'] }),
+  w('coupon', '/ˈkuːpɒn/', 'noun', 'Deals & discounts', 'B1', 'A paper or a code that gives you money off.', 'I have a coupon for ten percent off.', { forms: ['coupons'] }),
+  w('free', '/friː/', 'adjective', 'Deals & discounts', 'A1', 'Costing no money.', 'Delivery is free for big orders.'),
+  w('terms', '/tɜːmz/', 'noun', 'Deals & discounts', 'B1', 'The rules of a deal, such as when and how you pay.', 'What are your payment terms?', { related: ['invoice'] }),
+  w('invoice', '/ˈɪnvɔɪs/', 'noun', 'Deals & discounts', 'B1', 'A paper that asks for payment for goods or services.', 'Could you send me an invoice by email?', { related: ['receipt', 'terms'], forms: ['invoices'] }),
+
+  // ---- Events & bookings ----
+  w('booking', '/ˈbʊkɪŋ/', 'noun', 'Events & bookings', 'A2', 'A table or room kept for you before you arrive.', 'Do you have a booking?', { related: ['reservation'], forms: ['bookings'] }),
+  w('reservation', '/ˌrezəˈveɪʃn/', 'noun', 'Events & bookings', 'A2', 'The same as a booking: a table kept for you.', 'I have a reservation for eight o’clock.', { related: ['booking'], forms: ['reservations'] }),
+  w('book', '/bʊk/', 'verb', 'Events & bookings', 'A2', 'To arrange a table or a room before you come.', 'Would you like to book a table?', { forms: ['books', 'booked'] }),
+  w('private party', '/ˌpraɪvət ˈpɑːti/', 'phrase', 'Events & bookings', 'A2', 'A party only for invited people.', 'We have a private party on Saturday.', { related: ['guest list'] }),
+  w('guest list', '/ˈɡest lɪst/', 'noun', 'Events & bookings', 'B1', 'A list of the people who are invited.', 'Your name is on the guest list.'),
+  w('group', '/ɡruːp/', 'noun', 'Events & bookings', 'A2', 'Several people who are together.', 'We are a group of eight.', { forms: ['groups'] }),
+  w('happy hour', '/ˌhæpi ˈaʊə/', 'phrase', 'Events & bookings', 'A2', 'A time when drinks are cheaper.', 'Happy hour starts at six o’clock.'),
+  w('live music', '/ˌlaɪv ˈmjuːzɪk/', 'phrase', 'Events & bookings', 'A2', 'Music played by real musicians in the room.', 'We have live music on Friday.'),
+  w('cover charge', '/ˈkʌvə tʃɑːdʒ/', 'noun', 'Events & bookings', 'B1', 'Money you pay to enter a bar for an event.', 'There is a small cover charge for the concert.'),
+  w('deposit', '/dɪˈpɒzɪt/', 'noun', 'Events & bookings', 'B1', 'Money you pay first to keep a booking.', 'We need a deposit for a private party.', { forms: ['deposits'] }),
+  w('tab', '/tæb/', 'noun', 'Events & bookings', 'B1', 'A bill for drinks that you pay at the end of the evening.', 'Would you like to open a tab?', { forms: ['tabs'] }),
+  w('split the bill', '/ˌsplɪt ðə ˈbɪl/', 'phrase', 'Events & bookings', 'A2', 'To share the cost between the guests.', 'Can we split the bill, please?'),
+  w('tip', '/tɪp/', 'noun', 'Events & bookings', 'A2', 'Extra money you give to thank someone for good service.', 'Thank you for the tip!', { forms: ['tips'] }),
+  w('service charge', '/ˈsɜːvɪs tʃɑːdʒ/', 'noun', 'Events & bookings', 'B1', 'An extra fee for service that is added to the bill.', 'A service charge of ten percent is included.'),
+  w('last call', '/ˌlɑːst ˈkɔːl/', 'phrase', 'Events & bookings', 'B1', 'The last time to order drinks before the bar closes.', 'Last call is at midnight.'),
+  w('closing time', '/ˈkləʊzɪŋ taɪm/', 'phrase', 'Events & bookings', 'A2', 'The time when the bar closes.', 'Closing time is at one o’clock.'),
+  w('celebrate', '/ˈselɪbreɪt/', 'verb', 'Events & bookings', 'A2', 'To do something special for a happy event.', 'We are celebrating a birthday tonight.', { forms: ['celebrates', 'celebrated', 'celebrating', 'celebration'] }),
+  w('anniversary', '/ˌænɪˈvɜːsəri/', 'noun', 'Events & bookings', 'B1', 'A day when you remember a special event from a past year.', 'It is our wedding anniversary.', { forms: ['anniversaries'] }),
+
+  // ---- Responsible service ----
+  w('allergy', '/ˈælədʒi/', 'noun', 'Responsible service', 'B1', 'A body reaction to a food or an ingredient.', 'Do you have any food allergies?', { forms: ['allergies'] }),
+  w('allergic', '/əˈlɜːdʒɪk/', 'adjective', 'Responsible service', 'B1', 'Having a bad reaction to something, such as nuts or milk.', 'I am allergic to nuts.', { related: ['allergy'] }),
+  w('non-alcoholic', '/ˌnɒn ælkəˈhɒlɪk/', 'adjective', 'Responsible service', 'A2', 'Without alcohol.', 'We have a non-alcoholic cocktail.', { opposite: 'alcoholic' }),
+  w('designated driver', '/ˌdezɪɡneɪtɪd ˈdraɪvə/', 'phrase', 'Responsible service', 'B1', 'The person in a group who does not drink and drives everyone home.', 'Is anyone the designated driver tonight?'),
+  w('drunk', '/drʌŋk/', 'adjective', 'Responsible service', 'A2', 'Having drunk too much alcohol.', 'We cannot serve a guest who is drunk.', { opposite: 'sober' }),
+  w('refuse', '/rɪˈfjuːz/', 'verb', 'Responsible service', 'B1', 'To say no to a request.', 'We must refuse service when a guest has had enough.', { forms: ['refuses', 'refused', 'refusing'] }),
+  w('responsible', '/rɪˈspɒnsəbl/', 'adjective', 'Responsible service', 'B1', 'Careful and sensible; doing the right thing.', 'A good bartender is responsible.', { forms: ['responsibly'] }),
+  w('taxi', '/ˈtæksi/', 'noun', 'Responsible service', 'A1', 'A car with a driver that you pay to take you somewhere.', 'Shall I call you a taxi?', { forms: ['taxis'] }),
+  w('safe', '/seɪf/', 'adjective', 'Responsible service', 'A2', 'Not in danger; not likely to cause harm.', 'I want you to get home safe.', { opposite: 'dangerous' }),
+  w('water', '/ˈwɔːtə/', 'noun', 'Responsible service', 'A1', 'The clear drink with no taste or alcohol.', 'Would you like some water?')
+];

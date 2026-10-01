@@ -9,10 +9,13 @@ export interface DailyLesson {
   crystals: number;
 }
 
+import { MORE_DAILY_LESSONS } from './dailyLessonsMore';
+
 export const DAILY_LESSON_COUNT = 3;
 export const DAILY_LESSON_RECIPE_CHANCE = .06;
 
 const LESSON_BANK: DailyLesson[] = [
+  ...MORE_DAILY_LESSONS,
   { id:'guest-word',kind:'Word',prompt:'What does “guest” mean?',choices:['A person visiting the bar','A drink recipe','The person serving drinks'],answer:'A person visiting the bar',explanation:'A guest is the customer you welcome and serve.',xp:12,crystals:2 },
   { id:'stock-word',kind:'Word',prompt:'What does “in stock” mean?',choices:['Available to sell or use','Already ordered by a guest','Free of charge'],answer:'Available to sell or use',explanation:'An item is in stock when it is available in your inventory.',xp:12,crystals:2 },
   { id:'garnish-word',kind:'Word',prompt:'What is a garnish?',choices:['A decoration or finishing ingredient','A type of payment','A supplier discount'],answer:'A decoration or finishing ingredient',explanation:'Mint, citrus peel and cocktail cherries can be garnishes.',xp:12,crystals:2 },
@@ -29,9 +32,23 @@ const LESSON_BANK: DailyLesson[] = [
 
 const hash = (value: string) => [...value].reduce((total, character) => ((total * 31) + character.charCodeAt(0)) >>> 0, 2166136261);
 
+// The correct answer is written first in the lesson bank, so the choices are shuffled. The shuffle depends only on the
+// day and the lesson, so the client and the server show and check the same thing.
+function shuffled(choices: string[], seed: string) {
+  const result = [...choices];
+  let state = hash(seed) || 1;
+  for (let i = result.length - 1; i > 0; i--) {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    const j = state % (i + 1);
+    [result[i], result[j]] = [result[j]!, result[i]!];
+  }
+  return result;
+}
+
 export function dailyLessonsFor(dateKey: string) {
   const start = hash(dateKey) % LESSON_BANK.length;
-  return Array.from({ length: DAILY_LESSON_COUNT }, (_, index) => LESSON_BANK[(start + index * 5) % LESSON_BANK.length]!);
+  return Array.from({ length: DAILY_LESSON_COUNT }, (_, index) => LESSON_BANK[(start + index * 7) % LESSON_BANK.length]!)
+    .map((lesson) => ({ ...lesson, choices: shuffled(lesson.choices, `${dateKey}:${lesson.id}`) }));
 }
 
 export const normalizeLessonAnswer = (answer: unknown) => typeof answer === 'string' ? answer.trim().replace(/\s+/g, ' ').toLowerCase() : '';

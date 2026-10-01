@@ -3,6 +3,7 @@ import { coins, quotePurchase } from '../domain/economy';
 import { marketFor } from '../domain/progression';
 import type { RegionId } from '../domain/types';
 import type { PlayerState } from './state';
+import { supplierInfoReply } from './tradeTalk';
 
 // Haggling with a supplier's sales rep. Runs in the shared rules, so on the server.
 // The player makes up to three price offers; each has a success chance that falls as the offer drops.
@@ -66,9 +67,9 @@ export interface Negotiation {
 
 const has = (text: string, pattern: RegExp) => pattern.test(text.toLowerCase());
 const PATTERNS: Record<TacticId, RegExp> = {
-  ask: /\b(discount|lower (the |your )?prices?|better (price|deal)|cheaper|reduce|reduction|special price|good price)\b/,
+  ask: /\b(discount|lower (the |your )?prices?|better (price|deal)|cheaper|reduce|reduction|special price|good price|match (the |their |that |your )?prices?)\b/,
   bulk: /\b(bulk|large order|big order|a lot|lots of|wholesale|many (packs|bottles|boxes))\b/,
-  loyalty: /\b(regular|every (week|month|day)|weekly|monthly|long[- ]term|loyal|again and again|often)\b/,
+  loyalty: /\b(regular|every (week|month|day|monday|tuesday|wednesday|thursday|friday)|weekly|monthly|long[- ]term|loyal|again and again|often|standing orders?)\b/,
   competitor: /\b(another supplier|other suppliers?|competitors?|elsewhere|somewhere else|other shop)\b/,
   cash: /\b(cash|pay (now|today|upfront|in advance|immediately|right away)|advance payment)\b/,
   delivery: /\b(free delivery|free shipping|deliver (it )?for free|waive|no delivery (fee|charge|cost))\b/
@@ -254,7 +255,10 @@ export function haggle(state: PlayerState, text: string, context: { checkEnglish
       }[tactic.id]);
     }
     if (fresh.length && !polite) replies.push('A little more politely next time, please.');
-    if (!found.length && has(said, /\b(deal|agree|accept|sounds good|that works|ok(ay)?)\b/)) replies.push('Good. Make me an offer.');
+    const supplier = SUPPLIERS.find((item) => item.id === negotiation.supplierId);
+    const info = !found.length && supplier ? supplierInfoReply(said, { company: supplier.name, deliveryDays: supplier.deliveryDays }) : undefined;
+    if (info) replies.push(info);
+    else if (!found.length && has(said, /\b(deal|agree|accept|sounds good|that works|ok(ay)?)\b/)) replies.push('Good. Make me an offer.');
     else if (!found.length && has(said, /\b(hello|hi|good (morning|afternoon|evening))\b/)) replies.push('Hello! Let’s talk about your order.');
     else if (!found.length) replies.push('I see. We can talk about the price, the order size, payment or delivery.');
     else if (!fresh.length) replies.push('You already told me that.');

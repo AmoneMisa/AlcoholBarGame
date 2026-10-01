@@ -1,4 +1,6 @@
-// Phrase lessons for two jobs — bartender and shop seller — split into parts so learners see how English builds them.
+import { MORE_PHRASE_GROUPS } from './phrasesMore';
+
+// Phrase lessons for three jobs — bartender and shop seller — split into parts so learners see how English builds them.
 
 export type PartRole = 'helper' | 'person' | 'verb' | 'thing' | 'question' | 'extra';
 export interface PhraseLesson {
@@ -8,10 +10,10 @@ export interface PhraseLesson {
   answers: string[];
   swap?: string;
 }
-export type WorkContext = 'bar' | 'shop';
+export type WorkContext = 'bar' | 'shop' | 'buyer';
 export interface PhraseGroup { id: string; context: WorkContext; title: string; goal: string; lessons: PhraseLesson[]; }
 
-export const CONTEXT_LABEL: Record<WorkContext, string> = { bar: 'Bartender', shop: 'Seller / shop' };
+export const CONTEXT_LABEL: Record<WorkContext, string> = { bar: 'Bartender', shop: 'Seller / shop', buyer: 'Buyer / suppliers' };
 
 const p = (text: string, role: PartRole) => ({ text, role });
 
@@ -128,4 +130,5 @@ export const PHRASE_GROUPS: PhraseGroup[] = [
       { text: 'We can exchange it or give you a refund.', parts: [p('We', 'person'), p('can exchange', 'verb'), p('it', 'thing'), p('or give you a refund.', 'extra')], when: 'Offer two solutions. Exchange = a new product. Refund = the money back.', answers: ['A refund, please.', 'I will exchange it.'] }
     ]
   }
+  ,...MORE_PHRASE_GROUPS
 ];
