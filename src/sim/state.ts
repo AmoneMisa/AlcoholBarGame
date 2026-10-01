@@ -3,7 +3,7 @@ import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
 import { CHARACTER_ART, CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { generateCustomer } from '../domain/engine';
-import { BOND_STEPS, COMPANIONS, COMPANION_START_LEVEL, KEEPSAKE_IDS, MAX_BOND, bondLevel, companionSlots, levelCapForGrade } from '../domain/companions';
+import { BOND_STEPS, COMPANIONS, COMPANION_START_LEVEL, KEEPSAKE_IDS, LEGACY_COMPANION_IDS, MAX_BOND, bondLevel, companionSlots, levelCapForGrade } from '../domain/companions';
 import { MAX_LEVEL, levelFor, levelPerks, xpForLevel } from '../domain/progression';
 import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../domain/types';
 import { buildProfile, shortWish, type CustomerReply, type Fact } from '../domain/conversation/customerTalk';
@@ -372,31 +372,33 @@ export { levelFor } from '../domain/progression';
 function normalizeCompanions(input: unknown): import('./companions').CompanionState {
   const source = (input && typeof input === 'object' ? input : {}) as Partial<import('./companions').CompanionState>;
   const whole = (value: unknown, max: number) => Number.isFinite(value) && (value as number) > 0 ? Math.min(max, Math.floor(value as number)) : 0;
+  const legacyId = (id: string) => Object.keys(LEGACY_COMPANION_IDS).find((old) => LEGACY_COMPANION_IDS[old] === id);
+  const savedValue = <T>(record: Record<string, T> | undefined, id: string) => record?.[id] ?? record?.[legacyId(id) ?? ''];
   const owned: Record<string, number> = {};
   const shards: Record<string, number> = {};
   const keepsakes: Record<string, number> = {};
   for (const companion of COMPANIONS) {
-    const points = (source.owned as Record<string, unknown> | undefined)?.[companion.id];
+    const points = savedValue(source.owned as Record<string, unknown> | undefined, companion.id);
     if (points !== undefined) owned[companion.id] = whole(points, BOND_STEPS[MAX_BOND - 1]!);
-    else { const have = whole((source.shards as Record<string, unknown> | undefined)?.[companion.id], companion.shards); if (have) shards[companion.id] = have; }
+    else { const have = whole(savedValue(source.shards as Record<string, unknown> | undefined, companion.id), companion.shards); if (have) shards[companion.id] = have; }
   }
   for (const id of KEEPSAKE_IDS) { const have = whole((source.keepsakes as Record<string, unknown> | undefined)?.[id], 999); if (have) keepsakes[id] = have; }
   const placed = new Set<string>();
   const assigned: Record<string, string[]> = {};
   for (const region of REGIONS) {
     const list = (source.assigned as Record<string, unknown> | undefined)?.[region.id];
-    assigned[region.id] = (Array.isArray(list) ? list : []).filter((id): id is string => typeof id === 'string' && id in owned && !placed.has(id)).slice(0, companionSlots(MAX_LEVEL)).map((id) => { placed.add(id); return id; });
+    assigned[region.id] = (Array.isArray(list) ? list : []).map((id) => typeof id === 'string' ? LEGACY_COMPANION_IDS[id] ?? id : '').filter((id): id is string => !!id && id in owned && !placed.has(id)).slice(0, companionSlots(MAX_LEVEL)).map((id) => { placed.add(id); return id; });
   }
-  const visits = source.visits && typeof source.visits.day === 'string' && source.visits.counts && typeof source.visits.counts === 'object' ? { day: source.visits.day, counts: Object.fromEntries(Object.entries(source.visits.counts).map(([id, count]) => [id, whole(count, 99)])) } : { day: '', counts: {} };
+  const visits = source.visits && typeof source.visits.day === 'string' && source.visits.counts && typeof source.visits.counts === 'object' ? { day: source.visits.day, counts: Object.fromEntries(Object.entries(source.visits.counts).map(([id, count]) => [LEGACY_COMPANION_IDS[id] ?? id, whole(count, 99)])) } : { day: '', counts: {} };
   const spotlights: Record<string, { until: number; ready: number }> = {};
   for (const id of Object.keys(owned)) {
-    const saved = (source.spotlights as Record<string, { until?: unknown; ready?: unknown }> | undefined)?.[id];
+    const saved = savedValue(source.spotlights as Record<string, { until?: unknown; ready?: unknown }> | undefined, id);
     if (saved && Number.isFinite(saved.until) && Number.isFinite(saved.ready)) spotlights[id] = { until: Number(saved.until), ready: Number(saved.ready) };
   }
   // Levels: only what was saved is kept (a person with no saved level counts ten per bond grade, see levelOf).
   const levels: Record<string, number> = {};
   for (const id of Object.keys(owned)) {
-    const saved = (source.levels as Record<string, unknown> | undefined)?.[id];
+    const saved = savedValue(source.levels as Record<string, unknown> | undefined, id);
     if (Number.isFinite(saved)) levels[id] = Math.max(COMPANION_START_LEVEL, Math.min(levelCapForGrade(bondLevel(owned[id]!)), Math.floor(saved as number)));
   }
   return { owned, shards, keepsakes, assigned, visits, spotlights, levels };

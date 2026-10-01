@@ -27,6 +27,7 @@ import { collectChatter, reactionToServed } from './chatter';
 import { addStat, raiseStat, syncDerivedStats } from '../domain/achievementStats';
 import { accrueStaff, hireStaff, upgradeStaff } from './staff';
 import { CompanionError, assignCompanion, buyKeepsake, companionVisit, dismissCompanion, giveKeepsake, recruitCompanion, spotlightCompanion, levelUpCompanion } from './companions';
+import { COMPANIONS, companionName } from '../domain/companions';
 import { applyPromo, barEventFor, tickBarEvent } from './events';
 import { adjustPitch, askPitch, cancelPitch, pitchChance, startPitch } from './pitch';
 import { pitchActsIn } from '../domain/social/pitchActs';
@@ -276,6 +277,15 @@ function makeArrivingCustomer(state: PlayerState, now: number, random: () => num
   let arriving = make();
   // Some nights bring more women (ladies’ night): look again for a few tries.
   if (night?.womenShare !== undefined && random() < night.womenShare) for (let attempt = 0; attempt < 10 && genderOf(arriving.characterId) !== 'f'; attempt++) arriving = make();
+  // Circle guests have a separate cast and visit occasionally; ordinary customer rolls never use their art.
+  if (random() < .15) {
+    const available = COMPANIONS.filter((person) => !state.customers.some((guest) => guest.characterId === person.id));
+    if (available.length) {
+      const person = available[Math.floor(random() * available.length)]!;
+      arriving.characterId = person.id;
+      arriving.name = companionName(person.id);
+    }
+  }
   return arriving;
 }
 

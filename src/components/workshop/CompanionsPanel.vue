@@ -3,8 +3,8 @@ import { computed, ref } from 'vue';
 import { SPOTLIGHT_MIN_BOND, SPOTLIGHT_MS, BOND_NAMES, BOND_STEPS, COMPANIONS, KEEPSAKES, KEEPSAKE_CRYSTAL_PRICE, KEEPSAKE_LIKED_POINTS, KEEPSAKE_POINTS, COMPANION_START_LEVEL, MAX_COMPANION_LEVEL, companionLevelCost, levelCapForGrade, companionPower, linksOf, linkStrength, bondLevel, companionName, companionSlots, describeBonus, keepsakeDef, nextBondStep } from '../../domain/companions';
 import { REGIONS } from '../../domain/catalog';
 import { useGameStore } from '../../stores/game';
-import CharacterModel from '../characters/CharacterModel.vue';
 import UiButton from '../ui/UiButton.vue';
+import ItemArt from '../ui/ItemArt.vue';
 import RelationshipLine from '../ui/RelationshipLine.vue';
 import { COMPANION_LADDER } from '../../domain/relationship';
 
@@ -74,7 +74,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
     <section v-if="met" class="crew card">
       <h3>At the bar now <b>{{ crew.length }} / {{ slots }}</b></h3>
       <ul v-if="crew.length">
-        <li v-for="id in crew" :key="id"><b>{{ companionName(id) }}</b> — {{ describeBonus(COMPANIONS.find((item) => item.id === id)!.bonus, companionPower(levelOfId(id), bondLevel(game.circle.owned[id] ?? 0))) }}<UiButton size="sm" variant="solid" :reason="spotState(id).reason" :title="`Their bonus counts double for ${SPOTLIGHT_MS / 60000} minutes, then they rest for 6 hours.`" @click="game.spotlightCompanion(id)">{{ spotState(id).label }}</UiButton><UiButton size="sm" @click="game.dismissCompanion(id)">Send home</UiButton></li>
+        <li v-for="id in crew" :key="id"><ItemArt kind="companion" :id="id" fallback="👤" :size="38" class="crew-face" /><b>{{ companionName(id) }}</b> — {{ describeBonus(COMPANIONS.find((item) => item.id === id)!.bonus, companionPower(levelOfId(id), bondLevel(game.circle.owned[id] ?? 0))) }}<UiButton size="sm" variant="solid" :reason="spotState(id).reason" :title="`Their bonus counts double for ${SPOTLIGHT_MS / 60000} minutes, then they rest for 6 hours.`" @click="game.spotlightCompanion(id)">{{ spotState(id).label }}</UiButton><UiButton size="sm" @click="game.dismissCompanion(id)">Send home</UiButton></li>
       </ul>
       <p v-else class="empty">Nobody works here yet. Choose someone below.</p>
     </section>
@@ -82,14 +82,14 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
     <section v-if="met" class="keepsakes card">
       <h3>Keepsakes</h3>
       <div class="keep-row">
-        <span v-for="item in keepsakes" :key="item.id" class="keep"><i>{{ item.icon }}</i><b>{{ item.count }}</b><small>{{ item.name }}</small><UiButton size="sm" variant="primary" :disabled="game.crystals < KEEPSAKE_CRYSTAL_PRICE" :title="game.crystals < KEEPSAKE_CRYSTAL_PRICE ? `Not enough crystals: you need ${KEEPSAKE_CRYSTAL_PRICE}.` : `Buy for ${KEEPSAKE_CRYSTAL_PRICE} crystals`" @click="game.buyKeepsake(item.id)">{{ KEEPSAKE_CRYSTAL_PRICE }} 💎</UiButton></span>
+        <span v-for="item in keepsakes" :key="item.id" class="keep"><ItemArt kind="keepsake" :id="item.id" :fallback="item.icon" :size="52" class="keep-art" /><b>{{ item.count }}</b><small>{{ item.name }}</small><UiButton size="sm" variant="primary" :disabled="game.crystals < KEEPSAKE_CRYSTAL_PRICE" :title="game.crystals < KEEPSAKE_CRYSTAL_PRICE ? `Not enough crystals: you need ${KEEPSAKE_CRYSTAL_PRICE}.` : `Buy for ${KEEPSAKE_CRYSTAL_PRICE} crystals`" @click="game.buyKeepsake(item.id)">{{ KEEPSAKE_CRYSTAL_PRICE }} 💎</UiButton></span>
       </div>
     </section>
 
     <div class="people">
       <article v-for="item in cards" :key="item.person.id" class="person card" :class="{ joined: item.joined }">
         <header :class="{ clickable: item.joined }" @click="item.joined && toggle(item.person.id)">
-          <span class="face"><CharacterModel role="customer" :character-id="item.person.id" :seed="item.person.id" mood="friendly" /></span>
+          <span class="face"><ItemArt kind="companion" :id="item.person.id" fallback="👤" :size="76" /></span>
           <span class="who">
             <b>{{ companionName(item.person.id) }}</b>
             <small>{{ item.person.title }} · {{ item.person.from }}</small>
@@ -114,7 +114,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
             <UiButton size="sm" variant="solid" :reason="levelUpReason(item.person.id, item.bond)" :title="item.level < MAX_COMPANION_LEVEL ? `${companionLevelCost(item.level).coins} coins + ${companionLevelCost(item.level).parts} parts` : ''" @click="game.levelUpCompanion(item.person.id)">Level up<template v-if="item.level < MAX_COMPANION_LEVEL"> · {{ companionLevelCost(item.level).coins }} 🪙 {{ companionLevelCost(item.level).parts }} ⚙</template></UiButton>
           </div>
           <div class="gifts">
-            <UiButton v-for="keep in keepsakes" :key="keep.id" size="sm" :variant="item.person.likes === keep.id ? 'danger' : 'secondary'" :disabled="!keep.count || !item.next" :title="`${keep.name}${item.person.likes === keep.id ? ' — loved' : ''}${keep.count ? '' : ' (you have none)'}`" @click="game.giveKeepsake(item.person.id, keep.id)">{{ keep.icon }}</UiButton>
+            <UiButton v-for="keep in keepsakes" :key="keep.id" size="sm" :variant="item.person.likes === keep.id ? 'danger' : 'secondary'" :disabled="!keep.count || !item.next" :title="`${keep.name}${item.person.likes === keep.id ? ' — loved' : ''}${keep.count ? '' : ' (you have none)'}`" @click="game.giveKeepsake(item.person.id, keep.id)"><ItemArt kind="keepsake" :id="keep.id" :fallback="keep.icon" :size="24" class="gift-art" /></UiButton>
           </div>
           <p class="meta">Loves: {{ keepsakeDef(item.person.likes)?.icon }} {{ keepsakeDef(item.person.likes)?.name }}</p>
           <UiButton v-if="item.here" block @click="game.dismissCompanion(item.person.id)">Working here · send home</UiButton>
@@ -158,17 +158,19 @@ h3 { margin: 0 0 6px; font-size: 14px; }
 h3 b { margin-left: 8px; color: #e4b35c; }
 .crew ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .crew li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.crew-face { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; }
 .empty { margin: 0; color: #9eafc1; font-size: 13px; }
 .keep-row { display: flex; flex-wrap: wrap; gap: 10px; }
 .keep { display: grid; justify-items: center; gap: 2px; padding: 6px 10px; border-radius: 10px; background: #17253a; }
-.keep i { font-size: 22px; font-style: normal; }
+.keep-art { width: 52px; height: 52px; border-radius: 50%; }
 .keep small { color: #9eafc1; font-size: 11px; }
 .people { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
 .person { display: grid; align-content: start; gap: 4px; }
 .person.joined { border-color: #b78649; }
 .person header { display: grid; grid-template-columns: 72px 1fr; gap: 10px; align-items: center; cursor: pointer; }
 .face { position: relative; width: 72px; height: 72px; overflow: hidden; border: 2px solid #d4a44d; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #5b3a4a, #1b1522); }
-.face :deep(.art-character) { position: absolute; inset: auto; left: calc(50% - 52px); top: -2px; width: 104px; height: 149px; margin: 0; }
+.face img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.gift-art { display: block; width: 24px; height: 24px; border-radius: 50%; }
 .who { display: grid; gap: 1px; }
 .who b { font: 700 17px Georgia, serif; }
 .who small { color: #9eafc1; font-size: 11px; }

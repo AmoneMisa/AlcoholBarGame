@@ -157,7 +157,8 @@ const boostLeft = (id: string) => {
     <div v-if="tab === 'equipment'" class="grid">
       <nav v-if="ownedBars.length > 1" class="bar-chips" aria-label="Bar to upgrade"><UiButton v-for="region in ownedBars" :key="region.id" size="sm" :variant="region.id === equipBar ? 'solid' : 'secondary'" @click="pickedBar = region.id">{{ region.name }}</UiButton></nav>
       <article v-for="item in EQUIPMENT" :key="item.id" class="card">
-        <h3><ItemArt kind="equipment" :id="item.id" :fallback="item.icon" /> {{ item.name }} <em :class="slot(item.id).tier">{{ slot(item.id).tier }}</em></h3>
+        <ItemArt kind="equipment" :id="item.id" :fallback="item.icon" :size="72" class="workshop-art" />
+        <h3>{{ item.name }} <em :class="slot(item.id).tier">{{ slot(item.id).tier }}</em></h3>
         <p>{{ item.description }}</p>
         <b>Level {{ slot(item.id).level }} / {{ cap(item.id) }} · {{ effectText(item.id) }}</b>
         <progress :value="slot(item.id).level" :max="10"></progress>
@@ -175,7 +176,8 @@ const boostLeft = (id: string) => {
 
     <div v-else-if="tab === 'boxes'" class="grid">
       <article v-for="box in BOXES" :key="box.id" class="card">
-        <h3><ItemArt kind="box" :id="box.id" :fallback="box.icon" /> {{ box.name }} <b>×{{ boxCount(box.id) }}</b></h3>
+        <ItemArt kind="box" :id="box.id" :fallback="box.icon" :size="72" class="workshop-art" />
+        <h3>{{ box.name }} <b>×{{ boxCount(box.id) }}</b></h3>
         <p>{{ box.description }}</p>
         <div class="row">
           <UiButton variant="primary" :reason="!boxCount(box.id) ? `You have no ${box.name.toLowerCase()}. Earn them from quests, achievements and drops, or buy one.` : game.loot.pendingChoice ? `Pick your reward first.` : ''" @click="game.act({ type: 'openBox', box: box.id })">Open</UiButton>
@@ -190,7 +192,8 @@ const boostLeft = (id: string) => {
 
     <div v-else-if="tab === 'items'" class="grid">
       <article v-for="item in CONSUMABLES" :key="item.id" class="card">
-        <h3><ItemArt kind="item" :id="item.id" :fallback="item.icon" /> {{ item.name }} <b>×{{ game.loot.consumables[item.id] ?? 0 }}</b></h3>
+        <ItemArt kind="item" :id="item.id" :fallback="item.icon" :size="72" class="workshop-art" />
+        <h3>{{ item.name }} <b>×{{ game.loot.consumables[item.id] ?? 0 }}</b></h3>
         <p>{{ item.description }}</p>
         <small v-if="boostLeft(item.id)">Active · {{ boostLeft(item.id) }}</small>
         <small v-else-if="game.loot.armed[item.id]">Armed for your next order</small>
@@ -245,7 +248,8 @@ const boostLeft = (id: string) => {
         <p>{{ stat('tasted') }} recipes and {{ game.loot.tasted.length - stat('tasted') }} brands tasted. Serving a recipe for the first time gives parts and skin shards; a new brand gives a shard.</p>
       </article>
       <article v-for="row in achievementRows" :key="row.series" class="card">
-        <h3>🏅 {{ row.seriesName }}</h3>
+        <ItemArt kind="achievement" :id="row.series" fallback="🏅" :size="72" class="workshop-art" />
+        <h3>{{ row.seriesName }}</h3>
         <p>{{ row.goal.name }}</p>
         <p class="tiers"><span v-for="tier in row.tiers" :key="tier.id" :class="['tier', `tier-${tier.tier}`, { done: tier.done }]" :title="`${tier.tierName}: ${tier.target}`">{{ tier.tierName }}</span></p>
         <progress :value="Math.min(stat(row.goal.stat), row.goal.target)" :max="row.goal.target"></progress>
@@ -346,6 +350,7 @@ const boostLeft = (id: string) => {
 .workshop-log{margin:10px 14px 0;padding:8px 10px;border:1px solid #3e7756;border-radius:8px;background:#173425;color:#b9e5c6;font-size:11px}
 .grid,.draw{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;padding:14px}.draw{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
 .card{display:grid;align-content:start;gap:8px;padding:14px;border:1px solid #354762;border-radius:13px;background:#111c2d}.card h3{margin:0;font:700 17px Georgia,serif}.card p{margin:0;color:#aebdce;font-size:11px;line-height:1.45}.card>b{color:#f4d08e;font-size:11px}.card select{padding:8px;border:1px solid #40536c;border-radius:8px;background:#0c1625;color:#fff}
+.workshop-art{display:block;width:72px;height:72px;object-fit:contain;border-radius:50%}
 .card em{margin-left:6px;padding:2px 6px;border-radius:6px;background:#26364d;color:#c7d3e0;font-size:9px;font-style:normal;text-transform:uppercase}.card em.rare{background:#1d4b6e}.card em.legendary{background:#7a4d12;color:#ffe0a0}
 .card progress{width:100%;accent-color:#e7b556}.row{display:flex;flex-wrap:wrap;gap:6px}
 .results{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:11px}.results li{padding:5px 8px;border-radius:7px;background:#17253a}.results li.rare,.crafts .rare{border-color:#3f86b8;color:#bfe2ff}.results li.legendary,.crafts .legendary{background:#4a3210;color:#ffe0a0}
