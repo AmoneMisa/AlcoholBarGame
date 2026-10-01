@@ -47,8 +47,20 @@ const onScreen = (element: Element) => {
   // A hidden browser pane reports a window of size 0: then only the size of the element tells if it is shown.
   const width = window.innerWidth || document.documentElement.clientWidth;
   const height = window.innerHeight || document.documentElement.clientHeight;
-  return !width || !height || (box.bottom > 0 && box.right > 0 && box.top < height && box.left < width);
+  if (width && height && !(box.bottom > 0 && box.right > 0 && box.top < height && box.left < width)) return false;
+  return !coveredByDialog(element, box, width, height);
 };
+
+// A button hidden behind an open dialog (the navigation under the conversation) is not pointed at: the pointer would
+// float over the dialog and tell the player to press something they cannot reach.
+function coveredByDialog(element: Element, box: DOMRect, width: number, height: number) {
+  if (!width || !height || typeof document.elementFromPoint !== 'function') return false;
+  const x = Math.min(width - 1, Math.max(0, box.left + box.width / 2));
+  const y = Math.min(height - 1, Math.max(0, box.top + box.height / 2));
+  const top = document.elementFromPoint(x, y);
+  if (!top || element.contains(top) || top.contains(element)) return false;
+  return !!top.closest('.talk-popup, .modal-sheet, .modal-backdrop, [aria-modal="true"]:not(.tour)');
+}
 
 export function findTarget(spec: PointerSpec, root: ParentNode = document): Element | undefined {
   const all = [...root.querySelectorAll(spec.target)];

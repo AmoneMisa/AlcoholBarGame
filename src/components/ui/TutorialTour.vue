@@ -21,7 +21,7 @@ interface Step {
 }
 
 const props = defineProps<{ ready: boolean; seen: boolean }>();
-const emit = defineEmits<{ view: [id: string]; finish: [how: 'done' | 'skipped'] }>();
+const emit = defineEmits<{ finish: [how: 'done' | 'skipped'] }>();
 const game = useGameStore();
 
 const shown = (css: string) => { const element = document.querySelector<HTMLElement>(css); return !!element && element.getBoundingClientRect().width > 1; };
@@ -118,9 +118,8 @@ function place() {
 
 async function show() {
   expanded.value = false;
-  // Steps that point at a button leave the screen as it is: the player has to find the way, which is the lesson.
-  // The two header steps go back to the bar first, so the button they point at is there.
-  if (step.value.view && (!step.value.point || step.value.id === 'hud' || step.value.id === 'rules')) emit('view', step.value.view);
+  // The tour never moves the player: it does not switch tabs and does not close a popup that is open. The card says
+  // what to do and the pointer shows where, as soon as that part of the screen is there.
   setPointer('tour', step.value.point);
   await nextTick();
   setTimeout(() => { measure(); place(); }, 120);

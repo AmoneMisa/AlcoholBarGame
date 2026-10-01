@@ -220,3 +220,14 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .talk-header .talk-help { right: 56px; width: 36px; height: 36px; display: grid; place-items: center; padding: 0; }
 @media (max-width: 720px) { .talk-header { gap: 10px; padding-right: 96px; } }
 .chat-guide-list { margin: 0; padding-left: 20px; display: grid; gap: 10px; font-size: 14px; line-height: 1.45; }
+
+/* Conversation layout: the header and the answer area stay put, everything between them is one scrolling area.
+   (Before, five stacked areas each shrank and scrolled on their own and drew over one another on tall, narrow windows.) */
+.talk-popup { display: flex; flex-direction: column; }
+.talk-popup > .talk-header { flex: none; }
+.talk-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.talk-scroll .talk-extras { max-height: none; overflow: visible; }
+.talk-scroll .talk-body { min-height: auto; }
+.talk-scroll .talk-log { max-height: min(44dvh, 420px); }
+.talk-scroll .talk-clues { max-height: none; overflow: visible; }
+.talk-popup > .talk-compose { flex: none; max-height: min(52dvh, 520px); overflow-y: auto; overscroll-behavior: contain; }

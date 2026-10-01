@@ -177,7 +177,7 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
     <RewardPopup />
     <DailyRewardPopup v-if="game.dailyOpen" />
     <GuidePointer />
-    <TutorialTour :ready="game.sessionReady && game.startingBarChosen" :seen="game.tourSeen" @view="selectView" @finish="game.setTour" />
+    <TutorialTour :ready="game.sessionReady && game.startingBarChosen" :seen="game.tourSeen" @finish="game.setTour" />
     <StartingBarPicker v-if="game.sessionReady && !game.startingBarChosen" />
     <nav class="game-nav" aria-label="Game views">
       <button v-for="item in nav" :key="item.id" :class="{ active: view === item.id }" :data-guide="'nav-' + item.id" type="button" @click="selectView(item.id)"><UiIcon :name="item.mark" /><b>{{ item.label }}</b><i v-if="badges[item.id]" class="nav-badge" :aria-label="`${badges[item.id]} waiting`">{{ badges[item.id] }}</i></button>

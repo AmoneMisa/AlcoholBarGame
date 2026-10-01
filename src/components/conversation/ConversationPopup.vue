@@ -362,6 +362,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         <ol class="chat-guide-list"><li v-for="step in CHAT_GUIDE" :key="step.title"><b>{{ step.title }}.</b> {{ step.text }} <UiButton v-if="step.show" size="sm" class="show-me" @click="showMe(step)">Show me</UiButton></li></ol>
         <template #footer><UiButton block variant="solid" @click="guideOpen = false">Got it</UiButton></template>
       </ModalDialog>
+      <div class="talk-scroll">
       <div class="talk-extras">
       <section v-if="situation" class="situation-panel" :class="'sev-' + situation.severity" aria-label="Situation">
         <header><b>{{ situation.icon }} {{ situation.title }}</b><button type="button" class="situation-type" @click="composerOpen = !composerOpen">{{ composerOpen ? 'Hide typing' : 'Type it yourself' }}</button></header>
@@ -500,6 +501,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         <button class="reject-order-button" type="button" @click="rejectOrder">Reject order</button>
       </div>
 
+      </div>
       <footer v-if="!situation || composerOpen" class="talk-compose">
         <nav class="talk-modes" aria-label="Answer mode">
           <button type="button" :class="{ active: inputMode === 'words' }" @click="inputMode = 'words'; feedback = undefined">Choose words</button>
