@@ -97,7 +97,7 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 /* ==== Header popovers: servers, training and sound open under their button, above everything, and never run off the screen ==== */
 .staff-resource, .academy-resource, .sound-resource, .exchange-resource { position: relative; }
 .staff-panel, .academy-panel { position: absolute; top: calc(100% + 10px); left: 50%; z-index: 260; transform: translateX(-50%); width: min(380px, 92vw); max-height: calc(100dvh - 170px); overflow: auto; overscroll-behavior: contain; }
-.volume-panel, .currency-exchange { z-index: 260; max-height: calc(100dvh - 170px); overflow: auto; overscroll-behavior: contain; }
+.currency-exchange { z-index: 260; max-height: calc(100dvh - 170px); overflow: auto; overscroll-behavior: contain; }
 .staff-panel .staff-row:first-of-type { border-top: 0; }
 @media (max-width: 760px) {
   .staff-panel, .academy-panel { position: fixed; top: calc(max(8px, env(safe-area-inset-top)) + 112px); left: 7px; right: 7px; width: auto; transform: none; max-height: calc(100dvh - 112px - 90px); }
@@ -106,7 +106,6 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .house-rules-panel { position: absolute; z-index: 60; left: 12px; bottom: 90px; width: min(380px, calc(100% - 24px)); max-height: 62%; }
 
 /* ==== Voice and other selects use the styled list, and the one in the sound panel fills its row ==== */
-.volume-panel .opt-select { padding: 8px 9px; border: 1px solid #334158; border-radius: 10px; background: #0f1827; }
 
 /* ==== Design tab (bar): preview on the left and options on the right on wide screens; a smaller pinned preview on phones ==== */
 @media (min-width: 1000px) {
@@ -125,7 +124,6 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .bar-name-editor, .bartender-name-editor { align-items: end; }
 .bar-name-editor .ui-input, .bartender-name-editor .ui-input { min-height: var(--ctl-h); }
 .staff-row .ui-reason { grid-column: 1 / -1; }
-.settings-page .volume-panel.static { position: static; width: auto; max-height: none; overflow: visible; padding: 0; border: 0; background: transparent; box-shadow: none; display: grid; gap: 8px; }
 
 /* ==== Rows of tabs scroll sideways by swipe or drag; the page can always scroll past the bottom navigation ==== */
 .workshop-tabs, .learning-tabs, .category-tabs, .bar-switcher, .design-tabs, .job-switch, .market-modes, .bar-chips, .tabs-scroll { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; scrollbar-width: none; cursor: grab; }

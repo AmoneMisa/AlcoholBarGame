@@ -34,7 +34,7 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
 
     <section class="settings-card">
       <h3>Sound</h3>
-      <div class="volume-panel static">
+      <div class="sound-rows">
         <SoundControls id-prefix="settings" />
       </div>
     </section>

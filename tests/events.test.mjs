@@ -139,7 +139,7 @@ test('Servers: opened by level, trained one by one, paid only for time away and 
   const day = { ...state, staffAtByBar: { [state.regionId]: NOW } };
   const capped = state.money;
   accrueStaff(day, NOW + 72 * 3600_000, () => .5, market);
-  assert.ok(day.money - capped <= (8 * 3600_000 / (62.5 * 60_000)) * 10 * .85 * 1.15 + 1, 'a long absence pays at most eight hours');
+  assert.ok(day.money - capped <= (24 * 3600_000 / (62.5 * 60_000)) * 10 * .85 * 1.15 + 1, 'a long absence pays at most 24 hours');
 });
 
 test('A low-level bar cannot hire the next server', () => {

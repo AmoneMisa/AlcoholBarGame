@@ -11,7 +11,7 @@ export const MAX_STAFF_LEVEL = 5;
 /** What four fully upgraded servers reach, as a share of the player's own service. */
 export const STAFF_TEAM_CAP = .85;
 /** The longest absence that is paid, so a forgotten bar does not run for days. */
-export const STAFF_AWAY_CAP_MS = 8 * 60 * 60 * 1000;
+export const STAFF_AWAY_CAP_MS = 24 * 60 * 60 * 1000;
 /** Shorter gaps than this are the player simply being slow, not away. */
 export const STAFF_AWAY_MIN_MS = 3 * 60 * 1000;
 
