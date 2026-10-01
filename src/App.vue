@@ -97,7 +97,7 @@ function selectView(id: string) {
     <ConversationPopup v-if="game.conversationCustomerId" />
     <GuideSheet />
     <NotificationToasts />
-    <TutorialTour :ready="game.sessionReady && game.startingBarChosen" @view="selectView" />
+    <TutorialTour :ready="game.sessionReady && game.startingBarChosen" :seen="game.tourSeen" @view="selectView" @finish="game.setTour" />
     <StartingBarPicker v-if="game.sessionReady && !game.startingBarChosen" />
     <nav class="game-nav" aria-label="Game views">
       <button v-for="item in nav" :key="item.id" :class="{ active: view === item.id }" type="button" @click="selectView(item.id)"><UiIcon :name="item.mark" /><b>{{ item.label }}</b><i v-if="badges[item.id]" class="nav-badge" :aria-label="`${badges[item.id]} waiting`">{{ badges[item.id] }}</i></button>

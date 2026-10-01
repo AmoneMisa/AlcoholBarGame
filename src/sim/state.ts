@@ -90,6 +90,8 @@ export interface PlayerState {
   loyalty?: Record<string, number>;
   // Guests who came since the last situation, and how many guests the next one is due after (10–12; never before the 4th).
   guestsSinceEvent?: number;
+  // The guided tour: finished or skipped. Kept on the account, so it shows once, not once per device.
+  tour?: 'done' | 'skipped';
   // Servers hired (up to four), when their work was last counted, and what they have earned in all.
   staff?: { level: number }[];
   staffAt?: number;
@@ -262,6 +264,7 @@ export function normalizePlayerState(state: PlayerState) {
   state.cosmeticRouletteKey = typeof state.cosmeticRouletteKey === 'string' ? state.cosmeticRouletteKey : '';
   state.cosmeticRouletteResult = typeof state.cosmeticRouletteResult === 'string' ? state.cosmeticRouletteResult : 'Your daily style draw is ready.';
   state.cosmeticGiftLog = Array.isArray(state.cosmeticGiftLog) ? state.cosmeticGiftLog.slice(0, 30) : [];
+  if (state.tour !== 'done' && state.tour !== 'skipped') delete state.tour;
   state.staff = Array.isArray(state.staff) ? state.staff.slice(0, 4).map((member) => ({ level: Math.max(1, Math.min(5, Math.round(Number(member?.level) || 1))) })) : [];
   state.bars ??= structuredClone(DEFAULT_BARS);
   for (const region of REGIONS) {

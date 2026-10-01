@@ -181,7 +181,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: mode.value !== 'online' });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson','spinCosmeticRoulette','giftCosmetic','giveAshtray','cleanAshtrays','pitchStart','pitchAsk','pitchCancel','hireStaff','upgradeStaff','giveWater','callTaxi','askToLeave','situationChoice','reportIssue','discardStock']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson','spinCosmeticRoulette','giveAshtray','cleanAshtrays','pitchStart','pitchAsk','pitchCancel','hireStaff','upgradeStaff','giveWater','callTaxi','askToLeave','situationChoice','reportIssue','discardStock']);
 
   function saveOffline() {
     if (mode.value === 'online') return;
@@ -502,6 +502,9 @@ export const useGameStore = defineStore('game', () => {
   const ruleViolations = computed(() => state.value.ruleViolations ?? 0);
   const barEvent = computed(() => barEventFor(state.value, nowMs.value));
   const offerChance = (customerId: string) => { const guest = state.value.customers.find((item) => item.id === customerId); return guest ? pitchChance(state.value, guest, nowMs.value) : undefined; };
+  // Players who are already well into the game never need the tour.
+  const tourSeen = computed(() => !!state.value.tour || state.value.xp >= 150);
+  const setTour = (value: 'done' | 'skipped') => dispatch({ type: 'setTour', value });
   const staff = computed(() => state.value.staff ?? []);
   const hireStaff = () => dispatch({ type: 'hireStaff' });
   const upgradeStaff = (index: number) => dispatch({ type: 'upgradeStaff', index });
@@ -564,7 +567,6 @@ export const useGameStore = defineStore('game', () => {
     }
   }
   const spinCosmeticRoulette = () => dispatch({ type:'spinCosmeticRoulette' });
-  const giftCosmetic = (cosmeticId:string, recipient:string) => dispatch({ type:'giftCosmetic', cosmeticId, recipient });
   const activatePopularityBoost = (boost:'no-cooldown'|'vip-run') => dispatch({ type:'activatePopularityBoost', boost });
   const popularity = computed(() => state.value.popularity ?? 0);
   const popularityBoost = computed(() => state.value.popularityBoost);
@@ -597,7 +599,7 @@ export const useGameStore = defineStore('game', () => {
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, sessionReady, ownedInteriorIds, barBackground, barInteriorStyle,
-    cosmetics:COSMETICS, ownedCosmeticIds, cosmeticCopies, cosmeticRouletteAvailable, cosmeticRouletteResult, cosmeticGiftLog, canUseCosmetic, spinCosmeticRoulette, giftCosmetic, popularity, popularityBoost, activatePopularityBoost,
+    cosmetics:COSMETICS, ownedCosmeticIds, cosmeticCopies, cosmeticRouletteAvailable, cosmeticRouletteResult, cosmeticGiftLog, canUseCosmetic, spinCosmeticRoulette, popularity, popularityBoost, activatePopularityBoost,
     inventories, inventory, bottleInventories, bottleInventory, currentMix, shaken, customers, activeCustomerId, customer, hasCustomer, recipe, mixJudge,
     knownRecipeIds, recipeUnlockSources, knownRecipes, lockedRecipes, dailyGiftAvailable, dailyGiftResult, loginStreak, upcomingLoginDay, dailyCoinReward, dailyCrystalReward,
     dailyLessons, dailyLessonCompletedIds, dailyLessonsComplete, dailyLessonResult, learningStreak, learningStreakForToday, learningBonusPercent, completeDailyLesson,
@@ -606,6 +608,6 @@ export const useGameStore = defineStore('game', () => {
     pourBrands, brandOnShelf, shelfBrandsFor, setPourBrand,
     selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, tickGameClock, welcomeNextCustomer, offerSimilarOrder, rejectCustomer, buy, sell, switchBar, isBarOwned, nextBarPrice, barPurchaseLevel:BAR_PURCHASE_LEVEL, chooseStartingBar, buyBar, transferStock,
     supplier, localSuppliers, purchaseCart, saleCart, purchaseQuote, saleQuote, saleRevenue, deliveryOrders, deliveryCountdown, selectSupplier, checkoutPurchase, checkoutSale, renameBar, renameBartender,
-    buyRecipe, recipePrice, buyInterior, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, giveAshtray, giveWater, callTaxi, pitchStart, pitchAsk, pitchCancel, staff, hireStaff, upgradeStaff, barEvent, offerChance, houseRules, ruleViolations, askToLeave, cleanAshtrays, ashtrays, situationOf, answerSituation, deliveryIssues, quarantine, lowGrade, reportIssue, discardStock, buyCrystalPack, buyingCrystals, starterPackAvailable, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
+    buyRecipe, recipePrice, buyInterior, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, giveAshtray, giveWater, callTaxi, pitchStart, pitchAsk, pitchCancel, tourSeen, setTour, staff, hireStaff, upgradeStaff, barEvent, offerChance, houseRules, ruleViolations, askToLeave, cleanAshtrays, ashtrays, situationOf, answerSituation, deliveryIssues, quarantine, lowGrade, reportIssue, discardStock, buyCrystalPack, buyingCrystals, starterPackAvailable, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
   };
 });

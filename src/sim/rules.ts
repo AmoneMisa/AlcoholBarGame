@@ -55,7 +55,6 @@ export type GameAction =
   | { type: 'renameBartender'; name: string }
   | { type: 'setDecor'; key: string; value: string }
   | { type: 'spinCosmeticRoulette' }
-  | { type: 'giftCosmetic'; cosmeticId: string; recipient: string }
   | { type: 'activatePopularityBoost'; boost: 'no-cooldown' | 'vip-run' }
   | { type: 'selectCustomer'; customerId: string }
   | { type: 'openConversation'; customerId: string }
@@ -76,6 +75,7 @@ export type GameAction =
   // Looking after the people at the bar: each names the guest it is for.
   | { type: 'giveAshtray'; customerId: string }
   | { type: 'cleanAshtrays' }
+  | { type: 'setTour'; value: 'done' | 'skipped' }
   | { type: 'hireStaff' }
   | { type: 'upgradeStaff'; index: number }
   // Offering a guest another drink or some food: start the offer, talk, then ask (the chance is shown and changes as you talk).
@@ -794,18 +794,6 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.message = state.cosmeticRouletteResult;
       break;
     }
-    case 'giftCosmetic': {
-      const reward = COSMETICS.find((entry) => entry.id === action.cosmeticId);
-      const recipient = cleanText(action.recipient, 32);
-      if (!reward) throw new RuleError('Unknown cosmetic item.');
-      if (!recipient) throw new RuleError('Enter your friend’s code or nickname.');
-      if ((state.cosmeticCopies[reward.id] ?? 0) < 1) throw new RuleError('Only duplicate cosmetic items can be gifted.');
-      state.cosmeticCopies[reward.id] = (state.cosmeticCopies[reward.id] ?? 0) - 1;
-      state.cosmeticGiftLog.unshift({ cosmeticId:reward.id,recipient,at:now });
-      state.cosmeticGiftLog = state.cosmeticGiftLog.slice(0,30);
-      state.message = `${reward.label} sent to ${recipient}.`;
-      break;
-    }
     case 'giveAshtray':
     case 'giveWater':
     case 'callTaxi':
@@ -868,6 +856,9 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       addLine(transcript, 'customer', voice(target, result.text, transcript.lines.length));
       break;
     }
+    case 'setTour':
+      state.tour = action.value === 'done' ? 'done' : 'skipped';
+      break;
     case 'hireStaff':
     case 'upgradeStaff': {
       try { state.message = action.type === 'hireStaff' ? hireStaff(state) : upgradeStaff(state, Number(action.index)); }

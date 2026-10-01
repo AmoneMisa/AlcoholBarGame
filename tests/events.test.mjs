@@ -182,3 +182,12 @@ test('A guest who said no to a drink or a bottle is not offered it again, and he
   assert.ok(!suggestions.some((item) => item.text.includes(vodka.name)));
   assert.ok(!suggestions.some((item) => /Which type of alcohol/.test(item.text)), 'the type question is not asked again');
 });
+
+test('The tour choice is saved on the account state', () => {
+  const { state } = guestIn();
+  assert.equal(state.tour, undefined);
+  applyAction(state, { type: 'setTour', value: 'skipped' }, context());
+  assert.equal(state.tour, 'skipped');
+  applyAction(state, { type: 'setTour', value: 'done' }, context());
+  assert.equal(state.tour, 'done');
+});

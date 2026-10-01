@@ -6,10 +6,9 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 interface Step { id: string; title: string; text: string; view?: string; target?: string; tips?: string[] }
 
-const props = defineProps<{ ready: boolean }>();
-const emit = defineEmits<{ view: [id: string] }>();
+const props = defineProps<{ ready: boolean; seen: boolean }>();
+const emit = defineEmits<{ view: [id: string]; finish: [how: 'done' | 'skipped'] }>();
 
-const STORE_KEY = 'barlingo.tour';
 const STEPS: Step[] = [
   { id: 'welcome', title: 'Welcome to BarLingo!', text: 'You run a bar, and you learn real English while you serve. This tour takes about a minute. You can skip it at any time and replay it later from the Sound panel.', view: 'service' },
   { id: 'guests', title: 'Your guests', text: 'Guests arrive at the bar one by one. Each has a mood, a wish, and sometimes a problem. Tap a guest to start talking.', view: 'service', target: '.bar-scene', tips: ['The little bar above a guest shows how long they will wait.', 'Up to six guests can sit at the bar.'] },
@@ -29,9 +28,6 @@ const rect = ref<{ top: number; left: number; width: number; height: number } | 
 const step = computed(() => STEPS[index.value]!);
 const last = computed(() => index.value === STEPS.length - 1);
 
-const saved = () => { try { return localStorage.getItem(STORE_KEY); } catch { return null; } };
-const remember = (value: string) => { try { localStorage.setItem(STORE_KEY, value); } catch { /* private mode */ } };
-
 function measure() {
   const selector = step.value.target;
   const element = selector ? document.querySelector<HTMLElement>(selector) : null;
@@ -47,12 +43,13 @@ async function show() {
 }
 
 function start() { index.value = 0; open.value = true; void show(); }
-function finish(how: 'done' | 'skipped') { open.value = false; remember(how); }
+// The choice is saved on the account (see the game store), so it is not asked again on another device.
+function finish(how: 'done' | 'skipped') { open.value = false; emit('finish', how); }
 function next() { if (last.value) finish('done'); else { index.value++; void show(); } }
 function back() { if (index.value > 0) { index.value--; void show(); } }
 const onKey = (event: KeyboardEvent) => { if (open.value && event.key === 'Escape') finish('skipped'); };
 
-watch(() => props.ready, (ready) => { if (ready && !saved()) setTimeout(start, 900); }, { immediate: true });
+watch(() => props.ready, (ready) => { if (ready && !props.seen) setTimeout(() => { if (!props.seen) start(); }, 900); }, { immediate: true });
 onMounted(() => {
   window.addEventListener('resize', measure);
   window.addEventListener('keydown', onKey);
