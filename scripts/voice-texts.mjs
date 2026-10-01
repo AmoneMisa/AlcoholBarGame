@@ -6,6 +6,7 @@ import { ALCOHOL_PRODUCTS } from '../src/domain/bottleCatalog.ts';
 import { MORE_GUIDES } from '../src/data/knowledge/cocktailsMore.ts';
 import { SITUATIONS } from '../src/domain/situations/catalog.ts';
 import { FOODS } from '../src/domain/foods.ts';
+import { BAR_PAIRINGS } from '../src/data/pairings/barPairings.ts';
 import { BRANDS_A } from '../src/data/knowledge/brandsA.ts';
 import { BRANDS_B } from '../src/data/knowledge/brandsB.ts';
 import { BRANDS_C } from '../src/data/knowledge/brandsC.ts';
@@ -24,4 +25,14 @@ for (const table of [BRANDS_A, BRANDS_B, BRANDS_C, BRANDS_D]) for (const list of
 // Everything said in the situations, by the guest and by the bartender, and the food menu.
 for (const def of SITUATIONS) for (const stage of def.stages) { texts.add(stage.guest); for (const choice of stage.choices) { texts.add(choice.say); for (const outcome of choice.outcomes) texts.add(outcome.say); } }
 for (const food of FOODS) { texts.add(food.name); texts.add(food.menu); }
+// The pairing advisor reads food names, drink names and the reason a pairing works aloud.
+const walk = (node) => {
+  if (Array.isArray(node)) { node.forEach(walk); return; }
+  if (!node || typeof node !== 'object') return;
+  for (const [key, value] of Object.entries(node)) {
+    if (typeof value === 'string' && ['why', 'food', 'name'].includes(key) && value.length < 400) texts.add(value);
+    else walk(value);
+  }
+};
+walk({ ...BAR_PAIRINGS, metadata: undefined });
 process.stdout.write(JSON.stringify([...texts].map((text) => text.trim()).filter(Boolean), null, 1));
