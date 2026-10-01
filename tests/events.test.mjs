@@ -587,3 +587,39 @@ test('A hundred conversations about stories never repeat a guest line more than 
   const repeated = [...counts.entries()].filter(([, count]) => count > 12);
   assert.deepEqual(repeated.map(([text]) => text), [], 'no line is said more than 12 times in 100 conversations');
 });
+
+test('A sad guest does not jump to a new subject, and "I like X" is answered as news about the player, not as the guest’s own taste', async () => {
+  const { stanceOf, reactToMention } = await import('../src/domain/social/gen/mentions.ts');
+  const { socialReply } = await import('../src/domain/social/talk.ts');
+  const { applySocialReply } = await import('../src/sim/guests.ts');
+  assert.equal(stanceOf('I like football and pizza.'), 'share');
+  assert.equal(stanceOf('Do you like football?'), 'ask');
+  assert.equal(stanceOf('Have you been to Tokyo?'), 'ask');
+  const { guest } = guestIn({ emotion: 'upset', topic: 'family' });
+  applySocialReply(guest, socialReply(guest, ['askProblem'], 1));
+  assert.equal(guest.social.thread.kind, 'bad');
+  const sad = socialReply(guest, [], 2, 'I like football and pizza.');
+  assert.match(sad.text, /sorry|later|not now|mind|thinking/i, sad.text);
+  assert.doesNotMatch(sad.text, /never liked|boring|too loud/i);
+  const happy = guestIn({ emotion: 'happy' }).guest;
+  for (let index = 0; index < 40; index++) {
+    happy.id = `h${index}`;
+    const share = reactToMention(happy, { kind: 'sport', thing: 'football' }, `s${index}`, { stance: 'share' });
+    assert.doesNotMatch(share.text, /never liked|boring|honestly, i find|too loud/i, share.text);
+    assert.match(share.text, /football/i);
+  }
+  const ask = reactToMention(happy, { kind: 'food', thing: 'sushi' }, 'a', { stance: 'ask' });
+  assert.match(ask.text, /sushi/i);
+});
+
+test('"Who was it?" is answered as a repeat when the story already named the person', async () => {
+  const { makeStory } = await import('../src/domain/social/gen/story.ts');
+  let repeats = 0;
+  for (let index = 0; index < 120; index++) {
+    const frame = makeStory(`r${index}`, 'family', 'bad');
+    const person = /(my mother|my father|my brother|my sister|my grandmother|my uncle)/i.exec(frame.who)?.[1];
+    assert.ok(person);
+    if (frame.tell.toLowerCase().includes(person.toLowerCase())) { repeats++; assert.match(frame.who, /like i said|as i said|i told you/i, frame.who); }
+  }
+  assert.ok(repeats > 10);
+});

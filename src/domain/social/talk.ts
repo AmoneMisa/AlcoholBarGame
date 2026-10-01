@@ -3,7 +3,7 @@ import type { CustomerReply } from '../conversation/customerTalk';
 import { actsIn, isLeaveAct, type Act } from './acts';
 import { localize, originOf, spellFor } from './origin';
 import { makeStory } from './gen/story';
-import { mentionIn, reactToMention, type Mention } from './gen/mentions';
+import { mentionIn, reactToMention, stanceOf, type Mention } from './gen/mentions';
 import { embellish, PERSONA_ACTS, personaAnswer, reactToAnswer, threadAnswer, type PersonaAct, type ThreadAct } from './alive';
 import { drunkStage, type DrunkStage, type Emotion, type GuestSocial, type TalkTopic } from './model';
 
@@ -257,7 +257,9 @@ export function socialReply(customer: Customer, acts: Act[], turn: number, said 
   // A thing the player mentions (a sport, a food, a place) gets a reaction with an opinion of its own.
   const mention = social && said ? mentionIn(said) : undefined;
   if (social && mention && (!acts.length || ['weather', 'sports', 'music', 'travel'].includes(acts[0]!))) {
-    const reaction = reactToMention(customer, mention, `${customer.id}:${turn}:m`);
+    // A guest with something heavy on their mind does not switch subject at once.
+    const distracted = (social.emotion === 'upset' || social.emotion === 'angry' || social.emotion === 'tired' || social.emotion === 'nervous') && social.thread?.kind === 'bad';
+    const reaction = reactToMention(customer, mention, `${customer.id}:${turn}:m`, { stance: stanceOf(said), distracted, topic: social.thread?.topic ?? social.topic });
     return { text: reaction.text, expression: reaction.opinion === 'love' ? 'happy' : 'smile', rapport: reaction.opinion === 'love' ? 6 : reaction.opinion === 'meh' ? 3 : 1, heard: mention, asked: reaction.asks, chatted: 'mention' };
   }
   // A guest who asked the bartender a question reacts to whatever comes back, in a human way.

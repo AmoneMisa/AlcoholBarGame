@@ -61,10 +61,35 @@ export function opinionOf(customer: Pick<Customer, 'id' | 'characterId'>, mentio
   return roll < 5 ? 'love' : roll < 8 ? 'meh' : 'dislike';
 }
 
-export function reactToMention(customer: Customer, mention: Mention, seed: string): { text: string; opinion: Opinion; asks: boolean } {
+// Is the player asking the guest about the thing ("Do you like football?") or telling something about themselves
+// ("I like football")? A guest answers the first with their own opinion and responds to the person in the second.
+export type Stance = 'ask' | 'share';
+export const stanceOf = (text: string): Stance => (/\?/.test(text) || /^\s*(do|does|did|have|has|are|is|would|what about|how about|which|what)\b/i.test(text) ? 'ask' : 'share');
+
+const ASK_BACK: Record<MentionKind, string> = { sport: 'Do you play it?', music: 'Do you play something yourself?', food: 'Do you cook it yourself?', place: 'When did you go?', screen: 'What did you see last?' };
+const SHARE: Record<Opinion, string[]> = {
+  love: ['[Oh|Really]! You like {thing}? [Me too!|I love it too!|That is great!] {askback}', '{Thing}? [Nice|Great]! I like it too. {askback}'],
+  meh: ['{Thing}? [Nice|Good for you]. It is not really my thing, but I like that you enjoy it. {askback}', '[Oh|Hmm], {thing}. I am not a big fan, but it sounds fun. {askback}'],
+  dislike: ['{Thing}? [Nice|Good for you]! It is not for me, but I like it when people have something they love. {askback}', '[Oh|Really], {thing}. I never got into it, but tell me more.']
+};
+// A guest whose mind is on something sad does not jump into a new subject.
+const DISTRACTED = ['[Hm|Oh], {thing}. [That sounds nice.|Good for you.] Sorry, I am still thinking about {hook}.', '{Thing}? [Maybe later|Not now], if you do not mind. My mind is somewhere else tonight.', '[Yes|Sure], {thing} is nice. Sorry, I cannot think about it now. {Hook} is on my mind.'];
+export const TOPIC_HOOK: Record<string, string> = { work: 'work', relationship: 'my partner', money: 'money', family: 'my family', sports: 'the match', celebration: 'my day', travel: 'my trip', health: 'my health', weather: 'the weather' };
+
+export interface MentionContext { stance: Stance; distracted?: boolean; topic?: string }
+
+export function reactToMention(customer: Customer, mention: Mention, seed: string, context: MentionContext = { stance: 'ask' }): { text: string; opinion: Opinion; asks: boolean } {
   const persona = personaOf(customer);
   const random = rngOf(seed);
   const thing = mention.thing;
+  if (context.distracted) {
+    const hook = TOPIC_HOOK[context.topic ?? ''] ?? 'my day';
+    return { text: expand(pickFrom(DISTRACTED, random), { thing, Thing: thing, hook, Hook: hook }, random), opinion: 'meh', asks: false };
+  }
+  if (context.stance === 'share') {
+    const opinionNow = mention.kind === 'sport' && persona.hobby.toLowerCase().includes(thing.toLowerCase()) ? 'love' : opinionOf(customer, mention);
+    return { text: expand(pickFrom(SHARE[opinionNow], random), { thing, Thing: thing, askback: ASK_BACK[mention.kind] }, random), opinion: opinionNow, asks: true };
+  }
   // Their own hobby is a favourite thing: "Really? I play football on Sundays!"
   const shared = mention.kind === 'sport' && persona.hobby.toLowerCase().includes(thing.toLowerCase());
   const opinion: Opinion = shared ? 'love' : opinionOf(customer, mention);
@@ -84,5 +109,5 @@ const MEMORY: Record<MentionKind, string[]> = {
 export const memoryLine = (_customer: Customer, heard: { kind: MentionKind; thing: string }, seed: string) => { const random = rngOf(seed); return expand(pickFrom(MEMORY[heard.kind], random), { thing: heard.thing }, random); };
 
 export function allMentionTexts(): string[] {
-  return [...Object.values(REACT).flatMap((byOpinion) => Object.values(byOpinion).flat()), ...Object.values(MEMORY).flat(), ...Object.values(WORDS).flat()];
+  return [...Object.values(REACT).flatMap((byOpinion) => Object.values(byOpinion).flat()), ...Object.values(SHARE).flat(), ...DISTRACTED, ...Object.values(ASK_BACK), ...Object.values(TOPIC_HOOK), ...Object.values(MEMORY).flat(), ...Object.values(WORDS).flat()];
 }

@@ -135,11 +135,13 @@ export function makeStory(seed: string, topic: TalkTopic, kind: 'good' | 'bad'):
   const gender = person ? (person.g === 'x' ? (random() < .5 ? 'm' : 'f') : person.g) : 'f';
   const slots = { who: person?.t, Who: person?.t, he: PRONOUNS[gender === 'm' ? 'm' : 'f'].he, He: PRONOUNS[gender === 'm' ? 'm' : 'f'].he, him: PRONOUNS[gender === 'm' ? 'm' : 'f'].him, his: PRONOUNS[gender === 'm' ? 'm' : 'f'].his };
   const say = (list: string[]) => expand(pickFrom(list, random), slots, random);
-  const who = person
-    ? expand(`It was ${person.t}. ${pickFrom(kind === 'bad' ? WHO_TAIL : WHO_TAIL_GOOD, random)}`, slots, random)
-    : pickFrom(parts.whoAnswer ?? ['Nobody, really.'], random);
   const lead = pickFrom(LEADS, random);
   const event = say(parts.events);
+  // When the first sentence already named the person, "who?" is answered as a repeat, not as news.
+  const named = !!person && event.toLowerCase().includes(person.t.toLowerCase());
+  const who = person
+    ? expand(`${named ? '[Like I said, |As I said, |I told you: ]' : 'It was '}${person.t}. ${pickFrom(kind === 'bad' ? WHO_TAIL : WHO_TAIL_GOOD, random)}`, slots, random)
+    : pickFrom(parts.whoAnswer ?? ['Nobody, really.'], random);
   return { topic, kind, tell: lead ? `${lead}${lowerFirst(event)}` : event, why: say(parts.reasons), more: say(parts.details), how: say(parts.outcomes), who };
 }
 
