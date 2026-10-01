@@ -232,8 +232,8 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .talk-popup > .talk-compose { flex: none; max-height: min(52dvh, 520px); overflow-y: auto; overscroll-behavior: contain; }
 
 /* The daily gift tile sits in the top right corner of the rounded header panel, so it follows that corner. */
-.hud-resources > .daily-hud-gift { border-top-right-radius: 17px; }
-@media (min-width: 761px) { .hud-resources > .daily-hud-gift:last-child { border-bottom-right-radius: 17px; } }
+.hud-resources > .daily-hud-gift { border-top-right-radius: 12px; }
+.hud-resources > .daily-hud-gift:last-child { border-bottom-right-radius: 12px; }
 
 /* Buttons that sit in the bar scene's click-through layer must say they take clicks (the ashtray button could not be pressed). */
 .bar-cast .clean-ashtrays { pointer-events: auto; }
@@ -258,5 +258,23 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .house-rules-button, .clean-ashtrays { min-height: 36px; }
 .speak-button, .speak-button.ui-btn-sm { min-width: 36px; min-height: 36px; width: 36px; height: 36px; }
 /* On phones the night's event card goes under the city chip instead of on top of it. */
-@media (max-width: 760px) { .bar-event { top: 64px; } }
+@media (max-width: 760px) {
+  /* A one-line banner (the description is in its tooltip), so it never squeezes into a narrow tall box over the shelf. */
+  .bar-event { top: 64px; left: auto; right: 12px; width: max-content; max-width: calc(100% - 24px); transform: none; padding: 5px 10px; }
+  .bar-event > span { display: none; }
+}
 .house-rules-button { bottom: 58px; }
+
+/* Rows of tabs that can scroll fade out at the right edge, so it is clear there is more. */
+.workshop-tabs { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 34px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 34px), transparent); padding-right: 30px; }
+.supply-hint { margin: 6px 14px 10px; color: #9eafc1; font-size: 12.5px; }
+
+/* ==== One look for the same kind of control ==== */
+/* Second-level tabs (Workshop) are pills like the first-level ones, only a little smaller. */
+.workshop-tabs button { min-height: 34px; padding: 0 14px; border-radius: 999px; font-size: 13px; }
+.workshop-tabs button:focus-visible { outline: 2px solid #ffd35a; outline-offset: 2px; }
+/* Controls are 10px rounded, pills are fully round; no 7px or 9px in between. */
+.sealed-stock-grid .reserve-restock { min-height: 34px; border-radius: 10px; font-size: 11.5px; }
+.sound-rows .ui-btn { border-radius: 10px; font-size: 12px; }
+.daily-lesson-card footer > button { min-height: 38px; padding: 0 14px; border-radius: 10px; font-size: 13px; }
+.daily-lesson-card small, .daily-learning-head small { font-size: 10px; }

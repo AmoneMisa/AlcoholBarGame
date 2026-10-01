@@ -57,7 +57,8 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
     <PanelHeading :eyebrow="`TRADE FLOOR · ${game.region.name}`" title="Stock your next shift" />
     <!-- Level perks live on the bar scene's city chip; the market only shows what changes buying here. -->
     <!-- One supply card, one button: the window shows what would be ordered now and lets the player keep it automatic. -->
-    <div class="auto-supply" :class="{ on: game.autoSupply }">
+    <p v-if="supplyLocked" class="supply-hint">Supply (one-tap restock) unlocks at level {{ AUTO_SUPPLY_LEVEL }}.</p>
+    <div v-else class="auto-supply" :class="{ on: game.autoSupply }">
       <div><b>Supply</b><small>{{ supplyLocked ? `Unlocks at level ${AUTO_SUPPLY_LEVEL}.` : game.autoSupply ? 'Auto-supply is on: anything that runs low is reordered for you.' : 'Reorders what runs low from the cheapest supplier, at normal prices and delivery fees.' }}</small></div>
       <UiButton variant="solid" data-guide="top-up" :disabled="supplyLocked" @click="openSupply">{{ supplyLocked ? `Level ${AUTO_SUPPLY_LEVEL}` : 'Supply low stock' }}</UiButton>
     </div>

@@ -504,7 +504,7 @@ onBeforeUnmount(() => {
         <p class="rules-note">These are game rules for practice, not legal advice. Explain them politely to guests. Inspectors count every rule you break{{ game.ruleViolations ? ` (so far: ${game.ruleViolations})` : '' }}.</p>
         <article v-for="rule in game.houseRules" :key="rule.id" class="rule-row"><span class="rule-icon"><Glyph :g="rule.icon" /></span><span><b>{{ rule.title }}</b><small>{{ rule.text }}</small></span></article>
       </PopoverPanel>
-      <div v-if="game.barEvent" class="bar-event" :class="game.barEvent.mood"><b><Glyph :g="game.barEvent.icon" /> {{ game.barEvent.title }}</b><span>{{ game.barEvent.description }}</span></div>
+      <div v-if="game.barEvent" class="bar-event" :class="game.barEvent.mood" :title="game.barEvent.description"><b><Glyph :g="game.barEvent.icon" /> {{ game.barEvent.title }}</b><span>{{ game.barEvent.description }}</span></div>
       <button v-if="game.ashtrays.dirty" type="button" class="clean-ashtrays" @click="game.cleanAshtrays()"><UiIcon class="inline-icon" name="brush" /> Clean {{ game.ashtrays.dirty }} ashtray{{ game.ashtrays.dirty === 1 ? '' : 's' }}</button>
       <!-- The wait for the next guest is shown once, in the panel below the scene (with “Welcome now”). -->
     </div>

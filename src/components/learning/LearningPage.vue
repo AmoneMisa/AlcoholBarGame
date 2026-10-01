@@ -119,7 +119,7 @@ function when(at: number) {
       <div>
         <small>ENGLISH ACADEMY</small>
         <h2>English for the bar, the shop and your suppliers</h2>
-        <p>Learn the words and phrases you need behind the bar, at the shop counter and on the phone with suppliers — checking ID, taking bookings, serving guests, receiving deliveries, setting up regular orders and asking for discounts. Learn it here, then use it with your customers and sellers.</p>
+        <p>The words and phrases for serving guests, checking ID, taking bookings, deliveries and discounts.</p>
       </div>
       <dl class="learning-stats">
         <div><dt>Words known</dt><dd>{{ knownCount }}<span>/ {{ vocabulary.length }}</span></dd><i :style="{ width: knownCount / Math.max(1, vocabulary.length) * 100 + '%' }"></i></div>

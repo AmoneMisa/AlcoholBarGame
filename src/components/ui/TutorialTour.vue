@@ -48,7 +48,7 @@ const STEPS: Step[] = [
   { id: 'english', title: 'The English tab', text: 'Here you find words, phrases for every job, and daily quests. Quests give XP, crystals and sometimes a new recipe.',
     action: 'Open the English tab.', point: [{ target: selector('nav-english'), gesture: 'tap', label: '{Tap} English' }], until: () => shown('.learning-page') },
   { id: 'market', title: 'Stock and deliveries', text: 'Buy ingredients, bottles and food in the Market. Deliveries can be late, damaged or wrong. Report a problem politely, in English, and the supplier will help.',
-    action: 'Open Manage, then the Market tab.', point: [{ target: selector('nav-market'), gesture: 'tap', label: '{Tap} Market' }, { target: selector('nav-manage'), gesture: 'tap', label: '{Tap} Manage' }], until: () => shown(selector('top-up')) },
+    action: 'Open Manage, then the Market tab.', point: [{ target: selector('nav-market'), gesture: 'tap', label: '{Tap} Market' }, { target: selector('nav-manage'), gesture: 'tap', label: '{Tap} Manage' }], until: () => shown('.market-panel') },
   { id: 'hud', title: 'Coins, crystals and servers', text: 'Coins buy stock and upgrades. Crystals unlock recipes and styles. From level 8 you can hire servers: they earn coins while you are away, but never as much as you.', view: 'service' },
   { id: 'rules', title: 'House rules and events', text: 'Every city has its own rules, such as checking ID or paying by card only. Inspectors count every rule you break. Special nights, like ladies’ night or happy hour, change who comes and what they pay.', view: 'service',
     action: 'Press Rules to read them.', point: [{ target: selector('rules-button'), gesture: 'tap', label: '{Tap} Rules' }], until: () => shown('.house-rules-panel') },

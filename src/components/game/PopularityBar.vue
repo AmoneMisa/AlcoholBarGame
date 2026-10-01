@@ -18,7 +18,7 @@ const why = computed(() => active.value ? 'A boost is already running.' : enough
 </script>
 
 <template>
-  <section class="popularity-bar" :class="{ ready: enough && !active }" aria-label="Prestige">
+  <section class="popularity-bar" :class="{ ready: enough && !active, 'has-actions': enough || !!active }" aria-label="Prestige">
     <UiIcon name="trophy" />
     <div class="popularity-text">
       <b>Prestige <em>{{ game.popularity }} / {{ GOAL }}</em></b>
@@ -26,7 +26,7 @@ const why = computed(() => active.value ? 'A boost is already running.' : enough
       <small v-else>Friends who visit add +1 a day. At {{ GOAL }} spend it on a boost.</small>
       <progress :value="Math.min(game.popularity, GOAL)" :max="GOAL"></progress>
     </div>
-    <div class="popularity-actions">
+    <div v-if="enough || active" class="popularity-actions">
       <UiButton size="sm" :variant="enough && !active ? 'solid' : 'secondary'" :disabled="!!why" :title="why || 'Guests arrive without waiting for 15 minutes'" @click="game.activatePopularityBoost('no-cooldown')">15 min rush</UiButton>
       <UiButton size="sm" :variant="enough && !active ? 'solid' : 'secondary'" :disabled="!!why" :title="why || 'The next guests are VIPs'" @click="game.activatePopularityBoost('vip-run')">VIP run</UiButton>
     </div>
@@ -44,5 +44,5 @@ const why = computed(() => active.value ? 'A boost is already running.' : enough
 .popularity-text small.running { color: #7cc686; font-weight: 700; }
 .popularity-text progress { width: 100%; height: 5px; accent-color: #e7b556; }
 .popularity-actions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
-@media (max-width: 560px) { .popularity-bar { grid-template-columns: 24px minmax(0, 1fr); } .popularity-actions { grid-column: 1 / -1; justify-content: flex-start; } }
+@media (max-width: 560px) { .popularity-bar.has-actions { grid-template-columns: 24px minmax(0, 1fr); } .popularity-bar.has-actions .popularity-actions { grid-column: 1 / -1; justify-content: flex-start; } }
 </style>

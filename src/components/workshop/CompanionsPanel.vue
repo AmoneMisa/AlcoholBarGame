@@ -60,9 +60,18 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
 
 <template>
   <div class="circle">
-    <p class="hint">The Circle: {{ met }} of {{ COMPANIONS.length }} have joined. Serve them as guests to collect their shards, or reach certain achievements. Each person works in one bar at a time and gives it their own bonus; keepsakes deepen the bond ({{ KEEPSAKE_POINTS }} points, {{ KEEPSAKE_LIKED_POINTS }} for something they love).</p>
+    <p v-if="met" class="hint">The Circle: {{ met }} of {{ COMPANIONS.length }} have joined. Serve them as guests to collect their shards, or reach certain achievements. Each person works in one bar at a time and gives it their own bonus; keepsakes deepen the bond ({{ KEEPSAKE_POINTS }} points, {{ KEEPSAKE_LIKED_POINTS }} for something they love).</p>
 
-    <section class="crew card">
+    <section v-if="!met" class="card first-steps">
+      <h3>Nobody has joined yet</h3>
+      <ol>
+        <li>Special guests drop by now and then. Serve them a perfect drink and they leave <b>shards</b>.</li>
+        <li>With enough shards, press <b>Invite to your circle</b> on their card below.</li>
+        <li>Then send them to work in a bar: each one gives your bar a bonus.</li>
+      </ol>
+    </section>
+
+    <section v-if="met" class="crew card">
       <h3>At the bar now <b>{{ crew.length }} / {{ slots }}</b></h3>
       <ul v-if="crew.length">
         <li v-for="id in crew" :key="id"><b>{{ companionName(id) }}</b> — {{ describeBonus(COMPANIONS.find((item) => item.id === id)!.bonus, companionPower(levelOfId(id), bondLevel(game.circle.owned[id] ?? 0))) }}<UiButton size="sm" variant="solid" :reason="spotState(id).reason" :title="`Their bonus counts double for ${SPOTLIGHT_MS / 60000} minutes, then they rest for 6 hours.`" @click="game.spotlightCompanion(id)">{{ spotState(id).label }}</UiButton><UiButton size="sm" @click="game.dismissCompanion(id)">Send home</UiButton></li>
@@ -70,7 +79,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
       <p v-else class="empty">Nobody works here yet. Choose someone below.</p>
     </section>
 
-    <section class="keepsakes card">
+    <section v-if="met" class="keepsakes card">
       <h3>Keepsakes</h3>
       <div class="keep-row">
         <span v-for="item in keepsakes" :key="item.id" class="keep"><i>{{ item.icon }}</i><b>{{ item.count }}</b><small>{{ item.name }}</small><UiButton size="sm" variant="primary" :disabled="game.crystals < KEEPSAKE_CRYSTAL_PRICE" :title="game.crystals < KEEPSAKE_CRYSTAL_PRICE ? `Not enough crystals: you need ${KEEPSAKE_CRYSTAL_PRICE}.` : `Buy for ${KEEPSAKE_CRYSTAL_PRICE} crystals`" @click="game.buyKeepsake(item.id)">{{ KEEPSAKE_CRYSTAL_PRICE }} 💎</UiButton></span>
@@ -132,6 +141,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
 </template>
 
 <style scoped>
+.first-steps ol { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; line-height: 1.4; }
 .links { display: grid; gap: 4px; margin: 4px 0 8px; padding: 0; list-style: none; }
 .links li { display: grid; gap: 1px; padding: 6px 8px; border: 1px dashed #4a5b75; border-radius: 9px; font-size: 12px; }
 .links li.on { border-style: solid; border-color: #c98e3c; background: #2a2316; }
