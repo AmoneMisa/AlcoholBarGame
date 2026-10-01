@@ -36,7 +36,7 @@ import { discardQuarantine, expireStock, fileClaim, goodAmount, receiveOrder, ta
 import { situationById } from '../domain/situations/catalog';
 import { MAX_SEATS, afterServed, holdForPayment, recordDrink, settleGuest, applySocialReply, askToLeave, callTaxi, cleanAshtrays, drunkGain, giveAshtray, giveWater, isOrdering, orderingGuests, removeGuest, scheduleArrival, tickGuests, ashtraysOf, type GuestContext } from './guests';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
-import { DELIVERY_DAY_MS, levelFor, normalizePlayerState, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
+import { DELIVERY_DAY_MS, createInitialState, levelFor, normalizePlayerState, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
 
 // Game rules as pure state transitions. The server runs these for every request, so the client can only
 // ask for an action — it can never set coins, stock, XP or timers itself. Every payload is treated as untrusted.
@@ -118,6 +118,7 @@ export type GameAction =
   | { type: 'claimSpark'; cosmeticId: string }
   | { type: 'craftSkin'; cosmeticId: string }
   | { type: 'prestige' }
+  | { type: 'wipeAccount'; confirm: true }
   | { type: 'designSignature'; name: string; items: { ingredientId: string; amount: number }[]; needsShake: boolean }
   | { type: 'claimLeaderboardReward' }
   | { type: 'setFeaturedAchievements'; ids: string[] }
@@ -995,6 +996,16 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'trainingDone': {
       try { finishGuide(state, String(action.moduleId)); } catch (error) { throw new RuleError((error as Error).message); }
       break;
+    }
+    case 'wipeAccount': {
+      // Starts the account over from nothing, at any level. Only the "tour done" mark is kept, so nobody sees it again.
+      if (action.confirm !== true) throw new RuleError('Confirm the reset first.');
+      const keep = { tour: state.tour };
+      const fresh = createInitialState(now);
+      for (const key of Object.keys(state)) delete (state as unknown as Record<string, unknown>)[key];
+      Object.assign(state, fresh, keep);
+      state.message = 'Your account was reset. Choose your first bar to begin again.';
+      return { moneyDelta: 0, crystalDelta: 0, weekly: { week: state.loot.weekly.week, score: 0, label: '', level: 1 } };
     }
     case 'topUp': {
       // Supplying stock opens at the same level as auto-supply; the training lesson may try it earlier.

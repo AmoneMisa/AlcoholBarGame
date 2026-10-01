@@ -30,3 +30,10 @@
 .ui-field { display: grid; gap: 6px; min-width: 0; }
 .ui-field-label { color: #d6c5b0; font-size: 12px; font-weight: 700; }
 .ui-field-hint { color: var(--ui-muted); font-size: 11px; }
+
+/* One height, always: a button or input never grows because its neighbour is taller (rows and grids stretch their items). */
+.ui-btn { height: var(--ctl-h); align-self: center; }
+.ui-btn-sm { height: var(--ctl-h-sm); }
+.ui-input { height: var(--ctl-h); }
+.ui-btn-block { width: 100%; }
+.ui-input-field { align-self: end; }

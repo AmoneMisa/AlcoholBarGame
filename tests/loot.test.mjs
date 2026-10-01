@@ -826,3 +826,21 @@ test('Top-up preview shows what would be ordered without changing anything, and 
   assert.ok(Math.abs((money - state.money) - preview.total) < 0.01, 'the real total equals the preview');
   assert.equal(previewTopUp(state, NOW).orders.length, 0, 'nothing more to order while the delivery is on its way');
 });
+
+test('Resetting the account works at any level, needs a confirmation, and starts again from nothing', () => {
+  const state = fresh();
+  state.xp = xpForLevel(7); state.money = 5000; state.crystals = 300; state.loot.parts = 40; state.tour = 'done';
+  state.ownedBarIds = ['new-york', 'london'];
+  assert.throws(() => run(state, { type: 'wipeAccount' }), /Confirm/);
+  assert.throws(() => run(state, { type: 'wipeAccount', confirm: false }), /Confirm/);
+  run(state, { type: 'wipeAccount', confirm: true });
+  assert.equal(state.crystals, createInitialState(NOW).crystals, 'crystals are back to the start');
+  assert.equal(state.loot.parts, 0);
+  assert.equal(state.xp, 0);
+  assert.equal(state.startingBarChosen, false, 'the first bar is chosen again');
+  assert.equal(state.tour, 'done', 'the tour is not shown again');
+  assert.match(state.message, /reset/);
+  // a level-1 account can be reset too, and a reset gives no stars or boxes
+  assert.equal(state.loot.prestige.stars, 0);
+  run(state, { type: 'wipeAccount', confirm: true });
+});

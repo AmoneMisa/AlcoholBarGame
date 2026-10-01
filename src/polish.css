@@ -215,3 +215,8 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .venue-name .ui-icon { width: 16px; height: 16px; color: #c2a668; flex: none; }
 .venue-name:focus-visible { outline: 2px solid #ffd35a; outline-offset: 2px; border-radius: 6px; }
 .venue-dot { width: 9px; height: 9px; border-radius: 50%; background: #d9534f; }
+.agree { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1px solid #6b3a3a; border-radius: 10px; background: #2a1b17; cursor: pointer; }
+.agree input { flex: none; width: 20px; height: 20px; margin-top: 1px; accent-color: #d9534f; }
+.agree span { font-size: 13px; line-height: 1.4; }
+/* rows that hold an input and a button line them up at the bottom edge */
+.friends-page .row { align-items: flex-end; }

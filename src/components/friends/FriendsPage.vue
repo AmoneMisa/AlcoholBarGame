@@ -12,7 +12,6 @@ import CharacterModel from '../characters/CharacterModel.vue';
 import ProfileCard from '../profile/ProfileCard.vue';
 import UiIcon from '../ui/UiIcon.vue';
 
-const PRESTIGE_GOAL = 30;
 const game = useGameStore();
 const status = ref('');
 const code = ref(new URLSearchParams(location.search).get('friend') ?? '');
@@ -90,20 +89,9 @@ onMounted(() => { void game.loadFriends(); });
       </article>
       <form class="card" @submit.prevent="sendRequest">
         <small>ADD A FRIEND</small>
-        <label for="friend-code-input">Enter their friend code</label>
         <div class="row"><UiInput label="Friend code" id="friend-code-input" v-model="code" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="ABCD-1234" /><UiButton variant="solid" type="submit"><UiIcon name="user-plus" />Send</UiButton></div>
         <p>They must accept before you can visit each other.</p>
       </form>
-      <article class="prestige card">
-        <small>PRESTIGE</small>
-        <b><UiIcon name="trophy" />{{ game.popularity }} <em>/ {{ PRESTIGE_GOAL }}</em></b>
-        <progress :value="Math.min(game.popularity, PRESTIGE_GOAL)" :max="PRESTIGE_GOAL"></progress>
-        <p>Every friend who visits your bar once a day adds +1. At {{ PRESTIGE_GOAL }} you can spend it on a boost.</p>
-        <div class="row boosts">
-          <UiButton variant="secondary" size="sm" :disabled="game.popularity < PRESTIGE_GOAL || !!game.popularityBoost" @click="game.activatePopularityBoost('no-cooldown')">15 min rush</UiButton>
-          <UiButton variant="secondary" size="sm" :disabled="game.popularity < PRESTIGE_GOAL || !!game.popularityBoost" @click="game.activatePopularityBoost('vip-run')">VIP run</UiButton>
-        </div>
-      </article>
     </div>
 
     <section v-if="incoming.length || outgoing.length" class="card requests">

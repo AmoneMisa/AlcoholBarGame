@@ -17,7 +17,12 @@ const game = useGameStore();
 const asking = ref(false);
 const stars = computed(() => prestigeStarsFor(game.loot.runEarned));
 const wipeReason = computed(() => game.level >= PRESTIGE_LEVEL ? '' : `Available from level ${PRESTIGE_LEVEL} (you are level ${game.level}).`);
-function wipe() { asking.value = false; game.act({ type: 'prestige' }); }
+function grandOpening() { asking.value = false; game.act({ type: 'prestige' }); }
+// Resetting the whole account works at any level, and only after the player agrees.
+const resetting = ref(false);
+const agreed = ref(false);
+function openReset() { agreed.value = false; resetting.value = true; }
+function wipeAccount() { resetting.value = false; game.act({ type: 'wipeAccount', confirm: true }); }
 const emit = defineEmits<{ goto: [view: string] }>();
 const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.dispatchEvent(new Event('barlingo:tour')), 250); };
 </script>
@@ -51,13 +56,24 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
       <UiButton variant="primary" icon="help" @click="replayTour">How to play (replay the tour)</UiButton>
     </section>
 
-    <section class="settings-card danger-zone">
-      <h3>Grand Opening (start over)</h3>
+    <section class="settings-card">
+      <h3>Grand Opening</h3>
       <p>Reopens your bars from scratch: coins, XP, stock and equipment levels are reset. Recipes, styles, crystals, parts, boxes, friends and the bars you own stay. You earn prestige stars for permanent bonuses and a Choice box. Opened {{ game.loot.prestige.count }} times so far.</p>
-      <UiButton variant="danger" :reason="wipeReason" @click="asking = true">Start a Grand Opening…</UiButton>
+      <UiButton variant="secondary" class="settings-action" :reason="wipeReason" @click="asking = true">Start a Grand Opening…</UiButton>
     </section>
 
-    <ConfirmDialog v-if="asking" title="Start over?" confirm-label="Yes, reset my bars" danger @cancel="asking = false" @confirm="wipe">
+    <section class="settings-card danger-zone">
+      <h3>Reset my account</h3>
+      <p>Deletes all your progress and starts the game again from the beginning, at any level: bars, recipes, styles, crystals, equipment, friends' gifts you have not opened and your stats. Your friends list stays. This cannot be undone.</p>
+      <UiButton variant="danger" class="settings-action" @click="openReset">Reset my account…</UiButton>
+    </section>
+
+    <ConfirmDialog v-if="resetting" title="Delete all my progress?" confirm-label="Delete everything" danger :disabled="!agreed" @cancel="resetting = false" @confirm="wipeAccount">
+      <p>Everything you have built will be deleted <b>forever</b>: level {{ game.level }}, {{ game.knownRecipes.length }} recipes, your bars, styles, crystals and equipment. There is no way to get it back.</p>
+      <label class="agree"><input v-model="agreed" type="checkbox" /><span>I understand that my progress will be deleted and cannot be restored.</span></label>
+    </ConfirmDialog>
+
+    <ConfirmDialog v-if="asking" title="Start over?" confirm-label="Yes, reset my bars" danger @cancel="asking = false" @confirm="grandOpening">
       <p>This <b>resets your business</b> and cannot be undone. You will earn <b>{{ stars }} prestige stars</b> and a Choice box.</p>
       <ul>
         <li><span>Reset</span><b>coins, XP, stock, equipment levels</b></li>
@@ -81,6 +97,7 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
 .settings-card p { margin: 0; color: #aebdce; font-size: 13px; line-height: 1.45; }
 .settings-card :deep(.opt-label) { display: none; }
 .danger-zone { border-color: #6b3a3a; }
+.settings-action { justify-self: start; }
 .notification-settings label { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid #2d4059; }
 .notification-settings label span { display: grid; gap: 2px; }
 .notification-settings label b { font-size: 14px; }
