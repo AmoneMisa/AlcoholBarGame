@@ -464,6 +464,7 @@ onBeforeUnmount(() => {
           <footer><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customer.social?.phase === 'enjoying' ? 'Enjoying the drink' : customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
         </div>
       </button>
+      <div v-if="game.barEvent" class="bar-event" :class="game.barEvent.mood"><b>{{ game.barEvent.icon }} {{ game.barEvent.title }}</b><span>{{ game.barEvent.description }}</span></div>
       <button v-if="game.ashtrays.dirty" type="button" class="clean-ashtrays" @click="game.cleanAshtrays()">🧹 Clean {{ game.ashtrays.dirty }} ashtray{{ game.ashtrays.dirty === 1 ? '' : 's' }}</button>
       <!-- The wait for the next guest is shown once, in the panel below the scene (with “Welcome now”). -->
     </div>

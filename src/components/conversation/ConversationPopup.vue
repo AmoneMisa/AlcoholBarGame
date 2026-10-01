@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { FOODS } from '../../domain/foods';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { CUSTOMER_ART_BY_SLOT } from '../../data/cosmetics/artCatalog';
 import { MODIFIERS, RECIPES } from '../../domain/catalog';
@@ -86,6 +87,15 @@ const templates = computed(() => {
 });
 // How the guest feels, how drunk they are, and what they are waiting for.
 const social = computed(() => customer.value?.social);
+const offerOpen = ref(false);
+const offerKind = ref<'drink' | 'food'>('food');
+const offer = computed(() => customer.value ? game.offerChance(customer.value.id) : undefined);
+const offerName = computed(() => {
+  const pitch = social.value?.pitch;
+  return pitch ? (pitch.kind === 'food' ? FOODS.find((item) => item.id === pitch.itemId)?.name : game.knownRecipes.find((item) => item.id === pitch.itemId)?.name) : undefined;
+});
+const foodsInStock = computed(() => FOODS.filter((item) => (game.inventory.find((stock) => stock.ingredientId === item.id)?.amount ?? 0) >= 1));
+const startOffer = (kind: 'drink' | 'food', itemId: string) => { if (customer.value) game.pitchStart(customer.value.id, kind, itemId); };
 const stage = computed(() => drunkStage(social.value?.drunk ?? 0));
 const needNow = computed(() => social.value?.need && social.value.need.since <= game.nowMs ? social.value.need.kind : undefined);
 const NEED_LABEL: Record<string, string> = { ashtray: '🚬 Wants an ashtray', water: '💧 Wants water', taxi: '🚕 Wants a taxi', chat: '💬 Wants to talk' };
@@ -326,10 +336,35 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <button v-for="choice in situation.choices" :key="choice.id" type="button" @click="game.answerSituation(customer.id, choice.id)"><span>{{ choice.say }}</span></button>
         </div>
       </section>
+      <section v-if="social && offerOpen" class="offer-panel" aria-label="Offer something">
+        <header>
+          <b>Offer</b>
+          <span class="tabs"><button type="button" :class="{ on: offerKind === 'food' }" @click="offerKind = 'food'">Food</button><button type="button" :class="{ on: offerKind === 'drink' }" @click="offerKind = 'drink'">Another drink</button></span>
+        </header>
+        <template v-if="!social.pitch">
+          <div class="offer-items">
+            <template v-if="offerKind === 'food'">
+              <button v-for="item in foodsInStock" :key="item.id" type="button" @click="startOffer('food', item.id)">{{ item.name }} · {{ item.price }}</button>
+              <small v-if="!foodsInStock.length">No food in stock. Buy some from the local or fresh supplier.</small>
+            </template>
+            <template v-else>
+              <button v-for="item in game.knownRecipes" :key="item.id" type="button" @click="startOffer('drink', item.id)">{{ item.name }}</button>
+            </template>
+          </div>
+        </template>
+        <template v-else-if="offer">
+          <p class="offer-title">Offering <b>{{ offerName }}</b> · {{ offer.price.toFixed(2) }} coins</p>
+          <div class="chance-meter" role="meter" :aria-valuenow="Math.round(offer.chance * 100)" aria-valuemin="0" aria-valuemax="100"><i :style="{ width: Math.round(offer.chance * 100) + '%' }" /><span>{{ Math.round(offer.chance * 100) }}% chance</span></div>
+          <ul class="chance-parts"><li v-for="part in offer.parts" :key="part.label" :class="part.value < 0 ? 'minus' : 'plus'"><span>{{ part.label }}</span><b>{{ part.value > 0 ? '+' : '' }}{{ Math.round(part.value * 100) }}%</b></li></ul>
+          <small>Talk to raise it: tell its story, say how it pairs, offer a discount or a free taste. Do not push.</small>
+          <div class="offer-buttons"><button type="button" class="primary" @click="game.pitchAsk(customer.id)">Make the offer</button><button type="button" @click="game.pitchCancel(customer.id)">Cancel</button></div>
+        </template>
+      </section>
       <div v-if="social" class="talk-actions" aria-label="Look after this guest">
         <button type="button" :class="{ wanted: needNow === 'ashtray' }" :disabled="social.ashtray === 'given' || game.ashtrays.clean < 1" :title="social.ashtray === 'given' ? 'Already has one' : game.ashtrays.clean + ' clean ashtrays'" @click="game.giveAshtray(customer.id)">🚬 Ashtray</button>
         <button type="button" :class="{ wanted: needNow === 'water' }" @click="game.giveWater(customer.id)">💧 Water</button>
         <button type="button" :class="{ wanted: needNow === 'taxi' }" :disabled="!!social.taxiAt" @click="game.callTaxi(customer.id)">🚕 Call a taxi</button>
+        <button type="button" :class="{ wanted: social.hungry }" @click="offerOpen = !offerOpen">🍽️ Offer</button>
         <span class="leave-group">Ask to leave
           <button type="button" :title="leaveHint('gentle')" @click="game.askToLeave(customer.id, 'gentle')">Kindly</button>
           <button type="button" :title="leaveHint('firm')" @click="game.askToLeave(customer.id, 'firm')">Firmly</button>

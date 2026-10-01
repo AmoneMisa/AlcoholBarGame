@@ -1311,3 +1311,7 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:clip}
 
 .guest-badges { display:flex;align-items:center;gap:3px; }.guest-badges i { font-style:normal;margin-left:2px;opacity:.85; }
 .clean-ashtrays { position:absolute;z-index:30;left:12px;bottom:12px;padding:6px 12px;border:1px solid #f0c35a;border-radius:10px;background:#3a3016;color:#ffe6a8;font-size:12px;cursor:pointer; }
+.bar-event { position:absolute;z-index:29;left:50%;top:8px;transform:translateX(-50%);display:grid;gap:2px;max-width:min(92vw,420px);padding:6px 12px;border-radius:12px;background:rgba(30,22,12,.88);border:1px solid #d9a441;color:#ffe6a8;font-size:12px;text-align:center;pointer-events:none; }
+.bar-event.risky { border-color:#d9694f; }
+.bar-event.quiet { border-color:#7aa0c8; }
+.bar-event span { font-size:11px;opacity:.85; }

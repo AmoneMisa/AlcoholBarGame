@@ -1,4 +1,6 @@
 import { computed, ref, toRaw } from 'vue';
+import { barEventFor } from '../sim/events';
+import { pitchChance } from '../sim/pitch';
 import { defineStore } from 'pinia';
 import { INGREDIENTS, RECIPES, REGIONS, SUPPLIERS } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost } from '../domain/bottleCatalog';
@@ -495,6 +497,8 @@ export const useGameStore = defineStore('game', () => {
   const pitchStart = (customerId: string, kind: 'drink' | 'food', itemId: string) => dispatch({ type: 'pitchStart', customerId, kind, itemId });
   const pitchAsk = (customerId: string) => dispatch({ type: 'pitchAsk', customerId });
   const pitchCancel = (customerId: string) => dispatch({ type: 'pitchCancel', customerId });
+  const barEvent = computed(() => barEventFor(state.value, nowMs.value));
+  const offerChance = (customerId: string) => { const guest = state.value.customers.find((item) => item.id === customerId); return guest ? pitchChance(state.value, guest, nowMs.value) : undefined; };
   const giveWater = (customerId: string) => dispatch({ type: 'giveWater', customerId });
   const callTaxi = (customerId: string) => dispatch({ type: 'callTaxi', customerId });
   const askToLeave = (customerId: string, tone: 'gentle' | 'firm' | 'aggressive') => dispatch({ type: 'askToLeave', customerId, tone });
@@ -596,6 +600,6 @@ export const useGameStore = defineStore('game', () => {
     pourBrands, brandOnShelf, shelfBrandsFor, setPourBrand,
     selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, tickGameClock, welcomeNextCustomer, offerSimilarOrder, rejectCustomer, buy, sell, switchBar, isBarOwned, nextBarPrice, barPurchaseLevel:BAR_PURCHASE_LEVEL, chooseStartingBar, buyBar, transferStock,
     supplier, localSuppliers, purchaseCart, saleCart, purchaseQuote, saleQuote, saleRevenue, deliveryOrders, deliveryCountdown, selectSupplier, checkoutPurchase, checkoutSale, renameBar, renameBartender,
-    buyRecipe, recipePrice, buyInterior, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, giveAshtray, giveWater, callTaxi, pitchStart, pitchAsk, pitchCancel, askToLeave, cleanAshtrays, ashtrays, situationOf, answerSituation, deliveryIssues, quarantine, lowGrade, reportIssue, discardStock, buyCrystalPack, buyingCrystals, starterPackAvailable, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
+    buyRecipe, recipePrice, buyInterior, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, giveAshtray, giveWater, callTaxi, pitchStart, pitchAsk, pitchCancel, barEvent, offerChance, askToLeave, cleanAshtrays, ashtrays, situationOf, answerSituation, deliveryIssues, quarantine, lowGrade, reportIssue, discardStock, buyCrystalPack, buyingCrystals, starterPackAvailable, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
   };
 });
