@@ -58,7 +58,7 @@ test('Small talk works: asking how they are and what happened makes the guest te
   assert.match(lastLine(state, guest), /not great|better|hard day|kind/i);
   assert.ok(guest.social.rapport > 40, 'a kind question raises rapport');
   say(state, 'What happened?');
-  assert.match(lastLine(state, guest), /boss|worked|client|promoted|project|job/i, 'the guest tells their work story');
+  assert.match(lastLine(state, guest), /boss|worked|client|promoted|project|job|manager|colleague|supervisor|team|offer|director|plan|best work/i, 'the guest tells their work story');
   assert.equal(guest.social.told, true);
   const before = guest.social.rapport;
   say(state, 'I am sorry to hear that.');

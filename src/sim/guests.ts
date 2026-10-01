@@ -54,7 +54,8 @@ export function applySocialReply(guest: Customer, reply: SocialReply) {
   social.rapport = clampPercent(social.rapport + reply.rapport);
   if (reply.emotion) social.emotion = reply.emotion;
   if (reply.told) social.told = true;
-  if (reply.thread) social.thread = { ...reply.thread, depth: 0 };
+  if (reply.thread) social.thread = { ...reply.thread, depth: 0, seen: [] };
+  if (reply.heard) { const heard = (social.heard ??= []); if (!heard.some((item) => item.thing === reply.heard!.thing)) heard.push(reply.heard); if (heard.length > 5) heard.shift(); }
   social.asked = !!reply.asked;
   if (reply.chatted && !social.chatted.includes(reply.chatted)) social.chatted.push(reply.chatted);
   // Being rude to a guest makes them angry; being kind to an angry guest is how you calm them.

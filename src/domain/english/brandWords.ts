@@ -4,6 +4,8 @@ import { RECIPES } from '../catalog';
 import { LEXICON } from './lexicon';
 import { VOCABULARY } from './vocabulary';
 import { SITUATIONS } from '../situations/catalog';
+import { allStoryTexts } from '../social/gen/story';
+import { allMentionTexts } from '../social/gen/mentions';
 
 // Brand and cocktail names are proper nouns the player must be able to say (“Would you like Jameson instead?”),
 // so every word of every brand and bottle name is added to the checker's vocabulary.
@@ -14,6 +16,11 @@ for (const name of names) {
     const clean = word.replace(/'s$/, '').replace(/^'+|'+$/g, '');
     if (clean.length > 1) LEXICON.add(clean);
   }
+}
+
+// Every word the generated guest speech uses (stories, reactions) can be used by the player too.
+for (const text of [...allStoryTexts(), ...allMentionTexts()]) {
+  for (const word of text.toLowerCase().replace(/’/g, "'").split(/[^\p{L}\d']+/u)) if (word.length > 1) LEXICON.add(word.replace(/^'+|'+$/g, ''));
 }
 
 // Every word (and form) a learner meets on the vocabulary cards can be used in a sentence too.

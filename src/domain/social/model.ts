@@ -64,7 +64,9 @@ export interface GuestSocial {
   /** The guest has already steered the chat back to the order once. */
   nudged?: boolean;
   /** The story the guest told, and how deep the bartender has asked (0 = just told, 3 = everything). */
-  thread?: { topic: TalkTopic; kind: 'good' | 'bad'; depth: number };
+  thread?: { topic: TalkTopic; kind: 'good' | 'bad'; depth: number; frame?: import('./gen/story').StoryFrame; seen?: string[] };
+  /** Things the player said that the guest reacted to (a sport, a place...), so the guest can come back to them. */
+  heard?: { kind: import('./gen/mentions').MentionKind; thing: string }[];
   /** The guest asked the bartender a question and waits for the answer. */
   asked?: boolean;
   /** Something the guest said on their own, shown in their bubble for a while. */

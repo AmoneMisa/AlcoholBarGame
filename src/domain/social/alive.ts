@@ -1,6 +1,7 @@
 import type { Customer } from '../types';
 import { originOf } from './origin';
 import type { GuestSocial, TalkTopic } from './model';
+import type { StoryFrame } from './gen/story';
 
 // What makes a guest feel like a person and not a menu: a life of their own (a job, a hobby, a pet, a home town that
 // stay the same all evening), stories that go deeper when the bartender asks "why?" or "tell me more", questions
@@ -71,9 +72,26 @@ const THREAD_DONE = ['That is really all there is to it.', 'I think I told you e
 const THREAD_NONE = ['Good question. I am not sure, to be honest.', 'Hmm, I have not thought about that.'];
 
 export type ThreadAct = 'askWhy' | 'askMore' | 'askHow' | 'askWho';
+
+// A guest who is asked about their story answers from the story they told (the frame), layer by layer.
+function frameAnswer(frame: StoryFrame, thread: NonNullable<GuestSocial['thread']>, act: ThreadAct, seed: string): { text: string; rapport: number; done: boolean } {
+  const seen = (thread.seen ??= []);
+  if (act === 'askWho') {
+    const again = seen.includes('who');
+    if (!again) seen.push('who');
+    return { text: again ? choose(['I told you already: it was just that.', 'Same as before. Nothing more to say about that.'], seed) : frame.who, rapport: again ? 1 : 5, done: false };
+  }
+  const order: ('why' | 'more' | 'how')[] = act === 'askWhy' ? ['why', 'more', 'how'] : act === 'askHow' ? ['how', 'more', 'why'] : ['more', 'why', 'how'];
+  const next = order.find((layer) => !seen.includes(layer));
+  if (!next) return { text: choose(THREAD_DONE, seed), rapport: 1, done: true };
+  seen.push(next);
+  thread.depth = seen.filter((layer) => layer !== 'who').length;
+  return { text: frame[next], rapport: 6, done: thread.depth >= 3 };
+}
 export function threadAnswer(customer: Customer, social: GuestSocial, act: ThreadAct): { text: string; rapport: number; done: boolean } {
   const thread = social.thread;
   if (!thread) return { text: choose(THREAD_NONE, `${customer.id}:none`), rapport: 0, done: false };
+  if (thread.frame) return frameAnswer(thread.frame, thread, act, `${customer.id}:${thread.depth}:${act}`);
   if (thread.depth >= 3) return { text: choose(THREAD_DONE, `${customer.id}:done`), rapport: 1, done: true };
   const layer = THREAD[thread.topic][thread.kind][act === 'askHow' ? 2 : thread.depth === 2 ? 2 : thread.depth];
   thread.depth = act === 'askHow' ? 3 : Math.min(3, thread.depth + 1);
@@ -107,7 +125,7 @@ export interface ChatterContext {
   /** Minutes since the bartender last talked to this guest. */
   silentMinutes: number;
 }
-export interface Chatter { kind: 'drink' | 'room' | 'neighbour' | 'story' | 'life' | 'ask' | 'bored'; text: string; asks?: boolean; rapport?: number }
+export interface Chatter { kind: 'drink' | 'room' | 'neighbour' | 'story' | 'life' | 'ask' | 'bored' | 'memory'; text: string; asks?: boolean; rapport?: number }
 
 const ROOM_BY_EVENT: Record<string, string[]> = {
   'jazz-night': ['Is that live jazz? It is lovely.', 'This music is perfect for tonight.'],
@@ -153,6 +171,16 @@ export function chatterFor(context: ChatterContext): Chatter | undefined {
   const fresh = options.filter((item) => item.text !== social.lastChatter);
   const pool = fresh.length ? fresh : options;
   return pool[Math.floor(context.roll * pool.length) % pool.length]!;
+}
+
+// A little extra now and then, so a polite answer does not always end at the same place.
+const TAIL_GOOD = ['I am glad I came here tonight.', 'This place has a nice feeling.', 'It is good to talk to someone.', 'The evening is going better than I thought.', 'I should come here more often.'];
+const TAIL_BAD = ['It helps to talk, really.', 'Sorry if I am a bit grumpy tonight.', 'It has not been an easy day.', 'Sometimes I just need a quiet corner.'];
+export function embellish(text: string, social: GuestSocial, seed: string): string {
+  const roll = hash(`${seed}:emb`) % 100;
+  if (roll >= 40 || social.drunk >= 50 || text.length > 90) return text;
+  const bad = social.emotion === 'upset' || social.emotion === 'angry' || social.emotion === 'tired' || social.emotion === 'nervous' || social.emotion === 'lonely';
+  return `${text} ${choose(bad ? TAIL_BAD : TAIL_GOOD, `${seed}:tail`)}`;
 }
 
 /** Whether a guest is in the mood to say something on their own, and how long to wait for the next time. */

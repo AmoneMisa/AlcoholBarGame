@@ -173,7 +173,8 @@ test('Guests carry their price level, so level-ups mid-order never break a budge
   const guest = state.customers[0];
   const economy = economyAt(state.regionId, REGIONS.find((item) => item.id === state.regionId).marketFactor, state.xp, now);
   assert.equal(guest.priceFactor, economy.guestPriceFactor);
-  assert.ok(guest.priceFactor > REGIONS.find((item) => item.id === state.regionId).marketFactor, 'level 20 guests pay more than catalog city prices');
+  // A city event of the hour (a new competitor, a festival) can raise or lower the price factor; the level perk is what is tested.
+  assert.ok(guest.priceFactor / (economy.event?.effects?.pay ?? 1) > REGIONS.find((item) => item.id === state.regionId).marketFactor, 'level 20 guests pay more than catalog city prices');
   // A higher level makes the next guest arrive sooner (same random roll).
   const slow = createInitialState(now); slow.customers = []; slow.nextCustomerAt = 0;
   const fast = createInitialState(now); fast.customers = []; fast.nextCustomerAt = 0; fast.xp = xpForLevel(30);

@@ -411,7 +411,8 @@ test('A story goes deeper when the bartender asks why and tells more, then it is
   const { guest } = guestIn({ emotion: 'upset', topic: 'work' });
   const story = socialReply(guest, ['askProblem'], 1);
   applySocialReply(guest, story);
-  assert.deepEqual(guest.social.thread, { topic: 'work', kind: 'bad', depth: 0 });
+  assert.deepEqual({ topic: guest.social.thread.topic, kind: guest.social.thread.kind, depth: guest.social.thread.depth }, { topic: 'work', kind: 'bad', depth: 0 });
+  assert.ok(guest.social.thread.frame.tell && guest.social.thread.frame.why && guest.social.thread.frame.more && guest.social.thread.frame.how);
   const why = socialReply(guest, ['askWhy'], 2);
   const more = socialReply(guest, ['askMore'], 3);
   const how = socialReply(guest, ['askHow'], 4);
@@ -497,4 +498,92 @@ test('Emergency calls are understood in what the player says (the regexes are no
   for (const path of ['src/sim/situations.ts', 'src/domain/social/acts.ts', 'src/domain/social/origin.ts', 'src/domain/social/talk.ts']) assert.ok(!readFileSync(path, 'utf8').includes('\b'), `${path} has no backspace characters`);
   const { matchChoice } = await import('../src/sim/situations.ts');
   assert.equal(typeof matchChoice, 'function');
+});
+
+// ---- Procedural dialogue ----
+test('The grammar expands options and slots the same way for the same seed, and fixes a/an and capitals', async () => {
+  const { expand, rngOf, variants, say } = await import('../src/domain/social/gen/grammar.ts');
+  const template = '[Oh|Hey], {who} is an [old|new] friend.';
+  assert.equal(expand(template, { who: 'my uncle' }, rngOf('a')), expand(template, { who: 'my uncle' }, rngOf('a')));
+  const seen = new Set();
+  for (let index = 0; index < 60; index++) seen.add(expand(template, { who: 'my uncle' }, rngOf(`s${index}`)));
+  assert.equal(seen.size, variants(template));
+  assert.equal(expand('i have a apple and a orange', {}, rngOf('x')), 'I have an apple and an orange');
+  assert.equal(expand('[|, honestly] fine', {}, rngOf('q')).includes(' ,'), false);
+  assert.match(say(['hello {name}!'], { name: 'Ana' }, 'k'), /^Hello Ana!$/);
+});
+
+test('Stories are built from parts: the follow-ups come from the same story, and there are thousands of different ones', async () => {
+  const { makeStory, STORY_PARTS } = await import('../src/domain/social/gen/story.ts');
+  const topics = Object.keys(STORY_PARTS);
+  assert.equal(topics.length, 9);
+  const tells = new Set(), whole = new Set();
+  for (const topic of topics) for (const kind of ['good', 'bad']) for (let index = 0; index < 60; index++) {
+    const frame = makeStory(`g${index}`, topic, kind);
+    assert.deepEqual(frame, makeStory(`g${index}`, topic, kind), 'the same guest tells the same story');
+    for (const key of ['tell', 'why', 'more', 'how', 'who']) assert.ok(frame[key] && frame[key].length > 4 && !/[{}\[\]]/.test(frame[key]), `${topic}/${kind}: ${key} is complete text: ${frame[key]}`);
+    tells.add(frame.tell); whole.add(JSON.stringify(frame));
+  }
+  assert.ok(tells.size >= 100, `many different first sentences, saw ${tells.size}`);
+  assert.ok(whole.size >= 800, `many different whole stories, saw ${whole.size}`);
+  // The person is the same in the first sentence and in "who?" whenever there is a person.
+  let checked = 0;
+  for (let index = 0; index < 200; index++) {
+    const frame = makeStory(`w${index}`, 'work', 'bad');
+    const person = /(my manager|my boss|a client|a colleague|my supervisor)/i.exec(frame.who)?.[1];
+    if (person && new RegExp(person, 'i').test(frame.tell)) checked++;
+    assert.ok(person, frame.who);
+  }
+  assert.ok(checked > 30, 'the first sentence and the answer to "who?" name the same person');
+});
+
+test('A guest reacts to a thing the player mentions, with an opinion that stays the same, and remembers it', async () => {
+  const { mentionIn, reactToMention, opinionOf, memoryLine } = await import('../src/domain/social/gen/mentions.ts');
+  const { socialReply } = await import('../src/domain/social/talk.ts');
+  const { applySocialReply } = await import('../src/sim/guests.ts');
+  assert.deepEqual(mentionIn('I love playing football on Sundays'), { kind: 'sport', thing: 'football' });
+  assert.deepEqual(mentionIn('We went to Tokyo last year'), { kind: 'place', thing: 'Tokyo' });
+  assert.equal(mentionIn('Would you like a Mojito?'), undefined);
+  const { guest } = guestIn();
+  const first = reactToMention(guest, { kind: 'food', thing: 'sushi' }, 'a');
+  assert.equal(opinionOf(guest, { kind: 'food', thing: 'sushi' }), first.opinion);
+  const opinions = new Set();
+  for (let index = 0; index < 60; index++) opinions.add(opinionOf({ id: `o${index}`, characterId: `c${index}` }, { kind: 'food', thing: 'sushi' }));
+  assert.equal(opinions.size, 3, 'some guests love it, some do not care, some dislike it');
+  const reply = socialReply(guest, [], 4, 'I had sushi yesterday.');
+  assert.match(reply.text, /sushi/i);
+  assert.deepEqual(reply.heard, { kind: 'food', thing: 'sushi' });
+  applySocialReply(guest, reply);
+  assert.equal(guest.social.heard[0].thing, 'sushi');
+  assert.match(memoryLine(guest, guest.social.heard[0], 'm'), /sushi/);
+});
+
+test('Everything the generator can say uses words the learner can also type (the checker vocabulary)', async () => {
+  const { allStoryTexts } = await import('../src/domain/social/gen/story.ts');
+  const { allMentionTexts } = await import('../src/domain/social/gen/mentions.ts');
+  const { LEXICON } = await import('../src/domain/english/lexicon.ts');
+  await import('../src/domain/english/brandWords.ts');
+  const missing = new Set();
+  for (const text of [...allStoryTexts(), ...allMentionTexts()]) for (const word of text.toLowerCase().replace(/’/g, "'").split(/[^\p{L}\d']+/u)) if (word.length > 1 && !LEXICON.has(word.replace(/^'+|'+$/g, ''))) missing.add(word);
+  assert.deepEqual([...missing], []);
+});
+
+test('A hundred conversations about stories never repeat a guest line more than a few times', async () => {
+  const { socialReply } = await import('../src/domain/social/talk.ts');
+  const { applySocialReply } = await import('../src/sim/guests.ts');
+  const counts = new Map();
+  for (let index = 0; index < 100; index++) {
+    const { guest } = guestIn({ emotion: ['upset', 'happy', 'tired', 'excited'][index % 4], topic: ['work', 'family', 'money', 'travel', 'sports'][index % 5], chatted: [] });
+    guest.id = `conv-${index}`;
+    let turn = 0;
+    for (const [acts, said] of [[['askProblem'], ''], [['askWhy'], ''], [['askMore'], ''], [['askHow'], ''], [[], 'I like football.']]) {
+      const reply = socialReply(guest, acts, ++turn, said);
+      if (!reply) continue;
+      applySocialReply(guest, reply);
+      counts.set(reply.text, (counts.get(reply.text) ?? 0) + 1);
+    }
+  }
+  assert.ok(counts.size > 150, `varied lines, saw ${counts.size}`);
+  const repeated = [...counts.entries()].filter(([, count]) => count > 12);
+  assert.deepEqual(repeated.map(([text]) => text), [], 'no line is said more than 12 times in 100 conversations');
 });

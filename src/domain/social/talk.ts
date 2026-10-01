@@ -2,7 +2,9 @@ import type { Customer } from '../types';
 import type { CustomerReply } from '../conversation/customerTalk';
 import { actsIn, isLeaveAct, type Act } from './acts';
 import { localize, originOf, spellFor } from './origin';
-import { PERSONA_ACTS, personaAnswer, reactToAnswer, threadAnswer, type PersonaAct, type ThreadAct } from './alive';
+import { makeStory } from './gen/story';
+import { mentionIn, reactToMention, type Mention } from './gen/mentions';
+import { embellish, PERSONA_ACTS, personaAnswer, reactToAnswer, threadAnswer, type PersonaAct, type ThreadAct } from './alive';
 import { drunkStage, type DrunkStage, type Emotion, type GuestSocial, type TalkTopic } from './model';
 
 // How guests talk like people. Every line exists in several variants and the guest picks one by a stable hash, so a
@@ -20,7 +22,9 @@ export interface SocialReply {
   /** Which small-talk topic this answered, so it is not repeated. */
   chatted?: string;
   /** The guest has just told a story the bartender can ask more about. */
-  thread?: { topic: TalkTopic; kind: 'good' | 'bad' };
+  thread?: { topic: TalkTopic; kind: 'good' | 'bad'; frame: import('./gen/story').StoryFrame };
+  /** A thing the player mentioned that the guest reacted to. */
+  heard?: Mention;
   /** The guest asked the bartender something and waits for the answer. */
   asked?: boolean;
   /** Acts that need a roll or an effect from the rules. */
@@ -121,44 +125,6 @@ const HOW_ARE_YOU: Record<Emotion, string[]> = {
   relaxed: ['Calm and happy. How about you?', 'Very good. Nothing to complain about.', 'I am good, thanks. It is a nice, quiet evening.']
 };
 
-const STORIES: Record<TalkTopic, { bad: string[]; good: string[] }> = {
-  work: {
-    bad: ['My boss gave me extra work again, on a Friday night.', 'I worked twelve hours today and nobody even said thank you.', 'We lost an important client today, and everyone is blaming me.'],
-    good: ['I got promoted today! I still can not believe it.', 'We finished a big project at work, and the boss bought everyone lunch.', 'I have a new job starting on Monday!']
-  },
-  relationship: {
-    bad: ['My partner and I had a big argument this morning.', 'We broke up last week and I still can not sleep.', 'I think my partner forgot our anniversary.'],
-    good: ['I have a date tonight, with someone really special.', 'We are moving in together next month!', 'My partner surprised me with flowers today.']
-  },
-  money: {
-    bad: ['My car broke down, and the repair costs a fortune.', 'I lost my wallet on the bus. Everything was in it.', 'The rent went up again. I do not know how I will pay.'],
-    good: ['I finally paid off my loan today!', 'I found some money in an old coat. A small miracle!', 'I got a bonus this month.']
-  },
-  family: {
-    bad: ['My family is visiting this week and the house is chaos.', 'My brother and I had a fight at dinner.', 'My mother is ill and I am worried.'],
-    good: ['My sister is having a baby!', 'My whole family came together for dinner. It was lovely.', 'My grandmother just turned ninety!']
-  },
-  sports: {
-    bad: ['My team lost again. Third time this month!', 'I hurt my knee at the gym and I can not run for weeks.', 'The referee was terrible. We should have won.'],
-    good: ['My team won the match tonight!', 'I ran my first ten kilometres today!', 'We got tickets for the final!']
-  },
-  celebration: {
-    bad: ['It is my birthday, and nobody remembered.', 'My friends cancelled my party at the last minute.', 'It is our anniversary, but my partner is working late.'],
-    good: ['It is my birthday today!', 'We are celebrating our anniversary tonight.', 'My friends are coming soon for a surprise party. Shh!']
-  },
-  travel: {
-    bad: ['My flight was cancelled and I lost a whole day.', 'The airline lost my suitcase.', 'I missed my train, and the next one is tomorrow.'],
-    good: ['I am flying to Lisbon tomorrow!', 'I just came back from the mountains. It was beautiful.', 'We booked our summer holiday today!']
-  },
-  health: {
-    bad: ['I have a doctor appointment tomorrow. I hate hospitals.', 'I have had a terrible headache all week.', 'I have not slept properly for days.'],
-    good: ['My doctor said I am completely healthy!', 'I stopped smoking two weeks ago, and I feel great.', 'I finally started going to the gym.']
-  },
-  weather: {
-    bad: ['This rain is terrible. I got completely wet.', 'It is so cold outside! My hands are frozen.', 'The wind broke my umbrella.'],
-    good: ['What a beautiful warm evening!', 'I love this weather. It is perfect for a walk.', 'It is the first sunny day in weeks. I am so happy.']
-  }
-};
 // Said again later, so the guest seems to remember the story they told.
 const CALLBACK: Record<TalkTopic, { bad: string[]; good: string[] }> = {
   work: { bad: ['Work has been so heavy lately, you know.', 'Sorry, I keep thinking about work.'], good: ['I still cannot believe the news from work!', 'Work is going so well. It feels strange.'] },
@@ -255,6 +221,8 @@ export const TAXI_ACCEPTED = ['Thank you so much. You are really kind.', 'A taxi
 export const TAXI_ARRIVED = ['The taxi is here. Thank you for everything! Good night.', 'My taxi is outside. Thanks for looking after me!'];
 
 // ---- Making a drunk guest sound drunk (readable: stretched vowels, hiccups, slips of the tongue) ----
+// Words that can lose their capital after “Hmm…”; names of places and people keep it.
+const COMMON_FIRST = new Set(['The', 'It', 'My', 'We', 'This', 'That', 'Yes', 'No', 'Not', 'Oh', 'Well', 'So', 'And', 'But', 'Do', 'Is', 'Are', 'What', 'Why', 'How', 'Honestly', 'Thanks', 'Thank', 'Sorry', 'Maybe', 'Tired', 'Very', 'Fine', 'Good', 'Great', 'Hello', 'Hi', 'Sad', 'Stressed', 'Proud', 'Happy', 'Wet', 'Light', 'Warm', 'Loved', 'Free', 'Rich', 'Relieved', 'Worried', 'Furious', 'Excited', 'Nervous', 'Calm', 'Over', 'Still', 'Never', 'Dreaming', 'Rested', 'Alone', 'A', 'An', 'Then', 'Now', 'There', 'In', 'On', 'Our', 'Everyone', 'Everybody', 'Nobody']);
 export function voice(customer: Customer, line: string, turn: number, local = true) {
   const social = customer.social;
   if (!social) return line;
@@ -264,7 +232,7 @@ export function voice(customer: Customer, line: string, turn: number, local = tr
   const text = local && light ? localize(customer, line, turn) : spellFor(originOf(customer), line);
   const seed = `${customer.id}:${turn}`;
   const stage = stageOf(social);
-  if (stage === 'sober') return social.emotion === 'tired' && hash(seed) % 3 === 0 && !text.startsWith('…') ? `Hmm… ${text.charAt(0).toLowerCase()}${text.slice(1)}` : text;
+  if (stage === 'sober') return social.emotion === 'tired' && hash(seed) % 3 === 0 && !text.startsWith('…') ? `Hmm… ${COMMON_FIRST.has(text.split(/[\s,?.!…]/)[0]!) ? text.charAt(0).toLowerCase() + text.slice(1) : text}` : text;
   if (stage === 'tipsy') return hash(seed) % 3 === 0 && !text.endsWith('?') ? `${text} Hehe.` : text;
   const words = text.split(' ');
   const index = hash(seed + 's') % words.length;
@@ -278,8 +246,20 @@ export function voice(customer: Customer, line: string, turn: number, local = tr
 // ---- The guest's answer to a sentence the bartender says ----
 const rapportBy = (social: GuestSocial, value: number) => Math.round(value * (social.emotion === 'angry' ? .5 : 1));
 
-export function socialReply(customer: Customer, acts: Act[], turn: number): SocialReply | undefined {
+// The guest tells a story that is made for them (see gen/story.ts): the follow-up questions come from the same story.
+function tellStory(customer: Customer, kind: 'good' | 'bad') {
+  const frame = makeStory(customer.id, customer.social!.topic, kind);
+  return { text: frame.tell, thread: { topic: frame.topic, kind, frame } };
+}
+
+export function socialReply(customer: Customer, acts: Act[], turn: number, said = ''): SocialReply | undefined {
   const social = customer.social;
+  // A thing the player mentions (a sport, a food, a place) gets a reaction with an opinion of its own.
+  const mention = social && said ? mentionIn(said) : undefined;
+  if (social && mention && (!acts.length || ['weather', 'sports', 'music', 'travel'].includes(acts[0]!))) {
+    const reaction = reactToMention(customer, mention, `${customer.id}:${turn}:m`);
+    return { text: reaction.text, expression: reaction.opinion === 'love' ? 'happy' : 'smile', rapport: reaction.opinion === 'love' ? 6 : reaction.opinion === 'meh' ? 3 : 1, heard: mention, asked: reaction.asks, chatted: 'mention' };
+  }
   // A guest who asked the bartender a question reacts to whatever comes back, in a human way.
   if (social && social.asked && (!acts.length || ['weather', 'sports', 'music', 'travel'].includes(acts[0]!))) return { text: reactToAnswer(`${customer.id}:${turn}`), expression: 'smile', rapport: 3 };
   if (!social || !acts.length) return undefined;
@@ -301,16 +281,17 @@ export function socialReply(customer: Customer, acts: Act[], turn: number): Soci
   if (main === 'askProblem' || (main === 'askMore' && !social.thread && !social.told)) {
     const group = bad(emotion) ? 'bad' : 'good';
     if (social.told) return { text: choose(REPEAT_STORY, seed), expression: 'thinking', rapport: 2 };
-    return { text: choose(STORIES[social.topic][group], seed), expression: group === 'bad' ? 'disappointed' : 'very-happy', rapport: rapportBy(social, 8), told: true, chatted: 'story', thread: { topic: social.topic, kind: group } };
+    const story = tellStory(customer, group);
+    return { text: story.text, expression: group === 'bad' ? 'disappointed' : 'very-happy', rapport: rapportBy(social, 8), told: true, chatted: 'story', thread: story.thread };
   }
   if (main === 'empathy') {
     // Good news deserves a happy reply; sad news needs comfort. Rapport rises either way.
     const comfort = bad(emotion) && social.rapport + 8 >= 58 ? 'relaxed' as Emotion : undefined;
-    return { text: choose(EMPATHY[emotion], seed), expression: bad(emotion) ? 'smile' : 'happy', rapport: rapportBy(social, 9), emotion: comfort, chatted: 'empathy' };
+    return { text: embellish(choose(EMPATHY[emotion], seed), social, seed), expression: bad(emotion) ? 'smile' : 'happy', rapport: rapportBy(social, 9), emotion: comfort, chatted: 'empathy' };
   }
-  if (main === 'compliment') return { text: choose(bad(emotion) ? COMPLIMENT.bad : COMPLIMENT.good, seed), expression: 'happy', rapport: rapportBy(social, 5) };
+  if (main === 'compliment') return { text: embellish(choose(bad(emotion) ? COMPLIMENT.bad : COMPLIMENT.good, seed), social, seed), expression: 'happy', rapport: rapportBy(social, 5) };
   if (main === 'howAreYou' && social.chatted.includes('how')) return { text: choose(REPEAT_HOW[emotion], seed), expression: 'smile', rapport: rapportBy(social, 3) };
-  if (main === 'howAreYou') return { text: choose(HOW_ARE_YOU[emotion], seed), expression: bad(emotion) ? 'thinking' : 'smile', rapport: rapportBy(social, 6), chatted: 'how' };
+  if (main === 'howAreYou') return { text: embellish(choose(HOW_ARE_YOU[emotion], seed), social, seed), expression: bad(emotion) ? 'thinking' : 'smile', rapport: rapportBy(social, 6), chatted: 'how' };
   if ((PERSONA_ACTS as string[]).includes(main)) {
     // The guest has a life that stays the same all evening: the same job, hobby, home town and pet.
     const answer = personaAnswer(customer, main as PersonaAct);
@@ -332,7 +313,7 @@ export function socialReply(customer: Customer, acts: Act[], turn: number): Soci
     return { text: choose(['No, I can eat everything, thanks.', 'Nope, nothing like that. Thanks for asking!', 'No allergies. Why, is something in it?', 'I am fine with everything, thank you.', 'No, nothing. That is thoughtful of you.'], seed), expression: 'smile', rapport: rapportBy(social, 4) };
   }
   if (main === 'offerFood') return { text: social.hungry === false ? 'No, thanks. I am not hungry right now.' : choose(FOOD.slice(0, 2), customer.id + 'food'), expression: 'smile', rapport: 2 };
-  if (main === 'checkIn') return { text: choose(CHECK_IN[emotion], seed), expression: 'smile', rapport: rapportBy(social, 3) };
+  if (main === 'checkIn') return { text: embellish(choose(CHECK_IN[emotion], seed), social, seed), expression: 'smile', rapport: rapportBy(social, 3) };
   if (main === 'offerAnother' && social.phase === 'enjoying') return { text: choose(NOT_YET_ORDER, seed), expression: 'smile', rapport: 1 };
   if (main === 'thanks') {
     // Now and then a guest who told a story comes back to it.
@@ -340,12 +321,12 @@ export function socialReply(customer: Customer, acts: Act[], turn: number): Soci
     const back = told && hash(seed + 'cb') % 100 < 40 ? ` ${choose(CALLBACK[social.topic][bad(emotion) ? 'bad' : 'good'], seed + 'c')}` : '';
     return { text: `${choose(THANKS, seed)}${back}`, expression: 'smile', rapport: 1 };
   }
-  if (main === 'apology') return { text: choose(APOLOGY, seed), expression: 'smile', rapport: rapportBy(social, 5) };
+  if (main === 'apology') return { text: embellish(choose(APOLOGY, seed), social, seed), expression: 'smile', rapport: rapportBy(social, 5) };
   if (main === 'goodbye') return { text: choose(NOT_YET, seed), expression: 'smile', rapport: 0 };
   if (main === 'weather' || main === 'sports' || main === 'music' || main === 'travel') {
     const matches = (social.topic === main) || (main === 'sports' && social.topic === 'sports');
     const bank = TOPIC_CHAT[main];
-    if (matches && !social.told) return { text: choose(STORIES[social.topic][bad(emotion) ? 'bad' : 'good'], seed), expression: bad(emotion) ? 'disappointed' : 'very-happy', rapport: rapportBy(social, 8), told: true, chatted: main, thread: { topic: social.topic, kind: bad(emotion) ? 'bad' : 'good' } };
+    if (matches && !social.told) { const story = tellStory(customer, bad(emotion) ? 'bad' : 'good'); return { text: story.text, expression: bad(emotion) ? 'disappointed' : 'very-happy', rapport: rapportBy(social, 8), told: true, chatted: main, thread: story.thread }; }
     return { text: choose(matches ? bank.match : bank.other, seed), expression: 'smile', rapport: rapportBy(social, 3), chatted: main };
   }
   return undefined;
