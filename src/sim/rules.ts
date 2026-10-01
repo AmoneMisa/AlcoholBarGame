@@ -997,6 +997,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       break;
     }
     case 'topUp': {
+      // Supplying stock opens at the same level as auto-supply; the training lesson may try it earlier.
+      if (levelFor(state.xp) < AUTO_SUPPLY_LEVEL && !state.training?.active) throw new RuleError(`Supplying stock unlocks at level ${AUTO_SUPPLY_LEVEL}.`);
       const ordered = autoRestock(state, now, true);
       if (!ordered) throw new RuleError(state.message.includes('paused') ? state.message : 'Nothing is running low, or an order for it is already on the way.');
       noteTraining(state, 'toppedUp');

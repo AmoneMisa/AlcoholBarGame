@@ -2,17 +2,18 @@
 import GuidePointer from './components/ui/GuidePointer.vue';
 import TutorialTour from './components/ui/TutorialTour.vue';
 import PopularityBar from './components/game/PopularityBar.vue';
-import { computed, defineAsyncComponent, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import SectionTabs from './components/ui/SectionTabs.vue';
+import { lazyPage } from './ui/lazy';
 import BarChips from './components/game/BarChips.vue';
 import CocktailWorkspace from './components/cocktails/CocktailWorkspace.vue';
 import BarScene from './components/game/BarScene.vue';
 import TopHud from './components/game/TopHud.vue';
 import GuideSheet from './components/knowledge/GuideSheet.vue';
 import UiIcon from './components/ui/UiIcon.vue';
-const WorkshopPage = defineAsyncComponent(() => import('./components/workshop/WorkshopPage.vue'));
-const ProfilePage = defineAsyncComponent(() => import('./components/profile/ProfilePage.vue'));
-const SettingsPage = defineAsyncComponent(() => import('./components/settings/SettingsPage.vue'));
+const WorkshopPage = lazyPage(() => import('./components/workshop/WorkshopPage.vue'));
+const ProfilePage = lazyPage(() => import('./components/profile/ProfilePage.vue'));
+const SettingsPage = lazyPage(() => import('./components/settings/SettingsPage.vue'));
 import NotificationToasts from './components/ui/NotificationToasts.vue';
 import RewardPopup from './components/ui/RewardPopup.vue';
 import DailyRewardPopup from './components/ui/DailyRewardPopup.vue';
@@ -22,11 +23,11 @@ import { calendarDate } from './domain/economy';
 import { initMusic, musicOn, playSfx, refreshMusic, setMusicInterior } from './audio/index';
 
 // Only the bar scene is needed for the first paint; every other screen is fetched when the player opens it.
-const ConversationPopup = defineAsyncComponent(() => import('./components/conversation/ConversationPopup.vue'));
-const ManagementDeck = defineAsyncComponent(() => import('./components/game/ManagementDeck.vue'));
-const LearningPage = defineAsyncComponent(() => import('./components/learning/LearningPage.vue'));
-const FriendsPage = defineAsyncComponent(() => import('./components/friends/FriendsPage.vue'));
-const StartingBarPicker = defineAsyncComponent(() => import('./components/game/StartingBarPicker.vue'));
+const ConversationPopup = lazyPage(() => import('./components/conversation/ConversationPopup.vue'));
+const ManagementDeck = lazyPage(() => import('./components/game/ManagementDeck.vue'));
+const LearningPage = lazyPage(() => import('./components/learning/LearningPage.vue'));
+const FriendsPage = lazyPage(() => import('./components/friends/FriendsPage.vue'));
+const StartingBarPicker = lazyPage(() => import('./components/game/StartingBarPicker.vue'));
 
 const game = useGameStore();
 const notifications = useNotificationsStore();

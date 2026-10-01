@@ -17,6 +17,8 @@ const mode = ref<'buy'|'sell'>('buy');
 const category = ref('all');
 // One window for supplies: it shows what a top-up would order now and the switch for doing it automatically.
 const confirm = ref(false);
+// Opens at level 5 (the training lesson may use it earlier, as practice).
+const supplyLocked = computed(() => game.level < AUTO_SUPPLY_LEVEL && !game.training.active);
 const autoChoice = ref(false);
 const topUp = computed(() => (confirm.value ? game.topUpPreview() : { orders: [], total: 0 } as ReturnType<typeof game.topUpPreview>));
 const openSupply = () => { autoChoice.value = game.autoSupply; confirm.value = true; };
@@ -55,8 +57,8 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
     <!-- Level perks live on the bar scene's city chip; the market only shows what changes buying here. -->
     <!-- One supply card, one button: the window shows what would be ordered now and lets the player keep it automatic. -->
     <div class="auto-supply" :class="{ on: game.autoSupply }">
-      <div><b>Supply</b><small>{{ game.autoSupply ? 'Auto-supply is on: anything that runs low is reordered for you.' : 'Reorders what runs low from the cheapest supplier, at normal prices and delivery fees.' }}</small></div>
-      <UiButton variant="solid" data-guide="top-up" @click="openSupply">Supply low stock</UiButton>
+      <div><b>Supply</b><small>{{ supplyLocked ? `Unlocks at level ${AUTO_SUPPLY_LEVEL}.` : game.autoSupply ? 'Auto-supply is on: anything that runs low is reordered for you.' : 'Reorders what runs low from the cheapest supplier, at normal prices and delivery fees.' }}</small></div>
+      <UiButton variant="solid" data-guide="top-up" :disabled="supplyLocked" @click="openSupply">{{ supplyLocked ? `Level ${AUTO_SUPPLY_LEVEL}` : 'Supply low stock' }}</UiButton>
     </div>
     <ConfirmDialog v-if="confirm" title="Supply low stock" :confirm-label="topUp.orders.length ? 'Place the orders' : 'Save'" :disabled="!topUp.orders.length && autoChoice === game.autoSupply" :reason="topUp.orders.length && game.money < topUp.total ? `Not enough coins: you need ${topUp.total.toFixed(2)}, you have ${Math.floor(game.money)}.` : ''" @cancel="confirm = false" @confirm="doSupply">
       <template v-if="topUp.orders.length">

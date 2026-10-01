@@ -814,6 +814,8 @@ test('Top-up preview shows what would be ordered without changing anything, and 
   const state = fresh();
   for (const stock of state.inventories[state.regionId].slice(0, 3)) stock.amount = 0;
   state.money = 100000;
+  state.xp = xpForLevel(6);
+  assert.throws(() => run(Object.assign(fresh(), { money: 100000 }), { type: 'topUp' }), /unlocks at level/);
   const money = state.money, orders = state.deliveryOrders.length;
   const preview = previewTopUp(state, NOW);
   assert.ok(preview.orders.length > 0 && preview.total > 0, 'low stock gives an order');
