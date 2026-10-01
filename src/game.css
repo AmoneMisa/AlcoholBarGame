@@ -1315,3 +1315,6 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:clip}
 .bar-event.risky { border-color:#d9694f; }
 .bar-event.quiet { border-color:#7aa0c8; }
 .bar-event span { font-size:11px;opacity:.85; }
+
+.game-nav button { position: relative; }
+.nav-badge { position: absolute; top: 2px; right: 8px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: #d9534f; color: #fff; font: 700 10px/16px system-ui, sans-serif; font-style: normal; text-align: center; }

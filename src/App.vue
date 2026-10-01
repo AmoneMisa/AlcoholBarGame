@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue';
 import CocktailWorkspace from './components/cocktails/CocktailWorkspace.vue';
 import BarScene from './components/game/BarScene.vue';
 import TopHud from './components/game/TopHud.vue';
@@ -66,6 +66,15 @@ watch(() => game.message,(message,previous) => {
   else if (/gave you|reward|gift|unlocked/i.test(message)) notifications.push('reward','Reward received',message);
 });
 
+// Small counters on the tabs: what is waiting for the player.
+const badges = computed<Record<string, number>>(() => ({
+  service: (game.barEvent ? 1 : 0) + game.deliveryIssues.filter((issue) => issue.status === 'open').length,
+  english: game.dailyLessonsComplete ? 0 : 1,
+  market: game.economy.event ? 1 : 0,
+  design: game.cosmeticRouletteAvailable ? 1 : 0,
+  friends: game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'incoming').length
+}));
+
 function selectView(id: string) {
   view.value = id;
   if (id !== 'service' && id !== 'english' && id !== 'friends') { managementView.value = id; managementOpened.value = true; }
@@ -89,7 +98,7 @@ function selectView(id: string) {
     <NotificationToasts />
     <StartingBarPicker v-if="game.sessionReady && !game.startingBarChosen" />
     <nav class="game-nav" aria-label="Game views">
-      <button v-for="item in nav" :key="item.id" :class="{ active: view === item.id }" type="button" @click="selectView(item.id)"><UiIcon :name="item.mark" /><b>{{ item.label }}</b></button>
+      <button v-for="item in nav" :key="item.id" :class="{ active: view === item.id }" type="button" @click="selectView(item.id)"><UiIcon :name="item.mark" /><b>{{ item.label }}</b><i v-if="badges[item.id]" class="nav-badge" :aria-label="`${badges[item.id]} waiting`">{{ badges[item.id] }}</i></button>
     </nav>
   </div>
 </template>
