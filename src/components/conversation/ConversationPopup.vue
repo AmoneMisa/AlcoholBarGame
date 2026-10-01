@@ -363,8 +363,8 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         <p v-if="situation.line" class="situation-line">“{{ situation.line }}”</p>
         <small class="situation-hint">Choose what to say:</small>
         <div class="situation-choices">
-          <div v-for="choice in situation.choices" :key="choice.id" class="situation-choice">
-            <button type="button" data-guide="situation-choice" @click="game.answerSituation(customer.id, choice.id)"><span>{{ choice.say }}</span></button>
+          <div v-for="choice in situation.choices" :key="choice.id" class="situation-choice" :class="{ 'choice-best': choice.best }">
+            <button type="button" data-guide="situation-choice" @click="game.answerSituation(customer.id, choice.id)"><span v-if="choice.best" class="best-mark">💬 Best answer</span><span>{{ choice.say }}</span></button>
             <button type="button" class="choice-speak" aria-label="Listen" title="Listen" @click="speak(choice.say)">🔊</button>
             <SpeakTrainer :text="choice.say" compact />
           </div>

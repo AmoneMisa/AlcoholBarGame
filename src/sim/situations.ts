@@ -168,18 +168,30 @@ function finish(state: PlayerState, guest: Customer, def: SituationDef, outcome:
   const event = social.event!;
   const data = event.data;
   const symbol = symbolOf(state);
-  const leave = applyEffects(state, guest, outcome.effects, data);
-  const spawned = outcome.effects.spawn ? situationById(outcome.effects.spawn) : undefined;
+  // Calm Charm: a reply that would end badly (an angry guest leaving, a fine, damage, a fight) ends calmly instead.
+  const bad = outcome.effects;
+  const harmful = !!(bad.leave || bad.violation || bad.breakage || bad.spawn || (bad.popularity ?? 0) < 0 || (bad.money ?? 0) < 0 || bad.result === 'failed');
+  const calmed = harmful && (state.loot.armed['calm-charm'] ?? 0) > 0;
+  let effects = outcome.effects;
+  if (calmed) {
+    delete state.loot.armed['calm-charm'];
+    effects = { ...bad, leave: false, violation: 0, breakage: 0, spawn: undefined, popularity: Math.max(0, bad.popularity ?? 0), money: Math.max(0, bad.money ?? 0), emotion: 'relaxed', result: 'neutral', note: 'Calm Charm: the guest settled down and nothing bad happened.' };
+  }
+  const leave = applyEffects(state, guest, effects, data);
+  // Whisper lasts for one situation: it is used up when that situation ends.
+  const spawned0 = effects.spawn;
+  const spawned = spawned0 ? situationById(spawned0) : undefined;
   const guestText = fill(outcome.say, data, symbol);
   let followUp: string | undefined;
   if (spawned) followUp = startSituation(state, guest, spawned, now, random);
   else if (outcome.next === undefined) delete social.event;
   else event.stage = outcome.next;
   const ended = !social.event;
+  if (ended && (state.loot.armed['whisper'] ?? 0) > 0) delete state.loot.armed['whisper'];
   return {
-    bartender, guest: guestText, tone, tip, ended, leave, followUp, note: outcome.effects.note,
-    remake: ended && !!outcome.effects.remake && !leave,
-    afterServe: ended && !!def.holdsPayment && data.afterServe === 1 && !leave && !outcome.effects.remake
+    bartender, guest: guestText, tone, tip, ended, leave, followUp, note: effects.note,
+    remake: ended && !!effects.remake && !leave,
+    afterServe: ended && !!def.holdsPayment && data.afterServe === 1 && !leave && !effects.remake
   };
 }
 

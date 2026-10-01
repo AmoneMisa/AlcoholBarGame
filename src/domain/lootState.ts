@@ -1,4 +1,4 @@
-import { BOOST_KINDS, EQUIPMENT, TIER_ORDER, PRESTIGE_PERKS, newSlot, type EquipmentSlot, type Pity, type Reward } from './loot';
+import { ARMED_CHARGES, BOOST_KINDS, EQUIPMENT, TIER_ORDER, PRESTIGE_PERKS, newSlot, type EquipmentSlot, type Pity, type Reward } from './loot';
 import { INGREDIENTS, REGIONS } from './catalog';
 import { SEASON_MILESTONES } from './seasons';
 import { SignatureError, validateSignature, type Signature } from './signature';
@@ -13,7 +13,7 @@ export interface LootState {
   itemShards: Record<string, number>;
   consumables: Record<string, number>;
   boxes: Record<string, number>;
-  // One-shot charges armed by consumables: golden-ice, voucher, second-chance.
+  // One-shot charges armed by consumables: see ARMED_CHARGES.
   armed: Record<string, number>;
   // Timed boosters: kind → end time.
   boosts: Record<string, number>;
@@ -87,7 +87,7 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
     parts: count(source.parts), skinShards: count(source.skinShards),
     itemShards: counts(source.itemShards, EQUIPMENT.map((item) => item.id)),
     consumables: counts(source.consumables), boxes: counts(source.boxes, ['bronze', 'silver', 'gold', 'choice']),
-    armed: counts(source.armed, ['golden-ice', 'voucher', 'second-chance']), boosts, equipment,
+    armed: counts(source.armed, ARMED_CHARGES), boosts, equipment,
     pity: { sinceRare: count(source.pity?.sinceRare, 1000), sinceLegendary: count(source.pity?.sinceLegendary, 1000) },
     pendingChoice: Array.isArray(source.pendingChoice) && source.pendingChoice.length === 3 ? source.pendingChoice : undefined,
     lastDraw: Array.isArray(source.lastDraw) ? source.lastDraw.slice(0, 10) : [],

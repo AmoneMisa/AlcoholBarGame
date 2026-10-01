@@ -38,7 +38,7 @@ export function upgradeCostFor(level: number) {
 }
 
 // ---- Materials and consumables ----
-export type ConsumableId = 'happy-hour' | 'golden-ice' | 'voucher' | 'courier' | 'scroll' | 'second-chance' | 'xp-boost' | 'coin-boost' | 'tip-boost' | 'vip-magnet';
+export type ConsumableId = 'happy-hour' | 'golden-ice' | 'voucher' | 'courier' | 'scroll' | 'second-chance' | 'calm-charm' | 'whisper' | 'steady-hand' | 'xp-boost' | 'coin-boost' | 'tip-boost' | 'vip-magnet';
 export interface ConsumableDef { id: ConsumableId; name: string; icon: string; description: string; crystalPrice: number; kind: 'boost' | 'charge' | 'instant'; durationMs?: number; }
 const MIN = 60_000;
 export const CONSUMABLES: ConsumableDef[] = [
@@ -50,6 +50,9 @@ export const CONSUMABLES: ConsumableDef[] = [
   { id: 'golden-ice', name: 'Golden Ice', icon: '✨', kind: 'charge', crystalPrice: 30, description: 'Your next perfect serve pays +50% and always tips.' },
   { id: 'voucher', name: 'Supplier Voucher', icon: '🏷️', kind: 'charge', crystalPrice: 25, description: 'Your next supplier order costs 20% less.' },
   { id: 'second-chance', name: 'Second Chance', icon: '🛟', kind: 'charge', crystalPrice: 25, description: 'Your next wrong drink refunds its ingredients and keeps your streak.' },
+  { id: 'calm-charm', name: 'Calm Charm', icon: '🕊️', kind: 'charge', crystalPrice: 35, description: 'The next problem with a guest cannot go badly: nobody leaves angry, and no fine, damage or complaint counts.' },
+  { id: 'whisper', name: 'Whisper', icon: '💬', kind: 'charge', crystalPrice: 30, description: 'In the next guest situation the best answers are marked, so you can learn the right words.' },
+  { id: 'steady-hand', name: 'Steady Hand', icon: '🎯', kind: 'charge', crystalPrice: 30, description: 'Your next drink counts as perfect if every ingredient is right and the amounts are within 25%.' },
   { id: 'courier', name: 'Express Courier', icon: '🚚', kind: 'instant', crystalPrice: 35, description: 'The next delivery of this bar arrives right now.' },
   { id: 'scroll', name: 'Recipe Scroll', icon: '📜', kind: 'instant', crystalPrice: 70, description: 'A mastery card for a recipe you already know.' }
 ];
@@ -88,7 +91,7 @@ export const BOX_TABLES: Record<Exclude<BoxKind, 'choice'>, Entry[]> = {
   bronze: [
     { weight: 30, make: (_l, r) => ({ kind: 'parts', amount: between(r, 3, 6) }) },
     { weight: 26, make: (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 25, 50) * (1 + l / 25)) }) },
-    { weight: 20, make: consumable(['golden-ice', 'voucher', 'second-chance']) },
+    { weight: 20, make: consumable(['golden-ice', 'voucher', 'second-chance', 'whisper']) },
     { weight: 10, make: consumable(['tip-boost', 'happy-hour']) },
     { weight: 8, make: shards(1, 2) },
     { weight: 4, make: (_l, r) => ({ kind: 'skinShards', amount: between(r, 2, 4) }) },
@@ -99,7 +102,7 @@ export const BOX_TABLES: Record<Exclude<BoxKind, 'choice'>, Entry[]> = {
     { weight: 20, make: (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 60, 120) * (1 + l / 25)) }) },
     { weight: 16, make: shards(3, 6) },
     { weight: 14, make: consumable(['xp-boost', 'coin-boost', 'tip-boost', 'happy-hour']) },
-    { weight: 10, make: consumable(['courier', 'golden-ice', 'voucher']) },
+    { weight: 10, make: consumable(['courier', 'golden-ice', 'voucher', 'calm-charm', 'steady-hand']) },
     { weight: 8, make: (_l, r) => ({ kind: 'skinShards', amount: between(r, 4, 9) }) },
     { weight: 6, make: (_l, r) => ({ kind: 'crystals', amount: between(r, 12, 25) }) },
     { weight: 2, make: () => ({ kind: 'recipeCard' }) },
@@ -173,7 +176,7 @@ export function rollRarity(pity: Pity, random: () => number): 'common' | 'rare' 
 }
 
 // ---- Boosters that are not consumables ----
-export const ARMED_CHARGES = ['golden-ice', 'voucher', 'second-chance'] as const;
+export const ARMED_CHARGES = ['golden-ice', 'voucher', 'second-chance', 'calm-charm', 'whisper', 'steady-hand'] as const;
 
 // ---- Prestige ("Grand Opening") ----
 export const PRESTIGE_LEVEL = 50;

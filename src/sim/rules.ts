@@ -3,7 +3,7 @@ import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost, bottleSaleCrystalReward, bo
 import { arrivalSkipCrystalCost, calendarDate, coins, specialtyFactor, supplierInCity, consecutiveDays, conversationCrystalReward, conversationDifficulty, crystalExchange, dailyCoinsFor, dailyCrystalsFor, quotePurchase, recipePurchase } from '../domain/economy';
 import { withArticle } from '../domain/english/articles';
 import { BAR_PROFILE_OPTIONS, DEFAULT_BARS, INTERIORS, isEventInterior } from '../data/cosmetics/bars';
-import { consumeMix, generateCustomer, judgeMix, requiredRecipe } from '../domain/engine';
+import { consumeMix, generateCustomer, judgeMix, nearMiss, requiredRecipe } from '../domain/engine';
 import type { Customer, InventoryItem, Recipe, RegionId, Supplier } from '../domain/types';
 import { pourableBrand, replyToServe, serveName, serveRequestText, substitutesFor } from '../domain/brandServe';
 import { signatureBonus } from '../domain/brandPours';
@@ -556,7 +556,10 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const poured = saved > 0 ? mix.map((item) => INGREDIENTS.find((entry) => entry.id === item.ingredientId)?.unit === 'ml' ? { ...item, amount: Math.max(1, Math.round(item.amount * (1 - saved))) } : item) : mix;
       state.inventories[state.regionId] = consumeMix(inventoryOf(state), poured);
       const lowGradeUsed = guest.orderKind === 'serve' ? new Set<'damaged' | 'expiring'>() : takeLowGrade(state, mix);
-      const verdict = judgeMix(mix, guest, action.shaken === true);
+      let verdict = judgeMix(mix, guest, action.shaken === true);
+      // Steady Hand turns a drink that is close into a perfect one (and is only used up when it was needed).
+      const steady = !auto && !verdict.success && (state.loot.armed['steady-hand'] ?? 0) > 0 && nearMiss(verdict);
+      if (steady) { delete state.loot.armed['steady-hand']; verdict = { ...verdict, success: true }; }
       if (verdict.success) {
         // Upgraded recipes earn more: +6% price and +10% tips per level.
         const mastery = recipeBonus(guest.orderKind === 'serve' ? 1 : recipeLevel(state, verdict.recipe.id));
@@ -610,6 +613,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const note = unlocked ? `Perfect service. ${verdict.recipe.name} was added to your recipe book!${crystalNote}`
           : duplicateRecipe ? `Perfect service. You earned one ${verdict.recipe.name} recipe card for mastery.${crystalNote}`
           : auto ? `Auto-served ${verdict.recipe.name}. Paid ${revenue.toFixed(2)} coins (no tip for automated drinks).${crystalNote}`
+          : steady ? `Steady Hand: close enough counts as perfect! Paid ${revenue.toFixed(2)} coins${tip ? `, tip +${tip}` : ''}.${crystalNote}`
           : !tip ? `Perfect service. No tip this time.${crystalNote}`
           : bonus ? `Perfect service — classic touch with ${bonus}! Tip +${tip} coins.${crystalNote}` : `Perfect service. Tip +${tip} coins.${crystalNote}`;
         // Alcohol raises the guest's level; a guest who likes the bar may stay for another drink.

@@ -95,6 +95,11 @@ export function judgeMix(mix: InventoryItem[], customer: Customer, shaken: boole
   return { recipe, details, shakeOk, success: details.every((item) => item.ok) && shakeOk };
 }
 
+// Steady Hand: every ingredient of the recipe is in the glass, nothing else, each within a quarter of the right amount.
+export function nearMiss(verdict: ReturnType<typeof judgeMix>) {
+  return verdict.shakeOk && !verdict.success && verdict.details.every((item) => item.ok || (item.expected > 0 && item.actual > 0 && Math.abs(item.actual - item.expected) <= item.expected * .25));
+}
+
 export function consumeMix(inventory: InventoryItem[], mix: InventoryItem[]) {
   const next = inventory.map((item) => ({ ...item }));
   for (const used of mix) {

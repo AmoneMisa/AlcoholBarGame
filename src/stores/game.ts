@@ -609,9 +609,10 @@ export const useGameStore = defineStore('game', () => {
     const current = guest ? currentStage(guest) : undefined;
     if (!guest || !current) return undefined;
     const data = guest.social!.event!.data;
+    const whispered = (state.value.loot.armed['whisper'] ?? 0) > 0;
     return {
       line: guestLine(state.value, guest), title: current.def.title, icon: current.def.icon, category: current.def.category, severity: current.def.severity,
-      choices: visibleChoices(state.value, guest).map((choice) => ({ id: choice.id, say: fillSituationText(choice.say, data, region.value.currencySymbol) }))
+      choices: visibleChoices(state.value, guest).map((choice) => ({ id: choice.id, say: fillSituationText(choice.say, data, region.value.currencySymbol), best: whispered && choice.tone === 'good' }))
     };
   };
   const answerSituation = (customerId: string, choiceId: string) => dispatch({ type: 'situationChoice', customerId, choiceId });

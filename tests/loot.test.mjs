@@ -844,3 +844,47 @@ test('Resetting the account works at any level, needs a confirmation, and starts
   assert.equal(state.loot.prestige.stars, 0);
   run(state, { type: 'wipeAccount', confirm: true });
 });
+
+test('Steady Hand turns a close drink into a perfect one and is kept when it was not needed', () => {
+  const base = fresh();
+  const guest = base.customers[0];
+  guest.modifierId = undefined; guest.orderKind = 'cocktail'; guest.orderRevealed = true;
+  for (const stock of base.inventories['new-york']) stock.amount = 5000;
+  const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
+  const mix = (factor) => recipe.ingredients.map((item) => ({ ...item, amount: Math.round(item.amount * factor) }));
+  const serve = (factor, armed = true) => {
+    const state = structuredClone(base);
+    if (armed) state.loot.armed['steady-hand'] = 1;
+    run(state, { type: 'serve', mix: mix(factor), shaken: true, pourBrands: {} });
+    return state;
+  };
+  const close = serve(1.2);
+  assert.ok(close.money > base.money, 'the close drink was paid');
+  assert.equal(close.loot.armed['steady-hand'], undefined);
+  assert.equal(serve(1).loot.armed['steady-hand'], 1, 'a perfect drink does not use the charge');
+  assert.equal(serve(1.6).money, base.money, 'a drink too far off still fails');
+  assert.equal(serve(1.2, false).money, base.money, 'without the charge a close drink fails');
+});
+
+test('Whisper marks the best answers and the new charges survive a save', () => {
+  const loot = normalizeLoot({ armed: { 'calm-charm': 1, whisper: 1, 'steady-hand': 1, fake: 1 } }, 1);
+  assert.deepEqual(loot.armed, { 'calm-charm': 1, whisper: 1, 'steady-hand': 1 });
+});
+
+test('Calm Charm stops a bad ending once, and only when the ending was bad', async () => {
+  const { SITUATIONS } = await import('../src/domain/situations/catalog.ts');
+  const { startSituation, resolveChoice } = await import('../src/sim/situations.ts');
+  const def = SITUATIONS.find((item) => item.stages[0].choices.some((choice) => choice.outcomes.every((outcome) => outcome.effects.leave)));
+  const choice = def.stages[0].choices.find((item) => item.outcomes.every((outcome) => outcome.effects.leave));
+  const play = (armed) => {
+    const state = fresh();
+    const guest = state.customers[0];
+    if (armed) state.loot.armed['calm-charm'] = 1;
+    startSituation(state, guest, def, NOW, () => .5);
+    return { state, result: resolveChoice(state, guest, choice, NOW, () => .5) };
+  };
+  assert.equal(play(false).result.leave, true);
+  const calmed = play(true);
+  assert.equal(calmed.result.leave, false);
+  assert.equal(calmed.state.loot.armed['calm-charm'], undefined);
+});
