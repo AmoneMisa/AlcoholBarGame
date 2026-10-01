@@ -18,15 +18,14 @@ import { CHARACTER_ART } from '../../data/cosmetics/artCatalog';
 import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipeId, isRegularId, nextRegularStep, regularLevel } from '../../domain/regulars';
 import { SEASON_FEATURED_SHARE, SEASON_MILESTONES, SPARK_DRAWS, seasonAt } from '../../domain/seasons';
 import { featuredLegendary } from '../../sim/loot';
-import CompanionsPanel from './CompanionsPanel.vue';
 import UiButton from '../ui/UiButton.vue';
 import { REGIONS } from '../../domain/catalog';
 import OptionSelect from '../game/OptionSelect.vue';
 import { useGameStore } from '../../stores/game';
 
 const game = useGameStore();
-const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'circle' | 'signature' | 'weekly' | 'prestige'>('equipment');
-const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['circle', 'Circle'], ['signature', 'Signature'], ['weekly', 'Weekly']] as const;
+const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'signature' | 'weekly' | 'prestige'>('equipment');
+const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['signature', 'Signature'], ['weekly', 'Weekly']] as const;
 const scrollRecipe = ref('');
 const names = { consumable: (id: string) => consumableDef(id)?.name ?? id, equipment: (id: string) => equipmentDef(id)?.name ?? id };
 // Equipment is kept per bar. The bar shown here can be picked without leaving the page.
@@ -317,8 +316,6 @@ const boostLeft = (id: string) => {
         </article>
       </template>
     </div>
-
-    <CompanionsPanel v-else-if="tab === 'circle'" />
 
     <div v-else-if="tab === 'regulars'" class="grid">
       <p class="hint">Guests remember you. Every drink you serve earns loyalty (+1, +1 for VIPs, +1 for their favourite drink). Loyalty levels at {{ REGULAR_LEVELS.join(' / ') }} points pay rewards, and a regular pays {{ Math.round((REGULAR_FAVORITE_BONUS - 1) * 100) }}% more for their favourite. Level rewards: {{ REGULAR_REWARDS.map((reward) => [reward.box && reward.box + ' box', reward.parts && reward.parts + ' parts', reward.skinShards && reward.skinShards + ' skin shards', reward.crystals && reward.crystals + ' crystals'].filter(Boolean).join(' + ')).join(' → ') }}.</p>

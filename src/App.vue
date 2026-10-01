@@ -11,6 +11,7 @@ import BarScene from './components/game/BarScene.vue';
 import TopHud from './components/game/TopHud.vue';
 import GuideSheet from './components/knowledge/GuideSheet.vue';
 import UiIcon from './components/ui/UiIcon.vue';
+const CompanionsPanel = lazyPage(() => import('./components/workshop/CompanionsPanel.vue'));
 const WorkshopPage = lazyPage(() => import('./components/workshop/WorkshopPage.vue'));
 const ProfilePage = lazyPage(() => import('./components/profile/ProfilePage.vue'));
 const SettingsPage = lazyPage(() => import('./components/settings/SettingsPage.vue'));
@@ -35,12 +36,13 @@ const view = ref('service');
 const managementView = ref('inventory');
 // The management screens stay mounted once opened, so edits and scroll positions survive switching tabs.
 const managementOpened = ref(false);
-// The bottom bar has five tabs. Screens that belong together are tabs inside one screen; the bar and the character
+// The bottom bar has six tabs. Screens that belong together are tabs inside one screen; the bar and the character
 // open from the header (tap the bar name, or the bar icon).
 const nav = [
   { id: 'service', label: 'Service', mark: 'glass' },
   { id: 'english', label: 'English', mark: 'chat' },
   { id: 'manage', label: 'Manage', mark: 'stock' },
+  { id: 'circle', label: 'Circle', mark: 'heart' },
   { id: 'friends', label: 'Friends', mark: 'friends' },
   { id: 'settings', label: 'Settings', mark: 'settings' }
 ];
@@ -165,6 +167,7 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
       <SectionTabs v-if="sectionTabs.length" v-model="sub[view]" :tabs="sectionTabs" :label="view" />
       <BarChips v-if="view === 'bar'" />
       <LearningPage v-if="view === 'english' && sub.english === 'learn'" />
+      <section v-if="view === 'circle'" class="circle-page game-panel"><CompanionsPanel /></section>
       <FriendsPage v-if="view === 'friends'" />
       <WorkshopPage v-if="view === 'manage' && sub.manage === 'workshop'" />
       <ProfilePage v-if="view === 'character' && sub.character === 'profile'" />
