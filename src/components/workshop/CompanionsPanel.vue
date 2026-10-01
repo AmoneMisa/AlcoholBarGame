@@ -5,6 +5,8 @@ import { REGIONS } from '../../domain/catalog';
 import { useGameStore } from '../../stores/game';
 import CharacterModel from '../characters/CharacterModel.vue';
 import UiButton from '../ui/UiButton.vue';
+import RelationshipLine from '../ui/RelationshipLine.vue';
+import { COMPANION_LADDER } from '../../domain/relationship';
 
 // The Circle: fifteen people with a story. Meet them as guests, recruit them with shards, give keepsakes to deepen the
 // bond, and put up to two (three from level 25) to work in the bar being managed.
@@ -20,6 +22,8 @@ const spotState = (id: string) => {
   if (bondLevel(game.circle.owned[id] ?? 0) < SPOTLIGHT_MIN_BOND) return { label: 'Spotlight', reason: `Needs bond level ${SPOTLIGHT_MIN_BOND}.` };
   return { label: 'Spotlight', reason: '' };
 };
+// What each grade gives: the stronger bonus and the next chapter of their story.
+const companionGives = (person: (typeof COMPANIONS)[number]) => COMPANION_LADDER.names.map((_, at) => `${describeBonus(person.bonus, at + 1)} · chapter ${at + 1}`);
 const crew = computed(() => (game.circle.assigned[game.regionId] ?? []).filter((id) => id in game.circle.owned));
 const cards = computed(() => COMPANIONS.map((person) => {
   const joined = person.id in game.circle.owned;
@@ -67,9 +71,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
         <p class="bonus"><b>Bonus:</b> {{ describeBonus(item.person.bonus, Math.max(1, item.bond)) }}<template v-if="item.bond && item.bond < MAX_BOND"> (next level {{ describeBonus(item.person.bonus, item.bond + 1) }})</template></p>
 
         <template v-if="item.joined">
-          <progress v-if="item.next" :value="item.points" :max="item.next"></progress>
-          <p v-if="item.next" class="meta">{{ item.points }} / {{ item.next }} bond points</p>
-          <p v-else class="meta">Fully bonded</p>
+          <RelationshipLine :ladder="COMPANION_LADDER" :points="item.points" :gives="companionGives(item.person)" />
           <div class="gifts">
             <UiButton v-for="keep in keepsakes" :key="keep.id" size="sm" :variant="item.person.likes === keep.id ? 'danger' : 'secondary'" :disabled="!keep.count || !item.next" :title="`${keep.name}${item.person.likes === keep.id ? ' — loved' : ''}${keep.count ? '' : ' (you have none)'}`" @click="game.giveKeepsake(item.person.id, keep.id)">{{ keep.icon }}</UiButton>
           </div>

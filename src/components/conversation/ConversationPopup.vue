@@ -34,6 +34,8 @@ import UiIcon from '../ui/UiIcon.vue';
 import CloseButton from '../ui/CloseButton.vue';
 import UiButton from '../ui/UiButton.vue';
 import ModalDialog from '../ui/ModalDialog.vue';
+import { companionById } from '../../domain/companions';
+import { COMPANION_LADDER, standing } from '../../domain/relationship';
 
 const inputMode = ref<'type' | 'words'>('words');
 
@@ -119,6 +121,15 @@ const offerName = computed(() => {
 const foodsInStock = computed(() => FOODS.filter((item) => (game.inventory.find((stock) => stock.ingredientId === item.id)?.amount ?? 0) >= 1));
 const startOffer = (kind: 'drink' | 'food', itemId: string) => { if (customer.value) game.pitchStart(customer.value.id, kind, itemId); };
 const stage = computed(() => drunkStage(social.value?.drunk ?? 0));
+// A special person (the Circle) is shown with where the relationship stands; common guests have no such line.
+const relation = computed(() => {
+  const person = customer.value?.characterId ? companionById(customer.value.characterId) : undefined;
+  if (!person) return undefined;
+  const points = game.circle.owned[person.id];
+  if (points === undefined) return { text: `Not in your circle · ${game.circle.shards[person.id] ?? 0} / ${person.shards} shards`, joined: false };
+  const here = standing(COMPANION_LADDER, points);
+  return { text: here.nextAt === undefined ? `${here.name} · highest grade` : `${here.name} · ${here.points} / ${here.nextAt}`, joined: true };
+});
 const needNow = computed(() => social.value?.need && social.value.need.since <= game.nowMs ? social.value.need.kind : undefined);
 const NEED_LABEL: Record<string, string> = { ashtray: 'Wants an ashtray', water: '💧 Wants water', taxi: '🚕 Wants a taxi', chat: '💬 Wants to talk' };
 const leaveHint = (tone: 'gentle' | 'firm' | 'aggressive') => {
@@ -343,6 +354,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           </div>
           <div v-if="social" class="talk-state">
             <span class="state-chip" :class="social.emotion">{{ EMOTION_ICON[social.emotion] }} {{ EMOTION_LABEL[social.emotion] }}</span>
+            <span v-if="relation" class="state-chip relation" :class="{ joined: relation.joined }" title="Your relationship with this person"><UiIcon name="heart" /> {{ relation.text }}</span>
             <span v-if="stage !== 'sober'" class="state-chip drunk">🥴 {{ DRUNK_LABEL[stage] }}</span>
             <span v-if="needNow" class="state-chip need"><img v-if="needNow === 'ashtray'" class="ashtray-inline" :src="ashtrayArt" alt="" />{{ NEED_LABEL[needNow] }}</span>
             <span v-if="social.taxiAt" class="state-chip need">🚕 Taxi on the way</span>

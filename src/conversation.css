@@ -181,3 +181,6 @@
 .show-me { margin-left: 6px; padding: 1px 8px; border: 1px solid #ffd35a; border-radius: 8px; background: transparent; color: #ffd35a; font-size: .75rem; cursor: pointer; }
 .choice-best > button:first-child { border-color: #7bd88f; background: #17301d; }
 .best-mark { display: block; margin-bottom: 2px; color: #9be8ab; font-size: 11px; font-weight: 800; }
+.state-chip.relation { display: inline-flex; align-items: center; gap: 4px; border-color: #7a6a4a; background: #2a2316; color: #e7d7ad; }
+.state-chip.relation.joined { border-color: #c98e3c; color: #ffe6a8; }
+.state-chip.relation .ui-icon { width: 12px; height: 12px; }

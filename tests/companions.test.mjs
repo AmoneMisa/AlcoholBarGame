@@ -5,6 +5,7 @@ import { RECIPES } from '../src/domain/catalog.ts';
 import { ACHIEVEMENTS } from '../src/domain/quests.ts';
 import { barEventById } from '../src/domain/barEvents.ts';
 import { BONUSES, BOND_STEPS, COMPANIONS, KEEPSAKE_IDS, bondLevel, bonusAmount, companionSlots } from '../src/domain/companions.ts';
+import { COMPANION_LADDER, standing } from '../src/domain/relationship.ts';
 import { xpForLevel } from '../src/domain/progression.ts';
 import { companionBonus, companionVisit, crewOf, hasJoined } from '../src/sim/companions.ts';
 import { lootBonuses } from '../src/sim/loot.ts';
@@ -162,4 +163,17 @@ test('Spotlight doubles a working companion for half an hour, then they rest', (
   run(state, { type: 'spotlightCompanion', id: person.id }, undefined, NOW + 7 * 3_600_000);
   const saved = normalizePlayerState(JSON.parse(JSON.stringify(state)));
   assert.ok(saved.companions.spotlights[person.id].until > NOW, 'the spotlight survives a save');
+});
+
+test('The relationship line follows the bond: one grade per bond level, with what is left to the next', () => {
+  assert.equal(COMPANION_LADDER.names.length, BOND_STEPS.length);
+  for (let level = 1; level <= BOND_STEPS.length; level++) {
+    const here = standing(COMPANION_LADDER, BOND_STEPS[level - 1]);
+    assert.equal(here.index + 1, level, 'the grade matches bondLevel');
+  }
+  const start = standing(COMPANION_LADDER, 39);
+  assert.equal(start.name, 'Acquaintance');
+  assert.equal(start.nextAt, 40);
+  assert.equal(standing(COMPANION_LADDER, 560).nextAt, undefined, 'the top grade has no next step');
+  assert.equal(standing(COMPANION_LADDER, 9999).along, 1);
 });
