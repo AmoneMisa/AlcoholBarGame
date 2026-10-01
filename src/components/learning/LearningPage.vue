@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SpeakTrainer from './SpeakTrainer.vue';
 import { computed, ref } from 'vue';
 import { CONTEXT_LABEL, PHRASE_GROUPS, ROLE_LABEL, type WorkContext } from '../../domain/english/phrases';
 import { RULE_GROUPS, RULES, type RuleGroup, type RuleId } from '../../domain/english/rules';
@@ -174,7 +175,7 @@ function when(at: number) {
           </header>
           <p class="vocab-tags"><span>{{ entry.pos }}</span><span>{{ entry.level }}</span><span v-if="learning.seenWords[entry.word]" class="seen">met {{ learning.seenWords[entry.word] }}×</span></p>
           <p class="vocab-meaning">{{ entry.meaning }}</p>
-          <p class="vocab-example">“{{ entry.example }}” <button type="button" class="inline-speak-button" aria-label="Listen to example" @click="speak(entry.example)"><UiIcon name="speaker" /></button></p>
+          <p class="vocab-example">“{{ entry.example }}” <button type="button" class="inline-speak-button" aria-label="Listen to example" @click="speak(entry.example)"><UiIcon name="speaker" /></button> <SpeakTrainer :text="entry.example" compact /></p>
           <dl v-if="entry.opposite || entry.related?.length">
             <template v-if="entry.opposite"><dt>≠</dt><dd>{{ entry.opposite }}</dd></template>
             <template v-if="entry.related?.length"><dt>≈</dt><dd>{{ entry.related.join(', ') }}</dd></template>
@@ -199,6 +200,7 @@ function when(at: number) {
           <div class="phrase-line">
             <span v-for="(part, index) in lesson.parts" :key="index" class="phrase-part" :class="`role-${part.role}`"><b>{{ part.text }}</b><small>{{ ROLE_LABEL[part.role] }}</small></span>
             <button type="button" class="speak-button" aria-label="Listen" @click="speak(lesson.text)"><UiIcon name="speaker" /></button>
+            <SpeakTrainer :text="lesson.text" compact />
           </div>
           <p class="phrase-when"><span>When</span>{{ lesson.when }}</p>
           <p class="phrase-answers"><span>Guest may say</span><i v-for="answer in lesson.answers" :key="answer">“{{ answer }}”</i></p>

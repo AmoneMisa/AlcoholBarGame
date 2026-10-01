@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SpeakTrainer from '../learning/SpeakTrainer.vue';
 import { voiceProfileOf } from '../../domain/social/origin';
 import { guestVoice, speakLine } from '../../audio/index';
 import { FOODS } from '../../domain/foods';
@@ -341,7 +342,11 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         <p v-if="situation.line" class="situation-line">“{{ situation.line }}”</p>
         <small class="situation-hint">Choose what to say:</small>
         <div class="situation-choices">
-          <button v-for="choice in situation.choices" :key="choice.id" type="button" @click="game.answerSituation(customer.id, choice.id)"><span>{{ choice.say }}</span></button>
+          <div v-for="choice in situation.choices" :key="choice.id" class="situation-choice">
+            <button type="button" @click="game.answerSituation(customer.id, choice.id)"><span>{{ choice.say }}</span></button>
+            <button type="button" class="choice-speak" aria-label="Listen" title="Listen" @click="speak(choice.say)">🔊</button>
+            <SpeakTrainer :text="choice.say" compact />
+          </div>
         </div>
       </section>
       <section v-if="social && offerOpen" class="offer-panel" aria-label="Offer something">

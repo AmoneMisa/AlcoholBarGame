@@ -164,3 +164,7 @@
 .chance-parts .minus b { color: #e07a6a; }
 .chance-parts .plus b { color: #7cc686; }
 .offer-buttons { display: flex; gap: 8px; }
+
+.situation-choice { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.situation-choice > button:first-child { flex: 1 1 220px; text-align: left; }
+.choice-speak { border: 0; background: transparent; cursor: pointer; font-size: 1rem; }

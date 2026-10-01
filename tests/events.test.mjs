@@ -78,3 +78,38 @@ test('Clock keeps running with an event on', () => {
   state.barEvent = { id: 'happy-hour', startedAt: NOW, endsAt: NOW + 6e6 };
   advanceClock(state, context(NOW + 1000));
 });
+
+test('The speech checker marks the words that were not heard', async () => {
+  const { compareSpoken } = await import('../src/domain/english/speechCheck.ts');
+  assert.equal(compareSpoken('Would you like another drink?', 'would you like another drink').score, 100);
+  const partial = compareSpoken('Would you like another drink?', 'would like drink');
+  assert.ok(partial.score < 80 && partial.words.filter((item) => !item.ok).map((item) => item.word).includes('you'));
+  assert.equal(compareSpoken('Hello', '').score, 0);
+});
+
+test('Guests come from somewhere: spelling, local words, speed and age differ but stay the same for one person', async () => {
+  const { ORIGINS, originOf, spellFor, voiceProfileOf, ageGroupOf } = await import('../src/domain/social/origin.ts');
+  const ids = Array.from({ length: 60 }, (_, index) => ({ id: `g${index}`, characterId: `c${index}` }));
+  assert.ok(new Set(ids.map((item) => originOf(item).id)).size >= 5, 'several origins appear');
+  assert.ok(new Set(ids.map((item) => ageGroupOf(item))).size === 3, 'young, adult and old all appear');
+  assert.equal(originOf(ids[3]).id, originOf({ ...ids[3] }).id);
+  assert.equal(spellFor(ORIGINS.find((item) => item.id === 'us'), 'My favourite colour'), 'My favorite color');
+  assert.equal(spellFor(ORIGINS.find((item) => item.id === 'uk'), 'My favorite color'), 'My favourite colour');
+  const speeds = new Set(ids.map((item) => voiceProfileOf({ ...item, social: undefined }).speed.toFixed(2)));
+  assert.ok(speeds.size > 10, 'speeds differ');
+});
+
+test('A situation comes at least every 12 guests and never before the 4th guest', async () => {
+  const { pickSituation, noteSituationStarted } = await import('../src/sim/situations.ts');
+  const { state, guest } = guestIn({ phase: 'ordering' });
+  let seen = [];
+  let since = 0;
+  for (let index = 1; index <= 300; index++) {
+    since++;
+    const def = pickSituation(state, guest, 'arrival', () => .5);
+    if (def) { seen.push(since); since = 0; noteSituationStarted(state, () => .5); }
+  }
+  assert.ok(seen.length > 10, 'situations happen');
+  assert.ok(Math.min(...seen) >= 4, 'never within 3 guests of the last');
+  assert.ok(Math.max(...seen) <= 12, 'always within 12 guests');
+});
