@@ -393,5 +393,10 @@ function normalizeCompanions(input: unknown): import('./companions').CompanionSt
     assigned[region.id] = (Array.isArray(list) ? list : []).filter((id): id is string => typeof id === 'string' && id in owned && !placed.has(id)).slice(0, companionSlots(MAX_LEVEL)).map((id) => { placed.add(id); return id; });
   }
   const visits = source.visits && typeof source.visits.day === 'string' && source.visits.counts && typeof source.visits.counts === 'object' ? { day: source.visits.day, counts: Object.fromEntries(Object.entries(source.visits.counts).map(([id, count]) => [id, whole(count, 99)])) } : { day: '', counts: {} };
-  return { owned, shards, keepsakes, assigned, visits };
+  const spotlights: Record<string, { until: number; ready: number }> = {};
+  for (const id of Object.keys(owned)) {
+    const saved = (source.spotlights as Record<string, { until?: unknown; ready?: unknown }> | undefined)?.[id];
+    if (saved && Number.isFinite(saved.until) && Number.isFinite(saved.ready)) spotlights[id] = { until: Number(saved.until), ready: Number(saved.ready) };
+  }
+  return { owned, shards, keepsakes, assigned, visits, spotlights };
 }

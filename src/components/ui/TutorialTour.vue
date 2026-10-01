@@ -107,9 +107,13 @@ function place() {
   const dialog = [...document.querySelectorAll<HTMLElement>('.talk-popup, [aria-modal="true"]:not(.tour)')].map((element) => element.getBoundingClientRect()).find((box) => box.width > 200 && box.height > 200);
   const topY = dialog ? Math.max(8, dialog.top + 8) : Math.max(8, hud + 10);
   const bottomY = Math.max(topY, (dialog ? dialog.bottom - 8 : navTop - 12) - height);
-  const rects = targetRects();
-  const hidden = (y: number) => rects.reduce((sum, rect) => sum + Math.max(0, Math.min(y + height, rect.bottom) - Math.max(y, rect.top)) * Math.max(0, Math.min(box.right, rect.right) - Math.max(box.left, rect.left)), 0);
-  cardTop.value = hidden(topY) < hidden(bottomY) ? topY : bottomY;
+  // Only what the player can see counts: targets scrolled out of the dialog or the screen are not hidden by the card.
+  const areaTop = dialog ? dialog.top : 0;
+  const areaBottom = Math.min(window.innerHeight, dialog ? dialog.bottom : window.innerHeight);
+  const rects = targetRects().filter((rect) => rect.bottom > areaTop && rect.top < areaBottom);
+  const hidden = (y: number) => rects.reduce((sum, rect) => sum + Math.max(0, Math.min(y + height, rect.bottom, areaBottom) - Math.max(y, rect.top, areaTop)) * Math.max(0, Math.min(box.right, rect.right) - Math.max(box.left, rect.left)), 0);
+  // On a tie the card stays at the top, where it covers the least of the screen the player works in.
+  cardTop.value = hidden(bottomY) < hidden(topY) ? bottomY : topY;
 }
 
 async function show() {

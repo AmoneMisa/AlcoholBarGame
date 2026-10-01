@@ -144,3 +144,22 @@ test('Saves keep only known people, one bar each, and sane numbers; the achievem
   assert.deepEqual(state.companions.assigned.london, [], 'nobody is in two bars');
   assert.deepEqual(state.companions.visits, { day: '', counts: {} });
 });
+
+test('Spotlight doubles a working companion for half an hour, then they rest', () => {
+  const state = fresh();
+  const person = COMPANIONS[0];
+  state.companions = { owned: { [person.id]: BOND_STEPS[2] }, shards: {}, keepsakes: {}, assigned: {}, visits: { day: "", counts: {} } };
+  assert.throws(() => run(state, { type: 'spotlightCompanion', id: person.id }), /work in this bar/);
+  run(state, { type: 'assignCompanion', id: person.id });
+  const normal = companionBonus(state, person.bonus);
+  run(state, { type: 'spotlightCompanion', id: person.id });
+  state.lastClockAt = NOW + 60_000;
+  assert.equal(companionBonus(state, person.bonus), normal * 2);
+  assert.throws(() => run(state, { type: 'spotlightCompanion', id: person.id }, undefined, NOW + 60_000), /already in the spotlight/);
+  state.lastClockAt = NOW + 31 * 60_000;
+  assert.equal(companionBonus(state, person.bonus), normal);
+  assert.throws(() => run(state, { type: 'spotlightCompanion', id: person.id }, undefined, NOW + 31 * 60_000), /resting/);
+  run(state, { type: 'spotlightCompanion', id: person.id }, undefined, NOW + 7 * 3_600_000);
+  const saved = normalizePlayerState(JSON.parse(JSON.stringify(state)));
+  assert.ok(saved.companions.spotlights[person.id].until > NOW, 'the spotlight survives a save');
+});

@@ -56,6 +56,10 @@ export const KEEPSAKE_LIKED_POINTS = 40;
 export const VISIT_POINTS = 3;
 export const VISITS_PER_DAY = 3;
 export const KEEPSAKE_VISIT_CHANCE = .2;
+// Spotlight: ask someone who works in the bar to give their all. Their bonus counts double for a while, then they rest.
+export const SPOTLIGHT_MIN_BOND = 2;
+export const SPOTLIGHT_MS = 30 * 60_000;
+export const SPOTLIGHT_COOLDOWN_MS = 6 * 60 * 60_000;
 export const COMPANION_SLOTS_BASE = 2;
 export const COMPANION_SLOTS_EXTRA_LEVEL = 25;
 export const companionSlots = (playerLevel: number) => COMPANION_SLOTS_BASE + (playerLevel >= COMPANION_SLOTS_EXTRA_LEVEL ? 1 : 0);

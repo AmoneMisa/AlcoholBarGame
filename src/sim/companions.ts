@@ -1,6 +1,6 @@
 import { calendarDate } from '../domain/economy';
 import {
-  BONUSES, COMPANIONS, KEEPSAKE_CRYSTAL_PRICE, KEEPSAKE_LIKED_POINTS, KEEPSAKE_POINTS, KEEPSAKE_VISIT_CHANCE, MAX_BOND, BOND_STEPS, VISITS_PER_DAY, VISIT_POINTS,
+  BONUSES, COMPANIONS, SPOTLIGHT_COOLDOWN_MS, SPOTLIGHT_MIN_BOND, SPOTLIGHT_MS, KEEPSAKE_CRYSTAL_PRICE, KEEPSAKE_LIKED_POINTS, KEEPSAKE_POINTS, KEEPSAKE_VISIT_CHANCE, MAX_BOND, BOND_STEPS, VISITS_PER_DAY, VISIT_POINTS,
   bondLevel, bonusAmount, describeBonus, companionById, companionName, companionSlots, keepsakeDef, KEEPSAKE_IDS, type BonusId, type KeepsakeId
 } from '../domain/companions';
 import { levelFor, type PlayerState } from './state';
@@ -18,6 +18,8 @@ export interface CompanionState {
   assigned: Record<string, string[]>;
   /** Visits already rewarded today, per companion. */
   visits: { day: string; counts: Record<string, number> };
+  /** Spotlight: until when a person gives double, and when they can be asked again. */
+  spotlights?: Record<string, { until: number; ready: number }>;
 }
 export const emptyCompanions = (): CompanionState => ({ owned: {}, shards: {}, keepsakes: {}, assigned: {}, visits: { day: '', counts: {} } });
 const circle = (state: PlayerState): CompanionState => (state.companions ??= emptyCompanions());
@@ -27,8 +29,9 @@ export const hasJoined = (state: PlayerState, id: string) => id in (state.compan
 /** Who works in a bar now (the bar being managed unless another is named). */
 export const crewOf = (state: PlayerState, regionId: string = state.regionId): string[] => (state.companions?.assigned[regionId] ?? []).filter((id) => hasJoined(state, id));
 /** The sum of one bonus over the companions working in this bar, each at their own bond. */
+export const spotlightActive = (state: PlayerState, id: string, now: number = state.lastClockAt) => (state.companions?.spotlights?.[id]?.until ?? 0) > now;
 export const companionBonus = (state: PlayerState, bonus: BonusId, regionId: string = state.regionId): number =>
-  crewOf(state, regionId).reduce((sum, id) => (companionById(id)?.bonus === bonus ? sum + bonusAmount(bonus, bondOf(state, id)) : sum), 0);
+  crewOf(state, regionId).reduce((sum, id) => (companionById(id)?.bonus === bonus ? sum + bonusAmount(bonus, bondOf(state, id)) * (spotlightActive(state, id) ? 2 : 1) : sum), 0);
 export const companionBonuses = (state: PlayerState, regionId: string = state.regionId) => Object.fromEntries(BONUSES.map((item) => [item.id, companionBonus(state, item.id, regionId)])) as Record<BonusId, number>;
 
 const known = (id: unknown) => {
@@ -118,6 +121,19 @@ export function dismissCompanion(state: PlayerState, id: unknown): string {
   }
   if (!removed) throw new CompanionError(`${companionName(companion.id)} is not working in a bar.`);
   return `${companionName(companion.id)} is off duty.`;
+}
+
+/** A person who works in this bar gives double for half an hour, then rests for six hours. */
+export function spotlightCompanion(state: PlayerState, id: unknown, now: number): string {
+  const companion = known(id);
+  if (!crewOf(state).includes(companion.id)) throw new CompanionError(`${companionName(companion.id)} has to work in this bar first.`);
+  if (bondOf(state, companion.id) < SPOTLIGHT_MIN_BOND) throw new CompanionError(`Reach bond level ${SPOTLIGHT_MIN_BOND} with ${companionName(companion.id)} first.`);
+  const slot = ((circle(state).spotlights ??= {})[companion.id] ??= { until: 0, ready: 0 });
+  if (slot.until > now) throw new CompanionError(`${companionName(companion.id)} is already in the spotlight.`);
+  if (slot.ready > now) throw new CompanionError(`${companionName(companion.id)} is resting: ready in ${Math.ceil((slot.ready - now) / 3_600_000)} h.`);
+  slot.until = now + SPOTLIGHT_MS;
+  slot.ready = now + SPOTLIGHT_COOLDOWN_MS;
+  return `${companionName(companion.id)} is in the spotlight for ${SPOTLIGHT_MS / 60_000} minutes: ${describeBonus(companion.bonus, bondOf(state, companion.id) * 2)}.`;
 }
 
 /** A guest who is a companion was served well: shards if they have not joined, bond points if they have. */

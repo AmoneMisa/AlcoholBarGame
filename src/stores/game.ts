@@ -597,6 +597,7 @@ export const useGameStore = defineStore('game', () => {
   const buyKeepsake = (kind: string, quantity = 1) => dispatch({ type: 'buyKeepsake', kind, quantity });
   const assignCompanion = (id: string) => dispatch({ type: 'assignCompanion', id });
   const dismissCompanion = (id: string) => dispatch({ type: 'dismissCompanion', id });
+  const spotlightCompanion = (id: string) => dispatch({ type: 'spotlightCompanion', id });
   const hireStaff = () => dispatch({ type: 'hireStaff' });
   const upgradeStaff = (index: number) => dispatch({ type: 'upgradeStaff', index });
   const giveWater = (customerId: string) => dispatch({ type: 'giveWater', customerId });
@@ -687,7 +688,7 @@ export const useGameStore = defineStore('game', () => {
 
   const act = (action: GameAction) => dispatch(action);
   return {
-    topUpPreview, circle, crewBonus, recruitCompanion, giveKeepsake, buyKeepsake, assignCompanion, dismissCompanion, achievementStat, profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, act, visibleInventory, connectEpoch,
+    topUpPreview, circle, crewBonus, recruitCompanion, giveKeepsake, buyKeepsake, assignCompanion, dismissCompanion, spotlightCompanion, achievementStat, profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, act, visibleInventory, connectEpoch,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, sessionReady, ownedInteriorIds, barBackground, barInteriorStyle,

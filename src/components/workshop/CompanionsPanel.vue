@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { BOND_NAMES, BOND_STEPS, COMPANIONS, KEEPSAKES, KEEPSAKE_CRYSTAL_PRICE, KEEPSAKE_LIKED_POINTS, KEEPSAKE_POINTS, MAX_BOND, bondLevel, companionName, companionSlots, describeBonus, keepsakeDef, nextBondStep } from '../../domain/companions';
+import { SPOTLIGHT_MIN_BOND, SPOTLIGHT_MS, BOND_NAMES, BOND_STEPS, COMPANIONS, KEEPSAKES, KEEPSAKE_CRYSTAL_PRICE, KEEPSAKE_LIKED_POINTS, KEEPSAKE_POINTS, MAX_BOND, bondLevel, companionName, companionSlots, describeBonus, keepsakeDef, nextBondStep } from '../../domain/companions';
 import { REGIONS } from '../../domain/catalog';
 import { useGameStore } from '../../stores/game';
 import CharacterModel from '../characters/CharacterModel.vue';
@@ -11,6 +11,15 @@ import UiButton from '../ui/UiButton.vue';
 const game = useGameStore();
 const open = ref<string>('');
 const slots = computed(() => companionSlots(game.level));
+// Spotlight: what the button says and why it cannot be pressed right now.
+const spotState = (id: string) => {
+  const slot = game.circle.spotlights?.[id];
+  const now = game.nowMs;
+  if (slot && slot.until > now) return { label: `In the spotlight · ${Math.ceil((slot.until - now) / 60_000)} min left`, reason: 'Already in the spotlight.' };
+  if (slot && slot.ready > now) return { label: 'Spotlight', reason: `Resting: ready in ${Math.ceil((slot.ready - now) / 3_600_000)} h.` };
+  if (bondLevel(game.circle.owned[id] ?? 0) < SPOTLIGHT_MIN_BOND) return { label: 'Spotlight', reason: `Needs bond level ${SPOTLIGHT_MIN_BOND}.` };
+  return { label: 'Spotlight', reason: '' };
+};
 const crew = computed(() => (game.circle.assigned[game.regionId] ?? []).filter((id) => id in game.circle.owned));
 const cards = computed(() => COMPANIONS.map((person) => {
   const joined = person.id in game.circle.owned;
@@ -32,7 +41,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
     <section class="crew card">
       <h3>At the bar now <b>{{ crew.length }} / {{ slots }}</b></h3>
       <ul v-if="crew.length">
-        <li v-for="id in crew" :key="id"><b>{{ companionName(id) }}</b> — {{ describeBonus(COMPANIONS.find((item) => item.id === id)!.bonus, bondLevel(game.circle.owned[id] ?? 0)) }}<UiButton size="sm" @click="game.dismissCompanion(id)">Send home</UiButton></li>
+        <li v-for="id in crew" :key="id"><b>{{ companionName(id) }}</b> — {{ describeBonus(COMPANIONS.find((item) => item.id === id)!.bonus, bondLevel(game.circle.owned[id] ?? 0)) }}<UiButton size="sm" variant="solid" :reason="spotState(id).reason" :title="`Their bonus counts double for ${SPOTLIGHT_MS / 60000} minutes, then they rest for 6 hours.`" @click="game.spotlightCompanion(id)">{{ spotState(id).label }}</UiButton><UiButton size="sm" @click="game.dismissCompanion(id)">Send home</UiButton></li>
       </ul>
       <p v-else class="empty">Nobody works here yet. Choose someone below.</p>
     </section>
