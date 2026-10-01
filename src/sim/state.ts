@@ -7,6 +7,7 @@ import { levelPerks } from '../domain/progression';
 import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../domain/types';
 import { buildProfile, shortWish, type CustomerReply, type Fact } from '../domain/conversation/customerTalk';
 import type { BottleConversationFacts } from '../domain/conversation/bottleTalk';
+import { ensureSocial, rollSocial } from '../domain/social/generate';
 
 // The complete, serializable game state of one player. The server owns it; the client only displays it
 // (and, in offline practice mode, simulates it locally with the same rules).
@@ -71,6 +72,8 @@ export interface PlayerState {
   recipeCopies?: Record<string, number>;
   popularity: number;
   popularityBoost?: PopularityBoost;
+  // Clean and dirty ashtrays: guests who smoke ask for one, and it must be cleaned after they leave.
+  ashtrays?: { clean: number; dirty: number };
   // Day of the last rewarded visit to each friend's bar.
   friendVisits?: Record<string, string>;
   friendLabels?: Record<string, string>;
@@ -125,6 +128,9 @@ export function createInitialState(now = Date.now()): PlayerState {
   for (let seat = 0; seat < STARTER_GUESTS; seat++) {
     const guest = withUniqueLook(generateCustomer(2, RECIPES.slice(0, BASIC_RECIPE_COUNT), .35, REGIONS[0]!.marketFactor), starterGuests);
     guest.priceFactor = priceFactor;
+    // The first guests are always sober, so a new player's first conversations are the easy ones.
+    guest.social = rollSocial(guest, now, Math.random, { arrivesDrunk: 0 });
+    guest.social.staysFor = 0; // ...and each of them leaves after one drink; staying guests come later
     starterGuests.push(guest);
   }
   const firstGuest = starterGuests[0]!;
@@ -198,7 +204,11 @@ export function normalizePlayerState(state: PlayerState) {
   state.customers = Array.isArray(state.customers) ? state.customers : [];
   for (const customer of state.customers) {
     customer.smoker ??= [...customer.id].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 7 === 0;
+    ensureSocial(customer, 0);
   }
+  const ashtrays = state.ashtrays;
+  state.ashtrays = ashtrays && Number.isFinite(ashtrays.clean) && Number.isFinite(ashtrays.dirty)
+    ? { clean: Math.max(0, Math.floor(ashtrays.clean)), dirty: Math.max(0, Math.floor(ashtrays.dirty)) } : { clean: 4, dirty: 0 };
   const validRegions = new Set(REGIONS.map((region) => region.id));
   state.ownedBarIds = Array.isArray(state.ownedBarIds)
     ? [...new Set(state.ownedBarIds.filter((id) => validRegions.has(id)))]

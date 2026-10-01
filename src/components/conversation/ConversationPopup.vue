@@ -15,6 +15,9 @@ import { useGameStore } from '../../stores/game';
 import { useLearningStore } from '../../stores/learning';
 import { useGuide } from '../../composables/useGuide';
 import { serviceTemplates } from '../../domain/conversation/serviceTalk';
+import { DRUNK_LABEL, EMOTION_ICON, EMOTION_LABEL, drunkStage } from '../../domain/social/model';
+import { socialTemplates } from '../../domain/social/suggestions';
+import { leaveChance } from '../../sim/guests';
 import { guideIdForProduct } from '../../data/knowledge/alcohol';
 import BrandBottle from '../knowledge/BrandBottle.vue';
 import { serveTemplates } from '../../domain/brandServe';
@@ -75,8 +78,22 @@ const templates = computed(() => {
       : questionTemplates(talk.value?.facts ?? [], candidates.value);
   const turns = (talk.value?.lines.filter((line) => line.speaker === 'bartender').length ?? 0);
   const service = serviceTemplates(bottleOrder.value ? 'bottle' : 'drink', confirmed.value, turns).map((text) => ({ text }));
-  return confirmed.value || turns === 0 ? [...service, ...base] : [...base, ...service];
+  // Feelings first when something needs attention: a request, a drunk guest, or a guest who is just sitting with a drink.
+  const lively = customer.value ? socialTemplates(customer.value, game.nowMs).map((text) => ({ text })) : [];
+  const urgent = !!needNow.value || stage.value === 'drunk' || stage.value === 'very-drunk' || social.value?.phase === 'enjoying';
+  if (urgent) return [...lively, ...service, ...base];
+  return confirmed.value || turns === 0 ? [...service, ...base, ...lively] : [...base, ...service, ...lively];
 });
+// How the guest feels, how drunk they are, and what they are waiting for.
+const social = computed(() => customer.value?.social);
+const stage = computed(() => drunkStage(social.value?.drunk ?? 0));
+const needNow = computed(() => social.value?.need && social.value.need.since <= game.nowMs ? social.value.need.kind : undefined);
+const NEED_LABEL: Record<string, string> = { ashtray: '🚬 Wants an ashtray', water: '💧 Wants water', taxi: '🚕 Wants a taxi', chat: '💬 Wants to talk' };
+const leaveHint = (tone: 'gentle' | 'firm' | 'aggressive') => {
+  if (!customer.value) return '';
+  const chance = leaveChance(customer.value, tone);
+  return chance >= 65 ? 'likely to work' : chance >= 35 ? 'might work' : 'unlikely to work';
+};
 const tiles = ref<{ id: string; text: string }[]>([]);
 const picked = ref<string[]>([]);
 const pickedTiles = computed(() => picked.value.map((id) => tiles.value.find((tile) => tile.id === id)!).filter(Boolean));
@@ -285,9 +302,26 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
             <label>Order time <b>{{ game.orderCountdown }} · paused</b></label>
             <label>Your English <b>{{ accuracy }}%</b></label>
           </div>
+          <div v-if="social" class="talk-state">
+            <span class="state-chip" :class="social.emotion">{{ EMOTION_ICON[social.emotion] }} {{ EMOTION_LABEL[social.emotion] }}</span>
+            <span v-if="stage !== 'sober'" class="state-chip drunk">🥴 {{ DRUNK_LABEL[stage] }}</span>
+            <span v-if="needNow" class="state-chip need">{{ NEED_LABEL[needNow] }}</span>
+            <span v-if="social.taxiAt" class="state-chip need">🚕 Taxi on the way</span>
+            <label class="rapport" title="How much this guest likes you tonight">Likes you <span><i :style="{ width: social.rapport + '%' }"></i></span></label>
+          </div>
         </div>
         <CloseButton class="talk-close" label="Close conversation" @click="game.closeConversation()" />
       </header>
+      <div v-if="social" class="talk-actions" aria-label="Look after this guest">
+        <button type="button" :class="{ wanted: needNow === 'ashtray' }" :disabled="social.ashtray === 'given' || game.ashtrays.clean < 1" :title="social.ashtray === 'given' ? 'Already has one' : game.ashtrays.clean + ' clean ashtrays'" @click="game.giveAshtray(customer.id)">🚬 Ashtray</button>
+        <button type="button" :class="{ wanted: needNow === 'water' }" @click="game.giveWater(customer.id)">💧 Water</button>
+        <button type="button" :class="{ wanted: needNow === 'taxi' }" :disabled="!!social.taxiAt" @click="game.callTaxi(customer.id)">🚕 Call a taxi</button>
+        <span class="leave-group">Ask to leave
+          <button type="button" :title="leaveHint('gentle')" @click="game.askToLeave(customer.id, 'gentle')">Kindly</button>
+          <button type="button" :title="leaveHint('firm')" @click="game.askToLeave(customer.id, 'firm')">Firmly</button>
+          <button type="button" class="rude" :title="leaveHint('aggressive')" @click="game.askToLeave(customer.id, 'aggressive')">Rudely</button>
+        </span>
+      </div>
 
       <div class="talk-body">
         <div ref="log" class="talk-log" aria-live="polite">

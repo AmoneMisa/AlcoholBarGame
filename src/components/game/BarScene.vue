@@ -5,6 +5,7 @@ import { INGREDIENTS, RECIPES } from '../../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../../domain/bottleCatalog';
 import { buildProfile, shortWish } from '../../domain/conversation/customerTalk';
 import type { Customer } from '../../domain/types';
+import { DRUNK_LABEL, EMOTION_ICON, EMOTION_LABEL, drunkStage } from '../../domain/social/model';
 import type { CharacterExpression } from '../../domain/dialogue/types';
 import { useGameStore } from '../../stores/game';
 import { haptic } from '../../telegram/webapp';
@@ -279,6 +280,23 @@ const liquidColor = computed(() => {
 const expressionFor = (mood: string): CharacterExpression => ({
   calm: 'neutral', friendly: 'smile', impatient: 'impatient', angry: 'angry', sad: 'worried', tired: 'thinking', shy: 'embarrassed', confused: 'confused', wealthy: 'impressed', vip: 'smile'
 }[mood] as CharacterExpression ?? 'neutral');
+// A guest's feelings show on their face; the older mood only matters when a guest has none.
+const EMOTION_FACE: Record<string, CharacterExpression> = { happy: 'happy', upset: 'sad', angry: 'angry', tired: 'thinking', excited: 'very-happy', lonely: 'worried', nervous: 'embarrassed', relaxed: 'smile' };
+const faceOf = (customer: Customer): CharacterExpression => (customer.social ? EMOTION_FACE[customer.social.emotion] : undefined) ?? expressionFor(customer.mood);
+const NEED_ICON: Record<string, string> = { ashtray: '🚬', water: '💧', taxi: '🚕', chat: '💬' };
+// Small status icons above a guest: what they feel, how drunk they are, what they are waiting for.
+function badges(customer: Customer) {
+  const social = customer.social;
+  if (!social) return [];
+  const list: { icon: string; label: string }[] = [{ icon: EMOTION_ICON[social.emotion], label: EMOTION_LABEL[social.emotion] }];
+  const stage = drunkStage(social.drunk);
+  if (stage !== 'sober') list.push({ icon: '🥴', label: DRUNK_LABEL[stage] });
+  const need = social.need && social.need.since <= game.nowMs ? social.need.kind : undefined;
+  if (need) list.push({ icon: NEED_ICON[need] ?? '❗', label: 'Needs ' + need });
+  if (social.taxiAt) list.push({ icon: '🚕', label: 'Taxi on the way' });
+  if (social.event) list.push({ icon: '⚠️', label: 'Needs help' });
+  return list;
+}
 function bubbleText(customer: Customer) {
   if (customer.orderRevealed) return customer.request;
   if (customer.wish) return customer.wish;
@@ -438,14 +456,15 @@ onBeforeUnmount(() => {
     <div v-if="!preview" ref="castRef" class="bar-cast" @scroll.passive="onGuestScroll">
       <!-- Only the figure and the card take taps; the rest of the guest's column lets presses reach the shelves. -->
       <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" :style="customerStyle(index)" :aria-label="`Talk to ${customer.name}`" @click="game.openConversation(customer.id)">
-        <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="expressionFor(customer.mood)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
+        <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="faceOf(customer)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
         <div class="guest-card">
           <header><b>{{ customer.name }}</b><time v-if="customer.id === game.activeCustomerId">{{ game.orderCountdown }}</time></header>
-          <small>{{ customer.mood }}</small>
+          <small class="guest-badges"><span v-for="badge in badges(customer)" :key="badge.label" :title="badge.label">{{ badge.icon }}</span><i v-if="!customer.social">{{ customer.mood }}</i><i v-else>{{ customer.social.phase === 'enjoying' ? 'enjoying' : EMOTION_LABEL[customer.social.emotion].toLowerCase() }}</i></small>
           <p>{{ bubbleText(customer) }}</p>
-          <footer><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed }">{{ customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
+          <footer><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customer.social?.phase === 'enjoying' ? 'Enjoying the drink' : customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
         </div>
       </button>
+      <button v-if="game.ashtrays.dirty" type="button" class="clean-ashtrays" @click="game.cleanAshtrays()">🧹 Clean {{ game.ashtrays.dirty }} ashtray{{ game.ashtrays.dirty === 1 ? '' : 's' }}</button>
       <!-- The wait for the next guest is shown once, in the panel below the scene (with “Welcome now”). -->
     </div>
     <template v-if="guestsOverflow && !preview">

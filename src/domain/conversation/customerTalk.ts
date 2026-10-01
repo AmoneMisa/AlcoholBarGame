@@ -1,5 +1,6 @@
 import type { Customer, Recipe } from '../types';
 import { withArticle } from '../english/articles';
+import { openingFor } from '../social/talk';
 export { withArticle } from '../english/articles';
 
 // Turns a customer's hidden order into a taste profile they can talk about,
@@ -89,6 +90,12 @@ export function openingLine(customer: Customer, profile: DrinkProfile) {
   if (customer.specialRecipeRewardId) return `${customer.greeting} ${customer.request}`;
   const clue = TOPIC_LABEL[profile.clue];
   const likeLine = SPIRITS.includes(profile.clue) || FRUITS.includes(profile.clue) ? `I love the taste of ${clue}.` : profile.clue === 'sparkling' ? 'I love drinks with bubbles.' : `I like ${clue} drinks.`;
+  // A guest with feelings opens with how they feel (and an ashtray request, if they smoke), then names what they like.
+  const lively = openingFor(customer);
+  if (lively) {
+    const ashtray = customer.social?.need?.kind === 'ashtray' ? ' Could I have an ashtray, please?' : '';
+    return `${lively.text} ${likeLine} ${lively.ask}${ashtray}`;
+  }
   return `${MOOD_INTRO[customer.mood] ?? 'Hello.'} ${likeLine} Can you help me choose a drink?`;
 }
 

@@ -120,3 +120,18 @@
 @media (max-width: 700px) {
   .talk-portrait .art-character { top:-10px;left:calc(50% - 45px);width:90px;height:129px; }
 }
+
+/* Guests with feelings: state chips, the liking meter and the "look after this guest" strip */
+.talk-state { display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px; }
+.state-chip { padding:2px 9px;border-radius:999px;background:#2a3a55;color:#dbe6f5;font-size:11px;font-weight:700; }
+.state-chip.angry { background:#5a2326;color:#ffd0d0; }.state-chip.upset,.state-chip.lonely { background:#2b3350;color:#c9d6ff; }.state-chip.happy,.state-chip.excited,.state-chip.relaxed { background:#244533;color:#c9f3d9; }.state-chip.nervous,.state-chip.tired { background:#4a3d22;color:#ffe7b0; }
+.state-chip.drunk { background:#4a2a52;color:#f2d0ff; }.state-chip.need { background:#6a4a14;color:#ffe6a8; }
+.talk-state .rapport { display:flex;align-items:center;gap:6px;font-size:11px;color:#9fb0c7; }
+.talk-state .rapport span { display:block;width:70px;height:6px;border-radius:6px;background:#1c2940;overflow:hidden; }
+.talk-state .rapport i { display:block;height:100%;background:linear-gradient(90deg,#d0605a,#e6c35a,#6fcf97); }
+.talk-actions { display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 14px;border-bottom:1px solid #26344d;background:#12203a; }
+.talk-actions button { padding:5px 10px;border:1px solid #3b4d6b;border-radius:9px;background:#1a2a47;color:#e4ecf7;font-size:12px;cursor:pointer; }
+.talk-actions button:hover:not(:disabled) { border-color:#7fb6ff; }.talk-actions button:disabled { opacity:.45;cursor:not-allowed; }
+.talk-actions button.wanted { border-color:#f0c35a;box-shadow:0 0 0 1px #f0c35a55;background:#3a3016; }
+.talk-actions .leave-group { margin-left:auto;display:flex;align-items:center;gap:5px;font-size:11px;color:#9fb0c7; }
+.talk-actions .leave-group button.rude { border-color:#7a3a3a;color:#ffc9c9; }

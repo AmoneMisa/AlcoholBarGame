@@ -1308,3 +1308,6 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:clip}
 .currency-exchange > button.star-pack { border-color:#6b5a2c; }
 .currency-exchange > button.star-pack { position:relative; }
 .currency-exchange > button.star-pack em { position:absolute;top:-7px;left:10px;padding:1px 6px;border-radius:6px;background:#d2a24e;color:#17243a;font-size:7px;font-style:normal;font-weight:700;letter-spacing:.05em;text-transform:uppercase; }
+
+.guest-badges { display:flex;align-items:center;gap:3px; }.guest-badges i { font-style:normal;margin-left:2px;opacity:.85; }
+.clean-ashtrays { position:absolute;z-index:30;left:12px;bottom:12px;padding:6px 12px;border:1px solid #f0c35a;border-radius:10px;background:#3a3016;color:#ffe6a8;font-size:12px;cursor:pointer; }

@@ -7,7 +7,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   publicDir: isSsrBuild ? false : 'public',
   server: {
     host: true,
-    // `npm run dev` + `npm run dev:server:memory` (or dev:server): the game API runs on port 3000.
-    proxy: { '/api': 'http://localhost:3000' }
+    // `npm run dev` + `npm run dev:server:memory` (or dev:server): the game API runs on port 3000 (set API_URL to use another).
+    proxy: { '/api': process.env.API_URL ?? 'http://localhost:3000' }
   }
 }));

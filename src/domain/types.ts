@@ -83,6 +83,8 @@ export interface Customer {
   bottleRequest?: BottleRequest;
   selectedBottleId?: string;
   smoker?: boolean;
+  // Feelings, liking, drunkenness, needs and story: see social/model.ts. Missing on guests saved before it existed.
+  social?: import('./social/model').GuestSocial;
 }
 
 export interface AlcoholProduct {

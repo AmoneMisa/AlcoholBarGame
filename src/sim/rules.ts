@@ -1,4 +1,4 @@
-import { INGREDIENTS, MODIFIERS, RECIPES, REGIONS, SUPPLIERS } from '../domain/catalog';
+import { INGREDIENTS, MODIFIERS, RECIPES, REGIONS, SUPPLIERS, estimateRecipeAbv } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost, bottleSaleCrystalReward, bottleTotal, brandedServeCrystalReward } from '../domain/bottleCatalog';
 import { arrivalSkipCrystalCost, calendarDate, coins, specialtyFactor, supplierInCity, consecutiveDays, conversationCrystalReward, crystalExchange, dailyCoinsFor, dailyCrystalsFor, quotePurchase, recipePurchase } from '../domain/economy';
 import { withArticle } from '../domain/english/articles';
@@ -16,6 +16,11 @@ import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
+import { actsIn } from '../domain/social/acts';
+import { enjoyingOpening, openingFor, socialReply, voice, type Expression } from '../domain/social/talk';
+import { drunkStage } from '../domain/social/model';
+import { ensureSocial, rollSocial } from '../domain/social/generate';
+import { MAX_SEATS, afterServed, applySocialReply, askToLeave, callTaxi, cleanAshtrays, drunkGain, giveAshtray, giveWater, isOrdering, orderingGuests, removeGuest, scheduleArrival, tickGuests, ashtraysOf, type GuestContext } from './guests';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
 import { DELIVERY_DAY_MS, levelFor, normalizePlayerState, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
 
@@ -60,7 +65,13 @@ export type GameAction =
   | { type: 'offerSimilar'; customerId: string }
   | { type: 'rejectCustomer'; customerId: string }
   | { type: 'setAutoSupply'; enabled: boolean }
-  | { type: 'autoServe' };
+  | { type: 'autoServe' }
+  // Looking after the people at the bar: each names the guest it is for.
+  | { type: 'giveAshtray'; customerId: string }
+  | { type: 'cleanAshtrays' }
+  | { type: 'giveWater'; customerId: string }
+  | { type: 'callTaxi'; customerId: string }
+  | { type: 'askToLeave'; customerId: string; tone: 'gentle' | 'firm' | 'aggressive' };
 
 export class RuleError extends Error {}
 
@@ -106,10 +117,13 @@ const economyOf = (state: PlayerState, now: number) => {
   const region = REGIONS.find((item) => item.id === state.regionId)!;
   return economyAt(region.id, region.marketFactor, state.xp, now);
 };
-// Tips are a chance: the level sets the base rate, VIP and wealthy guests are more generous.
+// Tips are a chance: the level sets the base rate, VIP and wealthy guests are more generous, and a guest who likes the
+// bartender (or is a little drunk and happy) tips more often.
 function rollTip(state: PlayerState, guest: Customer, now: number, random: () => number) {
   const bonus = guest.mood === 'vip' || guest.mood === 'wealthy' ? .2 : 0;
-  return random() < Math.min(.95, economyOf(state, now).tipChance + bonus);
+  const social = guest.social;
+  const warmth = social ? (social.rapport - 50) / 250 + (social.drunk >= 25 && social.drunk < 75 ? .06 : 0) : 0;
+  return random() < Math.min(.95, Math.max(.05, economyOf(state, now).tipChance + bonus + warmth));
 }
 // Delivery time in days after the level's delivery perk.
 const deliveryDaysFor = (state: PlayerState, supplier: Supplier, now: number) => supplier.deliveryDays * economyOf(state, now).delivery;
@@ -186,32 +200,46 @@ function makeArrivingCustomer(state: PlayerState, now: number, random: () => num
   return priced(withUniqueLook(generateCustomer(level, knownRecipes(state), .35, priceFactor), []));
 }
 
+// What the guest rules need from this file: the arrival pace, and a fresh order for a guest who stays.
+function guestContext(state: PlayerState, now: number, random: () => number): GuestContext {
+  return {
+    now, random,
+    nextArrivalAt: () => nextArrival(state, now, random),
+    freshOrder: (guest) => {
+      const economy = economyOf(state, now);
+      const next = generateCustomer(levelFor(state.xp), knownRecipes(state), 0, economy.guestPriceFactor, .25);
+      const order: Partial<Customer> = {
+        orderRecipeId: next.orderRecipeId, modifierId: next.modifierId, request: next.request, orderKind: next.orderKind,
+        serveRequest: next.serveRequest, bottleRequest: undefined, selectedBottleId: undefined, specialRecipeRewardId: undefined,
+        budget: next.budget, patience: next.patience, patienceRemaining: next.patience, priceFactor: economy.guestPriceFactor
+      };
+      order.wish = wishFor({ ...guest, ...order } as Customer);
+      return order;
+    }
+  };
+}
+
 function welcomeNextCustomer(state: PlayerState, now: number, random: () => number) {
   const arrival = makeArrivingCustomer(state, now, random);
-  state.customers = [arrival];
+  arrival.social ??= rollSocial(arrival, now, random);
+  // Dirty ashtrays make a bar smell of old smoke: new guests like it a little less.
+  const dirty = ashtraysOf(state).dirty;
+  if (dirty) arrival.social.rapport = Math.max(0, arrival.social.rapport - Math.min(12, dirty * 4));
+  state.customers.push(arrival);
   state.activeCustomerId = arrival.id;
   state.nextCustomerAt = 0;
   state.lastClockAt = now;
   state.message = arrival.specialRecipeRewardId ? `VIP guest ${arrival.name} arrived with a recipe challenge.`
-    : `${arrival.mood === 'vip' ? 'VIP guest' : 'A new customer'} ${arrival.name} arrived.`;
+    : `${arrival.mood === 'vip' ? 'VIP guest' : 'A new customer'} ${arrival.name} arrived${dirty ? ' — and wrinkled their nose at the dirty ashtrays' : ''}.`;
 }
 
 // The current guest leaves (served, declined or out of time). Guests still seated keep waiting and the next
-// one in the row is served; only an empty bar schedules the next arrival.
+// one in the row is served; only a bar with nobody waiting to order schedules the next arrival.
 function scheduleNextCustomer(state: PlayerState, now: number, random: () => number) {
   const leaving = currentCustomer(state);
-  if (leaving) {
-    delete state.rewardedSentences[leaving.id];
-    delete state.conversations[leaving.id];
-  }
-  // Removed in place: on the client these rules run on reactive state, and re-assigning a filtered copy
-  // would store reactive proxies that structuredClone cannot save.
-  const seat = leaving ? state.customers.indexOf(leaving) : -1;
-  if (seat >= 0) state.customers.splice(seat, 1);
-  state.activeCustomerId = state.customers[0]?.id ?? '';
-  state.nextCustomerAt = state.customers.length ? 0 : nextArrival(state, now, random);
-  state.lastClockAt = now;
-  state.conversationCustomerId = undefined;
+  const guests = guestContext(state, now, random);
+  if (leaving) removeGuest(state, leaving, guests);
+  else scheduleArrival(state, guests);
 }
 
 function processDeliveries(state: PlayerState, now: number) {
@@ -226,7 +254,8 @@ function processDeliveries(state: PlayerState, now: number) {
   }
 }
 
-// Time passes on the server clock only: deliveries arrive, patience runs down, the next guest walks in.
+// Time passes on the server clock only: deliveries arrive, guests sober up, ask for things and order again,
+// patience runs down, the next guest walks in.
 export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now' | 'random' | 'spawnCustomers'>) {
   normalizePlayerState(state);
   state.conversations ??= {};
@@ -235,21 +264,25 @@ export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now
   if (state.popularityBoost?.kind === 'no-cooldown' && state.popularityBoost.until <= now) state.popularityBoost = undefined;
   processDeliveries(state, now);
   autoRestock(state, now);
-  if (!state.customers.length) {
-    state.lastClockAt = now;
-    if (context.spawnCustomers !== false && state.nextCustomerAt && now >= state.nextCustomerAt) welcomeNextCustomer(state, now, random);
-    else if (!state.nextCustomerAt) state.nextCustomerAt = nextArrival(state, now, random);
-    return;
+  const guests = guestContext(state, now, random);
+  tickGuests(state, guests, Math.max(0, (now - state.lastClockAt) / 1000));
+  // A guest walks in only while nobody is waiting to order and a seat is free.
+  if (!orderingGuests(state).length) {
+    if (context.spawnCustomers !== false && state.nextCustomerAt && now >= state.nextCustomerAt && state.customers.length < MAX_SEATS) welcomeNextCustomer(state, now, random);
+    else if (!state.nextCustomerAt) scheduleArrival(state, guests);
   }
+  const waiting = orderingGuests(state);
+  const guest = waiting.find((item) => item.id === state.activeCustomerId) ?? waiting[0];
+  if (!guest) { state.lastClockAt = now; return; }
   // Whole seconds only; the remainder carries over to the next tick.
   const elapsed = Math.max(0, Math.floor((now - state.lastClockAt) / 1000));
   state.lastClockAt = elapsed > 0 ? state.lastClockAt + elapsed * 1000 : Math.min(state.lastClockAt, now);
   // Reading and writing in the customer dialogue is learning time, so the order clock pauses.
   if (state.conversationCustomerId) return;
-  const guest = currentCustomer(state)!;
   guest.patienceRemaining = Math.max(0, guest.patienceRemaining - elapsed);
   if (guest.patienceRemaining <= 0) {
     const name = guest.name;
+    state.activeCustomerId = guest.id;
     scheduleNextCustomer(state, now, random);
     state.message = `${name} left because the order timer ran out.`;
   }
@@ -367,6 +400,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'serve': {
       const auto = action.auto === true;
       if (!guest) throw new RuleError('There is no order to serve.');
+      if (!isOrdering(guest)) throw new RuleError(`${guest.name} is still enjoying the last drink.`);
       if (guest.orderKind === 'bottle') throw new RuleError('This customer wants sealed bottles. Complete the sale in the conversation.');
       const mix = Array.isArray(action.mix) ? action.mix.filter((item) => INGREDIENTS.some((ingredient) => ingredient.id === item?.ingredientId))
         .map((item) => ({ ingredientId: item.ingredientId, amount: cleanAmount(item.amount, 1000) })).filter((item) => item.amount > 0) : [];
@@ -417,8 +451,10 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           : auto ? `Auto-served ${verdict.recipe.name}. Paid ${revenue.toFixed(2)} coins (no tip for automated drinks).${crystalNote}`
           : !tip ? `Perfect service. No tip this time.${crystalNote}`
           : bonus ? `Perfect service — classic touch with ${bonus}! Tip +${tip} coins.${crystalNote}` : `Perfect service. Tip +${tip} coins.${crystalNote}`;
-        scheduleNextCustomer(state, now, random);
-        state.message = note;
+        // Alcohol raises the guest's level; a guest who likes the bar may stay for another drink.
+        const abv = serveProduct ? serveProduct.abv * .8 : estimateRecipeAbv(verdict.recipe);
+        const outcome = afterServed(state, guest, drunkGain(abv), guestContext(state, now, random));
+        state.message = outcome === 'stays' ? `${note} ${guest.name} stays to enjoy the drink.` : note;
       } else {
         state.streak = 0;
         guest.patienceRemaining = Math.max(0, guest.patienceRemaining - 60);
@@ -716,6 +752,31 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.message = `${reward.label} sent to ${recipient}.`;
       break;
     }
+    case 'giveAshtray':
+    case 'giveWater':
+    case 'callTaxi':
+    case 'askToLeave': {
+      const target = state.customers.find((item) => item.id === action.customerId);
+      if (!target) throw new RuleError('This guest is no longer here.');
+      const guests = guestContext(state, now, random);
+      if (action.type === 'giveAshtray') {
+        const result = giveAshtray(state, target, now);
+        if (!result.ok) throw new RuleError(result.text);
+        state.message = result.text;
+      } else if (action.type === 'giveWater') state.message = giveWater(state, target, now);
+      else if (action.type === 'callTaxi') state.message = `${target.name}: “${callTaxi(state, target, guests)}”`;
+      else {
+        if (!['gentle', 'firm', 'aggressive'].includes(action.tone)) throw new RuleError('Choose how to ask.');
+        askToLeave(state, target, action.tone, guests);
+      }
+      break;
+    }
+    case 'cleanAshtrays': {
+      const cleaned = cleanAshtrays(state);
+      if (!cleaned) throw new RuleError('There is nothing to clean.');
+      state.message = `You cleaned ${cleaned} dirty ashtray${cleaned === 1 ? '' : 's'}.`;
+      break;
+    }
     case 'activatePopularityBoost': {
       if (state.popularity < 30) throw new RuleError('You need 30 popularity to activate a guest boost.');
       if (state.popularityBoost) throw new RuleError('A popularity boost is already active.');
@@ -798,13 +859,20 @@ function addLine(transcript: Transcript, speaker: 'customer' | 'bartender', text
   if (transcript.lines.length > MAX_LINES) transcript.lines.splice(0, transcript.lines.length - MAX_LINES);
 }
 
-function ensureTranscript(state: PlayerState, guest: Customer): Transcript {
+// How a guest who already knows what they want still sounds like a person: their feeling first.
+function feelingFirst(guest: Customer) {
+  const lively = openingFor(guest);
+  return lively ? `${lively.text} ` : '';
+}
+
+function ensureTranscript(state: PlayerState, guest: Customer, now = state.lastClockAt): Transcript {
   state.conversations ??= {};
   const existing = state.conversations[guest.id];
   if (existing) return existing;
   const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
-  const opening = guest.orderKind === 'bottle' ? bottleOpeningLine(guest)
-    : guest.orderKind === 'serve' || !recipe ? `${guest.greeting} ${guest.request}`
+  const opening = guest.social?.phase === 'enjoying' ? enjoyingOpening(guest, now)
+    : guest.orderKind === 'bottle' ? `${feelingFirst(guest)}${bottleOpeningLine(guest)}`
+    : guest.orderKind === 'serve' || !recipe ? `${guest.social ? feelingFirst(guest) : `${guest.greeting} `}${guest.request}`
       : openingLine(guest, buildProfile(recipe));
   // A bottle customer names the occasion in the opening line, so it is already known and never asked again.
   const bottleFacts: Transcript['bottleFacts'] = guest.orderKind === 'bottle' ? { occasion: guest.bottleRequest?.occasion ?? 'party' } : {};
@@ -839,15 +907,33 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
   const profile = guest.orderKind === 'cocktail' && recipe ? buildProfile(recipe) : undefined;
   const serveAnswer = guest.orderKind === 'serve' ? replyToServe(heard, guest, onShelf) : undefined;
   const namesOrder = !!findRecipeMention(heard, RECIPES) || !!findBottleMention(heard);
-  const service = serveAnswer || (namesOrder && guest.orderKind !== 'serve') ? undefined
+  // A person answers like a person first: small talk, kindness, offers, refusals and “time to go” come before order talk.
+  const turn = transcript.lines.length;
+  const lifelike = !serveAnswer && !namesOrder ? socialReply(guest, actsIn(heard), turn) : undefined;
+  const leaveTone = lifelike?.intent === 'leave-gentle' ? 'gentle' : lifelike?.intent === 'leave-firm' ? 'firm' : lifelike?.intent === 'leave-rude' ? 'aggressive' : undefined;
+  const leaving = leaveTone ? askToLeave(state, guest, leaveTone, guestContext(state, context.now, context.random ?? Math.random)) : undefined;
+  const social: (CustomerReply & { expression: Expression }) | undefined = leaving
+    ? { text: leaving.text, expression: leaving.outcome === 'leaves' ? 'smile' : 'disappointed', facts: [] }
+    : lifelike ? { text: lifelike.text, expression: lifelike.expression, facts: [] } : undefined;
+  if (lifelike && !leaving) {
+    applySocialReply(guest, lifelike);
+    if (lifelike.intent === 'refuse') ensureSocial(guest, context.now).refused = true;
+  }
+  const service = social || serveAnswer || (namesOrder && guest.orderKind !== 'serve') ? undefined
     : serviceReply(heard, { customer: guest, kind: guest.orderKind === 'bottle' ? 'bottle' : 'drink', confirmed: !!guest.orderRevealed, wish: profile ? shortWish(profile) : undefined });
   const reply: CustomerReply & { bottleFacts?: Transcript['bottleFacts']; selectedBottleId?: string } =
     (serveAnswer ? { text: serveAnswer.text, expression: serveAnswer.expression, facts: [] } : undefined)
+    ?? social
     ?? service
     ?? (guest.orderKind === 'serve' && guest.serveRequest ? { text: `Just ${serveName(guest.serveRequest)}, please.`, expression: 'smile', facts: [] }
       : guest.orderKind === 'bottle' ? replyToBottle(heard, guest, transcript.bottleFacts, marketFactor)
         : profile ? replyTo(heard, guest, profile, RECIPES, transcript.facts, MODIFIERS.find((item) => item.id === guest.modifierId)?.label)
           : { text: 'Sorry, I don’t understand.', expression: 'confused', facts: [] });
+  // After a little chat the guest remembers why they came: they nudge the order along.
+  const guestSocial = guest.social;
+  if (social && !leaving && guestSocial && guest.orderKind === 'cocktail' && !guest.orderRevealed && guestSocial.phase === 'ordering' && guestSocial.chatted.length >= 2 && guestSocial.rapport >= 45 && !guestSocial.refused) {
+    reply.text += ' Anyway, can you help me choose a drink?';
+  }
 
   // Effects happen here, on the server — the client cannot trigger them directly.
   if (serveAnswer?.switchTo && guest.serveRequest && substitutesFor(guest.serveRequest, onShelf).some((item) => item.id === serveAnswer.switchTo)) {
@@ -880,6 +966,7 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
     }
   }
   if (reply.wrongGuess) guest.patienceRemaining = Math.max(1, guest.patienceRemaining - 30);
-  addLine(transcript, 'customer', reply.text);
+  // A drunk guest sounds drunk.
+  addLine(transcript, 'customer', voice(guest, reply.text, turn));
   transcript.expression = reply.expression;
 }
