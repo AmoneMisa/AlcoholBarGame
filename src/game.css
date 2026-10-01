@@ -1340,3 +1340,5 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:clip}
 .rule-row { display:grid;grid-template-columns:30px 1fr;gap:8px;padding:7px 0;border-top:1px solid #304159; }
 .rule-icon { font-size:22px; }
 .rule-row small { display:block;opacity:.8; }
+
+.how-to-play { width:100%;margin-top:8px;padding:8px 10px;border:1px solid #5a6b86;border-radius:10px;background:#1d283b;color:inherit;font-size:12px;cursor:pointer; }

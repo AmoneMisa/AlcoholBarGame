@@ -11,6 +11,7 @@ defineEmits<{ design:[] }>();
 const game = useGameStore();
 const exchangeOpen = ref(false);
 const staffOpen = ref(false);
+const startTour = () => window.dispatchEvent(new Event('barlingo:tour'));
 const slots = computed(() => Array.from({ length: MAX_STAFF }, (_, index) => ({ index, profile: STAFF_PROFILES[index]!, unlockAt: STAFF_UNLOCK_LEVELS[index]!, member: game.staff[index], open: game.level >= STAFF_UNLOCK_LEVELS[index]! })));
 const teamPercent = computed(() => Math.round(teamShare(game.staff) * 100));
 const volumeOpen = ref(false);
@@ -71,11 +72,11 @@ onUnmounted(() => {
         </PopoverPanel>
       </div>
       <div class="staff-resource">
-        <button class="staff-open" type="button" :aria-expanded="staffOpen" :aria-label="`Servers: ${game.staff.length} of ${MAX_STAFF} hired`" @click="staffOpen = !staffOpen"><span class="staff-icons"><i v-for="slot in slots" :key="slot.index" :class="{ hired: !!slot.member, locked: !slot.open }">{{ slot.member ? slot.profile.icon : slot.open ? '➕' : '🔒' }}</i></span><span><small>SERVERS</small><b>{{ game.staff.length ? `${teamPercent}% of you` : 'Hire' }}</b></span></button>
+        <button class="staff-open" type="button" :aria-expanded="staffOpen" :aria-label="`Servers: ${game.staff.length} of ${MAX_STAFF} hired`" @click="staffOpen = !staffOpen"><span class="staff-icons"><i v-for="slot in slots" :key="slot.index" :class="{ hired: !!slot.member, locked: !slot.open }"><UiIcon name="server" /></i></span><span><small>SERVERS</small><b>{{ game.staff.length ? `${teamPercent}% of you` : 'Hire' }}</b></span></button>
         <PopoverPanel v-if="staffOpen" class="staff-panel" eyebrow="SERVERS" title="Your team" close-label="Close servers" @close="staffOpen = false">
           <p>Servers work for you while you are away and earn up to {{ Math.round(MAX_STAFF * 21.25) }}% of what you would earn serving alone with all four fully trained. They never bring crystals or tips.</p>
           <article v-for="slot in slots" :key="slot.index" class="staff-row">
-            <span class="staff-face">{{ slot.profile.icon }}</span>
+            <span class="staff-face" :class="{ hired: !!slot.member }"><UiIcon name="server" /></span>
             <span class="staff-text"><b>{{ slot.profile.name }} · {{ slot.profile.role }}</b><small v-if="slot.member">Level {{ slot.member.level }} / {{ MAX_STAFF_LEVEL }}</small><small v-else-if="slot.open">{{ slot.profile.about }}</small><small v-else>Opens at bar level {{ slot.unlockAt }}</small></span>
             <button v-if="slot.member" type="button" :disabled="slot.member.level >= MAX_STAFF_LEVEL || game.money < upgradeCost(slot.index, slot.member.level)" @click="game.upgradeStaff(slot.index)">{{ slot.member.level >= MAX_STAFF_LEVEL ? 'Max' : `Train ${upgradeCost(slot.index, slot.member.level)}` }}</button>
             <button v-else-if="slot.open && slot.index === game.staff.length" type="button" :disabled="game.money < hireCost(slot.index)" @click="game.hireStaff()">Hire {{ hireCost(slot.index) }}</button>
@@ -104,6 +105,7 @@ onUnmounted(() => {
             <output>{{ speechOn ? percent(speechVolume) : 'Off' }}</output>
             <button type="button" :aria-pressed="!speechOn" aria-label="Mute English voice" @click="speechOn = !speechOn">{{ speechOn ? 'Mute' : 'Unmute' }}</button>
           </div>
+          <button type="button" class="how-to-play" @click="volumeOpen = false; startTour()">❔ How to play (replay the tour)</button>
           <div class="volume-row voice-mode">
             <span id="voice-mode"><UiIcon name="chat" /> Guest voices</span>
             <select aria-labelledby="voice-mode" v-model="voiceMode"><option value="murmur">Murmur</option><option value="speech">Read aloud</option><option value="off">Off</option></select>
