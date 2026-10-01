@@ -3,8 +3,6 @@ import UiInput from '../ui/UiInput.vue';
 import { CHAT_GUIDE, type ChatGuideStep } from '../../domain/chatGuide';
 import { setPointer } from '../../guide/pointer';
 import SpeakTrainer from '../learning/SpeakTrainer.vue';
-import { voiceProfileOf } from '../../domain/social/origin';
-import { guestVoice, speakLine } from '../../audio/index';
 import { FOODS } from '../../domain/foods';
 const foodAssetBase = `${import.meta.env.BASE_URL}assets/drinks/food/`;
 const ashtrayArt = `${import.meta.env.BASE_URL}assets/bar/props/ashtray.webp`;
@@ -155,10 +153,6 @@ function phraseCandidates() {
 watch(() => talk.value?.lines.length ?? 0, (_count, before) => {
   for (const line of talk.value?.lines.slice(before ?? 0) ?? []) {
     if (line.speaker === 'customer') noteSeenWords(line.text);
-    // Only lines that arrive while the conversation is open are voiced, not the old ones when it opens.
-    if (before === undefined || !customer.value) continue;
-    const profile = voiceProfileOf(customer.value);
-    if (line.speaker === 'customer') { guestVoice(profile, line.text); speakLine(line.text, 'guest', profile); } else speakLine(line.text, 'bartender');
   }
   scrollLog();
 }, { immediate: true });

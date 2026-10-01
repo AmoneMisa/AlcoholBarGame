@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import UiCheckbox from '../ui/UiCheckbox.vue';
-import { voiceMode } from '../../audio/index';
 import { APP_BUILT, APP_VERSION, formatBuilt } from '../../version';
-import OptionSelect from '../game/OptionSelect.vue';
 import UiButton from '../ui/UiButton.vue';
 import ConfirmDialog from '../ui/ConfirmDialog.vue';
 import { ref } from 'vue';
@@ -10,7 +8,7 @@ import { useGameStore } from '../../stores/game';
 import SoundControls from './SoundControls.vue';
 import { NOTIFICATION_EVENTS, useNotificationsStore } from '../../stores/notifications';
 
-// Everything the player sets once and rarely touches again: sound, guest voices, help and the version of the game.
+// Everything the player sets once and rarely touches again: sound, notifications, help and the version of the game.
 const notifications = useNotificationsStore();
 const game = useGameStore();
 // Resetting the whole account works at any level, and only after the player agrees.
@@ -31,12 +29,6 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
       <div class="sound-rows">
         <SoundControls id-prefix="settings" />
       </div>
-    </section>
-
-    <section class="settings-card">
-      <h3>Guest voices</h3>
-      <p>How guests sound when they talk: a soft murmur, the sentence read aloud, or silent.</p>
-      <OptionSelect label="Guest voices" v-model="voiceMode" :options="[{ value: 'murmur', label: 'Murmur' }, { value: 'speech', label: 'Read aloud' }, { value: 'off', label: 'Off' }]" />
     </section>
 
     <section class="settings-card notification-settings">
