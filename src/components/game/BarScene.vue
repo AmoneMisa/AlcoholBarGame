@@ -153,6 +153,7 @@ watch([() => game.activeCustomerId, () => phoneTrack.value?.zone], ([id], previo
 const customerStyle = (index: number) => phoneTrack.value
   ? { left: `${Math.round(trackX(index))}px` }
   : { left: `${Math.round(wideSeats.value[index] ?? seatXs.value[index % seatXs.value.length] ?? sceneBox.value.width / 2)}px` };
+const rulesOpen = ref(false);
 const freshPickerOpen = ref(false);
 // The dragged bottle follows the finger, but while pouring it sits just above and left of the glass rim,
 // so the glass's stream starts at the bottle's neck instead of wherever the finger happens to be.
@@ -464,6 +465,11 @@ onBeforeUnmount(() => {
           <footer><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customer.social?.phase === 'enjoying' ? 'Enjoying the drink' : customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
         </div>
       </button>
+      <button type="button" class="house-rules-button" :aria-expanded="rulesOpen" @click="rulesOpen = !rulesOpen">📜 Rules<i v-if="game.ruleViolations" class="rules-count" :title="`${game.ruleViolations} rule breaks so far`">{{ game.ruleViolations }}</i></button>
+      <PopoverPanel v-if="rulesOpen" class="house-rules-panel" eyebrow="HOUSE RULES" :title="`Rules in ${game.region.name}`" close-label="Close house rules" @close="rulesOpen = false">
+        <p class="rules-note">These are game rules for practice, not legal advice. Explain them politely to guests. Inspectors count every rule you break{{ game.ruleViolations ? ` (so far: ${game.ruleViolations})` : '' }}.</p>
+        <article v-for="rule in game.houseRules" :key="rule.id" class="rule-row"><span class="rule-icon">{{ rule.icon }}</span><span><b>{{ rule.title }}</b><small>{{ rule.text }}</small></span></article>
+      </PopoverPanel>
       <div v-if="game.barEvent" class="bar-event" :class="game.barEvent.mood"><b>{{ game.barEvent.icon }} {{ game.barEvent.title }}</b><span>{{ game.barEvent.description }}</span></div>
       <button v-if="game.ashtrays.dirty" type="button" class="clean-ashtrays" @click="game.cleanAshtrays()">🧹 Clean {{ game.ashtrays.dirty }} ashtray{{ game.ashtrays.dirty === 1 ? '' : 's' }}</button>
       <!-- The wait for the next guest is shown once, in the panel below the scene (with “Welcome now”). -->
