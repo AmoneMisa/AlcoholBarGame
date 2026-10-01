@@ -26,7 +26,7 @@ const app = createApp({
     api.get('/api/health', async (_request, response) => {
       try {
         await pool.query('SELECT 1');
-        response.json({ status: 'ok', database: 'connected', telegram: telegramBot.status() });
+        response.json({ status: 'ok', version: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : 'dev', built: typeof __APP_BUILT__ === 'string' ? __APP_BUILT__ : undefined, database: 'connected', telegram: telegramBot.status() });
       } catch {
         response.status(503).json({ status: 'error', database: 'unavailable', telegram: telegramBot.status() });
       }
@@ -45,12 +45,13 @@ const app = createApp({
 const here = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.resolve(here, '../dist');
 // Vite's hashed files (index-Ab12Cd34.js) never change, so they are cached for a year. Art and audio keep their
-// names across releases, so they are cached for a day and then revalidated with their ETag.
+// names across releases, so they are cached for an hour and then revalidated with their ETag: a changed picture
+// shows up within the hour, and an unchanged one costs only a tiny "not modified" answer.
 const HASHED = /-[A-Za-z0-9_-]{8}\.(js|css|dic|aff)$/;
 app.use(express.static(dist, {
   index: false,
   setHeaders(response, file) {
-    response.setHeader('Cache-Control', HASHED.test(file) ? 'public, max-age=31536000, immutable' : 'public, max-age=86400, stale-while-revalidate=604800');
+    response.setHeader('Cache-Control', HASHED.test(file) ? 'public, max-age=31536000, immutable' : 'public, max-age=3600, must-revalidate');
   }
 }));
 app.use((request, response, next) => request.path.startsWith('/api/') ? next() : response.sendFile(path.join(dist, 'index.html')));

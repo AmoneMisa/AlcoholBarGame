@@ -713,3 +713,16 @@ test('A friend’s bar carries the profile, old saves get a served count, and th
   assert.equal(old.served, 42);
   assert.deepEqual(old.servedByBar, { [old.regionId]: 42 });
 });
+
+test('The build version is stamped (dev when built locally), shown in a readable form, and unchanged files are revalidated within the hour', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { APP_VERSION, formatBuilt } = await import('../src/version.ts');
+  assert.equal(APP_VERSION, 'dev');
+  assert.equal(formatBuilt('2026-10-01T11:04:06.000Z'), '2026-10-01 11:04 UTC');
+  assert.equal(formatBuilt('nonsense'), '');
+  const server = readFileSync('server/index.mjs', 'utf8');
+  assert.match(server, /max-age=3600, must-revalidate/);
+  assert.doesNotMatch(server, /max-age=86400/);
+  assert.match(readFileSync('Dockerfile', 'utf8'), /ARG GIT_SHA/);
+  assert.match(readFileSync('.github/workflows/docker-master.yml', 'utf8'), /GIT_SHA=\$\{\{ github\.sha \}\}/);
+});

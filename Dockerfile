@@ -6,6 +6,9 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
+# The commit being built, so the app and /api/health can say which version is running.
+ARG GIT_SHA=dev
+ENV GIT_SHA=$GIT_SHA
 RUN npm run build
 
 FROM node:24-alpine AS runtime
