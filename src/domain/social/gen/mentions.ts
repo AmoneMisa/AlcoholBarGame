@@ -76,12 +76,18 @@ const SHARE: Record<Opinion, string[]> = {
 const DISTRACTED = ['[Hm|Oh|Ah], {thing}. [That sounds nice.|Good for you.|Sounds good.] Sorry, I am [still thinking about|stuck on|worried about] {hook}.', '{Thing}? [Maybe later|Not now|Another time], if you do not mind. [My mind is somewhere else tonight.|I am not in the mood.|I cannot think about it now.]', '[Yes|Sure|OK], {thing} is nice. Sorry, {hook} is [on my mind|all I can think about|still in my head].', '[Hmm|Oh], {thing}. [Sorry|I am sorry], I am a bit [distracted|far away|tired] tonight.'];
 export const TOPIC_HOOK: Record<string, string> = { work: 'work', relationship: 'my partner', money: 'money', family: 'my family', sports: 'the match', celebration: 'my day', travel: 'my trip', health: 'my health', weather: 'the weather' };
 
-export interface MentionContext { stance: Stance; distracted?: boolean; topic?: string }
+export interface MentionContext { stance: Stance; distracted?: boolean; topic?: string; /** The guest still has to order: a few words, then back to the drink. */ ordering?: boolean }
+const BRIEF = ['{Thing}? Nice.', 'Oh, {thing}. Cool.', 'Nice, {thing}.', 'OK, {thing}. Good for you.', '{Thing}, nice.', 'Ah, {thing}. Fine.'];
+const BRIEF_DISTRACTED = ['Hm, OK.', 'Sorry, my mind is elsewhere.', 'Mm. Not now, sorry.'];
 
 export function reactToMention(customer: Customer, mention: Mention, seed: string, context: MentionContext = { stance: 'ask' }): { text: string; opinion: Opinion; asks: boolean } {
   const persona = personaOf(customer);
   const random = rngOf(seed);
   const thing = mention.thing;
+  if (context.ordering) {
+    const text = expand(pickFrom(context.distracted ? BRIEF_DISTRACTED : BRIEF, random), { thing, Thing: thing }, random);
+    return { text, opinion: context.distracted ? 'meh' : opinionOf(customer, mention), asks: false };
+  }
   if (context.distracted) {
     const hook = TOPIC_HOOK[context.topic ?? ''] ?? 'my day';
     return { text: expand(pickFrom(DISTRACTED, random), { thing, Thing: thing, hook, Hook: hook }, random), opinion: 'meh', asks: false };
@@ -109,5 +115,5 @@ const MEMORY: Record<MentionKind, string[]> = {
 export const memoryLine = (_customer: Customer, heard: { kind: MentionKind; thing: string }, seed: string) => { const random = rngOf(seed); return expand(pickFrom(MEMORY[heard.kind], random), { thing: heard.thing }, random); };
 
 export function allMentionTexts(): string[] {
-  return [...Object.values(REACT).flatMap((byOpinion) => Object.values(byOpinion).flat()), ...Object.values(SHARE).flat(), ...DISTRACTED, ...Object.values(ASK_BACK), ...Object.values(TOPIC_HOOK), ...Object.values(MEMORY).flat(), ...Object.values(WORDS).flat()];
+  return [...Object.values(REACT).flatMap((byOpinion) => Object.values(byOpinion).flat()), ...Object.values(SHARE).flat(), ...DISTRACTED, ...BRIEF, ...BRIEF_DISTRACTED, ...Object.values(ASK_BACK), ...Object.values(TOPIC_HOOK), ...Object.values(MEMORY).flat(), ...Object.values(WORDS).flat()];
 }

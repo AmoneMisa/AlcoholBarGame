@@ -195,7 +195,9 @@ export function replyTo(text: string, customer: Customer, profile: DrinkProfile,
     if (next) return { text: describe(next, true, profile).replace(/^Yes, /, '').replace(/^./, (letter) => letter.toUpperCase()), expression: 'thinking', facts: [{ topic: next, likes: true }] };
     return { text: 'I think you know everything now. What do you recommend?', expression: 'smile', facts: [] };
   }
-  return { text: 'Sorry, I don’t understand. You can ask about the taste, fruit, strength or bubbles.', expression: 'confused', facts: [] };
+  // Said differently each time, so a guest who is not understood twice does not repeat the same sentence.
+  const confused = ['Sorry, I don’t understand. You can ask about the taste, fruit, strength or bubbles.', 'Sorry, I don’t understand. Ask me what I like, for example sweet or sour.', 'Sorry, I don’t understand. Maybe ask me about the taste?', 'Hmm, I don’t understand. Do I want something strong, light or fresh? Ask me!'];
+  return { text: confused[(text.length + customer.id.length + revealedFacts.length) % confused.length]!, expression: 'confused', facts: [] };
 }
 
 // Question templates for the word-tile mode.

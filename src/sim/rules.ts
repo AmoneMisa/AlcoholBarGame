@@ -1151,7 +1151,7 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
   }
   // A drunk guest sounds drunk.
   // Answers that give a clue are not dressed up with local words: the learner must read them clearly.
-  const clue = !!reply.facts.length || !!reply.bottleFacts || !!reply.wrongGuess || !!reply.confirmed;
+  const clue = !!reply.facts.length || !!reply.bottleFacts || !!reply.wrongGuess || !!reply.confirmed || reply.expression === 'confused';
   addLine(transcript, 'customer', voice(guest, reply.text, turn, !clue));
   transcript.expression = reply.expression;
 }

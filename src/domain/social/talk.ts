@@ -266,7 +266,7 @@ export function socialReply(customer: Customer, acts: Act[], turn: number, said 
   if (social && mention && (!acts.length || ['weather', 'sports', 'music', 'travel'].includes(acts[0]!))) {
     // A guest with something heavy on their mind does not switch subject at once.
     const distracted = (social.emotion === 'upset' || social.emotion === 'angry' || social.emotion === 'tired' || social.emotion === 'nervous') && social.thread?.kind === 'bad';
-    const reaction = reactToMention(customer, mention, `${customer.id}:${turn}:m`, { stance: stanceOf(said), distracted, topic: social.thread?.topic ?? social.topic });
+    const reaction = reactToMention(customer, mention, `${customer.id}:${turn}:m`, { stance: stanceOf(said), distracted, topic: social.thread?.topic ?? social.topic, ordering: social.phase === 'ordering' });
     return { text: reaction.text, expression: reaction.opinion === 'love' ? 'happy' : 'smile', rapport: reaction.opinion === 'love' ? 6 : reaction.opinion === 'meh' ? 3 : 1, heard: mention, asked: reaction.asks && social.phase === 'enjoying', chatted: 'mention' };
   }
   // A guest who asked the bartender a question reacts to whatever comes back, in a human way.
