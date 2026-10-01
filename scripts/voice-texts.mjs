@@ -3,6 +3,8 @@ import { VOCABULARY } from '../src/domain/english/vocabulary.ts';
 import { PHRASE_GROUPS } from '../src/domain/english/phrases.ts';
 import { RECIPES } from '../src/domain/catalog.ts';
 import { MORE_GUIDES } from '../src/data/knowledge/cocktailsMore.ts';
+import { SITUATIONS } from '../src/domain/situations/catalog.ts';
+import { FOODS } from '../src/domain/foods.ts';
 import { BRANDS_A } from '../src/data/knowledge/brandsA.ts';
 import { BRANDS_B } from '../src/data/knowledge/brandsB.ts';
 import { BRANDS_C } from '../src/data/knowledge/brandsC.ts';
@@ -15,4 +17,7 @@ for (const recipe of RECIPES) texts.add(recipe.name);
 // The description of each newer cocktail is read aloud too (the speaker button in its guide).
 for (const guide of Object.values(MORE_GUIDES)) texts.add(guide.summary);
 for (const table of [BRANDS_A, BRANDS_B, BRANDS_C, BRANDS_D]) for (const list of Object.values(table)) for (const brand of list) texts.add(brand.name);
+// Everything said in the situations, by the guest and by the bartender, and the food menu.
+for (const def of SITUATIONS) for (const stage of def.stages) { texts.add(stage.guest); for (const choice of stage.choices) { texts.add(choice.say); for (const outcome of choice.outcomes) texts.add(outcome.say); } }
+for (const food of FOODS) { texts.add(food.name); texts.add(food.menu); }
 process.stdout.write(JSON.stringify([...texts].map((text) => text.trim()).filter(Boolean), null, 1));

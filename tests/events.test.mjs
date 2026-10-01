@@ -148,3 +148,18 @@ test('A low-level bar cannot hire the next server', () => {
   state.xp = 0;
   assert.throws(() => applyAction(state, { type: 'hireStaff' }, context()), /higher bar level/);
 });
+
+test('Asking about allergies is understood: a guest with one says so, and then the food is refused', async () => {
+  const { actsIn } = await import('../src/domain/social/acts.ts');
+  const { socialReply } = await import('../src/domain/social/talk.ts');
+  assert.equal(actsIn('Do you have any allergies?')[0], 'askAllergy');
+  const { state, guest } = guestIn({ allergy: 'nuts', hungry: true });
+  state.inventories[state.regionId].find((item) => item.ingredientId === 'nuts').amount = 5;
+  const reply = socialReply(guest, ['askAllergy'], 1);
+  assert.match(reply.text, /allergic to nuts/);
+  assert.equal(guest.social.allergyKnown, true);
+  assert.throws(() => applyAction(state, { type: 'pitchStart', customerId: guest.id, kind: 'food', itemId: 'nuts' }, context()), /allergic/);
+  const { state: other, guest: calm } = guestIn({ hungry: false });
+  assert.match(socialReply(calm, ['offerFood'], 1).text, /not hungry/);
+  assert.ok(other);
+});

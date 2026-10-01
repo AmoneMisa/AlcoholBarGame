@@ -1,12 +1,13 @@
 import { MORE_VOCABULARY } from './vocabularyMore';
 import { SITUATION_VOCABULARY } from './vocabularySituations';
+import { FOOD_VOCABULARY } from './vocabularyFood';
 
 // Bar and shop vocabulary for learners: every entry has a simple meaning, a real bar example,
 // pronunciation, and (where useful) an opposite or a related word to learn next.
 
 export type VocabTopic = 'Taste' | 'Strength & texture' | 'Fruit & ingredients' | 'Feelings' | 'At the bar' | 'Polite phrases' | 'Shop & products' | 'Money & payment'
   | 'Age & documents' | 'Delivery & packages' | 'Orders & schedules' | 'Deals & discounts' | 'Events & bookings' | 'Responsible service'
-  | 'First aid' | 'Emergencies & security' | 'Payments & currency' | 'Breakage & damage' | 'Rules & law' | 'Guests & feelings' | 'Celebrations';
+  | 'First aid' | 'Emergencies & security' | 'Payments & currency' | 'Breakage & damage' | 'Rules & law' | 'Guests & feelings' | 'Celebrations' | 'Food & pairing';
 
 export interface VocabEntry {
   word: string;
@@ -121,12 +122,13 @@ export const VOCABULARY: VocabEntry[] = [
   { word: 'exchange', ipa: '/ɪksˈtʃeɪndʒ/', pos: 'verb', topic: 'Money & payment', level: 'B1', meaning: 'To give back a product and take a different one.', example: 'You can exchange it within fourteen days.', related: ['refund'], forms: ['exchanged'] },
   { word: 'afford', ipa: '/əˈfɔːd/', pos: 'verb', topic: 'Money & payment', level: 'B1', meaning: 'To have enough money to buy something.', example: 'I can’t afford the big bottle today.', note: 'Usually with can / can’t: “I can afford it.”' }
   ,...MORE_VOCABULARY,
-  ...SITUATION_VOCABULARY
+  ...SITUATION_VOCABULARY,
+  ...FOOD_VOCABULARY
 ];
 
 export const VOCAB_TOPICS: VocabTopic[] = ['Taste', 'Strength & texture', 'Fruit & ingredients', 'Feelings', 'At the bar', 'Polite phrases', 'Shop & products', 'Money & payment',
   'Age & documents', 'Events & bookings', 'Responsible service', 'Delivery & packages', 'Orders & schedules', 'Deals & discounts',
-  'Guests & feelings', 'First aid', 'Emergencies & security', 'Payments & currency', 'Breakage & damage', 'Rules & law', 'Celebrations'];
+  'Guests & feelings', 'First aid', 'Emergencies & security', 'Payments & currency', 'Breakage & damage', 'Rules & law', 'Celebrations', 'Food & pairing'];
 
 // Which job a topic belongs to. Polite phrases and feelings help in both.
 export const TOPIC_CONTEXT: Record<VocabTopic, 'bar' | 'shop' | 'buyer' | 'both'> = {
@@ -134,7 +136,7 @@ export const TOPIC_CONTEXT: Record<VocabTopic, 'bar' | 'shop' | 'buyer' | 'both'
   'Shop & products': 'shop', 'Money & payment': 'shop',
   'Age & documents': 'both', 'Events & bookings': 'bar', 'Responsible service': 'bar',
   'Delivery & packages': 'buyer', 'Orders & schedules': 'buyer', 'Deals & discounts': 'buyer',
-  'Guests & feelings': 'bar', 'First aid': 'both', 'Emergencies & security': 'both', 'Payments & currency': 'both', 'Breakage & damage': 'both', 'Rules & law': 'both', Celebrations: 'bar'
+  'Guests & feelings': 'bar', 'First aid': 'both', 'Emergencies & security': 'both', 'Payments & currency': 'both', 'Breakage & damage': 'both', 'Rules & law': 'both', Celebrations: 'bar', 'Food & pairing': 'bar'
 };
 
 // Look up a word as it appears in a sentence (any listed form, any case).

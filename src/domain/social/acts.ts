@@ -4,7 +4,7 @@
 
 export type Act =
   | 'greet' | 'howAreYou' | 'askProblem' | 'empathy' | 'compliment' | 'askWork' | 'weather' | 'sports' | 'music' | 'travel' | 'askName'
-  | 'offerWater' | 'offerFood' | 'offerAnother' | 'offerTaxi' | 'offerAshtray'
+  | 'askAllergy' | 'offerWater' | 'offerFood' | 'offerAnother' | 'offerTaxi' | 'offerAshtray'
   | 'refuse' | 'leaveGentle' | 'leaveFirm' | 'leaveRude' | 'rude'
   | 'apology' | 'thanks' | 'goodbye' | 'checkIn';
 
@@ -26,6 +26,7 @@ const RULES: [Act, RegExp][] = [
   ['checkIn', /(everything (is )?(ok|okay|alright|fine|good)|is it (ok|okay|good|fine)|how is your drink|are you enjoying|enjoying (your|the) drink)/],
   ['askWork', /\b(what do you do|where do you work|what('s| is) your job|what is your job)\b/],
   ['askName', /\b(what('s| is) your name|nice to meet you)\b/],
+  ['askAllergy', /\b(allerg\w*|gluten|lactose|intoleran\w*|anything (i|you) (should|must|can't|cannot) (avoid|eat)|any (food )?restrictions?)\b/],
   ['offerAshtray', /\b(ashtray|cigarette|lighter|smoking)\b/],
   ['offerWater', /\b(would you like|can i get you|shall i (get|bring)|do you want|how about|here is|here's|i'll bring you)\b.*\bwater\b/],
   ['offerFood', /\b(hungry|snack|snacks|something to eat|food|eat|plate|fries|chips|cheese|meat|garlic|nuts|olives|bread|sausage)\b/],

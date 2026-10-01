@@ -256,7 +256,15 @@ export function socialReply(customer: Customer, acts: Act[], turn: number): Soci
   if (main === 'howAreYou') return { text: choose(HOW_ARE_YOU[emotion], seed), expression: bad(emotion) ? 'thinking' : 'smile', rapport: rapportBy(social, 6), chatted: 'how' };
   if (main === 'askWork') return { text: `${choose(JOBS, customer.id)} And you? Do you like being a bartender?`, expression: 'smile', rapport: rapportBy(social, 4), chatted: 'work' };
   if (main === 'askName') return { text: `I am ${customer.name}. Nice to meet you!`, expression: 'smile', rapport: rapportBy(social, 3) };
-  if (main === 'offerFood') return { text: choose(FOOD, customer.id + 'food'), expression: 'smile', rapport: 2 };
+  if (main === 'askAllergy') {
+    // Asking is always good service. A guest with an allergy says so, and now the bartender knows.
+    if (social.allergy) {
+      social.allergyKnown = true;
+      return { text: social.allergy === 'nuts' ? 'Yes, actually. I am allergic to nuts. Thank you for asking, that is very kind!' : 'Yes, I cannot have dairy. No cheese or cream for me, please. Thank you for asking!', expression: 'smile', rapport: rapportBy(social, 8) };
+    }
+    return { text: choose(['No, I can eat everything. But thank you for asking!', 'Nothing special, thanks. That is a nice question to ask.'], seed), expression: 'smile', rapport: rapportBy(social, 4) };
+  }
+  if (main === 'offerFood') return { text: social.hungry === false ? 'No, thanks. I am not hungry right now.' : choose(FOOD.slice(0, 2), customer.id + 'food'), expression: 'smile', rapport: 2 };
   if (main === 'checkIn') return { text: choose(CHECK_IN[emotion], seed), expression: 'smile', rapport: rapportBy(social, 3) };
   if (main === 'offerAnother' && social.phase === 'enjoying') return { text: choose(NOT_YET_ORDER, seed), expression: 'smile', rapport: 1 };
   if (main === 'thanks') return { text: choose(THANKS, seed), expression: 'smile', rapport: 1 };
