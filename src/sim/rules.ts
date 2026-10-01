@@ -26,7 +26,7 @@ import { FEATURED_MAX } from '../domain/profile';
 import { collectChatter, reactionToServed } from './chatter';
 import { addStat, raiseStat, syncDerivedStats } from '../domain/achievementStats';
 import { accrueStaff, hireStaff, upgradeStaff } from './staff';
-import { CompanionError, assignCompanion, buyKeepsake, companionVisit, dismissCompanion, giveKeepsake, recruitCompanion, spotlightCompanion } from './companions';
+import { CompanionError, assignCompanion, buyKeepsake, companionVisit, dismissCompanion, giveKeepsake, recruitCompanion, spotlightCompanion, levelUpCompanion } from './companions';
 import { applyPromo, barEventFor, tickBarEvent } from './events';
 import { adjustPitch, askPitch, cancelPitch, pitchChance, startPitch } from './pitch';
 import { pitchActsIn } from '../domain/social/pitchActs';
@@ -90,6 +90,7 @@ export type GameAction =
   | { type: 'assignCompanion'; id: string }
   | { type: 'dismissCompanion'; id: string }
   | { type: 'spotlightCompanion'; id: string }
+  | { type: 'levelUpCompanion'; id: string }
   | { type: 'hireStaff' }
   | { type: 'upgradeStaff'; index: number }
   // Offering a guest another drink or some food: start the offer, talk, then ask (the chance is shown and changes as you talk).
@@ -1021,13 +1022,15 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'buyKeepsake':
     case 'assignCompanion':
     case 'spotlightCompanion':
+    case 'levelUpCompanion':
     case 'dismissCompanion': {
       try {
         state.message = action.type === 'recruitCompanion' ? recruitCompanion(state, action.id)
           : action.type === 'giveKeepsake' ? giveKeepsake(state, action.id, action.kind)
           : action.type === 'buyKeepsake' ? buyKeepsake(state, action.kind, action.quantity)
           : action.type === 'assignCompanion' ? assignCompanion(state, action.id)
-          : action.type === 'spotlightCompanion' ? spotlightCompanion(state, action.id, now) : dismissCompanion(state, action.id);
+          : action.type === 'spotlightCompanion' ? spotlightCompanion(state, action.id, now)
+          : action.type === 'levelUpCompanion' ? levelUpCompanion(state, action.id) : dismissCompanion(state, action.id);
       } catch (error) {
         if (error instanceof CompanionError) throw new RuleError(error.message);
         throw error;

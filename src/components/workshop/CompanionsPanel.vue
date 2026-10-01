@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { SPOTLIGHT_MIN_BOND, SPOTLIGHT_MS, BOND_NAMES, BOND_STEPS, COMPANIONS, KEEPSAKES, KEEPSAKE_CRYSTAL_PRICE, KEEPSAKE_LIKED_POINTS, KEEPSAKE_POINTS, MAX_BOND, bondLevel, companionName, companionSlots, describeBonus, keepsakeDef, nextBondStep } from '../../domain/companions';
+import { SPOTLIGHT_MIN_BOND, SPOTLIGHT_MS, BOND_NAMES, BOND_STEPS, COMPANIONS, KEEPSAKES, KEEPSAKE_CRYSTAL_PRICE, KEEPSAKE_LIKED_POINTS, KEEPSAKE_POINTS, MAX_BOND, COMPANION_START_LEVEL, MAX_COMPANION_LEVEL, companionLevelCost, levelCapForGrade, companionPower, linksOf, linkStrength, bondLevel, companionName, companionSlots, describeBonus, keepsakeDef, nextBondStep } from '../../domain/companions';
 import { REGIONS } from '../../domain/catalog';
 import { useGameStore } from '../../stores/game';
 import CharacterModel from '../characters/CharacterModel.vue';
@@ -23,14 +23,34 @@ const spotState = (id: string) => {
   return { label: 'Spotlight', reason: '' };
 };
 // What each grade gives: the stronger bonus and the next chapter of their story.
-const companionGives = (person: (typeof COMPANIONS)[number]) => COMPANION_LADDER.names.map((_, at) => `${describeBonus(person.bonus, at + 1)} · chapter ${at + 1}`);
+const companionGives = (person: (typeof COMPANIONS)[number]) => COMPANION_LADDER.names.map((_, at) => `Level up to ${levelCapForGrade(at + 1)} (${describeBonus(person.bonus, companionPower(levelCapForGrade(at + 1), at + 1))}) · chapter ${at + 1}`);
+// A person's level: saved, or ten per bond grade for people who joined before levels existed.
+const levelOfId = (id: string) => game.circle.levels?.[id] ?? Math.max(COMPANION_START_LEVEL, bondLevel(game.circle.owned[id] ?? 0) * 10);
+const levelUpReason = (id: string, bond: number) => {
+  const level = levelOfId(id);
+  if (level >= MAX_COMPANION_LEVEL) return 'Highest level.';
+  if (level >= levelCapForGrade(bond)) return `Level ${level} is the most this grade allows. Deepen the bond to ${BOND_NAMES[bond + 1]} first.`;
+  const cost = companionLevelCost(level);
+  if (game.money < cost.coins) return `Needs ${cost.coins} coins.`;
+  if (game.loot.parts < cost.parts) return `Needs ${cost.parts} workshop parts.`;
+  return '';
+};
+// Friends who know each other: while both work in the same bar, both bonuses grow by a tenth for every grade of the lesser one.
+const linkRows = (id: string) => linksOf(id).map((link) => {
+  const mine = bondLevel(game.circle.owned[id] ?? 0);
+  const theirs = bondLevel(game.circle.owned[link.partner] ?? 0);
+  const both = id in game.circle.owned && link.partner in game.circle.owned;
+  const lesser = both ? Math.min(mine, theirs) : 0;
+  const together = both && crew.value.includes(id) && crew.value.includes(link.partner);
+  return { ...link, name: companionName(link.partner), both, lesser, percent: Math.round(linkStrength(lesser) * 100), together, lesserName: BOND_NAMES[lesser] ?? '' };
+});
 const crew = computed(() => (game.circle.assigned[game.regionId] ?? []).filter((id) => id in game.circle.owned));
 const cards = computed(() => COMPANIONS.map((person) => {
   const joined = person.id in game.circle.owned;
   const points = game.circle.owned[person.id] ?? 0;
   const bond = joined ? bondLevel(points) : 0;
   const bar = Object.entries(game.circle.assigned).find(([, list]) => list.includes(person.id))?.[0];
-  return { person, joined, points, bond, next: joined ? nextBondStep(points) : undefined, shards: game.circle.shards[person.id] ?? 0, here: crew.value.includes(person.id), bar };
+  return { person, joined, points, bond, level: joined ? levelOfId(person.id) : 0, cap: joined ? levelCapForGrade(bond) : 0, next: joined ? nextBondStep(points) : undefined, shards: game.circle.shards[person.id] ?? 0, here: crew.value.includes(person.id), bar };
 }));
 const met = computed(() => cards.value.filter((item) => item.joined).length);
 const keepsakes = computed(() => KEEPSAKES.map((item) => ({ ...item, count: game.circle.keepsakes[item.id] ?? 0 })));
@@ -45,7 +65,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
     <section class="crew card">
       <h3>At the bar now <b>{{ crew.length }} / {{ slots }}</b></h3>
       <ul v-if="crew.length">
-        <li v-for="id in crew" :key="id"><b>{{ companionName(id) }}</b> — {{ describeBonus(COMPANIONS.find((item) => item.id === id)!.bonus, bondLevel(game.circle.owned[id] ?? 0)) }}<UiButton size="sm" variant="solid" :reason="spotState(id).reason" :title="`Their bonus counts double for ${SPOTLIGHT_MS / 60000} minutes, then they rest for 6 hours.`" @click="game.spotlightCompanion(id)">{{ spotState(id).label }}</UiButton><UiButton size="sm" @click="game.dismissCompanion(id)">Send home</UiButton></li>
+        <li v-for="id in crew" :key="id"><b>{{ companionName(id) }}</b> — {{ describeBonus(COMPANIONS.find((item) => item.id === id)!.bonus, companionPower(levelOfId(id), bondLevel(game.circle.owned[id] ?? 0))) }}<UiButton size="sm" variant="solid" :reason="spotState(id).reason" :title="`Their bonus counts double for ${SPOTLIGHT_MS / 60000} minutes, then they rest for 6 hours.`" @click="game.spotlightCompanion(id)">{{ spotState(id).label }}</UiButton><UiButton size="sm" @click="game.dismissCompanion(id)">Send home</UiButton></li>
       </ul>
       <p v-else class="empty">Nobody works here yet. Choose someone below.</p>
     </section>
@@ -68,10 +88,22 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
             <small v-else>Not in your circle yet</small>
           </span>
         </header>
-        <p class="bonus"><b>Bonus:</b> {{ describeBonus(item.person.bonus, Math.max(1, item.bond)) }}<template v-if="item.bond && item.bond < MAX_BOND"> (next level {{ describeBonus(item.person.bonus, item.bond + 1) }})</template></p>
+        <p class="bonus"><b>Bonus:</b> {{ describeBonus(item.person.bonus, companionPower(item.joined ? item.level : COMPANION_START_LEVEL, Math.max(1, item.bond))) }}<template v-if="item.joined && item.level < MAX_COMPANION_LEVEL"> (next level {{ describeBonus(item.person.bonus, companionPower(item.level + 1, item.bond)) }})</template></p>
 
         <template v-if="item.joined">
           <RelationshipLine :ladder="COMPANION_LADDER" :points="item.points" :gives="companionGives(item.person)" />
+          <ul v-if="linkRows(item.person.id).length" class="links">
+            <li v-for="link in linkRows(item.person.id)" :key="link.partner" :class="{ on: link.together }">
+              <b>Friends with {{ link.name }}</b>
+              <small v-if="!link.both">{{ link.name }} has not joined your circle yet.</small>
+              <small v-else-if="link.together">Working together: both bonuses +{{ link.percent }}% (the lesser grade is {{ link.lesserName }}).</small>
+              <small v-else>Put both in the same bar for +{{ link.percent }}% on both bonuses (the lesser grade is {{ link.lesserName }}).</small>
+            </li>
+          </ul>
+          <div class="level-row">
+            <span><b>Level {{ item.level }}</b> <small>of {{ item.cap }} for this grade</small></span>
+            <UiButton size="sm" variant="solid" :reason="levelUpReason(item.person.id, item.bond)" :title="item.level < MAX_COMPANION_LEVEL ? `${companionLevelCost(item.level).coins} coins + ${companionLevelCost(item.level).parts} parts` : ''" @click="game.levelUpCompanion(item.person.id)">Level up<template v-if="item.level < MAX_COMPANION_LEVEL"> · {{ companionLevelCost(item.level).coins }} 🪙 {{ companionLevelCost(item.level).parts }} ⚙</template></UiButton>
+          </div>
           <div class="gifts">
             <UiButton v-for="keep in keepsakes" :key="keep.id" size="sm" :variant="item.person.likes === keep.id ? 'danger' : 'secondary'" :disabled="!keep.count || !item.next" :title="`${keep.name}${item.person.likes === keep.id ? ' — loved' : ''}${keep.count ? '' : ' (you have none)'}`" @click="game.giveKeepsake(item.person.id, keep.id)">{{ keep.icon }}</UiButton>
           </div>
@@ -100,6 +132,12 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
 </template>
 
 <style scoped>
+.links { display: grid; gap: 4px; margin: 4px 0 8px; padding: 0; list-style: none; }
+.links li { display: grid; gap: 1px; padding: 6px 8px; border: 1px dashed #4a5b75; border-radius: 9px; font-size: 12px; }
+.links li.on { border-style: solid; border-color: #c98e3c; background: #2a2316; }
+.links small { opacity: .8; }
+.level-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 4px 0 8px; }
+.level-row small { opacity: .7; }
 .circle { display: grid; gap: 12px; padding: 14px; }
 .card { padding: 12px 14px; border: 1px solid #354762; border-radius: 14px; background: #111c2d; color: #e9eef7; }
 .hint { margin: 0; color: #93a5b9; font-size: 12px; line-height: 1.5; }

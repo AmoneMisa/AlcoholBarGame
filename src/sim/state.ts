@@ -3,7 +3,7 @@ import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
 import { CHARACTER_ART, CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { generateCustomer } from '../domain/engine';
-import { BOND_STEPS, COMPANIONS, KEEPSAKE_IDS, MAX_BOND, companionSlots } from '../domain/companions';
+import { BOND_STEPS, COMPANIONS, COMPANION_START_LEVEL, KEEPSAKE_IDS, MAX_BOND, bondLevel, companionSlots, levelCapForGrade } from '../domain/companions';
 import { MAX_LEVEL, levelFor, levelPerks, xpForLevel } from '../domain/progression';
 import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../domain/types';
 import { buildProfile, shortWish, type CustomerReply, type Fact } from '../domain/conversation/customerTalk';
@@ -393,5 +393,11 @@ function normalizeCompanions(input: unknown): import('./companions').CompanionSt
     const saved = (source.spotlights as Record<string, { until?: unknown; ready?: unknown }> | undefined)?.[id];
     if (saved && Number.isFinite(saved.until) && Number.isFinite(saved.ready)) spotlights[id] = { until: Number(saved.until), ready: Number(saved.ready) };
   }
-  return { owned, shards, keepsakes, assigned, visits, spotlights };
+  // Levels: only what was saved is kept (a person with no saved level counts ten per bond grade, see levelOf).
+  const levels: Record<string, number> = {};
+  for (const id of Object.keys(owned)) {
+    const saved = (source.levels as Record<string, unknown> | undefined)?.[id];
+    if (Number.isFinite(saved)) levels[id] = Math.max(COMPANION_START_LEVEL, Math.min(levelCapForGrade(bondLevel(owned[id]!)), Math.floor(saved as number)));
+  }
+  return { owned, shards, keepsakes, assigned, visits, spotlights, levels };
 }

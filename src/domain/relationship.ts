@@ -5,7 +5,7 @@ import { BOND_NAMES, BOND_STEPS } from './companions';
 export interface Ladder { thresholds: number[]; names: string[] }
 export interface Standing { index: number; name: string; points: number; nextAt?: number; nextName?: string; /** 0-1 along the whole line. */ along: number }
 
-/** Circle: Acquaintance … Bonded. */
+/** Circle: Known person … Forever friends. */
 export const COMPANION_LADDER: Ladder = { thresholds: [...BOND_STEPS], names: BOND_NAMES.slice(1) as unknown as string[] };
 
 export function standing(ladder: Ladder, points: number): Standing {

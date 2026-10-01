@@ -4,10 +4,10 @@ import { CHARACTER_ART } from '../data/cosmetics/artCatalog';
 // that opens chapter by chapter as the bond grows. They are met as guests (serve them well and they leave shards),
 // or join at once when the player reaches a certain achievement. Keepsakes make the bond stronger.
 
-export const BOND_NAMES = ['Stranger', 'Acquaintance', 'Friend', 'Close friend', 'Trusted', 'Bonded'] as const;
-export const MAX_BOND = 5;
-/** Bond points needed for bond level 1 (met) … 5 (bonded). */
-export const BOND_STEPS = [0, 40, 120, 280, 560] as const;
+export const BOND_NAMES = ['Stranger', 'Known person', 'Friends', 'Good friends', 'Close friends', 'Best friends', 'Forever friends'] as const;
+export const MAX_BOND = 6;
+/** Bond points needed for bond level 1 (a known person) … 6 (forever friends). */
+export const BOND_STEPS = [0, 40, 120, 280, 560, 1000] as const;
 export const bondLevel = (points: number) => BOND_STEPS.filter((step) => points >= step).length;
 export const nextBondStep = (points: number) => BOND_STEPS.find((step) => points < step);
 
@@ -31,7 +31,37 @@ export const BONUSES: BonusDef[] = [
   { id: 'fame', label: 'Your signature cocktail grows famous faster', per: .05, unit: 'percent' }
 ];
 export const bonusDef = (id: BonusId) => BONUSES.find((item) => item.id === id)!;
-export const bonusAmount = (id: BonusId, bond: number) => bonusDef(id).per * Math.max(0, Math.min(MAX_BOND, bond));
+// Each person also has a level. Everyone starts at level 10; a bond grade lets the level climb to 19, 29, 39 … 69, and
+// the next grade has to be earned before it can go further. The bonus follows the level (level 10 is one step of the
+// bonus, level 69 is 6.9 steps).
+export const COMPANION_START_LEVEL = 10;
+export const levelCapForGrade = (grade: number) => Math.max(1, Math.min(MAX_BOND, grade)) * 10 + 9;
+export const MAX_COMPANION_LEVEL = levelCapForGrade(MAX_BOND);
+export const levelPower = (level: number) => level / 10;
+/** Every grade above the first adds two steps of bonus on top of the level, so a better bond is stronger at once. */
+export const gradePower = (grade: number) => Math.max(0, grade - 1) * .2;
+export const companionPower = (level: number, grade: number) => levelPower(level) + gradePower(grade);
+
+// Friends who know each other. When both of a pair work in the same bar, both of their bonuses grow by a tenth for every
+// grade of the one who knows the other less (the lesser grade of the two).
+export interface CompanionLink { a: string; b: string; text: string }
+export const COMPANION_LINKS: CompanionLink[] = [
+  { a: 'marin', b: 'leila', text: 'Two people who write about places for a living. They swap notes and never agree on a restaurant.' },
+  { a: 'kai', b: 'andre', text: 'Kai ships the crates, André builds them. Each says the other is the reason nothing breaks.' },
+  { a: 'remy', b: 'rosa', text: 'Remy writes it, Rosa reads it on air at midnight. Neither will say who is the better half.' },
+  { a: 'ana', b: 'marco', text: 'Marco never kept receipts until Ana found a drawer full of them. They have been arguing happily since.' },
+  { a: 'theo', b: 'felix', text: 'Felix stitched Theo’s eyebrow once, in a corridor. They have shared a table every Sunday since.' },
+  { a: 'imani', b: 'vera', text: 'Vera dresses the stage, Imani fills it. Between them, an evening looks planned even when it is not.' },
+  { a: 'owen', b: 'hana', text: 'Wine for her cakes, cakes for his tastings. They call it research, and it is.' },
+  { a: 'eli', b: 'owen', text: 'Eli asks Owen about every bottle. Owen pretends to be tired of it and writes the answers down.' }
+];
+export const linkStrength = (lesserGrade: number) => .1 * Math.max(0, Math.min(MAX_BOND, lesserGrade));
+export const linksOf = (id: string) => COMPANION_LINKS.filter((link) => link.a === id || link.b === id).map((link) => ({ ...link, partner: link.a === id ? link.b : link.a }));
+/** Coins and workshop parts to go from `level` to the next. */
+export const companionLevelCost = (level: number) => ({ coins: Math.round(25 * Math.pow(level, 1.5)), parts: 1 + Math.ceil(level / 4) });
+
+/** `power` is the level divided by ten (a bond grade of 3 and a level of 30 are the same strength). */
+export const bonusAmount = (id: BonusId, power: number) => bonusDef(id).per * Math.max(0, Math.min(MAX_BOND + 1, power));
 export const describeBonus = (id: BonusId, bond: number) => {
   const def = bonusDef(id);
   const amount = bonusAmount(id, bond);
@@ -82,7 +112,7 @@ export interface Companion {
   quote: string;
   /** What is known before they join, then one chapter for each bond level. */
   intro: string;
-  chapters: [string, string, string, string, string];
+  chapters: [string, string, string, string, string, string];
 }
 
 export const COMPANIONS: Companion[] = [
@@ -95,7 +125,8 @@ export const COMPANIONS: Companion[] = [
       'Her first review was a tiny pamphlet she left in cafés. Two owners wrote back angry letters, and she pinned both to her wall.',
       'She once gave a famous bar one star and was banned for a year. When it reopened she came back, ordered water, and wrote a kind page.',
       'Marin keeps a notebook of drinks that surprised her. Yours is on page nine, and she says it is the first page with a drawing.',
-      'She will mention your bar in her end-of-year list, with no discount asked and none given. “Because it is true,” she says.'
+      'She will mention your bar in her end-of-year list, with no discount asked and none given. “Because it is true,” she says.',
+      'Marin takes the stars away for one bar only: yours has no rating, just a line, “Come as you are.” She still arrives on Thursdays, and she still orders water first.'
     ]
   },
   {
@@ -107,7 +138,8 @@ export const COMPANIONS: Companion[] = [
       'He can read a shipping label like a menu. He once saved a bar from a missing order by finding the crate in the wrong port.',
       'He sends his mother half of every pay and a postcard from every city. She keeps them in a biscuit tin.',
       'Kai’s dream is a small boat that carries only coffee beans. He has drawn it nine times and never shown anyone.',
-      'He now calls the harbour office for you when a delivery slips. “They owe me three favours,” he says, “and I only need one.”'
+      'He now calls the harbour office for you when a delivery slips. “They owe me three favours,” he says, “and I only need one.”',
+      'Kai names his coffee boat after your bar and finally shows you the drawing. He says its first crate will be yours, and he has already chosen the date.'
     ]
   },
   {
@@ -119,7 +151,8 @@ export const COMPANIONS: Companion[] = [
       'Their first poem was written on a bus ticket for a stranger who was crying. The stranger kept it for ten years.',
       'Remy believes a waiting guest is a guest who is about to say something true. They teach you to wait a little longer.',
       'There is a notebook with your bar in it, written in the third person. You are described as “the one who listens.”',
-      'Remy’s first printed book has one poem for each bar they love. Yours is the last, and the longest.'
+      'Remy’s first printed book has one poem for each bar they love. Yours is the last, and the longest.',
+      'Remy stops leaving poems under glasses and writes one small one on your wall, near the till. “Forever is just a long evening,” it says.'
     ]
   },
   {
@@ -131,7 +164,8 @@ export const COMPANIONS: Companion[] = [
       'She can spot a supplier who rounds in their own favour from across the room. She does it politely, which is worse.',
       'Her sister runs a flower shop with no books at all. Ana fixes them every spring and is paid in tulips.',
       'She says you are the only owner who reads the invoice before arguing with it.',
-      'Ana now reviews your supplier terms for free once a year. “Think of it as a very dull gift,” she says, and her eyes smile.'
+      'Ana now reviews your supplier terms for free once a year. “Think of it as a very dull gift,” she says, and her eyes smile.',
+      'Ana adds your bar to the very short list of accounts she keeps for pleasure. She never sends a bill, only a card each year that says “Balanced.”'
     ]
   },
   {
@@ -143,7 +177,8 @@ export const COMPANIONS: Companion[] = [
       'He now trains teenagers for free. Their rule: no hitting until you can lose a game of cards politely.',
       'Theo found that a calm voice stops more fights than fists ever did. He gives your servers a short lesson on it.',
       'His old gloves hang above his bed. He lent them once, for a school play, and got them back signed by a dragon.',
-      'He says your team “walks like a crew”. He now stops by on slow evenings, just to see them work.'
+      'He says your team “walks like a crew”. He now stops by on slow evenings, just to see them work.',
+      'Theo hangs a pair of old gloves behind your bar. “For the nights nobody wins,” he says, “and everybody gets looked after anyway.”'
     ]
   },
   {
@@ -155,7 +190,8 @@ export const COMPANIONS: Companion[] = [
       'She toured for three years on a bus with a broken heater. She learned every song twice: once for the crowd, once for the driver.',
       'Her favourite record is a scratched copy she found in a bin. She plays it before every show for luck.',
       'She says the best nights are those when nobody asks for a song. They simply stay.',
-      'Imani now sings one song a month at your bar, unannounced. The tip jar is always full by the second verse.'
+      'Imani now sings one song a month at your bar, unannounced. The tip jar is always full by the second verse.',
+      'Imani writes a song with your bar’s name in the chorus. She sings it once, on the last night of the year, and never again, so it stays yours.'
     ]
   },
   {
@@ -167,7 +203,8 @@ export const COMPANIONS: Companion[] = [
       'He taught himself to taste by comparing three glasses a day for ten years. He insists the third glass is always honest.',
       'He is allergic to flattery and loves a good argument about oak.',
       'He once drove through the night to deliver a single case to a wedding. It was the right wine for the wrong bride, and they stayed friends.',
-      'Owen now sets aside a few bottles for you at cost. “A friend’s shelf should never be empty,” he says.'
+      'Owen now sets aside a few bottles for you at cost. “A friend’s shelf should never be empty,” he says.',
+      'Owen keeps one bottle of every vintage he imports for you, unopened, for a day that matters. “Some wines are patient,” he says. “So am I.”'
     ]
   },
   {
@@ -179,7 +216,8 @@ export const COMPANIONS: Companion[] = [
       'She buys for four stores and says no to nine out of ten. The tenth sells out in a week.',
       'She once cancelled a whole season because the buttons felt wrong. She was right, and nobody has asked her to explain since.',
       'Her friends say she is cold. She reads poetry to her cat and cries at train station reunions.',
-      'Vera now mentions your bar to every client who visits town. Guests arrive dressed for it, and they pay as if they were.'
+      'Vera now mentions your bar to every client who visits town. Guests arrive dressed for it, and they pay as if they were.',
+      'Vera has your bar’s colours stitched inside the collar of her best coat. “The inside is what counts,” she says, and smiles at the label.'
     ]
   },
   {
@@ -191,7 +229,8 @@ export const COMPANIONS: Companion[] = [
       'They have tested the same cocktail forty times to find where the sweetness tips over. They have a graph.',
       'Eli’s biggest fear is wasting a good ingredient. They once drank a failed cocktail on purpose, out of respect.',
       'They ask you questions you did not know you had the answers to, and write each one down.',
-      'Eli will graduate with a thesis on waste in bars. Chapter four is about you, and the numbers are very flattering.'
+      'Eli will graduate with a thesis on waste in bars. Chapter four is about you, and the numbers are very flattering.',
+      'Eli dedicates his thesis to you, and the first bar he ever runs prints a small line at the bottom of its menu: “Learned at a friend’s.”'
     ]
   },
   {
@@ -203,7 +242,8 @@ export const COMPANIONS: Companion[] = [
       'She writes the “last drink of the trip” column. Every bar in it is a place she would cross a desert to return to.',
       'She once waited three days for a ferry and wrote the best essay of her life. It was about a café and a very old dog.',
       'She says your bar has a rare quality: strangers talk to each other here. She wrote it in the margin.',
-      'Your bar is now in her next guidebook, under “a good evening”. Readers arrive carrying a folded page.'
+      'Your bar is now in her next guidebook, under “a good evening”. Readers arrive carrying a folded page.',
+      'Leila stops writing about your bar and starts writing from it. Her next book opens at your counter, and the first line is the one you always say.'
     ]
   },
   {
@@ -215,7 +255,8 @@ export const COMPANIONS: Companion[] = [
       'He once delivered a baby in a lift and still carries the first photo. He is quietly proud and very shy about it.',
       'He has a rule: never talk shop after midnight. The rule has been broken eleven times, all for friends.',
       'He says a bartender is the second most important listener in a city. He leaves it open who is first.',
-      'Felix now sends colleagues your way after hard nights. They return as regulars, and sometimes as friends who bring a gift.'
+      'Felix now sends colleagues your way after hard nights. They return as regulars, and sometimes as friends who bring a gift.',
+      'Felix keeps your number on a card in his coat, between the emergency contacts and his mother. “Fourth line,” he says, “and the only one that makes me laugh.”'
     ]
   },
   {
@@ -227,7 +268,8 @@ export const COMPANIONS: Companion[] = [
       'She believes every dessert has one loud note and two quiet ones. She tastes for the quiet ones first.',
       'Her bakery burned down once. The next morning she opened a stall with a single oven and a queue of neighbours.',
       'She has been experimenting with a cocktail-and-cake pairing. You were the first person she asked to taste it.',
-      'Hana now slips a spare part and a note into your delivery whenever you try something new. “Curiosity should be paid,” she says.'
+      'Hana now slips a spare part and a note into your delivery whenever you try something new. “Curiosity should be paid,” she says.',
+      'Hana bakes a small cake with your bar’s name on it every year and never lets you pay. “A recipe is a promise,” she says, “and I keep this one.”'
     ]
   },
   {
@@ -239,7 +281,8 @@ export const COMPANIONS: Companion[] = [
       'His workshop smells of cedar and coffee. A stray dog sleeps under the bench and has a name for every tool.',
       'He once rebuilt a bar from the wreck of a ship. People still sit at it and say they feel the sea.',
       'He tells you your equipment will last twice as long if you treat the corners well. He is right.',
-      'André now inspects your fittings on his rounds and brings spare parts. “Use them,” he says. “That is what they are for.”'
+      'André now inspects your fittings on his rounds and brings spare parts. “Use them,” he says. “That is what they are for.”',
+      'André carves your name into the underside of the counter, where only the two of you know to look. “Good wood remembers,” he says.'
     ]
   },
   {
@@ -251,7 +294,8 @@ export const COMPANIONS: Companion[] = [
       'Her show has no guests, only calls. She says a stranger’s story is the best interview there is.',
       'She keeps a tape of every caller who thanked her. There are four hundred, and she listens when she is tired.',
       'She asked what drink you would invent for the whole city. You told her and she was quiet for a long time.',
-      'Rosa now mentions your signature cocktail on air once a month. The phone starts ringing before she finishes the sentence.'
+      'Rosa now mentions your signature cocktail on air once a month. The phone starts ringing before she finishes the sentence.',
+      'Rosa ends her programme every night with a line about “a lamp left on at a friend’s bar.” Strangers write in asking where it is.'
     ]
   },
   {
@@ -263,7 +307,8 @@ export const COMPANIONS: Companion[] = [
       'He can date a bottle by the feel of its glass. He once identified a forgery by its weight and refused to be proud of it.',
       'He has a rule: sell only what you would keep. His shelves are mostly empty and very beautiful.',
       'He hates to see a good bottle wasted on a bad night. He says the same of good people.',
-      'Marco now brings buyers who pay a collector’s price for the bottles on your shelf. “Good things should find good homes,” he says.'
+      'Marco now brings buyers who pay a collector’s price for the bottles on your shelf. “Good things should find good homes,” he says.',
+      'Marco takes one bottle off his own shelf and leaves it on yours, with no price on it. “Some things are not for sale,” he says, “and some are for friends.”'
     ]
   }
 ];

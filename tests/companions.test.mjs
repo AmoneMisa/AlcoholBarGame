@@ -4,7 +4,7 @@ import { CHARACTER_ART } from '../src/data/cosmetics/artCatalog.ts';
 import { RECIPES } from '../src/domain/catalog.ts';
 import { ACHIEVEMENTS } from '../src/domain/quests.ts';
 import { barEventById } from '../src/domain/barEvents.ts';
-import { BONUSES, BOND_STEPS, COMPANIONS, KEEPSAKE_IDS, bondLevel, bonusAmount, companionSlots } from '../src/domain/companions.ts';
+import { BONUSES, BOND_STEPS, COMPANIONS, COMPANION_LINKS, MAX_COMPANION_LEVEL, companionLevelCost, companionPower, levelCapForGrade, linkStrength, KEEPSAKE_IDS, bondLevel, bonusAmount, companionSlots } from '../src/domain/companions.ts';
 import { COMPANION_LADDER, standing } from '../src/domain/relationship.ts';
 import { xpForLevel } from '../src/domain/progression.ts';
 import { companionBonus, companionVisit, crewOf, hasJoined } from '../src/sim/companions.ts';
@@ -17,13 +17,13 @@ const context = (random = () => .5, now = NOW) => ({ now, random, checkEnglish: 
 const run = (state, action, random, now) => applyAction(state, action, context(random, now));
 const fresh = () => { const state = createInitialState(NOW); state.startingBarChosen = true; state.loot.boxes = {}; state.xp = xpForLevel(30); state.crystals = 500; return state; };
 
-test('The Circle: fifteen people, each with their own bonus, a portrait, a story of five chapters and a real way to meet them', () => {
+test('The Circle: fifteen people, each with their own bonus, a portrait, a story of six chapters and a real way to meet them', () => {
   assert.equal(COMPANIONS.length, 15);
   assert.equal(new Set(COMPANIONS.map((item) => item.bonus)).size, 15, 'every person has a bonus of their own');
   assert.deepEqual(new Set(BONUSES.map((item) => item.id)), new Set(COMPANIONS.map((item) => item.bonus)), 'every bonus belongs to someone');
   for (const person of COMPANIONS) {
     assert.ok(CHARACTER_ART.some((art) => art.id === person.id), `${person.id} has a portrait`);
-    assert.equal(person.chapters.length, 5);
+    assert.equal(person.chapters.length, 6);
     assert.ok(person.chapters.every((text) => text.length > 60), `${person.id} chapters are real text`);
     assert.ok(person.intro.length > 40 && person.quote.length > 10);
     assert.ok(KEEPSAKE_IDS.includes(person.likes));
@@ -32,7 +32,7 @@ test('The Circle: fifteen people, each with their own bonus, a portrait, a story
   }
   assert.equal(new Set(COMPANIONS.map((item) => item.joinsWith).filter(Boolean)).size, COMPANIONS.filter((item) => item.joinsWith).length, 'one person per achievement');
   assert.equal(bondLevel(0), 1);
-  assert.equal(bondLevel(BOND_STEPS[4]), 5);
+  assert.equal(bondLevel(BOND_STEPS[5]), 6);
   assert.equal(companionSlots(10), 2);
   assert.equal(companionSlots(25), 3);
 });
@@ -66,8 +66,8 @@ test('Keepsakes deepen the bond; a loved one counts more; the story opens by bon
   assert.equal(state.companions.owned.eli, 55, 'a loved keepsake gives 40');
   assert.equal(bondLevel(55), 2);
   state.companions.keepsakes.book = 99;
-  for (let i = 0; i < 60; i++) { try { run(state, { type: 'giveKeepsake', id: 'eli', kind: 'book' }); } catch { break; } }
-  assert.equal(state.companions.owned.eli, BOND_STEPS[4], 'the bond stops at the top');
+  for (let i = 0; i < 120; i++) { try { run(state, { type: 'giveKeepsake', id: 'eli', kind: 'book' }); } catch { break; } }
+  assert.equal(state.companions.owned.eli, BOND_STEPS[5], 'the bond stops at the top');
   assert.throws(() => run(state, { type: 'giveKeepsake', id: 'eli', kind: 'book' }), /fully bonded/);
   // buying uses crystals
   const crystals = state.crystals;
@@ -87,8 +87,8 @@ test('A person works in one bar at a time, the bar has limited room, and the bon
   const before = lootBonuses(state, NOW).tipChance;
   run(state, { type: 'assignCompanion', id: 'imani' });
   assert.deepEqual(crewOf(state), ['imani']);
-  assert.equal(companionBonus(state, 'tips'), bonusAmount('tips', 4), 'Imani is at bond 4');
-  assert.ok(Math.abs(lootBonuses(state, NOW).tipChance - before - bonusAmount('tips', 4)) < 1e-9, 'the bonus reaches the rules');
+  assert.equal(companionBonus(state, 'tips'), bonusAmount('tips', companionPower(40, 4)), 'Imani is at bond 4: a saved person counts ten levels per grade');
+  assert.ok(Math.abs(lootBonuses(state, NOW).tipChance - before - bonusAmount('tips', companionPower(40, 4))) < 1e-9, 'the bonus reaches the rules');
   assert.throws(() => run(state, { type: 'assignCompanion', id: 'imani' }), /already/);
   run(state, { type: 'assignCompanion', id: 'kai' });
   assert.throws(() => run(state, { type: 'assignCompanion', id: 'theo' }), /room for 2/);
@@ -137,7 +137,7 @@ test('Saves keep only known people, one bar each, and sane numbers; the achievem
   state.companions = { owned: { kai: 99999, ghost: 5 }, shards: { kai: 5, ana: 9999, ghost: 3 }, keepsakes: { book: -3, vinyl: 2.8, fake: 4 }, assigned: { 'new-york': ['kai', 'ghost', 'ana'], london: ['kai'] }, visits: { day: 5, counts: null } };
   normalizePlayerState(state);
   assert.deepEqual(Object.keys(state.companions.owned), ['kai']);
-  assert.equal(state.companions.owned.kai, BOND_STEPS[4]);
+  assert.equal(state.companions.owned.kai, BOND_STEPS[5]);
   assert.equal(state.companions.shards.kai, undefined, 'a joined person has no shards');
   assert.equal(state.companions.shards.ana, 30);
   assert.deepEqual(state.companions.keepsakes, { vinyl: 2 });
@@ -172,8 +172,43 @@ test('The relationship line follows the bond: one grade per bond level, with wha
     assert.equal(here.index + 1, level, 'the grade matches bondLevel');
   }
   const start = standing(COMPANION_LADDER, 39);
-  assert.equal(start.name, 'Acquaintance');
+  assert.equal(start.name, 'Known person');
   assert.equal(start.nextAt, 40);
-  assert.equal(standing(COMPANION_LADDER, 560).nextAt, undefined, 'the top grade has no next step');
+  assert.equal(standing(COMPANION_LADDER, BOND_STEPS[5]).nextAt, undefined, 'the top grade has no next step');
+  assert.deepEqual(COMPANION_LADDER.names, ['Known person', 'Friends', 'Good friends', 'Close friends', 'Best friends', 'Forever friends']);
   assert.equal(standing(COMPANION_LADDER, 9999).along, 1);
+});
+
+test('A person has a level that the bond grade caps: 19, 29, 39 … and a better grade is stronger at once', () => {
+  assert.deepEqual([1, 2, 3, 6].map(levelCapForGrade), [19, 29, 39, 69]);
+  assert.ok(companionPower(20, 2) > companionPower(20, 1), 'the same level is stronger at a better grade');
+  const state = fresh();
+  state.money = 1e6; state.loot.parts = 1000;
+  state.companions = { owned: { marin: BOND_STEPS[0] }, shards: {}, keepsakes: {}, assigned: {}, visits: { day: '', counts: {} }, levels: { marin: 19 } };
+  assert.throws(() => run(state, { type: 'levelUpCompanion', id: 'marin' }), /cannot go past level 19/);
+  state.companions.owned.marin = BOND_STEPS[1];
+  const cost = companionLevelCost(19);
+  const coinsBefore = state.money, partsBefore = state.loot.parts;
+  run(state, { type: 'levelUpCompanion', id: 'marin' });
+  assert.equal(state.companions.levels.marin, 20);
+  assert.equal(state.money, coinsBefore - cost.coins);
+  assert.equal(state.loot.parts, partsBefore - cost.parts);
+  state.money = 0;
+  assert.throws(() => run(state, { type: 'levelUpCompanion', id: 'marin' }), /coins/);
+  state.companions.owned.marin = BOND_STEPS[5]; state.companions.levels.marin = MAX_COMPANION_LEVEL;
+  assert.throws(() => run(state, { type: 'levelUpCompanion', id: 'marin' }), /highest level/);
+});
+
+test('Friends who know each other: both bonuses grow in the same bar, by the lesser grade of the two', () => {
+  for (const link of COMPANION_LINKS) assert.ok(COMPANIONS.some((item) => item.id === link.a) && COMPANIONS.some((item) => item.id === link.b), 'a link joins two real people');
+  assert.equal(new Set(COMPANION_LINKS.flatMap((link) => [link.a, link.b])).size, 15, 'everyone has a friend');
+  assert.equal(linkStrength(3), .1 * 3);
+  const state = fresh();
+  state.companions = { owned: { marin: BOND_STEPS[4], leila: BOND_STEPS[1] }, shards: {}, keepsakes: {}, assigned: {}, visits: { day: '', counts: {} }, levels: { marin: 50, leila: 20 } };
+  run(state, { type: 'assignCompanion', id: 'marin' });
+  const alone = companionBonus(state, 'xp');
+  run(state, { type: 'assignCompanion', id: 'leila' });
+  const together = companionBonus(state, 'xp');
+  assert.ok(Math.abs(together - alone * (1 + linkStrength(2))) < 1e-9, 'the lesser grade (Friends, 2) sets the link: +20% on Marin');
+  assert.ok(companionBonus(state, 'arrival') > 0);
 });
