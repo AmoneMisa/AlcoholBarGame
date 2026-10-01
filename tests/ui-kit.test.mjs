@@ -11,7 +11,7 @@ test('Text inputs and selects come from the UI kit, not from raw elements', () =
   for (const [path, source] of vue) {
     if (path.endsWith('/ui/UiInput.vue') || path.endsWith('/OptionSelect.vue')) continue;
     if (/<select\b/.test(source)) bad.push(`${path}: <select>`);
-    for (const tag of source.match(/<input\b[^>]*>/g) ?? []) if (!/type="(range|checkbox|radio|number)"/.test(tag)) bad.push(`${path}: ${tag.slice(0, 60)}`);
+    for (const tag of source.match(/<input\b[^>]*>/g) ?? []) if (!/type="(range|radio|number)"/.test(tag) && !(path.endsWith('/ui/UiCheckbox.vue') && /type="checkbox"/.test(tag))) bad.push(`${path}: ${tag.slice(0, 60)}`);
   }
   assert.deepEqual(bad, [], 'use UiInput and OptionSelect (src/components/ui, src/components/game/OptionSelect.vue)');
 });

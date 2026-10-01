@@ -32,8 +32,22 @@
 .ui-field-hint { color: var(--ui-muted); font-size: 11px; }
 
 /* One height, always: a button or input never grows because its neighbour is taller (rows and grids stretch their items). */
-.ui-btn { height: var(--ctl-h); align-self: center; }
+.ui-btn { height: var(--ctl-h); }
 .ui-btn-sm { height: var(--ctl-h-sm); }
 .ui-input { height: var(--ctl-h); }
 .ui-btn-block { width: 100%; }
 .ui-input-field { align-self: end; }
+
+/* UiCheckbox: text on the left, the box on the right, the same everywhere */
+.ui-check { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; cursor: pointer; color: var(--ui-text); }
+.ui-check-text { display: grid; gap: 2px; min-width: 0; }
+.ui-check-text b { font-size: 14px; font-weight: 700; }
+.ui-check-text small { color: #91a2b5; font-size: 12px; font-weight: 500; line-height: 1.35; }
+.ui-check-box { flex: none; width: 22px; height: 22px; margin: 0; accent-color: #dca94e; cursor: pointer; }
+.ui-check-box:focus-visible { outline: 2px solid #ffd35a; outline-offset: 2px; }
+.ui-check-off { opacity: .55; cursor: not-allowed; }
+.ui-check-off .ui-check-box { cursor: not-allowed; }
+.ui-check-danger { padding: 10px 12px; border: 1px solid #6b3a3a; border-radius: 10px; background: #2a1b17; }
+.ui-check-danger .ui-check-box { accent-color: #d9534f; }
+.ui-check + .ui-check { border-top: 1px solid #2d4059; }
+.ui-check-danger + .ui-check-danger { border-top-color: #6b3a3a; }

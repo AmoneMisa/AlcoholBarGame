@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiCheckbox from '../ui/UiCheckbox.vue';
 import UiInput from '../ui/UiInput.vue';
 import { computed, ref, watch } from 'vue';
 import { fetchLeaderboard, type LeaderboardResult } from '../../telegram/api';
@@ -267,7 +268,7 @@ const boostLeft = (id: string) => {
             <UiButton variant="primary" @click="stepAmount(row, -1)">−</UiButton><b>{{ row.amount }} {{ ingredient(row.ingredientId).unit === 'ml' ? 'ml' : '×' }}</b><UiButton variant="primary" @click="stepAmount(row, 1)">+</UiButton>
             <UiButton variant="secondary" size="sm" icon="close" aria-label="Remove this ingredient" :disabled="draftItems.length <= 2" @click="draftItems.splice(index, 1)" />
           </div>
-          <div class="row"><UiButton variant="primary" :disabled="draftItems.length >= MAX_ITEMS" @click="addRow">Add ingredient</UiButton><label><input v-model="draftShake" type="checkbox" /> Needs shaking</label></div>
+          <div class="row"><UiButton variant="primary" :disabled="draftItems.length >= MAX_ITEMS" @click="addRow">Add ingredient</UiButton><UiCheckbox v-model="draftShake" label="Needs shaking" /></div>
           <b>Guests would pay {{ preview.price.toFixed(2) }} coins</b>
           <small v-for="line in preview.notes" :key="line">{{ line }}</small>
           <small v-if="draftError" class="sig-error">{{ draftError }}</small>

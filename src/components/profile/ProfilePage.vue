@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiCheckbox from '../ui/UiCheckbox.vue';
 import UiButton from '../ui/UiButton.vue';
 import { computed, onMounted, ref } from 'vue';
 import { APP_BUILT, APP_VERSION, fetchServerVersion, formatBuilt } from '../../version';
@@ -49,10 +50,7 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
 
     <section v-if="picking" class="picker" aria-label="Choose achievements to show">
       <header><b>Choose up to {{ FEATURED_MAX }} achievements to show on your profile</b></header>
-      <label v-for="item in earned" :key="item.id" :class="{ on: chosen.includes(item.id) }">
-        <input type="checkbox" :checked="chosen.includes(item.id)" :disabled="!chosen.includes(item.id) && chosen.length >= FEATURED_MAX" @change="toggle(item.id)" />
-        <span>🏅 {{ item.seriesName }} · {{ item.tierName }}</span>
-      </label>
+      <UiCheckbox v-for="item in earned" :key="item.id" :model-value="chosen.includes(item.id)" :label="`${item.seriesName} · ${item.tierName}`" :hint="item.name" :disabled="!chosen.includes(item.id) && chosen.length >= FEATURED_MAX" @update:model-value="toggle(item.id)" />
       <footer>
         <UiButton variant="primary" @click="save">Save ({{ chosen.length }} / {{ FEATURED_MAX }})</UiButton>
         <UiButton variant="secondary" @click="latest">Show the latest instead</UiButton>

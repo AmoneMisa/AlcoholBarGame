@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiCheckbox from '../ui/UiCheckbox.vue';
 import PanelHeading from '../ui/PanelHeading.vue';
 import { computed, ref } from 'vue';
 import { INGREDIENTS } from '../../domain/catalog';
@@ -67,10 +68,7 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
         <p><b>Total {{ topUp.total.toFixed(2) }} coins.</b> Deliveries still take time{{ topUp.days !== undefined ? ` (about ${formatDeliveryTime(topUp.days)})` : '' }}.</p>
       </template>
       <p v-else>Nothing is running low, or an order is already on its way.</p>
-      <label class="supply-auto" :class="{ off: game.level < AUTO_SUPPLY_LEVEL }">
-        <input v-model="autoChoice" type="checkbox" :disabled="game.level < AUTO_SUPPLY_LEVEL" />
-        <span><b>Keep doing this automatically</b><small>{{ game.level < AUTO_SUPPLY_LEVEL ? `Unlocks at level ${AUTO_SUPPLY_LEVEL}.` : 'From now on anything that runs low is reordered without asking. It pauses when coins run out.' }}</small></span>
-      </label>
+      <UiCheckbox v-model="autoChoice" label="Keep doing this automatically" :disabled="game.level < AUTO_SUPPLY_LEVEL" :hint="game.level < AUTO_SUPPLY_LEVEL ? `Unlocks at level ${AUTO_SUPPLY_LEVEL}.` : 'From now on anything that runs low is reordered without asking. It pauses when coins run out.'" />
     </ConfirmDialog>
     <TradeTalk />
     <div class="market-modes"><button :class="{active:mode === 'buy'}" type="button" @click="mode = 'buy'">Buy supplies</button><button :class="{active:mode === 'sell'}" type="button" @click="mode = 'sell'">Sell stock</button><span>City prices {{ game.region.marketFactor.toFixed(2) }}× · prices change each shift</span></div>

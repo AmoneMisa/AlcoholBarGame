@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiCheckbox from '../ui/UiCheckbox.vue';
 import { voiceMode } from '../../audio/index';
 import { APP_BUILT, APP_VERSION, formatBuilt } from '../../version';
 import OptionSelect from '../game/OptionSelect.vue';
@@ -47,7 +48,7 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
     <section class="settings-card notification-settings">
       <h3>Notifications</h3>
       <p>Choose what the game tells you about.</p>
-      <label v-for="event in NOTIFICATION_EVENTS" :key="event.id"><span><b>{{ event.label }}</b><small>{{ event.detail }}</small></span><input type="checkbox" :checked="notifications.prefs[event.id]" @change="notifications.setEnabled(event.id, ($event.target as HTMLInputElement).checked)" /></label>
+      <UiCheckbox v-for="event in NOTIFICATION_EVENTS" :key="event.id" :model-value="notifications.prefs[event.id]" :label="event.label" :hint="event.detail" @update:model-value="(value: boolean) => notifications.setEnabled(event.id, value)" />
     </section>
 
     <section class="settings-card">
@@ -70,7 +71,7 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
 
     <ConfirmDialog v-if="resetting" title="Delete all my progress?" confirm-label="Delete everything" danger :disabled="!agreed" @cancel="resetting = false" @confirm="wipeAccount">
       <p>Everything you have built will be deleted <b>forever</b>: level {{ game.level }}, {{ game.knownRecipes.length }} recipes, your bars, styles, crystals and equipment. There is no way to get it back.</p>
-      <label class="agree"><input v-model="agreed" type="checkbox" /><span>I understand that my progress will be deleted and cannot be restored.</span></label>
+      <UiCheckbox v-model="agreed" tone="danger" label="I understand that my progress will be deleted and cannot be restored." />
     </ConfirmDialog>
 
     <ConfirmDialog v-if="asking" title="Start over?" confirm-label="Yes, reset my bars" danger @cancel="asking = false" @confirm="grandOpening">
@@ -98,9 +99,4 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
 .settings-card :deep(.opt-label) { display: none; }
 .danger-zone { border-color: #6b3a3a; }
 .settings-action { justify-self: start; }
-.notification-settings label { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid #2d4059; }
-.notification-settings label span { display: grid; gap: 2px; }
-.notification-settings label b { font-size: 14px; }
-.notification-settings label small { color: #91a2b5; font-size: 12px; font-weight: 500; }
-.notification-settings input { flex: none; width: 22px; height: 22px; accent-color: #dca94e; }
 </style>
