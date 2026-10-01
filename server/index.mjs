@@ -51,10 +51,13 @@ const HASHED = /-[A-Za-z0-9_-]{8}\.(js|css|dic|aff)$/;
 app.use(express.static(dist, {
   index: false,
   setHeaders(response, file) {
-    response.setHeader('Cache-Control', HASHED.test(file) ? 'public, max-age=31536000, immutable' : 'public, max-age=3600, must-revalidate');
+    response.setHeader('Cache-Control', /[\/]index\.html$/.test(file) ? 'no-cache, must-revalidate' : HASHED.test(file) ? 'public, max-age=31536000, immutable' : 'public, max-age=3600, must-revalidate');
   }
 }));
-app.use((request, response, next) => request.path.startsWith('/api/') ? next() : response.sendFile(path.join(dist, 'index.html')));
+// The page itself is never cached without asking the server first, so a new release is picked up on the next open
+// (it names the new hashed script files). Telegram's in-app browser otherwise keeps showing an old page.
+const INDEX_HEADERS = { 'Cache-Control': 'no-cache, must-revalidate' };
+app.use((request, response, next) => request.path.startsWith('/api/') ? next() : response.sendFile(path.join(dist, 'index.html'), { headers: INDEX_HEADERS }));
 app.use('/api', (_request, response) => response.status(404).json({ ok: false, error: 'Not found' }));
 handleErrors(app);
 
