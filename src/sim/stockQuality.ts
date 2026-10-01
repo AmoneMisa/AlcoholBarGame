@@ -55,7 +55,8 @@ const trouble = (supplierName: string) => {
 // What happens to each line of an order that has just arrived. Returns notes for the message and the trade log.
 export function receiveOrder(state: PlayerState, order: DeliveryOrder, now: number, random: () => number): string[] {
   const notes: string[] = [];
-  const factor = trouble(order.supplier);
+  // Problems are uncommon, but not rare: roughly one order in five has one.
+  const factor = trouble(order.supplier) * .5;
   const supplierId = SUPPLIERS.find((item) => item.name === order.supplier)?.id ?? 'global';
   const issues = (state.deliveryIssues ??= []);
   for (const item of order.items) {

@@ -22,6 +22,7 @@ function barWith(region = 'new-york') {
   Object.assign(guest, { mood: 'calm', orderKind: 'cocktail', orderRecipeId: RECIPES[0].id, orderRevealed: true, smoker: false, patience: 99_999, patienceRemaining: 99_999 });
   guest.social = { ...SOCIAL };
   state.nextCustomerAt = 0;
+  state.guestsSinceEvent = 5;
   return { state, guest };
 }
 

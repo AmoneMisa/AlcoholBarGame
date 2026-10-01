@@ -12,7 +12,8 @@ const loadMode = (): VoiceMode => { try { const value = localStorage.getItem(KEY
 export const voiceMode = ref<VoiceMode>(loadMode());
 watch(voiceMode, (value) => { try { localStorage.setItem(KEY, value); } catch { /* private mode */ } });
 
-export interface VoiceProfile { seed: string; gender: 'f' | 'm' | 'x'; emotion?: string; drunk?: number }
+export type { GuestVoiceProfile as VoiceProfile } from '../domain/social/origin';
+import type { GuestVoiceProfile as VoiceProfile } from '../domain/social/origin';
 
 const hash = (text: string) => { let h = 2166136261; for (let i = 0; i < text.length; i++) { h ^= text.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
 // Rough formants (F1, F2) of five vowels.
@@ -40,11 +41,15 @@ export function guestVoice(profile: VoiceProfile, text: string) {
   if (ctx.currentTime - lastVoiceAt < .25) return;
   const h = hash(profile.seed);
   const feel = FEELING[profile.emotion ?? 'relaxed'] ?? FEELING.relaxed!;
-  const base = (profile.gender === 'f' ? 205 : profile.gender === 'm' ? 118 : 160) * (.88 + (h % 40) / 160);
+  // A woman, a man, a young or an old person each have their own pitch and vocal tract; the seed makes each one unique.
+  const pitches = { f: { young: 250, adult: 208, old: 186 }, m: { young: 138, adult: 114, old: 100 }, x: { young: 190, adult: 160, old: 140 } }[profile.gender][profile.age];
+  const base = pitches * (.93 + (h % 15) / 100);
+  const tract = (profile.gender === 'f' ? 1.14 : profile.gender === 'm' ? .9 : 1) * (profile.age === 'young' ? 1.05 : profile.age === 'old' ? .97 : 1) * (.94 + ((h >> 5) % 13) / 100);
+  const vibrato = profile.age === 'old' ? 5.5 : 0;
   const words = text.trim().split(/\s+/).filter(Boolean);
   const syllables = Math.min(lowPower() ? 7 : 14, Math.max(2, Math.round(words.length * .9)));
   const slur = Math.min(1, (profile.drunk ?? 0) / 100);
-  const length = (.15 / feel.speed) * (1 + slur * .5);
+  const length = (.15 / (feel.speed * profile.speed)) * (1 + slur * .5);
   const out = sfxDestination()!;
   const send = lowPower() ? undefined : sfxReverbSend();
   let t = ctx.currentTime + .02;
@@ -59,11 +64,12 @@ export function guestVoice(profile: VoiceProfile, text: string) {
     const pitch = base * feel.pitch * stress * (1 + feel.rise * progress + end + (((w >> 4) % 9) - 4) / 60);
     const dur = length * (word.length > 6 ? 1.3 : 1) * (.85 + ((w >> 8) % 5) / 12);
     const osc = ctx.createOscillator();
-    osc.type = 'sawtooth';
+    osc.type = profile.age === 'old' ? 'triangle' : 'sawtooth';
     osc.frequency.setValueAtTime(pitch, t);
     osc.frequency.linearRampToValueAtTime(pitch * (1 - slur * .12 + (feel.rise > 0 ? .03 : -.03)), t + dur);
-    const f1 = ctx.createBiquadFilter(); f1.type = 'bandpass'; f1.frequency.value = vowel[0] * (1 - slur * .1); f1.Q.value = 5;
-    const f2 = ctx.createBiquadFilter(); f2.type = 'bandpass'; f2.frequency.value = vowel[1] * (profile.gender === 'm' ? .92 : 1.05); f2.Q.value = 7;
+    if (vibrato) { const wobble = ctx.createOscillator(); const depth = ctx.createGain(); wobble.frequency.value = vibrato; depth.gain.value = pitch * .018; wobble.connect(depth).connect(osc.frequency); wobble.start(t); wobble.stop(t + dur + .02); }
+    const f1 = ctx.createBiquadFilter(); f1.type = 'bandpass'; f1.frequency.value = vowel[0] * tract * (1 - slur * .1); f1.Q.value = 5;
+    const f2 = ctx.createBiquadFilter(); f2.type = 'bandpass'; f2.frequency.value = vowel[1] * tract; f2.Q.value = 7;
     const gain = ctx.createGain();
     const peak = .16 * feel.level * speechVolume.value;
     gain.gain.setValueAtTime(0, t);
@@ -75,7 +81,7 @@ export function guestVoice(profile: VoiceProfile, text: string) {
     if (send) { const s = ctx.createGain(); s.gain.value = .25; gain.connect(s).connect(send); }
     osc.start(t); osc.stop(t + dur + .02);
     // A soft breath of noise on the start of a syllable gives the consonant.
-    if (i % 2 === 0 && !lowPower()) {
+    if ((i % 2 === 0 || profile.age === 'old') && !lowPower()) {
       const breath = noise();
       const bp = ctx.createBiquadFilter(); bp.type = 'highpass'; bp.frequency.value = 2800;
       const bg = ctx.createGain(); bg.gain.setValueAtTime(.04 * speechVolume.value, t); bg.gain.exponentialRampToValueAtTime(.0005, t + .05);
@@ -91,15 +97,17 @@ export function speakLine(text: string, who: 'guest' | 'bartender', profile?: Vo
   if (voiceMode.value !== 'speech' || !speechOn.value || speechVolume.value <= 0 || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
   const feel = FEELING[profile?.emotion ?? 'relaxed'] ?? FEELING.relaxed!;
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'en-GB';
+  utterance.lang = profile?.lang ?? 'en-GB';
   utterance.volume = speechVolume.value;
   const voices = window.speechSynthesis.getVoices().filter((item) => item.lang.startsWith('en'));
   const female = (item: SpeechSynthesisVoice) => /female|zira|hazel|susan|samantha|serena|libby|sonia/i.test(item.name);
   if (who === 'bartender') { utterance.pitch = .95; utterance.rate = .95; }
   else {
-    utterance.pitch = Math.min(2, (profile?.gender === 'f' ? 1.25 : .85) * feel.pitch);
-    utterance.rate = Math.min(1.4, .9 * feel.speed * (1 - Math.min(1, (profile?.drunk ?? 0) / 100) * .2));
-    const pick = voices.filter((item) => (profile?.gender === 'f') === female(item));
+    const ageShift = profile?.age === 'young' ? 1.12 : profile?.age === 'old' ? .88 : 1;
+    utterance.pitch = Math.max(.1, Math.min(2, (profile?.gender === 'f' ? 1.3 : .78) * feel.pitch * ageShift));
+    utterance.rate = Math.max(.5, Math.min(1.5, .9 * feel.speed * (profile?.speed ?? 1) * (1 - Math.min(1, (profile?.drunk ?? 0) / 100) * .2)));
+    const exact = voices.filter((item) => item.lang.replace('_', '-') === profile?.lang);
+    const pick = (exact.length ? exact : voices).filter((item) => (profile?.gender === 'f') === female(item));
     const pool = pick.length ? pick : voices;
     if (pool.length) utterance.voice = pool[hash(profile?.seed ?? '') % pool.length]!;
   }

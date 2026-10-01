@@ -10,7 +10,8 @@ import { goodAmount, lowGradeOf, receiveOrder } from '../src/sim/stockQuality.ts
 
 const NOW = Date.UTC(2026, 9, 1, 15);
 const context = (now = NOW, random = () => .5) => ({ now, random, checkEnglish, spawnCustomers: false });
-const seq = (...values) => { let index = 0; return () => (index < values.length ? values[index++] : .5); };
+// Problems happen at half the base rates (see receiveOrder), so the first roll is halved to land in the same band.
+const seq = (...values) => { const scaled = values.map((value, at) => (at === 0 ? value * .5 : value)); let index = 0; return () => (index < scaled.length ? scaled[index++] : .5); };
 const SOCIAL = { emotion: 'relaxed', rapport: 55, drunk: 0, chatty: false, topic: 'work', gender: 'x', phase: 'ordering', nextOrderAt: 0, rounds: 0, staysFor: 0, chatted: [] };
 
 function bar() {

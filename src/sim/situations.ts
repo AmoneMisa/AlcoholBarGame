@@ -13,6 +13,7 @@ import type { PlayerState } from './state';
 // matching a typed sentence, and what happens when nobody answers. Runs in the shared rules, so on the server.
 
 export type Trigger = 'arrival' | 'enjoying' | 'payment';
+const MIN_GAP = 4;
 const CHANCE: Record<Trigger, number> = { arrival: .10, enjoying: .16, payment: .10 };
 
 export interface Resolution {
@@ -78,6 +79,7 @@ export function guestLine(state: PlayerState, guest: Customer) {
 
 // Starts a situation on a guest and returns what they say first.
 export function startSituation(state: PlayerState, guest: Customer, def: SituationDef, now: number, random: () => number, extra: { amount?: number; afterServe?: boolean; data?: Record<string, string | number | boolean> } = {}) {
+  noteSituationStarted(state, random);
   const social = ensureSocial(guest, now);
   const data: Record<string, string | number | boolean> = { amount: extra.amount ?? 0, _tabs: state.tabs?.length ?? 0, _violations: state.ruleViolations ?? 0 };
   if (extra.afterServe) data.afterServe = 1;
@@ -90,9 +92,14 @@ export function startSituation(state: PlayerState, guest: Customer, def: Situati
 
 // Which situation (if any) starts for this guest now.
 export function pickSituation(state: PlayerState, guest: Customer, trigger: Trigger, random: () => number): SituationDef | undefined {
+  // Something happens at least once in every 10–12 guests, and never more often than every 4th guest.
+  if (trigger === 'arrival') state.guestsSinceEvent = (state.guestsSinceEvent ?? 0) + 1;
   if (anySituation(state)) return undefined;
+  const since = state.guestsSinceEvent ?? 0;
+  const gap = state.eventGap ??= 10 + Math.floor(random() * 3);
+  if (since < MIN_GAP) return undefined;
   const social = ensureSocial(guest, 0);
-  const chance = CHANCE[trigger] + (trigger === 'payment' ? social.drunk / 600 : 0);
+  const chance = since >= gap && trigger === 'arrival' ? 1 : CHANCE[trigger] + (trigger === 'payment' ? social.drunk / 600 : 0);
   if (random() >= chance) return undefined;
   const context = contextOf(state, guest, random, { amount: 0, _tabs: state.tabs?.length ?? 0, _violations: state.ruleViolations ?? 0 });
   const options = SITUATIONS.filter((def) => def.triggers.includes(trigger) && (!def.applies || def.applies(context)));
@@ -104,6 +111,12 @@ export function pickSituation(state: PlayerState, guest: Customer, trigger: Trig
   let roll = random() * total;
   for (const def of options) { roll -= weightOf(def); if (roll < 0) return def; }
   return options[0];
+}
+
+// The count starts again when a situation really begins.
+export function noteSituationStarted(state: PlayerState, random: () => number) {
+  state.guestsSinceEvent = 0;
+  state.eventGap = 10 + Math.floor(random() * 3);
 }
 
 function pickOutcome(outcomes: Outcome[], context: SituationContext) {

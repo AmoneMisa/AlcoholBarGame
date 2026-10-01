@@ -88,6 +88,9 @@ export interface PlayerState {
   nextBarEventAt?: number;
   lastBarEventId?: string;
   loyalty?: Record<string, number>;
+  // Guests who came since the last situation, and how many guests the next one is due after (10–12; never before the 4th).
+  guestsSinceEvent?: number;
+  eventGap?: number;
   // Day of the last rewarded visit to each friend's bar.
   friendVisits?: Record<string, string>;
   friendLabels?: Record<string, string>;

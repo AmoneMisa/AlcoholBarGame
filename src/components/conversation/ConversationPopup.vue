@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { voiceProfileOf } from '../../domain/social/origin';
 import { guestVoice, speakLine } from '../../audio/index';
 import { FOODS } from '../../domain/foods';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
@@ -134,7 +135,7 @@ watch(() => talk.value?.lines.length ?? 0, (_count, before) => {
     if (line.speaker === 'customer') noteSeenWords(line.text);
     // Only lines that arrive while the conversation is open are voiced, not the old ones when it opens.
     if (before === undefined || !customer.value) continue;
-    const profile = { seed: customer.value.characterId ?? customer.value.id, gender: (social.value?.gender ?? 'x') as 'f' | 'm' | 'x', emotion: social.value?.emotion, drunk: social.value?.drunk };
+    const profile = voiceProfileOf(customer.value);
     if (line.speaker === 'customer') { guestVoice(profile, line.text); speakLine(line.text, 'guest', profile); } else speakLine(line.text, 'bartender');
   }
   scrollLog();
