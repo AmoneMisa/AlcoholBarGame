@@ -753,3 +753,44 @@ test('Achievements have four tiers per series that must be claimed in order, and
   assert.equal(profile.shown[0].tierName, 'Gold');
   assert.equal(profile.achievementCount, 3);
 });
+
+test('Achievement counters: spending, collections, levels, servers, gifts and login days', async () => {
+  const { statValue, addStat } = await import('../src/domain/achievementStats.ts');
+  const { ACHIEVEMENTS } = await import('../src/domain/quests.ts');
+  const { normalizeLoot } = await import('../src/domain/lootState.ts');
+  const { xpForLevel } = await import('../src/domain/progression.ts');
+  const state = fresh();
+  // coins and crystals used: any action that lowers the purse counts, earning does not
+  state.crystals = 100;
+  run(state, { type: 'exchangeCrystals', crystals: 10 });
+  assert.equal(statValue(state, 'crystalsSpent'), 10);
+  assert.equal(statValue(state, 'coinsSpent'), 0, 'gaining coins is not spending');
+  state.money = 500;
+  state.loot.stats.coinsSpent = 0;
+  const { RECIPES } = await import('../src/domain/catalog.ts');
+  const { recipePurchase } = await import('../src/domain/economy.ts');
+  const cheap = RECIPES.map((item, index) => ({ item, price: recipePurchase(item, index) })).find((entry) => entry.price.currency === 'coins' && !state.knownRecipeIds.includes(entry.item.id));
+  state.money = cheap.price.amount + 10;
+  run(state, { type: 'buyRecipe', recipeId: cheap.item.id });
+  assert.equal(statValue(state, 'coinsSpent'), Math.floor(cheap.price.amount));
+  // derived counters read what the player owns now and keep the best value
+  state.xp = xpForLevel(26);
+  assert.equal(statValue(state, 'level'), 26);
+  state.ownedBarIds = ['new-york', 'london'];
+  assert.equal(statValue(state, 'bars'), 2);
+  state.staff = [{ level: 3 }, { level: 2 }];
+  assert.equal(statValue(state, 'staffHired'), 2);
+  assert.equal(statValue(state, 'staffLevels'), 5);
+  state.loot.stats.level = 40;
+  state.xp = 0;
+  assert.equal(statValue(state, 'level'), 40, 'progress is kept after a Grand Opening');
+  // fully equipped bars
+  for (const item of Object.values(state.loot.equipment['new-york'])) item.level = 5;
+  assert.equal(statValue(state, 'barUpgrades'), 1);
+  // counted when they happen
+  addStat(state, 'giftsSent', 2); addStat(state, 'visitedBy', 1);
+  assert.equal(statValue(state, 'giftsSent'), 2);
+  // every achievement counter exists and survives a save
+  const kept = normalizeLoot(JSON.parse(JSON.stringify({ ...state.loot, stats: Object.fromEntries(ACHIEVEMENTS.map((item) => [item.stat, 2_000_000])) })), 1);
+  for (const goal of ACHIEVEMENTS) assert.ok((kept.stats[goal.stat] ?? 0) > 0, `${goal.stat} is saved`);
+});

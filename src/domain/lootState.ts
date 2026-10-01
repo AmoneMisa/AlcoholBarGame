@@ -2,6 +2,7 @@ import { BOOST_KINDS, EQUIPMENT, TIER_ORDER, PRESTIGE_PERKS, newSlot, type Equip
 import { INGREDIENTS, REGIONS } from './catalog';
 import { SEASON_MILESTONES } from './seasons';
 import { SignatureError, validateSignature, type Signature } from './signature';
+import { STAT_IDS } from './quests';
 import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 
 // The loot layer of a player's save: materials, consumables, boxes, per-bar equipment, gacha pity and prestige.
@@ -57,12 +58,12 @@ export const createLoot = (): LootState => ({
 });
 
 const count = (value: unknown, max = 1_000_000) => Number.isFinite(value) && (value as number) > 0 ? Math.min(max, Math.floor(value as number)) : 0;
-function counts(value: unknown, allowed?: readonly string[]) {
+function counts(value: unknown, allowed?: readonly string[], max = 1_000_000) {
   const result: Record<string, number> = {};
   if (!value || typeof value !== 'object') return result;
   for (const [key, amount] of Object.entries(value as Record<string, unknown>)) {
     if (allowed && !allowed.includes(key)) continue;
-    const clean = count(amount);
+    const clean = count(amount, max);
     if (clean) result[key] = clean;
   }
   return result;
@@ -93,7 +94,7 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
     prestige: { stars: count(source.prestige?.stars), earned: count(source.prestige?.earned), count: count(source.prestige?.count, 1000), perks },
     runEarned: count(source.runEarned, 1e12),
     levelRewarded: Math.max(1, count(source.levelRewarded, 50) || currentLevel),
-    stats: counts(source.stats, ['serves', 'servesCoins', 'vips', 'bottles', 'boxes', 'draws', 'upgrades', 'tasted', 'perfectTalks', 'lessons', 'signatures']),
+    stats: counts(source.stats, STAT_IDS, 1_000_000_000),
     quests: { week: count(source.quests?.week, 1e6), progress: counts(source.quests?.progress), claimed: Array.isArray(source.quests?.claimed) ? source.quests!.claimed.filter((id) => typeof id === 'string').slice(0, 10) : [] },
     achievements: Array.isArray(source.achievements) ? [...new Set(source.achievements.filter((id) => typeof id === 'string'))].slice(0, 80) : [],
     tasted: Array.isArray(source.tasted) ? [...new Set(source.tasted.filter((id) => typeof id === 'string'))].slice(0, 400) : [],

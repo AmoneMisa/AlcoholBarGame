@@ -6,6 +6,7 @@ import { calendarDate, starCrystalPack } from '../src/domain/economy';
 import { friendCodeFor, playerIdFromCode } from './friendCode.mjs';
 import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE, describeLeaderboardReward, leaderboardReward } from '../src/domain/leaderboard';
 import { weekOf, WEEK_MS } from '../src/domain/quests';
+import { addStat } from '../src/domain/achievementStats';
 
 // Server-authoritative game: every request loads the player's state with a row lock, applies exactly one
 // validated action with the shared rules and the server clock, and stores the result together with a coin
@@ -234,6 +235,8 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       const rewarded = visitor.friendVisits[key] !== today;
       if (rewarded) {
         visitor.friendVisits[key] = today;
+        addStat(visitor, 'visitedFriends', 1);
+        addStat(owner, 'visitedBy', 1);
         owner.popularity += 1;
         owner.message = `${player.name} visited your bar. +1 prestige.`;
         await tx.saveState(player.id, visitor, (visitorRecord?.version ?? 0) + 1);
@@ -254,6 +257,7 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       if (state.friendVisits[String(targetId)] !== calendarDate(new Date(now()))) return { status: 403, body: { ok: false, error: 'Visit this friend’s bar first — gifts are handed over during a visit.' } };
       try {
         const paid = payForGift(state, gift, now());
+        addStat(state, 'giftsSent', 1);
         await tx.addGift({ fromId: Number(player.id), toId: targetId, payload: paid });
         state.message = `Gift sent to ${target.name}.`;
       } catch (error) {

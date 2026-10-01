@@ -17,6 +17,7 @@ import { SPOIL_MAX_DAYS, SPOIL_START_LEVEL, capacityFor, isPerishable, spoiledAm
 import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipeId, regularLevel } from '../domain/regulars';
 import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import type { Customer } from '../domain/types';
+import { statValue } from '../domain/achievementStats';
 import { ACHIEVEMENTS, TASTING_REWARD, achievementById, achievementSeries, questById, questsForWeek, weekOf, type StatId } from '../domain/quests';
 import type { DrawResult } from '../domain/lootState';
 import { createLoot } from '../domain/lootState';
@@ -372,7 +373,7 @@ export function track(state: PlayerState, stat: StatId, amount: number, now: num
   add(loot.stats, stat, amount);
   add(loot.quests.progress, stat, amount);
 }
-const goalProgress = (state: PlayerState, stat: StatId) => state.loot.stats[stat] ?? 0;
+const goalProgress = (state: PlayerState, stat: StatId) => statValue(state, stat);
 
 export function claimQuest(state: PlayerState, questId: unknown, now: number) {
   const week = weekOf(now);

@@ -683,7 +683,7 @@ test('Serving counts guests for the profile (drinks per bar), but practice guest
   const before = bar.served;
   bar.customers = [bar.customers[0]];
   const target = bar.customers[0];
-  Object.assign(target, { orderKind: 'cocktail', orderRevealed: true, orderRecipeId: recipe.id, patience: 99999, patienceRemaining: 99999 });
+  Object.assign(target, { modifierId: undefined, orderKind: 'cocktail', orderRevealed: true, orderRecipeId: recipe.id, patience: 99999, patienceRemaining: 99999 });
   for (const part of recipe.ingredients) bar.inventories[bar.regionId].find((stock) => stock.ingredientId === part.ingredientId).amount += 1000;
   doAction(bar, { type: 'serve', mix: recipe.ingredients.map((item) => ({ ...item })), shaken: true, pourBrands: {} });
   assert.equal(bar.served, before + 1);

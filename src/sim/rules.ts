@@ -25,6 +25,7 @@ import { guestLine, hasSituation, matchChoice, overdue, pickSituation, resolveCh
 import { FEATURED_MAX } from '../domain/profile';
 import { endTraining, finishGuide, isPractice, noteTraining, startTraining, tidyTraining } from './training';
 import { collectChatter, reactionToServed } from './chatter';
+import { addStat, raiseStat, syncDerivedStats } from '../domain/achievementStats';
 import { accrueStaff, hireStaff, upgradeStaff } from './staff';
 import { applyPromo, barEventFor, tickBarEvent } from './events';
 import { adjustPitch, askPitch, cancelPitch, pitchChance, startPitch } from './pitch';
@@ -683,6 +684,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const today = calendarDate(new Date(now));
       if (state.dailyGiftClaimedKey === today) throw new RuleError('Today’s gift has already been claimed.');
       state.loginStreak = consecutiveDays(state.dailyGiftClaimedKey, state.loginStreak, new Date(now));
+      raiseStat(state, 'loginDays', state.loginStreak);
       const reward = dailyCoinsFor(state.loginStreak);
       state.money = coins(state.money + reward);
       const crystalReward = dailyCrystalsFor(state.loginStreak);
@@ -1059,6 +1061,11 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
   // Training academy: note what the player did. A practice guest never pays and never brings crystals.
   const practising = guest && isPractice(guest) && ['serve', 'situationChoice', 'pitchAsk', 'say', 'autoServe'].includes(action.type);
   if (practising) { state.money = moneyBefore; state.crystals = crystalsBefore; }
+  // Achievements count what the player spent in all (a Grand Opening resetting the purse is not spending).
+  if (!practising && action.type !== 'prestige') {
+    addStat(state, 'coinsSpent', Math.floor(moneyBefore - state.money));
+    addStat(state, 'crystalsSpent', crystalsBefore - state.crystals);
+  }
   switch (action.type) {
     case 'say': if (guest && isPractice(guest)) { noteTraining(state, 'asked'); if (guest.orderRevealed) noteTraining(state, 'confirmed'); } break;
     case 'giveWater': noteTraining(state, 'water'); break;
@@ -1072,6 +1079,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
   // Coins earned by serving and selling bottles decide the stars of the next Grand Opening.
   if (['serve', 'autoServe', 'sellBottle'].includes(action.type) && state.money > moneyBefore) state.loot.runEarned += Math.floor(state.money - moneyBefore);
   grantLevelBoxes(state);
+  syncDerivedStats(state);
   // Auto-serve XP does not count for the leaderboard: the ranking rewards hands-on service.
   addWeeklyScore(state, action.type === 'prestige' || (action.type === 'serve' && action.auto) ? 0 : state.xp - xpBefore, now);
   if (!Number.isFinite(state.money) || state.money < 0) throw new RuleError('Not enough money.');

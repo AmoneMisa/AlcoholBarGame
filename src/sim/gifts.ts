@@ -1,3 +1,4 @@
+import { addStat } from '../domain/achievementStats';
 import { buildPlayerProfile } from '../domain/profile';
 import { RECIPES } from '../domain/catalog';
 import { calendarDate, coins, recipePurchase } from '../domain/economy';
@@ -116,6 +117,7 @@ function charge(state: PlayerState, currency: 'coins' | 'crystals', amount: numb
 
 // Applies a claimed gift to the receiver. Something they already have becomes a spare card or a crystal refund.
 export function receiveGift(state: PlayerState, gift: Gift, from: string) {
+  addStat(state, 'giftsGot', 1);
   if (gift.kind === 'consumable') {
     const item = consumableDef(gift.id);
     if (!item) return `${from}'s gift could not be opened.`;

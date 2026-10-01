@@ -8,7 +8,7 @@ import {
   BOXES, CONSUMABLES, DRAW_COST, DRAW_ODDS, DUPLICATE_SHARDS, EQUIPMENT, LEGENDARY_PITY, PRESTIGE_LEVEL, PRESTIGE_PERKS, SHARD_CRAFT_COST, TIER_SHARD_COST,
   consumableDef, describeReward, equipmentDef, levelCap, perkCost, prestigeStarsFor, upgradeCostFor
 } from '../../domain/loot';
-import { ACHIEVEMENTS, questsForWeek, weekOf } from '../../domain/quests';
+import { ACHIEVEMENTS, questsForWeek, weekOf, type StatId } from '../../domain/quests';
 import { INGREDIENTS } from '../../domain/catalog';
 import { FAME_PRICE_BONUS, FAME_STEPS, MAX_ITEMS, SIGNATURE_FEE, SIGNATURE_GUEST_CHANCE, SIGNATURE_LEVEL, fameLevel, nextFameStep, scoreSignature, validateSignature } from '../../domain/signature';
 import { usableIngredientIds } from '../../domain/usableStock';
@@ -34,7 +34,7 @@ const quests = computed(() => questsForWeek(week.value).map((quest) => {
   const current = game.loot.quests.week === week.value;
   return { quest, progress: current ? game.loot.quests.progress[quest.stat] ?? 0 : 0, claimed: current && game.loot.quests.claimed.includes(quest.id) };
 }));
-const stat = (id: string) => game.loot.stats[id] ?? 0;
+const stat = (id: string) => game.achievementStat(id as StatId);
 // One card per achievement series: the next tier to claim, and the four tiers as pips.
 const achievementRows = computed(() => [...new Set(ACHIEVEMENTS.map((item) => item.series))].map((series) => {
   const tiers = ACHIEVEMENTS.filter((item) => item.series === series).map((item) => ({ ...item, done: game.loot.achievements.includes(item.id) }));
