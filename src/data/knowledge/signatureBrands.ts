@@ -73,5 +73,21 @@ export const SIGNATURE_BRANDS: Record<string, SignatureBrand[]> = {
   'hugo-spritz': [{ brand: 'St-Germain', category: 'specialty-liqueur', reason: 'classic', note: 'Many bars use St-Germain elderflower liqueur instead of elderflower syrup.' }],
   gimlet: [{ brand: 'Plymouth', category: 'gin', ingredientId: 'gin', reason: 'classic', note: 'Navy history: Plymouth gin and lime cordial were the British Navy combination.' }],
   'rob-roy': [{ brand: 'Johnnie Walker', category: 'whiskey', ingredientId: 'whiskey', reason: 'classic', note: 'A blended Scotch like Johnnie Walker Black is the usual choice.' }],
+  'rusty-nail': [{ brand: 'Drambuie', category: 'herbal-liqueur', ingredientId: 'herbal-liqueur', reason: 'original', note: 'The drink is built on Drambuie, the honeyed Scotch liqueur; without it there is no Rusty Nail.' }],
+  'blue-lagoon': [{ brand: 'Bols', category: 'blue-curacao', ingredientId: 'blue-curacao', reason: 'classic', note: 'Bols made blue curaçao famous, and it is the usual choice for this drink.' }],
+  'blue-hawaii': [{ brand: 'Bols', category: 'blue-curacao', ingredientId: 'blue-curacao', reason: 'original', note: 'The drink was created in 1957 to show off Bols blue curaçao.' }],
+  'last-word': [
+    { brand: 'Chartreuse', category: 'herbal-liqueur', ingredientId: 'herbal-liqueur', reason: 'original', note: 'The original equal-parts recipe uses green Chartreuse.' },
+    { brand: 'Luxardo Maraschino', category: 'specialty-liqueur', ingredientId: 'specialty-liqueur', reason: 'original', note: 'A dry cherry-and-almond liqueur from Italy, the classic choice for maraschino.' }
+  ],
+  bijou: [{ brand: 'Chartreuse', category: 'herbal-liqueur', ingredientId: 'herbal-liqueur', reason: 'original', note: 'The “emerald” of the three jewels is green Chartreuse.' }],
+  martinez: [{ brand: 'Luxardo Maraschino', category: 'specialty-liqueur', ingredientId: 'specialty-liqueur', reason: 'classic', note: 'A small spoon of maraschino gives the drink its old-fashioned depth.' }],
+  'singapore-sling': [
+    { brand: 'Bénédictine', category: 'herbal-liqueur', ingredientId: 'herbal-liqueur', reason: 'original', note: 'The classic Raffles-style recipes use Bénédictine for the herbal sweetness.' },
+    { brand: 'Cherry Heering', category: 'specialty-liqueur', ingredientId: 'specialty-liqueur', reason: 'original', note: 'A Danish cherry liqueur that gives the sling its red-pink colour.' }
+  ],
+  'ti-punch': [{ brand: 'Clément', category: 'white-rum', ingredientId: 'white-rum', reason: 'classic', note: 'Rhum agricole from Martinique, made from fresh cane juice, is the traditional spirit.' }],
+  'queens-park-swizzle': [{ brand: 'Angostura', category: 'bitter-aperitif', ingredientId: 'bitter-aperitif', reason: 'classic', note: 'Angostura bitters are made in Trinidad, the home of the drink.' }],
+  'champagne-cocktail': [{ brand: 'Angostura', category: 'bitter-aperitif', ingredientId: 'bitter-aperitif', reason: 'original', note: 'The classic recipe soaks a sugar cube in Angostura bitters.' }],
   manhattan: [{ brand: 'Carpano Antica Formula', category: 'vermouth', ingredientId: 'vermouth', reason: 'classic', note: 'A rich Turin vermouth that many bartenders prefer in a Manhattan.' }]
 };

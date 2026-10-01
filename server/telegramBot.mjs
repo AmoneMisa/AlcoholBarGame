@@ -7,7 +7,7 @@ export class TelegramBotError extends Error {}
  * TELEGRAM_BOT_TOKEN is the only runtime Telegram setting. The launch URL is the bot's
  * standard Main Mini App deep link, whose HTTPS application URL is managed once in BotFather.
  */
-export function createTelegramBot({ token, fetchImpl = globalThis.fetch, logger = console } = {}) {
+export function createTelegramBot({ token, fetchImpl = globalThis.fetch, logger = console, payments } = {}) {
   const state = {
     configured: Boolean(token), connected: false, mode: 'off', id: null, username: null,
     mainMiniApp: false, lastUpdateAt: null, error: token ? null : 'TELEGRAM_BOT_TOKEN is not set'
@@ -54,8 +54,46 @@ export function createTelegramBot({ token, fetchImpl = globalThis.fetch, logger 
     await call('sendMessage', payload, signal);
   }
 
+  // Telegram Stars (XTR): a link for WebApp.openInvoice. Stars need an empty provider token and one price item.
+  async function createInvoiceLink({ pack, payload }) {
+    return call('createInvoiceLink', {
+      title: pack.title,
+      description: `${pack.crystals} crystals for your BarLingo bar.`,
+      payload,
+      provider_token: '',
+      currency: 'XTR',
+      prices: [{ label: `${pack.crystals} crystals`, amount: pack.stars }]
+    });
+  }
+
+  async function handlePreCheckout(query, signal) {
+    let verdict;
+    try { verdict = await payments.approve(query); } catch (error) { logger.error?.('Pre-checkout check failed:', error.message); verdict = { ok: false, error: 'Please try again in a moment.' }; }
+    await call('answerPreCheckoutQuery', verdict.ok
+      ? { pre_checkout_query_id: query.id, ok: true }
+      : { pre_checkout_query_id: query.id, ok: false, error_message: verdict.error }, signal);
+  }
+
+  // Telegram will not resend a paid update once it is acknowledged, so a failed credit is retried here.
+  async function handleSuccessfulPayment(message, signal) {
+    const payment = message.successful_payment;
+    let result;
+    for (let attempt = 1; !result; attempt++) {
+      try { result = await payments.fulfil(payment); } catch (error) {
+        logger.error?.(`Star payment ${payment.telegram_payment_charge_id} could not be credited (attempt ${attempt}):`, error.message);
+        if (attempt >= 3 || signal?.aborted) throw error;
+        await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+      }
+    }
+    if (result.credited && message.chat?.id) {
+      await call('sendMessage', { chat_id: message.chat.id, text: `Thank you! ✨ ${result.pack.crystals} crystals are now in your bar.` }, signal).catch(() => undefined);
+    }
+  }
+
   async function handleUpdate(update, signal) {
+    if (payments && update?.pre_checkout_query) return handlePreCheckout(update.pre_checkout_query, signal);
     const message = update?.message;
+    if (payments && message?.successful_payment) return handleSuccessfulPayment(message, signal);
     const command = message?.text?.trim().split(/\s+/, 1)[0]?.toLowerCase().split('@', 1)[0];
     if (command === '/start' || command === '/game') return sendWelcome(message, signal);
     if (command === '/help' && message?.chat?.id && message.chat.type === 'private') {
@@ -69,7 +107,7 @@ export function createTelegramBot({ token, fetchImpl = globalThis.fetch, logger 
   async function poll(signal) {
     while (!signal.aborted) {
       try {
-        const updates = await call('getUpdates', { offset, timeout: 25, allowed_updates: ['message'] }, signal);
+        const updates = await call('getUpdates', { offset, timeout: 25, allowed_updates: ['message', 'pre_checkout_query'] }, signal);
         for (const update of updates) {
           offset = Math.max(offset, Number(update.update_id) + 1);
           state.lastUpdateAt = new Date().toISOString();
@@ -130,5 +168,5 @@ export function createTelegramBot({ token, fetchImpl = globalThis.fetch, logger 
     state.mode = token ? 'stopped' : 'off';
   }
 
-  return { start, stop, status, call, handleUpdate };
+  return { start, stop, status, call, handleUpdate, createInvoiceLink };
 }

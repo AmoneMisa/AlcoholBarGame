@@ -49,11 +49,26 @@ function pgTx(client) {
     async saveRequest(playerId, requestId, response) {
       await client.query('INSERT INTO processed_requests (player_id, request_id, response) VALUES ($1, $2, $3::jsonb) ON CONFLICT DO NOTHING', [playerId, requestId, JSON.stringify(response)]);
     },
+    async pruneRequests(before) {
+      const { rowCount } = await client.query('DELETE FROM processed_requests WHERE created_at < to_timestamp($1 / 1000.0)', [before]);
+      return rowCount;
+    },
     async addLedger(playerId, entry) {
       await client.query('INSERT INTO coin_ledger (player_id, request_id, action, delta, balance) VALUES ($1, $2, $3, $4, $5)', [playerId, entry.requestId, entry.action, entry.delta, entry.balance]);
     },
     async addCrystalLedger(playerId, entry) {
       await client.query('INSERT INTO crystal_ledger (player_id, request_id, action, delta, balance) VALUES ($1, $2, $3, $4, $5)', [playerId, entry.requestId, entry.action, entry.delta, entry.balance]);
+    },
+    async hasStarPurchase(playerId, packId) {
+      const { rowCount } = await client.query('SELECT 1 FROM star_purchases WHERE player_id = $1 AND pack_id = $2 LIMIT 1', [playerId, packId]);
+      return rowCount > 0;
+    },
+    // A Telegram Stars payment is stored once per charge id; `true` means this call recorded it.
+    async addStarPurchase(playerId, purchase) {
+      const { rowCount } = await client.query(
+        `INSERT INTO star_purchases (charge_id, player_id, pack_id, stars, crystals) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (charge_id) DO NOTHING`,
+        [purchase.chargeId, playerId, purchase.packId, purchase.stars, purchase.crystals]);
+      return rowCount === 1;
     },
 
     // ---- Friends and gifts ----
@@ -110,6 +125,7 @@ export function createMemoryRepository() {
   const gifts = [];
   let nextGiftId = 1;
   const crystalLedger = [];
+  const starPurchases = new Map();
   let queue = Promise.resolve();
   let nextId = 1;
   const tx = {
@@ -121,8 +137,15 @@ export function createMemoryRepository() {
     async saveState(playerId, state, version) { states.set(playerId, structuredClone({ state, version })); },
     async findRequest(playerId, requestId) { return requests.get(`${playerId}:${requestId}`) ?? null; },
     async saveRequest(playerId, requestId, response) { requests.set(`${playerId}:${requestId}`, structuredClone(response)); },
+    async pruneRequests() { return 0; },
     async addLedger(playerId, entry) { ledger.push({ playerId, ...entry }); },
     async addCrystalLedger(playerId, entry) { crystalLedger.push({ playerId, ...entry }); },
+    async hasStarPurchase(playerId, packId) { return [...starPurchases.values()].some((item) => item.playerId === playerId && item.packId === packId); },
+    async addStarPurchase(playerId, purchase) {
+      if (starPurchases.has(purchase.chargeId)) return false;
+      starPurchases.set(purchase.chargeId, { playerId, ...purchase });
+      return true;
+    },
     async getPlayer(id) {
       for (const player of players.values()) if (player.id === id) return { id: player.id, name: player.name };
       return null;
@@ -155,6 +178,7 @@ export function createMemoryRepository() {
   return {
     ledger,
     crystalLedger,
+    starPurchases,
     // Stored (full, secret) states by player id — for tests.
     states,
     // Transactions run one at a time, like row locks for a single player.

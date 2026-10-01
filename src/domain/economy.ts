@@ -18,6 +18,22 @@ export const CRYSTAL_EXCHANGE_BUNDLES = [
   { crystals: 250, coins: 7750 }
 ] as const;
 
+// Crystal packs sold for Telegram Stars (currency XTR, whole Stars). The server is the only source of
+// prices and amounts; the client sends just a pack id.
+export interface StarCrystalPack { id: string; stars: number; crystals: number; title: string; once?: boolean }
+
+// The starter pack is a one-time welcome offer; the regular packs share one flat rate of 2.4 crystals per Star,
+// so a bigger pack is never a "better deal" that pushes players to spend more than they want.
+export const STAR_CRYSTAL_PACKS: readonly StarCrystalPack[] = [
+  { id: 'starter', stars: 15, crystals: 40, title: 'Starter crystals', once: true },
+  { id: 'pinch', stars: 25, crystals: 60, title: 'Pinch of crystals' },
+  { id: 'handful', stars: 75, crystals: 180, title: 'Handful of crystals' },
+  { id: 'chest', stars: 250, crystals: 600, title: 'Chest of crystals' },
+  { id: 'vault', stars: 750, crystals: 1800, title: 'Vault of crystals' }
+];
+
+export const starCrystalPack = (id: unknown) => STAR_CRYSTAL_PACKS.find((pack) => pack.id === id);
+
 export function crystalExchange(crystals: number) {
   return CRYSTAL_EXCHANGE_BUNDLES.find((bundle) => bundle.crystals === crystals);
 }

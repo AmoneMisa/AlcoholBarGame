@@ -7,9 +7,7 @@ export interface CharacterArtDefinition {
   castIndex?: number;
   asset?: string;
   sheet?: string;
-  baseSheet?: string;
   columns?: number;
-  baseColumns?: number;
   rows?: number;
   specialSheets?: string[];
 }
@@ -28,8 +26,8 @@ export const CHARACTER_ART: CharacterArtDefinition[] = [
     ['sora','Sora','male','straight','#d0a17f'],['priya','Priya','female','soft','#a86646'],['amara','Amara','female','straight','#8b553d'],['rowan','Rowan','neutral','straight','#e2a37f'],['mateo','Mateo','male','broad','#b87853'],
     ['zahra','Zahra','female','straight','#bd805b'],['kenji','Kenji','male','broad','#b78462'],['raven','Raven','female','straight','#dfb293'],['niko','Niko','neutral','broad','#75472f'],['edith','Edith','female','soft','#d6a07f']
   ].map(([id,name,presentation,body,skinTone],castIndex) => ({ id,name,presentation:presentation as CharacterArtDefinition['presentation'],body:body as CharacterArtDefinition['body'],skinTone,castIndex,sheet:'/assets/characters/customers/extended-seated-cast-2-v2.webp',columns:5,rows:2 })),
-  { id: 'noa', name: 'Noa', presentation: 'female', body: 'straight', skinTone: '#a86643', sheet:'/assets/characters/bartender/noa-wardrobe-v3.png',baseSheet:'/assets/characters/bartender/noa-mannequin-v3.png',specialSheets:['/assets/characters/bartender/noa-special-a-v1.webp','/assets/characters/bartender/noa-special-b-v1.webp'],columns:3,baseColumns:3,rows:3,castIndex:0 },
-  { id: 'leo', name: 'Leo', presentation: 'male', body: 'broad', skinTone: '#a96f4d', sheet:'/assets/characters/bartender/leo-wardrobe-v7.png',baseSheet:'/assets/characters/bartender/leo-mannequin-v3.png',specialSheets:['/assets/characters/bartender/leo-special-a-v1.webp','/assets/characters/bartender/leo-special-b-v1.webp'],columns:3,baseColumns:3,rows:3,castIndex:0 }
+  { id: 'noa', name: 'Noa', presentation: 'female', body: 'straight', skinTone: '#a86643', sheet:'/assets/characters/bartender/noa-wardrobe-v3.webp',specialSheets:['/assets/characters/bartender/noa-special-a-v1.webp','/assets/characters/bartender/noa-special-b-v1.webp'],columns:3,rows:3,castIndex:0 },
+  { id: 'leo', name: 'Leo', presentation: 'male', body: 'broad', skinTone: '#a96f4d', sheet:'/assets/characters/bartender/leo-wardrobe-v7.webp',specialSheets:['/assets/characters/bartender/leo-special-a-v1.webp','/assets/characters/bartender/leo-special-b-v1.webp'],columns:3,rows:3,castIndex:0 }
 ];
 
 export const CUSTOMER_ART_BY_SLOT = CHARACTER_ART.filter((art) => !['noa','leo'].includes(art.id)).map((art) => art.id);

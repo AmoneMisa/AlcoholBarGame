@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { RECIPES } from '../src/domain/catalog';
 import { createApp, handleErrors } from './app.mjs';
-import { listCocktails, migrate, pool, seedCocktailsIfEmpty } from './database.mjs';
+import { listCocktails, migrate, pool, seedMissingCocktails } from './database.mjs';
 import { checkEnglish } from './english.mjs';
 import { createGameService } from './gameService.mjs';
 import { createPgRepository } from './playerRepository.mjs';
@@ -14,11 +14,14 @@ const botToken = process.env.TELEGRAM_BOT_TOKEN;
 // Only for local development: lets the browser play without Telegram. Never enable in production.
 const allowDevLogin = process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production';
 if (!botToken && !allowDevLogin) console.warn('TELEGRAM_BOT_TOKEN is not set: players cannot sign in.');
-const telegramBot = createTelegramBot({ token: botToken });
+const payments = {};
+const telegramBot = createTelegramBot({ token: botToken, payments });
 
 const service = createGameService({ repository: createPgRepository(pool), checkEnglish });
+Object.assign(payments, { approve: service.approveStarCheckout, fulfil: service.fulfilStarPayment });
 const app = createApp({
   service, botToken, allowDevLogin,
+  createInvoiceLink: botToken ? telegramBot.createInvoiceLink : undefined,
   extraRoutes(api) {
     api.get('/api/health', async (_request, response) => {
       try {
@@ -41,20 +44,30 @@ const app = createApp({
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.resolve(here, '../dist');
-app.use(express.static(dist, { maxAge: '1y', immutable: true, index: false }));
+// Vite's hashed files (index-Ab12Cd34.js) never change, so they are cached for a year. Art and audio keep their
+// names across releases, so they are cached for a day and then revalidated with their ETag.
+const HASHED = /-[A-Za-z0-9_-]{8}\.(js|css|dic|aff)$/;
+app.use(express.static(dist, {
+  index: false,
+  setHeaders(response, file) {
+    response.setHeader('Cache-Control', HASHED.test(file) ? 'public, max-age=31536000, immutable' : 'public, max-age=86400, stale-while-revalidate=604800');
+  }
+}));
 app.use((request, response, next) => request.path.startsWith('/api/') ? next() : response.sendFile(path.join(dist, 'index.html')));
 app.use('/api', (_request, response) => response.status(404).json({ ok: false, error: 'Not found' }));
 handleErrors(app);
 
 await migrate();
-const seeded = await seedCocktailsIfEmpty(RECIPES);
-if (seeded.inserted) console.log(`Seeded ${seeded.inserted} cocktails.`);
+const seeded = await seedMissingCocktails(RECIPES);
+if (seeded.inserted) console.log(`Added ${seeded.inserted} new cocktails to the catalog.`);
 
 const server = app.listen(port, '0.0.0.0', () => console.log(`BarLingo listening on :${port}`));
 if (botToken) {
   telegramBot.start().then((status) => console.log(`Telegram @${status.username} connected (${status.mode}).`))
     .catch((error) => console.error('Telegram bot connection failed:', error.message));
 }
+const prune = setInterval(() => service.pruneRequests().catch((error) => console.error('Request cleanup failed:', error.message)), 6 * 60 * 60 * 1000);
+prune.unref();
 const shutdown = async () => {
   await telegramBot.stop();
   server.close(async () => {

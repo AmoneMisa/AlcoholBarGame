@@ -102,12 +102,6 @@ export function consumeMix(inventory: InventoryItem[], mix: InventoryItem[]) {
   return next;
 }
 
-export function canMake(inventory: InventoryItem[], customer: Customer) {
-  return requiredRecipe(customer).ingredients.every((required) =>
-    (inventory.find((item) => item.ingredientId === required.ingredientId)?.amount ?? 0) >= required.amount
-  );
-}
-
 export function createMarket(region: Region, day: number): SupplierOffer[] {
   const wave = 1 + Math.sin(day * 1.7) * 0.06;
   const suppliers = [

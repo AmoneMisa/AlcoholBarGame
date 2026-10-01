@@ -4,7 +4,7 @@ import { INGREDIENTS, RECIPES, REGIONS, recipeAlcoholLabel } from '../../domain/
 import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleSaleCrystalReward } from '../../domain/bottleCatalog';
 import BrandBottle from '../knowledge/BrandBottle.vue';
 import { guideIdForProduct } from '../../data/knowledge/alcohol';
-import { COUNTER_COLORS, COUNTER_MATERIALS, COUNTER_SIZES, HIGHLIGHTS, HIGHLIGHT_STRENGTHS, INTERIORS, POSES, SHELF_STYLES, WALLS, interiorStyle, shelfStyleFor } from '../../data/cosmetics/bars';
+import { HIGHLIGHTS, HIGHLIGHT_STRENGTHS, INTERIORS, POSES, SHELF_STYLES, WALLS, interiorStyle, shelfStyleFor } from '../../data/cosmetics/bars';
 import { DAILY_COINS, SPECIALTY_PREMIUM, isCitySpecialty, specialtyFactor } from '../../domain/economy';
 import type { Ingredient, RegionId } from '../../domain/types';
 import { useGameStore } from '../../stores/game';

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { CRYSTAL_EXCHANGE_BUNDLES } from '../../domain/economy';
+import { CRYSTAL_EXCHANGE_BUNDLES, STAR_CRYSTAL_PACKS } from '../../domain/economy';
 import { useGameStore } from '../../stores/game';
 import UiIcon from '../ui/UiIcon.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
@@ -23,6 +23,9 @@ const soundSummary = computed(() => soundSilent.value ? 'Muted' : [musicOn.value
 const xpPercent = computed(() => game.xpProgress.percent);
 function exchange(crystals: number) {
   if (game.exchangeCrystals(crystals)) exchangeOpen.value = false;
+}
+async function buyPack(packId: string) {
+  if (await game.buyCrystalPack(packId)) exchangeOpen.value = false;
 }
 let calendarTimer: ReturnType<typeof setInterval>;
 // Other screens pin content just below the HUD (the Design preview), so its height is published as --hud-h.
@@ -55,7 +58,10 @@ onUnmounted(() => {
       <div><UiIcon name="coin" /><span><small>COINS</small><b>{{ game.money.toLocaleString('en-US', { maximumFractionDigits: 2 }) }}</b></span></div>
       <div class="crystal-resource exchange-resource">
         <button class="exchange-open" type="button" :aria-expanded="exchangeOpen" aria-label="Convert crystals to coins" @click="exchangeOpen = !exchangeOpen"><UiIcon name="crystal" /><span><small>CRYSTALS</small><b>{{ game.crystals.toLocaleString('en-US') }}</b></span></button>
-        <PopoverPanel v-if="exchangeOpen" class="currency-exchange" eyebrow="CRYSTAL EXCHANGE" title="Turn crystals into coins" close-label="Close exchange" @close="exchangeOpen = false">
+        <PopoverPanel v-if="exchangeOpen" class="currency-exchange" eyebrow="CRYSTALS" title="Get and use crystals" close-label="Close exchange" @close="exchangeOpen = false">
+          <h4 class="crystal-shop-title">Buy with Telegram Stars</h4>
+          <button v-for="pack in STAR_CRYSTAL_PACKS.filter((item) => !item.once || game.starterPackAvailable)" :key="pack.id" type="button" class="star-pack" :disabled="game.buyingCrystals" @click="buyPack(pack.id)"><span><UiIcon name="crystal" /><b>{{ pack.crystals.toLocaleString('en-US') }}</b></span><i>→</i><span><b>{{ pack.stars }}</b> ⭐</span><em v-if="pack.once">One-time offer</em></button>
+          <h4 class="crystal-shop-title">Exchange for coins</h4>
           <p>This exchange only works from crystals to coins and cannot be reversed.</p>
           <button v-for="bundle in CRYSTAL_EXCHANGE_BUNDLES" :key="bundle.crystals" type="button" :disabled="game.crystals < bundle.crystals" @click="exchange(bundle.crystals)"><span><UiIcon name="crystal" /><b>{{ bundle.crystals }}</b></span><i>→</i><span><UiIcon name="coin" /><b>{{ bundle.coins.toLocaleString('en-US') }}</b></span></button>
         </PopoverPanel>

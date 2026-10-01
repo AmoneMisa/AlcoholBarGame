@@ -5,7 +5,7 @@ import { authenticate } from './auth.mjs';
 //   POST /api/session  → create/load the player's game and return it
 //   POST /api/action   → { requestId, action } → apply one action on the server, return the new state
 
-export function createApp({ service, botToken, allowDevLogin = false, extraRoutes }) {
+export function createApp({ service, botToken, allowDevLogin = false, extraRoutes, createInvoiceLink }) {
   const app = express();
   app.disable('x-powered-by');
   app.use('/api', express.json({ limit: '16kb' }));
@@ -24,6 +24,20 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
       const result = await service.act(request.identity, request.body);
       response.status(result.status).json(result.body);
     } catch (error) { next(error); }
+  });
+
+  // Telegram Stars: returns an invoice link for the Mini App's WebApp.openInvoice(). Crystals are credited
+  // only when Telegram confirms the payment to the bot — never because the client says it paid.
+  app.post('/api/stars/invoice', auth, limiter, async (request, response, next) => {
+    try {
+      if (!createInvoiceLink) return response.status(503).json({ ok: false, error: 'Star payments are not available right now.' });
+      const result = await service.startStarPurchase(request.identity, request.body?.packId);
+      if (!result.order) return response.status(result.status).json(result.body);
+      response.json({ ok: true, url: await createInvoiceLink(result.order) });
+    } catch (error) {
+      if (error?.name === 'TelegramBotError') return response.status(502).json({ ok: false, error: 'Telegram could not create the invoice. Try again.' });
+      next(error);
+    }
   });
 
   app.post('/api/friends', auth, limiter, async (request, response, next) => {
@@ -50,6 +64,8 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
 
 export function handleErrors(app) {
   app.use((error, _request, response, _next) => {
+    // A body that is not valid JSON (or is too large) is the client's mistake, not a server failure.
+    if (error?.status >= 400 && error.status < 500) return response.status(error.status).json({ ok: false, error: 'Invalid request.' });
     console.error(error);
     response.status(500).json({ ok: false, error: 'Internal server error' });
   });

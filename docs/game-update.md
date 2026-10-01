@@ -36,8 +36,8 @@ Generated using the built-in image generation tool, not Blender or the API/CLI f
 | `public/assets/characters/customers/extended-cast-2.png` | Ten additional diverse customers in a five-column, two-row sprite atlas |
 | `public/assets/characters/bartender/noa-wardrobe.png` | Three glamorous illustrated outfits for Noa |
 | `public/assets/characters/bartender/leo-wardrobe.png` | Three illustrated outfits for muscular, tattooed Leo |
-| `public/assets/bar/backgrounds/botanical-room.png` | Botanical room interior |
-| `public/assets/bar/backgrounds/skyline-lounge.png` | Skyline lounge interior |
+| `public/assets/bar/backgrounds/botanical-room.webp` | Botanical room interior |
+| `public/assets/bar/backgrounds/skyline-lounge.webp` | Skyline lounge interior |
 
 Production prompt specifications:
 

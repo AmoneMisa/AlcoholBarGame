@@ -34,21 +34,25 @@ export async function migrate() {
   }
 }
 
-// Seeds the catalog from the game's own recipe list (passed in by the server entry).
-export async function seedCocktailsIfEmpty(recipes) {
-  const { rows: [{ count }] } = await pool.query('SELECT count(*)::int AS count FROM cocktails');
-  if (count > 0) return { inserted: 0 };
+// Keeps the catalog in step with the game's own recipe list (passed in by the server entry): every recipe the table
+// does not have yet is added, so new cocktails reach an existing database. Rows that already exist are never
+// overwritten, so any edit made in the database stays.
+export async function seedMissingCocktails(recipes) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+    let inserted = 0;
     for (const [displayOrder, recipe] of recipes.entries()) {
-      await client.query(
+      const { rowCount } = await client.query(
         `INSERT INTO cocktails
           (id,name,price,needs_shake,category,origin,story,tasting_notes,occasions,method,display_order)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9::jsonb,$10::jsonb,$11)`,
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9::jsonb,$10::jsonb,$11)
+         ON CONFLICT (id) DO NOTHING`,
         [recipe.id, recipe.name, recipe.price, recipe.needsShake, recipe.category, recipe.origin, recipe.story,
           JSON.stringify(recipe.tastingNotes), JSON.stringify(recipe.occasions), JSON.stringify(recipe.method), displayOrder]
       );
+      if (!rowCount) continue;
+      inserted++;
       for (const [position, ingredient] of recipe.ingredients.entries()) {
         await client.query(
           'INSERT INTO cocktail_ingredients(cocktail_id,ingredient_id,amount,position) VALUES ($1,$2,$3,$4)',
@@ -57,7 +61,7 @@ export async function seedCocktailsIfEmpty(recipes) {
       }
     }
     await client.query('COMMIT');
-    return { inserted: recipes.length };
+    return { inserted };
   } catch (error) {
     await client.query('ROLLBACK');
     throw error;

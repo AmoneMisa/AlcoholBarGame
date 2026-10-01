@@ -254,7 +254,6 @@ const ice = computed(() => game.currentMix.find((item) => item.ingredientId === 
 const hasBubbles = computed(() => game.currentMix.some((item) => ['soda', 'tonic', 'ginger-beer', 'grapefruit-soda', 'sparkling-wine'].includes(item.ingredientId)));
 const garnish = computed(() => ['mint', 'lime-wedge', 'orange', 'pineapple-wedge'].find((id) => game.currentMix.some((item) => item.ingredientId === id)) ?? '');
 const selectedIngredient = computed(() => INGREDIENTS.find((item) => item.id === draggingIngredientId.value));
-const selectedAmount = computed(() => draggingIngredientId.value ? game.currentMix.find((item) => item.ingredientId === draggingIngredientId.value)?.amount : undefined);
 
 const colorMap: Record<string, string> = {
   'white-rum': '#e9e1b5', 'dark-rum': '#8a3e1f', gin: '#dce8d7', vodka: '#dce7ed', tequila: '#e5c675', whiskey: '#a94e21',

@@ -5,7 +5,7 @@ import type { PlayerState } from '../sim/state';
 // (vite dev + server with ALLOW_DEV_LOGIN=true) a per-browser dev id is used instead.
 
 export interface ServerResult { ok: boolean; state?: PlayerState; serverTime?: number; message?: string; error?: string; }
-export interface SessionResult { ok: true; player: { id: number; name: string; friendCode: string }; state: PlayerState; serverTime: number; }
+export interface SessionResult { ok: true; player: { id: number; name: string; friendCode: string }; state: PlayerState; starterPackAvailable?: boolean; serverTime: number; }
 export interface FriendSummary { id:number; code:string; nickname:string; customName:string; status:'pending'|'accepted'; direction:'incoming'|'outgoing' }
 export interface FriendBar { id:number; code:string; nickname:string; customName:string; name:string; level:number; regionId:string; bar:Record<string,unknown>; recipes:number; interiors:number; mastered:{name:string;level:number}[] }
 export interface SocialResult { ok:boolean; error?:string; message?:string; state?:PlayerState; friendCode?:string; friends?:FriendSummary[]; friend?:FriendBar; rewarded?:boolean }
@@ -35,6 +35,8 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 export function connectSession() {
   return post<SessionResult>('/api/session', {});
 }
+
+export const createStarInvoice = (packId: string) => post<{ ok: boolean; url?: string; error?: string }>('/api/stars/invoice', { packId });
 
 export const fetchFriends = () => post<SocialResult>('/api/friends', {});
 export const requestFriend = (code:string) => post<SocialResult>('/api/friends/add', { code });

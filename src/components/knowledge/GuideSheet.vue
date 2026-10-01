@@ -49,7 +49,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
         <header class="guide-head">
           <small>COCKTAIL GUIDE · {{ recipe.origin }}</small>
           <h2>{{ recipe.name }} <button type="button" class="guide-speak" aria-label="Listen to the name" @click="speak(recipe.name)"><UiIcon name="speaker" /></button></h2>
-          <p>{{ cocktail.summary }}</p>
+          <p>{{ cocktail.summary }} <button type="button" class="guide-speak" aria-label="Listen to the description" @click="speak(cocktail.summary)"><UiIcon name="speaker" /></button></p>
           <div class="guide-badges"><span>{{ cocktail.preparation.technique }}</span><span>{{ cocktail.strength }}</span><span v-for="note in recipe.tastingNotes" :key="note">{{ note }}</span></div>
         </header>
 

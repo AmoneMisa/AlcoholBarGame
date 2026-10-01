@@ -53,10 +53,10 @@ test('Customer smoking trait is stable and never injected as incompatible dialog
   assert.doesNotMatch(`${guest.greeting} ${guest.request} ${guest.wish}`,/I don['’]t smoke/i);
 });
 
-test('The complete 64-cocktail book is valid and includes alcohol strength',() => {
-  assert.equal(RECIPES.length,64);
-  assert.equal(new Set(RECIPES.map((recipe) => recipe.id)).size,64);
-  assert.equal(new Set(RECIPES.map((recipe) => recipe.name)).size,64);
+test('The complete 80-cocktail book is valid and includes alcohol strength',() => {
+  assert.equal(RECIPES.length,80);
+  assert.equal(new Set(RECIPES.map((recipe) => recipe.id)).size,80);
+  assert.equal(new Set(RECIPES.map((recipe) => recipe.name)).size,80);
   const ingredientIds = new Set(INGREDIENTS.map((ingredient) => ingredient.id));
   for (const recipe of RECIPES) {
     assert.ok(recipe.story.length > 30,`${recipe.name} needs a story`);
@@ -68,7 +68,7 @@ test('The complete 64-cocktail book is valid and includes alcohol strength',() =
   }
   const game = freshGame();
   assert.equal(game.knownRecipes.length,10);
-  assert.equal(game.lockedRecipes.length,54);
+  assert.equal(game.lockedRecipes.length,70);
 });
 
 test('Bottle dialogue ranks stocked brands by quantity, budget, type and taste',() => {

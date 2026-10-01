@@ -1,8 +1,9 @@
+import { randomBytes } from 'node:crypto';
 import { applyAction, advanceClock, RuleError } from '../src/sim/rules';
 import { createInitialState, normalizePlayerState, publicState } from '../src/sim/state';
 import { receiveGift } from '../src/sim/gifts';
 import { payForGift, publicBar } from '../src/sim/gifts';
-import { calendarDate } from '../src/domain/economy';
+import { calendarDate, starCrystalPack } from '../src/domain/economy';
 
 // Server-authoritative game: every request loads the player's state with a row lock, applies exactly one
 // validated action with the shared rules and the server clock, and stores the result together with a coin
@@ -33,7 +34,7 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
         if (claimed) state.message = receiveGift(state, claimed.payload, claimed.fromName);
       }
       await tx.saveState(player.id, state, (record?.version ?? 0) + 1);
-      return { ok: true, player: { id: player.id, name: player.name, friendCode: friendCode(player.id) }, state: publicState(state), serverTime: now() };
+      return { ok: true, player: { id: player.id, name: player.name, friendCode: friendCode(player.id) }, state: publicState(state), starterPackAvailable: !(await tx.hasStarPurchase(player.id, 'starter')), serverTime: now() };
     });
   }
 
@@ -45,10 +46,12 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
 
     return repository.transaction(async (tx) => {
       const player = await tx.findOrCreatePlayer(identity);
+      // Lock the player's row BEFORE looking for a replay: two simultaneous retries of one request id then run
+      // one after the other, and the second sees the first's stored answer instead of applying the action twice.
+      const record = await tx.lockState(player.id);
       const replay = await tx.findRequest(player.id, requestId);
       if (replay) return { status: 200, body: replay };
 
-      const record = await tx.lockState(player.id);
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
       const next = structuredClone(state);
       let result;
@@ -189,5 +192,61 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
     });
   }
 
-  return { session, act, friends, addFriend, answerFriend, labelFriend, visitFriend, sendGift };
+  // ---- Crystal packs paid with Telegram Stars ----
+  // The invoice payload is 'stars:<playerId>:<packId>:<nonce>'. Prices and amounts always come from the
+  // server's pack list, never from the client or from the payload itself.
+
+  async function startStarPurchase(identity, packId) {
+    const pack = starCrystalPack(packId);
+    if (!pack) return { status: 400, body: { ok: false, error: 'Unknown crystal pack.' } };
+    const player = await repository.transaction((tx) => tx.findOrCreatePlayer(identity));
+    if (pack.once && await repository.transaction((tx) => tx.hasStarPurchase(player.id, pack.id))) return { status: 409, body: { ok: false, error: 'This one-time offer was already claimed.' } };
+    const nonce = randomBytes(6).toString('hex');
+    return { status: 200, order: { pack, payload: `stars:${player.id}:${pack.id}:${nonce}` } };
+  }
+
+  function readStarPayment({ currency, total_amount: total, invoice_payload: payload }) {
+    const [kind, playerId, packId] = String(payload ?? '').split(':');
+    const pack = starCrystalPack(packId);
+    const id = Number(playerId);
+    if (kind !== 'stars' || !pack || !Number.isSafeInteger(id) || id <= 0) return { error: 'This order is not recognised.' };
+    if (currency !== 'XTR' || total !== pack.stars) return { error: 'The payment does not match this crystal pack.' };
+    return { pack, playerId: id };
+  }
+
+  // Answer to Telegram's pre-checkout query: only approve orders this server can fulfil.
+  async function approveStarCheckout(query) {
+    const order = readStarPayment(query ?? {});
+    if (order.error) return { ok: false, error: order.error };
+    return repository.transaction(async (tx) => {
+      if (!await tx.getPlayer(order.playerId)) return { ok: false, error: 'Player not found.' };
+      if (order.pack.once && await tx.hasStarPurchase(order.playerId, order.pack.id)) return { ok: false, error: 'This one-time offer was already claimed.' };
+      return { ok: true };
+    });
+  }
+
+  // Credits a successful payment exactly once per Telegram charge id.
+  async function fulfilStarPayment(payment) {
+    const order = readStarPayment(payment ?? {});
+    const chargeId = payment?.telegram_payment_charge_id;
+    if (order.error || typeof chargeId !== 'string' || !chargeId) throw new Error(order.error ?? 'Payment has no charge id.');
+    return repository.transaction(async (tx) => {
+      const player = await tx.getPlayer(order.playerId);
+      if (!player) throw new Error('Paid player not found.');
+      const fresh = await tx.addStarPurchase(player.id, { chargeId, packId: order.pack.id, stars: order.pack.stars, crystals: order.pack.crystals });
+      if (!fresh) return { credited: false, playerId: player.id, pack: order.pack };
+      const record = await tx.lockState(player.id);
+      const state = normalizePlayerState(record?.state ?? createInitialState(now()));
+      state.crystals += order.pack.crystals;
+      state.message = `Thank you! +${order.pack.crystals} crystals were added to your bar.`;
+      await tx.saveState(player.id, state, (record?.version ?? 0) + 1);
+      await tx.addCrystalLedger(player.id, { requestId: `stars-${chargeId}`.slice(0, 120), action: 'buyCrystalPack', delta: order.pack.crystals, balance: state.crystals });
+      return { credited: true, playerId: player.id, pack: order.pack };
+    });
+  }
+
+  // Request ids only need to survive long enough for a retry; older rows are pure bloat.
+  const pruneRequests = (olderThanMs = 7 * 24 * 60 * 60 * 1000) => repository.transaction((tx) => tx.pruneRequests(now() - olderThanMs));
+
+  return { pruneRequests, session, act, friends, addFriend, answerFriend, labelFriend, visitFriend, sendGift, startStarPurchase, approveStarCheckout, fulfilStarPayment };
 }

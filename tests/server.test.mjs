@@ -8,7 +8,7 @@ import { createMemoryRepository } from '../server/playerRepository.mjs';
 import { checkEnglish } from '../server/english.mjs';
 import { RECIPES } from '../src/domain/catalog.ts';
 import { ALCOHOL_PRODUCTS,bottleRestockCrystalCost } from '../src/domain/bottleCatalog.ts';
-import { recipePurchase } from '../src/domain/economy.ts';
+import { recipePurchase, STAR_CRYSTAL_PACKS } from '../src/domain/economy.ts';
 import { requiredRecipe } from '../src/domain/engine.ts';
 import { createTelegramBot, TelegramBotError } from '../server/telegramBot.mjs';
 import { COSMETICS } from '../src/domain/cosmetics.ts';
@@ -278,5 +278,108 @@ test('HTTP API: login required, dev login only when enabled, rate limited, state
     assert.equal(response.status, 401, 'dev login is off unless explicitly enabled');
   } finally {
     lockedServer.close();
+  }
+});
+
+test('Telegram Stars: invoice, pre-checkout and a payment credit crystals exactly once', async () => {
+  const { service, repository } = makeService();
+  const who = identity(901);
+  const { state, player } = await service.session(who);
+  const calls = [];
+  const fakeFetch = async (url, options) => {
+    const method = url.split('/').pop();
+    const payload = JSON.parse(options.body);
+    calls.push({ method, payload });
+    const result = method === 'createInvoiceLink' ? 'https://t.me/$invoice' : true;
+    return { ok: true, json: async () => ({ ok: true, result }) };
+  };
+  const bot = createTelegramBot({
+    token: BOT_TOKEN, fetchImpl: fakeFetch, logger: { error() {} },
+    payments: { approve: service.approveStarCheckout, fulfil: service.fulfilStarPayment }
+  });
+
+  assert.equal((await service.startStarPurchase(who, 'nope')).status, 400, 'unknown packs are refused');
+  const { order } = await service.startStarPurchase(who, 'handful');
+  assert.equal(order.pack.stars, 75);
+  assert.equal(await bot.createInvoiceLink(order), 'https://t.me/$invoice');
+  const invoice = calls.find((call) => call.method === 'createInvoiceLink').payload;
+  assert.equal(invoice.currency, 'XTR');
+  assert.equal(invoice.provider_token, '');
+  assert.deepEqual(invoice.prices, [{ label: '180 crystals', amount: 75 }]);
+
+  const paid = { currency: 'XTR', total_amount: 75, invoice_payload: order.payload, telegram_payment_charge_id: 'charge-1' };
+  await bot.handleUpdate({ update_id: 1, pre_checkout_query: { id: 'q1', ...paid } });
+  assert.equal(calls.at(-1).method, 'answerPreCheckoutQuery');
+  assert.equal(calls.at(-1).payload.ok, true);
+  await bot.handleUpdate({ update_id: 2, pre_checkout_query: { id: 'q2', ...paid, total_amount: 1 } });
+  assert.equal(calls.at(-1).payload.ok, false, 'a wrong amount is not approved');
+
+  const message = { chat: { id: 5, type: 'private' }, successful_payment: paid };
+  await bot.handleUpdate({ update_id: 3, message });
+  await bot.handleUpdate({ update_id: 4, message }); // Telegram delivering the same payment twice
+  const after = await service.session(who);
+  assert.equal(after.state.crystals, state.crystals + 180, 'credited once');
+  assert.equal(repository.crystalLedger.filter((entry) => entry.action === 'buyCrystalPack').length, 1);
+  assert.equal(repository.starPurchases.size, 1);
+
+  await assert.rejects(() => service.fulfilStarPayment({ ...paid, telegram_payment_charge_id: 'charge-2', total_amount: 1 }), /does not match/);
+  await assert.rejects(() => service.fulfilStarPayment({ ...paid, telegram_payment_charge_id: 'charge-3', invoice_payload: 'stars:999:handful:x' }), /not found/);
+  assert.equal((await service.session(who)).state.crystals, state.crystals + 180);
+  assert.ok(player.id);
+});
+
+test('The starter pack is one-time and every regular pack has the same rate', async () => {
+  const { service } = makeService();
+  const who = identity(902);
+  assert.equal((await service.session(who)).starterPackAvailable, true);
+  const { order } = await service.startStarPurchase(who, 'starter');
+  const paid = { currency: 'XTR', total_amount: order.pack.stars, invoice_payload: order.payload, telegram_payment_charge_id: 'starter-1' };
+  assert.equal((await service.approveStarCheckout(paid)).ok, true);
+  assert.equal((await service.fulfilStarPayment(paid)).credited, true);
+  assert.equal((await service.session(who)).starterPackAvailable, false);
+  assert.equal((await service.startStarPurchase(who, 'starter')).status, 409);
+  assert.equal((await service.approveStarCheckout(paid)).ok, false);
+  const rates = STAR_CRYSTAL_PACKS.filter((pack) => !pack.once).map((pack) => pack.crystals / pack.stars);
+  assert.ok(rates.every((rate) => rate === rates[0]), 'no bulk discount');
+});
+
+test('The invoice endpoint needs a signed-in player and a known pack', async () => {
+  const { service } = makeService();
+  const app = createApp({ service, botToken: BOT_TOKEN, allowDevLogin: true, createInvoiceLink: async ({ pack }) => `https://t.me/$${pack.id}` });
+  handleErrors(app);
+  const server = await new Promise((resolve) => { const listening = app.listen(0, () => resolve(listening)); });
+  const post = (body, headers = {}) => fetch(`http://127.0.0.1:${server.address().port}/api/stars/invoice`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(body) });
+  try {
+    assert.equal((await post({ packId: 'chest' })).status, 401);
+    assert.equal((await post({ packId: 'free' }, { 'X-Dev-Player': 'buyer' })).status, 400);
+    const ok = await (await post({ packId: 'chest' }, { 'X-Dev-Player': 'buyer' })).json();
+    assert.deepEqual(ok, { ok: true, url: 'https://t.me/$chest' });
+  } finally {
+    server.close();
+  }
+});
+
+test('500 players paying at the same moment: every payment is credited exactly once, even when delivered twice', async () => {
+  const { service, repository } = makeService();
+  const packs = STAR_CRYSTAL_PACKS.filter((pack) => !pack.once);
+  const buyers = await Promise.all(Array.from({ length: 500 }, async (_, index) => {
+    const who = identity(1000 + index);
+    await service.session(who);
+    const pack = packs[index % packs.length];
+    const { order } = await service.startStarPurchase(who, pack.id);
+    return { who, pack, payment: { currency: 'XTR', total_amount: pack.stars, invoice_payload: order.payload, telegram_payment_charge_id: `bulk-${index}` } };
+  }));
+  const results = await Promise.all(buyers.flatMap(({ payment }) => [service.fulfilStarPayment(payment), service.fulfilStarPayment(payment)]));
+  assert.equal(results.filter((result) => result.credited).length, 500, 'one credit per charge id');
+  assert.equal(repository.starPurchases.size, 500);
+  assert.equal(repository.crystalLedger.filter((entry) => entry.action === 'buyCrystalPack').length, 500);
+  for (const { who, pack } of buyers) assert.equal((await service.session(who)).state.crystals, pack.crystals);
+});
+
+test('Every cocktail name can be said to a guest without being "corrected" into another word', () => {
+  for (const recipe of RECIPES) {
+    const sentence = `I will make you ${/^[aeiou]/i.test(recipe.name) ? 'an' : 'a'} ${recipe.name}.`;
+    const result = checkEnglish(sentence);
+    assert.ok(result.ok && result.corrected === sentence, `"${sentence}" became "${result.corrected}"`);
   }
 });

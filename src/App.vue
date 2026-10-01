@@ -1,25 +1,29 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue';
 import CocktailWorkspace from './components/cocktails/CocktailWorkspace.vue';
-import ConversationPopup from './components/conversation/ConversationPopup.vue';
 import BarScene from './components/game/BarScene.vue';
-import ManagementDeck from './components/game/ManagementDeck.vue';
 import TopHud from './components/game/TopHud.vue';
-import LearningPage from './components/learning/LearningPage.vue';
 import GuideSheet from './components/knowledge/GuideSheet.vue';
 import UiIcon from './components/ui/UiIcon.vue';
-import FriendsPage from './components/friends/FriendsPage.vue';
-import StartingBarPicker from './components/game/StartingBarPicker.vue';
 import NotificationToasts from './components/ui/NotificationToasts.vue';
 import { useGameStore } from './stores/game';
 import { useNotificationsStore } from './stores/notifications';
 import { calendarDate } from './domain/economy';
 import { initMusic, musicOn, playSfx, refreshMusic, setMusicInterior } from './audio/index';
 
+// Only the bar scene is needed for the first paint; every other screen is fetched when the player opens it.
+const ConversationPopup = defineAsyncComponent(() => import('./components/conversation/ConversationPopup.vue'));
+const ManagementDeck = defineAsyncComponent(() => import('./components/game/ManagementDeck.vue'));
+const LearningPage = defineAsyncComponent(() => import('./components/learning/LearningPage.vue'));
+const FriendsPage = defineAsyncComponent(() => import('./components/friends/FriendsPage.vue'));
+const StartingBarPicker = defineAsyncComponent(() => import('./components/game/StartingBarPicker.vue'));
+
 const game = useGameStore();
 const notifications = useNotificationsStore();
 const view = ref('service');
 const managementView = ref('inventory');
+// The management screens stay mounted once opened, so edits and scroll positions survive switching tabs.
+const managementOpened = ref(false);
 const nav = [
   { id: 'service', label: 'Service', mark: 'glass' },
   { id: 'english', label: 'English', mark: 'chat' },
@@ -64,7 +68,7 @@ watch(() => game.message,(message,previous) => {
 
 function selectView(id: string) {
   view.value = id;
-  if (id !== 'service' && id !== 'english') managementView.value = id;
+  if (id !== 'service' && id !== 'english' && id !== 'friends') { managementView.value = id; managementOpened.value = true; }
 }
 </script>
 
@@ -78,7 +82,7 @@ function selectView(id: string) {
       </section>
       <LearningPage v-if="view === 'english'" />
       <FriendsPage v-if="view === 'friends'" />
-      <ManagementDeck v-show="view !== 'service' && view !== 'english' && view !== 'friends'" :active-view="managementView" />
+      <ManagementDeck v-if="managementOpened" v-show="view !== 'service' && view !== 'english' && view !== 'friends'" :active-view="managementView" />
     </main>
     <ConversationPopup v-if="game.conversationCustomerId" />
     <GuideSheet />

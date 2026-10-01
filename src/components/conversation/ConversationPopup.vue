@@ -96,7 +96,7 @@ function phraseCandidates() {
 }
 
 // New guest lines: remember the words the learner has seen, then scroll.
-watch(() => talk.value?.lines.length ?? 0, (count, before) => {
+watch(() => talk.value?.lines.length ?? 0, (_count, before) => {
   for (const line of talk.value?.lines.slice(before ?? 0) ?? []) if (line.speaker === 'customer') noteSeenWords(line.text);
   scrollLog();
 }, { immediate: true });

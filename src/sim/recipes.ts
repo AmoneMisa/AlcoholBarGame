@@ -7,7 +7,7 @@ import { BASIC_RECIPE_COUNT, type PlayerState } from './state';
 // VIP guests, friends) adds that separate inventory item; it may be used for mastery or gifted to a friend.
 
 export const RECIPE_MAX_LEVEL = 5;
-const COST_STEPS = [1, 1.8, 3, 5];
+const COST_STEPS = [1, 2, 3.5, 6];
 
 export const isStarterRecipe = (recipeId: string) => RECIPES.slice(0, BASIC_RECIPE_COUNT).some((recipe) => recipe.id === recipeId);
 export const recipeLevel = (state: Pick<PlayerState, 'recipeLevels'>, recipeId: string) => Math.min(RECIPE_MAX_LEVEL, Math.max(1, state.recipeLevels?.[recipeId] ?? 1));
@@ -24,7 +24,7 @@ export function recipeBonus(level: number) {
 // Coins to go from `level` to the next one (undefined at the top level).
 export function upgradeCost(recipe: Recipe, level: number) {
   const step = COST_STEPS[level - 1];
-  return step === undefined ? undefined : Math.round(Math.max(120, recipe.price * 18) * step);
+  return step === undefined ? undefined : Math.round(Math.max(250, recipe.price * 36) * step);
 }
 
 export function addSpareCopy(state: PlayerState, recipeId: string, amount = 1) {

@@ -1,5 +1,5 @@
 import { RECIPES } from '../domain/catalog';
-import { calendarDate, coins, recipePurchase } from '../domain/economy';
+import { coins, recipePurchase } from '../domain/economy';
 import { INTERIORS } from '../data/cosmetics/bars';
 import { addSpareCopy, isStarterRecipe, recipeCopies, recipeLevel } from './recipes';
 import { levelFor, type PlayerState } from './state';
@@ -16,15 +16,6 @@ export type GiftRequest =
   | { kind: 'interior'; interiorId: string }    // buy a bar background for a friend
   | { kind: 'cosmetic-copy'; cosmeticId: string };
 export type Gift = GiftRequest;
-
-export const VISIT_REWARD = 20;
-
-export function giftLabel(gift: Gift) {
-  if (gift.kind === 'cosmetic-copy') return `${COSMETICS.find((item) => item.id === gift.cosmeticId)?.label ?? 'A'} cosmetic`;
-  if (gift.kind === 'interior') return `${INTERIORS.find((item) => item.id === gift.interiorId)?.name ?? 'A new'} background`;
-  const recipe = RECIPES.find((item) => item.id === gift.recipeId);
-  return `${recipe?.name ?? 'A'} recipe card`;
-}
 
 // What sending costs, for the gift screen and the rules.
 export function giftPrice(gift: GiftRequest) {
@@ -115,14 +106,6 @@ export function receiveGift(state: PlayerState, gift: Gift, from: string) {
 }
 
 // One visit reward per friend per day.
-export function rewardVisit(state: PlayerState, friendId: string, now: number) {
-  const today = calendarDate(new Date(now));
-  if (state.friendVisits?.[friendId] === today) return 0;
-  state.friendVisits = { ...(state.friendVisits ?? {}), [friendId]: today };
-  state.money = coins(state.money + VISIT_REWARD);
-  return VISIT_REWARD;
-}
-
 // What a visitor may see of a friend's bar.
 export function publicBar(state: PlayerState, name: string) {
   const bar = state.bars[state.regionId];

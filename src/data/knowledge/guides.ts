@@ -4,11 +4,12 @@ import type { Recipe } from '../../domain/types';
 import { COCKTAIL_GUIDES, type CocktailGuide } from './cocktails';
 import { HISTORY_NOTES_A, type HistoryNote } from './historyNotesA';
 import { HISTORY_NOTES_B } from './historyNotesB';
+import { HISTORY_NOTES_C } from './historyNotesC';
 
 // Every recipe gets a complete guide: hand-written where it exists, otherwise built from the recipe data
 // plus a hand-written history note. The recipe card says exactly what to do with every ingredient.
 
-const HISTORY: Record<string, HistoryNote> = { ...HISTORY_NOTES_A, ...HISTORY_NOTES_B };
+const HISTORY: Record<string, HistoryNote> = { ...HISTORY_NOTES_A, ...HISTORY_NOTES_B, ...HISTORY_NOTES_C };
 const FIZZY = new Set(['soda', 'tonic', 'cola', 'ginger-beer', 'grapefruit-soda', 'sparkling-wine', 'alcohol-free-beer']);
 const DECORATION = new Set(['lime-wedge', 'orange', 'pineapple-wedge']);
 const nameOf = (id: string) => INGREDIENTS.find((item) => item.id === id)?.name ?? id;

@@ -17,7 +17,7 @@ import { checkText } from '../domain/english/checker';
 import { advanceClock, applyAction, RuleError, type GameAction } from '../sim/rules';
 import { createInitialState, levelFor, normalizePlayerState, type PlayerState } from '../sim/state';
 import { playSfx } from '../audio/index';
-import { answerFriendRequest, connectSession, fetchFriends, requestFriend, saveFriendLabel, sendAction, sendFriendGift, visitFriendBar, type FriendBar, type FriendSummary } from '../telegram/api';
+import { answerFriendRequest, connectSession, createStarInvoice, fetchFriends, requestFriend, saveFriendLabel, sendAction, sendFriendGift, visitFriendBar, type FriendBar, type FriendSummary } from '../telegram/api';
 import type { GiftRequest } from '../sim/gifts';
 
 // The client side of a server-authoritative game.
@@ -262,6 +262,7 @@ export const useGameStore = defineStore('game', () => {
       playerId.value = session.player.id;
       playerFriendCode.value = session.player.friendCode;
       mode.value = 'online';
+      starterPackAvailable.value = session.starterPackAvailable !== false;
       adoptServerState(session.state, session.serverTime, session.state.message);
       resetMix();
       void loadFriends();
@@ -487,6 +488,41 @@ export const useGameStore = defineStore('game', () => {
   const claimDailyGift = () => dispatch({ type: 'claimDaily' });
   const completeDailyLesson = (lessonId: string, answer: string) => dispatch({ type: 'completeDailyLesson', lessonId, answer });
   const exchangeCrystals = (crystals: number) => dispatch({ type: 'exchangeCrystals', crystals });
+
+  // Buying crystals with Telegram Stars. The server only hands out an invoice; crystals arrive when Telegram
+  // confirms the payment to the bot, so after "paid" the account is re-read until the new balance shows up.
+  const buyingCrystals = ref(false);
+  const starterPackAvailable = ref(true);
+  async function buyCrystalPack(packId: string): Promise<boolean> {
+    const webApp = window.Telegram?.WebApp;
+    if (buyingCrystals.value) return false;
+    if (mode.value !== 'online' || !webApp?.openInvoice) { message.value = 'Open the game inside Telegram to buy crystals with Stars.'; playSfx('error'); return false; }
+    buyingCrystals.value = true;
+    try {
+      const invoice = await createStarInvoice(packId);
+      if (!invoice.ok || !invoice.url) throw new Error(invoice.error ?? 'Could not start the payment.');
+      const status = await new Promise<string>((resolve) => webApp.openInvoice!(invoice.url!, resolve));
+      if (status === 'cancelled') return false;
+      if (status === 'failed') throw new Error('The payment failed. You were not charged.');
+      const before = state.value.crystals ?? 0;
+      message.value = 'Payment received. Adding your crystals…';
+      for (let attempt = 0; attempt < 10; attempt++) {
+        const session = await connectSession();
+        adoptServerState(session.state, session.serverTime);
+        starterPackAvailable.value = session.starterPackAvailable !== false;
+        if ((session.state.crystals ?? 0) > before) { message.value = session.state.message; playSfx('coin'); return true; }
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
+      message.value = 'Payment received. Your crystals will appear in a moment — reopen the game if they do not.';
+      return true;
+    } catch (error) {
+      message.value = error instanceof Error ? error.message : 'Could not start the payment.';
+      playSfx('error');
+      return false;
+    } finally {
+      buyingCrystals.value = false;
+    }
+  }
   const spinCosmeticRoulette = () => dispatch({ type:'spinCosmeticRoulette' });
   const giftCosmetic = (cosmeticId:string, recipient:string) => dispatch({ type:'giftCosmetic', cosmeticId, recipient });
   const activatePopularityBoost = (boost:'no-cooldown'|'vip-run') => dispatch({ type:'activatePopularityBoost', boost });
@@ -530,6 +566,6 @@ export const useGameStore = defineStore('game', () => {
     pourBrands, brandOnShelf, shelfBrandsFor, setPourBrand,
     selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, tickGameClock, welcomeNextCustomer, offerSimilarOrder, rejectCustomer, buy, sell, switchBar, isBarOwned, nextBarPrice, barPurchaseLevel:BAR_PURCHASE_LEVEL, chooseStartingBar, buyBar, transferStock,
     supplier, localSuppliers, purchaseCart, saleCart, purchaseQuote, saleQuote, saleRevenue, deliveryOrders, deliveryCountdown, selectSupplier, checkoutPurchase, checkoutSale, renameBar, renameBartender,
-    buyRecipe, recipePrice, buyInterior, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
+    buyRecipe, recipePrice, buyInterior, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, buyCrystalPack, buyingCrystals, starterPackAvailable, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
   };
 });

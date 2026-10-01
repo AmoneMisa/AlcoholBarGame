@@ -1,11 +1,12 @@
 import { CLASSIC_GUIDES } from './cocktailsClassic';
 import type { CocktailGuide } from './cocktailTypes';
 import { SPIRITED_GUIDES } from './cocktailsSpirited';
+import { MORE_GUIDES } from './cocktailsMore';
 
 export type { CocktailGuide } from './cocktailTypes';
 
 // Every recipe in the game has a guide (checked by the test suite).
-export const COCKTAIL_GUIDES: Record<string, CocktailGuide> = { ...CLASSIC_GUIDES, ...SPIRITED_GUIDES };
+export const COCKTAIL_GUIDES: Record<string, CocktailGuide> = { ...CLASSIC_GUIDES, ...SPIRITED_GUIDES, ...MORE_GUIDES };
 
 export const TECHNIQUE_EXPLAINED: Record<CocktailGuide['preparation']['technique'], string> = {
   shaken: 'Shaken: ingredients and ice are shaken hard in a shaker. Use it for drinks with juice, cream or egg — it mixes them fully, chills fast and adds air.',

@@ -1,10 +1,10 @@
 import type { RegionId } from '../../domain/types';
 
 export const INTERIORS = [
-  { id:'velvet',name:'Velvet lounge',asset:'/assets/bar/backgrounds/velvet-hour-bar.png',tint:'#2d0d1e55',position:'center',blend:'multiply',crystalCost:0 },
-  { id:'garden',name:'Botanical room',asset:'/assets/bar/backgrounds/botanical-room.png',tint:'#123d2b44',position:'center',blend:'multiply',crystalCost:350 },
-  { id:'skyline',name:'Skyline lounge',asset:'/assets/bar/backgrounds/skyline-lounge.png',tint:'#101d4655',position:'center',blend:'multiply',crystalCost:450 },
-  { id:'inferno-penthouse',name:'Midnight Penthouse',asset:'/assets/bar/backgrounds/inferno-penthouse-club.png',tint:'#25071322',position:'center',blend:'multiply',special:true,crystalCost:3500 },
+  { id:'velvet',name:'Velvet lounge',asset:'/assets/bar/backgrounds/velvet-hour-bar.webp',tint:'#2d0d1e55',position:'center',blend:'multiply',crystalCost:0 },
+  { id:'garden',name:'Botanical room',asset:'/assets/bar/backgrounds/botanical-room.webp',tint:'#123d2b44',position:'center',blend:'multiply',crystalCost:350 },
+  { id:'skyline',name:'Skyline lounge',asset:'/assets/bar/backgrounds/skyline-lounge.webp',tint:'#101d4655',position:'center',blend:'multiply',crystalCost:450 },
+  { id:'inferno-penthouse',name:'Midnight Penthouse',asset:'/assets/bar/backgrounds/inferno-penthouse-club.webp',tint:'#25071322',position:'center',blend:'multiply',special:true,crystalCost:3500 },
   { id:'speakeasy',name:'Secret speakeasy',asset:'/assets/bar/backgrounds/interior-speakeasy.webp',tint:'#21130b33',position:'center 62%',blend:'multiply',crystalCost:550 },
   { id:'jazz-cellar',name:'Midnight jazz cellar',asset:'/assets/bar/backgrounds/interior-jazz-cellar.webp',tint:'#25122633',position:'center 62%',blend:'multiply',crystalCost:650 },
   { id:'art-deco',name:'Golden Art Deco',asset:'/assets/bar/backgrounds/interior-art-deco.webp',tint:'#5e431511',position:'center 62%',blend:'soft-light',crystalCost:800 },
