@@ -83,6 +83,11 @@ export interface PlayerState {
   deliveryIssues?: import('./stockQuality').DeliveryIssue[];
   lowGrade?: Record<RegionId, Record<string, import('./stockQuality').LowGrade>>;
   quarantine?: import('./stockQuality').QuarantineItem[];
+  // Events at this bar tonight (promotions, moods of the night), when the next one starts, and loyalty counts by guest look.
+  barEvent?: import('./events').ActiveBarEvent;
+  nextBarEventAt?: number;
+  lastBarEventId?: string;
+  loyalty?: Record<string, number>;
   // Day of the last rewarded visit to each friend's bar.
   friendVisits?: Record<string, string>;
   friendLabels?: Record<string, string>;

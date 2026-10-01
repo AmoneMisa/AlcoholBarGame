@@ -2,7 +2,7 @@
 
 export interface IngredientGuide {
   id: string;
-  kind: 'spirit' | 'liqueur' | 'wine' | 'mixer' | 'fresh' | 'garnish';
+  kind: 'spirit' | 'liqueur' | 'wine' | 'mixer' | 'fresh' | 'garnish' | 'food';
   summary: string;
   madeFrom?: string;
   howMade?: string;

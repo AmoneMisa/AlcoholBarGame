@@ -6,6 +6,7 @@ import { SITUATIONS, situationById } from '../domain/situations/catalog';
 import { accepts } from '../domain/situations/helpers';
 import type { Choice, Effects, Outcome, SituationContext, SituationDef, Stage, Tone } from '../domain/situations/types';
 import type { Customer } from '../domain/types';
+import { barEventFor } from './events';
 import type { PlayerState } from './state';
 
 // Runs situations (see domain/situations): starting one, listing the replies, resolving a reply into an outcome,
@@ -95,10 +96,13 @@ export function pickSituation(state: PlayerState, guest: Customer, trigger: Trig
   if (random() >= chance) return undefined;
   const context = contextOf(state, guest, random, { amount: 0, _tabs: state.tabs?.length ?? 0, _violations: state.ruleViolations ?? 0 });
   const options = SITUATIONS.filter((def) => def.triggers.includes(trigger) && (!def.applies || def.applies(context)));
-  const total = options.reduce((sum, def) => sum + def.weight, 0);
+  // The night changes what is likely: a big match brings trouble, date night brings good news.
+  const shifts = barEventFor(state, state.lastClockAt)?.effects.situations ?? {};
+  const weightOf = (def: SituationDef) => def.weight * (shifts[def.category] ?? 1);
+  const total = options.reduce((sum, def) => sum + weightOf(def), 0);
   if (!total) return undefined;
   let roll = random() * total;
-  for (const def of options) { roll -= def.weight; if (roll < 0) return def; }
+  for (const def of options) { roll -= weightOf(def); if (roll < 0) return def; }
   return options[0];
 }
 

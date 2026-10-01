@@ -1,5 +1,6 @@
 import type { Ingredient, Modifier, Recipe, Region, Supplier } from './types';
 import { ADDITIONAL_RECIPES } from './additionalRecipes';
+import { FOOD_INGREDIENTS } from './foods';
 
 export const REGIONS: Region[] = [
   { id: 'new-york', name: 'New York', currencySymbol: '$', marketFactor: 1.35, rentPerDay: 50, tagline: 'Classic & diverse' },
@@ -45,7 +46,9 @@ export const INGREDIENTS: Ingredient[] = [
   { id: 'lime-wedge', name: 'Fresh lime', unit: 'piece', basePrice: 0.18, pourStep: 1, category: 'fruit' },
   { id: 'orange', name: 'Fresh orange', unit: 'piece', basePrice: 0.22, pourStep: 1, category: 'fruit' },
   { id: 'pineapple-wedge', name: 'Pineapple wedge', unit: 'piece', basePrice: 0.24, pourStep: 1, category: 'fruit' },
-  { id: 'salt', name: 'Bar salt', unit: 'piece', basePrice: 0.04, pourStep: 1, category: 'garnish' }
+  { id: 'salt', name: 'Bar salt', unit: 'piece', basePrice: 0.04, pourStep: 1, category: 'garnish' },
+  // Food for the menu: stock items like the rest, kept out of the cocktail mixer.
+  ...FOOD_INGREDIENTS
 ];
 
 export const RECIPES: Recipe[] = [

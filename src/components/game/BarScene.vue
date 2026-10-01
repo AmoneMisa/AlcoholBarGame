@@ -246,7 +246,7 @@ function pourable(id: string) {
   const inGlass = game.currentMix.find((item) => item.ingredientId === id)?.amount ?? 0;
   return Math.max(0, stock - inGlass);
 }
-const freshIngredients = computed(() => INGREDIENTS.filter((item) => item.unit === 'piece'));
+const freshIngredients = computed(() => INGREDIENTS.filter((item) => item.unit === 'piece' && item.category !== 'food'));
 const buildingEnabled = computed(() => game.hasCustomer && game.customer.orderKind !== 'bottle');
 const totalAmount = computed(() => game.currentMix.reduce((sum, item) => sum + (INGREDIENTS.find((entry) => entry.id === item.ingredientId)?.unit === 'ml' ? item.amount : 0), 0));
 const itemCount = computed(() => game.currentMix.reduce((sum, item) => sum + (INGREDIENTS.find((entry) => entry.id === item.ingredientId)?.unit === 'piece' ? item.amount : 0), 0));

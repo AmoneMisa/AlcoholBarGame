@@ -145,6 +145,8 @@ export function startNextRound(state: PlayerState, guest: Customer, context: Gue
   guest.orderRevealed = guest.orderKind === 'serve';
   guest.patienceRemaining = guest.patience;
   social.phase = 'ordering';
+  social.pitchTries = 0;
+  delete social.pitch;
   driftEmotion(guest, context.random);
   if (!state.activeCustomerId || !state.customers.some((item) => item.id === state.activeCustomerId && isOrdering(item))) state.activeCustomerId = guest.id;
   state.nextCustomerAt = 0;
@@ -206,7 +208,7 @@ export function cleanAshtrays(state: PlayerState) {
   return cleaned;
 }
 
-export function giveWater(state: PlayerState, guest: Customer, now: number) {
+export function giveWater(guest: Customer, now: number) {
   const social = ensureSocial(guest, now);
   const wanted = social.need?.kind === 'water';
   social.drunk = clampPercent(social.drunk - 12);
@@ -215,7 +217,7 @@ export function giveWater(state: PlayerState, guest: Customer, now: number) {
   return `${guest.name} drinks the water. ${drunkStage(social.drunk) === 'sober' ? 'They look much better.' : 'It helps a little.'}`;
 }
 
-export function callTaxi(state: PlayerState, guest: Customer, context: GuestContext) {
+export function callTaxi(guest: Customer, context: GuestContext) {
   const social = ensureSocial(guest, context.now);
   social.taxiAt = context.now + Math.round((3 + context.random() * 2) * MINUTE);
   social.staysFor = 0;

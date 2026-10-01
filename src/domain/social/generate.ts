@@ -63,22 +63,39 @@ export function seededRandom(text: string) {
   };
 }
 
-export function rollSocial(customer: Pick<Customer, 'id' | 'mood' | 'characterId' | 'smoker'>, now: number, random: () => number, options: { arrivesDrunk?: number } = {}): GuestSocial {
-  const emotion = weighted(EMOTIONS_BY_MOOD[customer.mood] ?? EMOTIONS_BY_MOOD.calm, random);
+export interface RollOptions {
+  arrivesDrunk?: number;
+  /** Added to the chance a guest arrives already drunk (events: student night, a big match). */
+  drunkChance?: number;
+  /** Extra weight for some feelings (events: a big match makes guests excited or angry). */
+  emotionWeights?: Partial<Record<Emotion, number>>;
+  chattyBonus?: number;
+  extraStays?: number;
+}
+
+export function rollSocial(customer: Pick<Customer, 'id' | 'mood' | 'characterId' | 'smoker'>, now: number, random: () => number, options: RollOptions = {}): GuestSocial {
+  const table: Weighted<Emotion> = [...(EMOTIONS_BY_MOOD[customer.mood] ?? EMOTIONS_BY_MOOD.calm)];
+  for (const [emotion, weight] of Object.entries(options.emotionWeights ?? {}) as [Emotion, number][]) {
+    const existing = table.find(([name]) => name === emotion);
+    if (existing) existing[1] += weight; else table.push([emotion, weight]);
+  }
+  const emotion = weighted(table, random);
   // About one guest in eleven walks in already drunk — and then tends to want company and one more.
-  const drunk = options.arrivesDrunk ?? (random() < .09 ? 30 + Math.floor(random() * 45) : 0);
+  const drunk = options.arrivesDrunk ?? (random() < .09 + (options.drunkChance ?? 0) ? 30 + Math.floor(random() * 45) : 0);
   const rapport = clampPercent(START_RAPPORT[emotion] + (random() - .5) * 16);
   const social: GuestSocial = {
     emotion,
     rapport,
     drunk,
-    chatty: random() < CHATTY[emotion] + (drunk >= 30 ? .25 : 0),
+    chatty: random() < CHATTY[emotion] + (drunk >= 30 ? .25 : 0) + (options.chattyBonus ?? 0),
     topic: weighted(TOPICS_BY_EMOTION[emotion], random),
     gender: genderOf(customer.characterId),
     phase: 'ordering',
     nextOrderAt: 0,
     rounds: 0,
-    staysFor: weighted(STAYS[emotion], random) + (drunk >= 50 ? 1 : 0),
+    staysFor: weighted(STAYS[emotion], random) + (drunk >= 50 ? 1 : 0) + (options.extraStays ?? 0),
+    hungry: random() < .28 + (drunk >= 30 ? .2 : 0),
+    allergy: random() < .05 ? (random() < .6 ? 'nuts' : 'dairy') : undefined,
     chatted: []
   };
   // Smokers often ask for an ashtray as soon as they sit down.

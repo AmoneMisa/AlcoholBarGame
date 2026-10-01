@@ -29,7 +29,7 @@ export interface Ingredient {
   unit: 'ml' | 'piece';
   basePrice: number;
   pourStep: number;
-  category: 'spirit' | 'mixer' | 'fruit' | 'herb' | 'garnish';
+  category: 'spirit' | 'mixer' | 'fruit' | 'herb' | 'garnish' | 'food';
 }
 
 export interface RecipeItem {

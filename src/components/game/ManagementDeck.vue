@@ -25,7 +25,7 @@ import { BAR_PROFILE_OPTIONS } from '../../data/cosmetics/bars';
 
 withDefaults(defineProps<{ activeView?: string }>(), { activeView: 'inventory' });
 const game = useGameStore();
-const stockCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh'>('all');
+const stockCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh' | 'food'>('all');
 const selectedRecipeId = ref<string | null>(null);
 const recipeMode = ref<'library' | 'shop'>('library');
 const transferIngredientId = ref(INGREDIENTS[0]!.id);
@@ -38,7 +38,7 @@ watch(() => game.regionId, () => {
 
 const ingredientById = (id: string) => INGREDIENTS.find((item) => item.id === id)!;
 const bottleById = (id: string) => ALCOHOL_PRODUCTS.find((item) => item.id === id)!;
-const uiCategory = (ingredient: Ingredient) => ingredient.category === 'spirit' ? 'spirit' : ingredient.category === 'mixer' && !['sugar-syrup', 'coconut-cream', 'milk', 'coconut-milk'].includes(ingredient.id) ? 'mixer' : 'fresh';
+const uiCategory = (ingredient: Ingredient) => ingredient.category === 'food' ? 'food' : ingredient.category === 'spirit' ? 'spirit' : ingredient.category === 'mixer' && !['sugar-syrup', 'coconut-cream', 'milk', 'coconut-milk'].includes(ingredient.id) ? 'mixer' : 'fresh';
 const visibleStock = computed(() => game.inventory.filter((stock) => stockCategory.value === 'all' || uiCategory(ingredientById(stock.ingredientId)) === stockCategory.value));
 const { openGuide } = useGuide();
 // What to do with each ingredient of the open recipe (pour, top up, garnish…), from the recipe card.
@@ -126,7 +126,7 @@ function selectBartender(id: 'noa' | 'leo') {
       </div>
       <div class="inventory-tools">
         <div class="category-tabs inventory-filter">
-          <button v-for="category in ['all','spirit','mixer','fresh'] as const" :key="category" :class="{ active: stockCategory === category }" type="button" @click="stockCategory = category">{{ category === 'spirit' ? 'Spirits' : category === 'mixer' ? 'Mixers' : category === 'fresh' ? 'Fresh & food' : 'All' }}</button>
+          <button v-for="category in ['all','spirit','mixer','fresh','food'] as const" :key="category" :class="{ active: stockCategory === category }" type="button" @click="stockCategory = category">{{ category === 'spirit' ? 'Spirits' : category === 'mixer' ? 'Mixers' : category === 'fresh' ? 'Fresh & food' : 'All' }}</button>
         </div>
         <div v-if="targetRegions.length" class="transfer-console">
           <div><small>MOVE BETWEEN BARS</small><b>Stock transfer</b></div>

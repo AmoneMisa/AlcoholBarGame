@@ -1,3 +1,4 @@
+import { FOODS } from '../../domain/foods';
 import { SPIRIT_GUIDES, type IngredientGuide } from './spirits';
 
 export type { IngredientGuide } from './spirits';
@@ -132,5 +133,17 @@ const OTHER_GUIDES: Record<string, IngredientGuide> = {
 export const INGREDIENT_GUIDES: Record<string, IngredientGuide> = { ...SPIRIT_GUIDES, ...OTHER_GUIDES };
 
 export const KIND_LABEL: Record<IngredientGuide['kind'], string> = {
-  spirit: 'Spirit', liqueur: 'Liqueur', wine: 'Wine', mixer: 'Mixer', fresh: 'Fresh juice', garnish: 'Garnish & ice'
+  spirit: 'Spirit', liqueur: 'Liqueur', wine: 'Wine', mixer: 'Mixer', fresh: 'Fresh juice', garnish: 'Garnish & ice', food: 'Food'
 };
+
+// Guides for the menu food: the story, how to serve it and what to pair it with, written from the food data.
+const PAIR_WORDS: Record<string, string> = { strong: 'strong spirits', dry: 'dry drinks', sweet: 'sweet cocktails', sour: 'sour drinks', bitter: 'bitter drinks', sparkling: 'sparkling drinks', fresh: 'fresh, citrusy drinks', creamy: 'creamy drinks' };
+for (const food of FOODS) {
+  const goes = food.pairs.slice(0, 3).map((trait) => PAIR_WORDS[trait] ?? trait).join(', ');
+  (INGREDIENT_GUIDES as Record<string, IngredientGuide>)[food.id] = {
+    id: food.id, kind: 'food', summary: food.description, history: food.story,
+    flavour: food.menu + '.', howToUse: `Serve it hot or fresh, next to the drink. It goes well with ${goes}. Classic partners: ${food.classic.join(', ')}.`,
+    sellingTip: `Suggest it when a guest is hungry or has been drinking for a while: “Would you like ${food.name.toLowerCase()} with that?”`,
+    funFact: 'Food slows down the alcohol in the body, so a guest who eats stays happier for longer.'
+  };
+}

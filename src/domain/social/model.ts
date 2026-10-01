@@ -53,6 +53,21 @@ export interface GuestSocial {
   chatted: string[];
   /** An open special situation (medical, danger, advice…); see sim/situations.ts. */
   event?: GuestEvent;
+  /** Hungry guests are glad to be offered food. */
+  hungry?: boolean;
+  /** A hidden allergy: serving the food it hides in starts a medical emergency unless the guest said so first. */
+  allergy?: 'nuts' | 'dairy';
+  allergyKnown?: boolean;
+  /** What the guest is drinking now, for pairing food with it. */
+  lastDrink?: { recipeId?: string; productId?: string };
+  ate?: string[];
+  /** Drinks counted towards a promotion tonight. */
+  promo?: { drinks: number; wine: number };
+  /** An offer in progress: another drink or some food, and how the dialogue has changed the chance. */
+  pitch?: Pitch;
+  /** When the last offer was refused (a short pause before the next one) and how many were made this round. */
+  pitchedAt?: number;
+  pitchTries?: number;
 }
 
 // Special situations have their own small state machine; `kind` selects the rules that run them.
@@ -62,6 +77,18 @@ export interface GuestEvent {
   startedAt: number;
   /** Free data for the situation (what hurts, what has been tried…). */
   data: Record<string, string | number | boolean>;
+}
+
+// Offering something (another drink, food) is a chance the bartender can improve by talking to the guest.
+export interface Pitch {
+  kind: 'drink' | 'food';
+  itemId: string;
+  /** Change to the chance from what the bartender has said so far. */
+  bonus: number;
+  /** Which kinds of sales talk were already used (each counts once). */
+  used: string[];
+  /** 0 = full price, 1 = free (a sample on the house). */
+  discount: number;
 }
 
 export type DrunkStage = 'sober' | 'tipsy' | 'drunk' | 'very-drunk';

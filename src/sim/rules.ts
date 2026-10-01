@@ -18,8 +18,12 @@ import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { actsIn } from '../domain/social/acts';
 import { enjoyingOpening, openingFor, socialReply, voice, type Expression } from '../domain/social/talk';
-import { ensureSocial, rollSocial } from '../domain/social/generate';
+import { ensureSocial, genderOf, rollSocial } from '../domain/social/generate';
 import { guestLine, hasSituation, matchChoice, overdue, pickSituation, resolveChoice, resolveIgnored, startSituation, visibleChoices, type Resolution } from './situations';
+import { applyPromo, barEventFor, tickBarEvent } from './events';
+import { adjustPitch, askPitch, cancelPitch, pitchChance, startPitch } from './pitch';
+import { pitchActsIn } from '../domain/social/pitchActs';
+import { foodById } from '../domain/foods';
 import { discardQuarantine, expireStock, fileClaim, goodAmount, receiveOrder, takeLowGrade } from './stockQuality';
 import { situationById } from '../domain/situations/catalog';
 import { MAX_SEATS, afterServed, holdForPayment, recordDrink, settleGuest, applySocialReply, askToLeave, callTaxi, cleanAshtrays, drunkGain, giveAshtray, giveWater, isOrdering, orderingGuests, removeGuest, scheduleArrival, tickGuests, ashtraysOf, type GuestContext } from './guests';
@@ -71,6 +75,10 @@ export type GameAction =
   // Looking after the people at the bar: each names the guest it is for.
   | { type: 'giveAshtray'; customerId: string }
   | { type: 'cleanAshtrays' }
+  // Offering a guest another drink or some food: start the offer, talk, then ask (the chance is shown and changes as you talk).
+  | { type: 'pitchStart'; customerId: string; kind: 'drink' | 'food'; itemId: string }
+  | { type: 'pitchAsk'; customerId: string }
+  | { type: 'pitchCancel'; customerId: string }
   // Telling a supplier about a problem with a delivery (in English), and throwing away goods that can not be used.
   | { type: 'reportIssue'; issueId: string; text: string }
   | { type: 'discardStock'; id: string }
@@ -127,7 +135,7 @@ const economyOf = (state: PlayerState, now: number) => {
 // Tips are a chance: the level sets the base rate, VIP and wealthy guests are more generous, and a guest who likes the
 // bartender (or is a little drunk and happy) tips more often.
 function rollTip(state: PlayerState, guest: Customer, now: number, random: () => number) {
-  const bonus = guest.mood === 'vip' || guest.mood === 'wealthy' ? .2 : 0;
+  const bonus = (guest.mood === 'vip' || guest.mood === 'wealthy' ? .2 : 0) + (barEventFor(state, now)?.effects.tipChance ?? 0);
   const social = guest.social;
   const warmth = social ? (social.rapport - 50) / 250 + (social.drunk >= 25 && social.drunk < 75 ? .06 : 0) : 0;
   return random() < Math.min(.95, Math.max(.05, economyOf(state, now).tipChance + bonus + warmth));
@@ -172,7 +180,7 @@ const priceFactorOf = (guest: Customer | undefined, marketFactor: number) => gue
 // Higher levels bring guests sooner; city events (Hot Time, storms...) speed them up or slow them down.
 function nextArrival(state: PlayerState, now: number, random: () => number) {
   if (state.popularityBoost?.kind === 'no-cooldown' && state.popularityBoost.until > now) return now + 1000;
-  return now + Math.round((nextCustomerArrival(now, random) - now) * economyOf(state, now).arrival);
+  return now + Math.round((nextCustomerArrival(now, random) - now) * economyOf(state, now).arrival * (barEventFor(state, now)?.effects.arrival ?? 1));
 }
 
 function makeVipCustomer(state: PlayerState, level: number, priceFactor: number) {
@@ -188,7 +196,8 @@ function makeVipCustomer(state: PlayerState, level: number, priceFactor: number)
 function makeArrivingCustomer(state: PlayerState, now: number, random: () => number) {
   const level = levelFor(state.xp);
   const economy = economyOf(state, now);
-  const priceFactor = economy.guestPriceFactor;
+  const night = barEventFor(state, now)?.effects;
+  const priceFactor = Number((economy.guestPriceFactor * (night?.pay ?? 1)).toFixed(4));
   const priced = (customer: Customer) => { customer.priceFactor = priceFactor; return customer; };
   if (state.popularityBoost?.kind === 'vip-run' && state.popularityBoost.remaining > 0) {
     state.popularityBoost.remaining -= 1;
@@ -204,7 +213,11 @@ function makeArrivingCustomer(state: PlayerState, now: number, random: () => num
     if (vipCarriesRecipe(recipeRewards.length > 0, random)) return priced(withUniqueLook(makeSpecialCustomer(recipeRewards[Math.floor(random() * recipeRewards.length)]!, level), []));
     return makeVipCustomer(state, level, priceFactor);
   }
-  return priced(withUniqueLook(generateCustomer(level, knownRecipes(state), .35, priceFactor), []));
+  const make = () => priced(withUniqueLook(generateCustomer(level, knownRecipes(state), Math.min(.8, Math.max(.05, .35 + (night?.bottleShare ?? 0) * .3)), priceFactor, Math.min(.8, .25 + (night?.serveShare ?? 0) * .3)), []));
+  let arriving = make();
+  // Some nights bring more women (ladies’ night): look again for a few tries.
+  if (night?.womenShare !== undefined && random() < night.womenShare) for (let attempt = 0; attempt < 10 && genderOf(arriving.characterId) !== 'f'; attempt++) arriving = make();
+  return arriving;
 }
 
 // What the guest rules need from this file: the arrival pace, and a fresh order for a guest who stays.
@@ -228,7 +241,8 @@ function guestContext(state: PlayerState, now: number, random: () => number): Gu
 
 function welcomeNextCustomer(state: PlayerState, now: number, random: () => number) {
   const arrival = makeArrivingCustomer(state, now, random);
-  arrival.social ??= rollSocial(arrival, now, random);
+  const night = barEventFor(state, now)?.effects;
+  arrival.social ??= rollSocial(arrival, now, random, { drunkChance: night?.drunkChance, emotionWeights: night?.emotions, chattyBonus: night?.chatty, extraStays: night?.stays });
   // Dirty ashtrays make a bar smell of old smoke: new guests like it a little less.
   const dirty = ashtraysOf(state).dirty;
   if (dirty) arrival.social.rapport = Math.max(0, arrival.social.rapport - Math.min(12, dirty * 4));
@@ -271,6 +285,8 @@ export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now
   if (state.popularityBoost?.kind === 'no-cooldown' && state.popularityBoost.until <= now) state.popularityBoost = undefined;
   processDeliveries(state, now, random);
   expireStock(state, now);
+  const night = tickBarEvent(state, now, random);
+  if (night) state.message = night;
   autoRestock(state, now);
   const guests = guestContext(state, now, random);
   tickGuests(state, guests, Math.max(0, (now - state.lastClockAt) / 1000));
@@ -454,13 +470,15 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const tip = tipped ? Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .2 : .1) * economyOf(state, now).tips * mastery.tips) + (bonus ? 2 : 0) : 0;
         // Sometimes the guest has a problem with paying: then the bill is held until it is sorted out.
         // A drink made with damaged or old goods can bring a complaint instead.
-        const complaint = lowGradeUsed.size && random() < (lowGradeUsed.has('expiring') ? .4 : .2) ? situationById('complaint-quality') : undefined;
-        const payTrouble = complaint ?? pickSituation(state, guest, 'payment', random);
-        if (!payTrouble) state.money = coins(state.money + revenue + tip);
+        const promo = applyPromo(state, guest, verdict.recipe, now);
+        const complaint = !promo.free && lowGradeUsed.size && random() < (lowGradeUsed.has('expiring') ? .4 : .2) ? situationById('complaint-quality') : undefined;
+        const payTrouble = promo.free ? undefined : complaint ?? pickSituation(state, guest, 'payment', random);
+        if (!payTrouble && !promo.free) state.money = coins(state.money + revenue + tip);
         // About 60 successful orders reach level 25: roughly four medium two-hour play days.
         state.xp += 100 + Math.min(state.streak * 2, 14);
         state.streak += 1;
         const serveProduct = serve ? ALCOHOL_PRODUCTS.find((item) => item.id === serve.productId) : undefined;
+        ensureSocial(guest, now).lastDrink = serveProduct ? { productId: serveProduct.id } : { recipeId: verdict.recipe.id };
         const brandedPayment = serveProduct ? brandedServeCrystalReward(serveProduct) : 0;
         const specialPayment = guest.specialRecipeRewardId || guest.mood === 'vip' ? conversationCrystalReward(guest, verdict.recipe) : 0;
         const crystalPayment = brandedPayment + specialPayment;
@@ -482,7 +500,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           state.message = `${note} But there is a problem with the payment.`;
         } else {
           const outcome = afterServed(state, guest, drunkGain(abv), guestContext(state, now, random));
-          state.message = outcome === 'stays' ? `${note} ${guest.name} stays to enjoy the drink.` : note;
+          state.message = `${outcome === 'stays' ? `${note} ${guest.name} stays to enjoy the drink.` : note}${promo.notes.length ? ` ${promo.notes.join(' ')}` : ''}`;
         }
       } else {
         state.streak = 0;
@@ -792,8 +810,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const result = giveAshtray(state, target, now);
         if (!result.ok) throw new RuleError(result.text);
         state.message = result.text;
-      } else if (action.type === 'giveWater') state.message = giveWater(state, target, now);
-      else if (action.type === 'callTaxi') state.message = `${target.name}: “${callTaxi(state, target, guests)}”`;
+      } else if (action.type === 'giveWater') state.message = giveWater(target, now);
+      else if (action.type === 'callTaxi') state.message = `${target.name}: “${callTaxi(target, guests)}”`;
       else {
         if (!['gentle', 'firm', 'aggressive'].includes(action.tone)) throw new RuleError('Choose how to ask.');
         askToLeave(state, target, action.tone, guests);
@@ -821,6 +839,26 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'discardStock': {
       if (!discardQuarantine(state, String(action.id))) throw new RuleError('There is nothing to throw away.');
       state.message = 'You threw away the unusable goods.';
+      break;
+    }
+    case 'pitchStart':
+    case 'pitchAsk':
+    case 'pitchCancel': {
+      const target = state.customers.find((item) => item.id === action.customerId);
+      if (!target) throw new RuleError('This guest is no longer here.');
+      if (action.type === 'pitchCancel') { cancelPitch(target); break; }
+      if (action.type === 'pitchStart') {
+        const problem = startPitch(state, target, action.kind, String(action.itemId), now);
+        if (problem) throw new RuleError(problem);
+        const food = action.kind === 'food' ? foodById(String(action.itemId)) : undefined;
+        const recipeName = RECIPES.find((item) => item.id === action.itemId)?.name;
+        addLine(ensureTranscript(state, target), 'bartender', food ? `Would you like ${food.name.toLowerCase()} with your drink?` : `Would you like ${withArticle(recipeName ?? 'another drink')} next?`, { ok: true });
+        break;
+      }
+      if (!pitchChance(state, target, now)) throw new RuleError('Choose what to offer first.');
+      const result = askPitch(state, target, now, random);
+      const transcript = ensureTranscript(state, target);
+      addLine(transcript, 'customer', voice(target, result.text, transcript.lines.length));
       break;
     }
     case 'cleanAshtrays': {
@@ -985,6 +1023,7 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
   }
   // The guest answers what they understood: the corrected sentence.
   const heard = english.corrected;
+  const sellTalk = guest.social?.pitch ? adjustPitch(guest, pitchActsIn(heard), `${guest.id}:${transcript.lines.length}`) : undefined;
   const onShelf = (id: string) => (bottleStock(state, id)?.quantity ?? 0) > 0;
   const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
   const profile = guest.orderKind === 'cocktail' && recipe ? buildProfile(recipe) : undefined;
@@ -992,12 +1031,14 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
   const namesOrder = !!findRecipeMention(heard, RECIPES) || !!findBottleMention(heard);
   // A person answers like a person first: small talk, kindness, offers, refusals and “time to go” come before order talk.
   const turn = transcript.lines.length;
-  const lifelike = !serveAnswer && !namesOrder ? socialReply(guest, actsIn(heard), turn) : undefined;
+  const lifelike = !serveAnswer && (!namesOrder || !!guest.social?.pitch) ? socialReply(guest, actsIn(heard), turn) : undefined;
   const leaveTone = lifelike?.intent === 'leave-gentle' ? 'gentle' : lifelike?.intent === 'leave-firm' ? 'firm' : lifelike?.intent === 'leave-rude' ? 'aggressive' : undefined;
   const leaving = leaveTone ? askToLeave(state, guest, leaveTone, guestContext(state, context.now, context.random ?? Math.random)) : undefined;
+  if (sellTalk && guest.social) guest.social.rapport = Math.max(0, Math.min(100, guest.social.rapport + sellTalk.rapport));
   const social: (CustomerReply & { expression: Expression }) | undefined = leaving
     ? { text: leaving.text, expression: leaving.outcome === 'leaves' ? 'smile' : 'disappointed', facts: [] }
-    : lifelike ? { text: lifelike.text, expression: lifelike.expression, facts: [] } : undefined;
+    : lifelike ? { text: lifelike.text, expression: lifelike.expression, facts: [] }
+      : sellTalk ? { text: sellTalk.text, expression: sellTalk.expression, facts: [] } : undefined;
   if (lifelike && !leaving) {
     applySocialReply(guest, lifelike);
     if (lifelike.intent === 'refuse') ensureSocial(guest, context.now).refused = true;
