@@ -18,10 +18,10 @@ export const STAFF_AWAY_MIN_MS = 3 * 60 * 1000;
 export interface StaffMember { level: number }
 
 export const STAFF_PROFILES = [
-  { name: 'Mia', icon: '🧑‍🍳', role: 'Floor server', about: 'Quick and friendly. Takes the easy orders.' },
-  { name: 'Omar', icon: '🤵', role: 'Cocktail server', about: 'Learns the menu and keeps guests happy.' },
-  { name: 'Lena', icon: '💁', role: 'Host', about: 'Greets guests and keeps the tables moving.' },
-  { name: 'Ravi', icon: '🧑‍💼', role: 'Head server', about: 'Experienced. Handles busy evenings.' }
+  { name: 'Mia', role: 'Floor server', about: 'Quick and friendly. Takes the easy orders.' },
+  { name: 'Omar', role: 'Cocktail server', about: 'Learns the menu and keeps guests happy.' },
+  { name: 'Lena', role: 'Host', about: 'Greets guests and keeps the tables moving.' },
+  { name: 'Ravi', role: 'Head server', about: 'Experienced. Handles busy evenings.' }
 ] as const;
 
 const HIRE_COST = [1500, 4500, 12000, 30000];

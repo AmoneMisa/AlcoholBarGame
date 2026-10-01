@@ -19,8 +19,13 @@ const gridPosition = (index: number, columns: number, rows: number) => {
   const y = rows === 1 ? 50 : (row / (rows - 1)) * 100;
   return `${x}% ${y}%`;
 };
-const kind = computed(() => props.ingredient.unit === 'ml' ? 'bottle' : props.ingredient.id in ingredientArt ? 'ingredient' : 'standalone');
+const kind = computed(() => props.ingredient.category === 'food' ? 'food' : props.ingredient.unit === 'ml' ? 'bottle' : props.ingredient.id in ingredientArt ? 'ingredient' : 'standalone');
 const spriteStyle = computed(() => {
+  if (kind.value === 'food') return {
+    backgroundImage: `url('${import.meta.env.BASE_URL}assets/drinks/food/${props.ingredient.id}.webp')`,
+    backgroundSize: 'contain',
+    backgroundPosition: 'center'
+  };
   if (kind.value === 'ingredient') return {
     backgroundImage: "url('/assets/drinks/ingredients/velvet-ingredients-v2.webp')",
     backgroundSize: '400% 200%',
@@ -33,7 +38,7 @@ const spriteStyle = computed(() => {
   };
   return paintedBottleSpriteStyle(ingredientBottleArtIndex(props.ingredient.id) ?? 0);
 });
-const modelClass = computed(() => kind.value === 'bottle' ? 'bottle-model-painted' : 'ingredient-model');
+const modelClass = computed(() => kind.value === 'bottle' ? 'bottle-model-painted' : kind.value === 'food' ? 'food-model' : 'ingredient-model');
 </script>
 
 <template>
