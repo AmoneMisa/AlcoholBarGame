@@ -234,3 +234,6 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 /* The daily gift tile sits in the top right corner of the rounded header panel, so it follows that corner. */
 .hud-resources > .daily-hud-gift { border-top-right-radius: 17px; }
 @media (min-width: 761px) { .hud-resources > .daily-hud-gift:last-child { border-bottom-right-radius: 17px; } }
+
+/* Buttons that sit in the bar scene's click-through layer must say they take clicks (the ashtray button could not be pressed). */
+.bar-cast .clean-ashtrays { pointer-events: auto; }
