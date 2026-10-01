@@ -2,6 +2,8 @@
 import { computed, defineAsyncComponent, ref } from 'vue';
 const Bartender3D = defineAsyncComponent(() => import('./Bartender3D.vue'));
 const modelFailed = ref(false);
+// The bartender is painted 2D art again. The 3D model is kept in the code and comes back with VITE_BARTENDER_3D=true.
+const USE_3D_BARTENDER = import.meta.env?.VITE_BARTENDER_3D === 'true';
 import { CHARACTER_ART, GUEST_FIGURE_BOTTOM, GUEST_SEAT_LINE } from '../../data/cosmetics/artCatalog';
 import { createCharacterLook } from '../../domain/customers/characterFactory';
 import type { CharacterExpression } from '../../domain/dialogue/types';
@@ -81,7 +83,7 @@ const castStyle = computed(() => {
 
 <template>
   <div class="art-character" :style="{ '--figure-drop': figureDrop }" :class="[`role-${role}`, `character-${characterId}`, `expression-${expression}`, `motion-${animation}`, `body-${look.body}`, `skin-${look.skin}`, `hair-${look.hair}`, `face-${look.face}`, `outfit-${outfit}`, `accessory-${accessory}`, `glasses-${look.glasses}`, `hat-${look.hat}`, `vip-${look.vip}`, `custom-pose-${pose}`, mood]" :aria-label="`${art.name}, ${expression}`">
-    <Bartender3D v-if="role === 'bartender' && (characterId === 'noa' || characterId === 'leo') && !outfit.startsWith('special-') && !modelFailed" v-bind="props" :key="characterId" @error="modelFailed = true" />
+    <Bartender3D v-if="USE_3D_BARTENDER && role === 'bartender' && (characterId === 'noa' || characterId === 'leo') && !outfit.startsWith('special-') && !modelFailed" v-bind="props" :key="characterId" @error="modelFailed = true" />
     <img v-else-if="art.asset" class="bartender-art" :src="art.asset" :alt="art.name" draggable="false" />
     <div v-else-if="role === 'customer'" class="character-sprite customer-art" :style="castStyle" role="img" :aria-label="art.name"></div>
     <div v-else class="character-composite" role="img" :aria-label="art.name">
