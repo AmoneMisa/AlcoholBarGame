@@ -121,22 +121,22 @@ test('Servers: opened by level, trained one by one, paid only for time away and 
   state.money = 10000000;
   state.xp = 1e9;
   for (let index = 0; index < 4; index++) applyAction(state, { type: 'hireStaff' }, context());
-  assert.equal(state.staff.length, 4);
+  assert.equal(state.staffByBar[state.regionId].length, 4);
   assert.throws(() => applyAction(state, { type: 'hireStaff' }, context()), /whole team/);
-  assert.ok(staff.teamShare(state.staff) < .85, 'untrained servers are weaker');
+  assert.ok(staff.teamShare(state.staffByBar[state.regionId]) < .85, 'untrained servers are weaker');
   for (let round = 0; round < 4; round++) for (let index = 0; index < 4; index++) applyAction(state, { type: 'upgradeStaff', index }, context());
-  assert.equal(staff.teamShare(state.staff), .85);
+  assert.equal(staff.teamShare(state.staffByBar[state.regionId]), .85);
   assert.throws(() => applyAction(state, { type: 'upgradeStaff', index: 0 }, context()), /fully trained/);
 
   const market = { averagePrice: 10, arrival: 1 };
-  state.staffAt = NOW;
+  state.staffAtByBar = { [state.regionId]: NOW };
   assert.equal(accrueStaff(state, NOW + 60_000, () => .5, market), undefined, 'a short pause is not an absence');
   const crystals = state.crystals, money = state.money;
-  state.staffAt = NOW;
+  state.staffAtByBar = { [state.regionId]: NOW };
   assert.match(accrueStaff(state, NOW + 4 * 3600_000, () => .5, market), /your team served/);
   assert.ok(state.money > money);
   assert.equal(state.crystals, crystals, 'servers never bring crystals');
-  const day = { ...state, staffAt: NOW };
+  const day = { ...state, staffAtByBar: { [state.regionId]: NOW } };
   const capped = state.money;
   accrueStaff(day, NOW + 72 * 3600_000, () => .5, market);
   assert.ok(day.money - capped <= (8 * 3600_000 / (62.5 * 60_000)) * 10 * .85 * 1.15 + 1, 'a long absence pays at most eight hours');
@@ -725,4 +725,36 @@ test('The build version is stamped (dev when built locally), shown in a readable
   assert.doesNotMatch(server, /max-age=86400/);
   assert.match(readFileSync('Dockerfile', 'utf8'), /ARG GIT_SHA/);
   assert.match(readFileSync('.github/workflows/docker-master.yml', 'utf8'), /GIT_SHA=\$\{\{ github\.sha \}\}/);
+});
+
+test('Every bar has its own servers: hired and trained in one bar, they work in that bar only', async () => {
+  const { accrueStaff, teamOf } = await import('../src/sim/staff.ts');
+  const { normalizePlayerState } = await import('../src/sim/state.ts');
+  const { state } = guestIn();
+  state.money = 10000000; state.xp = 1e9;
+  state.ownedBarIds = ['new-york', 'london'];
+  const home = state.regionId;
+  applyAction(state, { type: 'hireStaff' }, context());
+  applyAction(state, { type: 'hireStaff' }, context());
+  applyAction(state, { type: 'switchBar', regionId: 'london' }, context());
+  assert.equal(teamOf(state).length, 0, 'the other bar starts without servers');
+  applyAction(state, { type: 'hireStaff' }, context());
+  assert.equal(teamOf(state, 'london').length, 1);
+  assert.equal(teamOf(state, home).length, 2);
+  applyAction(state, { type: 'upgradeStaff', index: 0 }, context());
+  assert.equal(teamOf(state, 'london')[0].level, 2);
+  assert.equal(teamOf(state, home)[0].level, 1, 'training one bar leaves the other alone');
+  // away time pays each bar by its own team
+  const market = { averagePrice: 10, arrival: 1 };
+  state.staffAtByBar = { [home]: NOW, london: NOW };
+  const before = state.money;
+  assert.match(accrueStaff(state, NOW + 4 * 3600_000, () => .5, market, home), /team in /);
+  assert.ok(state.money > before);
+  // an old save with one team keeps it in the bar that was being managed
+  const old = JSON.parse(JSON.stringify(state));
+  old.staff = [{ level: 3 }, { level: 2 }]; old.staffAt = NOW; delete old.staffByBar; delete old.staffAtByBar; old.regionId = 'london';
+  const migrated = normalizePlayerState(old);
+  assert.deepEqual(migrated.staffByBar, { london: [{ level: 3 }, { level: 2 }] });
+  assert.equal(migrated.staffAtByBar.london, NOW);
+  assert.equal('staff' in migrated, false);
 });

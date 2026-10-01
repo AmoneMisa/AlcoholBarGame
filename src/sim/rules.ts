@@ -343,8 +343,17 @@ export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now
   if (night) state.message = night;
   const known = knownRecipes(state);
   const economy = economyOf(state, now);
-  const team = accrueStaff(state, now, random, { averagePrice: known.length ? known.reduce((sum, recipe) => sum + recipe.price, 0) / known.length * economy.guestPriceFactor : 0, arrival: economy.arrival * (barEventFor(state, now)?.effects.arrival ?? 1) });
-  if (team) state.message = team;
+  // Every bar's own team works while the player is away, each in its own market.
+  const averagePrice = (factor: number) => known.length ? known.reduce((sum, recipe) => sum + recipe.price, 0) / known.length * factor : 0;
+  const teamNews: string[] = [];
+  for (const region of REGIONS) {
+    if (!state.ownedBarIds.includes(region.id)) continue;
+    const here = region.id === state.regionId;
+    const market = here ? { averagePrice: averagePrice(economy.guestPriceFactor), arrival: economy.arrival * (barEventFor(state, now)?.effects.arrival ?? 1) } : (() => { const other = economyAt(region.id, region.marketFactor, state.xp, now); return { averagePrice: averagePrice(other.guestPriceFactor), arrival: other.arrival }; })();
+    const text = accrueStaff(state, now, random, market, region.id);
+    if (text) teamNews.push(text);
+  }
+  if (teamNews.length) state.message = teamNews.join(' ');
   autoRestock(state, now);
   const guests = guestContext(state, now, random);
   tickGuests(state, guests, Math.max(0, (now - state.lastClockAt) / 1000));

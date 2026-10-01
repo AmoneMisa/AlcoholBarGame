@@ -12,7 +12,7 @@ export interface StatSource {
   ownedInteriorIds: string[];
   ownedBarIds: string[];
   ownedCosmeticIds: string[];
-  staff?: { level: number }[];
+  staffByBar?: Record<string, { level: number }[]>;
   loot: {
     stats: Record<string, number>;
     prestige: { count: number };
@@ -29,8 +29,8 @@ const DERIVED: Partial<Record<StatId, (state: StatSource) => number>> = {
   skins: (state) => state.ownedCosmeticIds.length,
   prestiges: (state) => state.loot.prestige.count,
   level: (state) => levelFor(state.xp),
-  staffHired: (state) => state.staff?.length ?? 0,
-  staffLevels: (state) => (state.staff ?? []).reduce((sum, member) => sum + Math.max(0, member.level), 0),
+  staffHired: (state) => Object.values(state.staffByBar ?? {}).reduce((sum, team) => sum + team.length, 0),
+  staffLevels: (state) => Object.values(state.staffByBar ?? {}).reduce((sum, team) => sum + team.reduce((total, member) => total + Math.max(0, member.level), 0), 0),
   barUpgrades: (state) => REGIONS.filter((region) => state.ownedBarIds.includes(region.id) && EQUIPMENT.every((item) => (state.loot.equipment[region.id]?.[item.id]?.level ?? 0) >= EQUIPPED_LEVEL)).length
 };
 

@@ -107,8 +107,8 @@ export interface PlayerState {
   // Training academy: finished lessons, what was done in the lesson that is on, and the practice that is running.
   training?: import('./training').TrainingState;
   // Servers hired (up to four), when their work was last counted, and what they have earned in all.
-  staff?: { level: number }[];
-  staffAt?: number;
+  staffByBar?: Record<string, { level: number }[]>;
+  staffAtByBar?: Record<string, number>;
   staffEarned?: number;
   eventGap?: number;
   // Day of the last rewarded visit to each friend's bar.
@@ -324,7 +324,20 @@ export function normalizePlayerState(state: PlayerState) {
     state.training = { done: Array.isArray(state.training.done) ? state.training.done.filter((id) => known.has(id)) : [], progress: state.training.progress && typeof state.training.progress === 'object' ? state.training.progress : {}, active: state.training.active && known.has(state.training.active.moduleId) ? state.training.active : undefined };
   }
   if (state.tour !== 'done' && state.tour !== 'skipped') delete state.tour;
-  state.staff = Array.isArray(state.staff) ? state.staff.slice(0, 4).map((member) => ({ level: Math.max(1, Math.min(5, Math.round(Number(member?.level) || 1))) })) : [];
+  // Servers belong to a bar. Older saves had one team: it stays in the bar that was being managed.
+  const legacy = state as unknown as { staff?: unknown; staffAt?: unknown };
+  const teams: Record<string, { level: number }[]> = {};
+  const source = (state.staffByBar && typeof state.staffByBar === 'object' ? state.staffByBar : Array.isArray(legacy.staff) ? { [state.regionId]: legacy.staff } : {}) as Record<string, unknown>;
+  for (const region of REGIONS) {
+    const team = source[region.id];
+    if (Array.isArray(team) && team.length) teams[region.id] = team.slice(0, 4).map((member) => ({ level: Math.max(1, Math.min(5, Math.round(Number((member as { level?: number })?.level) || 1))) }));
+  }
+  state.staffByBar = teams;
+  const times: Record<string, number> = {};
+  const oldTimes = (state.staffAtByBar && typeof state.staffAtByBar === 'object' ? state.staffAtByBar : typeof legacy.staffAt === 'number' ? { [state.regionId]: legacy.staffAt } : {}) as Record<string, unknown>;
+  for (const region of REGIONS) if (Number.isFinite(oldTimes[region.id])) times[region.id] = oldTimes[region.id] as number;
+  state.staffAtByBar = times;
+  delete legacy.staff; delete legacy.staffAt;
   state.bars ??= structuredClone(DEFAULT_BARS);
   for (const region of REGIONS) {
     const saved = state.bars[region.id] as Partial<BarProfile> | undefined;

@@ -778,9 +778,9 @@ test('Achievement counters: spending, collections, levels, servers, gifts and lo
   assert.equal(statValue(state, 'level'), 26);
   state.ownedBarIds = ['new-york', 'london'];
   assert.equal(statValue(state, 'bars'), 2);
-  state.staff = [{ level: 3 }, { level: 2 }];
-  assert.equal(statValue(state, 'staffHired'), 2);
-  assert.equal(statValue(state, 'staffLevels'), 5);
+  state.staffByBar = { 'new-york': [{ level: 3 }, { level: 2 }], london: [{ level: 1 }] };
+  assert.equal(statValue(state, 'staffHired'), 3, 'servers of all bars count');
+  assert.equal(statValue(state, 'staffLevels'), 6);
   state.loot.stats.level = 40;
   state.xp = 0;
   assert.equal(statValue(state, 'level'), 40, 'progress is kept after a Grand Opening');

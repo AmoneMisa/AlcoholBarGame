@@ -584,7 +584,8 @@ export const useGameStore = defineStore('game', () => {
   const endTraining = () => dispatch({ type: 'endTraining' });
   const trainingDone = (moduleId: string) => dispatch({ type: 'trainingDone', moduleId });
   const topUp = () => dispatch({ type: 'topUp' });
-  const staff = computed(() => state.value.staff ?? []);
+  // The servers of the bar being managed: every bar has its own team.
+  const staff = computed(() => state.value.staffByBar?.[state.value.regionId] ?? []);
   const hireStaff = () => dispatch({ type: 'hireStaff' });
   const upgradeStaff = (index: number) => dispatch({ type: 'upgradeStaff', index });
   const giveWater = (customerId: string) => dispatch({ type: 'giveWater', customerId });

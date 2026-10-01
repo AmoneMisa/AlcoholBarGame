@@ -81,8 +81,8 @@ onUnmounted(() => {
       </div>
       <div class="staff-resource">
         <button class="staff-open" type="button" :aria-expanded="staffOpen" :aria-label="`Servers: ${game.staff.length} of ${MAX_STAFF} hired`" @click="staffOpen = !staffOpen"><span class="staff-icons"><i v-for="slot in slots" :key="slot.index" :class="{ hired: !!slot.member, locked: !slot.open }"><UiIcon name="server" /></i></span><span><small>SERVERS</small><b>{{ game.staff.length ? `${teamPercent}% of you` : 'Hire' }}</b></span></button>
-        <PopoverPanel v-if="staffOpen" class="staff-panel" eyebrow="SERVERS" title="Your team" close-label="Close servers" @close="staffOpen = false">
-          <p>Servers work for you while you are away and earn up to {{ Math.round(MAX_STAFF * 21.25) }}% of what you would earn serving alone with all four fully trained. They never bring crystals or tips.</p>
+        <PopoverPanel v-if="staffOpen" class="staff-panel" eyebrow="SERVERS" :title="`Your team in ${game.region.name}`" close-label="Close servers" @close="staffOpen = false">
+          <p>Every bar has its own servers. They work for you while you are away and earn up to {{ Math.round(MAX_STAFF * 21.25) }}% of what you would earn serving alone with all four fully trained. They never bring crystals or tips.</p>
           <article v-for="slot in slots" :key="slot.index" class="staff-row">
             <span class="staff-face" :class="{ hired: !!slot.member }"><UiIcon name="server" /></span>
             <span class="staff-text"><b>{{ slot.profile.name }} · {{ slot.profile.role }}</b><small v-if="slot.member">Level {{ slot.member.level }} / {{ MAX_STAFF_LEVEL }}</small><small v-else-if="slot.open">{{ slot.profile.about }}</small><small v-else>Opens at bar level {{ slot.unlockAt }}</small></span>
