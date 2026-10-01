@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ItemArt from '../ui/ItemArt.vue';
 import UiCheckbox from '../ui/UiCheckbox.vue';
 import UiInput from '../ui/UiInput.vue';
 import { computed, ref, watch } from 'vue';
@@ -156,7 +157,7 @@ const boostLeft = (id: string) => {
     <div v-if="tab === 'equipment'" class="grid">
       <nav v-if="ownedBars.length > 1" class="bar-chips" aria-label="Bar to upgrade"><UiButton v-for="region in ownedBars" :key="region.id" size="sm" :variant="region.id === equipBar ? 'solid' : 'secondary'" @click="pickedBar = region.id">{{ region.name }}</UiButton></nav>
       <article v-for="item in EQUIPMENT" :key="item.id" class="card">
-        <h3><span>{{ item.icon }}</span> {{ item.name }} <em :class="slot(item.id).tier">{{ slot(item.id).tier }}</em></h3>
+        <h3><ItemArt kind="equipment" :id="item.id" :fallback="item.icon" /> {{ item.name }} <em :class="slot(item.id).tier">{{ slot(item.id).tier }}</em></h3>
         <p>{{ item.description }}</p>
         <b>Level {{ slot(item.id).level }} / {{ cap(item.id) }} · {{ effectText(item.id) }}</b>
         <progress :value="slot(item.id).level" :max="10"></progress>
@@ -174,7 +175,7 @@ const boostLeft = (id: string) => {
 
     <div v-else-if="tab === 'boxes'" class="grid">
       <article v-for="box in BOXES" :key="box.id" class="card">
-        <h3><span>{{ box.icon }}</span> {{ box.name }} <b>×{{ boxCount(box.id) }}</b></h3>
+        <h3><ItemArt kind="box" :id="box.id" :fallback="box.icon" /> {{ box.name }} <b>×{{ boxCount(box.id) }}</b></h3>
         <p>{{ box.description }}</p>
         <div class="row">
           <UiButton variant="primary" :reason="!boxCount(box.id) ? `You have no ${box.name.toLowerCase()}. Earn them from quests, achievements and drops, or buy one.` : game.loot.pendingChoice ? `Pick your reward first.` : ''" @click="game.act({ type: 'openBox', box: box.id })">Open</UiButton>
@@ -189,7 +190,7 @@ const boostLeft = (id: string) => {
 
     <div v-else-if="tab === 'items'" class="grid">
       <article v-for="item in CONSUMABLES" :key="item.id" class="card">
-        <h3><span>{{ item.icon }}</span> {{ item.name }} <b>×{{ game.loot.consumables[item.id] ?? 0 }}</b></h3>
+        <h3><ItemArt kind="item" :id="item.id" :fallback="item.icon" /> {{ item.name }} <b>×{{ game.loot.consumables[item.id] ?? 0 }}</b></h3>
         <p>{{ item.description }}</p>
         <small v-if="boostLeft(item.id)">Active · {{ boostLeft(item.id) }}</small>
         <small v-else-if="game.loot.armed[item.id]">Armed for your next order</small>
