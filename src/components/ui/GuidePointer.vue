@@ -36,9 +36,20 @@ function refresh() {
     if (target) { const end = center(target.getBoundingClientRect()); dx = end.x - start.x; dy = end.y - start.y; }
   } else if (gesture === 'swipe') { dx = box.left < (window.innerWidth || 800) / 2 ? 90 : -90; }
   const size = Math.max(44, Math.min(120, Math.max(box.width, box.height) + 14));
+  // The label goes above or below the ring, wherever it hides fewer other controls (and stays on the screen).
+  const labelText = wording(label);
+  const labelWidth = Math.min(280, (window.innerWidth || 800) * .8, labelText.length * 7.2 + 24);
+  const labelCenter = window.innerWidth ? Math.max(labelWidth / 2 + 6, Math.min(window.innerWidth - labelWidth / 2 - 6, start.x)) : start.x;
+  const labelHeight = labelText.length * 7.2 > 250 ? 52 : 34;
+  const aboveTop = start.y - size / 2 - 44, belowTop = start.y + size / 2 + 10;
+  const controls = [...document.querySelectorAll<HTMLElement>('button, input, textarea, [role="tab"], .word-answer, .talk-line, .tour-card')].filter((control) => control !== element && !element.contains(control) && !control.contains(element)).map((control) => control.getBoundingClientRect()).filter((rect) => rect.width > 1 && rect.height > 1);
+  const covered = (top: number) => controls.reduce((sum, rect) => sum + Math.max(0, Math.min(top + labelHeight, rect.bottom) - Math.max(top, rect.top)) * Math.max(0, Math.min(labelCenter + labelWidth / 2, rect.right) - Math.max(labelCenter - labelWidth / 2, rect.left)), 0);
+  const fitsAbove = aboveTop >= 4, fitsBelow = belowTop + labelHeight <= (window.innerHeight || 800) - 4;
+  const preferBelow = start.y < (window.innerHeight || 800) * 0.55;
+  const below = fitsAbove && fitsBelow ? (covered(belowTop) === covered(aboveTop) ? preferBelow : covered(belowTop) < covered(aboveTop)) : fitsBelow;
   drawn.value = {
-    key: `${found.spec.target}|${label}`, gesture, label: wording(label), x: start.x, y: start.y, size, dx, dy,
-    labelBelow: start.y < (window.innerHeight || 800) * 0.55, labelLeft: window.innerWidth ? Math.max(150, Math.min(window.innerWidth - 150, start.x)) : start.x
+    key: `${found.spec.target}|${label}`, gesture, label: labelText, x: start.x, y: start.y, size, dx, dy,
+    labelBelow: below, labelLeft: labelCenter
   };
 }
 

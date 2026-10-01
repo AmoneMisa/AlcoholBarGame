@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { CRYSTAL_EXCHANGE_BUNDLES, STAR_CRYSTAL_PACKS } from '../../domain/economy';
 import { useGameStore } from '../../stores/game';
 import UiIcon from '../ui/UiIcon.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
+import OptionSelect from './OptionSelect.vue';
 import { MAX_STAFF, MAX_STAFF_LEVEL, STAFF_PROFILES, STAFF_UNLOCK_LEVELS, hireCost, teamShare, upgradeCost } from '../../domain/staff';
 import { TRAINING_MODULES } from '../../domain/training';
 import AcademyPanel from './AcademyPanel.vue';
@@ -17,8 +18,17 @@ const academyOpen = ref(false);
 const lessonsLeft = computed(() => TRAINING_MODULES.length - game.training.done.length);
 const startTour = () => window.dispatchEvent(new Event('barlingo:tour'));
 const slots = computed(() => Array.from({ length: MAX_STAFF }, (_, index) => ({ index, profile: STAFF_PROFILES[index]!, unlockAt: STAFF_UNLOCK_LEVELS[index]!, member: game.staff[index], open: game.level >= STAFF_UNLOCK_LEVELS[index]! })));
+// Why a hire or training button is off, said in words under the row.
+const staffReason = (slot: { index: number; member?: { level: number }; open: boolean }) => {
+  if (slot.member) return slot.member.level >= MAX_STAFF_LEVEL ? '' : game.money < upgradeCost(slot.index, slot.member.level) ? `Not enough coins: training costs ${upgradeCost(slot.index, slot.member.level)}, you have ${Math.floor(game.money)}.` : '';
+  if (!slot.open || slot.index !== game.staff.length) return '';
+  return game.money < hireCost(slot.index) ? `Not enough coins: hiring costs ${hireCost(slot.index)}, you have ${Math.floor(game.money)}.` : '';
+};
 const teamPercent = computed(() => Math.round(teamShare(game.staff) * 100));
 const volumeOpen = ref(false);
+// Only one header panel is open at a time, so they never pile up on top of each other.
+const panels = { exchange: exchangeOpen, staff: staffOpen, academy: academyOpen, volume: volumeOpen };
+for (const [name, flag] of Object.entries(panels)) watch(flag, (open) => { if (open) for (const [other, ref] of Object.entries(panels)) if (other !== name) ref.value = false; });
 const percent = (value: number) => `${Math.round(value * 100)}%`;
 // Dragging a slider up from zero also turns that channel back on.
 function setVolume(channel: 'music' | 'sfx' | 'speech', event: Event) {
@@ -81,13 +91,14 @@ onUnmounted(() => {
       </div>
       <div class="staff-resource">
         <button class="staff-open" type="button" :aria-expanded="staffOpen" :aria-label="`Servers: ${game.staff.length} of ${MAX_STAFF} hired`" @click="staffOpen = !staffOpen"><span class="staff-icons"><i v-for="slot in slots" :key="slot.index" :class="{ hired: !!slot.member, locked: !slot.open }"><UiIcon name="server" /></i></span><span><small>SERVERS</small><b>{{ game.staff.length ? `${teamPercent}% of you` : 'Hire' }}</b></span></button>
-        <PopoverPanel v-if="staffOpen" class="staff-panel" eyebrow="SERVERS" :title="`Your team in ${game.region.name}`" close-label="Close servers" @close="staffOpen = false">
+        <PopoverPanel v-if="staffOpen" class="staff-panel" padded eyebrow="SERVERS" :title="`Your team in ${game.region.name}`" close-label="Close servers" @close="staffOpen = false">
           <p>Every bar has its own servers. They work for you while you are away and earn up to {{ Math.round(MAX_STAFF * 21.25) }}% of what you would earn serving alone with all four fully trained. They never bring crystals or tips.</p>
           <article v-for="slot in slots" :key="slot.index" class="staff-row">
             <span class="staff-face" :class="{ hired: !!slot.member }"><UiIcon name="server" /></span>
             <span class="staff-text"><b>{{ slot.profile.name }} · {{ slot.profile.role }}</b><small v-if="slot.member">Level {{ slot.member.level }} / {{ MAX_STAFF_LEVEL }}</small><small v-else-if="slot.open">{{ slot.profile.about }}</small><small v-else>Opens at bar level {{ slot.unlockAt }}</small></span>
-            <button v-if="slot.member" type="button" :disabled="slot.member.level >= MAX_STAFF_LEVEL || game.money < upgradeCost(slot.index, slot.member.level)" @click="game.upgradeStaff(slot.index)">{{ slot.member.level >= MAX_STAFF_LEVEL ? 'Max' : `Train ${upgradeCost(slot.index, slot.member.level)}` }}</button>
-            <button v-else-if="slot.open && slot.index === game.staff.length" type="button" :disabled="game.money < hireCost(slot.index)" @click="game.hireStaff()">Hire {{ hireCost(slot.index) }}</button>
+            <button v-if="slot.member" type="button" :disabled="slot.member.level >= MAX_STAFF_LEVEL || !!staffReason(slot)" @click="game.upgradeStaff(slot.index)">{{ slot.member.level >= MAX_STAFF_LEVEL ? 'Max' : `Train ${upgradeCost(slot.index, slot.member.level)}` }}</button>
+            <button v-else-if="slot.open && slot.index === game.staff.length" type="button" :disabled="!!staffReason(slot)" @click="game.hireStaff()">Hire {{ hireCost(slot.index) }}</button>
+            <p v-if="staffReason(slot)" class="staff-reason" role="note">{{ staffReason(slot) }}</p>
           </article>
         </PopoverPanel>
       </div>
@@ -114,10 +125,7 @@ onUnmounted(() => {
             <button type="button" :aria-pressed="!speechOn" aria-label="Mute English voice" @click="speechOn = !speechOn">{{ speechOn ? 'Mute' : 'Unmute' }}</button>
           </div>
           <button type="button" class="how-to-play" @click="volumeOpen = false; startTour()"><UiIcon class="inline-icon" name="help" /> How to play (replay the tour)</button>
-          <div class="volume-row voice-mode">
-            <span id="voice-mode"><UiIcon name="chat" /> Guest voices</span>
-            <select aria-labelledby="voice-mode" v-model="voiceMode"><option value="murmur">Murmur</option><option value="speech">Read aloud</option><option value="off">Off</option></select>
-          </div>
+          <OptionSelect label="Guest voices" v-model="voiceMode" :options="[{ value: 'murmur', label: 'Murmur' }, { value: 'speech', label: 'Read aloud' }, { value: 'off', label: 'Off' }]" />
         </PopoverPanel>
       </div>
     </div>

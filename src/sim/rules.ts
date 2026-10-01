@@ -107,8 +107,8 @@ export type GameAction =
   | { type: 'giveWater'; customerId: string }
   | { type: 'callTaxi'; customerId: string }
   | { type: 'askToLeave'; customerId: string; tone: 'gentle' | 'firm' | 'aggressive' }
-  | { type: 'upgradeEquipment'; item: string }
-  | { type: 'promoteEquipment'; item: string }
+  | { type: 'upgradeEquipment'; item: string; regionId?: string }
+  | { type: 'promoteEquipment'; item: string; regionId?: string }
   | { type: 'openBox'; box: string }
   | { type: 'pickReward'; index: number }
   | { type: 'buyBox'; box: string; quantity?: number }
@@ -1065,8 +1065,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'buyPrestigePerk': {
       try {
         switch (action.type) {
-          case 'upgradeEquipment': upgradeEquipment(state, action.item, now); break;
-          case 'promoteEquipment': promoteEquipment(state, action.item); break;
+          case 'upgradeEquipment': upgradeEquipment(state, action.item, now, action.regionId); break;
+          case 'promoteEquipment': promoteEquipment(state, action.item, action.regionId); break;
           case 'openBox': openBox(state, action.box, random, now); break;
           case 'pickReward': pickChoice(state, action.index, random); break;
           case 'buyBox': buyBox(state, action.box, action.quantity); break;

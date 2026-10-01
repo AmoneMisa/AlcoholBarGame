@@ -38,8 +38,9 @@ const take = (map: Record<string, number>, key: string, amount: number) => {
   if (map[key]! <= 0) delete map[key];
 };
 const has = (map: Record<string, number>, key: string, amount = 1) => (map[key] ?? 0) >= amount;
-const slotOf = (state: PlayerState, id: string) => {
-  const slot = state.loot.equipment[state.regionId]?.[id];
+const slotOf = (state: PlayerState, id: string, regionId: string = state.regionId) => {
+  if (!(state.ownedBarIds as string[]).includes(regionId)) throw new LootError('You do not own this bar yet.');
+  const slot = state.loot.equipment[regionId]?.[id];
   if (!slot || !equipmentDef(id)) throw new LootError('Unknown equipment.');
   return slot;
 };
@@ -48,6 +49,7 @@ const slotOf = (state: PlayerState, id: string) => {
 export const perkRank = (state: PlayerState, id: PrestigePerkId) => state.loot.prestige.perks[id] ?? 0;
 export const boostActive = (state: PlayerState, kind: string, now: number) => (state.loot.boosts[kind] ?? 0) > now;
 export const equipmentLevel = (state: PlayerState, id: EquipmentId, regionId = state.regionId) => state.loot.equipment[regionId]?.[id]?.level ?? 0;
+const barLabel = (regionId: string) => REGIONS.find((item) => item.id === regionId)?.name ?? 'this bar';
 const effect = (state: PlayerState, id: EquipmentId) => equipmentLevel(state, id) * equipmentDef(id)!.perLevel;
 
 export function lootBonuses(state: PlayerState, now: number) {
@@ -201,28 +203,28 @@ export function useConsumable(state: PlayerState, id: string, recipeId: unknown,
 }
 
 // ---- Equipment ----
-export function upgradeEquipment(state: PlayerState, id: string, now: number) {
-  const slot = slotOf(state, id);
+export function upgradeEquipment(state: PlayerState, id: string, now: number, regionId: string = state.regionId) {
+  const slot = slotOf(state, id, regionId);
   const cap = levelCap(slot.tier, perkRank(state, 'cap'));
   if (slot.level >= cap) throw new LootError(TIER_SHARD_COST[slot.tier] ? 'Raise the item’s tier with shards to unlock more levels.' : 'This item is at its top level.');
   const cost = upgradeCostFor(slot.level);
   if (state.money < cost.coins) throw new LootError(`You need ${cost.coins} coins.`);
-  const partsCost = Math.max(1, Math.ceil(cost.parts * (1 - companionBonus(state, 'upgrade'))));
+  const partsCost = Math.max(1, Math.ceil(cost.parts * (1 - companionBonus(state, 'upgrade', regionId))));
   if (state.loot.parts < partsCost) throw new LootError(`You need ${partsCost} workshop parts.`);
   state.money = coins(state.money - cost.coins);
   state.loot.parts -= partsCost;
   slot.level += 1;
   track(state, 'upgrades', 1, now);
-  note(state, `${equipmentDef(id)!.name} is now level ${slot.level} in this bar.`);
+  note(state, `${equipmentDef(id)!.name} is now level ${slot.level} in ${barLabel(regionId)}.`);
 }
-export function promoteEquipment(state: PlayerState, id: string) {
-  const slot = slotOf(state, id);
+export function promoteEquipment(state: PlayerState, id: string, regionId: string = state.regionId) {
+  const slot = slotOf(state, id, regionId);
   const cost = TIER_SHARD_COST[slot.tier];
   if (!cost) throw new LootError('This item is already legendary.');
   if (!has(state.loot.itemShards, id, cost)) throw new LootError(`You need ${cost} ${equipmentDef(id)!.name} shards.`);
   take(state.loot.itemShards, id, cost);
   slot.tier = TIER_ORDER[TIER_ORDER.indexOf(slot.tier) + 1]!;
-  note(state, `${equipmentDef(id)!.name} is now ${slot.tier} tier (level cap ${levelCap(slot.tier, perkRank(state, 'cap'))}).`);
+  note(state, `${equipmentDef(id)!.name} in ${barLabel(regionId)} is now ${slot.tier} tier (level cap ${levelCap(slot.tier, perkRank(state, 'cap'))}).`);
 }
 
 // ---- Style draw ----

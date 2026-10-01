@@ -502,7 +502,7 @@ onBeforeUnmount(() => {
       </button>
       <TrainingStrip />
       <button type="button" class="house-rules-button" data-guide="rules-button" :aria-expanded="rulesOpen" @click="rulesOpen = !rulesOpen"><UiIcon class="inline-icon" name="book" /> Rules<i v-if="game.ruleViolations" class="rules-count" :title="`${game.ruleViolations} rule breaks so far`">{{ game.ruleViolations }}</i></button>
-      <PopoverPanel v-if="rulesOpen" class="house-rules-panel" eyebrow="HOUSE RULES" :title="`Rules in ${game.region.name}`" close-label="Close house rules" @close="rulesOpen = false">
+      <PopoverPanel v-if="rulesOpen" class="house-rules-panel" padded eyebrow="HOUSE RULES" :title="`Rules in ${game.region.name}`" close-label="Close house rules" @close="rulesOpen = false">
         <p class="rules-note">These are game rules for practice, not legal advice. Explain them politely to guests. Inspectors count every rule you break{{ game.ruleViolations ? ` (so far: ${game.ruleViolations})` : '' }}.</p>
         <article v-for="rule in game.houseRules" :key="rule.id" class="rule-row"><span class="rule-icon"><Glyph :g="rule.icon" /></span><span><b>{{ rule.title }}</b><small>{{ rule.text }}</small></span></article>
       </PopoverPanel>

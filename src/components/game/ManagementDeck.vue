@@ -136,9 +136,9 @@ function selectBartender(id: 'noa' | 'leo') {
         </div>
         <div v-if="targetRegions.length" class="transfer-console">
           <div><small>MOVE BETWEEN BARS</small><b>Stock transfer</b></div>
-          <select v-model="transferIngredientId" aria-label="Ingredient to transfer"><option v-for="ingredient in INGREDIENTS" :key="ingredient.id" :value="ingredient.id">{{ ingredient.name }}</option></select>
+          <OptionSelect label="Ingredient" v-model="transferIngredientId" :options="INGREDIENTS.map((ingredient) => ({ value: ingredient.id, label: ingredient.name }))" />
           <UiIcon class="inline-icon" name="arrow-right" />
-          <select v-model="game.transferTargetId" aria-label="Destination bar"><option v-for="region in targetRegions" :key="region.id" :value="region.id">{{ region.name }}</option></select>
+          <OptionSelect label="To bar" v-model="game.transferTargetId" :options="targetRegions.map((region) => ({ value: region.id, label: region.name }))" />
           <button type="button" @click="game.transferStock(transferIngredientId, game.transferTargetId)">Transfer {{ ingredientById(transferIngredientId).unit === 'ml' ? '100 ml' : '3 pcs' }}</button>
         </div>
         <p v-else class="transfer-locked">Unlock a second bar at level {{ game.barPurchaseLevel }} to rotate stock between locations.</p>

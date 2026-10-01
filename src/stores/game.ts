@@ -589,7 +589,7 @@ export const useGameStore = defineStore('game', () => {
   // The servers of the bar being managed: every bar has its own team.
   const staff = computed(() => state.value.staffByBar?.[state.value.regionId] ?? []);
   // The Circle: people who joined, shards, keepsakes and who works in this bar.
-  const crewBonus = (bonus: BonusId) => companionBonus(state.value, bonus);
+  const crewBonus = (bonus: BonusId, regionId?: string) => companionBonus(state.value, bonus, regionId);
   const circle = computed(() => state.value.companions ?? emptyCompanions());
   const recruitCompanion = (id: string) => dispatch({ type: 'recruitCompanion', id });
   const giveKeepsake = (id: string, kind: string) => dispatch({ type: 'giveKeepsake', id, kind });

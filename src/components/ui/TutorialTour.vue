@@ -61,6 +61,13 @@ const rect = ref<{ top: number; left: number; width: number; height: number } | 
 const step = computed(() => STEPS[index.value]!);
 const last = computed(() => index.value === STEPS.length - 1);
 const waiting = computed(() => !!step.value.until);
+const cardEl = ref<HTMLElement>();
+// Steps that ask for an action show a slim card (what to do and the buttons), so it hides as little as possible;
+// "Why?" opens the explanation.
+const expanded = ref(false);
+const slim = computed(() => !!step.value.point && !expanded.value);
+/** Where the card sits (px from the top): in the free band that covers the least of what the step points at. */
+const cardTop = ref<number | undefined>();
 let poll: ReturnType<typeof setInterval> | undefined;
 let finishedAt = -1;
 
@@ -72,13 +79,46 @@ function measure() {
   rect.value = box.width && box.height ? { top: box.top - 6, left: box.left - 6, width: box.width + 12, height: box.height + 12 } : undefined;
 }
 
+// The card must never sit on top of what it asks the player to press: it takes the band under the header or the band
+// above the navigation, whichever hides less of the targets of this step.
+function targetRects(): DOMRect[] {
+  const specs = step.value.point ?? (step.value.target ? [{ target: step.value.target }] : []);
+  const rects: DOMRect[] = [];
+  for (const spec of specs as { target: string; to?: string }[]) {
+    for (const css of [spec.target, spec.to]) {
+      if (!css) continue;
+      let found: Element[] = [];
+      try { found = [...document.querySelectorAll(css)].slice(0, 40); } catch { found = []; }
+      for (const element of found) { const box = element.getBoundingClientRect(); if (box.width > 1 && box.height > 1) rects.push(box); }
+    }
+  }
+  return rects;
+}
+function place() {
+  const card = cardEl.value;
+  if (!card || !open.value) return;
+  const box = card.getBoundingClientRect();
+  const height = card.offsetHeight;
+  const hud = document.querySelector('.top-hud')?.getBoundingClientRect().bottom ?? 70;
+  const nav = document.querySelector('.game-nav')?.getBoundingClientRect();
+  const navTop = nav && nav.height > 1 ? nav.top : window.innerHeight;
+  // A dialog that covers the header and the navigation (the conversation) sets the free area instead.
+  const dialog = [...document.querySelectorAll<HTMLElement>('.talk-popup, [aria-modal="true"]:not(.tour)')].map((element) => element.getBoundingClientRect()).find((box) => box.width > 200 && box.height > 200);
+  const topY = dialog ? Math.max(8, dialog.top + 8) : Math.max(8, hud + 10);
+  const bottomY = Math.max(topY, (dialog ? dialog.bottom - 8 : navTop - 12) - height);
+  const rects = targetRects();
+  const hidden = (y: number) => rects.reduce((sum, rect) => sum + Math.max(0, Math.min(y + height, rect.bottom) - Math.max(y, rect.top)) * Math.max(0, Math.min(box.right, rect.right) - Math.max(box.left, rect.left)), 0);
+  cardTop.value = hidden(topY) < hidden(bottomY) ? topY : bottomY;
+}
+
 async function show() {
+  expanded.value = false;
   // Steps that point at a button leave the screen as it is: the player has to find the way, which is the lesson.
   // The two header steps go back to the bar first, so the button they point at is there.
   if (step.value.view && (!step.value.point || step.value.id === 'hud' || step.value.id === 'rules')) emit('view', step.value.view);
   setPointer('tour', step.value.point);
   await nextTick();
-  setTimeout(measure, 120);
+  setTimeout(() => { measure(); place(); }, 120);
 }
 
 function start() { index.value = 0; finishedAt = -1; open.value = true; void show(); }
@@ -91,10 +131,12 @@ const onKey = (event: KeyboardEvent) => { if (open.value && event.key === 'Escap
 watch(() => props.ready, (ready) => { if (ready && !props.seen) setTimeout(() => { if (!props.seen) start(); }, 900); }, { immediate: true });
 onMounted(() => {
   window.addEventListener('resize', measure);
+  window.addEventListener('resize', place);
   window.addEventListener('keydown', onKey);
   window.addEventListener('barlingo:tour', start);
   // A step that waits for an action moves on a moment after the player has done it.
   poll = setInterval(() => {
+    place();
     const current = step.value;
     if (!open.value || !current.until || finishedAt === index.value) return;
     let done = false;
@@ -109,6 +151,7 @@ onBeforeUnmount(() => {
   if (poll) clearInterval(poll);
   setPointer('tour', undefined);
   window.removeEventListener('resize', measure);
+  window.removeEventListener('resize', place);
   window.removeEventListener('keydown', onKey);
   window.removeEventListener('barlingo:tour', start);
 });
@@ -118,13 +161,13 @@ onBeforeUnmount(() => {
   <div v-if="open" class="tour" role="dialog" aria-modal="false" aria-label="Game tour">
     <div v-if="rect" class="tour-spot" :style="{ top: rect.top + 'px', left: rect.left + 'px', width: rect.width + 'px', height: rect.height + 'px' }" />
     <div v-else-if="!step.point" class="tour-dim" />
-    <section class="tour-card" :class="{ top: (!!rect && rect.top > 260) || !!step.point }">
-      <header><small>Step {{ index + 1 }} of {{ STEPS.length }}</small><button type="button" class="tour-skip" @click="finish('skipped')">Skip tour <UiIcon class="inline-icon" name="close" /></button></header>
-      <h3>{{ step.title }}</h3>
-      <p>{{ step.text }}</p>
+    <section ref="cardEl" class="tour-card" :class="{ compact: slim }" :style="cardTop !== undefined ? { top: cardTop + 'px', bottom: 'auto' } : undefined">
+      <header><small>Step {{ index + 1 }} of {{ STEPS.length }}</small><button v-if="step.point" type="button" class="tour-why" @click="expanded = !expanded; $nextTick(place)">{{ expanded ? 'Hide details' : 'Why?' }}</button><button type="button" class="tour-skip" @click="finish('skipped')">Skip tour <UiIcon class="inline-icon" name="close" /></button></header>
+      <h3 v-if="!slim">{{ step.title }}</h3>
+      <p v-if="!slim">{{ step.text }}</p>
       <p v-if="step.action" class="tour-action"><UiIcon class="inline-icon" name="pointer" /> {{ step.action }}</p>
-      <ul v-if="step.tips?.length"><li v-for="tip in step.tips" :key="tip">{{ tip }}</li></ul>
-      <div class="tour-dots" aria-hidden="true"><i v-for="(item, at) in STEPS" :key="item.id" :class="{ on: at === index, past: at < index }" /></div>
+      <ul v-if="step.tips?.length && !slim"><li v-for="tip in step.tips" :key="tip">{{ tip }}</li></ul>
+      <div v-if="!step.point" class="tour-dots" aria-hidden="true"><i v-for="(item, at) in STEPS" :key="item.id" :class="{ on: at === index, past: at < index }" /></div>
       <footer>
         <button type="button" :disabled="index === 0" @click="back">Back</button>
         <button type="button" class="primary" @click="next">{{ last ? 'Start playing' : waiting || step.point ? 'Skip step' : 'Next' }}</button>
@@ -138,7 +181,13 @@ onBeforeUnmount(() => {
 .tour-dim { position: absolute; inset: 0; background: rgba(5, 8, 14, .55); }
 .tour-spot { position: absolute; border-radius: 14px; border: 2px solid #f0c35a; box-shadow: 0 0 0 9999px rgba(5, 8, 14, .6); transition: all .25s ease; }
 .tour-card { pointer-events: auto; position: absolute; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(94vw, 440px); padding: 14px 16px; border: 1px solid #b78649; border-radius: 16px; background: #141c2b; color: #f1ead9; box-shadow: 0 16px 40px #000c; display: grid; gap: 8px; }
-.tour-card.top { bottom: auto; top: calc(var(--hud-h, 70px) + 12px); }
+.tour-card.compact { width: min(94vw, 400px); padding: 8px 12px; }
+.tour-card.compact p { font-size: 12.5px; line-height: 1.35; }
+.tour-card.compact footer { gap: 6px; }
+.tour-card.compact footer button { padding: 5px 12px; font-size: 13px; }
+.tour-card header { gap: 8px; }
+.tour-card header small { margin-right: auto; }
+.tour-card .tour-why { justify-self: start; padding: 2px 8px; border: 0; background: transparent; color: #9fb4d0; font-size: 12px; text-decoration: underline; }
 .tour-card header { display: flex; justify-content: space-between; align-items: center; }
 .tour-card small { color: #e4b35c; letter-spacing: .08em; font-weight: 700; }
 .tour-card h3 { margin: 0; font: 700 20px Georgia, serif; }

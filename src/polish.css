@@ -93,3 +93,30 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 ::-webkit-scrollbar-corner { background: transparent; }
 .pshelf-row .shelf-nudge button { width: 28px; height: 28px; }
 .pshelf-row .shelf-nudge button .ui-icon { width: 18px; height: 18px; }
+
+/* ==== Header popovers: servers, training and sound open under their button, above everything, and never run off the screen ==== */
+.staff-resource, .academy-resource, .sound-resource, .exchange-resource { position: relative; }
+.staff-panel, .academy-panel { position: absolute; top: calc(100% + 10px); left: 50%; z-index: 260; transform: translateX(-50%); width: min(380px, 92vw); max-height: calc(100dvh - 170px); overflow: auto; overscroll-behavior: contain; }
+.volume-panel, .currency-exchange { z-index: 260; max-height: calc(100dvh - 170px); overflow: auto; overscroll-behavior: contain; }
+.staff-panel .staff-row:first-of-type { border-top: 0; }
+@media (max-width: 760px) {
+  .staff-panel, .academy-panel { position: fixed; top: calc(max(8px, env(safe-area-inset-top)) + 112px); left: 7px; right: 7px; width: auto; transform: none; max-height: calc(100dvh - 112px - 90px); }
+}
+/* The House rules panel floats over the bar scene, above the button that opens it. */
+.house-rules-panel { position: absolute; z-index: 60; left: 12px; bottom: 90px; width: min(380px, calc(100% - 24px)); max-height: 62%; }
+
+/* ==== Voice and other selects use the styled list, and the one in the sound panel fills its row ==== */
+.volume-panel .opt-select { padding: 8px 9px; border: 1px solid #334158; border-radius: 10px; background: #0f1827; }
+
+/* ==== Design tab (bar): preview on the left and options on the right on wide screens; a smaller pinned preview on phones ==== */
+@media (min-width: 1000px) {
+  .design-deck .design-tab-bar { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr); gap: 12px 16px; align-items: start; }
+  .design-deck .design-tab-bar > .design-location-tabs, .design-deck .design-tab-bar > .bar-name-editor { grid-column: 1 / -1; }
+  .design-deck .design-tab-bar > .design-preview { grid-column: 1; grid-row: 3; position: sticky; top: calc(var(--hud-h, 0px) + 10px); width: 100%; height: auto; max-height: none; aspect-ratio: 16 / 10; margin: 0; }
+  .design-deck .design-tab-bar > .design-options { grid-column: 2; grid-row: 3; min-width: 0; }
+}
+@media (max-width: 999px) {
+  .design-deck .design-preview { width: min(100%, calc(30vh * 1.6)); max-height: 30vh; }
+}
+.staff-row { grid-template-columns: 34px 1fr auto; }
+.staff-reason { grid-column: 1 / -1; margin: 2px 0 0 !important; padding: 5px 8px; border: 1px solid #8a5a3a; border-radius: 8px; background: #2a1b17; color: #ffcfae; font-size: 11px !important; opacity: 1 !important; }

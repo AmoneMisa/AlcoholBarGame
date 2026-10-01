@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import OptionSelect from './game/OptionSelect.vue';
 import { computed, ref } from 'vue';
 import PairingPrinciples from './PairingPrinciples.vue';
 import { BAR_PAIRINGS } from '../data/pairings/barPairings';
@@ -84,13 +85,14 @@ const lesson = computed(() => {
     who: `It is a strong starting point for guests who ask for ${profile.style.replaceAll('_', ' ')} flavors, already enjoy ${profile.family}, or want a ${profile.abv_class === 'non_alcoholic' ? 'zero-proof' : 'characterful'} recommendation.`
   };
 });
+// Choices for the styled selects (the first option can be "any").
+const opts = (values: readonly string[], any = false) => [...(any ? [{ value: '', label: 'any' }] : []), ...values.map((value) => ({ value, label: value.replaceAll('_', ' ') }))];
 </script>
 
 <template>
   <article class="panel pairing-advisor">
     <div class="panel-title-row">
       <h2>Recommendation Academy</h2>
-      <span>Knowledge base {{ BAR_PAIRINGS.metadata.version }}</span>
     </div>
 
     <section class="learning-intro">
@@ -108,25 +110,21 @@ const lesson = computed(() => {
 
     <div v-if="mode === 'food' || mode === 'drink'" class="pairing-controls">
       <input v-model="search" placeholder="Search wine, beer, spirit, tea, coffee, mocktail…" />
-      <select v-model="selectedBeverage">
-        <option v-for="profile in profiles" :key="profile.id" :value="profile.id">
-          {{ profile.name }} · {{ profile.style }} · {{ profile.abv_class }}
-        </option>
-      </select>
+      <OptionSelect label="Drink" v-model="selectedBeverage" :options="profiles.map((profile) => ({ value: profile.id, label: `${profile.name} · ${profile.style} · ${profile.abv_class}` }))" />
     </div>
 
     <div v-if="mode === 'context'" class="context-controls">
-      <label>Mood<select v-model="mood"><option>neutral</option><option>sad</option><option>angry</option><option>stressed</option><option>lonely</option><option>tired</option></select></label>
-      <label>Setting<select v-model="setting"><option value="">any</option><option>balcony</option><option>terrace</option></select></label>
-      <label>Activity<select v-model="activity"><option value="">any</option><option>cigar</option><option>reading</option><option>gaming</option><option>dessert</option><option>gift_buying</option></select></label>
-      <label>Time<select v-model="timeOfDay"><option value="">any</option><option>evening</option><option>late_night</option></select></label>
-      <label>Weather<select v-model="weather"><option value="">any</option><option>hot</option><option>cold</option></select></label>
-      <label>Company<select v-model="company"><option value="">any</option><option>friend</option></select></label>
+      <OptionSelect label="Mood" v-model="mood" :options="opts(['neutral', 'sad', 'angry', 'stressed', 'lonely', 'tired'])" />
+      <OptionSelect label="Setting" v-model="setting" :options="opts(['balcony', 'terrace'], true)" />
+      <OptionSelect label="Activity" v-model="activity" :options="opts(['cigar', 'reading', 'gaming', 'dessert', 'gift_buying'], true)" />
+      <OptionSelect label="Time" v-model="timeOfDay" :options="opts(['evening', 'late_night'], true)" />
+      <OptionSelect label="Weather" v-model="weather" :options="opts(['hot', 'cold'], true)" />
+      <OptionSelect label="Company" v-model="company" :options="opts(['friend'], true)" />
     </div>
 
     <div v-if="mode === 'cigar'" class="context-controls cigar-controls">
-      <label>Body<select v-model="cigarBody"><option value="mild">mild</option><option value="medium">medium</option><option value="full">full</option></select></label>
-      <label>Note<select v-model="cigarNote"><option v-for="note in cigarNotes" :key="note" :value="note">{{ note }}</option></select></label>
+      <OptionSelect label="Body" v-model="cigarBody" :options="opts(['mild', 'medium', 'full'])" />
+      <OptionSelect label="Note" v-model="cigarNote" :options="opts(cigarNotes)" />
     </div>
 
     <div v-if="mode === 'food'" class="pairing-results">

@@ -794,3 +794,17 @@ test('Achievement counters: spending, collections, levels, servers, gifts and lo
   const kept = normalizeLoot(JSON.parse(JSON.stringify({ ...state.loot, stats: Object.fromEntries(ACHIEVEMENTS.map((item) => [item.stat, 2_000_000])) })), 1);
   for (const goal of ACHIEVEMENTS) assert.ok((kept.stats[goal.stat] ?? 0) > 0, `${goal.stat} is saved`);
 });
+
+test('Equipment of another owned bar can be upgraded without switching, and only owned bars', () => {
+  const state = fresh();
+  state.ownedBarIds = ['new-york', 'london'];
+  state.money = 100000; state.loot.parts = 100; state.loot.itemShards = { shaker: 20 };
+  run(state, { type: 'upgradeEquipment', item: 'shaker', regionId: 'london' });
+  assert.equal(state.loot.equipment.london.shaker.level, 1);
+  assert.equal(state.loot.equipment['new-york'].shaker.level, 0, 'the managed bar is untouched');
+  assert.equal(state.regionId, 'new-york');
+  run(state, { type: 'promoteEquipment', item: 'shaker', regionId: 'london' });
+  assert.equal(state.loot.equipment.london.shaker.tier, 'rare');
+  assert.throws(() => run(state, { type: 'upgradeEquipment', item: 'shaker', regionId: 'berlin' }), /do not own/);
+  assert.throws(() => run(state, { type: 'upgradeEquipment', item: 'shaker', regionId: 'nowhere' }), /do not own/);
+});

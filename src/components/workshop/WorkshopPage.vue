@@ -17,6 +17,8 @@ import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipe
 import { SEASON_FEATURED_SHARE, SEASON_MILESTONES, SPARK_DRAWS, seasonAt } from '../../domain/seasons';
 import { featuredLegendary } from '../../sim/loot';
 import CompanionsPanel from './CompanionsPanel.vue';
+import { REGIONS } from '../../domain/catalog';
+import OptionSelect from '../game/OptionSelect.vue';
 import { useGameStore } from '../../stores/game';
 
 const game = useGameStore();
@@ -24,8 +26,27 @@ const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars'
 const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['circle', 'Circle'], ['signature', 'Signature'], ['weekly', 'Weekly'], ['prestige', 'Grand Opening']] as const;
 const scrollRecipe = ref('');
 const names = { consumable: (id: string) => consumableDef(id)?.name ?? id, equipment: (id: string) => equipmentDef(id)?.name ?? id };
-const cap = (id: string) => levelCap(game.loot.equipment[game.regionId]![id]!.tier, game.loot.prestige.perks.cap ?? 0);
-const slot = (id: string) => game.loot.equipment[game.regionId]![id]!;
+// Equipment is kept per bar. The bar shown here can be picked without leaving the page.
+const pickedBar = ref('');
+const equipBar = computed(() => (ownedBars.value.some((region) => region.id === pickedBar.value) ? pickedBar.value : game.regionId));
+const ownedBars = computed(() => REGIONS.filter((region) => game.isBarOwned(region.id)));
+const cap = (id: string) => levelCap(game.loot.equipment[equipBar.value]![id]!.tier, game.loot.prestige.perks.cap ?? 0);
+const slot = (id: string) => game.loot.equipment[equipBar.value]![id]!;
+const partsFor = (id: string) => Math.max(1, Math.ceil(upgradeCostFor(slot(id).level).parts * (1 - game.crewBonus('upgrade', equipBar.value))));
+// Why a button is off, in words: shown under it, so the player never faces a dead button.
+function upgradeReason(id: string) {
+  const level = slot(id).level;
+  if (level >= cap(id)) return TIER_SHARD_COST[slot(id).tier] ? 'This tier is at its top level. Raise the tier with shards to go higher.' : 'This item is at its top level.';
+  const cost = upgradeCostFor(level);
+  if (game.money < cost.coins) return `Not enough coins: you need ${cost.coins}, you have ${Math.floor(game.money)}.`;
+  if (game.loot.parts < partsFor(id)) return `Not enough parts: you need ${partsFor(id)}, you have ${game.loot.parts}. Serve guests or open boxes to find parts.`;
+  return '';
+}
+function tierReason(id: string) {
+  const need = TIER_SHARD_COST[slot(id).tier];
+  const have = game.loot.itemShards[id] ?? 0;
+  return need && have < need ? `Not enough shards: you need ${need} ${equipmentDef(id)?.name.toLowerCase()} shards, you have ${have}. Silver and gold boxes bring item shards.` : '';
+}
 const boxCount = (id: string) => game.loot.boxes[id] ?? 0;
 const knownRecipes = computed(() => RECIPES.filter((recipe) => game.knownRecipeIds.includes(recipe.id)));
 const featured = computed(() => featuredLegendary(Date.now()));
@@ -131,21 +152,23 @@ const boostLeft = (id: string) => {
     <p v-if="game.loot.log[0]" class="workshop-log">{{ game.loot.log[0] }}</p>
 
     <div v-if="tab === 'equipment'" class="grid">
+      <nav v-if="ownedBars.length > 1" class="bar-chips" aria-label="Bar to upgrade"><button v-for="region in ownedBars" :key="region.id" type="button" :class="{ active: region.id === equipBar }" @click="pickedBar = region.id">{{ region.name }}</button></nav>
       <article v-for="item in EQUIPMENT" :key="item.id" class="card">
         <h3><span>{{ item.icon }}</span> {{ item.name }} <em :class="slot(item.id).tier">{{ slot(item.id).tier }}</em></h3>
         <p>{{ item.description }}</p>
         <b>Level {{ slot(item.id).level }} / {{ cap(item.id) }} · {{ effectText(item.id) }}</b>
         <progress :value="slot(item.id).level" :max="10"></progress>
         <div class="row">
-          <button type="button" :disabled="slot(item.id).level >= cap(item.id)" @click="game.act({ type: 'upgradeEquipment', item: item.id })">
-            Upgrade · {{ upgradeCostFor(slot(item.id).level).coins }} coins + {{ Math.max(1, Math.ceil(upgradeCostFor(slot(item.id).level).parts * (1 - game.crewBonus('upgrade')))) }} parts
+          <button type="button" :class="{ blocked: !!upgradeReason(item.id) }" :aria-disabled="!!upgradeReason(item.id)" @click="!upgradeReason(item.id) && game.act({ type: 'upgradeEquipment', item: item.id, regionId: equipBar })">
+            Upgrade · {{ upgradeCostFor(slot(item.id).level).coins }} coins + {{ partsFor(item.id) }} parts
           </button>
-          <button v-if="TIER_SHARD_COST[slot(item.id).tier]" type="button" :disabled="(game.loot.itemShards[item.id] ?? 0) < TIER_SHARD_COST[slot(item.id).tier]!" @click="game.act({ type: 'promoteEquipment', item: item.id })">
+          <button v-if="TIER_SHARD_COST[slot(item.id).tier]" type="button" :class="{ blocked: !!tierReason(item.id) }" :aria-disabled="!!tierReason(item.id)" @click="!tierReason(item.id) && game.act({ type: 'promoteEquipment', item: item.id, regionId: equipBar })">
             Raise tier · {{ game.loot.itemShards[item.id] ?? 0 }}/{{ TIER_SHARD_COST[slot(item.id).tier] }} shards
           </button>
         </div>
+        <p v-for="why in [upgradeReason(item.id), tierReason(item.id)].filter(Boolean)" :key="why" class="reason" role="note">{{ why }}</p>
       </article>
-      <p class="hint">Equipment belongs to the bar you are managing now. Serving guests drops workshop parts; boxes bring shards.</p>
+      <p class="hint">Every bar has its own equipment. Pick a bar above to upgrade it from here, without switching. Serving guests drops workshop parts; boxes bring shards.</p>
     </div>
 
     <div v-else-if="tab === 'boxes'" class="grid">
@@ -169,7 +192,7 @@ const boostLeft = (id: string) => {
         <p>{{ item.description }}</p>
         <small v-if="boostLeft(item.id)">Active · {{ boostLeft(item.id) }}</small>
         <small v-else-if="game.loot.armed[item.id]">Armed for your next order</small>
-        <select v-if="item.id === 'scroll'" v-model="scrollRecipe"><option value="">Choose a recipe</option><option v-for="recipe in knownRecipes" :key="recipe.id" :value="recipe.id">{{ recipe.name }}</option></select>
+        <OptionSelect v-if="item.id === 'scroll'" label="Recipe" v-model="scrollRecipe" :options="[{ value: '', label: 'Choose a recipe' }, ...knownRecipes.map((recipe) => ({ value: recipe.id, label: recipe.name }))]" />
         <div class="row">
           <button type="button" :disabled="!game.loot.consumables[item.id] || (item.id === 'scroll' && !scrollRecipe)" @click="game.act({ type: 'useConsumable', id: item.id, recipeId: scrollRecipe })">Use</button>
           <button type="button" :disabled="game.crystals < item.crystalPrice" @click="game.act({ type: 'buyConsumable', id: item.id })">Buy · {{ item.crystalPrice }} crystals</button>
@@ -237,7 +260,7 @@ const boostLeft = (id: string) => {
           <p>Some guests will come asking for your house special (about {{ Math.round(SIGNATURE_GUEST_CHANCE * 100) }}% of arrivals) without naming it: open the conversation and offer it in English, by name or as “the house special”. Developing or changing it costs {{ SIGNATURE_FEE }} coins and restarts its fame.</p>
           <input v-model="draftName" maxlength="24" placeholder="Cocktail name" />
           <div v-for="(row, index) in draftItems" :key="index" class="row sig-row">
-            <select :value="row.ingredientId" @change="pickIngredient(row, ($event.target as HTMLSelectElement).value)"><option v-for="item in usableList" :key="item.id" :value="item.id">{{ item.name }}</option></select>
+            <OptionSelect label="Ingredient" :model-value="row.ingredientId" :options="usableList.map((item) => ({ value: item.id, label: item.name }))" @update:model-value="(value: string) => pickIngredient(row, value)" />
             <button type="button" @click="stepAmount(row, -1)">−</button><b>{{ row.amount }} {{ ingredient(row.ingredientId).unit === 'ml' ? 'ml' : '×' }}</b><button type="button" @click="stepAmount(row, 1)">+</button>
             <button type="button" :disabled="draftItems.length <= 2" @click="draftItems.splice(index, 1)">✕</button>
           </div>
@@ -342,5 +365,7 @@ const boostLeft = (id: string) => {
 .crafts{display:flex;flex-wrap:wrap;gap:5px;max-height:260px;overflow:auto}input[type=text],.card>input{padding:8px;border:1px solid #40536c;border-radius:8px;background:#0c1625;color:#fff}.sig-row{align-items:center}.sig-row select{flex:1;min-width:120px}.sig-row b{min-width:58px;text-align:center;color:#fff0c8}.sig-error{color:#f2a0a0}.card label{color:#c7d3e0;font-size:11px}
 .board{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:12px}.board li{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;padding:6px 8px;border-radius:7px;background:#17253a}.board li.me{background:#4a3210;color:#ffe0a0}.board li b{color:#f4d08e}.board li em{font-style:normal;color:#fff0c8}.board .empty{display:block;color:#93a5b9}
 .card button.picked{border-color:#ffd27a;background:#7a4d12}.gotit{color:#8fd1a0;text-decoration:line-through}
+.bar-chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}.bar-chips button{padding:6px 12px;border:1px solid #475a76;border-radius:999px;background:#17253a;color:#c7d3e0;font-weight:700;font-size:12px;cursor:pointer}.bar-chips button.active{border-color:#e0a14a;background:#5f3d1c;color:#ffe9bd}
+.card button.blocked{opacity:.55;filter:saturate(.6);cursor:help}.reason{padding:6px 9px;border:1px solid #8a5a3a;border-radius:9px;background:#2a1b17;color:#ffcfae!important;font-size:11px}
 .hint{grid-column:1/-1;margin:0;color:#93a5b9;font-size:11px}small{color:#e4b35c}
 </style>

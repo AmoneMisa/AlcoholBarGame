@@ -25,7 +25,7 @@ const seen = (id: string) => game.training.progress[id] ?? [];
 </script>
 
 <template>
-  <PopoverPanel class="academy-panel" eyebrow="TRAINING" title="Academy" close-label="Close training" @close="emit('close')">
+  <PopoverPanel class="academy-panel" padded eyebrow="TRAINING" title="Academy" close-label="Close training" @close="emit('close')">
     <p class="academy-lead">{{ finished }} of {{ TRAINING_MODULES.length }} lessons done. Each lesson has a short guide and, where it helps, a practice with no risk. The first time you finish one: +{{ TRAINING_REWARD.xp }} XP and +{{ TRAINING_REWARD.crystals }} crystals.</p>
     <article v-for="module in TRAINING_MODULES" :key="module.id" class="academy-module" :class="{ done: game.training.done.includes(module.id), open: openId === module.id }">
       <button type="button" class="academy-head" :aria-expanded="openId === module.id" @click="toggle(module.id)">

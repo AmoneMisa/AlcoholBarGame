@@ -3,7 +3,7 @@ import CloseButton from './CloseButton.vue';
 
 // Shared frame for small panels (volume, crystal exchange, fresh ingredients): gold-edged card with an
 // eyebrow, a serif title and the standard close button. The parent class positions it.
-defineProps<{ eyebrow: string; title: string; closeLabel?: string }>();
+defineProps<{ eyebrow: string; title: string; closeLabel?: string; /** Adds room around the content (panels that do not set their own). */ padded?: boolean }>();
 defineEmits<{ close: [] }>();
 </script>
 
@@ -13,7 +13,8 @@ defineEmits<{ close: [] }>();
       <div><small>{{ eyebrow }}</small><b>{{ title }}</b></div>
       <CloseButton :label="closeLabel ?? `Close ${title.toLowerCase()}`" size="sm" @click="$emit('close')" />
     </header>
-    <slot />
+    <div v-if="padded" class="ui-popover-body"><slot /></div>
+    <slot v-else />
   </section>
 </template>
 
@@ -21,5 +22,6 @@ defineEmits<{ close: [] }>();
 .ui-popover { z-index: 180; border: 1px solid #d2a24e; border-radius: 14px; background: linear-gradient(145deg, #17243a, #0b1320 70%); box-shadow: 0 20px 50px #000d; color: #fff; text-align: left; }
 .ui-popover-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px 9px; border-bottom: 1px solid #354762; }
 .ui-popover-head small { display: block; color: var(--gold, #e8b85a); font-size: 9px; font-weight: 900; letter-spacing: .13em; }
+.ui-popover-body { padding: 12px 14px 14px; }
 .ui-popover-head b { display: block; margin-top: 2px; color: #fff3dc; font: 700 17px Georgia, serif; }
 </style>
