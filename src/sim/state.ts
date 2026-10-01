@@ -79,6 +79,10 @@ export interface PlayerState {
   situationStats?: { solved: number; failed: number; neutral: number };
   // How many rules the bar has broken since the last inspection.
   ruleViolations?: number;
+  // Delivery problems: what went wrong with arrived orders, lower-grade units inside the stock, and unusable goods.
+  deliveryIssues?: import('./stockQuality').DeliveryIssue[];
+  lowGrade?: Record<RegionId, Record<string, import('./stockQuality').LowGrade>>;
+  quarantine?: import('./stockQuality').QuarantineItem[];
   // Day of the last rewarded visit to each friend's bar.
   friendVisits?: Record<string, string>;
   friendLabels?: Record<string, string>;
@@ -216,6 +220,9 @@ export function normalizePlayerState(state: PlayerState) {
     customer.smoker ??= [...customer.id].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 7 === 0;
     ensureSocial(customer, 0);
   }
+  state.deliveryIssues = Array.isArray(state.deliveryIssues) ? state.deliveryIssues.slice(0, 40) : [];
+  state.quarantine = Array.isArray(state.quarantine) ? state.quarantine.slice(0, 40) : [];
+  state.lowGrade = state.lowGrade && typeof state.lowGrade === 'object' ? state.lowGrade : ({} as NonNullable<PlayerState['lowGrade']>);
   const ashtrays = state.ashtrays;
   state.ashtrays = ashtrays && Number.isFinite(ashtrays.clean) && Number.isFinite(ashtrays.dirty)
     ? { clean: Math.max(0, Math.floor(ashtrays.clean)), dirty: Math.max(0, Math.floor(ashtrays.dirty)) } : { clean: 4, dirty: 0 };

@@ -19,7 +19,7 @@ import { createInitialState, levelFor, normalizePlayerState, type PlayerState } 
 import { playSfx } from '../audio/index';
 import { answerFriendRequest, connectSession, createStarInvoice, fetchFriends, requestFriend, saveFriendLabel, sendAction, sendFriendGift, visitFriendBar, type FriendBar, type FriendSummary } from '../telegram/api';
 import type { GiftRequest } from '../sim/gifts';
-import { currentStage, fill as fillSituationText, visibleChoices } from '../sim/situations';
+import { currentStage, fill as fillSituationText, guestLine, visibleChoices } from '../sim/situations';
 
 // The client side of a server-authoritative game.
 // Online: every action is applied locally for an instant response, then sent to the server; the server's
@@ -178,7 +178,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: mode.value !== 'online' });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson','spinCosmeticRoulette','giftCosmetic','giveAshtray','cleanAshtrays','giveWater','callTaxi','askToLeave','situationChoice']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson','spinCosmeticRoulette','giftCosmetic','giveAshtray','cleanAshtrays','giveWater','callTaxi','askToLeave','situationChoice','reportIssue','discardStock']);
 
   function saveOffline() {
     if (mode.value === 'online') return;
@@ -503,11 +503,17 @@ export const useGameStore = defineStore('game', () => {
     if (!guest || !current) return undefined;
     const data = guest.social!.event!.data;
     return {
-      title: current.def.title, icon: current.def.icon, category: current.def.category, severity: current.def.severity,
-      choices: visibleChoices(state.value, guest).map((choice) => ({ id: choice.id, say: fillSituationText(choice.say, data) }))
+      line: guestLine(state.value, guest), title: current.def.title, icon: current.def.icon, category: current.def.category, severity: current.def.severity,
+      choices: visibleChoices(state.value, guest).map((choice) => ({ id: choice.id, say: fillSituationText(choice.say, data, region.value.currencySymbol) }))
     };
   };
   const answerSituation = (customerId: string, choiceId: string) => dispatch({ type: 'situationChoice', customerId, choiceId });
+  // Problems with delivered goods in the bar you are in.
+  const deliveryIssues = computed(() => (state.value.deliveryIssues ?? []).filter((issue) => issue.barId === state.value.regionId));
+  const quarantine = computed(() => (state.value.quarantine ?? []).filter((item) => item.barId === state.value.regionId));
+  const lowGrade = computed(() => state.value.lowGrade?.[state.value.regionId] ?? {});
+  const reportIssue = (issueId: string, text: string) => dispatch({ type: 'reportIssue', issueId, text });
+  const discardStock = (id: string) => dispatch({ type: 'discardStock', id });
   const ashtrays = computed(() => state.value.ashtrays ?? { clean: 4, dirty: 0 });
 
   // Buying crystals with Telegram Stars. The server only hands out an invoice; crystals arrive when Telegram
@@ -587,6 +593,6 @@ export const useGameStore = defineStore('game', () => {
     pourBrands, brandOnShelf, shelfBrandsFor, setPourBrand,
     selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, tickGameClock, welcomeNextCustomer, offerSimilarOrder, rejectCustomer, buy, sell, switchBar, isBarOwned, nextBarPrice, barPurchaseLevel:BAR_PURCHASE_LEVEL, chooseStartingBar, buyBar, transferStock,
     supplier, localSuppliers, purchaseCart, saleCart, purchaseQuote, saleQuote, saleRevenue, deliveryOrders, deliveryCountdown, selectSupplier, checkoutPurchase, checkoutSale, renameBar, renameBartender,
-    buyRecipe, recipePrice, buyInterior, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, giveAshtray, giveWater, callTaxi, askToLeave, cleanAshtrays, ashtrays, situationOf, answerSituation, buyCrystalPack, buyingCrystals, starterPackAvailable, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
+    buyRecipe, recipePrice, buyInterior, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, giveAshtray, giveWater, callTaxi, askToLeave, cleanAshtrays, ashtrays, situationOf, answerSituation, deliveryIssues, quarantine, lowGrade, reportIssue, discardStock, buyCrystalPack, buyingCrystals, starterPackAvailable, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
   };
 });

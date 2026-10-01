@@ -18,6 +18,7 @@ import { recipeCard } from '../../data/knowledge/guides';
 import WorldMap from './WorldMap.vue';
 import OptionSelect, { type SelectOption } from './OptionSelect.vue';
 import BarScene from './BarScene.vue';
+import DeliveryProblems from './DeliveryProblems.vue';
 import CharacterModel from '../characters/CharacterModel.vue';
 import { avatarOptionsFor, avatarLabel, type AvatarOption, type AvatarOptionKey } from '../../data/cosmetics/avatar';
 import { BAR_PROFILE_OPTIONS } from '../../data/cosmetics/bars';
@@ -141,8 +142,11 @@ function selectBartender(id: 'noa' | 'leo') {
           <BottleModel :ingredient="ingredientById(stock.ingredientId)" />
           <div><b>{{ ingredientById(stock.ingredientId).name }}</b><small>{{ stock.amount }} {{ ingredientById(stock.ingredientId).unit }}</small></div>
           <span>{{ uiCategory(ingredientById(stock.ingredientId)) }}</span>
+          <em v-if="game.lowGrade[stock.ingredientId]?.damaged" class="grade damaged" title="Damaged: cocktails only">{{ game.lowGrade[stock.ingredientId]!.damaged }} damaged</em>
+          <em v-if="game.lowGrade[stock.ingredientId]?.expiring" class="grade expiring" title="Close to its date: use it soon">{{ game.lowGrade[stock.ingredientId]!.expiring }} old</em>
         </div>
       </div>
+      <DeliveryProblems />
       <section v-if="stockCategory === 'all' && recipeCardInventory.length" class="recipe-item-inventory">
         <header><div><small>COLLECTIBLE ITEMS</small><h3>Recipe cards</h3></div><span>Duplicates are spent on mastery upgrades.</span></header>
         <div><article v-for="item in recipeCardInventory" :key="item.recipe.id"><GlassModel :art-index="RECIPES.indexOf(item.recipe) % 10" type="coupe" /><span><small>RECIPE ITEM</small><b>{{ item.recipe.name }}</b><em>Owned ×{{ item.quantity }}</em></span><strong>×{{ item.quantity }}</strong></article></div>

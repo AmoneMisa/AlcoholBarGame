@@ -38,6 +38,8 @@ export interface Effects {
   note?: string;
   /** The bar broke a rule (served a minor, accepted cash where only cards are allowed…). Inspectors count these. */
   violation?: number;
+  /** The guest stays and the drink is made again (a complaint about a bad drink). */
+  remake?: boolean;
   /** A guest who owed money pays the oldest tab back, with a small tip. */
   settleTab?: boolean;
   /** The inspector's visit clears the record. */

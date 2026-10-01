@@ -388,7 +388,7 @@ test('Every bartender and seller lesson phrase is understood by a customer in it
   const notUnderstood = /don’t understand|Please ask about quantity/;
   for (const group of PHRASE_GROUPS) {
     // Buyer lessons are answered by a supplier's sales rep: see the negotiation test in trade.test.mjs.
-    if (group.context === 'buyer') continue;
+    if (group.context === 'buyer' || group.id.startsWith('sit-')) continue; // answered by suppliers / by the situation scripts (see situations.test.mjs)
     const confirmed = ['serve', 'shop-pay'].includes(group.id);
     for (const lesson of group.lessons) {
       const bottle = group.context === 'shop';

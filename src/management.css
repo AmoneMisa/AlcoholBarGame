@@ -244,3 +244,6 @@ header.top-hud { grid-template-columns: minmax(230px, 1fr) auto 130px; }
 /* Win over per-character sizing rules (.character-leo etc.) so every bartender fills the stage. */
 .design-deck .avatar-stage{display:block!important;padding:0 0 6px!important}
 .design-deck .avatar-stage > .art-character.art-character{width:100%!important;max-width:none!important;flex:none}
+
+.inventory-card .grade { position:absolute;right:8px;bottom:6px;font-style:normal;font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px; }
+.inventory-card .grade.damaged { background:#5a3a1c;color:#ffd9a8; }.inventory-card .grade.expiring { background:#4a2a52;color:#f2d0ff;bottom:26px; }

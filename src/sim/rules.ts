@@ -20,6 +20,8 @@ import { actsIn } from '../domain/social/acts';
 import { enjoyingOpening, openingFor, socialReply, voice, type Expression } from '../domain/social/talk';
 import { ensureSocial, rollSocial } from '../domain/social/generate';
 import { guestLine, hasSituation, matchChoice, overdue, pickSituation, resolveChoice, resolveIgnored, startSituation, visibleChoices, type Resolution } from './situations';
+import { discardQuarantine, expireStock, fileClaim, goodAmount, receiveOrder, takeLowGrade } from './stockQuality';
+import { situationById } from '../domain/situations/catalog';
 import { MAX_SEATS, afterServed, holdForPayment, recordDrink, settleGuest, applySocialReply, askToLeave, callTaxi, cleanAshtrays, drunkGain, giveAshtray, giveWater, isOrdering, orderingGuests, removeGuest, scheduleArrival, tickGuests, ashtraysOf, type GuestContext } from './guests';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
 import { DELIVERY_DAY_MS, levelFor, normalizePlayerState, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
@@ -69,6 +71,9 @@ export type GameAction =
   // Looking after the people at the bar: each names the guest it is for.
   | { type: 'giveAshtray'; customerId: string }
   | { type: 'cleanAshtrays' }
+  // Telling a supplier about a problem with a delivery (in English), and throwing away goods that can not be used.
+  | { type: 'reportIssue'; issueId: string; text: string }
+  | { type: 'discardStock'; id: string }
   // Answering a situation (a payment problem, a broken glass, an emergency…) with one of the offered sentences.
   | { type: 'situationChoice'; customerId: string; choiceId: string }
   | { type: 'giveWater'; customerId: string }
@@ -246,15 +251,13 @@ function scheduleNextCustomer(state: PlayerState, now: number, random: () => num
   else scheduleArrival(state, guests);
 }
 
-function processDeliveries(state: PlayerState, now: number) {
+function processDeliveries(state: PlayerState, now: number, random: () => number) {
   const arrived = state.deliveryOrders.filter((order) => order.dueAt <= now);
-  for (const order of arrived) for (const item of order.items) {
-    const stock = state.inventories[order.barId].find((entry) => entry.ingredientId === item.ingredientId);
-    if (stock) stock.amount += item.amount;
-  }
+  const notes: string[] = [];
+  for (const order of arrived) notes.push(...receiveOrder(state, order, now, random));
   if (arrived.length) {
     state.deliveryOrders = state.deliveryOrders.filter((order) => order.dueAt > now);
-    log(state, `${arrived.length} supplier ${arrived.length === 1 ? 'delivery has' : 'deliveries have'} arrived.`);
+    log(state, `${arrived.length} supplier ${arrived.length === 1 ? 'delivery has' : 'deliveries have'} arrived.${notes.length ? ` Problems: ${notes.join(' ')}` : ''}`);
   }
 }
 
@@ -266,7 +269,8 @@ export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now
   const now = context.now;
   const random = context.random ?? Math.random;
   if (state.popularityBoost?.kind === 'no-cooldown' && state.popularityBoost.until <= now) state.popularityBoost = undefined;
-  processDeliveries(state, now);
+  processDeliveries(state, now, random);
+  expireStock(state, now);
   autoRestock(state, now);
   const guests = guestContext(state, now, random);
   tickGuests(state, guests, Math.max(0, (now - state.lastClockAt) / 1000));
@@ -420,6 +424,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       for (const item of mix) {
         const stock = inventoryOf(state).find((entry) => entry.ingredientId === item.ingredientId);
         if (!stock || stock.amount < item.amount) throw new RuleError(`Not enough ${INGREDIENTS.find((entry) => entry.id === item.ingredientId)!.name} in stock.`);
+        // Damaged and expiring goods can go into cocktails, but never into a brand pour.
+        if (guest.orderKind === 'serve' && goodAmount(state, item.ingredientId) < item.amount) throw new RuleError(`Only damaged or old ${INGREDIENTS.find((entry) => entry.id === item.ingredientId)!.name} is left. It can only be used in cocktails.`);
       }
       // Brand choices must be real bottles on this bar's shelf, of the right spirit.
       const pourBrands: Record<string, string> = {};
@@ -434,6 +440,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         if (product && pourBrands[product.ingredientId] !== product.id) throw new RuleError(`The guest asked for ${product.brand}. Choose that brand before you pour.`);
       }
       state.inventories[state.regionId] = consumeMix(inventoryOf(state), mix);
+      const lowGradeUsed = guest.orderKind === 'serve' ? new Set<'damaged' | 'expiring'>() : takeLowGrade(state, mix);
       const verdict = judgeMix(mix, guest, action.shaken === true);
       if (verdict.success) {
         // Upgraded recipes earn more: +6% price and +10% tips per level.
@@ -446,7 +453,9 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const tipped = !auto && rollTip(state, guest, now, random);
         const tip = tipped ? Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .2 : .1) * economyOf(state, now).tips * mastery.tips) + (bonus ? 2 : 0) : 0;
         // Sometimes the guest has a problem with paying: then the bill is held until it is sorted out.
-        const payTrouble = pickSituation(state, guest, 'payment', random);
+        // A drink made with damaged or old goods can bring a complaint instead.
+        const complaint = lowGradeUsed.size && random() < (lowGradeUsed.has('expiring') ? .4 : .2) ? situationById('complaint-quality') : undefined;
+        const payTrouble = complaint ?? pickSituation(state, guest, 'payment', random);
         if (!payTrouble) state.money = coins(state.money + revenue + tip);
         // About 60 successful orders reach level 25: roughly four medium two-hour play days.
         state.xp += 100 + Math.min(state.streak * 2, 14);
@@ -469,7 +478,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         if (payTrouble) {
           recordDrink(guest, drunkGain(abv), now);
           holdForPayment(guest, now);
-          addGuestLine(state, guest, startSituation(state, guest, payTrouble, now, random, { amount: coins(revenue + tip), afterServe: true }));
+          addGuestLine(state, guest, startSituation(state, guest, payTrouble, now, random, { amount: coins(revenue + tip), afterServe: true, data: complaint ? { reason: lowGradeUsed.has('expiring') ? 'expiring' : 'damaged' } : undefined }));
           state.message = `${note} But there is a problem with the payment.`;
         } else {
           const outcome = afterServed(state, guest, drunkGain(abv), guestContext(state, now, random));
@@ -799,6 +808,21 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       applyResolution(state, target, resolveChoice(state, target, choice, now, random), guestContext(state, now, random));
       break;
     }
+    case 'reportIssue': {
+      const text = cleanText(action.text, 240);
+      if (text.length < 3) throw new RuleError('Write what went wrong first.');
+      const english = context.checkEnglish(text);
+      state.languageStats.sentences++;
+      if (english.ok) { state.languageStats.correct++; state.xp += 2; }
+      const result = fileClaim(state, String(action.issueId), english.corrected, english, now, random);
+      state.message = `${result.line}${result.note ? ` ${result.note}` : ''}${english.ok ? '' : ` (Better: “${english.corrected}”)`}`;
+      break;
+    }
+    case 'discardStock': {
+      if (!discardQuarantine(state, String(action.id))) throw new RuleError('There is nothing to throw away.');
+      state.message = 'You threw away the unusable goods.';
+      break;
+    }
     case 'cleanAshtrays': {
       const cleaned = cleanAshtrays(state);
       if (!cleaned) throw new RuleError('There is nothing to clean.');
@@ -901,7 +925,13 @@ function applyResolution(state: PlayerState, guest: Customer, resolution: Resolu
   if (resolution.followUp) addLine(transcript, 'customer', resolution.followUp);
   if (resolution.tone === 'good') state.xp += 1;
   if (resolution.leave) removeGuest(state, guest, guests);
-  else if (resolution.afterServe) settleGuest(state, guest, guests);
+  else if (resolution.remake) {
+    guest.orderRevealed = true;
+    guest.patienceRemaining = guest.patience;
+    ensureSocial(guest, guests.now).phase = 'ordering';
+    state.activeCustomerId = guest.id;
+    state.message = `Make ${guest.name} a fresh drink.`;
+  } else if (resolution.afterServe) settleGuest(state, guest, guests);
 }
 
 // How a guest who already knows what they want still sounds like a person: their feeling first.

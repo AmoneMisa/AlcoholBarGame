@@ -25,6 +25,8 @@ export interface Resolution {
   leave: boolean;
   /** A payment situation ended and the guest stays: the rules decide whether they sit on or go. */
   afterServe: boolean;
+  /** The guest stays and the drink must be made again. */
+  remake?: boolean;
   /** The first line of a follow-up situation, if one started. */
   followUp?: string;
   note?: string;
@@ -74,10 +76,11 @@ export function guestLine(state: PlayerState, guest: Customer) {
 }
 
 // Starts a situation on a guest and returns what they say first.
-export function startSituation(state: PlayerState, guest: Customer, def: SituationDef, now: number, random: () => number, extra: { amount?: number; afterServe?: boolean } = {}) {
+export function startSituation(state: PlayerState, guest: Customer, def: SituationDef, now: number, random: () => number, extra: { amount?: number; afterServe?: boolean; data?: Record<string, string | number | boolean> } = {}) {
   const social = ensureSocial(guest, now);
   const data: Record<string, string | number | boolean> = { amount: extra.amount ?? 0, _tabs: state.tabs?.length ?? 0, _violations: state.ruleViolations ?? 0 };
   if (extra.afterServe) data.afterServe = 1;
+  Object.assign(data, extra.data ?? {});
   Object.assign(data, def.setup?.({ ...contextOf(state, guest, random, data), data }) ?? {});
   social.event = { kind: def.id, stage: 0, startedAt: now, data };
   state.message = `${guest.name}: ${def.icon} ${def.title}.`;
@@ -157,7 +160,8 @@ function finish(state: PlayerState, guest: Customer, def: SituationDef, outcome:
   const ended = !social.event;
   return {
     bartender, guest: guestText, tone, tip, ended, leave, followUp, note: outcome.effects.note,
-    afterServe: ended && !!def.holdsPayment && data.afterServe === 1 && !leave
+    remake: ended && !!outcome.effects.remake && !leave,
+    afterServe: ended && !!def.holdsPayment && data.afterServe === 1 && !leave && !outcome.effects.remake
   };
 }
 

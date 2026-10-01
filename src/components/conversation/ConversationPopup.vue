@@ -96,6 +96,9 @@ const leaveHint = (tone: 'gentle' | 'firm' | 'aggressive') => {
 };
 // An open situation: what is happening and the English replies the bartender can choose.
 const situation = computed(() => customer.value ? game.situationOf(customer.value.id) : undefined);
+// While a situation is open the order widgets step aside; the player can still type a reply instead of choosing one.
+const composerOpen = ref(false);
+watch(() => [customer.value?.id, situation.value?.title], () => { composerOpen.value = false; });
 const tiles = ref<{ id: string; text: string }[]>([]);
 const picked = ref<string[]>([]);
 const pickedTiles = computed(() => picked.value.map((id) => tiles.value.find((tile) => tile.id === id)!).filter(Boolean));
@@ -314,8 +317,11 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         </div>
         <CloseButton class="talk-close" label="Close conversation" @click="game.closeConversation()" />
       </header>
+      <div class="talk-extras">
       <section v-if="situation" class="situation-panel" :class="'sev-' + situation.severity" aria-label="Situation">
-        <header><b>{{ situation.icon }} {{ situation.title }}</b><small>Choose what to say — or type it in your own words</small></header>
+        <header><b>{{ situation.icon }} {{ situation.title }}</b><button type="button" class="situation-type" @click="composerOpen = !composerOpen">{{ composerOpen ? 'Hide typing' : 'Type it yourself' }}</button></header>
+        <p v-if="situation.line" class="situation-line">“{{ situation.line }}”</p>
+        <small class="situation-hint">Choose what to say:</small>
         <div class="situation-choices">
           <button v-for="choice in situation.choices" :key="choice.id" type="button" @click="game.answerSituation(customer.id, choice.id)"><span>{{ choice.say }}</span></button>
         </div>
@@ -329,6 +335,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <button type="button" :title="leaveHint('firm')" @click="game.askToLeave(customer.id, 'firm')">Firmly</button>
           <button type="button" class="rude" :title="leaveHint('aggressive')" @click="game.askToLeave(customer.id, 'aggressive')">Rudely</button>
         </span>
+      </div>
       </div>
 
       <div class="talk-body">
@@ -367,7 +374,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <button type="button" class="secondary-button" @click="learning.toggleSaved(activeWord.word)">{{ learning.savedWords.includes(activeWord.word) ? '★ Saved to my words' : '☆ Save to my words' }}</button>
         </div>
 
-        <aside class="talk-clues">
+        <aside v-if="!situation" class="talk-clues">
           <template v-if="bottleOrder">
             <small>CUSTOMER REQUEST</small>
             <div class="clue-chips">
@@ -401,7 +408,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         </aside>
       </div>
 
-      <div v-if="confirmed" class="talk-confirmed">
+      <div v-if="confirmed && !situation" class="talk-confirmed">
         <template v-if="bottleOrder && confirmedBottle && customer.bottleRequest">
           <div><small>SEALED-BOTTLE SALE CONFIRMED</small><b>{{ customer.bottleRequest.quantity }} × {{ confirmedBottle.name }}</b><span>{{ confirmedBottle.volumeMl }} ml · {{ confirmedBottle.abv }}% ABV · total {{ bottleTotal(confirmedBottle, customer.bottleRequest.quantity, game.guestPriceFactor) }} coins</span></div>
           <button class="primary-button" type="button" :disabled="game.serving || bottleStock(confirmedBottle.id) < customer.bottleRequest.quantity" @click="completeBottleSale">Sell full bottle{{ customer.bottleRequest.quantity === 1 ? '' : 's' }} <span>→</span></button>
@@ -413,13 +420,13 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         </template>
       </div>
 
-      <div class="service-decisions">
+      <div v-if="!situation" class="service-decisions">
         <div><small>CAN’T SERVE THIS ORDER?</small><span>The guest can accept the closest stocked alternative, or you can decline the order and let them leave.</span></div>
         <button class="secondary-button" type="button" @click="offerAlternative">Offer similar</button>
         <button class="reject-order-button" type="button" @click="rejectOrder">Reject order</button>
       </div>
 
-      <footer class="talk-compose">
+      <footer v-if="!situation || composerOpen" class="talk-compose">
         <nav class="talk-modes" aria-label="Answer mode">
           <button type="button" :class="{ active: inputMode === 'words' }" @click="inputMode = 'words'; feedback = undefined">Choose words</button>
           <button type="button" :class="{ active: inputMode === 'type' }" @click="inputMode = 'type'; feedback = undefined">Type yourself</button>

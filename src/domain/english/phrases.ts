@@ -1,4 +1,5 @@
 import { MORE_PHRASE_GROUPS } from './phrasesMore';
+import { situationPhraseGroups } from '../situations/learning';
 
 // Phrase lessons for three jobs — bartender and shop seller — split into parts so learners see how English builds them.
 
@@ -130,5 +131,7 @@ export const PHRASE_GROUPS: PhraseGroup[] = [
       { text: 'We can exchange it or give you a refund.', parts: [p('We', 'person'), p('can exchange', 'verb'), p('it', 'thing'), p('or give you a refund.', 'extra')], when: 'Offer two solutions. Exchange = a new product. Refund = the money back.', answers: ['A refund, please.', 'I will exchange it.'] }
     ]
   }
-  ,...MORE_PHRASE_GROUPS
+  ,...MORE_PHRASE_GROUPS,
+  // One group per situation (payments, first aid, security, rules…), written from the situations themselves.
+  ...situationPhraseGroups()
 ];

@@ -10,12 +10,14 @@ export interface DailyLesson {
 }
 
 import { MORE_DAILY_LESSONS } from './dailyLessonsMore';
+import { situationDailyLessons } from './situations/learning';
 
 export const DAILY_LESSON_COUNT = 3;
 export const DAILY_LESSON_RECIPE_CHANCE = .06;
 
 const LESSON_BANK: DailyLesson[] = [
   ...MORE_DAILY_LESSONS,
+  ...situationDailyLessons(),
   { id:'guest-word',kind:'Word',prompt:'What does “guest” mean?',choices:['A person visiting the bar','A drink recipe','The person serving drinks'],answer:'A person visiting the bar',explanation:'A guest is the customer you welcome and serve.',xp:12,crystals:2 },
   { id:'stock-word',kind:'Word',prompt:'What does “in stock” mean?',choices:['Available to sell or use','Already ordered by a guest','Free of charge'],answer:'Available to sell or use',explanation:'An item is in stock when it is available in your inventory.',xp:12,crystals:2 },
   { id:'garnish-word',kind:'Word',prompt:'What is a garnish?',choices:['A decoration or finishing ingredient','A type of payment','A supplier discount'],answer:'A decoration or finishing ingredient',explanation:'Mint, citrus peel and cocktail cherries can be garnishes.',xp:12,crystals:2 },
@@ -29,6 +31,9 @@ const LESSON_BANK: DailyLesson[] = [
   { id:'similar-phrase',kind:'Phrase',prompt:'How do you offer a substitute politely?',choices:['May I offer you something similar?','Take another one.','I cannot, next drink.'],answer:'May I offer you something similar?',explanation:'“May I offer…” is polite and makes the alternative clear.',xp:15,crystals:2 },
   { id:'plural-grammar',kind:'Grammar',prompt:'Choose the correct bottle question.',choices:['How many bottles would you like?','How much bottles would you like?','How many bottle do you like?'],answer:'How many bottles would you like?',explanation:'Use “how many” with countable plural nouns such as bottles.',xp:18,crystals:3 }
 ];
+
+// A step through the bank that never lands on the same lesson twice in a day, whatever the size of the bank.
+const STRIDE = LESSON_BANK.length % 7 === 0 ? 11 : 7;
 
 const hash = (value: string) => [...value].reduce((total, character) => ((total * 31) + character.charCodeAt(0)) >>> 0, 2166136261);
 
@@ -47,7 +52,7 @@ function shuffled(choices: string[], seed: string) {
 
 export function dailyLessonsFor(dateKey: string) {
   const start = hash(dateKey) % LESSON_BANK.length;
-  return Array.from({ length: DAILY_LESSON_COUNT }, (_, index) => LESSON_BANK[(start + index * 7) % LESSON_BANK.length]!)
+  return Array.from({ length: DAILY_LESSON_COUNT }, (_, index) => LESSON_BANK[(start + index * STRIDE) % LESSON_BANK.length]!)
     .map((lesson) => ({ ...lesson, choices: shuffled(lesson.choices, `${dateKey}:${lesson.id}`) }));
 }
 
