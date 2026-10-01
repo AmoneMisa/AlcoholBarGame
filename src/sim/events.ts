@@ -6,10 +6,10 @@ import { ensureSocial } from '../domain/social/generate';
 import { clampPercent } from '../domain/social/model';
 import { goodAmount } from './stockQuality';
 import type { PlayerState } from './state';
+import { MINUTE } from '../domain/time';
 
 // Events at the bar (domain/barEvents.ts): which one is on now, when the next starts, and what a promotion gives away.
 
-const MINUTE = 60_000;
 export interface ActiveBarEvent { id: string; startedAt: number; endsAt: number }
 
 export function barEventFor(state: PlayerState, now: number): (BarEventDef & { endsAt: number }) | undefined {

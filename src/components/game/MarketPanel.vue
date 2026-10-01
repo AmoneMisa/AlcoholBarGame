@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PanelHeading from '../ui/PanelHeading.vue';
 import { computed, ref } from 'vue';
 import { INGREDIENTS } from '../../domain/catalog';
 import { useGameStore } from '../../stores/game';
@@ -33,7 +34,7 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
 
 <template>
   <article class="game-panel market-panel">
-    <header class="panel-heading"><div><small>TRADE FLOOR · {{ game.region.name }}</small><h2>Stock your next shift</h2></div></header>
+    <PanelHeading :eyebrow="`TRADE FLOOR · ${game.region.name}`" title="Stock your next shift" />
     <!-- Level perks live on the bar scene's city chip; the market only shows what changes buying here. -->
     <div class="auto-supply" :class="{ locked: game.level < AUTO_SUPPLY_LEVEL, on: game.autoSupply }">
       <div><b>Auto-supply</b><small>{{ game.level < AUTO_SUPPLY_LEVEL ? `Unlocks at level ${AUTO_SUPPLY_LEVEL}` : 'Reorders anything that runs low from the cheapest supplier, with normal prices and delivery fees.' }}</small></div>

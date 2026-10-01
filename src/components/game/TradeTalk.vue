@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ingredientName as nameOf } from '../../domain/catalog';
 import UiIcon from '../ui/UiIcon.vue';
 import { computed, nextTick, ref, watch } from 'vue';
 import { INGREDIENTS, REGIONS } from '../../domain/catalog';
@@ -21,7 +22,6 @@ const pending = ref('');
 const waiting = ref(false);
 const log = ref<HTMLElement>();
 const input = ref<HTMLInputElement>();
-const nameOf = (id: string) => INGREDIENTS.find((item) => item.id === id)?.name ?? id;
 const barName = (id: string) => REGIONS.find((item) => item.id === id)?.name ?? id;
 const swapped = computed(() => new Map((talk.value?.misunderstandings ?? []).flatMap((item) => item.kind === 'product' ? [[item.to, item.from] as const] : [])));
 const done = computed(() => talk.value?.mood === 'done');

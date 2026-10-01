@@ -4,6 +4,7 @@ import { marketFor } from '../domain/progression';
 import type { RegionId } from '../domain/types';
 import type { PlayerState } from './state';
 import { supplierInfoReply } from './tradeTalk';
+import { ingredientName as nameOf } from '../domain/catalog';
 
 // Haggling with a supplier's sales rep. Runs in the shared rules, so on the server.
 // The player makes up to three price offers; each has a success chance that falls as the offer drops.
@@ -76,7 +77,6 @@ const PATTERNS: Record<TacticId, RegExp> = {
 };
 const POLITE = /\b(please|could|would|may|kindly|thank|thanks)\b/;
 
-const nameOf = (id: string) => INGREDIENTS.find((item) => item.id === id)?.name ?? id;
 function addLine(negotiation: Negotiation, speaker: TradeLine['speaker'], text: string, extra: { note?: string; ok?: boolean } = {}) {
   negotiation.lines.push({ id: (negotiation.lines.at(-1)?.id ?? -1) + 1, speaker, text, ...extra });
 }

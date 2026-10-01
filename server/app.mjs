@@ -15,16 +15,17 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
   const auth = authenticate({ botToken, allowDevLogin });
   const limiter = rateLimit({ windowMs: 10_000, max: 40 });
 
-  app.post('/api/session', auth, limiter, async (request, response, next) => {
-    try { response.json(await service.session(request.identity)); } catch (error) { next(error); }
-  });
-
-  app.post('/api/action', auth, limiter, async (request, response, next) => {
+  // One place for the shared plumbing: sign-in, rate limit, errors. A handler returns { status, body }, or a plain answer for 200.
+  const route = (path, handle) => app.post(path, auth, limiter, async (request, response, next) => {
     try {
-      const result = await service.act(request.identity, request.body);
-      response.status(result.status).json(result.body);
+      const result = await handle(request);
+      if (result && 'status' in result && 'body' in result) response.status(result.status).json(result.body); else response.json(result);
     } catch (error) { next(error); }
   });
+  const who = (request) => request.identity;
+
+  route('/api/session', (request) => service.session(who(request)));
+  route('/api/action', (request) => service.act(who(request), request.body));
 
   // Telegram Stars: returns an invoice link for the Mini App's WebApp.openInvoice(). Crystals are credited
   // only when Telegram confirms the payment to the bot — never because the client says it paid.
@@ -40,30 +41,14 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
     }
   });
 
-  app.post('/api/friends', auth, limiter, async (request, response, next) => {
-    try { response.json(await service.friends(request.identity)); } catch (error) { next(error); }
-  });
-  app.post('/api/friends/add', auth, limiter, async (request, response, next) => {
-    try { const result = await service.addFriend(request.identity, request.body?.code); response.status(result.status).json(result.body); } catch (error) { next(error); }
-  });
-  app.post('/api/friends/answer', auth, limiter, async (request, response, next) => {
-    try { const result = await service.answerFriend(request.identity, request.body?.code, request.body?.accept === true); response.status(result.status).json(result.body); } catch (error) { next(error); }
-  });
-  app.post('/api/friends/remove', auth, limiter, async (request, response, next) => {
-    try { const result = await service.removeFriend(request.identity, request.body?.code); response.status(result.status).json(result.body); } catch (error) { next(error); }
-  });
-  app.post('/api/friends/claim', auth, limiter, async (request, response, next) => {
-    try { const result = await service.claimGifts(request.identity); response.status(result.status).json(result.body); } catch (error) { next(error); }
-  });
-  app.post('/api/friends/label', auth, limiter, async (request, response, next) => {
-    try { const result = await service.labelFriend(request.identity, request.body?.code, request.body?.label); response.status(result.status).json(result.body); } catch (error) { next(error); }
-  });
-  app.post('/api/friends/visit', auth, limiter, async (request, response, next) => {
-    try { const result = await service.visitFriend(request.identity, request.body?.code); response.status(result.status).json(result.body); } catch (error) { next(error); }
-  });
-  app.post('/api/friends/gift', auth, limiter, async (request, response, next) => {
-    try { const result = await service.sendGift(request.identity, request.body?.code, request.body?.gift); response.status(result.status).json(result.body); } catch (error) { next(error); }
-  });
+  route('/api/friends', (request) => service.friends(who(request)));
+  route('/api/friends/add', (request) => service.addFriend(who(request), request.body?.code));
+  route('/api/friends/answer', (request) => service.answerFriend(who(request), request.body?.code, request.body?.accept === true));
+  route('/api/friends/remove', (request) => service.removeFriend(who(request), request.body?.code));
+  route('/api/friends/claim', (request) => service.claimGifts(who(request)));
+  route('/api/friends/label', (request) => service.labelFriend(who(request), request.body?.code, request.body?.label));
+  route('/api/friends/visit', (request) => service.visitFriend(who(request), request.body?.code));
+  route('/api/friends/gift', (request) => service.sendGift(who(request), request.body?.code, request.body?.gift));
 
   return app;
 }

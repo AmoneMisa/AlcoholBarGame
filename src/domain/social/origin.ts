@@ -1,5 +1,6 @@
 import type { Customer } from '../types';
 import { genderOf } from './generate';
+import { fnvHash as hash } from '../text';
 
 // Where a guest comes from and who they are, worked out from their look (so the same person always sounds the same):
 // the way they spell, how fast they talk, a few local words (always written in English letters), and what their
@@ -32,7 +33,6 @@ export const ORIGINS: Origin[] = [
   { id: 'au', name: 'Australian', lang: 'en-AU', spelling: 'uk', speed: 1.02, openers: ['G’day,', 'Mate,', 'No worries,'], remarks: ['See you this arvo, mate.', 'She’ll be right.'] }
 ];
 
-const hash = (text: string) => { let h = 2166136261; for (let i = 0; i < text.length; i++) { h ^= text.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
 const key = (customer: Pick<Customer, 'id' | 'characterId'>) => customer.characterId ?? customer.id;
 
 export const originOf = (customer: Pick<Customer, 'id' | 'characterId'>): Origin => ORIGINS[hash(`origin:${key(customer)}`) % ORIGINS.length]!;

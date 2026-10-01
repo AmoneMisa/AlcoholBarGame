@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import CrystalAmount from '../ui/CrystalAmount.vue';
+import PanelHeading from '../ui/PanelHeading.vue';
 import { computed, ref, watch } from 'vue';
 import { INGREDIENTS, RECIPES, REGIONS, recipeAlcoholLabel } from '../../domain/catalog';
 import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleSaleCrystalReward } from '../../domain/bottleCatalog';
@@ -120,7 +122,7 @@ function selectBartender(id: 'noa' | 'leo') {
 <template>
   <section class="management-deck">
     <article v-show="activeView === 'inventory'" class="game-panel inventory-deck">
-      <header class="panel-heading"><div><small>STOCK ROOM · {{ game.region.name }}</small><h2>Bar inventories</h2></div><span>{{ game.inventory.length }} ingredients · {{ game.bottleInventory.length }} sealed brands</span></header>
+      <PanelHeading :eyebrow="`STOCK ROOM · ${game.region.name}`" title="Bar inventories" :aside="`${game.inventory.length} ingredients · ${game.bottleInventory.length} sealed brands`" />
       <div class="bar-switcher" aria-label="Choose a bar inventory">
         <button v-for="region in REGIONS.filter(item => game.isBarOwned(item.id))" :key="region.id" :class="{ active: region.id === game.regionId }" type="button" @click="game.switchBar(region.id)"><b>{{ region.name }}</b><small>{{ barUnits(region.id).toLocaleString() }} ingredient units · {{ barBottles(region.id) }} bottles</small></button>
       </div>
@@ -156,9 +158,9 @@ function selectBartender(id: 'noa' | 'leo') {
         <div class="sealed-stock-grid">
           <article v-for="stock in game.bottleInventory" :key="stock.productId">
             <div class="stock-brand-model"><BrandBottle :brand="bottleById(stock.productId).brand" :category="guideIdForProduct(bottleById(stock.productId))" :color="bottleById(stock.productId).color" /></div>
-            <div><small>{{ ALCOHOL_TYPE_LABELS[bottleById(stock.productId).type] }} · {{ bottleById(stock.productId).abv }}% ABV</small><b>{{ bottleById(stock.productId).name }}</b><span>{{ bottleById(stock.productId).volumeMl }} ml · customer pays {{ (bottleById(stock.productId).price * game.economy.guestPriceFactor).toFixed(2) }} coins + <UiIcon class="inline-icon" name="crystal" /> {{ bottleSaleCrystalReward(bottleById(stock.productId)) }}</span></div>
+            <div><small>{{ ALCOHOL_TYPE_LABELS[bottleById(stock.productId).type] }} · {{ bottleById(stock.productId).abv }}% ABV</small><b>{{ bottleById(stock.productId).name }}</b><span>{{ bottleById(stock.productId).volumeMl }} ml · customer pays {{ (bottleById(stock.productId).price * game.economy.guestPriceFactor).toFixed(2) }} coins + <CrystalAmount :value="bottleSaleCrystalReward(bottleById(stock.productId))" /></span></div>
             <strong>{{ stock.quantity }}×</strong>
-            <button v-if="game.bottleCrystalCost(stock.productId)" class="reserve-restock" type="button" :disabled="game.crystals < game.bottleCrystalCost(stock.productId)" @click="game.buyBottleStock(stock.productId)">+1 reserve · <UiIcon class="inline-icon" name="crystal" /> {{ game.bottleCrystalCost(stock.productId) }}</button>
+            <button v-if="game.bottleCrystalCost(stock.productId)" class="reserve-restock" type="button" :disabled="game.crystals < game.bottleCrystalCost(stock.productId)" @click="game.buyBottleStock(stock.productId)">+1 reserve · <CrystalAmount :value="game.bottleCrystalCost(stock.productId)" /></button>
           </article>
         </div>
       </section>
@@ -168,7 +170,7 @@ function selectBartender(id: 'noa' | 'leo') {
 
     <article v-show="activeView === 'recipes'" class="game-panel recipes-deck">
       <template v-if="!selectedRecipe">
-        <header class="panel-heading"><div><small>RECIPE ACADEMY</small><h2>Learn, collect & master</h2></div><span>{{ game.knownRecipes.length }} / {{ RECIPES.length }} learned</span></header>
+        <PanelHeading eyebrow="RECIPE ACADEMY" title="Learn, collect & master" :aside="`${game.knownRecipes.length} / ${RECIPES.length} learned`" />
         <section class="unlock-guide">
           <div class="unlock-intro"><small>HOW THE RECIPE BOOK GROWS</small><h3>Ten classics start your journey</h3><p>Every cocktail appears in the catalog. Advanced lessons stay locked until you discover them, then reveal the complete story, guest profile, ingredients and cooking path.</p></div>
           <div><b>1</b><strong>Recipe shop</strong><span>Spend service earnings on a recipe you want next.</span></div>
@@ -204,7 +206,7 @@ function selectBartender(id: 'noa' | 'leo') {
     </article>
 
     <article v-show="activeView === 'design'" class="game-panel design-deck">
-      <header class="panel-heading"><div><small>PERSONALIZE</small><h2>Bar & bartender</h2></div><span>Live preview</span></header>
+      <PanelHeading eyebrow="PERSONALIZE" title="Bar & bartender" aside="Live preview" />
       <div class="design-tabs" role="tablist" aria-label="Design sections"><button v-for="tab in DESIGN_TABS" :key="tab.id" role="tab" type="button" :aria-selected="designTab === tab.id" :class="{ active: designTab === tab.id }" @click="designTab = tab.id">{{ tab.label }}</button></div>
       <div class="design-grid-new">
         <!-- Bar: the real bar scene in preview mode, pinned while the options scroll. -->
@@ -213,7 +215,7 @@ function selectBartender(id: 'noa' | 'leo') {
       <form class="bar-name-editor" @submit.prevent="game.renameBar(barName)"><label :for="'bar-name'">Bar name in {{ game.region.name }}<input id="bar-name" v-model="barName" maxlength="32" required placeholder="Name your bar" /></label><button type="submit">Save name</button></form>
           <div class="design-preview" aria-label="Live preview of your bar"><BarScene preview :active="false" /></div>
         <div class="design-options">
-          <section class="background-picker"><small>{{ INTERIORS.length }} BACKGROUNDS · {{ game.ownedInteriorIds.length }} OWNED</small><div><button v-for="interior in INTERIORS" :key="interior.id" :class="{active:game.decor.interior === interior.id,locked:!isInteriorOwned(interior.id),special:'special' in interior && interior.special}" :style="interiorStyle(interior.id)" type="button" @click="game.chooseInterior(interior.id)"><em v-if="!isInteriorOwned(interior.id)"><UiIcon class="inline-icon" name="crystal" /> {{ interior.crystalCost }}</em><span>{{ interior.name }}</span></button></div></section>
+          <section class="background-picker"><small>{{ INTERIORS.length }} BACKGROUNDS · {{ game.ownedInteriorIds.length }} OWNED</small><div><button v-for="interior in INTERIORS" :key="interior.id" :class="{active:game.decor.interior === interior.id,locked:!isInteriorOwned(interior.id),special:'special' in interior && interior.special}" :style="interiorStyle(interior.id)" type="button" @click="game.chooseInterior(interior.id)"><em v-if="!isInteriorOwned(interior.id)"><CrystalAmount :value="interior.crystalCost" /></em><span>{{ interior.name }}</span></button></div></section>
           <section><small>WALL COLOR</small><div><button v-for="wall in WALLS" :key="wall" :class="{ active: game.decor.wall === wall }" type="button" @click="game.decor.wall = wall"><i :data-color="wall"></i>{{ wall }}</button></div></section>
           <section class="shelf-style-picker"><small>BACK-BAR SHELVES · {{ shelfStyleFor(game.decor) }}</small><div><button v-for="shelf in SHELF_STYLES" :key="shelf" :class="{ active: (game.decor.shelf ?? 'auto') === shelf }" :data-shelf-swatch="shelf === 'auto' ? shelfStyleFor({ interior: game.decor.interior }) : shelf" type="button" @click="game.decor.shelf = shelf">{{ shelf === 'auto' ? 'Match background' : shelf }}</button></div></section>
           <section><small>HIGHLIGHT COLOR</small><div><button v-for="light in HIGHLIGHTS" :key="light" :class="{ active: game.decor.lighting === light }" type="button" @click="game.decor.lighting = light"><i :data-color="light"></i>{{ light }}</button></div></section>
@@ -247,7 +249,7 @@ function selectBartender(id: 'noa' | 'leo') {
     </article>
 
     <article v-show="activeView === 'regions'" class="game-panel regions-deck">
-      <header class="panel-heading"><div><small>WORLD TOUR</small><h2>{{ game.startingBarChosen ? 'Build your bar network' : 'Choose your first city' }}</h2></div><span>{{ game.ownedBarIds.length }} / {{ REGIONS.length }} bars open</span></header>
+      <PanelHeading eyebrow="WORLD TOUR" :title="`${game.startingBarChosen ? 'Build your bar network' : 'Choose your first city'}`" :aside="`${game.ownedBarIds.length} / ${REGIONS.length} bars open`" />
       <div class="bar-unlock-rules"><b>{{ game.startingBarChosen ? `Expansion unlocks at level ${game.barPurchaseLevel}` : 'Your first bar is free' }}</b><span>The second location costs coins. Every later location costs crystals. Each bar keeps its own name, look and inventory.</span></div>
       <WorldMap />
       <div class="region-cards"><article v-for="region in REGIONS" :key="region.id" :class="{ active: region.id === game.regionId && game.isBarOwned(region.id), locked: !game.isBarOwned(region.id) }"><img :src="INTERIORS.find(item => item.id === game.bars[region.id].interior)?.asset" alt="" /><small>{{ region.name }}</small><b>{{ game.bars[region.id].name }}</b><small>{{ region.tagline }}</small><span v-if="game.isBarOwned(region.id)">{{ region.marketFactor }}× prices · {{ barUnits(region.id).toLocaleString() }} stock</span><span v-else>{{ game.level < game.barPurchaseLevel && game.startingBarChosen ? `Level ${game.barPurchaseLevel} required` : 'Location not owned' }}</span><button type="button" :disabled="game.startingBarChosen && (game.isBarOwned(region.id) && region.id === game.regionId || !game.isBarOwned(region.id) && game.level < game.barPurchaseLevel)" @click="regionAction(region.id)">{{ barActionLabel(region.id) }}</button></article></div>

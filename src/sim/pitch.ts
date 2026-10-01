@@ -11,12 +11,12 @@ import { goodAmount } from './stockQuality';
 import { startSituation } from './situations';
 import { barEventFor } from './events';
 import type { PlayerState } from './state';
+import { MINUTE } from '../domain/time';
 
 // Offering something to a guest: another drink or some food. There is a chance of a "yes", shown to the player with
 // the reasons behind it, and what the bartender says while offering raises or lowers it (a drink's story, a
 // discount or a free taste help; pushing hurts). Food also pairs with the drink the guest has.
 
-const MINUTE = 60_000;
 const PAUSE_AFTER_NO = 2 * MINUTE;
 const MAX_TRIES = 2;
 

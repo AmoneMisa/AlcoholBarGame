@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PanelHeading from '../ui/PanelHeading.vue';
 import { computed, nextTick, onMounted, ref } from 'vue';
 import { RECIPES } from '../../domain/catalog';
 import { INTERIORS } from '../../data/cosmetics/bars';
@@ -71,7 +72,7 @@ onMounted(() => { void game.loadFriends(); });
 
 <template>
   <section class="friends-page game-panel">
-    <header class="panel-heading"><div><small>YOUR BAR CIRCLE</small><h2>Friends</h2></div><span>{{ accepted.length }} {{ accepted.length === 1 ? 'friend' : 'friends' }}</span></header>
+    <PanelHeading eyebrow="YOUR BAR CIRCLE" title="Friends" :aside="`${accepted.length} ${accepted.length === 1 ? 'friend' : 'friends'}`" />
     <p v-if="status" class="friend-status" role="status" aria-live="polite">{{ status }}</p>
 
     <div class="friend-top">

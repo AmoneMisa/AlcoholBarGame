@@ -3,6 +3,7 @@ import { coins } from '../domain/economy';
 import type { InventoryItem, RegionId } from '../domain/types';
 import { SELLERS } from './trade';
 import { DELIVERY_DAY_MS, type DeliveryOrder, type PlayerState } from './state';
+import { ingredientName as nameOf } from '../domain/catalog';
 
 // Deliveries do not always arrive in perfect shape. A small share of every order is lost, damaged, wrong, fake,
 // close to its date or past it. The player must notice, decide what to do with it, and may report it to the supplier
@@ -31,7 +32,6 @@ export interface QuarantineItem { id: string; barId: RegionId; ingredientId: str
 const CLAIM_WINDOW_MS = 3 * DELIVERY_DAY_MS;
 const FRESH = new Set(['fruit', 'herb', 'mixer']);
 
-const nameOf = (id: string) => INGREDIENTS.find((item) => item.id === id)?.name ?? id;
 export const lowGradeOf = (state: PlayerState, barId: RegionId = state.regionId) => ((state.lowGrade ??= {} as Record<RegionId, Record<string, LowGrade>>)[barId] ??= {});
 const lowFor = (state: PlayerState, barId: RegionId, ingredientId: string) => (lowGradeOf(state, barId)[ingredientId] ??= { damaged: 0, expiring: 0, expiringAt: 0 });
 export const goodAmount = (state: PlayerState, ingredientId: string) => {

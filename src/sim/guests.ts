@@ -4,13 +4,13 @@ import { ensureSocial } from '../domain/social/generate';
 import { TAXI_ACCEPTED, TAXI_ARRIVED, choose, leaveLine, type LeaveOutcome, type LeaveTone, type SocialReply } from '../domain/social/talk';
 import { pickSituation, startSituation } from './situations';
 import type { PlayerState } from './state';
+import { MINUTE } from '../domain/time';
 
 // The life of the guests at the bar, run by the shared rules (so on the server): who sits, who stays for another
 // drink, who is getting drunk or asking for something, and what happens when the bartender asks someone to leave.
 // Nothing here knows about drinks or prices; rules.ts passes in what it needs through `GuestContext`.
 
 export const MAX_SEATS = 6;
-const MINUTE = 60_000;
 const ASHTRAYS_AT_START = 4;
 
 export interface GuestContext {

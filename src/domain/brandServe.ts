@@ -1,6 +1,7 @@
 import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS } from './bottleCatalog';
 import { INGREDIENTS, RECIPES } from './catalog';
 import type { AlcoholProduct, Customer, Recipe, RecipeItem } from './types';
+import { foldText as norm } from './text';
 
 // Brand-call orders: the only time a bar guest names a brand is for a simple serve of one spirit
 // (“Jack Daniel’s on the rocks”, “Tanqueray and tonic”). Cocktails are always ordered without brands.
@@ -105,7 +106,6 @@ export function substitutesFor(request: ServeRequest, onShelf: (productId: strin
   return servableProducts().filter((item) => item.id !== wanted.id && item.ingredientId === wanted.ingredientId && onShelf(item.id));
 }
 
-const norm = (text: string) => text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 function brandsMentioned(text: string) {
   const haystack = ` ${norm(text)} `;
   return [...ALCOHOL_PRODUCTS]

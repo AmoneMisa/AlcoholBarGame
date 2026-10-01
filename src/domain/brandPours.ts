@@ -1,8 +1,8 @@
 import { ALCOHOL_PRODUCTS } from './bottleCatalog';
 import { SIGNATURE_BRANDS } from '../data/knowledge/signatureBrands';
+import { foldText as norm } from './text';
 
 // When the bartender pours the cocktail's signature brand (Campari in a Negroni), the guest notices: a small bonus tip.
-const norm = (text: string) => text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 export function sameBrand(catalogBrand: string, signatureBrand: string) {
   const a = norm(catalogBrand), b = norm(signatureBrand);
   return a === b || a.startsWith(`${b} `) || b.startsWith(`${a} `);

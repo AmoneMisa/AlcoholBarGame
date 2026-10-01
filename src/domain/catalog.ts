@@ -206,3 +206,5 @@ export const STARTING_INVENTORY = INGREDIENTS.map((item) => ({
   ingredientId: item.id,
   amount: item.unit === 'ml' ? 360 : item.id === 'ice' ? 45 : 18
 }));
+
+export const ingredientName = (id: string) => INGREDIENTS.find((item) => item.id === id)?.name ?? id;

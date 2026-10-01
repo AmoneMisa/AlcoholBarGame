@@ -5,6 +5,7 @@ import { BRANDS_B } from './brandsB';
 import { BRANDS_C } from './brandsC';
 import { BRANDS_D } from './brandsD';
 import type { IngredientGuide } from './spirits';
+import { foldText as norm } from '../../domain/text';
 
 export type { BrandNote } from './brandsA';
 
@@ -176,7 +177,6 @@ export const EXTRA_ALCOHOL_GUIDES: Record<string, IngredientGuide & { name: stri
   }
 };
 
-const norm = (text: string) => text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 
 // Bottles from the shop catalog that belong to a brand note (e.g. “Martini” ↔ “Martini & Rossi”).
 export function shopProductsFor(brand: BrandNote): AlcoholProduct[] {

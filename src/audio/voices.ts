@@ -14,8 +14,8 @@ watch(voiceMode, (value) => { try { localStorage.setItem(KEY, value); } catch { 
 
 export type { GuestVoiceProfile as VoiceProfile } from '../domain/social/origin';
 import type { GuestVoiceProfile as VoiceProfile } from '../domain/social/origin';
+import { fnvHash as hash } from '../domain/text';
 
-const hash = (text: string) => { let h = 2166136261; for (let i = 0; i < text.length; i++) { h ^= text.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
 // Rough formants (F1, F2) of five vowels.
 const VOWELS: [number, number][] = [[730, 1090], [530, 1840], [270, 2290], [570, 840], [300, 870]];
 
