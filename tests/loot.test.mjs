@@ -850,7 +850,12 @@ test('Steady Hand turns a close drink into a perfect one and is kept when it was
   const guest = base.customers[0];
   guest.modifierId = undefined; guest.orderKind = 'cocktail'; guest.orderRevealed = true;
   for (const stock of base.inventories['new-york']) stock.amount = 5000;
-  const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
+  // A recipe where +20% (rounded) is close enough but changes something, and +60% is clearly too much.
+  const scaled = (item, factor) => item.ingredients.map((part) => Math.round(part.amount * factor));
+  const recipe = RECIPES.find((item) => item.ingredients.every((part, at) => Math.abs(scaled(item, 1.2)[at] - part.amount) <= part.amount * .25)
+    && item.ingredients.some((part, at) => scaled(item, 1.2)[at] !== part.amount)
+    && item.ingredients.some((part, at) => Math.abs(scaled(item, 1.6)[at] - part.amount) > part.amount * .25));
+  guest.orderRecipeId = recipe.id;
   const mix = (factor) => recipe.ingredients.map((item) => ({ ...item, amount: Math.round(item.amount * factor) }));
   const serve = (factor, armed = true) => {
     const state = structuredClone(base);
