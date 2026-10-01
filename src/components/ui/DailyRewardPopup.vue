@@ -2,7 +2,7 @@
 import { computed, onUnmounted } from 'vue';
 import { DAILY_COINS, dailyCrystalsFor } from '../../domain/economy';
 import { useGameStore } from '../../stores/game';
-import CloseButton from './CloseButton.vue';
+import ModalDialog from './ModalDialog.vue';
 import UiIcon from './UiIcon.vue';
 import RewardList from './RewardList.vue';
 
@@ -19,12 +19,8 @@ function claim() { game.claimDailyGift(); }
 </script>
 
 <template>
-  <div class="daily-backdrop" @click.self="game.dailyOpen = false">
-    <section class="daily-popup" role="dialog" aria-modal="true" aria-labelledby="daily-title">
-      <header>
-        <div><small>LOGIN STREAK</small><h2 id="daily-title">Day {{ cycleDay }} · {{ game.dailyGiftAvailable ? 'reward ready' : 'claimed' }}</h2></div>
-        <CloseButton label="Close daily reward" size="sm" @click="game.dailyOpen = false" />
-      </header>
+  <ModalDialog eyebrow="LOGIN STREAK" :title="`Day ${cycleDay} · ${game.dailyGiftAvailable ? 'reward ready' : 'claimed'}`" close-label="Close daily reward" width="520px" @close="game.dailyOpen = false">
+    <div class="daily-popup">
       <p class="daily-intro">Come back every day to grow your streak. Day 3 and day 7 add crystals, and a recipe card may drop as an extra gift (12% chance).</p>
       <div class="daily-track">
         <span v-for="(coins, index) in DAILY_COINS" :key="index" :class="{ today: cycleDay === index + 1, claimed: index < claimedDays }">
@@ -42,16 +38,12 @@ function claim() { game.claimDailyGift(); }
       <button class="primary-button daily-claim" type="button" :disabled="!game.dailyGiftAvailable" @click="claim">
         <UiIcon name="gift" /><template v-if="game.dailyGiftAvailable">Claim +{{ game.dailyCoinReward }}<template v-if="game.dailyCrystalReward"> · +{{ game.dailyCrystalReward }} <UiIcon class="inline-icon" name="crystal" /></template></template><template v-else>Claimed</template>
       </button>
-    </section>
-  </div>
+    </div>
+  </ModalDialog>
 </template>
 
 <style>
-.daily-backdrop { position: fixed; z-index: 1500; inset: 0; display: grid; place-items: center; padding: 12px; background: #050910b8; backdrop-filter: blur(4px); }
-.daily-popup { display: grid; gap: 12px; width: min(520px, 100%); max-height: calc(100dvh - 24px); overflow-y: auto; padding: 14px; border: 1px solid #d2a24e; border-radius: 16px; background: linear-gradient(150deg, #1b2740, #0b1320 72%); box-shadow: 0 24px 70px #000e; color: #fff; }
-.daily-popup > header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.daily-popup > header small { color: var(--gold, #e8b85a); font-size: 9px; font-weight: 900; letter-spacing: .14em; }
-.daily-popup > header h2 { margin: 2px 0 0; color: #fff3dc; font: 700 21px Georgia, serif; }
+.daily-popup { display: grid; gap: 12px; }
 .daily-intro, .daily-wait { margin: 0; color: #aebccd; font-size: 12px; line-height: 1.5; }
 .daily-track { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
 .daily-track > span { display: grid; justify-items: center; gap: 3px; padding: 8px 2px; border: 1px solid #34465e; border-radius: 10px; background: #142034; text-align: center; }

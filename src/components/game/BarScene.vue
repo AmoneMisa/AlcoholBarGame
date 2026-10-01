@@ -302,6 +302,9 @@ function badges(customer: Customer) {
   return list;
 }
 function bubbleText(customer: Customer) {
+  // Something the guest said on their own (about the drink, the room, their life) shows for a while.
+  const murmur = customer.social?.murmur;
+  if (murmur && murmur.until > game.nowMs) return murmur.text;
   if (customer.orderRevealed) return customer.request;
   if (customer.wish) return customer.wish;
   if (customer.orderKind === 'bottle') return `I need bottles for a ${customer.bottleRequest?.occasion ?? 'special occasion'}.`;
@@ -327,8 +330,29 @@ function addFresh(id: string) {
   freshPickerOpen.value = false;
   haptic('light');
 }
+// A finger on a bottle may be the start of a shelf swipe or of pulling the bottle down to the glass. Wait for the
+// direction: sideways lets the browser scroll the shelf (it then cancels the pointer); upwards or downwards lifts the
+// bottle; lifting the finger without moving is a tap (pours one measure). A mouse has no swipe and lifts at once.
+let pendingBottle: { id: string; pointerId: number; x: number; y: number } | undefined;
+const SWIPE_SLOP = 9;
+function decidePendingBottle(event: PointerEvent) {
+  const pending = pendingBottle;
+  if (!pending || pending.pointerId !== event.pointerId) return;
+  const dx = Math.abs(event.clientX - pending.x), dy = Math.abs(event.clientY - pending.y);
+  if (Math.max(dx, dy) < SWIPE_SLOP) return;
+  pendingBottle = undefined;
+  if (dy > dx * 1.2) {
+    activePointerId = pending.pointerId;
+    dragStartX = pending.x; dragStartY = pending.y; dragTravelled = true;
+    liftBottle(pending.id, event);
+  }
+}
 function beginBottleDrag(id: string, event: PointerEvent) {
   if (event.button !== 0 || !buildingEnabled.value) return;
+  if (event.pointerType !== 'mouse') {
+    pendingBottle = { id, pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+    return;
+  }
   event.preventDefault();
   const target = event.currentTarget as HTMLElement;
   activePointerId = event.pointerId;
@@ -363,6 +387,7 @@ function liftBottle(id: string, event: PointerEvent) {
   }, 180);
 }
 function moveBottle(event: PointerEvent) {
+  if (pendingBottle) decidePendingBottle(event);
   if (activePointerId !== event.pointerId) return;
   if (!glassTarget.value || !draggingIngredientId.value) return;
   if (Math.hypot(event.clientX - dragStartX, event.clientY - dragStartY) > 6) dragTravelled = true;
@@ -372,6 +397,12 @@ function moveBottle(event: PointerEvent) {
   dragOverGlass.value = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
 }
 function endBottle(event: PointerEvent) {
+  const pending = pendingBottle;
+  if (pending && pending.pointerId === event.pointerId) {
+    pendingBottle = undefined;
+    if (event.type === 'pointerup') { activePointerId = pending.pointerId; dragTravelled = false; dragStartX = pending.x; dragStartY = pending.y; liftBottle(pending.id, event); }
+    else return;
+  }
   if (activePointerId !== event.pointerId) return;
   window.clearInterval(pourInterval);
   if (event.type !== 'pointercancel' && draggingIngredientId.value) {
