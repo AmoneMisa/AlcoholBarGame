@@ -132,7 +132,11 @@ jobs:
           DEPLOY_PATH="${DEPLOY_PATH#'~/'}"
           for attempt in $(seq 1 20); do
             if ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "cd '$DEPLOY_PATH' && docker compose --env-file .env -f compose.prod.yaml exec -T app node -e \"fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""; then
-              echo "Game is healthy."; exit 0
+              # The web server in front of the game reaches it on the host's loopback port: check that port too, so a missing port mapping (502 for players) fails the deploy.
+              if ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "curl -fsS -m 10 http://127.0.0.1:\${APP_PORT:-3000}/api/health >/dev/null"; then
+                echo "Game is healthy and reachable on the host port."; exit 0
+              fi
+              echo "Healthy inside the container, but not reachable on the host port yet."; sleep 6; continue
             fi
             sleep 6
           done

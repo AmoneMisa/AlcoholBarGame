@@ -33,9 +33,9 @@ services:
     depends_on:
       database:
         condition: service_healthy
-    # The host's nginx (HTTPS for the domain) proxies to 127.0.0.1:3000, so the app publishes that port on the loopback only.
+    # The host's nginx (HTTPS for the domain) proxies to 127.0.0.1:3000, so the app publishes that port on the loopback only (APP_PORT in .env changes the host port, and then the nginx proxy_pass must follow).
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 15s

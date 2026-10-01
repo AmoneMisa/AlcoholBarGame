@@ -43,3 +43,11 @@ The app verifies every `Telegram.WebApp.initData` signature on the server. At st
 3. Supplier delivery queue and warehouse capacity.
 4. Persistent language progress and spaced repetition.
 5. Replace CSS prototype characters with an original sprite/rigged 2D art pipeline.
+
+## Production deploy notes
+
+- CI (`.github/workflows/docker-master.yml`) copies `deploy/compose.prod.yaml` to the server and recreates only the `app` container.
+- The app publishes `127.0.0.1:3000` (set `APP_PORT` in the server `.env` to change it). A web server on the host (nginx, `proxy_pass http://127.0.0.1:3000`) terminates HTTPS. Without that port mapping the site answers **502**.
+- Caddy in the compose file is optional (`docker compose --profile caddy up -d`) and only for a server whose ports 80 and 443 are free.
+- The deploy checks `/api/health` inside the container and on the host port, so a missing mapping fails the workflow.
+- `compose.yaml` in the repository root is for building and running locally; do not run it next to the CI stack on the server.
