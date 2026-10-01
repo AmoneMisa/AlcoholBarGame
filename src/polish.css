@@ -237,3 +237,10 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 
 /* Buttons that sit in the bar scene's click-through layer must say they take clicks (the ashtray button could not be pressed). */
 .bar-cast .clean-ashtrays { pointer-events: auto; }
+
+/* House rules: one steady size for the list, whatever the screen. */
+.house-rules-panel .rules-note { font-size: 12.5px; line-height: 1.4; }
+.house-rules-panel .rule-row { grid-template-columns: 30px minmax(0, 1fr); align-items: start; }
+.house-rules-panel .rule-row b { display: block; font-size: 15px; line-height: 1.25; }
+.house-rules-panel .rule-row small { margin-top: 2px; font-size: 13px; line-height: 1.4; }
+.house-rules-panel .rule-icon { display: grid; place-items: center; width: 30px; height: 30px; font-size: 20px; }
