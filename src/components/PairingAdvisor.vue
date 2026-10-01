@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiInput from './ui/UiInput.vue';
 import OptionSelect from './game/OptionSelect.vue';
 import { computed, ref } from 'vue';
 import PairingPrinciples from './PairingPrinciples.vue';
@@ -109,7 +110,7 @@ const opts = (values: readonly string[], any = false) => [...(any ? [{ value: ''
     </div>
 
     <div v-if="mode === 'food' || mode === 'drink'" class="pairing-controls">
-      <input v-model="search" placeholder="Search wine, beer, spirit, tea, coffee, mocktail…" />
+      <UiInput v-model="search" placeholder="Search wine, beer, spirit, tea, coffee, mocktail…" />
       <OptionSelect label="Drink" v-model="selectedBeverage" :options="profiles.map((profile) => ({ value: profile.id, label: `${profile.name} · ${profile.style} · ${profile.abv_class}` }))" />
     </div>
 

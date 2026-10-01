@@ -1,0 +1,32 @@
+/* The UI kit: UiButton, UiInput, UiField. Every screen uses these, so heights, colours and focus rings stay the same. */
+:root { --ctl-h: 40px; --ctl-h-sm: 32px; --ctl-radius: 10px; --ui-gold: #e0a14a; --ui-edge: #5a6b86; --ui-edge-soft: #354762; --ui-text: #e9eef7; --ui-muted: #aebdce; }
+
+.ui-btn { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: var(--ctl-h); padding: 0 16px; border: 1px solid var(--ui-edge); border-radius: var(--ctl-radius); background: #1d283b; color: var(--ui-text); font: 700 13px/1.2 system-ui, sans-serif; text-align: center; cursor: pointer; transition: background .12s, border-color .12s, transform .06s; }
+.ui-btn:hover { background: #26354d; }
+.ui-btn:active { transform: translateY(1px); }
+.ui-btn:focus-visible { outline: 2px solid #ffd35a; outline-offset: 2px; }
+.ui-btn .ui-icon { flex: none; width: 18px; height: 18px; }
+.ui-btn-label { display: inline-block; min-width: 0; }
+.ui-btn-sm { min-height: var(--ctl-h-sm); padding: 0 11px; font-size: 12px; }
+.ui-btn-sm .ui-icon { width: 15px; height: 15px; }
+.ui-btn-block { display: flex; width: 100%; }
+.ui-btn-primary { border-color: #a97938; background: #5f3d1c; color: #ffe9bd; }
+.ui-btn-primary:hover { background: #7a4d12; }
+.ui-btn-solid { border-color: var(--ui-gold); background: #a9702b; color: #fff6e0; }
+.ui-btn-solid:hover { background: #bd8034; }
+.ui-btn-danger { border-color: #a14a4a; background: #3a1d1d; color: #ffd6d6; }
+.ui-btn-danger:hover { background: #4d2424; }
+.ui-btn-ghost { border-color: transparent; background: transparent; color: #c7d3e0; }
+.ui-btn-ghost:hover { background: #ffffff10; }
+.ui-btn:disabled, .ui-btn-blocked { opacity: .5; cursor: not-allowed; filter: saturate(.6); }
+.ui-btn:disabled:hover, .ui-btn-blocked:hover { background: inherit; }
+.ui-reason { margin: 4px 0 0; padding: 6px 9px; border: 1px solid #8a5a3a; border-radius: 9px; background: #2a1b17; color: #ffcfae; font-size: 11px; line-height: 1.4; }
+
+.ui-input { box-sizing: border-box; width: 100%; min-height: var(--ctl-h); padding: 0 12px; border: 1px solid var(--ui-edge); border-radius: var(--ctl-radius); background: #0f1827; color: var(--ui-text); font: 500 14px/1.2 system-ui, sans-serif; }
+.ui-input::placeholder { color: #7e8fa5; }
+.ui-input:focus-visible { outline: 2px solid #ffd35a; outline-offset: 1px; border-color: var(--ui-gold); }
+.ui-input:disabled { opacity: .55; cursor: not-allowed; }
+
+.ui-field { display: grid; gap: 6px; min-width: 0; }
+.ui-field-label { color: #d6c5b0; font-size: 12px; font-weight: 700; }
+.ui-field-hint { color: var(--ui-muted); font-size: 11px; }

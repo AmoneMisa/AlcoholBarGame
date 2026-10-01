@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiButton from '../ui/UiButton.vue';
 import UiIcon from '../ui/UiIcon.vue';
 import Glyph from '../ui/Glyph.vue';
 import { computed, ref } from 'vue';
@@ -39,13 +40,13 @@ const seen = (id: string) => game.training.progress[id] ?? [];
           <p class="academy-hint"><UiIcon class="inline-icon" name="bulb" /> {{ module.practice.hint }}</p>
           <ul v-if="game.training.active?.moduleId === module.id" class="academy-needs"><li v-for="need in module.practice.needs" :key="need" :class="{ ok: seen(module.id).includes(need) }"><UiIcon class="inline-icon" :name="seen(module.id).includes(need) ? 'check' : 'circle'" /> {{ NEED_LABEL[need] }}</li></ul>
           <div class="academy-actions">
-            <button type="button" class="primary" @click="practise(module.id)">{{ game.training.active?.moduleId === module.id ? 'Restart practice' : game.training.done.includes(module.id) ? 'Practise again' : 'Start practice' }}</button>
-            <button v-if="game.training.active?.moduleId === module.id" type="button" @click="game.endTraining()">End practice</button>
+            <UiButton variant="primary" @click="practise(module.id)">{{ game.training.active?.moduleId === module.id ? 'Restart practice' : game.training.done.includes(module.id) ? 'Practise again' : 'Start practice' }}</UiButton>
+            <UiButton variant="secondary" v-if="game.training.active?.moduleId === module.id" @click="game.endTraining()">End practice</UiButton>
           </div>
         </template>
         <div v-else class="academy-actions">
-          <button v-if="module.goto" type="button" @click="emit('close'); emit('goto', module.goto.view)">{{ module.goto.label }}</button>
-          <button type="button" class="primary" :disabled="game.training.done.includes(module.id)" @click="game.trainingDone(module.id)">{{ game.training.done.includes(module.id) ? 'Done' : 'Got it' }}</button>
+          <UiButton variant="secondary" v-if="module.goto" @click="emit('close'); emit('goto', module.goto.view)">{{ module.goto.label }}</UiButton>
+          <UiButton variant="primary" :disabled="game.training.done.includes(module.id)" @click="game.trainingDone(module.id)">{{ game.training.done.includes(module.id) ? 'Done' : 'Got it' }}</UiButton>
         </div>
       </div>
     </article>
@@ -67,7 +68,4 @@ const seen = (id: string) => game.training.progress[id] ?? [];
 .academy-needs { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
 .academy-needs li.ok { color: #7cc686; }
 .academy-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.academy-actions button { padding: 7px 12px; border: 1px solid #5a6b86; border-radius: 10px; background: #1d283b; color: inherit; font-weight: 700; cursor: pointer; }
-.academy-actions button.primary { background: #a9702b; border-color: #e0a14a; color: #fff6e0; }
-.academy-actions button:disabled { opacity: .5; cursor: default; }
 </style>

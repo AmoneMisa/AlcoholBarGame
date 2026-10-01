@@ -16,6 +16,7 @@ if (studio && new URLSearchParams(window.location.search).has('studio')) {
     import('./conversation.css'), import('./management.css'),
     import('./learning.css'), import('./knowledge.css'),
   ]);
+  await import('./ui-kit.css');
   await import('./polish.css'); // last, so its layout fixes win over the older rules
   const catalogRequest = new AbortController();
   const abortTimer = setTimeout(() => catalogRequest.abort(), 800);

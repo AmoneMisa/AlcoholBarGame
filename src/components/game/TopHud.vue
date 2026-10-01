@@ -4,6 +4,8 @@ import { CRYSTAL_EXCHANGE_BUNDLES, STAR_CRYSTAL_PACKS } from '../../domain/econo
 import { useGameStore } from '../../stores/game';
 import UiIcon from '../ui/UiIcon.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
+import UiButton from '../ui/UiButton.vue';
+import SoundControls from '../settings/SoundControls.vue';
 import { MAX_STAFF, MAX_STAFF_LEVEL, STAFF_PROFILES, STAFF_UNLOCK_LEVELS, hireCost, teamShare, upgradeCost } from '../../domain/staff';
 import { TRAINING_MODULES } from '../../domain/training';
 import AcademyPanel from './AcademyPanel.vue';
@@ -27,14 +29,6 @@ const volumeOpen = ref(false);
 // Only one header panel is open at a time, so they never pile up on top of each other.
 const panels = { exchange: exchangeOpen, staff: staffOpen, academy: academyOpen, volume: volumeOpen };
 for (const [name, flag] of Object.entries(panels)) watch(flag, (open) => { if (open) for (const [other, ref] of Object.entries(panels)) if (other !== name) ref.value = false; });
-const percent = (value: number) => `${Math.round(value * 100)}%`;
-// Dragging a slider up from zero also turns that channel back on.
-function setVolume(channel: 'music' | 'sfx' | 'speech', event: Event) {
-  const value = Number((event.target as HTMLInputElement).value) / 100;
-  if (channel === 'music') { musicVolume.value = value; if (value > 0) musicOn.value = true; }
-  else if (channel === 'sfx') { sfxVolume.value = value; if (value > 0) sfxOn.value = true; }
-  else { speechVolume.value = value; if (value > 0) speechOn.value = true; }
-}
 const soundSilent = computed(() => (!musicOn.value || musicVolume.value === 0) && (!sfxOn.value || sfxVolume.value === 0) && (!speechOn.value || speechVolume.value === 0));
 const soundSummary = computed(() => soundSilent.value ? 'Muted' : [musicOn.value && musicVolume.value > 0 && 'Music', sfxOn.value && sfxVolume.value > 0 && 'FX', speechOn.value && speechVolume.value > 0 && 'Voice'].filter(Boolean).join(' · '));
 const xpPercent = computed(() => game.xpProgress.percent);
@@ -94,9 +88,8 @@ onUnmounted(() => {
           <article v-for="slot in slots" :key="slot.index" class="staff-row">
             <span class="staff-face" :class="{ hired: !!slot.member }"><UiIcon name="server" /></span>
             <span class="staff-text"><b>{{ slot.profile.name }} · {{ slot.profile.role }}</b><small v-if="slot.member">Level {{ slot.member.level }} / {{ MAX_STAFF_LEVEL }}</small><small v-else-if="slot.open">{{ slot.profile.about }}</small><small v-else>Opens at bar level {{ slot.unlockAt }}</small></span>
-            <button v-if="slot.member" type="button" :disabled="slot.member.level >= MAX_STAFF_LEVEL || !!staffReason(slot)" @click="game.upgradeStaff(slot.index)">{{ slot.member.level >= MAX_STAFF_LEVEL ? 'Max' : `Train ${upgradeCost(slot.index, slot.member.level)}` }}</button>
-            <button v-else-if="slot.open && slot.index === game.staff.length" type="button" :disabled="!!staffReason(slot)" @click="game.hireStaff()">Hire {{ hireCost(slot.index) }}</button>
-            <p v-if="staffReason(slot)" class="staff-reason" role="note">{{ staffReason(slot) }}</p>
+            <UiButton v-if="slot.member" size="sm" variant="primary" :disabled="slot.member.level >= MAX_STAFF_LEVEL" :reason="staffReason(slot)" @click="game.upgradeStaff(slot.index)">{{ slot.member.level >= MAX_STAFF_LEVEL ? 'Max' : `Train ${upgradeCost(slot.index, slot.member.level)}` }}</UiButton>
+            <UiButton v-else-if="slot.open && slot.index === game.staff.length" size="sm" variant="primary" :reason="staffReason(slot)" @click="game.hireStaff()">Hire {{ hireCost(slot.index) }}</UiButton>
           </article>
         </PopoverPanel>
       </div>
@@ -104,25 +97,8 @@ onUnmounted(() => {
       <div class="sound-resource">
         <button class="sound-open" type="button" :class="{ off: soundSilent }" :aria-expanded="volumeOpen" :aria-label="`Sound: ${soundSummary}. Open volume settings`" @click="volumeOpen = !volumeOpen"><UiIcon :name="soundSilent ? 'speaker-off' : 'speaker'" /><span><small>SOUND</small><b>{{ soundSummary }}</b></span></button>
         <PopoverPanel v-if="volumeOpen" class="volume-panel" eyebrow="SOUND" title="Volume" close-label="Close volume settings" @close="volumeOpen = false">
-          <div class="volume-row" :class="{ off: !musicOn }">
-            <span id="volume-music"><UiIcon name="music" /> Music</span>
-            <input type="range" min="0" max="100" step="5" aria-labelledby="volume-music" :value="Math.round(musicVolume * 100)" :style="{ '--fill': percent(musicVolume) }" :aria-valuetext="musicOn ? percent(musicVolume) : 'Muted'" @input="setVolume('music', $event)" />
-            <output>{{ musicOn ? percent(musicVolume) : 'Off' }}</output>
-            <button type="button" :aria-pressed="!musicOn" aria-label="Mute music" @click="musicOn = !musicOn">{{ musicOn ? 'Mute' : 'Unmute' }}</button>
-          </div>
-          <div class="volume-row" :class="{ off: !sfxOn }">
-            <span id="volume-sfx"><UiIcon name="speaker" /> Effects</span>
-            <input type="range" min="0" max="100" step="5" aria-labelledby="volume-sfx" :value="Math.round(sfxVolume * 100)" :style="{ '--fill': percent(sfxVolume) }" :aria-valuetext="sfxOn ? percent(sfxVolume) : 'Muted'" @input="setVolume('sfx', $event)" />
-            <output>{{ sfxOn ? percent(sfxVolume) : 'Off' }}</output>
-            <button type="button" :aria-pressed="!sfxOn" aria-label="Mute sound effects" @click="sfxOn = !sfxOn">{{ sfxOn ? 'Mute' : 'Unmute' }}</button>
-          </div>
-          <div class="volume-row" :class="{ off: !speechOn }">
-            <span id="volume-speech"><UiIcon name="chat" /> English voice</span>
-            <input type="range" min="0" max="100" step="5" aria-labelledby="volume-speech" :value="Math.round(speechVolume * 100)" :style="{ '--fill': percent(speechVolume) }" :aria-valuetext="speechOn ? percent(speechVolume) : 'Muted'" @input="setVolume('speech', $event)" />
-            <output>{{ speechOn ? percent(speechVolume) : 'Off' }}</output>
-            <button type="button" :aria-pressed="!speechOn" aria-label="Mute English voice" @click="speechOn = !speechOn">{{ speechOn ? 'Mute' : 'Unmute' }}</button>
-          </div>
-          <button type="button" class="how-to-play more-settings" @click="volumeOpen = false; $emit('goto', 'settings')"><UiIcon name="settings" /><span>More settings</span></button>
+          <SoundControls id-prefix="hud" />
+          <UiButton block icon="settings" @click="volumeOpen = false; $emit('goto', 'settings')">More settings</UiButton>
         </PopoverPanel>
       </div>
     </div>

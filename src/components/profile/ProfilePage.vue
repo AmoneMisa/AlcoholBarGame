@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiButton from '../ui/UiButton.vue';
 import { computed, onMounted, ref } from 'vue';
 import { APP_BUILT, APP_VERSION, fetchServerVersion, formatBuilt } from '../../version';
 import { FEATURED_MAX } from '../../domain/profile';
@@ -32,7 +33,7 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
   <div class="profile-page game-panel">
     <ProfileCard :name="game.decor.name || game.playerName" :level="game.level" :profile="game.profile" :look="game.decor as unknown as Record<string, string>">
       <template #achievements-action>
-        <button v-if="earned.length" type="button" class="pick-button" @click="startPicking">Choose what to show</button>
+        <UiButton variant="secondary" size="sm" v-if="earned.length" @click="startPicking">Choose what to show</UiButton>
       </template>
     </ProfileCard>
 
@@ -42,7 +43,7 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
         <div><dt>This device</dt><dd>{{ APP_VERSION }}<small v-if="APP_BUILT">built {{ formatBuilt(APP_BUILT) }}</small></dd></div>
         <div><dt>Server</dt><dd>{{ server ? server.version : 'not reachable' }}<small v-if="server?.built">built {{ formatBuilt(server.built) }}</small></dd></div>
       </dl>
-      <p v-if="outdated" class="outdated">A newer version is running on the server. <button type="button" @click="reload">Reload to update</button></p>
+      <p v-if="outdated" class="outdated">A newer version is running on the server. <UiButton variant="primary" size="sm" @click="reload">Reload to update</UiButton></p>
       <p v-else-if="server && APP_VERSION !== 'dev'" class="current">You have the latest version.</p>
     </section>
 
@@ -53,9 +54,9 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
         <span>🏅 {{ item.seriesName }} · {{ item.tierName }}</span>
       </label>
       <footer>
-        <button type="button" class="primary" @click="save">Save ({{ chosen.length }} / {{ FEATURED_MAX }})</button>
-        <button type="button" @click="latest">Show the latest instead</button>
-        <button type="button" @click="picking = false">Cancel</button>
+        <UiButton variant="primary" @click="save">Save ({{ chosen.length }} / {{ FEATURED_MAX }})</UiButton>
+        <UiButton variant="secondary" @click="latest">Show the latest instead</UiButton>
+        <UiButton variant="secondary" @click="picking = false">Cancel</UiButton>
       </footer>
     </section>
   </div>
@@ -63,7 +64,6 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
 
 <style scoped>
 .profile-page { display: grid; gap: 14px; padding: 14px; }
-.pick-button { margin-left: 10px; padding: 3px 10px; border: 1px solid #5a6b86; border-radius: 8px; background: transparent; color: inherit; font-size: 12px; cursor: pointer; }
 .version-card { padding: 12px 14px; border: 1px solid #354762; border-radius: 14px; background: #111c2d; color: #e9eef7; font-size: 13px; }
 .version-card h3 { margin: 0 0 6px; font-size: 14px; }
 .version-card dl { display: flex; flex-wrap: wrap; gap: 18px; margin: 0; }
@@ -72,12 +72,9 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
 .version-card dd small { display: block; font: 400 11px system-ui, sans-serif; color: #9eafc1; }
 .version-card p { margin: 8px 0 0; }
 .version-card .outdated { color: #ffd35a; }
-.version-card .outdated button { margin-left: 8px; padding: 4px 10px; border: 1px solid #e0a14a; border-radius: 8px; background: #a9702b; color: #fff6e0; font-weight: 700; cursor: pointer; }
 .version-card .current { color: #7cc686; }
 .picker { display: grid; gap: 6px; padding: 14px; border: 1px solid #b78649; border-radius: 14px; background: #1a1f2c; color: #e9eef7; }
 .picker label { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; cursor: pointer; }
 .picker label.on { background: rgba(255, 211, 90, .12); }
 .picker footer { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-.picker button { padding: 7px 12px; border: 1px solid #5a6b86; border-radius: 10px; background: #1d283b; color: inherit; font-weight: 700; cursor: pointer; }
-.picker button.primary { background: #a9702b; border-color: #e0a14a; color: #fff6e0; }
 </style>

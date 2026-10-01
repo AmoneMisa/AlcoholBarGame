@@ -4,6 +4,7 @@ import { BOND_NAMES, BOND_STEPS, COMPANIONS, KEEPSAKES, KEEPSAKE_CRYSTAL_PRICE, 
 import { REGIONS } from '../../domain/catalog';
 import { useGameStore } from '../../stores/game';
 import CharacterModel from '../characters/CharacterModel.vue';
+import UiButton from '../ui/UiButton.vue';
 
 // The Circle: fifteen people with a story. Meet them as guests, recruit them with shards, give keepsakes to deepen the
 // bond, and put up to two (three from level 25) to work in the bar being managed.
@@ -31,7 +32,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
     <section class="crew card">
       <h3>At the bar now <b>{{ crew.length }} / {{ slots }}</b></h3>
       <ul v-if="crew.length">
-        <li v-for="id in crew" :key="id"><b>{{ companionName(id) }}</b> — {{ describeBonus(COMPANIONS.find((item) => item.id === id)!.bonus, bondLevel(game.circle.owned[id] ?? 0)) }}<button type="button" @click="game.dismissCompanion(id)">Send home</button></li>
+        <li v-for="id in crew" :key="id"><b>{{ companionName(id) }}</b> — {{ describeBonus(COMPANIONS.find((item) => item.id === id)!.bonus, bondLevel(game.circle.owned[id] ?? 0)) }}<UiButton size="sm" @click="game.dismissCompanion(id)">Send home</UiButton></li>
       </ul>
       <p v-else class="empty">Nobody works here yet. Choose someone below.</p>
     </section>
@@ -39,7 +40,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
     <section class="keepsakes card">
       <h3>Keepsakes</h3>
       <div class="keep-row">
-        <span v-for="item in keepsakes" :key="item.id" class="keep"><i>{{ item.icon }}</i><b>{{ item.count }}</b><small>{{ item.name }}</small><button type="button" :disabled="game.crystals < KEEPSAKE_CRYSTAL_PRICE" @click="game.buyKeepsake(item.id)">{{ KEEPSAKE_CRYSTAL_PRICE }} 💎</button></span>
+        <span v-for="item in keepsakes" :key="item.id" class="keep"><i>{{ item.icon }}</i><b>{{ item.count }}</b><small>{{ item.name }}</small><UiButton size="sm" variant="primary" :disabled="game.crystals < KEEPSAKE_CRYSTAL_PRICE" :title="game.crystals < KEEPSAKE_CRYSTAL_PRICE ? `Not enough crystals: you need ${KEEPSAKE_CRYSTAL_PRICE}.` : `Buy for ${KEEPSAKE_CRYSTAL_PRICE} crystals`" @click="game.buyKeepsake(item.id)">{{ KEEPSAKE_CRYSTAL_PRICE }} 💎</UiButton></span>
       </div>
     </section>
 
@@ -61,16 +62,16 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
           <p v-if="item.next" class="meta">{{ item.points }} / {{ item.next }} bond points</p>
           <p v-else class="meta">Fully bonded</p>
           <div class="gifts">
-            <button v-for="keep in keepsakes" :key="keep.id" type="button" :class="{ loved: item.person.likes === keep.id }" :disabled="!keep.count || !item.next" :title="`${keep.name}${item.person.likes === keep.id ? ' — loved' : ''}`" @click="game.giveKeepsake(item.person.id, keep.id)">{{ keep.icon }}</button>
+            <UiButton v-for="keep in keepsakes" :key="keep.id" size="sm" :variant="item.person.likes === keep.id ? 'danger' : 'secondary'" :disabled="!keep.count || !item.next" :title="`${keep.name}${item.person.likes === keep.id ? ' — loved' : ''}${keep.count ? '' : ' (you have none)'}`" @click="game.giveKeepsake(item.person.id, keep.id)">{{ keep.icon }}</UiButton>
           </div>
           <p class="meta">Loves: {{ keepsakeDef(item.person.likes)?.icon }} {{ keepsakeDef(item.person.likes)?.name }}</p>
-          <button v-if="item.here" type="button" @click="game.dismissCompanion(item.person.id)">Working here · send home</button>
-          <button v-else type="button" :disabled="crew.length >= slots" @click="game.assignCompanion(item.person.id)">{{ item.bar ? `Move from ${barName(item.bar)} to this bar` : 'Work in this bar' }}</button>
+          <UiButton v-if="item.here" block @click="game.dismissCompanion(item.person.id)">Working here · send home</UiButton>
+          <UiButton v-else block variant="primary" :reason="crew.length >= slots ? `This bar has room for ${slots} people. Send someone home first.` : ''" @click="game.assignCompanion(item.person.id)">{{ item.bar ? `Move from ${barName(item.bar)} to this bar` : 'Work in this bar' }}</UiButton>
         </template>
         <template v-else>
           <progress :value="item.shards" :max="item.person.shards"></progress>
           <p class="meta">{{ item.shards }} / {{ item.person.shards }} shards<template v-if="item.person.joinsWith"> · joins at once with an achievement</template><template v-if="item.person.eventId"> · likes a special night</template></p>
-          <button type="button" :disabled="item.shards < item.person.shards" @click="game.recruitCompanion(item.person.id)">Invite to your circle</button>
+          <UiButton block variant="primary" :reason="item.shards < item.person.shards ? `Not enough shards: you need ${item.person.shards}, you have ${item.shards}. Serve ${companionName(item.person.id)} as a guest to collect more.` : ''" @click="game.recruitCompanion(item.person.id)">Invite to your circle</UiButton>
         </template>
 
         <section v-if="open === item.person.id" class="story">
@@ -81,7 +82,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
             <p v-else class="locked">🔒 Chapter {{ index + 1 }} opens at bond level {{ index + 1 }}{{ index ? ` (${BOND_STEPS[index]} points)` : '' }}.</p>
           </template>
         </section>
-        <button type="button" class="story-toggle" @click="toggle(item.person.id)">{{ open === item.person.id ? 'Hide story' : 'Read story' }}</button>
+        <UiButton size="sm" variant="ghost" @click="toggle(item.person.id)">{{ open === item.person.id ? 'Hide story' : 'Read story' }}</UiButton>
       </article>
     </div>
   </div>
@@ -114,16 +115,8 @@ h3 b { margin-left: 8px; color: #e4b35c; }
 .meta { margin: 2px 0 6px; color: #9eafc1; font-size: 12px; }
 progress { width: 100%; height: 8px; }
 .gifts { display: flex; gap: 6px; margin: 6px 0; }
-.gifts button { padding: 4px 8px; font-size: 16px; background: #1d283b; border-color: #5a6b86; }
-.gifts button.loved { border-color: #ff8fb1; }
-.crew li button { background: #1d283b; border-color: #5a6b86; color: #e9eef7; }
-button { padding: 7px 11px; border: 1px solid #a97938; border-radius: 8px; background: #5f3d1c; color: #ffe9bd; font-weight: 800; font-size: 12px; cursor: pointer; }
-button:disabled { opacity: .45; cursor: default; }
 .story { margin-top: 10px; padding-top: 8px; border-top: 1px solid #2d4059; font-size: 13px; line-height: 1.45; }
 .story blockquote { margin: 0 0 6px; color: #e4b35c; font-style: italic; }
 .story p { margin: 6px 0; }
 .story .locked { color: #6f819a; }
-.story-toggle { margin-top: 8px; background: transparent; border-color: #5a6b86; color: #c7d3e0; }
-.keep button { padding: 4px 8px; font-size: 11px; }
-.person > button:not(.story-toggle) { margin-top: 4px; }
 </style>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiInput from '../ui/UiInput.vue';
 import { computed, ref, watch } from 'vue';
 import { fetchLeaderboard, type LeaderboardResult } from '../../telegram/api';
 import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE, leaderboardReward, describeLeaderboardReward } from '../../domain/leaderboard';
@@ -17,6 +18,7 @@ import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipe
 import { SEASON_FEATURED_SHARE, SEASON_MILESTONES, SPARK_DRAWS, seasonAt } from '../../domain/seasons';
 import { featuredLegendary } from '../../sim/loot';
 import CompanionsPanel from './CompanionsPanel.vue';
+import UiButton from '../ui/UiButton.vue';
 import { REGIONS } from '../../domain/catalog';
 import OptionSelect from '../game/OptionSelect.vue';
 import { useGameStore } from '../../stores/game';
@@ -56,6 +58,8 @@ const quests = computed(() => questsForWeek(week.value).map((quest) => {
   const current = game.loot.quests.week === week.value;
   return { quest, progress: current ? game.loot.quests.progress[quest.stat] ?? 0 : 0, claimed: current && game.loot.quests.claimed.includes(quest.id) };
 }));
+// The words under a blocked button when the player cannot afford something.
+const needMore = (what: string, need: number, have: number) => have < need ? `Not enough ${what}: you need ${need}, you have ${Math.floor(have)}.` : '';
 const stat = (id: string) => game.achievementStat(id as StatId);
 // One card per achievement series: the next tier to claim, and the four tiers as pips.
 const achievementRows = computed(() => [...new Set(ACHIEVEMENTS.map((item) => item.series))].map((series) => {
@@ -152,21 +156,20 @@ const boostLeft = (id: string) => {
     <p v-if="game.loot.log[0]" class="workshop-log">{{ game.loot.log[0] }}</p>
 
     <div v-if="tab === 'equipment'" class="grid">
-      <nav v-if="ownedBars.length > 1" class="bar-chips" aria-label="Bar to upgrade"><button v-for="region in ownedBars" :key="region.id" type="button" :class="{ active: region.id === equipBar }" @click="pickedBar = region.id">{{ region.name }}</button></nav>
+      <nav v-if="ownedBars.length > 1" class="bar-chips" aria-label="Bar to upgrade"><UiButton v-for="region in ownedBars" :key="region.id" size="sm" :variant="region.id === equipBar ? 'solid' : 'secondary'" @click="pickedBar = region.id">{{ region.name }}</UiButton></nav>
       <article v-for="item in EQUIPMENT" :key="item.id" class="card">
         <h3><span>{{ item.icon }}</span> {{ item.name }} <em :class="slot(item.id).tier">{{ slot(item.id).tier }}</em></h3>
         <p>{{ item.description }}</p>
         <b>Level {{ slot(item.id).level }} / {{ cap(item.id) }} · {{ effectText(item.id) }}</b>
         <progress :value="slot(item.id).level" :max="10"></progress>
         <div class="row">
-          <button type="button" :class="{ blocked: !!upgradeReason(item.id) }" :aria-disabled="!!upgradeReason(item.id)" @click="!upgradeReason(item.id) && game.act({ type: 'upgradeEquipment', item: item.id, regionId: equipBar })">
+          <UiButton variant="primary" :reason="upgradeReason(item.id)" @click="game.act({ type: 'upgradeEquipment', item: item.id, regionId: equipBar })">
             Upgrade · {{ upgradeCostFor(slot(item.id).level).coins }} coins + {{ partsFor(item.id) }} parts
-          </button>
-          <button v-if="TIER_SHARD_COST[slot(item.id).tier]" type="button" :class="{ blocked: !!tierReason(item.id) }" :aria-disabled="!!tierReason(item.id)" @click="!tierReason(item.id) && game.act({ type: 'promoteEquipment', item: item.id, regionId: equipBar })">
+          </UiButton>
+          <UiButton variant="primary" v-if="TIER_SHARD_COST[slot(item.id).tier]" type="button" :reason="tierReason(item.id)" @click="game.act({ type: 'promoteEquipment', item: item.id, regionId: equipBar })">
             Raise tier · {{ game.loot.itemShards[item.id] ?? 0 }}/{{ TIER_SHARD_COST[slot(item.id).tier] }} shards
-          </button>
+          </UiButton>
         </div>
-        <p v-for="why in [upgradeReason(item.id), tierReason(item.id)].filter(Boolean)" :key="why" class="reason" role="note">{{ why }}</p>
       </article>
       <p class="hint">Every bar has its own equipment. Pick a bar above to upgrade it from here, without switching. Serving guests drops workshop parts; boxes bring shards.</p>
     </div>
@@ -176,13 +179,13 @@ const boostLeft = (id: string) => {
         <h3><span>{{ box.icon }}</span> {{ box.name }} <b>×{{ boxCount(box.id) }}</b></h3>
         <p>{{ box.description }}</p>
         <div class="row">
-          <button type="button" :disabled="!boxCount(box.id) || !!game.loot.pendingChoice" @click="game.act({ type: 'openBox', box: box.id })">Open</button>
-          <button v-if="box.crystalPrice" type="button" :disabled="game.crystals < box.crystalPrice" @click="game.act({ type: 'buyBox', box: box.id })">Buy · {{ box.crystalPrice }} crystals</button>
+          <UiButton variant="primary" :reason="!boxCount(box.id) ? `You have no ${box.name.toLowerCase()}. Earn them from quests, achievements and drops, or buy one.` : game.loot.pendingChoice ? `Pick your reward first.` : ''" @click="game.act({ type: 'openBox', box: box.id })">Open</UiButton>
+          <UiButton variant="primary" v-if="box.crystalPrice" type="button" :reason="needMore('crystals', box.crystalPrice, game.crystals)" @click="game.act({ type: 'buyBox', box: box.id })">Buy · {{ box.crystalPrice }} crystals</UiButton>
         </div>
       </article>
       <article v-if="game.loot.pendingChoice" class="card choice">
         <h3>🧭 Pick one reward</h3>
-        <div class="row"><button v-for="(reward, index) in game.loot.pendingChoice" :key="index" type="button" @click="game.act({ type: 'pickReward', index })">{{ describeReward(reward, names) }}</button></div>
+        <div class="row"><UiButton variant="primary" v-for="(reward, index) in game.loot.pendingChoice" :key="index" type="button" @click="game.act({ type: 'pickReward', index })">{{ describeReward(reward, names) }}</UiButton></div>
       </article>
     </div>
 
@@ -194,8 +197,8 @@ const boostLeft = (id: string) => {
         <small v-else-if="game.loot.armed[item.id]">Armed for your next order</small>
         <OptionSelect v-if="item.id === 'scroll'" label="Recipe" v-model="scrollRecipe" :options="[{ value: '', label: 'Choose a recipe' }, ...knownRecipes.map((recipe) => ({ value: recipe.id, label: recipe.name }))]" />
         <div class="row">
-          <button type="button" :disabled="!game.loot.consumables[item.id] || (item.id === 'scroll' && !scrollRecipe)" @click="game.act({ type: 'useConsumable', id: item.id, recipeId: scrollRecipe })">Use</button>
-          <button type="button" :disabled="game.crystals < item.crystalPrice" @click="game.act({ type: 'buyConsumable', id: item.id })">Buy · {{ item.crystalPrice }} crystals</button>
+          <UiButton variant="primary" :disabled="!game.loot.consumables[item.id] || (item.id === 'scroll' && !scrollRecipe)" @click="game.act({ type: 'useConsumable', id: item.id, recipeId: scrollRecipe })">Use</UiButton>
+          <UiButton variant="primary" :reason="needMore('crystals', item.crystalPrice, game.crystals)" @click="game.act({ type: 'buyConsumable', id: item.id })">Buy · {{ item.crystalPrice }} crystals</UiButton>
         </div>
       </article>
     </div>
@@ -203,20 +206,20 @@ const boostLeft = (id: string) => {
     <div v-else-if="tab === 'draw'" class="draw">
       <article class="card">
         <h3>✨ Style draw</h3>
-        <div class="row"><button type="button" :class="{ picked: banner === 'seasonal' }" @click="banner = 'seasonal'">{{ season.name }} banner</button><button type="button" :class="{ picked: banner === 'standard' }" @click="banner = 'standard'">Standard banner</button></div>
+        <div class="row"><UiButton :variant="banner === 'seasonal' ? 'solid' : 'secondary'" @click="banner = 'seasonal'">{{ season.name }} banner</UiButton><UiButton :variant="banner === 'standard' ? 'solid' : 'secondary'" @click="banner = 'standard'">Standard banner</UiButton></div>
         <template v-if="banner === 'seasonal'">
           <p><b>{{ season.name }}</b> — {{ season.tagline }} Ends in {{ seasonDaysLeft }} day{{ seasonDaysLeft === 1 ? '' : 's' }}. Featured Legendary styles win {{ Math.round(SEASON_FEATURED_SHARE * 100) }}% of Legendary pulls: <b>{{ seasonFeatured.map((item) => item.label).join(' and ') }}</b>.</p>
           <progress :value="Math.min(seasonDraws, SPARK_DRAWS)" :max="SPARK_DRAWS"></progress>
           <p>{{ seasonDraws }} / {{ SPARK_DRAWS }} season draws. Milestones: <template v-for="step in SEASON_MILESTONES" :key="step.draws"><span :class="{ gotit: seasonRewarded.includes(step.draws) }">{{ step.draws }} → {{ step.label }}</span> · </template>{{ SPARK_DRAWS }} → pick a featured style (Spark).</p>
-          <div v-if="seasonDraws >= SPARK_DRAWS && !sparkUsed" class="row"><button v-for="item in seasonFeatured" :key="item.id" type="button" :disabled="game.ownedCosmeticIds.includes(item.id)" @click="game.act({ type: 'claimSpark', cosmeticId: item.id })">Spark: {{ item.label }}{{ item.character ? ` (${item.character})` : '' }}</button></div>
+          <div v-if="seasonDraws >= SPARK_DRAWS && !sparkUsed" class="row"><UiButton variant="primary" v-for="item in seasonFeatured" :key="item.id" type="button" :disabled="game.ownedCosmeticIds.includes(item.id)" @click="game.act({ type: 'claimSpark', cosmeticId: item.id })">Spark: {{ item.label }}{{ item.character ? ` (${item.character})` : '' }}</UiButton></div>
           <p v-else-if="sparkUsed">You used this season’s Spark.</p>
         </template>
         <p>Odds: Common {{ DRAW_ODDS.common * 100 }}% · Rare {{ DRAW_ODDS.rare * 100 }}% · Legendary {{ DRAW_ODDS.legendary * 100 }}%. A Rare is guaranteed in every ten draws and a Legendary within {{ LEGENDARY_PITY }}.</p>
         <p v-if="featured && banner === 'standard'">This week's featured Legendary: <b>{{ featured.label }}</b> (half of all Legendary wins).</p>
         <p>Pity: {{ game.loot.pity.sinceLegendary }} / {{ LEGENDARY_PITY }} · duplicates give {{ DUPLICATE_SHARDS.common }} / {{ DUPLICATE_SHARDS.rare }} / {{ DUPLICATE_SHARDS.legendary }} skin shards.</p>
         <div class="row">
-          <button type="button" :disabled="game.crystals < DRAW_COST.single" @click="game.act({ type: 'drawStyle', count: 1, banner })">Draw ×1 · {{ DRAW_COST.single }}</button>
-          <button type="button" :disabled="game.crystals < DRAW_COST.ten" @click="game.act({ type: 'drawStyle', count: 10, banner })">Draw ×10 · {{ DRAW_COST.ten }}</button>
+          <UiButton variant="primary" :reason="needMore('crystals', DRAW_COST.single, game.crystals)" @click="game.act({ type: 'drawStyle', count: 1, banner })">Draw ×1 · {{ DRAW_COST.single }}</UiButton>
+          <UiButton variant="primary" :reason="needMore('crystals', DRAW_COST.ten, game.crystals)" @click="game.act({ type: 'drawStyle', count: 10, banner })">Draw ×10 · {{ DRAW_COST.ten }}</UiButton>
         </div>
         <ul v-if="game.loot.lastDraw.length" class="results"><li v-for="(result, index) in game.loot.lastDraw" :key="index" :class="result.rarity">{{ result.label }}<small v-if="result.duplicate"> · duplicate +{{ result.shards }} shards</small></li></ul>
       </article>
@@ -224,7 +227,7 @@ const boostLeft = (id: string) => {
         <h3>🧩 Craft with shards</h3>
         <p>Common {{ SHARD_CRAFT_COST.common }} · Rare {{ SHARD_CRAFT_COST.rare }} · Legendary {{ SHARD_CRAFT_COST.legendary }} skin shards.</p>
         <div class="crafts">
-          <button v-for="item in lockedSkins" :key="item.id" type="button" :class="item.rarity" :disabled="game.loot.skinShards < SHARD_CRAFT_COST[item.rarity]" @click="game.act({ type: 'craftSkin', cosmeticId: item.id })">{{ item.label }} ({{ cosmeticKind(item.key) }}{{ item.character ? `, ${item.character}` : '' }}) · {{ SHARD_CRAFT_COST[item.rarity] }}</button>
+          <UiButton variant="primary" v-for="item in lockedSkins" :key="item.id" type="button" :class="item.rarity" :disabled="game.loot.skinShards < SHARD_CRAFT_COST[item.rarity]" @click="game.act({ type: 'craftSkin', cosmeticId: item.id })">{{ item.label }} ({{ cosmeticKind(item.key) }}{{ item.character ? `, ${item.character}` : '' }}) · {{ SHARD_CRAFT_COST[item.rarity] }}</UiButton>
           <p v-if="!lockedSkins.length">You own every style.</p>
         </div>
       </article>
@@ -236,7 +239,7 @@ const boostLeft = (id: string) => {
         <p>{{ item.quest.name }}</p>
         <progress :value="Math.min(item.progress, item.quest.target)" :max="item.quest.target"></progress>
         <b>{{ Math.min(item.progress, item.quest.target) }} / {{ item.quest.target }} · +{{ item.quest.crystals }} crystals + {{ item.quest.box }} box</b>
-        <button type="button" :disabled="item.claimed || item.progress < item.quest.target" @click="game.act({ type: 'claimQuest', questId: item.quest.id })">{{ item.claimed ? 'Claimed' : 'Claim' }}</button>
+        <UiButton variant="primary" :disabled="item.claimed || item.progress < item.quest.target" @click="game.act({ type: 'claimQuest', questId: item.quest.id })">{{ item.claimed ? 'Claimed' : 'Claim' }}</UiButton>
       </article>
       <article class="card">
         <h3>🍷 Tasting log</h3>
@@ -248,7 +251,7 @@ const boostLeft = (id: string) => {
         <p class="tiers"><span v-for="tier in row.tiers" :key="tier.id" :class="['tier', `tier-${tier.tier}`, { done: tier.done }]" :title="`${tier.tierName}: ${tier.target}`">{{ tier.tierName }}</span></p>
         <progress :value="Math.min(stat(row.goal.stat), row.goal.target)" :max="row.goal.target"></progress>
         <b>{{ Math.min(stat(row.goal.stat), row.goal.target) }} / {{ row.goal.target }} · +{{ row.goal.crystals }} crystals + {{ row.goal.box }} box</b>
-        <button type="button" :disabled="row.finished || stat(row.goal.stat) < row.goal.target" @click="game.act({ type: 'claimAchievement', id: row.goal.id })">{{ row.finished ? 'All tiers claimed' : `Claim ${row.goal.tierName}` }}</button>
+        <UiButton variant="primary" :disabled="row.finished || stat(row.goal.stat) < row.goal.target" @click="game.act({ type: 'claimAchievement', id: row.goal.id })">{{ row.finished ? 'All tiers claimed' : `Claim ${row.goal.tierName}` }}</UiButton>
       </article>
     </div>
 
@@ -258,17 +261,17 @@ const boostLeft = (id: string) => {
         <article class="card">
           <h3>🍹 Design your signature</h3>
           <p>Some guests will come asking for your house special (about {{ Math.round(SIGNATURE_GUEST_CHANCE * 100) }}% of arrivals) without naming it: open the conversation and offer it in English, by name or as “the house special”. Developing or changing it costs {{ SIGNATURE_FEE }} coins and restarts its fame.</p>
-          <input v-model="draftName" maxlength="24" placeholder="Cocktail name" />
+          <UiInput v-model="draftName" maxlength="24" placeholder="Cocktail name" />
           <div v-for="(row, index) in draftItems" :key="index" class="row sig-row">
             <OptionSelect label="Ingredient" :model-value="row.ingredientId" :options="usableList.map((item) => ({ value: item.id, label: item.name }))" @update:model-value="(value: string) => pickIngredient(row, value)" />
-            <button type="button" @click="stepAmount(row, -1)">−</button><b>{{ row.amount }} {{ ingredient(row.ingredientId).unit === 'ml' ? 'ml' : '×' }}</b><button type="button" @click="stepAmount(row, 1)">+</button>
-            <button type="button" :disabled="draftItems.length <= 2" @click="draftItems.splice(index, 1)">✕</button>
+            <UiButton variant="primary" @click="stepAmount(row, -1)">−</UiButton><b>{{ row.amount }} {{ ingredient(row.ingredientId).unit === 'ml' ? 'ml' : '×' }}</b><UiButton variant="primary" @click="stepAmount(row, 1)">+</UiButton>
+            <UiButton variant="primary" :disabled="draftItems.length <= 2" @click="draftItems.splice(index, 1)">✕</UiButton>
           </div>
-          <div class="row"><button type="button" :disabled="draftItems.length >= MAX_ITEMS" @click="addRow">Add ingredient</button><label><input v-model="draftShake" type="checkbox" /> Needs shaking</label></div>
+          <div class="row"><UiButton variant="primary" :disabled="draftItems.length >= MAX_ITEMS" @click="addRow">Add ingredient</UiButton><label><input v-model="draftShake" type="checkbox" /> Needs shaking</label></div>
           <b>Guests would pay {{ preview.price.toFixed(2) }} coins</b>
           <small v-for="line in preview.notes" :key="line">{{ line }}</small>
           <small v-if="draftError" class="sig-error">{{ draftError }}</small>
-          <button type="button" :disabled="!!draftError || game.money < SIGNATURE_FEE" @click="game.act({ type: 'designSignature', name: draftName, items: draftItems, needsShake: draftShake })">{{ saved ? 'Replace signature' : 'Develop signature' }} · {{ SIGNATURE_FEE }} coins</button>
+          <UiButton variant="primary" :disabled="!!draftError || game.money < SIGNATURE_FEE" @click="game.act({ type: 'designSignature', name: draftName, items: draftItems, needsShake: draftShake })">{{ saved ? 'Replace signature' : 'Develop signature' }} · {{ SIGNATURE_FEE }} coins</UiButton>
         </article>
         <article class="card">
           <h3>⭐ {{ saved?.name ?? 'No signature yet' }}</h3>
@@ -288,7 +291,7 @@ const boostLeft = (id: string) => {
       <template v-else>
         <article class="card">
           <h3>🏆 This week's {{ boardScope === 'friends' ? 'friends' : 'top bars' }}</h3>
-          <div class="row"><button type="button" :class="{ picked: boardScope === 'global' }" @click="boardScope = 'global'">Everyone</button><button type="button" :class="{ picked: boardScope === 'friends' }" @click="boardScope = 'friends'">Friends</button></div>
+          <div class="row"><UiButton :variant="boardScope === 'global' ? 'solid' : 'secondary'" @click="boardScope = 'global'">Everyone</UiButton><UiButton :variant="boardScope === 'friends' ? 'solid' : 'secondary'" @click="boardScope = 'friends'">Friends</UiButton></div>
           <p>Score = XP you earn this week (serving, English, lessons). A drink pays the same XP at every level, so newcomers can win. Resets in {{ daysLeft }} day{{ daysLeft === 1 ? '' : 's' }}.</p>
           <p v-if="boardLoading">Loading…</p><p v-if="boardError" class="sig-error">{{ boardError }}</p>
           <ol v-if="board" class="board">
@@ -297,7 +300,7 @@ const boostLeft = (id: string) => {
           </ol>
           <p v-if="board?.me">You are <b>#{{ board.me.rank }}</b> of {{ board.me.size }} with {{ board.me.score }} XP.<template v-if="board.me.rank > LEADERBOARD_SIZE"> The list shows the top {{ LEADERBOARD_SIZE }}.</template></p>
           <p v-else-if="board">You have no score this week yet.</p>
-          <button type="button" @click="loadBoard">Refresh</button>
+          <UiButton variant="primary" @click="loadBoard">Refresh</UiButton>
         </article>
         <article class="card">
           <h3>🎁 Last week's reward</h3>
@@ -305,7 +308,7 @@ const boostLeft = (id: string) => {
             <p>You finished <b>#{{ board.previous.rank }}</b> of {{ board.previous.size }} with {{ board.previous.score }} XP<template v-if="board.previous.tier"> — {{ board.previous.tier }}</template>.</p>
             <p v-if="board.previous.reward">Reward: {{ board.previous.reward }}</p>
             <p v-else>You need {{ MIN_WEEKLY_SCORE }} XP in a week to earn a reward.</p>
-            <button type="button" :disabled="!board.previous.claimable" @click="game.act({ type: 'claimLeaderboardReward' })">{{ board.previous.claimable ? 'Claim reward' : board.previous.reward ? 'Claimed' : 'No reward' }}</button>
+            <UiButton variant="primary" :disabled="!board.previous.claimable" @click="game.act({ type: 'claimLeaderboardReward' })">{{ board.previous.claimable ? 'Claim reward' : board.previous.reward ? 'Claimed' : 'No reward' }}</UiButton>
           </template>
           <p v-else>You did not play last week. Score at least {{ MIN_WEEKLY_SCORE }} XP this week to earn a reward next week.</p>
           <h3>Reward tiers</h3>
@@ -332,12 +335,12 @@ const boostLeft = (id: string) => {
         <h3>🏛️ Grand Opening</h3>
         <p>At level {{ PRESTIGE_LEVEL }} you can reopen your bars: coins, XP, stock and equipment reset. Recipes, styles, crystals, parts and boxes stay, and you earn prestige stars for permanent perks plus a Choice box.</p>
         <b>Opened {{ game.loot.prestige.count }} times · this run earns {{ runStars }} stars</b>
-        <button type="button" :disabled="game.level < PRESTIGE_LEVEL" @click="game.act({ type: 'prestige' })">{{ game.level < PRESTIGE_LEVEL ? `Reach level ${PRESTIGE_LEVEL} (now ${game.level})` : 'Start a Grand Opening' }}</button>
+        <UiButton variant="primary" :disabled="game.level < PRESTIGE_LEVEL" @click="game.act({ type: 'prestige' })">{{ game.level < PRESTIGE_LEVEL ? `Reach level ${PRESTIGE_LEVEL} (now ${game.level})` : 'Start a Grand Opening' }}</UiButton>
       </article>
       <article v-for="perk in PRESTIGE_PERKS" :key="perk.id" class="card">
         <h3>{{ perk.name }} <b>{{ game.loot.prestige.perks[perk.id] ?? 0 }} / {{ perk.maxRank }}</b></h3>
         <p>{{ perk.description }}</p>
-        <button type="button" :disabled="(game.loot.prestige.perks[perk.id] ?? 0) >= perk.maxRank || game.loot.prestige.stars < perkCost(game.loot.prestige.perks[perk.id] ?? 0)" @click="game.act({ type: 'buyPrestigePerk', perk: perk.id })">Buy · {{ perkCost(game.loot.prestige.perks[perk.id] ?? 0) }} stars</button>
+        <UiButton variant="primary" :disabled="(game.loot.prestige.perks[perk.id] ?? 0) >= perk.maxRank || game.loot.prestige.stars < perkCost(game.loot.prestige.perks[perk.id] ?? 0)" @click="game.act({ type: 'buyPrestigePerk', perk: perk.id })">Buy · {{ perkCost(game.loot.prestige.perks[perk.id] ?? 0) }} stars</UiButton>
       </article>
     </div>
   </section>
@@ -360,12 +363,12 @@ const boostLeft = (id: string) => {
 .grid,.draw{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;padding:14px}.draw{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
 .card{display:grid;align-content:start;gap:8px;padding:14px;border:1px solid #354762;border-radius:13px;background:#111c2d}.card h3{margin:0;font:700 17px Georgia,serif}.card p{margin:0;color:#aebdce;font-size:11px;line-height:1.45}.card>b{color:#f4d08e;font-size:11px}.card select{padding:8px;border:1px solid #40536c;border-radius:8px;background:#0c1625;color:#fff}
 .card em{margin-left:6px;padding:2px 6px;border-radius:6px;background:#26364d;color:#c7d3e0;font-size:9px;font-style:normal;text-transform:uppercase}.card em.rare{background:#1d4b6e}.card em.legendary{background:#7a4d12;color:#ffe0a0}
-.card progress{width:100%;accent-color:#e7b556}.row{display:flex;flex-wrap:wrap;gap:6px}.card button,.crafts button{padding:8px 10px;border:1px solid #a97938;border-radius:8px;background:#5f3d1c;color:#ffe9bd;font-weight:800;font-size:11px;cursor:pointer}.card button:disabled,.crafts button:disabled{opacity:.4;cursor:default}
+.card progress{width:100%;accent-color:#e7b556}.row{display:flex;flex-wrap:wrap;gap:6px}
 .results{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:11px}.results li{padding:5px 8px;border-radius:7px;background:#17253a}.results li.rare,.crafts .rare{border-color:#3f86b8;color:#bfe2ff}.results li.legendary,.crafts .legendary{background:#4a3210;color:#ffe0a0}
 .crafts{display:flex;flex-wrap:wrap;gap:5px;max-height:260px;overflow:auto}input[type=text],.card>input{padding:8px;border:1px solid #40536c;border-radius:8px;background:#0c1625;color:#fff}.sig-row{align-items:center}.sig-row select{flex:1;min-width:120px}.sig-row b{min-width:58px;text-align:center;color:#fff0c8}.sig-error{color:#f2a0a0}.card label{color:#c7d3e0;font-size:11px}
 .board{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:12px}.board li{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;padding:6px 8px;border-radius:7px;background:#17253a}.board li.me{background:#4a3210;color:#ffe0a0}.board li b{color:#f4d08e}.board li em{font-style:normal;color:#fff0c8}.board .empty{display:block;color:#93a5b9}
-.card button.picked{border-color:#ffd27a;background:#7a4d12}.gotit{color:#8fd1a0;text-decoration:line-through}
-.bar-chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}.bar-chips button{padding:6px 12px;border:1px solid #475a76;border-radius:999px;background:#17253a;color:#c7d3e0;font-weight:700;font-size:12px;cursor:pointer}.bar-chips button.active{border-color:#e0a14a;background:#5f3d1c;color:#ffe9bd}
-.card button.blocked{opacity:.55;filter:saturate(.6);cursor:help}.reason{padding:6px 9px;border:1px solid #8a5a3a;border-radius:9px;background:#2a1b17;color:#ffcfae!important;font-size:11px}
+.gotit{color:#8fd1a0;text-decoration:line-through}
+.bar-chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
+
 .hint{grid-column:1/-1;margin:0;color:#93a5b9;font-size:11px}small{color:#e4b35c}
 </style>

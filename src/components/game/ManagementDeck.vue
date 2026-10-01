@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import UiButton from '../ui/UiButton.vue';
+import UiInput from '../ui/UiInput.vue';
 import CrystalAmount from '../ui/CrystalAmount.vue';
 import PanelHeading from '../ui/PanelHeading.vue';
 import { computed, ref, watch } from 'vue';
@@ -216,7 +218,7 @@ function selectBartender(id: 'noa' | 'leo') {
         <!-- Bar: the real bar scene in preview mode, pinned while the options scroll. -->
         <div v-show="designTab === 'bar'" class="design-tab-bar">
       <div class="design-location-tabs"><button v-for="region in REGIONS.filter(item => game.isBarOwned(item.id))" :key="region.id" :class="{active:region.id === game.regionId}" type="button" @click="game.switchBar(region.id)">{{ region.name }}</button></div>
-      <form class="bar-name-editor" @submit.prevent="game.renameBar(barName)"><label :for="'bar-name'">Bar name in {{ game.region.name }}<input id="bar-name" v-model="barName" maxlength="32" required placeholder="Name your bar" /></label><button type="submit">Save name</button></form>
+      <form class="bar-name-editor" @submit.prevent="game.renameBar(barName)"><label :for="'bar-name'">Bar name in {{ game.region.name }}<UiInput id="bar-name" v-model="barName" maxlength="32" required placeholder="Name your bar" /></label><UiButton type="submit" variant="solid">Save name</UiButton></form>
           <div class="design-preview" aria-label="Live preview of your bar"><BarScene preview :active="false" /></div>
         <div class="design-options">
           <section class="background-picker"><small>{{ INTERIORS.length }} BACKGROUNDS · {{ game.ownedInteriorIds.length }} OWNED</small><div><button v-for="interior in INTERIORS" :key="interior.id" :class="{active:game.decor.interior === interior.id,locked:!isInteriorOwned(interior.id),special:'special' in interior && interior.special}" :style="interiorStyle(interior.id)" type="button" @click="game.chooseInterior(interior.id)"><em v-if="!isInteriorOwned(interior.id)"><template v-if="isEventInterior(interior.id)">★ Event · boxes</template><CrystalAmount v-else :value="interior.crystalCost" /></em><span>{{ interior.name }}</span></button></div></section>
@@ -242,7 +244,7 @@ function selectBartender(id: 'noa' | 'leo') {
             </div>
           </div>
           <div v-show="designTab === 'character'" class="design-tab-character">
-      <form class="bartender-name-editor" @submit.prevent="game.renameBartender(bartenderNickname)"><label for="bartender-nickname">Bartender nickname<input id="bartender-nickname" v-model="bartenderNickname" maxlength="18" required placeholder="Enter a nickname" /></label><button type="submit">Save nickname</button><span>This is the name guests see.</span></form>
+      <form class="bartender-name-editor" @submit.prevent="game.renameBartender(bartenderNickname)"><label for="bartender-nickname">Bartender nickname<UiInput id="bartender-nickname" v-model="bartenderNickname" maxlength="18" required placeholder="Enter a nickname" /></label><UiButton type="submit" variant="solid">Save nickname</UiButton><span>This is the name guests see.</span></form>
             <p class="avatar-help">Drag to turn your character. Changes are saved with this bar.</p>
             <div class="avatar-options">
               <OptionSelect v-for="option in characterOptions" :key="option.key" :label="option.label" :model-value="game.decor[option.key]" :options="avatarChoices(option)" @update:model-value="setAvatarOption(option.key, $event)" />

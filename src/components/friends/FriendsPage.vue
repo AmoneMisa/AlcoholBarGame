@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import UiButton from '../ui/UiButton.vue';
+import UiInput from '../ui/UiInput.vue';
 import PanelHeading from '../ui/PanelHeading.vue';
 import { computed, nextTick, onMounted, ref } from 'vue';
 import { RECIPES } from '../../domain/catalog';
@@ -86,12 +88,12 @@ onMounted(() => { void game.loadFriends(); });
         <small>YOUR FRIEND CODE</small>
         <b>{{ game.playerFriendCode || '…' }}</b>
         <p>It never changes. Share it so a friend can send you a request.</p>
-        <div class="row"><button type="button" :disabled="!game.playerFriendCode" @click="copyCode"><UiIcon name="copy" />Copy</button><button type="button" class="gold" :disabled="!game.playerFriendCode" @click="shareInvite"><UiIcon name="share" />Invite</button></div>
+        <div class="row"><UiButton variant="secondary" :disabled="!game.playerFriendCode" @click="copyCode"><UiIcon name="copy" />Copy</UiButton><UiButton variant="solid" :disabled="!game.playerFriendCode" @click="shareInvite"><UiIcon name="share" />Invite</UiButton></div>
       </article>
       <form class="card" @submit.prevent="sendRequest">
         <small>ADD A FRIEND</small>
         <label for="friend-code-input">Enter their friend code</label>
-        <div class="row"><input id="friend-code-input" v-model="code" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="ABCD-1234" /><button class="gold" type="submit"><UiIcon name="user-plus" />Send</button></div>
+        <div class="row"><UiInput id="friend-code-input" v-model="code" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="ABCD-1234" /><UiButton variant="solid" type="submit"><UiIcon name="user-plus" />Send</UiButton></div>
         <p>They must accept before you can visit each other.</p>
       </form>
       <article class="prestige card">
@@ -100,8 +102,8 @@ onMounted(() => { void game.loadFriends(); });
         <progress :value="Math.min(game.popularity, PRESTIGE_GOAL)" :max="PRESTIGE_GOAL"></progress>
         <p>Every friend who visits your bar once a day adds +1. At {{ PRESTIGE_GOAL }} you can spend it on a boost.</p>
         <div class="row boosts">
-          <button type="button" :disabled="game.popularity < PRESTIGE_GOAL || !!game.popularityBoost" @click="game.activatePopularityBoost('no-cooldown')">15 min rush</button>
-          <button type="button" :disabled="game.popularity < PRESTIGE_GOAL || !!game.popularityBoost" @click="game.activatePopularityBoost('vip-run')">VIP run</button>
+          <UiButton variant="secondary" size="sm" :disabled="game.popularity < PRESTIGE_GOAL || !!game.popularityBoost" @click="game.activatePopularityBoost('no-cooldown')">15 min rush</UiButton>
+          <UiButton variant="secondary" size="sm" :disabled="game.popularity < PRESTIGE_GOAL || !!game.popularityBoost" @click="game.activatePopularityBoost('vip-run')">VIP run</UiButton>
         </div>
       </article>
     </div>
@@ -110,12 +112,12 @@ onMounted(() => { void game.loadFriends(); });
       <header><small>REQUESTS</small></header>
       <article v-for="friend in incoming" :key="friend.code">
         <span><b>{{ friend.nickname }}</b><small>wants to join your circle · {{ friend.code }}</small></span>
-        <button class="gold" type="button" @click="answer(friend.code, true)"><UiIcon name="check" />Accept</button>
-        <button type="button" @click="answer(friend.code, false)">Decline</button>
+        <UiButton variant="solid" @click="answer(friend.code, true)"><UiIcon name="check" />Accept</UiButton>
+        <UiButton variant="secondary" @click="answer(friend.code, false)">Decline</UiButton>
       </article>
       <article v-for="friend in outgoing" :key="friend.code">
         <span><b>{{ friend.nickname }}</b><small>waiting for them to accept · {{ friend.code }}</small></span>
-        <button type="button" @click="remove(friend.code, friend.nickname)">Cancel</button>
+        <UiButton variant="secondary" @click="remove(friend.code, friend.nickname)">Cancel</UiButton>
       </article>
     </section>
 
@@ -130,23 +132,23 @@ onMounted(() => { void game.loadFriends(); });
           <em><UiIcon name="trophy" />{{ friend.prestige }} prestige</em>
         </div>
         <div class="actions">
-          <button class="gold" type="button" @click="goVisit(friend.code)"><UiIcon name="eye" />Visit</button>
-          <button type="button" aria-label="Rename" title="Rename" @click="startRename(friend.code, friend.customName)"><UiIcon name="brush" /></button>
-          <button type="button" aria-label="Remove friend" title="Remove friend" @click="remove(friend.code, friendName(friend))"><UiIcon name="trash" /></button>
+          <UiButton variant="solid" @click="goVisit(friend.code)"><UiIcon name="eye" />Visit</UiButton>
+          <UiButton variant="secondary" size="sm" aria-label="Rename" title="Rename" @click="startRename(friend.code, friend.customName)"><UiIcon name="brush" /></UiButton>
+          <UiButton variant="secondary" size="sm" aria-label="Remove friend" title="Remove friend" @click="remove(friend.code, friendName(friend))"><UiIcon name="trash" /></UiButton>
         </div>
         <form v-if="renaming === friend.code" class="rename" @submit.prevent="saveRename">
-          <input v-model="draftName" maxlength="28" :placeholder="`Name for ${friend.nickname}`" :aria-label="`Custom name for ${friend.nickname}`" />
-          <button class="gold" type="submit">Save</button><button type="button" @click="renaming = ''">Cancel</button>
+          <UiInput v-model="draftName" maxlength="28" :placeholder="`Name for ${friend.nickname}`" :aria-label="`Custom name for ${friend.nickname}`" />
+          <UiButton variant="solid" type="submit">Save</UiButton><UiButton variant="secondary" @click="renaming = ''">Cancel</UiButton>
         </form>
       </article>
     </section>
 
     <section v-if="visit" ref="visitPanel" class="card visit">
-      <header><div><small>VISITING NOW</small><h3>{{ visit.customName || visit.nickname }}’s bar</h3></div><button type="button" @click="game.leaveVisit()">Leave</button></header>
+      <header><div><small>VISITING NOW</small><h3>{{ visit.customName || visit.nickname }}’s bar</h3></div><UiButton variant="secondary" size="sm" @click="game.leaveVisit()">Leave</UiButton></header>
       <ProfileCard v-if="visit.profile" :name="visit.customName || visit.nickname" :level="visit.level" :profile="visit.profile" :look="visitBar">
         <template #actions>
-          <button type="button" class="gold" @click="giftsPanel?.scrollIntoView({ behavior: 'smooth', block: 'center' })">Send a gift</button>
-          <button type="button" class="danger" @click="remove(visit.code, visit.customName || visit.nickname)">Remove from friends</button>
+          <UiButton variant="solid" @click="giftsPanel?.scrollIntoView({ behavior: 'smooth', block: 'center' })">Send a gift</UiButton>
+          <UiButton variant="danger" @click="remove(visit.code, visit.customName || visit.nickname)">Remove from friends</UiButton>
         </template>
       </ProfileCard>
       <div class="visit-scene" :style="{ backgroundImage: `url('${visitBackground}')` }">
@@ -162,10 +164,10 @@ onMounted(() => { void game.loadFriends(); });
       <p v-if="visit.mastered.length" class="mastered">Mastered: {{ visit.mastered.map((item) => `${item.name} (lv ${item.level})`).join(' · ') }}</p>
       <div ref="giftsPanel" class="gifts">
         <header><UiIcon name="gift" /><div><small>GIFT FROM YOUR INVENTORY</small><p>Only spare copies can be given away — you keep everything else. Workshop items: up to 5 gifts a day.</p></div></header>
-        <article v-for="item in recipeCards" :key="item.recipe.id"><span><b>{{ item.recipe.name }}</b><small>Recipe card · you have {{ item.quantity }}</small></span><button class="gold" type="button" @click="gift({ kind: 'recipe-copy', recipeId: item.recipe.id })">Give</button></article>
-        <article v-for="item in styleItems" :key="item.cosmetic.id"><span><b>{{ item.cosmetic.label }}</b><small>Style · you have {{ item.quantity }}</small></span><button class="gold" type="button" @click="gift({ kind: 'cosmetic-copy', cosmeticId: item.cosmetic.id })">Give</button></article>
-        <article v-for="item in itemGifts" :key="item.id"><span><b>{{ item.name }}</b><small>Workshop item · you have {{ item.quantity }}</small></span><button class="gold" type="button" @click="gift({ kind: 'consumable', id: item.id })">Give</button></article>
-        <article v-for="amount in shardGifts" :key="amount"><span><b>{{ amount }} skin shards</b><small>You have {{ game.loot.skinShards }}</small></span><button class="gold" type="button" :disabled="game.loot.skinShards < amount" @click="gift({ kind: 'skin-shards', amount })">Give</button></article>
+        <article v-for="item in recipeCards" :key="item.recipe.id"><span><b>{{ item.recipe.name }}</b><small>Recipe card · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'recipe-copy', recipeId: item.recipe.id })">Give</UiButton></article>
+        <article v-for="item in styleItems" :key="item.cosmetic.id"><span><b>{{ item.cosmetic.label }}</b><small>Style · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'cosmetic-copy', cosmeticId: item.cosmetic.id })">Give</UiButton></article>
+        <article v-for="item in itemGifts" :key="item.id"><span><b>{{ item.name }}</b><small>Workshop item · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'consumable', id: item.id })">Give</UiButton></article>
+        <article v-for="amount in shardGifts" :key="amount"><span><b>{{ amount }} skin shards</b><small>You have {{ game.loot.skinShards }}</small></span><UiButton variant="solid" size="sm" :disabled="game.loot.skinShards < amount" @click="gift({ kind: 'skin-shards', amount })">Give</UiButton></article>
         <p v-if="!recipeCards.length && !styleItems.length && !itemGifts.length" class="empty">You have no spare cards or styles yet. Duplicates from VIP guests, lessons and the daily style draw show up here.</p>
       </div>
     </section>
@@ -193,10 +195,6 @@ onMounted(() => { void game.loadFriends(); });
 .friend-code b { color: #fff0c8; font: 700 28px Georgia, serif; letter-spacing: .1em; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; }
 .row > * { flex: 1 1 120px; }
-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 42px; padding: 8px 12px; border: 1px solid #4c5d73; border-radius: 10px; background: #18263a; color: #dbe5ef; font-weight: 800; cursor: pointer; }
-button.gold { border-color: #b78649; background: #5f3d1c; color: #ffe9bd; }
-button:disabled { opacity: .4; cursor: default; }
-button .ui-icon { width: 18px; height: 18px; flex: none; }
 input { min-width: 0; min-height: 42px; padding: 8px 10px; border: 1px solid #40536c; border-radius: 10px; background: #0c1625; color: #fff; font-size: 16px; }
 form.card label { color: #c7d2df; font-size: 12px; }
 form.card { display: grid; align-content: start; gap: 8px; }
@@ -218,8 +216,8 @@ form.card { display: grid; align-content: start; gap: 8px; }
 .who em { display: flex; align-items: center; gap: 5px; color: #f2bd58; font-size: 12px; font-style: normal; }
 .who em .ui-icon { width: 15px; height: 15px; }
 .actions { display: flex; gap: 8px; }
-.actions .gold { flex: 1; }
-.actions button:not(.gold) { flex: none; width: 44px; padding: 0; }
+.actions .ui-btn-solid { flex: 1; }
+.actions .ui-btn-sm { flex: none; width: 44px; padding: 0; }
 .rename { display: flex; gap: 6px; }
 .rename input { flex: 1; }
 .empty { display: flex; align-items: center; gap: 10px; padding: 10px 0; color: #9eafc1; font-size: 13px; }

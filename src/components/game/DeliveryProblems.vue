@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import UiButton from '../ui/UiButton.vue';
+import UiInput from '../ui/UiInput.vue';
 import { computed, ref } from 'vue';
 import { INGREDIENTS } from '../../domain/catalog';
 import { CLAIM_PHRASES } from '../../domain/situations/claimPhrases';
@@ -38,15 +40,15 @@ function send(id: string) {
         <em :class="issue.status">{{ STATUS[issue.status] }}</em>
       </div>
       <template v-if="issue.status === 'open'">
-        <button type="button" class="link" @click="open = open === issue.id ? undefined : issue.id">{{ open === issue.id ? 'Close' : 'Tell the supplier' }}</button>
+        <UiButton variant="ghost" size="sm" @click="open = open === issue.id ? undefined : issue.id">{{ open === issue.id ? 'Close' : 'Tell the supplier' }}</UiButton>
         <div v-if="open === issue.id" class="report">
           <div class="ideas">
-            <button v-for="phrase in CLAIM_PHRASES[issue.kind]" :key="phrase" type="button" @click="text[issue.id] = phrase">{{ phrase }}</button>
+            <UiButton variant="secondary" size="sm" v-for="phrase in CLAIM_PHRASES[issue.kind]" :key="phrase" @click="text[issue.id] = phrase">{{ phrase }}</UiButton>
           </div>
           <div class="row">
-            <input v-model="text[issue.id]" type="text" maxlength="200" placeholder="Write it in English…" @keyup.enter="send(issue.id)" />
-            <button type="button" class="speak" aria-label="Listen" :disabled="!text[issue.id]" @click="speak(text[issue.id]!)"><UiIcon name="speaker" /></button>
-            <button type="button" class="send" :disabled="!text[issue.id]?.trim()" @click="send(issue.id)">Send</button>
+            <UiInput v-model="text[issue.id]" type="text" maxlength="200" placeholder="Write it in English…" @keyup.enter="send(issue.id)" />
+            <UiButton variant="secondary" size="sm" aria-label="Listen" :disabled="!text[issue.id]" @click="speak(text[issue.id]!)"><UiIcon name="speaker" /></UiButton>
+            <UiButton variant="primary" :disabled="!text[issue.id]?.trim()" @click="send(issue.id)">Send</UiButton>
           </div>
           <small>Be polite, say what is wrong, and mention a photo or the invoice: it helps. You have two tries and three days.</small>
         </div>
@@ -56,7 +58,7 @@ function send(id: string) {
       <small>SET ASIDE — can not be used</small>
       <div v-for="item in game.quarantine" :key="item.id" class="q-item">
         <span>{{ nameOf(item.ingredientId) }} · {{ item.amount }} · {{ item.kind === 'counterfeit' ? 'not original' : 'past its date' }}</span>
-        <button type="button" @click="game.discardStock(item.id)">Throw away</button>
+        <UiButton variant="secondary" size="sm" @click="game.discardStock(item.id)">Throw away</UiButton>
       </div>
     </div>
   </section>
@@ -73,13 +75,11 @@ function send(id: string) {
 .problem-kind { padding:1px 8px;border-radius:999px;background:#4a3d22;color:#ffe7b0;font-size:10px;font-weight:700; }
 .problem.counterfeit .problem-kind,.problem.expired .problem-kind { background:#5a2326;color:#ffd0d0; }.problem.lost .problem-kind { background:#2b3350;color:#c9d6ff; }
 .problem em { font-style:normal;font-size:11px;color:#c9b88a; }.problem em.refunded,.problem em.replaced { color:#8fe0a8; }.problem em.rejected,.problem em.closed { color:#e49a9a; }
-.link { margin-top:6px;border:0;background:transparent;color:#8fc4ff;font-size:12px;cursor:pointer;text-decoration:underline; }
 .report { display:grid;gap:6px;margin-top:6px; }
-.ideas { display:grid;gap:4px; }.ideas button { padding:5px 8px;border:1px solid #4a3d2a;border-radius:8px;background:#1d1812;color:#e8dcc0;font-size:12px;text-align:left;cursor:pointer; }.ideas button:hover { border-color:#d9b86d; }
+.ideas { display:grid;gap:4px; }
 .row { display:flex;gap:6px; }.row input { flex:1;min-width:0;padding:7px 9px;border:1px solid #4a3d2a;border-radius:8px;background:#14110d;color:#f4ead0;font-size:13px; }
-.row button { padding:6px 12px;border:1px solid #6a5a2c;border-radius:8px;background:#3a3016;color:#ffe6a8;cursor:pointer; }.row button:disabled { opacity:.45;cursor:not-allowed; }.row .speak { width:36px;padding:0; }
+
 .report small { color:#a99a78;font-size:11px; }
 .quarantine { margin-top:10px;padding-top:8px;border-top:1px dashed #4a3d2a; }.quarantine small { color:#d9b86d;font-size:10px;letter-spacing:.08em; }
 .q-item { display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:5px;color:#e8dcc0;font-size:12px; }
-.q-item button { padding:4px 10px;border:1px solid #7a3a3a;border-radius:8px;background:transparent;color:#ffc9c9;cursor:pointer; }
 </style>

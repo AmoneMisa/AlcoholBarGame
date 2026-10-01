@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import UiButton from '../ui/UiButton.vue';
+import UiInput from '../ui/UiInput.vue';
 import { ingredientName as nameOf } from '../../domain/catalog';
 import UiIcon from '../ui/UiIcon.vue';
 import { computed, nextTick, ref, watch } from 'vue';
@@ -21,7 +23,7 @@ const draft = ref('');
 const pending = ref('');
 const waiting = ref(false);
 const log = ref<HTMLElement>();
-const input = ref<HTMLInputElement>();
+const input = ref<{ focus: () => void }>();
 const barName = (id: string) => REGIONS.find((item) => item.id === id)?.name ?? id;
 const swapped = computed(() => new Map((talk.value?.misunderstandings ?? []).flatMap((item) => item.kind === 'product' ? [[item.to, item.from] as const] : [])));
 const done = computed(() => talk.value?.mood === 'done');
@@ -112,15 +114,15 @@ function accept() {
               <span :class="{ on: (chance?.mood ?? 0) > 0, off: (chance?.mood ?? 0) < 0 }" title="How the seller feels">Mood {{ percent(chance?.mood ?? 0) }}</span>
             </div>
             <div class="haggle-price">
-              <button type="button" @click="offer = clampOffer(quote.minOffer)">Min</button>
-              <button type="button" :aria-label="`Lower the offer by ${step} coins`" @click="offer = clampOffer(offer - step)">−{{ step }}</button>
+              <UiButton variant="secondary" size="sm" @click="offer = clampOffer(quote.minOffer)">Min</UiButton>
+              <UiButton variant="secondary" size="sm" :aria-label="`Lower the offer by ${step} coins`" @click="offer = clampOffer(offer - step)">−{{ step }}</UiButton>
               <output>{{ offer.toFixed(2) }}</output>
-              <button type="button" :aria-label="`Raise the offer by ${step} coins`" @click="offer = clampOffer(offer + step)">+{{ step }}</button>
-              <button type="button" @click="offer = clampOffer(quote.goods)">Max</button>
+              <UiButton variant="secondary" size="sm" :aria-label="`Raise the offer by ${step} coins`" @click="offer = clampOffer(offer + step)">+{{ step }}</UiButton>
+              <UiButton variant="secondary" size="sm" @click="offer = clampOffer(quote.goods)">Max</UiButton>
             </div>
             <input v-model.number="offer" class="haggle-slider" type="range" :min="quote.minOffer" :max="quote.goods" step="0.5" aria-label="Your offer for the goods" :style="{ '--fill': `${(offer - quote.minOffer) / Math.max(.01, quote.goods - quote.minOffer) * 100}%` }" />
             <div class="haggle-range"><span>{{ quote.minOffer.toFixed(2) }}</span><span>list {{ quote.goods.toFixed(2) }}</span></div>
-            <button type="button" class="primary-button haggle-offer-button" :disabled="waiting" @click="placeOffer()">Offer <em>{{ offersLeft }}/{{ MAX_OFFERS }}</em></button>
+            <UiButton variant="solid" :disabled="waiting" @click="placeOffer()">Offer <em>{{ offersLeft }}/{{ MAX_OFFERS }}</em></UiButton>
           </section>
           <p v-else-if="agreed" class="haggle-agreed"><UiIcon class="inline-icon" name="check" /> Agreed: {{ talk.agreedGoods!.toFixed(2) }} coins for the goods <em>(−{{ Math.round(quote.discountRate * 100) }}%)</em></p>
           <p v-else class="haggle-agreed failed">No offers left — the list price stays.</p>
@@ -144,12 +146,12 @@ function accept() {
 
       <footer class="haggle-compose">
         <form @submit.prevent="send()">
-          <input ref="input" v-model="draft" type="text" maxlength="240" :disabled="done || agreed || waiting" :placeholder="agreed ? 'The price is agreed.' : done ? 'No offers left.' : 'Write to ' + seller.name + ' in English…'" autocomplete="off" />
-          <button type="submit" class="secondary-button" :disabled="!draft.trim() || done || agreed || waiting">Say</button>
+          <UiInput ref="input" v-model="draft" type="text" maxlength="240" :disabled="done || agreed || waiting" :placeholder="agreed ? 'The price is agreed.' : done ? 'No offers left.' : 'Write to ' + seller.name + ' in English…'" autocomplete="off" />
+          <UiButton variant="primary" type="submit" :disabled="!draft.trim() || done || agreed || waiting">Say</UiButton>
         </form>
         <div class="haggle-actions">
-          <button type="button" class="ghost-button" @click="game.leaveNegotiation()">Leave</button>
-          <button type="button" :class="agreed ? 'primary-button' : 'secondary-button quick-buy'" :disabled="quote.total > game.money" @click="accept()">{{ agreed ? 'Accept deal' : 'Buy at list price' }} · {{ quote.total.toFixed(2) }} coins</button>
+          <UiButton variant="ghost" @click="game.leaveNegotiation()">Leave</UiButton>
+          <UiButton variant="secondary" :class="agreed ? 'primary-button' : 'secondary-button quick-buy'" :disabled="quote.total > game.money" @click="accept()">{{ agreed ? 'Accept deal' : 'Buy at list price' }} · {{ quote.total.toFixed(2) }} coins</UiButton>
         </div>
       </footer>
     </section>
@@ -210,9 +212,6 @@ function accept() {
 .haggle-compose form { display: flex; gap: 8px; }
 .haggle-compose input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid #4a5c75; border-radius: 10px; background: #0a111d; color: #eef1f5; font-size: 13px; }
 .haggle-actions { display: flex; justify-content: flex-end; gap: 8px; }
-.haggle-compose .secondary-button { min-height: 40px; padding: 0 16px; border-radius: 10px; font-weight: 800; cursor: pointer; }
-.ghost-button { min-height: 46px; padding: 9px 14px; border: 1px solid #4a5c75; border-radius: 10px; background: transparent; color: #cfd8e4; font-weight: 800; cursor: pointer; }
-.haggle-popup button:disabled { opacity: .45; cursor: default; }
 .haggle-offer { display: grid; gap: 7px; padding: 10px; border: 1px solid #5d4a2e; border-radius: 12px; background: radial-gradient(120% 90% at 50% 0%, #2c2418, #121821 70%); }
 .haggle-offer > header { display: flex; flex-direction: column; align-items: center; gap: 1px; }
 .haggle-offer > header small { padding: 1px 8px; border-radius: 8px; background: #3a2d1a; color: #f3d38c; font-size: 8px; font-weight: 900; letter-spacing: .12em; }
@@ -227,13 +226,11 @@ function accept() {
 .haggle-bonuses span.on { border-color: #3b8c62; color: #91dbad; }
 .haggle-bonuses span.off { border-color: #98535b; color: #ffb6bd; }
 .haggle-price { display: grid; grid-template-columns: auto auto 1fr auto auto; gap: 4px; }
-.haggle-price button { min-width: 38px; padding: 6px 4px; border: 1px solid #56688a; border-radius: 7px; background: linear-gradient(#22324b, #16223a); color: #dfe6ef; font-size: 10px; font-weight: 800; cursor: pointer; }
 .haggle-price output { display: grid; place-items: center; border: 1px solid #b78649; border-radius: 7px; background: #0b1220; color: #ffe3a3; font-weight: 800; }
 .haggle-slider { width: 100%; height: 6px; appearance: none; -webkit-appearance: none; border-radius: 4px; background: linear-gradient(90deg, #f2c35f var(--fill, 50%), #2a3446 var(--fill, 50%)); cursor: pointer; }
 .haggle-slider::-webkit-slider-thumb { width: 16px; height: 16px; appearance: none; -webkit-appearance: none; border: 2px solid #fff4d2; border-radius: 3px; background: #f2c35f; transform: rotate(45deg); box-shadow: 0 0 8px rgba(242, 195, 95, .7); }
 .haggle-slider::-moz-range-thumb { width: 14px; height: 14px; border: 2px solid #fff4d2; border-radius: 3px; background: #f2c35f; transform: rotate(45deg); }
 .haggle-range { display: flex; justify-content: space-between; color: #8f9bab; font-size: 9px; }
-.haggle-offer-button { min-height: 40px !important; }
 .haggle-offer-button em { margin-left: 6px; padding: 1px 6px; border-radius: 8px; background: rgba(0, 0, 0, .2); font-style: normal; font-size: 10px; }
 .haggle-agreed { margin: 0; padding: 9px; border: 1px solid #3b8c62; border-radius: 10px; background: #12301f; color: #91dbad; font-size: 11px; font-weight: 800; }
 .haggle-agreed.failed { border-color: #98535b; background: #32191e; color: #ffb6bd; }
@@ -251,6 +248,6 @@ function accept() {
   .haggle-log { min-height: 180px; }
   .haggle-deal { border-top: 1px solid #34435a; border-left: 0; }
   .haggle-actions button { flex: 1; }
-  .haggle-actions .primary-button { flex: 2; }
+    .haggle-actions .ui-btn-solid { flex: 2; }
 }
 </style>

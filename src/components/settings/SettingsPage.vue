@@ -1,26 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { musicOn, musicVolume, sfxOn, sfxVolume, speechOn, speechVolume, voiceMode } from '../../audio/index';
+import { voiceMode } from '../../audio/index';
 import { APP_BUILT, APP_VERSION, formatBuilt } from '../../version';
 import OptionSelect from '../game/OptionSelect.vue';
-import UiIcon from '../ui/UiIcon.vue';
+import UiButton from '../ui/UiButton.vue';
+import SoundControls from './SoundControls.vue';
 
 // Everything the player sets once and rarely touches again: sound, guest voices, help and the version of the game.
 const emit = defineEmits<{ goto: [view: string] }>();
-const percent = (value: number) => `${Math.round(value * 100)}%`;
-// Dragging a slider up from zero also turns that channel back on.
-function setVolume(channel: 'music' | 'sfx' | 'speech', event: Event) {
-  const value = Number((event.target as HTMLInputElement).value) / 100;
-  if (channel === 'music') { musicVolume.value = value; if (value > 0) musicOn.value = true; }
-  else if (channel === 'sfx') { sfxVolume.value = value; if (value > 0) sfxOn.value = true; }
-  else { speechVolume.value = value; if (value > 0) speechOn.value = true; }
-}
-const channels = computed(() => [
-  { id: 'music' as const, label: 'Music', icon: 'music', on: musicOn.value, volume: musicVolume.value },
-  { id: 'sfx' as const, label: 'Effects', icon: 'speaker', on: sfxOn.value, volume: sfxVolume.value },
-  { id: 'speech' as const, label: 'English voice', icon: 'chat', on: speechOn.value, volume: speechVolume.value }
-]);
-const toggle = (id: 'music' | 'sfx' | 'speech') => { if (id === 'music') musicOn.value = !musicOn.value; else if (id === 'sfx') sfxOn.value = !sfxOn.value; else speechOn.value = !speechOn.value; };
 const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.dispatchEvent(new Event('barlingo:tour')), 250); };
 </script>
 
@@ -31,12 +17,7 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
     <section class="settings-card">
       <h3>Sound</h3>
       <div class="volume-panel static">
-        <div v-for="channel in channels" :key="channel.id" class="volume-row" :class="{ off: !channel.on }">
-          <span :id="`settings-${channel.id}`"><UiIcon :name="channel.icon" /> {{ channel.label }}</span>
-          <input type="range" min="0" max="100" step="5" :aria-labelledby="`settings-${channel.id}`" :value="Math.round(channel.volume * 100)" :style="{ '--fill': percent(channel.volume) }" :aria-valuetext="channel.on ? percent(channel.volume) : 'Muted'" @input="setVolume(channel.id, $event)" />
-          <output>{{ channel.on ? percent(channel.volume) : 'Off' }}</output>
-          <button type="button" :aria-pressed="!channel.on" :aria-label="`Mute ${channel.label.toLowerCase()}`" @click="toggle(channel.id)">{{ channel.on ? 'Mute' : 'Unmute' }}</button>
-        </div>
+        <SoundControls id-prefix="settings" />
       </div>
     </section>
 
@@ -49,7 +30,7 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
     <section class="settings-card">
       <h3>Help</h3>
       <p>The tour shows the main parts of the game step by step. You can skip any step and replay it whenever you like.</p>
-      <button type="button" class="settings-button-main" @click="replayTour"><UiIcon name="help" /><span>How to play (replay the tour)</span></button>
+      <UiButton variant="primary" icon="help" @click="replayTour">How to play (replay the tour)</UiButton>
     </section>
 
     <section class="settings-card">
@@ -67,6 +48,4 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
 .settings-card h3 { margin: 0; font-size: 15px; }
 .settings-card p { margin: 0; color: #aebdce; font-size: 13px; line-height: 1.45; }
 .settings-card :deep(.opt-label) { display: none; }
-.settings-card > button { justify-self: start; padding-inline: 18px; border: 1px solid #a97938; border-radius: 10px; background: #5f3d1c; color: #ffe9bd; font-weight: 800; font-size: 14px; cursor: pointer; }
-.settings-card > button:hover { background: #7a4d12; }
 </style>
