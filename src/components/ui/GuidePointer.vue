@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiIcon from './UiIcon.vue';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { guide, pickPointer, wording, type Gesture } from '../../guide/pointer';
 
@@ -25,7 +26,7 @@ function refresh() {
     if (box.right > view.right + 2 || box.left < view.left - 2) {
       const right = box.right > view.right;
       const arrow = shelf.closest('.pshelf-row')?.querySelectorAll<HTMLElement>('.shelf-nudge button')[right ? 1 : 0];
-      if (arrow) { element = arrow; box = arrow.getBoundingClientRect(); gesture = 'swipe'; label = `Swipe the shelf ${right ? 'left' : 'right'} (or {tap} ${right ? '›' : '‹'}) to find the bottle`; }
+      if (arrow) { element = arrow; box = arrow.getBoundingClientRect(); gesture = 'swipe'; label = `Swipe the shelf ${right ? 'left' : 'right'} (or {tap} the ${right ? 'right' : 'left'} arrow) to find the bottle`; }
     }
   }
   const start = center(box);
@@ -42,7 +43,7 @@ function refresh() {
 }
 
 const style = computed(() => drawn.value ? { left: `${drawn.value.x}px`, top: `${drawn.value.y}px`, '--size': `${drawn.value.size}px`, '--dx': `${drawn.value.dx}px`, '--dy': `${drawn.value.dy}px` } : {});
-const hand = computed(() => drawn.value?.gesture === 'type' ? '⌨️' : '👆');
+const hand = computed(() => drawn.value?.gesture === 'type' ? 'keyboard' : 'pointer');
 
 onMounted(() => { refresh(); timer = setInterval(refresh, 180); window.addEventListener('resize', refresh); });
 onBeforeUnmount(() => { if (timer) clearInterval(timer); window.removeEventListener('resize', refresh); });
@@ -52,7 +53,7 @@ onBeforeUnmount(() => { if (timer) clearInterval(timer); window.removeEventListe
   <div v-if="drawn" :key="drawn.key" class="guide-pointer" :class="drawn.gesture" :style="style" aria-hidden="true">
     <i class="gp-ring" />
     <svg v-if="drawn.gesture === 'drag'" class="gp-path" width="1" height="1" overflow="visible"><line x1="0" y1="0" :x2="drawn.dx" :y2="drawn.dy" /></svg>
-    <span class="gp-hand">{{ hand }}</span>
+    <span class="gp-hand"><UiIcon :name="hand" /></span>
     <b class="gp-label" :class="{ below: drawn.labelBelow }" :style="{ marginLeft: `${drawn.labelLeft - drawn.x}px` }">{{ drawn.label }}</b>
   </div>
 </template>
@@ -60,7 +61,8 @@ onBeforeUnmount(() => { if (timer) clearInterval(timer); window.removeEventListe
 <style scoped>
 .guide-pointer { position: fixed; z-index: 450; width: 0; height: 0; pointer-events: none; }
 .gp-ring { position: absolute; left: calc(var(--size) / -2); top: calc(var(--size) / -2); width: var(--size); height: var(--size); border-radius: 50%; border: 3px solid #ffd35a; box-shadow: 0 0 0 4px rgba(255, 211, 90, .25), 0 0 18px rgba(255, 211, 90, .8); animation: gp-pulse 1.3s ease-out infinite; }
-.gp-hand { position: absolute; left: -6px; top: -4px; font-size: 30px; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }
+.gp-hand .ui-icon { width: 30px; height: 30px; }
+.gp-hand { position: absolute; left: -6px; top: -4px; width: 30px; height: 30px; color: #fff3dc; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }
 .guide-pointer.tap .gp-hand { animation: gp-tap 1.3s ease-in-out infinite; }
 .guide-pointer.drag .gp-hand { animation: gp-drag 2.2s ease-in-out infinite; }
 .guide-pointer.swipe .gp-hand { animation: gp-drag 1.6s ease-in-out infinite; }

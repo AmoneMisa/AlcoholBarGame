@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiIcon from './UiIcon.vue';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { setPointer, selector, type PointerSpec } from '../../guide/pointer';
 import { useGameStore } from '../../stores/game';
@@ -39,7 +40,7 @@ const STEPS: Step[] = [
   { id: 'mix', title: 'Make the drink', text: 'When you know the order, close the conversation and build the drink: pull a bottle down to the glass and hold to pour, then shake and serve.', view: 'service',
     action: 'Drag a bottle onto the glass and hold to pour.',
     point: [
-      { target: selector('talk-close'), gesture: 'tap', label: '{Tap} ✕ to go back to the bar', when: () => shown('.talk-popup') },
+      { target: selector('talk-close'), gesture: 'tap', label: '{Tap} the close button to go back to the bar', when: () => shown('.talk-popup') },
       { target: '.pshelf-bottles button:not(.empty)', to: selector('glass'), gesture: 'drag', label: 'Drag a bottle onto the glass and hold to pour' }
     ], until: () => game.currentMix.length > 0 },
   { id: 'care', title: 'Look after your guests', text: 'Guests are people. Bring water or an ashtray, call a taxi, offer a snack or another drink (you will see the chance of a yes), and solve problems: a card that does not work, a broken glass, a person who feels ill.', tips: ['Every answer in a situation is a real English sentence.', 'Be kind, but firm with drunk or rude guests.'] },
@@ -118,10 +119,10 @@ onBeforeUnmount(() => {
     <div v-if="rect" class="tour-spot" :style="{ top: rect.top + 'px', left: rect.left + 'px', width: rect.width + 'px', height: rect.height + 'px' }" />
     <div v-else-if="!step.point" class="tour-dim" />
     <section class="tour-card" :class="{ top: (!!rect && rect.top > 260) || !!step.point }">
-      <header><small>Step {{ index + 1 }} of {{ STEPS.length }}</small><button type="button" class="tour-skip" @click="finish('skipped')">Skip tour ✕</button></header>
+      <header><small>Step {{ index + 1 }} of {{ STEPS.length }}</small><button type="button" class="tour-skip" @click="finish('skipped')">Skip tour <UiIcon class="inline-icon" name="close" /></button></header>
       <h3>{{ step.title }}</h3>
       <p>{{ step.text }}</p>
-      <p v-if="step.action" class="tour-action">👉 {{ step.action }}</p>
+      <p v-if="step.action" class="tour-action"><UiIcon class="inline-icon" name="pointer" /> {{ step.action }}</p>
       <ul v-if="step.tips?.length"><li v-for="tip in step.tips" :key="tip">{{ tip }}</li></ul>
       <div class="tour-dots" aria-hidden="true"><i v-for="(item, at) in STEPS" :key="item.id" :class="{ on: at === index, past: at < index }" /></div>
       <footer>

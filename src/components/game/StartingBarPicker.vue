@@ -27,7 +27,7 @@ function start() { game.chooseStartingBar(picked.value); }
           <span class="starting-bar-copy"><small>{{ region.name }}</small><b>{{ game.bars[region.id].name }}</b><em>{{ region.tagline }}</em><i>{{ pricing(region.marketFactor) }} · {{ region.marketFactor.toFixed(2) }}×</i></span>
         </button>
       </div>
-      <footer><button type="button" class="primary-button" @click="start">Open my bar in {{ REGIONS.find((region) => region.id === picked)?.name }}</button></footer>
+      <footer><button type="button" class="primary-button" @click="start">Open {{ REGIONS.find((region) => region.id === picked)?.name }}</button></footer>
     </div>
   </div>
 </template>

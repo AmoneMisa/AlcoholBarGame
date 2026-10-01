@@ -5,10 +5,10 @@ import type { PlayerState } from '../sim/state';
 // (vite dev + server with ALLOW_DEV_LOGIN=true) a per-browser dev id is used instead.
 
 export interface ServerResult { ok: boolean; state?: PlayerState; serverTime?: number; message?: string; error?: string; }
-export interface SessionResult { ok: true; player: { id: number; name: string; friendCode: string }; state: PlayerState; starterPackAvailable?: boolean; serverTime: number; }
-export interface FriendSummary { id:number; code:string; nickname:string; customName:string; status:'pending'|'accepted'; direction:'incoming'|'outgoing' }
-export interface FriendBar { id:number; code:string; nickname:string; customName:string; name:string; level:number; regionId:string; bar:Record<string,unknown>; recipes:number; interiors:number; mastered:{name:string;level:number}[] }
-export interface SocialResult { ok:boolean; error?:string; message?:string; state?:PlayerState; friendCode?:string; friends?:FriendSummary[]; friend?:FriendBar; rewarded?:boolean }
+export interface SessionResult { ok: true; player: { id: number; name: string; friendCode: string }; state: PlayerState; starterPackAvailable?: boolean; received?: string[]; serverTime: number; }
+export interface FriendSummary { id:number; code:string; nickname:string; customName:string; status:'pending'|'accepted'; direction:'incoming'|'outgoing'; level:number; prestige:number; barName:string; visitedToday:boolean }
+export interface FriendBar { id:number; code:string; nickname:string; customName:string; name:string; level:number; prestige:number; regionId:string; bar:Record<string,any>; recipes:number; interiors:number; mastered:{name:string;level:number}[] }
+export interface SocialResult { ok:boolean; error?:string; message?:string; state?:PlayerState; serverTime?:number; friendCode?:string; prestige?:number; pendingGifts?:number; received?:string[]; friends?:FriendSummary[]; friend?:FriendBar; rewarded?:boolean }
 
 function authHeaders(): Record<string, string> {
   const initData = window.Telegram?.WebApp?.initData;
@@ -41,6 +41,8 @@ export const createStarInvoice = (packId: string) => post<{ ok: boolean; url?: s
 export const fetchFriends = () => post<SocialResult>('/api/friends', {});
 export const requestFriend = (code:string) => post<SocialResult>('/api/friends/add', { code });
 export const answerFriendRequest = (code:string, accept:boolean) => post<SocialResult>('/api/friends/answer', { code, accept });
+export const removeFriendLink = (code:string) => post<SocialResult>('/api/friends/remove', { code });
+export const claimFriendGifts = () => post<SocialResult>('/api/friends/claim', {});
 export const saveFriendLabel = (code:string, label:string) => post<SocialResult>('/api/friends/label', { code, label });
 export const visitFriendBar = (code:string) => post<SocialResult>('/api/friends/visit', { code });
 export const sendFriendGift = (code:string, gift:unknown) => post<SocialResult>('/api/friends/gift', { code, gift });

@@ -124,7 +124,7 @@ function when(at: number) {
         <div><dt>Words known</dt><dd>{{ knownCount }}<span>/ {{ vocabulary.length }}</span></dd><i :style="{ width: knownCount / Math.max(1, vocabulary.length) * 100 + '%' }"></i></div>
         <div><dt>Saved words</dt><dd>{{ learning.savedWords.length }}</dd></div>
         <div><dt>Correct sentences</dt><dd>{{ learning.correctSentences.length }}</dd></div>
-        <div v-if="topMistake" class="stat-focus"><dt>Practise next</dt><dd><button type="button" @click="openRule(topMistake.id)">{{ topMistake.title }} →</button></dd></div>
+        <div v-if="topMistake" class="stat-focus"><dt>Practise next</dt><dd><button type="button" @click="openRule(topMistake.id)">{{ topMistake.title }} <UiIcon class="inline-icon" name="arrow-right" /></button></dd></div>
       </dl>
     </header>
 
@@ -148,12 +148,12 @@ function when(at: number) {
       <div class="daily-lesson-progress" :style="{ '--daily-progress': `${game.dailyLessonCompletedIds.length / game.dailyLessons.length * 100}%` }"><span>{{ game.dailyLessonCompletedIds.length }} / {{ game.dailyLessons.length }} complete</span><i></i></div>
       <div class="daily-lesson-grid">
         <article v-for="(lesson,index) in game.dailyLessons" :key="lesson.id" class="daily-lesson-card" :class="{ complete: lessonDone(lesson.id) }">
-          <header><span>{{ index + 1 }}</span><div><small>{{ lesson.kind }}</small><b>{{ lesson.prompt }}</b></div><em v-if="lessonDone(lesson.id)">✓ DONE</em></header>
+          <header><span>{{ index + 1 }}</span><div><small>{{ lesson.kind }}</small><b>{{ lesson.prompt }}</b></div><em v-if="lessonDone(lesson.id)"><UiIcon class="inline-icon" name="check" /> DONE</em></header>
           <div class="daily-choices">
             <button v-for="choice in lesson.choices" :key="choice" type="button" :class="{ selected: dailyChoice[lesson.id] === choice }" :disabled="lessonDone(lesson.id)" @click="dailyChoice[lesson.id] = choice">{{ choice }}</button>
           </div>
           <p v-if="lessonDone(lesson.id)" class="daily-explanation">{{ lesson.explanation }}</p>
-          <footer><span>+{{ Math.round(lesson.xp * (1 + game.learningBonusPercent / 100)) }} XP · +{{ Math.round(lesson.crystals * (1 + game.learningBonusPercent / 100)) }} ◆</span><button type="button" :disabled="lessonDone(lesson.id) || !dailyChoice[lesson.id]" @click="submitDailyLesson(lesson.id)">{{ lessonDone(lesson.id) ? 'Reward claimed' : 'Check answer' }}</button></footer>
+          <footer><span>+{{ Math.round(lesson.xp * (1 + game.learningBonusPercent / 100)) }} XP · +{{ Math.round(lesson.crystals * (1 + game.learningBonusPercent / 100)) }} <UiIcon class="inline-icon" name="crystal" /></span><button type="button" :disabled="lessonDone(lesson.id) || !dailyChoice[lesson.id]" @click="submitDailyLesson(lesson.id)">{{ lessonDone(lesson.id) ? 'Reward claimed' : 'Check answer' }}</button></footer>
         </article>
       </div>
       <p class="daily-result" aria-live="polite">{{ game.dailyLessonResult }}</p>
@@ -164,7 +164,7 @@ function when(at: number) {
       <div class="learning-filters">
         <button type="button" :class="{ active: topic === 'all' }" @click="topic = 'all'">All</button>
         <button v-for="item in topics" :key="item" type="button" :class="{ active: topic === item }" @click="topic = item">{{ item }}</button>
-        <button type="button" :class="{ active: topic === 'saved' }" @click="topic = 'saved'">★ Saved ({{ learning.savedWords.length }})</button>
+        <button type="button" :class="{ active: topic === 'saved' }" @click="topic = 'saved'"><UiIcon class="inline-icon" name="star-fill" /> Saved ({{ learning.savedWords.length }})</button>
         <input v-model="search" type="search" placeholder="Search a word or meaning…" aria-label="Search words" />
       </div>
       <div class="vocab-grid">
@@ -180,13 +180,13 @@ function when(at: number) {
             <template v-if="entry.opposite"><dt>≠</dt><dd>{{ entry.opposite }}</dd></template>
             <template v-if="entry.related?.length"><dt>≈</dt><dd>{{ entry.related.join(', ') }}</dd></template>
           </dl>
-          <p v-if="entry.note" class="vocab-note">💡 {{ entry.note }}</p>
+          <p v-if="entry.note" class="vocab-note"><UiIcon class="inline-icon" name="bulb" /> {{ entry.note }}</p>
           <footer>
-            <button type="button" :class="{ on: learning.savedWords.includes(entry.word) }" @click="learning.toggleSaved(entry.word)">{{ learning.savedWords.includes(entry.word) ? '★ Saved' : '☆ Save' }}</button>
-            <button type="button" :class="{ on: learning.knownWords.includes(entry.word) }" @click="learning.toggleKnown(entry.word)">{{ learning.knownWords.includes(entry.word) ? '✓ I know it' : 'Mark as known' }}</button>
+            <button type="button" :class="{ on: learning.savedWords.includes(entry.word) }" @click="learning.toggleSaved(entry.word)">{{ learning.savedWords.includes(entry.word) ? 'Saved' : 'Save' }}</button>
+            <button type="button" :class="{ on: learning.knownWords.includes(entry.word) }" @click="learning.toggleKnown(entry.word)">{{ learning.knownWords.includes(entry.word) ? 'I know it' : 'Mark as known' }}</button>
           </footer>
         </article>
-        <p v-if="!words.length" class="learning-empty">{{ topic === 'saved' ? 'No saved words yet. Tap ☆ on a word — or tap an underlined word in a conversation.' : 'No words match your search.' }}</p>
+        <p v-if="!words.length" class="learning-empty">{{ topic === 'saved' ? 'No saved words yet. Tap the star on a word — or tap an underlined word in a conversation.' : 'No words match your search.' }}</p>
       </div>
     </div>
 
@@ -196,7 +196,7 @@ function when(at: number) {
       <section v-for="group in phraseGroups" :key="group.id" class="phrase-group">
         <header><span class="job-tag" :class="group.context">{{ CONTEXT_LABEL[group.context] }}</span><span class="phrase-progress">{{ group.lessons.filter((lesson) => learning.usedPhrases.includes(lesson.text)).length }} / {{ group.lessons.length }} used with customers</span><h3>{{ group.title }}</h3><p>{{ group.goal }}</p></header>
         <article v-for="lesson in group.lessons" :key="lesson.text" class="phrase-card" :class="{ used: learning.usedPhrases.includes(lesson.text) }">
-          <p v-if="learning.usedPhrases.includes(lesson.text)" class="phrase-used">✓ You used this with a customer</p>
+          <p v-if="learning.usedPhrases.includes(lesson.text)" class="phrase-used"><UiIcon class="inline-icon" name="check" /> You used this with a customer</p>
           <div class="phrase-line">
             <span v-for="(part, index) in lesson.parts" :key="index" class="phrase-part" :class="`role-${part.role}`"><b>{{ part.text }}</b><small>{{ ROLE_LABEL[part.role] }}</small></span>
             <button type="button" class="speak-button" aria-label="Listen" @click="speak(lesson.text)"><UiIcon name="speaker" /></button>
@@ -213,7 +213,7 @@ function when(at: number) {
     <div v-else-if="tab === 'grammar'" class="learning-body">
       <div class="learning-filters">
         <button type="button" :class="{ active: ruleGroup === 'all' }" @click="ruleGroup = 'all'">All rules</button>
-        <button v-if="Object.keys(learning.ruleCounts).length" type="button" :class="{ active: ruleGroup === 'focus' }" @click="ruleGroup = 'focus'">🎯 My focus</button>
+        <button v-if="Object.keys(learning.ruleCounts).length" type="button" :class="{ active: ruleGroup === 'focus' }" @click="ruleGroup = 'focus'">My focus</button>
         <button v-for="group in RULE_GROUPS" :key="group" type="button" :class="{ active: ruleGroup === group }" @click="ruleGroup = group">{{ group }}</button>
       </div>
       <div class="rule-grid">
@@ -222,7 +222,7 @@ function when(at: number) {
           <p>{{ rule.explain }}</p>
           <p v-if="rule.pattern" class="rule-pattern"><span>Pattern</span>{{ rule.pattern }}</p>
           <div v-for="example in rule.examples" :key="example.wrong" class="rule-example"><s>{{ example.wrong }}</s><b>{{ example.right }}</b></div>
-          <p class="rule-tip">💡 {{ rule.tip }}</p>
+          <p class="rule-tip"><UiIcon class="inline-icon" name="bulb" /> {{ rule.tip }}</p>
         </article>
       </div>
     </div>
@@ -270,7 +270,7 @@ function when(at: number) {
         <li v-for="item in learning.mistakes" :key="item.at + item.rule">
           <div class="mistake-sentences"><s>{{ item.sentence }}</s><b>{{ item.corrected }}</b></div>
           <p>{{ item.message }}</p>
-          <footer><button type="button" @click="openRule(item.rule)">{{ RULES[item.rule].title }} — read the rule →</button><time>{{ when(item.at) }}</time></footer>
+          <footer><button type="button" @click="openRule(item.rule)">{{ RULES[item.rule].title }} — read the rule <UiIcon class="inline-icon" name="arrow-right" /></button><time>{{ when(item.at) }}</time></footer>
         </li>
       </ul>
     </div>
@@ -288,11 +288,11 @@ function when(at: number) {
         </template>
         <em v-else>Tap to see the meaning</em>
       </div>
-      <p v-else class="learning-empty">🎉 You marked every word as known. Great work!</p>
+      <p v-else class="learning-empty">You marked every word as known. Great work!</p>
       <div v-if="card" class="practice-actions">
         <button type="button" class="secondary-button listen-button" @click="speak(card.word)"><UiIcon name="speaker" />Listen</button>
         <button type="button" class="secondary-button" @click="nextCard(false)">Again later</button>
-        <button type="button" class="primary-button" :disabled="!revealed" @click="nextCard(true)">I knew it ✓</button>
+        <button type="button" class="primary-button" :disabled="!revealed" @click="nextCard(true)">I knew it <UiIcon class="inline-icon" name="check" /></button>
       </div>
       <p class="practice-count">{{ deck.length }} words left to learn</p>
     </div>

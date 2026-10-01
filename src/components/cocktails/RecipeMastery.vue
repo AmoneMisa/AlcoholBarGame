@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiIcon from '../ui/UiIcon.vue';
 import { computed } from 'vue';
 import { RECIPES } from '../../domain/catalog';
 import { recipePurchase } from '../../domain/economy';
@@ -44,7 +45,7 @@ const pct = (value: number) => `+${Math.round((value - 1) * 100)}%`;
     <p v-else-if="!next" class="mastery-max">Top level reached.</p>
     <footer>
       <span>Duplicate cards can upgrade this recipe or be gifted.</span>
-      <button type="button" class="secondary-button" :disabled="sparePrice.currency === 'coins' ? game.money < sparePrice.amount : game.crystals < sparePrice.amount" @click="game.buyRecipe(recipe.id)">Get another card · {{ sparePrice.currency === 'coins' ? '' : '◆ ' }}{{ sparePrice.amount }}{{ sparePrice.currency === 'coins' ? ' coins' : '' }}</button>
+      <button type="button" class="secondary-button" :disabled="sparePrice.currency === 'coins' ? game.money < sparePrice.amount : game.crystals < sparePrice.amount" @click="game.buyRecipe(recipe.id)">Get another card · <UiIcon v-if="sparePrice.currency !== 'coins'" class="inline-icon" name="crystal" /> {{ sparePrice.amount }}{{ sparePrice.currency === 'coins' ? ' coins' : '' }}</button>
     </footer>
   </section>
 </template>

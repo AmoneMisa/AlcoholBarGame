@@ -69,14 +69,14 @@ onUnmounted(() => {
         <button class="exchange-open" type="button" :aria-expanded="exchangeOpen" aria-label="Convert crystals to coins" @click="exchangeOpen = !exchangeOpen"><UiIcon name="crystal" /><span><small>CRYSTALS</small><b>{{ game.crystals.toLocaleString('en-US') }}</b></span></button>
         <PopoverPanel v-if="exchangeOpen" class="currency-exchange" eyebrow="CRYSTALS" title="Get and use crystals" close-label="Close exchange" @close="exchangeOpen = false">
           <h4 class="crystal-shop-title">Buy with Telegram Stars</h4>
-          <button v-for="pack in STAR_CRYSTAL_PACKS.filter((item) => !item.once || game.starterPackAvailable)" :key="pack.id" type="button" class="star-pack" :disabled="game.buyingCrystals" @click="buyPack(pack.id)"><span><UiIcon name="crystal" /><b>{{ pack.crystals.toLocaleString('en-US') }}</b></span><i>→</i><span><b>{{ pack.stars }}</b> ⭐</span><em v-if="pack.once">One-time offer</em></button>
+          <button v-for="pack in STAR_CRYSTAL_PACKS.filter((item) => !item.once || game.starterPackAvailable)" :key="pack.id" type="button" class="star-pack" :disabled="game.buyingCrystals" @click="buyPack(pack.id)"><span><UiIcon name="crystal" /><b>{{ pack.crystals.toLocaleString('en-US') }}</b></span><i><UiIcon name="arrow-right" /></i><span><b>{{ pack.stars }}</b> <UiIcon class="inline-icon" name="star" /></span><em v-if="pack.once">One-time offer</em></button>
           <h4 class="crystal-shop-title">Exchange for coins</h4>
           <p>This exchange only works from crystals to coins and cannot be reversed.</p>
-          <button v-for="bundle in CRYSTAL_EXCHANGE_BUNDLES" :key="bundle.crystals" type="button" :disabled="game.crystals < bundle.crystals" @click="exchange(bundle.crystals)"><span><UiIcon name="crystal" /><b>{{ bundle.crystals }}</b></span><i>→</i><span><UiIcon name="coin" /><b>{{ bundle.coins.toLocaleString('en-US') }}</b></span></button>
+          <button v-for="bundle in CRYSTAL_EXCHANGE_BUNDLES" :key="bundle.crystals" type="button" :disabled="game.crystals < bundle.crystals" @click="exchange(bundle.crystals)"><span><UiIcon name="crystal" /><b>{{ bundle.crystals }}</b></span><i><UiIcon name="arrow-right" /></i><span><UiIcon name="coin" /><b>{{ bundle.coins.toLocaleString('en-US') }}</b></span></button>
         </PopoverPanel>
       </div>
       <div class="academy-resource">
-        <button class="staff-open" data-guide="academy" type="button" :aria-expanded="academyOpen" aria-label="Open the training academy" @click="academyOpen = !academyOpen"><span class="staff-icons"><i class="hired">🎓</i></span><span><small>TRAINING</small><b>{{ lessonsLeft ? `${lessonsLeft} to do` : 'All done' }}</b></span></button>
+        <button class="staff-open" data-guide="academy" type="button" :aria-expanded="academyOpen" aria-label="Open the training academy" @click="academyOpen = !academyOpen"><span class="staff-icons"><i class="hired"><UiIcon name="cap" /></i></span><span><small>TRAINING</small><b>{{ lessonsLeft ? `${lessonsLeft} to do` : 'All done' }}</b></span></button>
         <AcademyPanel v-if="academyOpen" @close="academyOpen = false" @goto="(view) => $emit('goto', view)" />
       </div>
       <div class="staff-resource">
@@ -91,7 +91,7 @@ onUnmounted(() => {
           </article>
         </PopoverPanel>
       </div>
-      <button class="daily-hud-gift" type="button" :disabled="!game.dailyGiftAvailable" @click="game.claimDailyGift()"><UiIcon name="gift" /><span><small>LOGIN STREAK {{ game.upcomingLoginDay }}</small><b>{{ game.dailyGiftAvailable ? `+${game.dailyCoinReward}${game.dailyCrystalReward ? ` · ◆${game.dailyCrystalReward}` : ''}` : 'Claimed' }}</b></span></button>
+      <button class="daily-hud-gift" :class="{ ready: game.dailyGiftAvailable }" type="button" :aria-expanded="game.dailyOpen" aria-label="Daily reward and login streak" @click="game.dailyOpen = true"><UiIcon name="gift" /><span><small>DAY {{ game.dailyGiftAvailable ? game.upcomingLoginDay : game.loginStreak }}</small><b>{{ game.dailyGiftAvailable ? 'Claim' : 'Done' }}</b></span></button>
       <div class="sound-resource">
         <button class="sound-open" type="button" :class="{ off: soundSilent }" :aria-expanded="volumeOpen" :aria-label="`Sound: ${soundSummary}. Open volume settings`" @click="volumeOpen = !volumeOpen"><UiIcon :name="soundSilent ? 'speaker-off' : 'speaker'" /><span><small>SOUND</small><b>{{ soundSummary }}</b></span></button>
         <PopoverPanel v-if="volumeOpen" class="volume-panel" eyebrow="SOUND" title="Volume" close-label="Close volume settings" @close="volumeOpen = false">
@@ -113,7 +113,7 @@ onUnmounted(() => {
             <output>{{ speechOn ? percent(speechVolume) : 'Off' }}</output>
             <button type="button" :aria-pressed="!speechOn" aria-label="Mute English voice" @click="speechOn = !speechOn">{{ speechOn ? 'Mute' : 'Unmute' }}</button>
           </div>
-          <button type="button" class="how-to-play" @click="volumeOpen = false; startTour()">❔ How to play (replay the tour)</button>
+          <button type="button" class="how-to-play" @click="volumeOpen = false; startTour()"><UiIcon class="inline-icon" name="help" /> How to play (replay the tour)</button>
           <div class="volume-row voice-mode">
             <span id="voice-mode"><UiIcon name="chat" /> Guest voices</span>
             <select aria-labelledby="voice-mode" v-model="voiceMode"><option value="murmur">Murmur</option><option value="speech">Read aloud</option><option value="off">Off</option></select>

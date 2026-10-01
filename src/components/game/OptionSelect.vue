@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiIcon from '../ui/UiIcon.vue';
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 
 export interface SelectOption { value: string; label: string; locked?: boolean }
@@ -34,17 +35,17 @@ onBeforeUnmount(() => document.body.classList.remove('opt-sheet-open'));
   <div class="opt-select">
     <span class="opt-label">{{ label }}</span>
     <button ref="trigger" type="button" class="opt-trigger" aria-haspopup="listbox" :aria-expanded="open" :aria-label="`${label}: ${current}`" @click="open = true">
-      <span>{{ current }}</span><i aria-hidden="true">▾</i>
+      <span>{{ current }}</span><i aria-hidden="true"><UiIcon name="chevron-down" /></i>
     </button>
     <!-- Rendered on <body>: the design panel clips overflow and the bottom navigation would hide a dropdown. -->
     <Teleport to="body">
       <div v-if="open" class="opt-backdrop" @pointerdown.self="close()" @keydown="onKey">
         <div ref="list" class="opt-sheet" role="listbox" :aria-label="label">
-          <header><b>{{ label }}</b><button type="button" class="opt-close" aria-label="Close" @click="close()">✕</button></header>
+          <header><b>{{ label }}</b><button type="button" class="opt-close" aria-label="Close" @click="close()"><UiIcon name="close" /></button></header>
           <ul>
             <li v-for="option in options" :key="option.value" role="option" :aria-selected="option.value === modelValue" :aria-disabled="option.locked || undefined">
               <button type="button" :disabled="option.locked" :class="{ selected: option.value === modelValue }" @click="choose(option)">
-                <span>{{ option.label }}</span><em v-if="option.locked">🔒 Locked</em><em v-else-if="option.value === modelValue">✓</em>
+                <span>{{ option.label }}</span><em v-if="option.locked"><UiIcon class="inline-icon" name="lock" /> Locked</em><em v-else-if="option.value === modelValue"><UiIcon name="check" /></em>
               </button>
             </li>
           </ul>

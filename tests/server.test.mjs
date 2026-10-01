@@ -32,24 +32,44 @@ function makeService(now = () => Date.now()) {
   return { repository, service: createGameService({ repository, checkEnglish, now }) };
 }
 
-test('A duplicate roulette cosmetic is transferred to another real player account', async () => {
-  const { repository,service } = makeService(() => Date.UTC(2026,8,30));
-  const senderIdentity = identity(301);
-  const recipientIdentity = identity(302);
-  const sender = await service.session(senderIdentity);
-  const recipient = await service.session(recipientIdentity);
+test('Friends: unique codes, approval, a visit pays prestige, and gifts only travel during a visit', async () => {
+  const { repository, service } = makeService(() => Date.UTC(2026,8,30));
+  const ana = identity(301), ben = identity(302);
+  const a = await service.session(ana), b = await service.session(ben);
+  assert.notEqual(a.player.friendCode, b.player.friendCode);
+  assert.match(a.player.friendCode, /^[0-9A-Z]{4}-[0-9A-Z]{4}$/);
+  assert.equal((await service.addFriend(ana, a.player.friendCode)).status, 409, 'not your own code');
+  assert.equal((await service.addFriend(ana, '1234-5678')).status, 409, 'bad check character');
+  assert.equal((await service.addFriend(ana, b.player.friendCode.toLowerCase())).status, 200, 'codes ignore case');
+  assert.equal((await service.addFriend(ana, b.player.friendCode)).status, 409, 'no second request');
+  assert.equal((await service.visitFriend(ana, b.player.friendCode)).status, 403, 'visiting needs approval');
+  assert.equal((await service.answerFriend(ben, a.player.friendCode, true)).status, 200);
+
   const cosmetic = COSMETICS[0];
-  const row = repository.states.get(sender.player.id);
+  const row = repository.states.get(a.player.id);
   row.state.ownedCosmeticIds.push(cosmetic.id);
   row.state.cosmeticCopies[cosmetic.id] = 1;
-  repository.states.set(sender.player.id,row);
-  const sent = await act(service,{type:'giftCosmetic',cosmeticId:cosmetic.id,recipient:String(recipient.player.id)},requestId(),senderIdentity);
-  assert.equal(sent.ok,true);
-  assert.equal(sent.state.cosmeticCopies[cosmetic.id],0);
-  const received = await service.session(recipientIdentity);
-  assert.ok(received.state.ownedCosmeticIds.includes(cosmetic.id));
-  assert.match(received.state.message,/gave you/i);
+  const early = await service.sendGift(ana, b.player.friendCode, { kind: 'cosmetic-copy', cosmeticId: cosmetic.id });
+  assert.equal(early.status, 403, 'no gift without a visit');
+
+  const visit = await service.visitFriend(ana, b.player.friendCode);
+  assert.equal(visit.body.rewarded, true);
+  assert.equal(visit.body.friend.prestige, 1);
+  assert.equal((await service.visitFriend(ana, b.player.friendCode)).body.rewarded, false, 'one prestige per friend per day');
+  const sent = await service.sendGift(ana, b.player.friendCode, { kind: 'cosmetic-copy', cosmeticId: cosmetic.id });
+  assert.equal(sent.status, 200);
+  assert.equal(sent.body.state.cosmeticCopies[cosmetic.id], 0);
+
+  const claimed = await service.claimGifts(ben);
+  assert.equal(claimed.body.received.length, 1);
+  assert.match(claimed.body.received[0], /gave you/i);
+  assert.ok(claimed.body.state.ownedCosmeticIds.includes(cosmetic.id));
+  assert.equal((await service.friends(ben)).prestige, 1);
+
+  assert.equal((await service.removeFriend(ben, a.player.friendCode)).status, 200);
+  assert.equal((await service.visitFriend(ana, b.player.friendCode)).status, 403, 'removed friends cannot visit');
 });
+
 async function act(service, action, id = requestId(), who = identity()) {
   return (await service.act(who, { requestId: id, action })).body;
 }

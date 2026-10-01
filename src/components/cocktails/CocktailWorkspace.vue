@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiIcon from '../ui/UiIcon.vue';
 import { computed } from 'vue';
 import { useGuide } from '../../composables/useGuide';
 import { INGREDIENTS } from '../../domain/catalog';
@@ -32,7 +33,7 @@ function serve() {
 <template>
   <section v-if="!game.hasCustomer" class="cocktail-workspace waiting-station game-panel">
     <div class="waiting-station-clock"><small>NEXT CUSTOMER</small><b>{{ game.nextCustomerCountdown }}</b></div>
-    <div><small>BAR PREP TIME</small><h2>The station is ready</h2><p>A new guest will arrive between five minutes and two hours after the previous customer leaves. Inventory, learning, recipes, market, and bar design remain available while you wait.</p><button class="primary-button compact" type="button" :disabled="game.crystals < game.nextCustomerCrystalCost" @click="game.expediteCustomer()">Welcome next guest now · ◆ {{ game.nextCustomerCrystalCost }}</button></div>
+    <div><small>BAR PREP TIME</small><h2>The station is ready</h2><p>A new guest will arrive between five minutes and two hours after the previous customer leaves. Inventory, learning, recipes, market, and bar design remain available while you wait.</p><button class="primary-button compact" type="button" :disabled="game.crystals < game.nextCustomerCrystalCost" @click="game.expediteCustomer()">Welcome next guest now · <UiIcon class="inline-icon" name="crystal" /> {{ game.nextCustomerCrystalCost }}</button></div>
   </section>
 
   <section v-else-if="game.customer.orderKind === 'bottle'" class="cocktail-workspace bottle-order-station game-panel">
@@ -48,7 +49,7 @@ function serve() {
     </div>
     <div v-else class="confirmed-bottle-station">
       <div class="hero-brand-model"><BrandBottle :brand="activeBottle.brand" :category="guideIdForProduct(activeBottle)" :color="activeBottle.color" /><em>{{ activeBottle.abv }}%</em></div>
-      <div><small>MOST COVERED MATCH</small><h3>{{ activeBottle.name }}</h3><p>{{ activeBottle.description }}</p><div class="bottle-sale-facts"><span>{{ ALCOHOL_TYPE_LABELS[activeBottle.type] }}</span><span>{{ activeBottle.volumeMl }} ml</span><span>{{ activeBottle.abv }}% ABV</span><span>{{ activeBottleStock }} in stock</span></div><strong>{{ game.customer.bottleRequest?.quantity }} bottle{{ game.customer.bottleRequest?.quantity === 1 ? '' : 's' }} · {{ bottleTotal(activeBottle, game.customer.bottleRequest?.quantity ?? 1, game.guestPriceFactor) }} coins · ◆ {{ bottleSaleCrystalReward(activeBottle, game.customer.bottleRequest?.quantity ?? 1) }}</strong><button class="primary-button" type="button" @click="game.openConversation(game.customer.id)">Return to customer and sell <span>→</span></button></div>
+      <div><small>MOST COVERED MATCH</small><h3>{{ activeBottle.name }}</h3><p>{{ activeBottle.description }}</p><div class="bottle-sale-facts"><span>{{ ALCOHOL_TYPE_LABELS[activeBottle.type] }}</span><span>{{ activeBottle.volumeMl }} ml</span><span>{{ activeBottle.abv }}% ABV</span><span>{{ activeBottleStock }} in stock</span></div><strong>{{ game.customer.bottleRequest?.quantity }} bottle{{ game.customer.bottleRequest?.quantity === 1 ? '' : 's' }} · {{ bottleTotal(activeBottle, game.customer.bottleRequest?.quantity ?? 1, game.guestPriceFactor) }} coins · <UiIcon class="inline-icon" name="crystal" /> {{ bottleSaleCrystalReward(activeBottle, game.customer.bottleRequest?.quantity ?? 1) }}</strong><button class="primary-button" type="button" @click="game.openConversation(game.customer.id)">Return to customer and sell <UiIcon class="inline-icon" name="arrow-right" /></button></div>
     </div>
   </section>
 
@@ -65,7 +66,7 @@ function serve() {
         <span>{{ game.level < AUTO_SERVE_LEVEL ? `Auto-serve unlocks at level ${AUTO_SERVE_LEVEL}` : 'Auto-serve makes this order from stock. Guests pay, but automated drinks get no tip.' }}</span>
         <button type="button" class="secondary-button" :disabled="game.level < AUTO_SERVE_LEVEL" @click="game.autoServe()">Auto-serve</button>
       </div>
-      <div class="counter-instructions"><small>WORK ON THE LIVE BAR</small><b>Drag a painted bottle into the glass above.</b><span>Keep holding to pour in 5 ml steps. Tap <i>+</i> beside the glass for ice, fruit, herbs, salt, or garnish.</span><em v-if="servedProduct">Specific brand order · pays ◆ {{ brandedServeCrystalReward(servedProduct) }}</em></div>
+      <div class="counter-instructions"><small>WORK ON THE LIVE BAR</small><b>Drag a painted bottle into the glass above.</b><span>Keep holding to pour in 5 ml steps. Tap <i>+</i> beside the glass for ice, fruit, herbs, salt, or garnish.</span><em v-if="servedProduct">Specific brand order · pays <UiIcon class="inline-icon" name="crystal" /> {{ brandedServeCrystalReward(servedProduct) }}</em></div>
       <div class="compact-recipe-progress">
         <div v-for="part in game.recipe.ingredients" :key="part.ingredientId" :class="{ done: game.currentMix.find((item) => item.ingredientId === part.ingredientId)?.amount === part.amount, wrong: (game.currentMix.find((item) => item.ingredientId === part.ingredientId)?.amount ?? 0) > part.amount }">
           <span><b>{{ INGREDIENTS.find((item) => item.id === part.ingredientId)?.name }}</b><small v-if="pourProduct(part.ingredientId)">{{ pourProduct(part.ingredientId)!.brand }}</small><small v-else-if="servedProduct?.ingredientId === part.ingredientId">requested: {{ servedProduct.brand }}</small><small v-else-if="classicBrand(part.ingredientId)">classic: {{ classicBrand(part.ingredientId) }}</small></span>
@@ -76,7 +77,7 @@ function serve() {
     <footer class="workspace-actions compact-actions">
       <button class="secondary-button" type="button" @click="game.resetMix">Clear</button>
       <button class="secondary-button" type="button" data-guide="shake" @click="shake">Shake</button>
-      <button class="primary-button" type="button" data-guide="serve" :disabled="game.serving" @click="serve">Serve drink <span>→</span></button>
+      <button class="primary-button" type="button" data-guide="serve" :disabled="game.serving" @click="serve">Serve drink <UiIcon class="inline-icon" name="arrow-right" /></button>
     </footer>
   </section>
 </template>

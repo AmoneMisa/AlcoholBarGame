@@ -33,7 +33,7 @@ function send(id: string) {
     <article v-for="issue in issues" :key="issue.id" class="problem" :class="[issue.kind, issue.status]">
       <div class="problem-head">
         <span class="problem-kind">{{ ISSUE_LABEL[issue.kind] }}</span>
-        <b>{{ nameOf(issue.ingredientId) }} <template v-if="issue.deliveredId">→ {{ nameOf(issue.deliveredId) }}</template> · {{ issue.amount }}</b>
+        <b>{{ nameOf(issue.ingredientId) }} <template v-if="issue.deliveredId"><UiIcon class="inline-icon" name="arrow-right" /> {{ nameOf(issue.deliveredId) }}</template> · {{ issue.amount }}</b>
         <small>{{ issue.supplier }} · {{ age(issue.at) }} · worth {{ issue.value.toFixed(2) }}</small>
         <em :class="issue.status">{{ STATUS[issue.status] }}</em>
       </div>

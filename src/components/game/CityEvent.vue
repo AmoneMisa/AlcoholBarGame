@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Glyph from '../ui/Glyph.vue';
 import { computed, ref } from 'vue';
 import { INGREDIENTS } from '../../domain/catalog';
 import { formatCountdown } from '../../domain/customerTiming';
@@ -32,7 +33,7 @@ const perks = computed(() => {
 <template>
   <div class="city-event" :class="[compact ? 'compact' : 'full', event?.kind ?? 'calm']">
     <button type="button" class="city-event-head" :aria-expanded="!compact || open" @click="open = !open">
-      <span class="city-event-icon" aria-hidden="true">{{ event?.icon ?? '🌙' }}</span>
+      <span class="city-event-icon" aria-hidden="true"><Glyph :g="event?.icon ?? '🌙'" /></span>
       <span><b>{{ event?.name ?? 'A quiet night' }}</b><small>{{ event ? `${event.kind === 'buff' ? 'City buff' : 'City disaster'} · ends in ${endsIn}` : `Level ${game.level} perks` }}</small></span>
     </button>
     <div v-if="!compact || open" class="city-event-body">

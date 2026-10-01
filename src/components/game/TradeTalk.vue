@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiIcon from '../ui/UiIcon.vue';
 import { computed, nextTick, ref, watch } from 'vue';
 import { INGREDIENTS, REGIONS } from '../../domain/catalog';
 import { checkText } from '../../domain/english/checker';
@@ -86,7 +87,7 @@ function accept() {
         <div ref="log" class="haggle-log" aria-live="polite">
           <div v-for="line in talk.lines" :key="line.id" class="haggle-line" :class="line.speaker">
             <p>{{ line.text }}</p>
-            <small v-if="line.speaker === 'buyer'" :class="line.ok ? 'good' : 'fix'">{{ line.ok ? '✓ Correct English' : '✗ Hard mistake · ' + line.note }}</small>
+            <small v-if="line.speaker === 'buyer'" :class="line.ok ? 'good' : 'fix'"><template v-if="line.ok"><UiIcon class="inline-icon" name="check" /> Correct English</template><template v-else><UiIcon class="inline-icon" name="close" /> Hard mistake · {{ line.note }}</template></small>
           </div>
           <div v-if="pending" class="haggle-line buyer"><p>{{ pending }}</p></div>
           <div v-if="waiting" class="haggle-line seller typing"><p><i></i><i></i><i></i></p></div>
@@ -121,10 +122,10 @@ function accept() {
             <div class="haggle-range"><span>{{ quote.minOffer.toFixed(2) }}</span><span>list {{ quote.goods.toFixed(2) }}</span></div>
             <button type="button" class="primary-button haggle-offer-button" :disabled="waiting" @click="placeOffer()">Offer <em>{{ offersLeft }}/{{ MAX_OFFERS }}</em></button>
           </section>
-          <p v-else-if="agreed" class="haggle-agreed">✓ Agreed: {{ talk.agreedGoods!.toFixed(2) }} coins for the goods <em>(−{{ Math.round(quote.discountRate * 100) }}%)</em></p>
+          <p v-else-if="agreed" class="haggle-agreed"><UiIcon class="inline-icon" name="check" /> Agreed: {{ talk.agreedGoods!.toFixed(2) }} coins for the goods <em>(−{{ Math.round(quote.discountRate * 100) }}%)</em></p>
           <p v-else class="haggle-agreed failed">No offers left — the list price stays.</p>
           <ol v-if="talk.offers.length" class="haggle-history">
-            <li v-for="(item, index) in talk.offers" :key="index" :class="item.success ? 'yes' : 'no'">{{ item.success ? '✓' : '✗' }} {{ item.price.toFixed(2) }} <small>{{ (item.rate * 100).toFixed(0) }}%</small></li>
+            <li v-for="(item, index) in talk.offers" :key="index" :class="item.success ? 'yes' : 'no'"><UiIcon class="inline-icon" :name="item.success ? 'check' : 'close'" /> {{ item.price.toFixed(2) }} <small>{{ (item.rate * 100).toFixed(0) }}%</small></li>
           </ol>
           <dl>
             <div><dt>Goods (list)</dt><dd>{{ quote.goods.toFixed(2) }}</dd></div>
@@ -136,7 +137,7 @@ function accept() {
           <p class="haggle-address" :class="{ bad: quote.barId !== talk.barId }">Delivery to <b>{{ barName(quote.barId) }}</b><template v-if="quote.barId !== talk.barId"> — not your {{ barName(talk.barId) }} bar!</template></p>
           <small class="haggle-hint">Talk first: every bargaining idea in correct, polite English raises your chance. Hard mistakes: {{ talk.mistakes }} · the next {{ untilSlip === 1 ? 'one' : 'two' }} will confuse {{ seller.name }}.</small>
           <div class="haggle-tactics">
-            <button v-for="tactic in TACTICS" :key="tactic.id" type="button" :class="{ used: talk.tactics.includes(tactic.id) }" :disabled="done || agreed" :title="tactic.example" @click="useExample(tactic.example)">{{ talk.tactics.includes(tactic.id) ? '✓ ' : '' }}{{ tactic.label }}</button>
+            <button v-for="tactic in TACTICS" :key="tactic.id" type="button" :class="{ used: talk.tactics.includes(tactic.id) }" :disabled="done || agreed" :title="tactic.example" @click="useExample(tactic.example)"><UiIcon v-if="talk.tactics.includes(tactic.id)" class="inline-icon" name="check" /> {{ tactic.label }}</button>
           </div>
         </aside>
       </div>

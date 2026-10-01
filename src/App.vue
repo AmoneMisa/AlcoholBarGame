@@ -8,6 +8,8 @@ import TopHud from './components/game/TopHud.vue';
 import GuideSheet from './components/knowledge/GuideSheet.vue';
 import UiIcon from './components/ui/UiIcon.vue';
 import NotificationToasts from './components/ui/NotificationToasts.vue';
+import RewardPopup from './components/ui/RewardPopup.vue';
+import DailyRewardPopup from './components/ui/DailyRewardPopup.vue';
 import { useGameStore } from './stores/game';
 import { useNotificationsStore } from './stores/notifications';
 import { calendarDate } from './domain/economy';
@@ -65,7 +67,6 @@ watch(() => game.friends.filter((friend) => friend.status === 'pending' && frien
 watch(() => game.message,(message,previous) => {
   if (!message || message === previous) return;
   if (/visited your bar/i.test(message)) notifications.push('friendVisit','A friend visited',message,`visit:${message}`);
-  else if (/gave you|reward|gift|unlocked/i.test(message)) notifications.push('reward','Reward received',message);
 });
 
 // Small counters on the tabs: what is waiting for the player.
@@ -98,6 +99,8 @@ function selectView(id: string) {
     <ConversationPopup v-if="game.conversationCustomerId" />
     <GuideSheet />
     <NotificationToasts />
+    <RewardPopup />
+    <DailyRewardPopup v-if="game.dailyOpen" />
     <GuidePointer />
     <TutorialTour :ready="game.sessionReady && game.startingBarChosen" :seen="game.tourSeen" @view="selectView" @finish="game.setTour" />
     <StartingBarPicker v-if="game.sessionReady && !game.startingBarChosen" />

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiIcon from '../ui/UiIcon.vue';
 import { ref } from 'vue';
 import { canListen, listenOnce } from '../../audio/listen';
 import { compareSpoken, type SpeechResult } from '../../domain/english/speechCheck';
@@ -25,7 +26,7 @@ async function start() {
 
 <template>
   <span v-if="supported" class="speak-trainer" :class="{ compact }">
-    <button type="button" class="mic-button" :class="{ live: listening }" :aria-label="`Say: ${text}`" :title="listening ? 'Listening…' : 'Say it out loud'" @click.stop="start">{{ listening ? '● Listening…' : '🎤' }}</button>
+    <button type="button" class="mic-button" :class="{ live: listening }" :aria-label="`Say: ${text}`" :title="listening ? 'Listening…' : 'Say it out loud'" @click.stop="start">{{ listening ? 'Listening…' : '' }}<UiIcon v-if="!listening" name="mic" /></button>
     <span v-if="result" class="speak-result" :class="{ passed: result.passed }" role="status">
       <b>{{ result.score }}%</b>
       <span class="spoken"><template v-for="(item, index) in result.words" :key="index"><i :class="item.ok ? 'ok' : 'miss'">{{ item.word }}</i>{{ ' ' }}</template></span>

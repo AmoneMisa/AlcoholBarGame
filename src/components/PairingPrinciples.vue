@@ -13,7 +13,7 @@ const open = ref<string>();
   <div class="pairing-principles">
     <small>THE PRINCIPLE</small>
     <div class="principle-chips">
-      <button v-for="principle in principles" :key="principle.id" type="button" :aria-expanded="open === principle.id" @click="open = open === principle.id ? undefined : principle.id">{{ principle.title }} {{ open === principle.id ? '▴' : '▾' }}</button>
+      <button v-for="principle in principles" :key="principle.id" type="button" :aria-expanded="open === principle.id" @click="open = open === principle.id ? undefined : principle.id">{{ principle.title }} <UiIcon class="inline-icon" :name="open === principle.id ? 'chevron-up' : 'chevron-down'" /></button>
     </div>
     <template v-for="principle in principles" :key="principle.id">
       <div v-if="open === principle.id" class="principle-detail">

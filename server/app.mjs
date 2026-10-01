@@ -49,6 +49,12 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
   app.post('/api/friends/answer', auth, limiter, async (request, response, next) => {
     try { const result = await service.answerFriend(request.identity, request.body?.code, request.body?.accept === true); response.status(result.status).json(result.body); } catch (error) { next(error); }
   });
+  app.post('/api/friends/remove', auth, limiter, async (request, response, next) => {
+    try { const result = await service.removeFriend(request.identity, request.body?.code); response.status(result.status).json(result.body); } catch (error) { next(error); }
+  });
+  app.post('/api/friends/claim', auth, limiter, async (request, response, next) => {
+    try { const result = await service.claimGifts(request.identity); response.status(result.status).json(result.body); } catch (error) { next(error); }
+  });
   app.post('/api/friends/label', auth, limiter, async (request, response, next) => {
     try { const result = await service.labelFriend(request.identity, request.body?.code, request.body?.label); response.status(result.status).json(result.body); } catch (error) { next(error); }
   });

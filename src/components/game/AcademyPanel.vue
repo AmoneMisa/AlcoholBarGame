@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import UiIcon from '../ui/UiIcon.vue';
+import Glyph from '../ui/Glyph.vue';
 import { computed, ref } from 'vue';
 import { NEED_LABEL, TRAINING_MODULES, TRAINING_REWARD } from '../../domain/training';
 import { useGameStore } from '../../stores/game';
@@ -27,15 +29,15 @@ const seen = (id: string) => game.training.progress[id] ?? [];
     <p class="academy-lead">{{ finished }} of {{ TRAINING_MODULES.length }} lessons done. Each lesson has a short guide and, where it helps, a practice with no risk. The first time you finish one: +{{ TRAINING_REWARD.xp }} XP and +{{ TRAINING_REWARD.crystals }} crystals.</p>
     <article v-for="module in TRAINING_MODULES" :key="module.id" class="academy-module" :class="{ done: game.training.done.includes(module.id), open: openId === module.id }">
       <button type="button" class="academy-head" :aria-expanded="openId === module.id" @click="toggle(module.id)">
-        <span class="academy-icon">{{ game.training.done.includes(module.id) ? '✅' : module.icon }}</span>
+        <span class="academy-icon"><Glyph :g="game.training.done.includes(module.id) ? '✅' : module.icon" /></span>
         <span><b>{{ module.title }}</b><small>{{ module.summary }}</small></span>
-        <i>{{ openId === module.id ? '▾' : '▸' }}</i>
+        <i><UiIcon :name="openId === module.id ? 'chevron-down' : 'chevron-right'" /></i>
       </button>
       <div v-if="openId === module.id" class="academy-body">
         <ol><li v-for="step in module.guide" :key="step.title"><b>{{ step.title }}.</b> {{ step.text }}</li></ol>
         <template v-if="module.practice">
-          <p class="academy-hint">🎯 {{ module.practice.hint }}</p>
-          <ul v-if="game.training.active?.moduleId === module.id" class="academy-needs"><li v-for="need in module.practice.needs" :key="need" :class="{ ok: seen(module.id).includes(need) }">{{ seen(module.id).includes(need) ? '☑' : '☐' }} {{ NEED_LABEL[need] }}</li></ul>
+          <p class="academy-hint"><UiIcon class="inline-icon" name="bulb" /> {{ module.practice.hint }}</p>
+          <ul v-if="game.training.active?.moduleId === module.id" class="academy-needs"><li v-for="need in module.practice.needs" :key="need" :class="{ ok: seen(module.id).includes(need) }"><UiIcon class="inline-icon" :name="seen(module.id).includes(need) ? 'check' : 'circle'" /> {{ NEED_LABEL[need] }}</li></ul>
           <div class="academy-actions">
             <button type="button" class="primary" @click="practise(module.id)">{{ game.training.active?.moduleId === module.id ? 'Restart practice' : game.training.done.includes(module.id) ? 'Practise again' : 'Start practice' }}</button>
             <button v-if="game.training.active?.moduleId === module.id" type="button" @click="game.endTraining()">End practice</button>
@@ -43,7 +45,7 @@ const seen = (id: string) => game.training.progress[id] ?? [];
         </template>
         <div v-else class="academy-actions">
           <button v-if="module.goto" type="button" @click="emit('close'); emit('goto', module.goto.view)">{{ module.goto.label }}</button>
-          <button type="button" class="primary" :disabled="game.training.done.includes(module.id)" @click="game.trainingDone(module.id)">{{ game.training.done.includes(module.id) ? 'Done ✓' : 'Got it' }}</button>
+          <button type="button" class="primary" :disabled="game.training.done.includes(module.id)" @click="game.trainingDone(module.id)">{{ game.training.done.includes(module.id) ? 'Done' : 'Got it' }}</button>
         </div>
       </div>
     </article>

@@ -17,7 +17,7 @@ import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learni
 import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { actsIn } from '../domain/social/acts';
-import { enjoyingOpening, openingFor, socialReply, voice, type Expression } from '../domain/social/talk';
+import { backToOrder, enjoyingOpening, openingFor, socialReply, voice, type Expression } from '../domain/social/talk';
 import { ensureSocial, genderOf, rollSocial } from '../domain/social/generate';
 import { guestLine, hasSituation, matchChoice, overdue, pickSituation, resolveChoice, resolveIgnored, startSituation, visibleChoices, type Resolution } from './situations';
 import { endTraining, finishGuide, isPractice, noteTraining, startTraining, tidyTraining } from './training';
@@ -1099,7 +1099,7 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
   // After a little chat the guest remembers why they came: they nudge the order along.
   const guestSocial = guest.social;
   if (social && !leaving && guestSocial && guest.orderKind === 'cocktail' && !guest.orderRevealed && guestSocial.phase === 'ordering' && guestSocial.chatted.length >= 2 && guestSocial.rapport >= 45 && !guestSocial.refused) {
-    reply.text += ' Anyway, can you help me choose a drink?';
+    reply.text += ` ${backToOrder(`${guest.id}:${transcript.lines.length}`)}`;
   }
 
   // Effects happen here, on the server — the client cannot trigger them directly.

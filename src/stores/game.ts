@@ -20,7 +20,8 @@ import { checkText } from '../domain/english/checker';
 import { advanceClock, applyAction, RuleError, type GameAction } from '../sim/rules';
 import { createInitialState, levelFor, normalizePlayerState, type PlayerState } from '../sim/state';
 import { playSfx } from '../audio/index';
-import { answerFriendRequest, connectSession, createStarInvoice, fetchFriends, requestFriend, saveFriendLabel, sendAction, sendFriendGift, visitFriendBar, type FriendBar, type FriendSummary } from '../telegram/api';
+import { answerFriendRequest, claimFriendGifts, connectSession, createStarInvoice, fetchFriends, removeFriendLink, requestFriend, saveFriendLabel, sendAction, sendFriendGift, visitFriendBar, type FriendBar, type FriendSummary } from '../telegram/api';
+import { rewardLines, snapshot as stateSnapshot, type RewardLine, type RewardReport, type Snapshot } from '../domain/rewards';
 import type { GiftRequest } from '../sim/gifts';
 import { currentStage, fill as fillSituationText, guestLine, visibleChoices } from '../sim/situations';
 
@@ -77,6 +78,9 @@ export const useGameStore = defineStore('game', () => {
   const playerFriendCode = ref('');
   const friends = ref<FriendSummary[]>([]);
   const visitedFriend = ref<FriendBar>();
+  const rewardReport = ref<RewardReport>();
+  const dailyOpen = ref(false);
+  let reportId = 0;
   const serverOffset = ref(0);
   const clientNow = () => Date.now() + serverOffset.value;
   const nowMs = ref(clientNow());
@@ -195,10 +199,25 @@ export const useGameStore = defineStore('game', () => {
     if (note) message.value = note;
   }
 
-  function send(action: GameAction) {
+  // The popup that tells the player what an action paid. Only actions that can give something are reported.
+  const REWARD_TITLES: Partial<Record<GameAction['type'], string>> = {
+    serve: 'Drink served', autoServe: 'Drink served', sellBottle: 'Bottle sold', claimDaily: 'Daily reward', completeDailyLesson: 'Lesson complete',
+    spinCosmeticRoulette: 'Style draw', sell: 'Stock sold', exchangeCrystals: 'Crystals exchanged', situationChoice: 'Guest situation resolved'
+  };
+  function showRewards(title: string, lines: RewardLine[]) {
+    if (lines.length) rewardReport.value = { id: ++reportId, title, lines };
+  }
+  function reportAction(action: GameAction, before: Snapshot) {
+    const title = REWARD_TITLES[action.type];
+    if (title) showRewards(title, rewardLines(before, stateSnapshot(state.value), state.value.message));
+  }
+  const dismissRewards = () => { rewardReport.value = undefined; };
+
+  function send(action: GameAction, before: Snapshot = stateSnapshot(state.value)) {
     const levelBefore = levelFor(state.value.xp ?? 0);
     return sendAction(action).then((result) => {
       if (result.state) adoptServerState(result.state, result.serverTime, result.ok ? result.message : result.error);
+      if (result.ok) reportAction(action, before);
       if (result.ok) playActionSound(action, levelBefore);
       else playSfx('error');
       return result.ok;
@@ -230,9 +249,10 @@ export const useGameStore = defineStore('game', () => {
 
   // Apply an action locally (instant feedback), then let the server decide. Returns false if the rules refuse it.
   function dispatch(action: GameAction): boolean {
+    const before = stateSnapshot(state.value);
     if (mode.value === 'online' && SERVER_ONLY.has(action.type)) {
       if (action.type === 'openConversation') state.value.conversationCustomerId = action.customerId;
-      void send(action);
+      void send(action, before);
       return true;
     }
     // Applied in place (objects the screens hold stay valid); a refused action is rolled back.
@@ -251,8 +271,9 @@ export const useGameStore = defineStore('game', () => {
     }
     message.value = state.value.message;
     playActionSound(action, levelBefore);
-    if (mode.value === 'online') void send(action);
+    if (mode.value === 'online') void send(action, before);
     else {
+      reportAction(action, before);
       saveOffline();
     }
     return true;
@@ -268,6 +289,7 @@ export const useGameStore = defineStore('game', () => {
       mode.value = 'online';
       starterPackAvailable.value = session.starterPackAvailable !== false;
       adoptServerState(session.state, session.serverTime, session.state.message);
+      if (session.received?.length) showRewards('Gifts from friends', session.received.map((text) => ({ kind: 'gift', text })));
       resetMix();
       void loadFriends();
     } catch {
@@ -276,6 +298,8 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
+  const friendPrestige = ref(0);
+  const friendError = (error: unknown, fallback: string) => { message.value = (error as Error)?.message || fallback; return false; };
   async function loadFriends() {
     if (mode.value !== 'online') { friends.value = []; return false; }
     try {
@@ -283,29 +307,61 @@ export const useGameStore = defineStore('game', () => {
       if (!result.ok) throw new Error(result.error);
       friends.value = result.friends ?? [];
       playerFriendCode.value = result.friendCode ?? playerFriendCode.value;
+      friendPrestige.value = result.prestige ?? friendPrestige.value;
+      if (result.pendingGifts) await claimGifts();
       return true;
-    } catch (error) { message.value = (error as Error).message || 'Could not load friends.'; return false; }
+    } catch (error) { return friendError(error, 'Could not load friends.'); }
   }
-  async function addFriend(code:string) {
+  // Gifts that friends handed over while this player was online.
+  async function claimGifts() {
+    try {
+      const result = await claimFriendGifts();
+      if (!result.ok) throw new Error(result.error);
+      if (result.state) adoptServerState(result.state, result.serverTime);
+      if (result.received?.length) { showRewards('Gifts from friends', result.received.map((text) => ({ kind: 'gift' as const, text }))); playSfx('coin'); }
+      return true;
+    } catch (error) { return friendError(error, 'Could not open your gifts.'); }
+  }
+  async function addFriend(code: string) {
     try { const result = await requestFriend(code); if (!result.ok) throw new Error(result.error); message.value = result.message ?? 'Friend request sent.'; await loadFriends(); return true; }
-    catch (error) { message.value = (error as Error).message; return false; }
+    catch (error) { return friendError(error, 'Could not send the request.'); }
   }
-  async function answerFriend(code:string, accept:boolean) {
-    try { const result = await answerFriendRequest(code,accept); if (!result.ok) throw new Error(result.error); message.value = result.message ?? ''; await loadFriends(); return true; }
-    catch (error) { message.value = (error as Error).message; return false; }
+  async function answerFriend(code: string, accept: boolean) {
+    try { const result = await answerFriendRequest(code, accept); if (!result.ok) throw new Error(result.error); message.value = result.message ?? ''; await loadFriends(); return true; }
+    catch (error) { return friendError(error, 'Could not answer the request.'); }
   }
-  async function renameFriend(code:string,label:string) {
-    try { const result = await saveFriendLabel(code,label); if (!result.ok) throw new Error(result.error); if (result.state) adoptServerState(result.state, clientNow(), result.message); await loadFriends(); return true; }
-    catch (error) { message.value = (error as Error).message; return false; }
+  async function removeFriend(code: string) {
+    try {
+      const result = await removeFriendLink(code); if (!result.ok) throw new Error(result.error);
+      if (visitedFriend.value?.code === code) visitedFriend.value = undefined;
+      message.value = result.message ?? ''; await loadFriends(); return true;
+    } catch (error) { return friendError(error, 'Could not remove this friend.'); }
   }
-  async function visitFriend(code:string) {
-    try { const result = await visitFriendBar(code); if (!result.ok || !result.friend) throw new Error(result.error); if (result.state) adoptServerState(result.state, clientNow()); visitedFriend.value = result.friend; message.value = result.rewarded ? `Visited ${result.friend.nickname}. They received +1 popularity.` : `Visiting ${result.friend.nickname}. Today’s popularity was already awarded.`; return true; }
-    catch (error) { message.value = (error as Error).message; return false; }
+  async function renameFriend(code: string, label: string) {
+    try { const result = await saveFriendLabel(code, label); if (!result.ok) throw new Error(result.error); if (result.state) adoptServerState(result.state, clientNow(), result.message); await loadFriends(); return true; }
+    catch (error) { return friendError(error, 'Could not save the name.'); }
   }
-  async function giftFriend(gift:GiftRequest) {
+  async function visitFriend(code: string) {
+    try {
+      const result = await visitFriendBar(code);
+      if (!result.ok || !result.friend) throw new Error(result.error);
+      if (result.state) adoptServerState(result.state, clientNow());
+      visitedFriend.value = result.friend;
+      message.value = result.rewarded ? `You visited ${result.friend.nickname}. They received +1 prestige.` : `Visiting ${result.friend.nickname}. Today's prestige was already given.`;
+      void loadFriends();
+      return true;
+    } catch (error) { return friendError(error, 'Could not visit this bar.'); }
+  }
+  const leaveVisit = () => { visitedFriend.value = undefined; };
+  async function giftFriend(gift: GiftRequest) {
     if (!visitedFriend.value) return false;
-    try { const result = await sendFriendGift(visitedFriend.value.code,gift); if (!result.ok) throw new Error(result.error); if (result.state) adoptServerState(result.state,clientNow(),result.message); return true; }
-    catch (error) { message.value = (error as Error).message; return false; }
+    try {
+      const result = await sendFriendGift(visitedFriend.value.code, gift);
+      if (!result.ok) throw new Error(result.error);
+      if (result.state) adoptServerState(result.state, clientNow(), result.message);
+      playSfx('coin');
+      return true;
+    } catch (error) { return friendError(error, 'The gift could not be sent.'); }
   }
 
   // ---- Clock ----
@@ -599,7 +655,7 @@ export const useGameStore = defineStore('game', () => {
   void connect();
 
   return {
-    mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, renameFriend, visitFriend, giftFriend, friendVisits, connect,
+    mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen,
     economy, xpProgress, guestPriceFactor, nowMs,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,

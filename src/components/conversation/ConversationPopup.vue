@@ -6,6 +6,7 @@ import { voiceProfileOf } from '../../domain/social/origin';
 import { guestVoice, speakLine } from '../../audio/index';
 import { FOODS } from '../../domain/foods';
 const foodAssetBase = `${import.meta.env.BASE_URL}assets/drinks/food/`;
+const ashtrayArt = `${import.meta.env.BASE_URL}assets/bar/props/ashtray.webp`;
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { CUSTOMER_ART_BY_SLOT } from '../../data/cosmetics/artCatalog';
 import { MODIFIERS, RECIPES } from '../../domain/catalog';
@@ -115,7 +116,7 @@ const foodsInStock = computed(() => FOODS.filter((item) => (game.inventory.find(
 const startOffer = (kind: 'drink' | 'food', itemId: string) => { if (customer.value) game.pitchStart(customer.value.id, kind, itemId); };
 const stage = computed(() => drunkStage(social.value?.drunk ?? 0));
 const needNow = computed(() => social.value?.need && social.value.need.since <= game.nowMs ? social.value.need.kind : undefined);
-const NEED_LABEL: Record<string, string> = { ashtray: '🚬 Wants an ashtray', water: '💧 Wants water', taxi: '🚕 Wants a taxi', chat: '💬 Wants to talk' };
+const NEED_LABEL: Record<string, string> = { ashtray: 'Wants an ashtray', water: '💧 Wants water', taxi: '🚕 Wants a taxi', chat: '💬 Wants to talk' };
 const leaveHint = (tone: 'gentle' | 'firm' | 'aggressive') => {
   if (!customer.value) return '';
   const chance = leaveChance(customer.value, tone);
@@ -343,7 +344,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <div v-if="social" class="talk-state">
             <span class="state-chip" :class="social.emotion">{{ EMOTION_ICON[social.emotion] }} {{ EMOTION_LABEL[social.emotion] }}</span>
             <span v-if="stage !== 'sober'" class="state-chip drunk">🥴 {{ DRUNK_LABEL[stage] }}</span>
-            <span v-if="needNow" class="state-chip need">{{ NEED_LABEL[needNow] }}</span>
+            <span v-if="needNow" class="state-chip need"><img v-if="needNow === 'ashtray'" class="ashtray-inline" :src="ashtrayArt" alt="" />{{ NEED_LABEL[needNow] }}</span>
             <span v-if="social.taxiAt" class="state-chip need">🚕 Taxi on the way</span>
             <label class="rapport" title="How much this guest likes you tonight">Likes you <span><i :style="{ width: social.rapport + '%' }"></i></span></label>
           </div>
@@ -393,7 +394,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         </template>
       </section>
       <div v-if="social" class="talk-actions" data-guide="talk-actions" aria-label="Look after this guest">
-        <button type="button" data-guide="give-ashtray" :class="{ wanted: needNow === 'ashtray' }" :disabled="social.ashtray === 'given' || game.ashtrays.clean < 1" :title="social.ashtray === 'given' ? 'Already has one' : game.ashtrays.clean + ' clean ashtrays'" @click="game.giveAshtray(customer.id)">🚬 Ashtray</button>
+        <button type="button" data-guide="give-ashtray" :class="{ wanted: needNow === 'ashtray' }" :disabled="social.ashtray === 'given' || game.ashtrays.clean < 1" :title="social.ashtray === 'given' ? 'Already has one' : game.ashtrays.clean + ' clean ashtrays'" @click="game.giveAshtray(customer.id)"><img class="ashtray-inline" :src="ashtrayArt" alt="" /> Ashtray</button>
         <button type="button" data-guide="give-water" :class="{ wanted: needNow === 'water' }" @click="game.giveWater(customer.id)">💧 Water</button>
         <button type="button" :class="{ wanted: needNow === 'taxi' }" :disabled="!!social.taxiAt" @click="game.callTaxi(customer.id)">🚕 Call a taxi</button>
         <button type="button" data-guide="offer-open" :class="{ wanted: social.hungry }" @click="offerOpen = !offerOpen">🍽️ Offer</button>
@@ -415,7 +416,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
               </template>
             </p>
             <p v-else>{{ line.text }}</p>
-            <small v-if="line.speaker === 'bartender'" :class="line.ok ? 'good' : 'fix'">{{ line.ok ? '✓ Correct English' : '✎ ' + line.note }}</small>
+            <small v-if="line.speaker === 'bartender'" :class="line.ok ? 'good' : 'fix'"><template v-if="line.ok"><UiIcon class="inline-icon" name="check" /> Correct English</template><template v-else><UiIcon class="inline-icon" name="pencil" /> {{ line.note }}</template></small>
           </div>
           <div v-if="pending" class="talk-line bartender"><p>{{ pending }}</p></div>
           <div v-if="customerTyping" class="talk-line customer typing"><p><i></i><i></i><i></i></p></div>
@@ -438,14 +439,14 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
             <template v-if="activeWord.related?.length"><dt>Related</dt><dd>{{ activeWord.related.join(', ') }}</dd></template>
           </dl>
           <p v-if="activeWord.note" class="word-note">💡 {{ activeWord.note }}</p>
-          <button type="button" class="secondary-button" @click="learning.toggleSaved(activeWord.word)">{{ learning.savedWords.includes(activeWord.word) ? '★ Saved to my words' : '☆ Save to my words' }}</button>
+          <button type="button" class="secondary-button" @click="learning.toggleSaved(activeWord.word)"><UiIcon class="inline-icon" :name="learning.savedWords.includes(activeWord.word) ? 'star-fill' : 'star'" /> {{ learning.savedWords.includes(activeWord.word) ? 'Saved to my words' : 'Save to my words' }}</button>
         </div>
 
         <aside v-if="!situation" class="talk-clues" data-guide="clue-board">
           <template v-if="bottleOrder">
             <small>CUSTOMER REQUEST</small>
             <div class="clue-chips">
-              <span v-for="fact in bottleFactChips(talk.bottleFacts)" :key="fact" class="yes">✓ {{ fact }}</span>
+              <span v-for="fact in bottleFactChips(talk.bottleFacts)" :key="fact" class="yes"><UiIcon class="inline-icon" name="check" /> {{ fact }}</span>
               <em v-if="!bottleFactChips(talk.bottleFacts).length">Ask how many, total budget, type, flavour, occasion and brand.</em>
             </div>
             <small>BEST STOCKED MATCHES</small>
@@ -463,7 +464,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <template v-else>
             <small>WHAT YOU KNOW</small>
             <div class="clue-chips">
-              <span v-for="fact in talk.facts" :key="fact.topic" :class="fact.likes ? 'yes' : 'no'">{{ fact.likes ? '✓' : '✗' }} {{ TOPIC_LABEL[fact.topic] }}</span>
+              <span v-for="fact in talk.facts" :key="fact.topic" :class="fact.likes ? 'yes' : 'no'"><UiIcon class="inline-icon" :name="fact.likes ? 'check' : 'close'" /> {{ TOPIC_LABEL[fact.topic] }}</span>
               <em v-if="!talk.facts.length">Ask about taste, fruit, strength or bubbles.</em>
             </div>
             <small>POSSIBLE DRINKS</small>
@@ -478,12 +479,12 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
       <div v-if="confirmed && !situation" class="talk-confirmed">
         <template v-if="bottleOrder && confirmedBottle && customer.bottleRequest">
           <div><small>SEALED-BOTTLE SALE CONFIRMED</small><b>{{ customer.bottleRequest.quantity }} × {{ confirmedBottle.name }}</b><span>{{ confirmedBottle.volumeMl }} ml · {{ confirmedBottle.abv }}% ABV · total {{ bottleTotal(confirmedBottle, customer.bottleRequest.quantity, game.guestPriceFactor) }} coins</span></div>
-          <button class="primary-button" type="button" :disabled="game.serving || bottleStock(confirmedBottle.id) < customer.bottleRequest.quantity" @click="completeBottleSale">Sell full bottle{{ customer.bottleRequest.quantity === 1 ? '' : 's' }} <span>→</span></button>
+          <button class="primary-button" type="button" :disabled="game.serving || bottleStock(confirmedBottle.id) < customer.bottleRequest.quantity" @click="completeBottleSale">Sell full bottle{{ customer.bottleRequest.quantity === 1 ? '' : 's' }} <UiIcon class="inline-icon" name="arrow-right" /></button>
         </template>
         <template v-else>
           <div v-if="serveOrder"><small>BRAND ORDER</small><b>{{ customer.request.replace(/, please\.$/, '') }}</b><span v-if="!game.brandOnShelf(serveOrder.productId)" class="serve-missing">Not on your shelf — offer another brand of the same spirit.</span></div>
           <div v-else><small>ORDER CONFIRMED</small><b>{{ recipe?.name }}<template v-if="modifierLabel"> · {{ modifierLabel }}</template></b></div>
-          <button class="primary-button" type="button" @click="startMixing">Start mixing <span>→</span></button>
+          <button class="primary-button" type="button" @click="startMixing">Start mixing <UiIcon class="inline-icon" name="arrow-right" /></button>
         </template>
       </div>
 
@@ -517,7 +518,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
               </div>
             </li>
           </ol>
-          <button v-if="!showAllCards && ruleCards(feedback).length > 3" type="button" class="more-fixes" @click="showAllCards = true">Show {{ ruleCards(feedback).length - 3 }} smaller {{ ruleCards(feedback).length - 3 === 1 ? 'fix' : 'fixes' }} ▾</button>
+          <button v-if="!showAllCards && ruleCards(feedback).length > 3" type="button" class="more-fixes" @click="showAllCards = true">Show {{ ruleCards(feedback).length - 3 }} smaller {{ ruleCards(feedback).length - 3 === 1 ? 'fix' : 'fixes' }} <UiIcon class="inline-icon" name="chevron-down" /></button>
           <p v-if="feedback.corrected !== feedbackFor" class="feedback-fix">{{ feedback.reliable ? 'Correct' : 'Try' }}: <b>{{ feedback.corrected }}</b></p>
           <p v-else class="feedback-fix">Rebuild the sentence: start with “Do you …” or “Would you …”.</p>
           <div class="feedback-actions">
@@ -535,7 +536,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
             <button v-for="tile in tiles" :key="tile.id" type="button" class="word-tile" :class="{ used: picked.includes(tile.id) }" :disabled="picked.includes(tile.id)" @click="pick(tile.id)">{{ tile.text }}</button>
           </div>
           <div class="compose-actions">
-            <button class="secondary-button" type="button" data-guide="new-question" @click="nextTemplate">New question ↻</button>
+            <button class="secondary-button" type="button" data-guide="new-question" @click="nextTemplate">New question <UiIcon class="inline-icon" name="refresh" /></button>
             <button class="secondary-button" type="button" :disabled="!picked.length" @click="picked = []">Clear</button>
             <button class="primary-button compact" type="button" data-guide="talk-send" :disabled="!picked.length || customerTyping" @click="send(builtSentence)">Check & send</button>
           </div>

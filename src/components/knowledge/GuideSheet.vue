@@ -99,7 +99,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
           <ul class="guide-compare"><li v-for="item in cocktail.variations" :key="item.name"><b>{{ item.name }}</b> — {{ item.change }}</li></ul>
         </section>
 
-        <p class="guide-fun">💡 {{ cocktail.funFact }}</p>
+        <p class="guide-fun"><UiIcon class="inline-icon" name="bulb" /> {{ cocktail.funFact }}</p>
       </template>
 
       <!-- INGREDIENT -->
@@ -147,7 +147,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
           <p class="guide-sell"><b>Selling tip:</b> {{ ingredientGuide.sellingTip }}</p>
           <p v-if="usedIn.length" class="guide-note">Used in: <template v-for="(item, index) in usedIn" :key="item.id"><button type="button" class="guide-link" @click="openGuide('cocktail', item.id)">{{ item.name }}</button>{{ index < usedIn.length - 1 ? ', ' : '' }}</template></p>
         </section>
-        <p class="guide-fun">💡 {{ ingredientGuide.funFact }}</p>
+        <p class="guide-fun"><UiIcon class="inline-icon" name="bulb" /> {{ ingredientGuide.funFact }}</p>
       </template>
 
       <p v-else class="guide-note">No guide yet for this item.</p>

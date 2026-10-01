@@ -27,7 +27,7 @@ globalThis.window = { setTimeout,clearTimeout };
 // The store plays with real randomness; tests that serve guests must not meet a random payment problem or drunk guest.
 function freshGame() { saves.clear();Math.random = () => .5;setActivePinia(createPinia());return useGameStore(); }
 
-test('Daily style draw unlocks modular face parts and duplicate cosmetics can be gifted',() => {
+test('Daily style draw unlocks modular face parts and a duplicate becomes a spare copy',() => {
   const state = createInitialState(Date.UTC(2026,8,30));
   const context = { now:Date.UTC(2026,8,30),random:()=>0,checkEnglish:(text)=>({ok:true,corrected:text}) };
   const first = COSMETICS.find((item) => item.character === 'noa');
@@ -41,9 +41,6 @@ test('Daily style draw unlocks modular face parts and duplicate cosmetics can be
   applyAction(state,{type:'spinCosmeticRoulette'},context);
   const duplicate = COSMETICS[0];
   assert.equal(state.cosmeticCopies[duplicate.id],1);
-  applyAction(state,{type:'giftCosmetic',cosmeticId:duplicate.id,recipient:'NightFox'},context);
-  assert.equal(state.cosmeticCopies[duplicate.id],0);
-  assert.equal(state.cosmeticGiftLog[0].recipient,'NightFox');
 });
 
 test('Customer smoking trait is stable and never injected as incompatible dialogue text',() => {
@@ -517,4 +514,20 @@ test('The newer vocabulary is complete: sentences are correct English and every 
     assert.equal(result.ok, true, entry.word + ': “' + entry.example + '” ' + JSON.stringify(result.issues.map((item) => item.message)));
   }
   assert.equal(new Set(VOCABULARY.map((entry) => entry.word.toLowerCase())).size, VOCABULARY.length, 'no duplicate words, ignoring case');
+});
+
+test('The reward report lists what an action paid: payment, tip, crystals, XP, level and new recipes', async () => {
+  const { rewardLines, snapshot } = await import('../src/domain/rewards.ts');
+  const before = createInitialState(Date.UTC(2026, 8, 30));
+  const after = structuredClone(before);
+  after.money += 25; after.crystals += 30; after.xp += 400;
+  after.knownRecipeIds.push(RECIPES.find((recipe) => !before.knownRecipeIds.includes(recipe.id)).id);
+  const lines = rewardLines(snapshot(before), snapshot(after), 'Perfect service. Tip +5 coins.');
+  const text = lines.map((line) => line.text).join(' | ');
+  assert.match(text, /\+20 coins/);
+  assert.match(text, /\+5 coins tip/);
+  assert.match(text, /\+30 crystals/);
+  assert.match(text, /\+400 XP/);
+  assert.match(text, /New recipe: /);
+  assert.deepEqual(rewardLines(snapshot(before), snapshot(before)), [], 'nothing gained, nothing to show');
 });

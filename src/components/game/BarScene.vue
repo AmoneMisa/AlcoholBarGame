@@ -16,10 +16,12 @@ import CityEvent from './CityEvent.vue';
 import TrainingStrip from './TrainingStrip.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
 import UiIcon from '../ui/UiIcon.vue';
+import Glyph from '../ui/Glyph.vue';
 import { INTERIORS, shelfStyleFor } from '../../data/cosmetics/bars';
 import { sceneLayout } from '../../data/cosmetics/barLines';
 
 const game = useGameStore();
+const ashtrayArt = `${import.meta.env.BASE_URL}assets/bar/props/ashtray.webp`;
 // `preview` renders the bar exactly as decorated (shelves always on, no guests or glass) for the Design tab.
 const props = withDefaults(defineProps<{ active?: boolean; preview?: boolean }>(), { active: true, preview: false });
 const glassTarget = ref<HTMLElement>();
@@ -285,7 +287,7 @@ const expressionFor = (mood: string): CharacterExpression => ({
 // A guest's feelings show on their face; the older mood only matters when a guest has none.
 const EMOTION_FACE: Record<string, CharacterExpression> = { happy: 'happy', upset: 'sad', angry: 'angry', tired: 'thinking', excited: 'very-happy', lonely: 'worried', nervous: 'embarrassed', relaxed: 'smile' };
 const faceOf = (customer: Customer): CharacterExpression => (customer.social ? EMOTION_FACE[customer.social.emotion] : undefined) ?? expressionFor(customer.mood);
-const NEED_ICON: Record<string, string> = { ashtray: '🚬', water: '💧', taxi: '🚕', chat: '💬' };
+const NEED_ICON: Record<string, string> = { ashtray: 'ashtray', water: '💧', taxi: '🚕', chat: '💬' };
 // Small status icons above a guest: what they feel, how drunk they are, what they are waiting for.
 function badges(customer: Customer) {
   const social = customer.social;
@@ -439,7 +441,7 @@ onBeforeUnmount(() => {
     <div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div>
     <CityEvent v-if="!preview" compact />
     <div v-if="buildingEnabled || preview" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
-      <small v-if="shelfRows.length && !preview" class="pshelf-hint" :style="{ left: shelfRows[0]!.style.left, top: `calc(${shelfRows[0]!.style.top} - 18px)` }">Use ‹ › to browse a shelf · pull a bottle down to the glass</small>
+      <small v-if="shelfRows.length && !preview" class="pshelf-hint" :style="{ left: shelfRows[0]!.style.left, top: `calc(${shelfRows[0]!.style.top} - 18px)` }">Use the arrows to browse a shelf · pull a bottle down to the glass</small>
       <div v-for="row in shelfRows" :key="row.id" class="pshelf-row" :style="row.style">
         <small class="pshelf-label">{{ row.label }}</small>
         <div :ref="(element) => trackLine(row.id, element as HTMLElement | null)" class="pshelf-bottles" @scroll="markEdges($event.currentTarget as HTMLElement)">
@@ -459,9 +461,10 @@ onBeforeUnmount(() => {
       <!-- Only the figure and the card take taps; the rest of the guest's column lets presses reach the shelves. -->
       <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" :data-guide="customer.training ? 'practice-guest' : 'guest'" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" :style="customerStyle(index)" :aria-label="`Talk to ${customer.name}`" @click="game.openConversation(customer.id)">
         <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="faceOf(customer)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
+        <img v-if="customer.social?.ashtray === 'given'" class="customer-ashtray" :src="ashtrayArt" alt="" draggable="false" />
         <div class="guest-card">
           <header><b>{{ customer.name }}</b><time v-if="customer.id === game.activeCustomerId">{{ game.orderCountdown }}</time></header>
-          <small class="guest-badges"><span v-if="customer.training" title="Practice guest">🎓</span><span v-for="badge in badges(customer)" :key="badge.label" :title="badge.label">{{ badge.icon }}</span><i v-if="!customer.social">{{ customer.mood }}</i><i v-else>{{ customer.social.phase === 'enjoying' ? 'enjoying' : EMOTION_LABEL[customer.social.emotion].toLowerCase() }}</i></small>
+          <small class="guest-badges"><span v-if="customer.training" title="Practice guest"><Glyph g="🎓" /></span><span v-for="badge in badges(customer)" :key="badge.label" :title="badge.label"><img v-if="badge.icon === 'ashtray'" class="ashtray-badge" :src="ashtrayArt" alt="" /><Glyph v-else :g="badge.icon" /></span><i v-if="!customer.social">{{ customer.mood }}</i><i v-else>{{ customer.social.phase === 'enjoying' ? 'enjoying' : EMOTION_LABEL[customer.social.emotion].toLowerCase() }}</i></small>
           <p>{{ bubbleText(customer) }}</p>
           <footer><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customer.social?.phase === 'enjoying' ? 'Enjoying the drink' : customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
         </div>
@@ -470,9 +473,9 @@ onBeforeUnmount(() => {
       <button type="button" class="house-rules-button" data-guide="rules-button" :aria-expanded="rulesOpen" @click="rulesOpen = !rulesOpen"><UiIcon class="inline-icon" name="book" /> Rules<i v-if="game.ruleViolations" class="rules-count" :title="`${game.ruleViolations} rule breaks so far`">{{ game.ruleViolations }}</i></button>
       <PopoverPanel v-if="rulesOpen" class="house-rules-panel" eyebrow="HOUSE RULES" :title="`Rules in ${game.region.name}`" close-label="Close house rules" @close="rulesOpen = false">
         <p class="rules-note">These are game rules for practice, not legal advice. Explain them politely to guests. Inspectors count every rule you break{{ game.ruleViolations ? ` (so far: ${game.ruleViolations})` : '' }}.</p>
-        <article v-for="rule in game.houseRules" :key="rule.id" class="rule-row"><span class="rule-icon">{{ rule.icon }}</span><span><b>{{ rule.title }}</b><small>{{ rule.text }}</small></span></article>
+        <article v-for="rule in game.houseRules" :key="rule.id" class="rule-row"><span class="rule-icon"><Glyph :g="rule.icon" /></span><span><b>{{ rule.title }}</b><small>{{ rule.text }}</small></span></article>
       </PopoverPanel>
-      <div v-if="game.barEvent" class="bar-event" :class="game.barEvent.mood"><b>{{ game.barEvent.icon }} {{ game.barEvent.title }}</b><span>{{ game.barEvent.description }}</span></div>
+      <div v-if="game.barEvent" class="bar-event" :class="game.barEvent.mood"><b><Glyph :g="game.barEvent.icon" /> {{ game.barEvent.title }}</b><span>{{ game.barEvent.description }}</span></div>
       <button v-if="game.ashtrays.dirty" type="button" class="clean-ashtrays" @click="game.cleanAshtrays()"><UiIcon class="inline-icon" name="brush" /> Clean {{ game.ashtrays.dirty }} ashtray{{ game.ashtrays.dirty === 1 ? '' : 's' }}</button>
       <!-- The wait for the next guest is shown once, in the panel below the scene (with “Welcome now”). -->
     </div>

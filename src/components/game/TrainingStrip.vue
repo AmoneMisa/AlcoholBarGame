@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import UiIcon from '../ui/UiIcon.vue';
 import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
 import { INGREDIENTS } from '../../domain/catalog';
 import { NEED_LABEL, trainingById } from '../../domain/training';
 import { practicePointer } from '../../guide/practice';
 import { setPointer } from '../../guide/pointer';
 import { useGameStore } from '../../stores/game';
+import Glyph from '../ui/Glyph.vue';
 
 // A small card while a practice is running: what the lesson asks for, what is already done, and the next thing to
 // press. The same instruction is drawn on the screen by the guide pointer (a circle and a moving hand).
@@ -44,9 +46,9 @@ onBeforeUnmount(() => { if (timer) clearInterval(timer); setPointer('practice', 
 
 <template>
   <aside v-if="module?.practice" class="training-strip" aria-label="Practice">
-    <header><b>{{ module.icon }} Practice: {{ module.title }}</b><button type="button" @click="game.endTraining()">End</button></header>
-    <ul><li v-for="need in module.practice.needs" :key="need" :class="{ ok: seen.includes(need) }">{{ seen.includes(need) ? '☑' : '☐' }} {{ NEED_LABEL[need] }}</li></ul>
-    <p v-if="next" class="next-step">👉 {{ next.instruction }}</p>
+    <header><b><Glyph :g="module.icon" /> Practice: {{ module.title }}</b><button type="button" @click="game.endTraining()">End</button></header>
+    <ul><li v-for="need in module.practice.needs" :key="need" :class="{ ok: seen.includes(need) }"><UiIcon class="inline-icon" :name="seen.includes(need) ? 'check' : 'circle'" /> {{ NEED_LABEL[need] }}</li></ul>
+    <p v-if="next" class="next-step"><Glyph g="👉" /> {{ next.instruction }}</p>
     <small v-else>{{ module.practice.hint }}</small>
   </aside>
 </template>

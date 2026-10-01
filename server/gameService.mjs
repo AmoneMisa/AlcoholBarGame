@@ -1,9 +1,9 @@
 import { randomBytes } from 'node:crypto';
 import { applyAction, advanceClock, RuleError } from '../src/sim/rules';
-import { createInitialState, normalizePlayerState, publicState } from '../src/sim/state';
-import { receiveGift } from '../src/sim/gifts';
-import { payForGift, publicBar } from '../src/sim/gifts';
+import { createInitialState, levelFor, normalizePlayerState, publicState } from '../src/sim/state';
+import { payForGift, publicBar, receiveGift } from '../src/sim/gifts';
 import { calendarDate, starCrystalPack } from '../src/domain/economy';
+import { friendCodeFor, playerIdFromCode } from './friendCode.mjs';
 
 // Server-authoritative game: every request loads the player's state with a row lock, applies exactly one
 // validated action with the shared rules and the server clock, and stores the result together with a coin
@@ -11,13 +11,20 @@ import { calendarDate, starCrystalPack } from '../src/domain/economy';
 // Clients only ever receive publicState(): a guest's order stays secret until it is found out in conversation.
 
 const REQUEST_ID = /^[a-zA-Z0-9-]{8,64}$/;
-const friendCode = (id) => String(id).padStart(8, '0');
-const friendIdFrom = (value) => {
-  const clean = String(value ?? '').trim();
-  if (!/^\d{1,12}$/.test(clean)) return 0;
-  const id = Number(clean);
-  return Number.isSafeInteger(id) && id > 0 ? id : 0;
-};
+const friendCode = friendCodeFor;
+const friendIdFrom = playerIdFromCode;
+
+// Opens every unclaimed gift addressed to the player; returns the text of each (what was received, from whom).
+async function claimGiftsInto(tx, playerId, state) {
+  const received = [];
+  for (const gift of await tx.listGifts(playerId)) {
+    const claimed = await tx.takeGift(gift.id, playerId);
+    if (claimed) received.push(receiveGift(state, claimed.payload, claimed.fromName));
+  }
+  return received;
+}
+
+const areFriends = async (tx, a, b) => await tx.friendship(a, b) === 'accepted' || await tx.friendship(b, a) === 'accepted';
 
 export function createGameService({ repository, checkEnglish, now = () => Date.now() }) {
   const context = () => ({ now: now(), checkEnglish, spawnCustomers: true });
@@ -28,13 +35,10 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       const record = await tx.lockState(player.id);
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
       advanceClock(state, context());
-      const pending = await tx.listGifts(player.id);
-      for (const gift of pending) {
-        const claimed = await tx.takeGift(gift.id, player.id);
-        if (claimed) state.message = receiveGift(state, claimed.payload, claimed.fromName);
-      }
+      const received = await claimGiftsInto(tx, player.id, state);
+      if (received.length) state.message = received[received.length - 1];
       await tx.saveState(player.id, state, (record?.version ?? 0) + 1);
-      return { ok: true, player: { id: player.id, name: player.name, friendCode: friendCode(player.id) }, state: publicState(state), starterPackAvailable: !(await tx.hasStarPurchase(player.id, 'starter')), serverTime: now() };
+      return { ok: true, player: { id: player.id, name: player.name, friendCode: friendCode(player.id) }, state: publicState(state), starterPackAvailable: !(await tx.hasStarPurchase(player.id, 'starter')), received, serverTime: now() };
     });
   }
 
@@ -56,15 +60,7 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       const next = structuredClone(state);
       let result;
       try {
-        let giftTarget;
-        if (action.type === 'giftCosmetic') {
-          const recipientId = Number(action.recipient);
-          if (!Number.isSafeInteger(recipientId) || recipientId <= 0 || recipientId === Number(player.id)) throw new RuleError('Enter a valid friend player code.');
-          giftTarget = await tx.getPlayer(recipientId);
-          if (!giftTarget) throw new RuleError('That friend player code was not found.');
-        }
         result = applyAction(next, action, context());
-        if (action.type === 'giftCosmetic' && giftTarget) await tx.addGift({ fromId:Number(player.id),toId:Number(giftTarget.id),payload:{ kind:'cosmetic-copy',cosmeticId:action.cosmeticId } });
       } catch (error) {
         if (!(error instanceof RuleError)) throw error;
         // The action was refused; time still passes, but nothing the client asked for happens.
@@ -87,18 +83,25 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
     return repository.transaction(async (tx) => {
       const player = await tx.findOrCreatePlayer(identity);
       const own = normalizePlayerState((await tx.readState(player.id)) ?? createInitialState(now()));
-      const rows = await tx.listFriendships(player.id);
+      const today = calendarDate(new Date(now()));
       const items = new Map();
-      for (const row of rows) {
+      for (const row of await tx.listFriendships(player.id)) {
         const outgoing = Number(row.playerId) === Number(player.id);
         const otherId = outgoing ? Number(row.friendId) : Number(row.playerId);
         const other = await tx.getPlayer(otherId);
         if (!other) continue;
-        const item = { id: otherId, code: friendCode(otherId), nickname: other.name, customName: own.friendLabels?.[String(otherId)] ?? '', status: row.status, direction: outgoing ? 'outgoing' : 'incoming' };
+        const theirs = row.status === 'accepted' ? normalizePlayerState((await tx.readState(otherId)) ?? createInitialState(now())) : null;
+        const item = {
+          id: otherId, code: friendCode(otherId), nickname: other.name, customName: own.friendLabels?.[String(otherId)] ?? '',
+          status: row.status, direction: outgoing ? 'outgoing' : 'incoming',
+          level: theirs ? levelFor(theirs.xp) : 0, prestige: theirs?.popularity ?? 0, barName: theirs?.bars[theirs.regionId]?.name ?? '',
+          visitedToday: own.friendVisits?.[String(otherId)] === today
+        };
         const previous = items.get(otherId);
         if (!previous || row.status === 'accepted' || previous.direction === 'outgoing') items.set(otherId, item);
       }
-      return { ok: true, friendCode: friendCode(player.id), friends: [...items.values()] };
+      const pendingGifts = (await tx.listGifts(player.id)).length;
+      return { ok: true, friendCode: friendCode(player.id), prestige: own.popularity, pendingGifts, friends: [...items.values()] };
     });
   }
 
@@ -106,11 +109,12 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
     return repository.transaction(async (tx) => {
       const player = await tx.findOrCreatePlayer(identity);
       const targetId = friendIdFrom(code);
-      if (!targetId || targetId === Number(player.id)) return { status: 409, body: { ok: false, error: 'Enter another player’s numeric friend code.' } };
+      if (!targetId) return { status: 409, body: { ok: false, error: 'This is not a valid friend code. Check it and try again.' } };
+      if (targetId === Number(player.id)) return { status: 409, body: { ok: false, error: 'This is your own friend code.' } };
       const target = await tx.getPlayer(targetId);
-      if (!target) return { status: 404, body: { ok: false, error: 'Friend code not found.' } };
-      const accepted = await tx.friendship(player.id, targetId) === 'accepted' || await tx.friendship(targetId, player.id) === 'accepted';
-      if (accepted) return { status: 409, body: { ok: false, error: 'This player is already your friend.' } };
+      if (!target) return { status: 404, body: { ok: false, error: 'No player has this friend code.' } };
+      if (await areFriends(tx, player.id, targetId)) return { status: 409, body: { ok: false, error: 'This player is already your friend.' } };
+      if (await tx.friendship(player.id, targetId) === 'pending') return { status: 409, body: { ok: false, error: 'You already sent this player a request. Wait for them to accept.' } };
       if (await tx.friendship(targetId, player.id) === 'pending') return { status: 409, body: { ok: false, error: 'This player already invited you. Accept the incoming request.' } };
       await tx.setFriendship(player.id, targetId, 'pending');
       return { status: 200, body: { ok: true, message: `Friend request sent to ${target.name}.` } };
@@ -131,12 +135,25 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
     });
   }
 
+  // Withdraws a request you sent, or ends a friendship (either side may do it).
+  async function removeFriend(identity, code) {
+    return repository.transaction(async (tx) => {
+      const player = await tx.findOrCreatePlayer(identity);
+      const targetId = friendIdFrom(code);
+      const target = targetId ? await tx.getPlayer(targetId) : null;
+      const linked = target && (await tx.friendship(player.id, targetId) || await tx.friendship(targetId, player.id));
+      if (!linked) return { status: 404, body: { ok: false, error: 'This player is not in your list.' } };
+      const wasFriend = await areFriends(tx, player.id, targetId);
+      await tx.deleteFriendship(player.id, targetId);
+      return { status: 200, body: { ok: true, message: wasFriend ? `${target.name} was removed from your friends.` : 'Friend request withdrawn.' } };
+    });
+  }
+
   async function labelFriend(identity, code, label) {
     return repository.transaction(async (tx) => {
       const player = await tx.findOrCreatePlayer(identity);
       const targetId = friendIdFrom(code);
-      const accepted = await tx.friendship(player.id, targetId) === 'accepted' || await tx.friendship(targetId, player.id) === 'accepted';
-      if (!accepted) return { status: 403, body: { ok: false, error: 'Add this player as a friend first.' } };
+      if (!targetId || !await areFriends(tx, player.id, targetId)) return { status: 403, body: { ok: false, error: 'Add this player as a friend first.' } };
       const record = await tx.lockState(player.id);
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
       const clean = String(label ?? '').replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 28);
@@ -146,13 +163,13 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
     });
   }
 
+  // Visiting shows a friend's bar. The first visit of the day gives the owner +1 prestige and opens gifting for that friend.
   async function visitFriend(identity, code) {
     return repository.transaction(async (tx) => {
       const player = await tx.findOrCreatePlayer(identity);
       const targetId = friendIdFrom(code);
       const target = targetId ? await tx.getPlayer(targetId) : null;
-      const accepted = target && (await tx.friendship(player.id, targetId) === 'accepted' || await tx.friendship(targetId, player.id) === 'accepted');
-      if (!target || !accepted) return { status: 403, body: { ok: false, error: 'Add this player as a friend before visiting.' } };
+      if (!target || !await areFriends(tx, player.id, targetId)) return { status: 403, body: { ok: false, error: 'Add this player as a friend before visiting.' } };
       const visitorRecord = await tx.lockState(player.id);
       const friendRecord = await tx.lockState(targetId);
       const visitor = normalizePlayerState(visitorRecord?.state ?? createInitialState(now()));
@@ -163,23 +180,24 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       if (rewarded) {
         visitor.friendVisits[key] = today;
         owner.popularity += 1;
-        owner.message = `${player.name} visited your bar. +1 popularity.`;
+        owner.message = `${player.name} visited your bar. +1 prestige.`;
+        await tx.saveState(player.id, visitor, (visitorRecord?.version ?? 0) + 1);
+        await tx.saveState(targetId, owner, (friendRecord?.version ?? 0) + 1);
       }
-      await tx.saveState(player.id, visitor, (visitorRecord?.version ?? 0) + 1);
-      await tx.saveState(targetId, owner, (friendRecord?.version ?? 0) + 1);
-      return { status: 200, body: { ok: true, rewarded, state: publicState(visitor), friend: { id: targetId, code: friendCode(targetId), nickname: target.name, customName: visitor.friendLabels[key] ?? '', ...publicBar(owner, target.name) } } };
+      return { status: 200, body: { ok: true, rewarded, state: publicState(visitor), friend: { id: targetId, code: friendCode(targetId), nickname: target.name, customName: visitor.friendLabels[key] ?? '', prestige: owner.popularity, ...publicBar(owner, target.name) } } };
     });
   }
 
+  // Gifts can only be handed over while visiting: the sender must have visited this friend's bar today.
   async function sendGift(identity, code, gift) {
     return repository.transaction(async (tx) => {
       const player = await tx.findOrCreatePlayer(identity);
       const targetId = friendIdFrom(code);
       const target = targetId ? await tx.getPlayer(targetId) : null;
-      const accepted = target && (await tx.friendship(player.id, targetId) === 'accepted' || await tx.friendship(targetId, player.id) === 'accepted');
-      if (!target || !accepted) return { status: 403, body: { ok: false, error: 'You can only send gifts while visiting a friend.' } };
+      if (!target || !await areFriends(tx, player.id, targetId)) return { status: 403, body: { ok: false, error: 'You can only send gifts to friends.' } };
       const record = await tx.lockState(player.id);
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
+      if (state.friendVisits[String(targetId)] !== calendarDate(new Date(now()))) return { status: 403, body: { ok: false, error: 'Visit this friend’s bar first — gifts are handed over during a visit.' } };
       try {
         const paid = payForGift(state, gift);
         await tx.addGift({ fromId: Number(player.id), toId: targetId, payload: paid });
@@ -189,6 +207,19 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       }
       await tx.saveState(player.id, state, (record?.version ?? 0) + 1);
       return { status: 200, body: { ok: true, state: publicState(state), message: state.message } };
+    });
+  }
+
+  // Opens gifts that arrived while the player was playing (the session does the same when the game starts).
+  async function claimGifts(identity) {
+    return repository.transaction(async (tx) => {
+      const player = await tx.findOrCreatePlayer(identity);
+      if (!(await tx.listGifts(player.id)).length) return { status: 200, body: { ok: true, received: [] } };
+      const record = await tx.lockState(player.id);
+      const state = normalizePlayerState(record?.state ?? createInitialState(now()));
+      const received = await claimGiftsInto(tx, player.id, state);
+      await tx.saveState(player.id, state, (record?.version ?? 0) + 1);
+      return { status: 200, body: { ok: true, received, state: publicState(state), serverTime: now() } };
     });
   }
 
@@ -248,5 +279,5 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
   // Request ids only need to survive long enough for a retry; older rows are pure bloat.
   const pruneRequests = (olderThanMs = 7 * 24 * 60 * 60 * 1000) => repository.transaction((tx) => tx.pruneRequests(now() - olderThanMs));
 
-  return { pruneRequests, session, act, friends, addFriend, answerFriend, labelFriend, visitFriend, sendGift, startStarPurchase, approveStarCheckout, fulfilStarPayment };
+  return { pruneRequests, session, act, friends, addFriend, answerFriend, removeFriend, labelFriend, visitFriend, sendGift, claimGifts, startStarPurchase, approveStarCheckout, fulfilStarPayment };
 }
