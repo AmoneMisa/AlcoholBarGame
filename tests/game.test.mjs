@@ -24,7 +24,8 @@ import {
 const saves = new Map();
 globalThis.localStorage = { getItem:key => saves.get(key) ?? null,setItem:(key,value) => saves.set(key,value) };
 globalThis.window = { setTimeout,clearTimeout };
-function freshGame() { saves.clear();setActivePinia(createPinia());return useGameStore(); }
+// The store plays with real randomness; tests that serve guests must not meet a random payment problem or drunk guest.
+function freshGame() { saves.clear();Math.random = () => .5;setActivePinia(createPinia());return useGameStore(); }
 
 test('Daily style draw unlocks modular face parts and duplicate cosmetics can be gifted',() => {
   const state = createInitialState(Date.UTC(2026,8,30));

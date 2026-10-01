@@ -167,7 +167,6 @@ const CHECK_IN: Record<Emotion, string[]> = {
 const NOT_YET_ORDER = ['Not yet, thanks. Maybe in a few minutes.', 'I am still enjoying this one. Ask me again later!'];
 const THANKS = ['No problem!', 'Anytime.', 'Ha, that is my line!'];
 const APOLOGY = ['It is OK. Do not worry about it.', 'Thanks for saying that.', 'No problem. It happens.'];
-const GOODBYE = ['Thanks, you too! See you soon.', 'Good night! I will be back.', 'Take care!'];
 const NOT_YET = ['Oh, I am not leaving yet. I am still enjoying my drink!', 'Not yet! I want to stay a little longer.'];
 const RUDE: string[] = ['Excuse me? That was rude.', 'Wow. Is that how you talk to guests?', 'I do not have to listen to that.'];
 const REFUSE: Record<DrunkStage, string[]> = {

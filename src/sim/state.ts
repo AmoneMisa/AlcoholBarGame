@@ -74,6 +74,11 @@ export interface PlayerState {
   popularityBoost?: PopularityBoost;
   // Clean and dirty ashtrays: guests who smoke ask for one, and it must be cleaned after they leave.
   ashtrays?: { clean: number; dirty: number };
+  // Bills guests could not pay and promised to pay later, and how many situations were solved well or badly.
+  tabs?: { guest: string; amount: number; since: number }[];
+  situationStats?: { solved: number; failed: number; neutral: number };
+  // How many rules the bar has broken since the last inspection.
+  ruleViolations?: number;
   // Day of the last rewarded visit to each friend's bar.
   friendVisits?: Record<string, string>;
   friendLabels?: Record<string, string>;
@@ -104,6 +109,11 @@ export function wishFor(customer: Customer) {
 // What the client may see: unrevealed orders are hidden, so the player has to find them out in English.
 export function publicState(state: PlayerState): PlayerState {
   const view = structuredClone(state);
+  // Facts a situation hides from the player (a banknote is fake, the guest really is right) start with an underscore.
+  for (const customer of view.customers) {
+    const event = customer.social?.event;
+    if (event) event.data = Object.fromEntries(Object.entries(event.data).filter(([key]) => !key.startsWith('_')));
+  }
   view.customers = view.customers.map((customer) => customer.orderRevealed ? customer : {
     ...customer, orderRecipeId: '', modifierId: undefined, bottleRequest: undefined, budget: 0,
     wish: customer.wish ?? wishFor(customer), request: customer.wish ?? wishFor(customer)

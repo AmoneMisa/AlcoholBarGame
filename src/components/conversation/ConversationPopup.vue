@@ -94,6 +94,8 @@ const leaveHint = (tone: 'gentle' | 'firm' | 'aggressive') => {
   const chance = leaveChance(customer.value, tone);
   return chance >= 65 ? 'likely to work' : chance >= 35 ? 'might work' : 'unlikely to work';
 };
+// An open situation: what is happening and the English replies the bartender can choose.
+const situation = computed(() => customer.value ? game.situationOf(customer.value.id) : undefined);
 const tiles = ref<{ id: string; text: string }[]>([]);
 const picked = ref<string[]>([]);
 const pickedTiles = computed(() => picked.value.map((id) => tiles.value.find((tile) => tile.id === id)!).filter(Boolean));
@@ -312,6 +314,12 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         </div>
         <CloseButton class="talk-close" label="Close conversation" @click="game.closeConversation()" />
       </header>
+      <section v-if="situation" class="situation-panel" :class="'sev-' + situation.severity" aria-label="Situation">
+        <header><b>{{ situation.icon }} {{ situation.title }}</b><small>Choose what to say — or type it in your own words</small></header>
+        <div class="situation-choices">
+          <button v-for="choice in situation.choices" :key="choice.id" type="button" @click="game.answerSituation(customer.id, choice.id)"><span>{{ choice.say }}</span></button>
+        </div>
+      </section>
       <div v-if="social" class="talk-actions" aria-label="Look after this guest">
         <button type="button" :class="{ wanted: needNow === 'ashtray' }" :disabled="social.ashtray === 'given' || game.ashtrays.clean < 1" :title="social.ashtray === 'given' ? 'Already has one' : game.ashtrays.clean + ' clean ashtrays'" @click="game.giveAshtray(customer.id)">🚬 Ashtray</button>
         <button type="button" :class="{ wanted: needNow === 'water' }" @click="game.giveWater(customer.id)">💧 Water</button>

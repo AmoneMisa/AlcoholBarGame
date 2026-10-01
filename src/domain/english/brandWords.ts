@@ -3,6 +3,7 @@ import { BRANDS } from '../../data/knowledge/alcohol';
 import { RECIPES } from '../catalog';
 import { LEXICON } from './lexicon';
 import { VOCABULARY } from './vocabulary';
+import { SITUATIONS } from '../situations/catalog';
 
 // Brand and cocktail names are proper nouns the player must be able to say (“Would you like Jameson instead?”),
 // so every word of every brand and bottle name is added to the checker's vocabulary.
@@ -19,5 +20,17 @@ for (const name of names) {
 for (const entry of VOCABULARY) {
   for (const text of [entry.word, ...(entry.forms ?? [])]) {
     for (const word of text.toLowerCase().replace(/’/g, "'").split(/[^\p{L}\d']+/u)) if (word.length > 1) LEXICON.add(word);
+  }
+}
+
+// Every word the bartender can say in a situation (a first-aid reply, a payment sentence) can be said and typed too,
+// and so can the words listed for each situation's lesson.
+for (const situation of SITUATIONS) {
+  const texts = [...(situation.vocab ?? []), ...situation.stages.flatMap((stage) => stage.choices.map((choice) => choice.say))];
+  for (const text of texts) {
+    for (const word of text.toLowerCase().replace(/’/g, "'").replace(/\{\w+\}/g, ' ').split(/[^\p{L}\d']+/u)) {
+      const clean = word.replace(/'s$/, '').replace(/^'+|'+$/g, '');
+      if (clean.length > 1) LEXICON.add(clean);
+    }
   }
 }

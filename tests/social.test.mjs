@@ -20,7 +20,7 @@ function barWith(social = {}, patch = {}) {
   state.customers = [state.customers[0]];
   const guest = state.customers[0];
   state.activeCustomerId = guest.id;
-  Object.assign(guest, { mood: 'calm', orderKind: 'cocktail', orderRecipeId: RECIPES[0].id, orderRevealed: true, smoker: false, ...patch });
+  Object.assign(guest, { mood: 'calm', orderKind: 'cocktail', orderRecipeId: RECIPES[0].id, orderRevealed: true, smoker: false, patience: 99_999, patienceRemaining: 99_999, ...patch });
   guest.social = { ...SOBER_GUEST, ...social };
   state.nextCustomerAt = 0;
   return { state, guest };
@@ -48,7 +48,7 @@ test('Guests open with their own feelings, and the same feeling is said in diffe
   assert.ok(openings.size >= 20, `many different openings, saw ${openings.size}`);
   const { state, guest } = barWith({ emotion: 'angry' });
   talkTo(state, guest);
-  assert.match(state.conversations[guest.id].lines[0].text, /can I|help me|recommend|what would/i, 'the guest still asks for help with a drink');
+  assert.match(state.conversations[guest.id].lines[0].text, /help|recommend|what would|suggest/i, 'the guest still asks for help with a drink');
 });
 
 test('Small talk works: asking how they are and what happened makes the guest tell a story and like you more', () => {

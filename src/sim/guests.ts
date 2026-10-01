@@ -2,6 +2,7 @@ import type { Customer } from '../domain/types';
 import { drunkStage, clampPercent, type Emotion, type GuestNeed, type NeedKind } from '../domain/social/model';
 import { ensureSocial } from '../domain/social/generate';
 import { TAXI_ACCEPTED, TAXI_ARRIVED, choose, leaveLine, type LeaveOutcome, type LeaveTone, type SocialReply } from '../domain/social/talk';
+import { pickSituation, startSituation } from './situations';
 import type { PlayerState } from './state';
 
 // The life of the guests at the bar, run by the shared rules (so on the server): who sits, who stays for another
@@ -75,11 +76,17 @@ function driftEmotion(guest: Customer, random: () => number) {
 // Alcohol level rises with the drink's strength: a light cocktail adds about ten points, a neat spirit nearly thirty.
 export const drunkGain = (abv: number) => abv <= 0 ? 0 : Math.round(4 + abv * .6);
 
-export function afterServed(state: PlayerState, guest: Customer, gain: number, context: GuestContext): 'stays' | 'leaves' {
-  const social = ensureSocial(guest, context.now);
+// The drink is in the guest's hands: it counts, and it raises their alcohol level.
+export function recordDrink(guest: Customer, gain: number, now: number) {
+  const social = ensureSocial(guest, now);
   social.rounds++;
   social.drunk = clampPercent(social.drunk + gain);
   social.refused = false;
+}
+
+// After the drink and the payment: the guest either sits on for another round or leaves.
+export function settleGuest(state: PlayerState, guest: Customer, context: GuestContext): 'stays' | 'leaves' {
+  const social = ensureSocial(guest, context.now);
   const stays = social.staysFor > 0 && social.rapport >= 20 && !social.taxiAt && social.event?.kind !== 'aggression';
   if (!stays) { removeGuest(state, guest, context); return 'leaves'; }
   social.staysFor--;
@@ -91,9 +98,24 @@ export function afterServed(state: PlayerState, guest: Customer, gain: number, c
   delete state.rewardedSentences[guest.id];
   if (state.conversationCustomerId === guest.id) state.conversationCustomerId = undefined;
   rollEnjoyingNeed(guest, context);
+  // Something may happen to a guest who sits for a while.
+  const trouble = pickSituation(state, guest, 'enjoying', context.random);
+  if (trouble) startSituation(state, guest, trouble, context.now, context.random);
   if (state.activeCustomerId === guest.id) state.activeCustomerId = pickActive(state)?.id ?? guest.id;
   scheduleArrival(state, context);
   return 'stays';
+}
+
+export function afterServed(state: PlayerState, guest: Customer, gain: number, context: GuestContext): 'stays' | 'leaves' {
+  recordDrink(guest, gain, context.now);
+  return settleGuest(state, guest, context);
+}
+
+// A guest who has not paid yet stays where they are: the bill is held until the payment is sorted out.
+export function holdForPayment(guest: Customer, now: number) {
+  const social = ensureSocial(guest, now);
+  social.phase = 'enjoying';
+  social.nextOrderAt = now + 120 * MINUTE;
 }
 
 // While the guest enjoys the drink they may ask for something, a little after they settle.

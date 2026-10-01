@@ -18,9 +18,9 @@ import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { actsIn } from '../domain/social/acts';
 import { enjoyingOpening, openingFor, socialReply, voice, type Expression } from '../domain/social/talk';
-import { drunkStage } from '../domain/social/model';
 import { ensureSocial, rollSocial } from '../domain/social/generate';
-import { MAX_SEATS, afterServed, applySocialReply, askToLeave, callTaxi, cleanAshtrays, drunkGain, giveAshtray, giveWater, isOrdering, orderingGuests, removeGuest, scheduleArrival, tickGuests, ashtraysOf, type GuestContext } from './guests';
+import { guestLine, hasSituation, matchChoice, overdue, pickSituation, resolveChoice, resolveIgnored, startSituation, visibleChoices, type Resolution } from './situations';
+import { MAX_SEATS, afterServed, holdForPayment, recordDrink, settleGuest, applySocialReply, askToLeave, callTaxi, cleanAshtrays, drunkGain, giveAshtray, giveWater, isOrdering, orderingGuests, removeGuest, scheduleArrival, tickGuests, ashtraysOf, type GuestContext } from './guests';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
 import { DELIVERY_DAY_MS, levelFor, normalizePlayerState, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
 
@@ -69,6 +69,8 @@ export type GameAction =
   // Looking after the people at the bar: each names the guest it is for.
   | { type: 'giveAshtray'; customerId: string }
   | { type: 'cleanAshtrays' }
+  // Answering a situation (a payment problem, a broken glass, an emergency…) with one of the offered sentences.
+  | { type: 'situationChoice'; customerId: string; choiceId: string }
   | { type: 'giveWater'; customerId: string }
   | { type: 'callTaxi'; customerId: string }
   | { type: 'askToLeave'; customerId: string; tone: 'gentle' | 'firm' | 'aggressive' };
@@ -226,6 +228,8 @@ function welcomeNextCustomer(state: PlayerState, now: number, random: () => numb
   const dirty = ashtraysOf(state).dirty;
   if (dirty) arrival.social.rapport = Math.max(0, arrival.social.rapport - Math.min(12, dirty * 4));
   state.customers.push(arrival);
+  const trouble = pickSituation(state, arrival, 'arrival', random);
+  if (trouble) startSituation(state, arrival, trouble, now, random);
   state.activeCustomerId = arrival.id;
   state.nextCustomerAt = 0;
   state.lastClockAt = now;
@@ -266,6 +270,11 @@ export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now
   autoRestock(state, now);
   const guests = guestContext(state, now, random);
   tickGuests(state, guests, Math.max(0, (now - state.lastClockAt) / 1000));
+  for (const waiting of [...state.customers]) {
+    if (!overdue(waiting, now)) continue;
+    const resolution = resolveIgnored(state, waiting, now, random);
+    if (resolution) applyResolution(state, waiting, resolution, guests);
+  }
   // A guest walks in only while nobody is waiting to order and a seat is free.
   if (!orderingGuests(state).length) {
     if (context.spawnCustomers !== false && state.nextCustomerAt && now >= state.nextCustomerAt && state.customers.length < MAX_SEATS) welcomeNextCustomer(state, now, random);
@@ -359,6 +368,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     }
 
     case 'sellBottle': {
+      if (guest && hasSituation(guest)) throw new RuleError(`Deal with ${guest.name}’s situation first.`);
       const request = guest?.bottleRequest;
       const product = ALCOHOL_PRODUCTS.find((item) => item.id === guest?.selectedBottleId);
       if (!guest || guest.orderKind !== 'bottle' || !guest.orderRevealed || !request || !product) throw new RuleError('Confirm the customer’s bottle choice first.');
@@ -400,6 +410,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'serve': {
       const auto = action.auto === true;
       if (!guest) throw new RuleError('There is no order to serve.');
+      if (hasSituation(guest)) throw new RuleError(`Deal with ${guest.name}’s situation first.`);
       if (!isOrdering(guest)) throw new RuleError(`${guest.name} is still enjoying the last drink.`);
       if (guest.orderKind === 'bottle') throw new RuleError('This customer wants sealed bottles. Complete the sale in the conversation.');
       const mix = Array.isArray(action.mix) ? action.mix.filter((item) => INGREDIENTS.some((ingredient) => ingredient.id === item?.ingredientId))
@@ -434,7 +445,9 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         // Tips are a chance, never a given; drinks made with Auto-serve are paid but never tipped.
         const tipped = !auto && rollTip(state, guest, now, random);
         const tip = tipped ? Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .2 : .1) * economyOf(state, now).tips * mastery.tips) + (bonus ? 2 : 0) : 0;
-        state.money = coins(state.money + revenue + tip);
+        // Sometimes the guest has a problem with paying: then the bill is held until it is sorted out.
+        const payTrouble = pickSituation(state, guest, 'payment', random);
+        if (!payTrouble) state.money = coins(state.money + revenue + tip);
         // About 60 successful orders reach level 25: roughly four medium two-hour play days.
         state.xp += 100 + Math.min(state.streak * 2, 14);
         state.streak += 1;
@@ -453,8 +466,15 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           : bonus ? `Perfect service — classic touch with ${bonus}! Tip +${tip} coins.${crystalNote}` : `Perfect service. Tip +${tip} coins.${crystalNote}`;
         // Alcohol raises the guest's level; a guest who likes the bar may stay for another drink.
         const abv = serveProduct ? serveProduct.abv * .8 : estimateRecipeAbv(verdict.recipe);
-        const outcome = afterServed(state, guest, drunkGain(abv), guestContext(state, now, random));
-        state.message = outcome === 'stays' ? `${note} ${guest.name} stays to enjoy the drink.` : note;
+        if (payTrouble) {
+          recordDrink(guest, drunkGain(abv), now);
+          holdForPayment(guest, now);
+          addGuestLine(state, guest, startSituation(state, guest, payTrouble, now, random, { amount: coins(revenue + tip), afterServe: true }));
+          state.message = `${note} But there is a problem with the payment.`;
+        } else {
+          const outcome = afterServed(state, guest, drunkGain(abv), guestContext(state, now, random));
+          state.message = outcome === 'stays' ? `${note} ${guest.name} stays to enjoy the drink.` : note;
+        }
       } else {
         state.streak = 0;
         guest.patienceRemaining = Math.max(0, guest.patienceRemaining - 60);
@@ -771,6 +791,14 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       }
       break;
     }
+    case 'situationChoice': {
+      const target = state.customers.find((item) => item.id === action.customerId);
+      if (!target || !hasSituation(target)) throw new RuleError('There is nothing to answer.');
+      const choice = visibleChoices(state, target, random).find((item) => item.id === action.choiceId);
+      if (!choice) throw new RuleError('That answer is not possible now.');
+      applyResolution(state, target, resolveChoice(state, target, choice, now, random), guestContext(state, now, random));
+      break;
+    }
     case 'cleanAshtrays': {
       const cleaned = cleanAshtrays(state);
       if (!cleaned) throw new RuleError('There is nothing to clean.');
@@ -859,6 +887,23 @@ function addLine(transcript: Transcript, speaker: 'customer' | 'bartender', text
   if (transcript.lines.length > MAX_LINES) transcript.lines.splice(0, transcript.lines.length - MAX_LINES);
 }
 
+// A line the guest says on their own (a payment problem, a new situation), written into their conversation.
+function addGuestLine(state: PlayerState, guest: Customer, text: string) {
+  addLine(ensureTranscript(state, guest), 'customer', text);
+}
+
+// What a situation outcome does to the conversation and the seat: lines, a guest who leaves, a guest who stays on.
+function applyResolution(state: PlayerState, guest: Customer, resolution: Resolution, guests: GuestContext, bartenderAlreadyShown = false) {
+  const transcript = ensureTranscript(state, guest);
+  if (resolution.bartender && !bartenderAlreadyShown) addLine(transcript, 'bartender', resolution.bartender, { ok: resolution.tone !== 'rude', note: resolution.tip && resolution.tone !== 'good' ? resolution.tip : undefined });
+  else if (resolution.bartender && resolution.tip && resolution.tone !== 'good') { const last = transcript.lines.at(-1); if (last && last.speaker === 'bartender') last.note = resolution.tip; }
+  if (resolution.guest) addLine(transcript, 'customer', resolution.guest);
+  if (resolution.followUp) addLine(transcript, 'customer', resolution.followUp);
+  if (resolution.tone === 'good') state.xp += 1;
+  if (resolution.leave) removeGuest(state, guest, guests);
+  else if (resolution.afterServe) settleGuest(state, guest, guests);
+}
+
 // How a guest who already knows what they want still sounds like a person: their feeling first.
 function feelingFirst(guest: Customer) {
   const lively = openingFor(guest);
@@ -870,10 +915,10 @@ function ensureTranscript(state: PlayerState, guest: Customer, now = state.lastC
   const existing = state.conversations[guest.id];
   if (existing) return existing;
   const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
-  const opening = guest.social?.phase === 'enjoying' ? enjoyingOpening(guest, now)
+  const opening = guestLine(state, guest) ?? (guest.social?.phase === 'enjoying' ? enjoyingOpening(guest, now)
     : guest.orderKind === 'bottle' ? `${feelingFirst(guest)}${bottleOpeningLine(guest)}`
     : guest.orderKind === 'serve' || !recipe ? `${guest.social ? feelingFirst(guest) : `${guest.greeting} `}${guest.request}`
-      : openingLine(guest, buildProfile(recipe));
+      : openingLine(guest, buildProfile(recipe)));
   // A bottle customer names the occasion in the opening line, so it is already known and never asked again.
   const bottleFacts: Transcript['bottleFacts'] = guest.orderKind === 'bottle' ? { occasion: guest.bottleRequest?.occasion ?? 'party' } : {};
   const transcript: Transcript = { lines: [], facts: [], bottleFacts, expression: 'thinking', attempts: 0, correct: 0 };
@@ -900,6 +945,14 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
   }
   addLine(transcript, 'bartender', text, { ok: english.ok, note: english.ok ? english.note : `Better: “${english.corrected}”` });
 
+  // While a situation is open, the guest answers the situation: a typed sentence that means one of the offered replies counts as it.
+  if (hasSituation(guest)) {
+    const choice = matchChoice(state, guest, english.corrected) ?? matchChoice(state, guest, text);
+    if (choice) { applyResolution(state, guest, resolveChoice(state, guest, choice, context.now, context.random ?? Math.random), guestContext(state, context.now, context.random ?? Math.random), true); return; }
+    addLine(transcript, 'customer', `I need your help with this. ${guestLine(state, guest) ?? ''}`.trim());
+    transcript.expression = 'confused';
+    return;
+  }
   // The guest answers what they understood: the corrected sentence.
   const heard = english.corrected;
   const onShelf = (id: string) => (bottleStock(state, id)?.quantity ?? 0) > 0;
