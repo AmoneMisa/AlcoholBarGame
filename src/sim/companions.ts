@@ -1,6 +1,6 @@
 import { calendarDate, coins } from '../domain/economy';
 import {
-  BONUSES, COMPANIONS, COMPANION_START_LEVEL, MAX_COMPANION_LEVEL, companionLevelCost, levelCapForGrade, companionPower, linksOf, linkStrength, SPOTLIGHT_COOLDOWN_MS, SPOTLIGHT_MIN_BOND, SPOTLIGHT_MS, KEEPSAKE_CRYSTAL_PRICE, KEEPSAKE_LIKED_POINTS, KEEPSAKE_POINTS, KEEPSAKE_VISIT_CHANCE, MAX_BOND, BOND_STEPS, VISITS_PER_DAY, VISIT_POINTS,
+  COMPANION_START_LEVEL, MAX_COMPANION_LEVEL, companionLevelCost, levelCapForGrade, companionPower, linksOf, linkStrength, SPOTLIGHT_COOLDOWN_MS, SPOTLIGHT_MIN_BOND, SPOTLIGHT_MS, KEEPSAKE_CRYSTAL_PRICE, KEEPSAKE_LIKED_POINTS, KEEPSAKE_POINTS, KEEPSAKE_VISIT_CHANCE, MAX_BOND, BOND_STEPS, VISITS_PER_DAY, VISIT_POINTS,
   bondLevel, bonusAmount, describeBonus, companionById, companionName, companionSlots, keepsakeDef, KEEPSAKE_IDS, type BonusId, type KeepsakeId
 } from '../domain/companions';
 import { levelFor, type PlayerState } from './state';
@@ -44,7 +44,6 @@ export const linkBonusOf = (state: PlayerState, id: string, regionId: string = s
 /** The sum of one bonus over the companions working in this bar, each at their own strength (and stronger with a friend beside them). */
 export const companionBonus = (state: PlayerState, bonus: BonusId, regionId: string = state.regionId): number =>
   crewOf(state, regionId).reduce((sum, id) => (companionById(id)?.bonus === bonus ? sum + bonusAmount(bonus, powerOf(state, id)) * (1 + linkBonusOf(state, id, regionId)) * (spotlightActive(state, id) ? 2 : 1) : sum), 0);
-export const companionBonuses = (state: PlayerState, regionId: string = state.regionId) => Object.fromEntries(BONUSES.map((item) => [item.id, companionBonus(state, item.id, regionId)])) as Record<BonusId, number>;
 
 const known = (id: unknown) => {
   const companion = companionById(String(id));

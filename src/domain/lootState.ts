@@ -1,11 +1,11 @@
-import { ARMED_CHARGES, BOOST_KINDS, EQUIPMENT, TIER_ORDER, PRESTIGE_PERKS, newSlot, type EquipmentSlot, type Pity, type Reward } from './loot';
+import { ARMED_CHARGES, BOOST_KINDS, EQUIPMENT, TIER_ORDER, newSlot, type EquipmentSlot, type Pity, type Reward } from './loot';
 import { INGREDIENTS, REGIONS } from './catalog';
 import { SEASON_MILESTONES } from './seasons';
 import { SignatureError, validateSignature, type Signature } from './signature';
-import { STAT_IDS } from './quests';
+import { STAT_IDS, achievementById } from './quests';
 import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 
-// The loot layer of a player's save: materials, consumables, boxes, per-bar equipment, gacha pity and prestige.
+// The loot layer of a player's save: materials, consumables, boxes, per-bar equipment, gacha pity.
 export interface DrawResult { id: string; label: string; rarity: 'common' | 'rare' | 'legendary'; duplicate: boolean; shards: number; }
 export interface LootState {
   parts: number;
@@ -21,9 +21,6 @@ export interface LootState {
   pity: Pity;
   pendingChoice?: Reward[];
   lastDraw: DrawResult[];
-  prestige: { stars: number; earned: number; count: number; perks: Record<string, number> };
-  // Coins earned since the last Grand Opening; sets the stars for the next one.
-  runEarned: number;
   // Highest level whose level-up box was already granted.
   levelRewarded: number;
   log: string[];
@@ -53,7 +50,7 @@ export const createLoot = (): LootState => ({
   parts: 0, skinShards: 0, itemShards: {}, consumables: {}, boxes: {}, armed: {}, boosts: {},
   equipment: Object.fromEntries(REGIONS.map((region) => [region.id, Object.fromEntries(EQUIPMENT.map((item) => [item.id, newSlot()]))])),
   pity: { sinceRare: 0, sinceLegendary: 0 }, lastDraw: [],
-  prestige: { stars: 0, earned: 0, count: 0, perks: {} }, runEarned: 0, levelRewarded: 1, log: [],
+  levelRewarded: 1, log: [],
   stats: {}, quests: { week: 0, progress: {}, claimed: [] }, achievements: [], tasted: [], regulars: {}, spoiledAt: 0, signatures: {}, weekly: { week: 0, score: 0 }, leaderboardClaimed: 0, season: { id: '', draws: 0, rewarded: [], spark: false }, firstBoxOpened: false
 });
 
@@ -81,8 +78,6 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
   }
   const boosts: Record<string, number> = {};
   for (const kind of BOOST_KINDS) if (Number.isFinite(source.boosts?.[kind])) boosts[kind] = source.boosts![kind]!;
-  const perks: Record<string, number> = {};
-  for (const perk of PRESTIGE_PERKS) perks[perk.id] = Math.min(perk.maxRank, count(source.prestige?.perks?.[perk.id], perk.maxRank));
   return {
     parts: count(source.parts), skinShards: count(source.skinShards),
     itemShards: counts(source.itemShards, EQUIPMENT.map((item) => item.id)),
@@ -91,12 +86,11 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
     pity: { sinceRare: count(source.pity?.sinceRare, 1000), sinceLegendary: count(source.pity?.sinceLegendary, 1000) },
     pendingChoice: Array.isArray(source.pendingChoice) && source.pendingChoice.length === 3 ? source.pendingChoice : undefined,
     lastDraw: Array.isArray(source.lastDraw) ? source.lastDraw.slice(0, 10) : [],
-    prestige: { stars: count(source.prestige?.stars), earned: count(source.prestige?.earned), count: count(source.prestige?.count, 1000), perks },
-    runEarned: count(source.runEarned, 1e12),
     levelRewarded: Math.max(1, count(source.levelRewarded, 50) || currentLevel),
     stats: counts(source.stats, STAT_IDS, 1_000_000_000),
     quests: { week: count(source.quests?.week, 1e6), progress: counts(source.quests?.progress), claimed: Array.isArray(source.quests?.claimed) ? source.quests!.claimed.filter((id) => typeof id === 'string').slice(0, 10) : [] },
-    achievements: Array.isArray(source.achievements) ? [...new Set(source.achievements.filter((id) => typeof id === 'string'))].slice(0, 80) : [],
+    // Only achievements that exist are kept (one that was removed from the game disappears), and there is room for all of them.
+    achievements: Array.isArray(source.achievements) ? [...new Set(source.achievements.filter((id) => typeof id === 'string' && !!achievementById(id)))] : [],
     tasted: Array.isArray(source.tasted) ? [...new Set(source.tasted.filter((id) => typeof id === 'string'))].slice(0, 400) : [],
     regulars: counts(source.regulars, CUSTOMER_ART_BY_SLOT),
     spoiledAt: count(source.spoiledAt, 1e14),

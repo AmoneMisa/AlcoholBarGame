@@ -158,34 +158,6 @@ test('Level-ups grant boxes exactly once', () => {
   assert.equal(state.loot.boxes.bronze, 4);
 });
 
-test('Prestige needs level 50, resets the business, keeps recipes and crystals, and stars buy permanent perks', () => {
-  const state = fresh();
-  state.crystals = 77;
-  assert.throws(() => run(state, { type: 'prestige' }), /level 50/);
-  state.xp = xpForLevel(50);
-  state.money = 99_999;
-  state.loot.runEarned = 40_000;
-  state.loot.equipment['new-york'].shaker.level = 4;
-  const recipes = [...state.knownRecipeIds];
-  run(state, { type: 'prestige' });
-  assert.equal(state.xp, 0);
-  assert.equal(state.money, 600);
-  assert.equal(state.crystals, 77);
-  assert.deepEqual(state.knownRecipeIds, recipes);
-  assert.equal(state.loot.equipment['new-york'].shaker.level, 0);
-  assert.equal(state.loot.prestige.count, 1);
-  assert.equal(state.loot.prestige.stars, 2 + Math.floor(Math.sqrt(40_000 / 400)));
-  assert.equal(state.loot.boxes.choice, 1);
-  const stars = state.loot.prestige.stars;
-  run(state, { type: 'buyPrestigePerk', perk: 'pay' });
-  run(state, { type: 'buyPrestigePerk', perk: 'bank' });
-  assert.equal(state.loot.prestige.stars, stars - 2);
-  assert.equal(lootBonuses(state, NOW).payFactor, 1.015);
-  state.loot.prestige.stars = 0;
-  assert.throws(() => run(state, { type: 'buyPrestigePerk', perk: 'supply' }), /stars/);
-  assert.throws(() => run(state, { type: 'buyPrestigePerk', perk: 'fake' }), /Unknown/);
-});
-
 test('Recipe Scroll needs a known recipe; Express Courier needs a delivery', () => {
   const state = fresh();
   state.loot.consumables = { scroll: 1, courier: 1 };
@@ -718,7 +690,6 @@ test('Negotiated orders respect storeroom capacity, the fridge and order discoun
   assert.equal(state.money, 1e6, 'a refused deal costs nothing');
   state.loot.equipment['new-york'].fridge.level = 10;
   deal({ [offer.ingredientId]: 2 });
-  state.loot.prestige.perks.supply = 5;   // -10% supplier prices
   state.loot.armed.voucher = 1;           // -20%
   const quoted = state.negotiation;
   void quoted;
@@ -840,8 +811,7 @@ test('Resetting the account works at any level, needs a confirmation, and starts
   assert.equal(state.startingBarChosen, false, 'the first bar is chosen again');
   assert.equal(state.tour, 'done', 'the tour is not shown again');
   assert.match(state.message, /reset/);
-  // a level-1 account can be reset too, and a reset gives no stars or boxes
-  assert.equal(state.loot.prestige.stars, 0);
+  // a level-1 account can be reset too
   run(state, { type: 'wipeAccount', confirm: true });
 });
 
@@ -892,4 +862,13 @@ test('Calm Charm stops a bad ending once, and only when the ending was bad', asy
   const calmed = play(true);
   assert.equal(calmed.result.leave, false);
   assert.equal(calmed.state.loot.armed['calm-charm'], undefined);
+});
+
+test('A save keeps every earned achievement (there are more than a hundred) and drops one that no longer exists', async () => {
+  const { ACHIEVEMENTS } = await import('../src/domain/quests.ts');
+  const ids = ACHIEVEMENTS.map((item) => item.id);
+  assert.ok(ids.length > 100);
+  const loot = normalizeLoot({ achievements: [...ids, 'a-prestige-1', 'made-up'] }, 1);
+  assert.equal(loot.achievements.length, ids.length);
+  assert.ok(!loot.achievements.includes('a-prestige-1'));
 });

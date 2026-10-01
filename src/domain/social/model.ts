@@ -13,7 +13,6 @@ export const EMOTION_ICON: Record<Emotion, string> = {
 
 // What the guest's life is about tonight; it decides which stories they tell.
 export type TalkTopic = 'work' | 'relationship' | 'money' | 'family' | 'sports' | 'celebration' | 'travel' | 'health' | 'weather';
-export const TALK_TOPICS: TalkTopic[] = ['work', 'relationship', 'money', 'family', 'sports', 'celebration', 'travel', 'health', 'weather'];
 
 export type Gender = 'f' | 'm' | 'x';
 

@@ -17,7 +17,6 @@ export interface StatSource {
   companions?: { owned: Record<string, number> };
   loot: {
     stats: Record<string, number>;
-    prestige: { count: number };
     equipment: Record<string, Record<string, { level: number }>>;
   };
 }
@@ -29,7 +28,6 @@ const DERIVED: Partial<Record<StatId, (state: StatSource) => number>> = {
   backgrounds: (state) => state.ownedInteriorIds.length,
   bars: (state) => state.ownedBarIds.length,
   skins: (state) => state.ownedCosmeticIds.length,
-  prestiges: (state) => state.loot.prestige.count,
   level: (state) => levelFor(state.xp),
   staffHired: (state) => Object.values(state.staffByBar ?? {}).reduce((sum, team) => sum + team.length, 0),
   staffLevels: (state) => Object.values(state.staffByBar ?? {}).reduce((sum, team) => sum + team.reduce((total, member) => total + Math.max(0, member.level), 0), 0),
@@ -38,7 +36,6 @@ const DERIVED: Partial<Record<StatId, (state: StatSource) => number>> = {
   barUpgrades: (state) => REGIONS.filter((region) => state.ownedBarIds.includes(region.id) && EQUIPMENT.every((item) => (state.loot.equipment[region.id]?.[item.id]?.level ?? 0) >= EQUIPPED_LEVEL)).length
 };
 
-export const isDerived = (stat: StatId) => stat in DERIVED;
 
 /** The progress for one counter: the larger of what was counted and what the player has now. */
 export function statValue(state: StatSource, stat: StatId): number {

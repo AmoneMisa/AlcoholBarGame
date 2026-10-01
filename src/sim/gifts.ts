@@ -25,16 +25,6 @@ export const SHARD_GIFT_AMOUNTS = [5, 10, 20] as const;
 export const LOOT_GIFTS_PER_DAY = 5;
 export type Gift = GiftRequest;
 
-export const VISIT_REWARD = 20;
-
-export function giftLabel(gift: Gift) {
-  if (gift.kind === 'consumable') return consumableDef(gift.id)?.name ?? 'A consumable';
-  if (gift.kind === 'skin-shards') return `${gift.amount} skin shards`;
-  if (gift.kind === 'cosmetic-copy') return `${COSMETICS.find((item) => item.id === gift.cosmeticId)?.label ?? 'A'} cosmetic`;
-  if (gift.kind === 'interior') return `${INTERIORS.find((item) => item.id === gift.interiorId)?.name ?? 'A new'} background`;
-  const recipe = RECIPES.find((item) => item.id === gift.recipeId);
-  return `${recipe?.name ?? 'A'} recipe card`;
-}
 
 // What sending costs, for the gift screen and the rules.
 export function giftPrice(gift: GiftRequest) {

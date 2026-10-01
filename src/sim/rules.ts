@@ -15,7 +15,7 @@ import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL, economyAt, formatDeliveryTime, mar
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
-import { LootError, orderDiscount, claimSpark, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, buyPrestigePerk, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, prestige, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
+import { LootError, orderDiscount, claimSpark, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
 import { usableIngredientIds } from '../domain/usableStock';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { actsIn } from '../domain/social/acts';
@@ -115,14 +115,12 @@ export type GameAction =
   | { type: 'drawStyle'; count: 1 | 10; banner?: 'standard' | 'seasonal' }
   | { type: 'claimSpark'; cosmeticId: string }
   | { type: 'craftSkin'; cosmeticId: string }
-  | { type: 'prestige' }
   | { type: 'wipeAccount'; confirm: true }
   | { type: 'designSignature'; name: string; items: { ingredientId: string; amount: number }[]; needsShake: boolean }
   | { type: 'claimLeaderboardReward' }
   | { type: 'setFeaturedAchievements'; ids: string[] }
   | { type: 'claimQuest'; questId: string }
   | { type: 'claimAchievement'; id: string }
-  | { type: 'buyPrestigePerk'; perk: string };
 
 export class RuleError extends Error {}
 
@@ -1076,12 +1074,10 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'drawStyle':
     case 'claimSpark':
     case 'craftSkin':
-    case 'prestige':
     case 'designSignature':
     case 'claimLeaderboardReward':
     case 'claimQuest':
-    case 'claimAchievement':
-    case 'buyPrestigePerk': {
+    case 'claimAchievement': {
       try {
         switch (action.type) {
           case 'upgradeEquipment': upgradeEquipment(state, action.item, now, action.regionId); break;
@@ -1094,12 +1090,10 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           case 'drawStyle': drawStyle(state, action.count, action.banner, now, random); break;
           case 'claimSpark': claimSpark(state, action.cosmeticId, now); break;
           case 'craftSkin': craftSkin(state, action.cosmeticId); break;
-          case 'prestige': prestige(state, now); break;
           case 'designSignature': designSignature(state, { name: action.name, items: action.items, needsShake: action.needsShake }); break;
           case 'claimLeaderboardReward': claimLeaderboardReward(state, context.leaderboard, now); break;
           case 'claimQuest': claimQuest(state, action.questId, now); break;
           case 'claimAchievement': claimAchievement(state, action.id); break;
-          case 'buyPrestigePerk': buyPrestigePerk(state, action.perk); break;
         }
       } catch (error) {
         if (error instanceof LootError) throw new RuleError(error.message);
@@ -1114,8 +1108,6 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
   // Achievements count what the player spent in all.
   addStat(state, 'coinsSpent', Math.floor(moneyBefore - state.money));
   addStat(state, 'crystalsSpent', crystalsBefore - state.crystals);
-  // Coins earned by serving and selling bottles decide the stars of the next Grand Opening.
-  if (['serve', 'autoServe', 'sellBottle'].includes(action.type) && state.money > moneyBefore) state.loot.runEarned += Math.floor(state.money - moneyBefore);
   grantLevelBoxes(state);
   syncDerivedStats(state);
   // Auto-serve XP does not count for the leaderboard: the ranking rewards hands-on service.
@@ -1126,14 +1118,13 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     weekly: { week: state.loot.weekly.week, score: state.loot.weekly.score, label: state.bars[state.regionId].name, level: levelFor(state.xp) } };
 }
 
-// Loot actions leave a trail (what was rolled, pity, prestige) for the server's loot ledger.
-const AUDITED = new Set<GameAction['type']>(['openBox', 'pickReward', 'buyBox', 'buyConsumable', 'drawStyle', 'claimSpark', 'craftSkin', 'prestige', 'buyPrestigePerk', 'claimLeaderboardReward', 'claimQuest', 'claimAchievement']);
+// Loot actions leave a trail (what was rolled, pity) for the server's loot ledger.
+const AUDITED = new Set<GameAction['type']>(['openBox', 'pickReward', 'buyBox', 'buyConsumable', 'drawStyle', 'claimSpark', 'craftSkin', 'claimLeaderboardReward', 'claimQuest', 'claimAchievement']);
 export interface LootAudit { action: string; message: string; detail: Record<string, unknown>; }
 function auditEntry(state: PlayerState, action: GameAction): LootAudit | undefined {
   if (!AUDITED.has(action.type)) return undefined;
   const detail: Record<string, unknown> = {};
   if (action.type === 'drawStyle') Object.assign(detail, { banner: (action as { banner?: string }).banner ?? 'standard', results: state.loot.lastDraw, pity: state.loot.pity, season: state.loot.season });
-  else if (action.type === 'prestige') Object.assign(detail, { prestige: state.loot.prestige });
   else if (action.type === 'openBox' && state.loot.pendingChoice) Object.assign(detail, { offered: state.loot.pendingChoice });
   return { action: action.type, message: state.message, detail };
 }

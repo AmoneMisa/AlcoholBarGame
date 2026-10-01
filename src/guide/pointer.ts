@@ -35,8 +35,6 @@ export const GUIDE_ATTRIBUTES = [
 ] as const;
 
 export const selector = (name: (typeof GUIDE_ATTRIBUTES)[number]) => `[data-guide="${name}"]`;
-export const bottleSelector = (ingredientId: string) => `[data-guide-ingredient="${ingredientId}"]`;
-export const freshSelector = (ingredientId: string) => `[data-guide-fresh="${ingredientId}"]`;
 
 export const isTouch = () => typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
 export const wording = (label: string) => label.replace(/\{Tap\}/g, isTouch() ? 'Tap' : 'Click').replace(/\{tap\}/g, isTouch() ? 'tap' : 'click');

@@ -94,12 +94,12 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .pshelf-row .shelf-nudge button .ui-icon { width: 18px; height: 18px; }
 
 /* ==== Header popovers: servers, training and sound open under their button, above everything, and never run off the screen ==== */
-.staff-resource, .academy-resource, .sound-resource, .exchange-resource { position: relative; }
-.staff-panel, .academy-panel { position: absolute; top: calc(100% + 10px); left: 50%; z-index: 260; transform: translateX(-50%); width: min(380px, 92vw); max-height: calc(100dvh - 170px); overflow: auto; overscroll-behavior: contain; }
+.staff-resource, .sound-resource, .exchange-resource { position: relative; }
+.staff-panel { position: absolute; top: calc(100% + 10px); left: 50%; z-index: 260; transform: translateX(-50%); width: min(380px, 92vw); max-height: calc(100dvh - 170px); overflow: auto; overscroll-behavior: contain; }
 .currency-exchange { z-index: 260; max-height: calc(100dvh - 170px); overflow: auto; overscroll-behavior: contain; }
 .staff-panel .staff-row:first-of-type { border-top: 0; }
 @media (max-width: 760px) {
-  .staff-panel, .academy-panel { position: fixed; top: calc(max(8px, env(safe-area-inset-top)) + 112px); left: 7px; right: 7px; width: auto; transform: none; max-height: calc(100dvh - 112px - 90px); }
+  .staff-panel { position: fixed; top: calc(max(8px, env(safe-area-inset-top)) + 112px); left: 7px; right: 7px; width: auto; transform: none; max-height: calc(100dvh - 112px - 90px); }
 }
 /* The House rules panel floats over the bar scene, above the button that opens it. */
 .house-rules-panel { position: absolute; z-index: 60; left: 12px; bottom: 90px; width: min(380px, calc(100% - 24px)); max-height: 62%; }

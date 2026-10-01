@@ -3,11 +3,11 @@ import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { coins } from '../domain/economy';
 import { COSMETICS } from '../domain/cosmetics';
 import { DUPLICATE_INTERIOR_SHARDS, EVENT_INTERIOR_IDS, INTERIORS } from '../data/cosmetics/bars';
-import { economyAt, levelFor, MAX_LEVEL } from '../domain/progression';
+import { levelFor, MAX_LEVEL } from '../domain/progression';
 import {
-  BOOST_KINDS, BOXES, CONSUMABLES, DRAW_COST, DUPLICATE_SHARDS, EQUIPMENT, FEATURED_SHARE, PRESTIGE_LEVEL, PRESTIGE_PERKS, SHARD_CRAFT_COST, STARTING_COINS,
-  TIER_ORDER, TIER_SHARD_COST, boxDef, choiceOptions, consumableDef, describeReward, equipmentDef, featuredIndex, levelCap, perkCost, prestigeStarsFor, rollBox, rollRarity,
-  upgradeCostFor, type BoxKind, type EquipmentId, type PrestigePerkId, type Reward
+  BOOST_KINDS, BOXES, CONSUMABLES, DRAW_COST, DUPLICATE_SHARDS, EQUIPMENT, FEATURED_SHARE, SHARD_CRAFT_COST,
+  TIER_ORDER, TIER_SHARD_COST, boxDef, choiceOptions, consumableDef, describeReward, equipmentDef, featuredIndex, levelCap, rollBox, rollRarity,
+  upgradeCostFor, type BoxKind, type EquipmentId, type Reward
 } from '../domain/loot';
 import { SEASON_FEATURED_SHARE, SEASON_MILESTONES, SPARK_DRAWS, seasonAt } from '../domain/seasons';
 import { MIN_WEEKLY_SCORE, describeLeaderboardReward, leaderboardReward } from '../domain/leaderboard';
@@ -20,11 +20,10 @@ import type { Customer } from '../domain/types';
 import { statValue } from '../domain/achievementStats';
 import { companionBonus, joinCompanion, addKeepsakes } from './companions';
 import { companionJoiningWith, keepsakeFor } from '../domain/companions';
-import { ACHIEVEMENTS, TASTING_REWARD, achievementById, achievementSeries, questById, questsForWeek, weekOf, type StatId } from '../domain/quests';
+import { ACHIEVEMENTS, TASTING_REWARD, achievementById, achievementSeries, questsForWeek, weekOf, type StatId } from '../domain/quests';
 import type { DrawResult } from '../domain/lootState';
-import { createLoot } from '../domain/lootState';
 import { addSpareCopy, isStarterRecipe } from './recipes';
-import { createInitialState, type PlayerState } from './state';
+import type { PlayerState } from './state';
 
 // Rules of the loot layer. They only run inside applyAction (server side); every input is checked here.
 
@@ -46,7 +45,6 @@ const slotOf = (state: PlayerState, id: string, regionId: string = state.regionI
 };
 
 // ---- Bonuses the other rules read ----
-export const perkRank = (state: PlayerState, id: PrestigePerkId) => state.loot.prestige.perks[id] ?? 0;
 export const boostActive = (state: PlayerState, kind: string, now: number) => (state.loot.boosts[kind] ?? 0) > now;
 export const equipmentLevel = (state: PlayerState, id: EquipmentId, regionId = state.regionId) => state.loot.equipment[regionId]?.[id]?.level ?? 0;
 const barLabel = (regionId: string) => REGIONS.find((item) => item.id === regionId)?.name ?? 'this bar';
@@ -65,9 +63,9 @@ export function lootBonuses(state: PlayerState, now: number) {
     crystalFactor: 1 + c('crystals'),
     upgradeDiscount: c('upgrade'),
     tasteParts: c('parts'),
-    // Cash register, prestige name and the Coin Booster multiply what guests pay.
-    payFactor: (1 + effect(state, 'register') + c('pay')) * (1 + perkRank(state, 'pay') * .015) * (boostActive(state, 'coin-boost', now) ? 1.25 : 1),
-    supplyFactor: 1 - perkRank(state, 'supply') * .02 - c('supply'),
+    // Cash register and the Coin Booster multiply what guests pay.
+    payFactor: (1 + effect(state, 'register') + c('pay')) * (boostActive(state, 'coin-boost', now) ? 1.25 : 1),
+    supplyFactor: 1 - c('supply'),
     bottleCostFactor: 1 - effect(state, 'cellar') - c('restock'),
     xpFactor: (boostActive(state, 'xp-boost', now) ? 1.5 : 1) * (1 + c('xp')),
     arrivalFactor: (boostActive(state, 'happy-hour', now) ? .5 : 1) * (1 - c('arrival')),
@@ -205,7 +203,7 @@ export function useConsumable(state: PlayerState, id: string, recipeId: unknown,
 // ---- Equipment ----
 export function upgradeEquipment(state: PlayerState, id: string, now: number, regionId: string = state.regionId) {
   const slot = slotOf(state, id, regionId);
-  const cap = levelCap(slot.tier, perkRank(state, 'cap'));
+  const cap = levelCap(slot.tier);
   if (slot.level >= cap) throw new LootError(TIER_SHARD_COST[slot.tier] ? 'Raise the item’s tier with shards to unlock more levels.' : 'This item is at its top level.');
   const cost = upgradeCostFor(slot.level);
   if (state.money < cost.coins) throw new LootError(`You need ${cost.coins} coins.`);
@@ -224,7 +222,7 @@ export function promoteEquipment(state: PlayerState, id: string, regionId: strin
   if (!has(state.loot.itemShards, id, cost)) throw new LootError(`You need ${cost} ${equipmentDef(id)!.name} shards.`);
   take(state.loot.itemShards, id, cost);
   slot.tier = TIER_ORDER[TIER_ORDER.indexOf(slot.tier) + 1]!;
-  note(state, `${equipmentDef(id)!.name} in ${barLabel(regionId)} is now ${slot.tier} tier (level cap ${levelCap(slot.tier, perkRank(state, 'cap'))}).`);
+  note(state, `${equipmentDef(id)!.name} in ${barLabel(regionId)} is now ${slot.tier} tier (level cap ${levelCap(slot.tier)}).`);
 }
 
 // ---- Style draw ----
@@ -232,7 +230,6 @@ export const featuredLegendary = (now: number) => {
   const legendary = COSMETICS.filter((item) => item.rarity === 'legendary');
   return legendary[featuredIndex(now, legendary.length)];
 };
-export type Banner = 'standard' | 'seasonal';
 // The season's progress restarts when the UTC month changes.
 function currentSeason(state: PlayerState, now: number) {
   const season = seasonAt(now);
@@ -334,44 +331,6 @@ export function dailyStreakBox(state: PlayerState) {
     return ' Week streak bonus: a silver box!';
   }
   return '';
-}
-
-// ---- Prestige ----
-export const canPrestige = (state: PlayerState) => levelFor(state.xp) >= PRESTIGE_LEVEL;
-export function prestige(state: PlayerState, now: number) {
-  if (!canPrestige(state)) throw new LootError(`Reach level ${PRESTIGE_LEVEL} for a Grand Opening.`);
-  const stars = prestigeStarsFor(state.loot.runEarned);
-  const fresh = createInitialState(now);
-  const bank = perkRank(state, 'bank') * 300;
-  const loot = state.loot;
-  loot.prestige.stars += stars;
-  loot.prestige.earned += stars;
-  loot.prestige.count += 1;
-  const reset = createLoot();
-  loot.equipment = reset.equipment;
-  loot.boosts = {}; loot.armed = {}; loot.pendingChoice = undefined; loot.runEarned = 0; loot.levelRewarded = 1;
-  grantBox(state, 'choice');
-  // Recipes, styles, crystals, bars, friends and materials survive; the business starts over.
-  Object.assign(state, {
-    money: STARTING_COINS + bank, xp: 0, streak: 0, inventories: fresh.inventories, bottleInventories: fresh.bottleInventories,
-    customers: fresh.customers, activeCustomerId: fresh.activeCustomerId, conversationCustomerId: undefined, nextCustomerAt: 0, vipCooldownUntil: 0,
-    lastClockAt: now, deliveryOrders: [], autoSupply: undefined, popularityBoost: undefined, negotiation: undefined, conversations: {}, rewardedSentences: {}, tradeLog: []
-  });
-  const region = REGIONS.find((item) => item.id === state.regionId)!;
-  const priceFactor = economyAt(region.id, region.marketFactor, 0, now).guestPriceFactor;
-  for (const guest of state.customers) guest.priceFactor = priceFactor;
-  note(state, `Grand Opening #${loot.prestige.count}! +${stars} prestige stars and a Choice box. Your bars start over with permanent bonuses.`);
-}
-export function buyPrestigePerk(state: PlayerState, perkId: unknown) {
-  const perk = PRESTIGE_PERKS.find((item) => item.id === perkId);
-  if (!perk) throw new LootError('Unknown prestige perk.');
-  const rank = perkRank(state, perk.id);
-  if (rank >= perk.maxRank) throw new LootError(`${perk.name} is at its top rank.`);
-  const cost = perkCost(rank);
-  if (state.loot.prestige.stars < cost) throw new LootError(`You need ${cost} prestige stars.`);
-  state.loot.prestige.stars -= cost;
-  state.loot.prestige.perks[perk.id] = rank + 1;
-  note(state, `${perk.name} rank ${rank + 1}: ${perk.description}`);
 }
 
 export { BOXES, CONSUMABLES, EQUIPMENT, MAX_LEVEL };

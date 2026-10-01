@@ -4,7 +4,7 @@ import UiInput from '../ui/UiInput.vue';
 import { ingredientName as nameOf } from '../../domain/catalog';
 import UiIcon from '../ui/UiIcon.vue';
 import { computed, nextTick, ref, watch } from 'vue';
-import { INGREDIENTS, REGIONS } from '../../domain/catalog';
+import { REGIONS } from '../../domain/catalog';
 import { checkText } from '../../domain/english/checker';
 import { MAX_OFFERS, SELLERS, TACTICS, offerChance } from '../../sim/trade';
 import { useGameStore } from '../../stores/game';

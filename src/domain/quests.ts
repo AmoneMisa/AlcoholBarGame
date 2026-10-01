@@ -2,7 +2,7 @@ import type { BoxKind } from './loot';
 
 // Weekly quests and lifetime achievements. Both read the same counters (`loot.stats`), which only server rules increase.
 export const STAT_IDS = ['serves', 'servesCoins', 'vips', 'bottles', 'boxes', 'draws', 'upgrades', 'tasted', 'perfectTalks', 'lessons', 'signatures',
-  'coinsSpent', 'crystalsSpent', 'backgrounds', 'bars', 'skins', 'visitedBy', 'visitedFriends', 'prestiges', 'giftsSent', 'giftsGot', 'barUpgrades', 'level', 'staffHired', 'staffLevels', 'loginDays', 'companions', 'bonds'] as const;
+  'coinsSpent', 'crystalsSpent', 'backgrounds', 'bars', 'skins', 'visitedBy', 'visitedFriends', 'giftsSent', 'giftsGot', 'barUpgrades', 'level', 'staffHired', 'staffLevels', 'loginDays', 'companions', 'bonds'] as const;
 export type StatId = typeof STAT_IDS[number];
 export interface Goal { id: string; name: string; stat: StatId; target: number; box: BoxKind; crystals: number; }
 
@@ -48,7 +48,6 @@ const SERIES: { stat: StatId; name: string; rows: Row[] }[] = [
   { stat: 'skins', name: 'Collector', rows: [['a-skins-10', 'New wardrobe: collect 10 styles', 10, 'bronze', 8], ['a-skins-25', 'Stylist: collect 25 styles', 25, 'silver', 25], ['a-skins-50', 'Wardrobe master: collect 50 styles', 50, 'silver', 45], ['a-skins-80', 'Museum of style: collect 80 styles', 80, 'choice', 90]] },
   { stat: 'visitedBy', name: 'Popular bar', rows: [['a-visited-1', 'First guest: 1 friend visit to your bar', 1, 'bronze', 5], ['a-visited-5', 'Open doors: 5 friend visits', 5, 'silver', 15], ['a-visited-20', 'Meeting place: 20 friend visits', 20, 'silver', 35], ['a-visited-60', 'Neighbourhood landmark: 60 friend visits', 60, 'choice', 80]] },
   { stat: 'visitedFriends', name: 'Good neighbour', rows: [['a-visits-1', 'Say hello: visit a friend 1 time', 1, 'bronze', 5], ['a-visits-5', 'Regular visitor: 5 visits', 5, 'silver', 15], ['a-visits-20', 'Bar hopper: 20 visits', 20, 'silver', 35], ['a-visits-60', 'Guest of honour: 60 visits', 60, 'choice', 80]] },
-  { stat: 'prestiges', name: 'Grand opening', rows: [['a-prestige-1', 'Fresh start: 1 Grand Opening', 1, 'bronze', 20], ['a-prestige-3', 'Reborn: 3 Grand Openings', 3, 'silver', 40], ['a-prestige-7', 'Phoenix: 7 Grand Openings', 7, 'choice', 70], ['a-prestige-15', 'Eternal: 15 Grand Openings', 15, 'choice', 120]] },
   { stat: 'giftsSent', name: 'Generous', rows: [['a-sent-1', 'Kind gesture: send 1 gift', 1, 'bronze', 5], ['a-sent-10', 'Gift giver: send 10 gifts', 10, 'silver', 20], ['a-sent-40', 'Santa: send 40 gifts', 40, 'silver', 40], ['a-sent-120', 'Patron of friends: send 120 gifts', 120, 'choice', 90]] },
   { stat: 'giftsGot', name: 'Beloved', rows: [['a-got-1', 'Surprise: get 1 gift', 1, 'bronze', 5], ['a-got-10', 'Well liked: get 10 gifts', 10, 'silver', 20], ['a-got-40', 'Spoiled: get 40 gifts', 40, 'silver', 40], ['a-got-120', 'Friend of all: get 120 gifts', 120, 'choice', 90]] },
   { stat: 'barUpgrades', name: 'Well equipped', rows: [['a-equipped-1', 'Fitted out: 1 bar with all equipment at level 5', 1, 'bronze', 15], ['a-equipped-2', '2 bars with all equipment at level 5', 2, 'silver', 30], ['a-equipped-4', '4 bars with all equipment at level 5', 4, 'silver', 55], ['a-equipped-6', 'Perfect chain: all 6 bars at level 5', 6, 'choice', 110]] },

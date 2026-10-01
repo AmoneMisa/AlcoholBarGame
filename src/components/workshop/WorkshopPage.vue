@@ -7,8 +7,8 @@ import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE, leaderboardReward, describeLeaderbo
 import { RECIPES } from '../../domain/catalog';
 import { COSMETICS } from '../../domain/cosmetics';
 import {
-  BOXES, CONSUMABLES, DRAW_COST, DRAW_ODDS, DUPLICATE_SHARDS, EQUIPMENT, LEGENDARY_PITY, PRESTIGE_LEVEL, PRESTIGE_PERKS, SHARD_CRAFT_COST, TIER_SHARD_COST,
-  consumableDef, describeReward, equipmentDef, levelCap, perkCost, prestigeStarsFor, upgradeCostFor
+  BOXES, CONSUMABLES, DRAW_COST, DRAW_ODDS, DUPLICATE_SHARDS, EQUIPMENT, LEGENDARY_PITY, SHARD_CRAFT_COST, TIER_SHARD_COST,
+  consumableDef, describeReward, equipmentDef, levelCap, upgradeCostFor
 } from '../../domain/loot';
 import { ACHIEVEMENTS, questsForWeek, weekOf, type StatId } from '../../domain/quests';
 import { INGREDIENTS } from '../../domain/catalog';
@@ -24,7 +24,7 @@ import OptionSelect from '../game/OptionSelect.vue';
 import { useGameStore } from '../../stores/game';
 
 const game = useGameStore();
-const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'signature' | 'weekly' | 'prestige'>('equipment');
+const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'signature' | 'weekly'>('equipment');
 const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['signature', 'Signature'], ['weekly', 'Weekly']] as const;
 const scrollRecipe = ref('');
 const names = { consumable: (id: string) => consumableDef(id)?.name ?? id, equipment: (id: string) => equipmentDef(id)?.name ?? id };
@@ -32,7 +32,7 @@ const names = { consumable: (id: string) => consumableDef(id)?.name ?? id, equip
 const pickedBar = ref('');
 const equipBar = computed(() => (ownedBars.value.some((region) => region.id === pickedBar.value) ? pickedBar.value : game.regionId));
 const ownedBars = computed(() => REGIONS.filter((region) => game.isBarOwned(region.id)));
-const cap = (id: string) => levelCap(game.loot.equipment[equipBar.value]![id]!.tier, game.loot.prestige.perks.cap ?? 0);
+const cap = (id: string) => levelCap(game.loot.equipment[equipBar.value]![id]!.tier);
 const slot = (id: string) => game.loot.equipment[equipBar.value]![id]!;
 const partsFor = (id: string) => Math.max(1, Math.ceil(upgradeCostFor(slot(id).level).parts * (1 - game.crewBonus('upgrade', equipBar.value))));
 // Why a button is off, in words: shown under it, so the player never faces a dead button.
@@ -129,7 +129,6 @@ const seasonDraws = computed(() => game.loot.season.id === season.value.id ? gam
 const seasonRewarded = computed(() => game.loot.season.id === season.value.id ? game.loot.season.rewarded : []);
 const sparkUsed = computed(() => game.loot.season.id === season.value.id && game.loot.season.spark);
 const seasonDaysLeft = computed(() => Math.max(0, Math.ceil((season.value.endsAt - Date.now()) / 86_400_000)));
-const runStars = computed(() => prestigeStarsFor(game.loot.runEarned));
 const effectText = (id: string) => {
   const item = equipmentDef(id)!;
   return `${Math.round(slot(id).level * item.perLevel * 1000) / 10}% ${item.unit}`;
@@ -148,7 +147,6 @@ const boostLeft = (id: string) => {
         <div><dt>Parts</dt><dd>{{ game.loot.parts }}</dd></div>
         <div><dt>Skin shards</dt><dd>{{ game.loot.skinShards }}</dd></div>
         <div><dt>Crystals</dt><dd>{{ game.crystals }}</dd></div>
-        <div><dt>Stars</dt><dd>{{ game.loot.prestige.stars }}</dd></div>
       </dl>
     </header>
     <nav class="workshop-tabs"><button v-for="[id, label] in tabs" :key="id" type="button" :class="{ active: tab === id }" @click="tab = id">{{ label }}</button></nav>
@@ -328,19 +326,6 @@ const boostLeft = (id: string) => {
       <p class="hint">{{ regulars.length - metRegulars.length }} guests have not been served yet.</p>
     </div>
 
-    <div v-else class="grid">
-      <article class="card">
-        <h3>🏛️ Grand Opening</h3>
-        <p>At level {{ PRESTIGE_LEVEL }} you can reopen your bars: coins, XP, stock and equipment reset. Recipes, styles, crystals, parts and boxes stay, and you earn prestige stars for permanent perks plus a Choice box.</p>
-        <b>Opened {{ game.loot.prestige.count }} times · this run earns {{ runStars }} stars</b>
-
-      </article>
-      <article v-for="perk in PRESTIGE_PERKS" :key="perk.id" class="card">
-        <h3>{{ perk.name }} <b>{{ game.loot.prestige.perks[perk.id] ?? 0 }} / {{ perk.maxRank }}</b></h3>
-        <p>{{ perk.description }}</p>
-        <UiButton variant="primary" :disabled="(game.loot.prestige.perks[perk.id] ?? 0) >= perk.maxRank || game.loot.prestige.stars < perkCost(game.loot.prestige.perks[perk.id] ?? 0)" @click="game.act({ type: 'buyPrestigePerk', perk: perk.id })">Buy · {{ perkCost(game.loot.prestige.perks[perk.id] ?? 0) }} stars</UiButton>
-      </article>
-    </div>
   </section>
 </template>
 

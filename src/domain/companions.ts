@@ -314,7 +314,6 @@ export const COMPANIONS: Companion[] = [
 ];
 
 export const companionById = (id: string) => COMPANIONS.find((item) => item.id === id);
-export const isCompanionId = (id: string | undefined) => !!id && COMPANIONS.some((item) => item.id === id);
 export const companionName = (id: string) => CHARACTER_ART.find((art) => art.id === id)?.name ?? id;
 /** The companion that joins with this achievement, if any. */
 export const companionJoiningWith = (achievementId: string) => COMPANIONS.find((item) => item.joinsWith === achievementId);

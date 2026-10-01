@@ -42,7 +42,6 @@ export const FOODS: FoodDef[] = [
 ];
 
 export const foodById = (id: string) => FOODS.find((food) => food.id === id);
-export const isFood = (id: string) => FOODS.some((food) => food.id === id);
 
 // The stock items for the food: a portion is a "piece"; suppliers sell packs of twelve portions.
 export const FOOD_INGREDIENTS: Ingredient[] = FOODS.map((food) => ({ id: food.id, name: food.name, unit: 'piece', basePrice: food.cost, pourStep: 1, category: 'food' }));

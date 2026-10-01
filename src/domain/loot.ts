@@ -1,4 +1,4 @@
-// Pure tables for the loot layer: equipment, consumables, boxes, the style draw and prestige.
+// Pure tables for the loot layer: equipment, consumables, boxes, and the style draw.
 // Nothing here touches state; sim/loot.ts applies these rules on the server.
 
 // ---- Bar equipment ----
@@ -28,8 +28,8 @@ export const equipmentDef = (id: string) => EQUIPMENT.find((item) => item.id ===
 export interface EquipmentSlot { level: number; tier: EquipmentTier; }
 export const newSlot = (): EquipmentSlot => ({ level: 0, tier: 'common' });
 
-export function levelCap(tier: EquipmentTier, prestigeCapBonus = 0) {
-  return Math.min(EQUIPMENT_MAX_LEVEL, TIER_LEVEL_CAP[tier] + prestigeCapBonus);
+export function levelCap(tier: EquipmentTier) {
+  return Math.min(EQUIPMENT_MAX_LEVEL, TIER_LEVEL_CAP[tier]);
 }
 // Coins and workshop parts needed to go from `level` to `level + 1`.
 export function upgradeCostFor(level: number) {
@@ -58,7 +58,6 @@ export const CONSUMABLES: ConsumableDef[] = [
 ];
 export const consumableDef = (id: string) => CONSUMABLES.find((item) => item.id === id);
 export const BOOST_KINDS = ['happy-hour', 'xp-boost', 'coin-boost', 'tip-boost'] as const;
-export type BoostKind = typeof BOOST_KINDS[number];
 
 // ---- Boxes ----
 export type BoxKind = 'bronze' | 'silver' | 'gold' | 'choice';
@@ -66,7 +65,7 @@ export const BOXES: { id: BoxKind; name: string; icon: string; crystalPrice?: nu
   { id: 'bronze', name: 'Bronze box', icon: '📦', crystalPrice: 30, description: 'Random: parts, coins and common consumables.' },
   { id: 'silver', name: 'Silver box', icon: '🎁', crystalPrice: 90, description: 'Random: better rolls, item shards and boosters.' },
   { id: 'gold', name: 'Gold box', icon: '🏆', crystalPrice: 240, description: 'Random: crystals, skin shards, recipe cards, mystery bottles and special-event backgrounds.' },
-  { id: 'choice', name: 'Choice box', icon: '🧭', description: 'Pick one of three rewards. Earned from prestige, achievements and level milestones.' }
+  { id: 'choice', name: 'Choice box', icon: '🧭', description: 'Pick one of three rewards. Earned from achievements and level milestones.' }
 ];
 export const boxDef = (id: string) => BOXES.find((item) => item.id === id);
 
@@ -178,15 +177,4 @@ export function rollRarity(pity: Pity, random: () => number): 'common' | 'rare' 
 // ---- Boosters that are not consumables ----
 export const ARMED_CHARGES = ['golden-ice', 'voucher', 'second-chance', 'calm-charm', 'whisper', 'steady-hand'] as const;
 
-// ---- Prestige ("Grand Opening") ----
-export const PRESTIGE_LEVEL = 50;
-export type PrestigePerkId = 'pay' | 'supply' | 'cap' | 'bank';
-export const PRESTIGE_PERKS: { id: PrestigePerkId; name: string; description: string; maxRank: number }[] = [
-  { id: 'pay', name: 'Renowned name', description: '+1.5% guest pay per rank.', maxRank: 10 },
-  { id: 'supply', name: 'Trade contacts', description: '−2% supplier prices per rank.', maxRank: 8 },
-  { id: 'cap', name: 'Master craftsmen', description: '+1 equipment level cap per rank.', maxRank: 3 },
-  { id: 'bank', name: 'Family fortune', description: '+300 starting coins after each Grand Opening per rank.', maxRank: 5 }
-];
-export const perkCost = (rank: number) => rank + 1;
-export const prestigeStarsFor = (runEarned: number) => 2 + Math.floor(Math.sqrt(Math.max(0, runEarned) / 400));
 export const STARTING_COINS = 600;

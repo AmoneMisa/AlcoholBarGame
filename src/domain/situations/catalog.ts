@@ -19,11 +19,3 @@ export const SITUATIONS: SituationDef[] = [
 const INDEX = new Map(SITUATIONS.map((situation) => [situation.id, situation]));
 export const situationById = (id: string) => INDEX.get(id);
 
-// Registered from other files that need to add situations after the catalog is built (kept for tests and mods).
-export function registerSituations(list: SituationDef[]) {
-  for (const situation of list) {
-    if (INDEX.has(situation.id)) continue;
-    SITUATIONS.push(situation);
-    INDEX.set(situation.id, situation);
-  }
-}
