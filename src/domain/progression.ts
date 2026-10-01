@@ -81,6 +81,14 @@ const EVENTS: (Omit<MarketEvent, 'shortageIds' | 'startsAt' | 'endsAt'> & { weig
   { id: 'vip-night', name: 'VIP Night', kind: 'buff', icon: '💎', weight: 2, description: 'A gala nearby: VIP guests are 15% more likely (up to 25%).', effects: { vipBonus: .15 } },
   { id: 'festival', name: 'City Festival', kind: 'buff', icon: '🎉', weight: 2, description: 'Festival crowds: new guests pay 15% more and tip 30% more.', effects: { pay: 1.15, tips: 1.3, arrival: .8 } },
   { id: 'shortage', name: 'Product Shortage', kind: 'disaster', icon: '📦', weight: 3, description: 'A delivery failed: some ingredients cost 80% more — but other bars pay 50% more for yours.', effects: { shortage: 1.8, buyback: 1.5 } },
+  { id: 'tourists', name: 'Tourist Season', kind: 'buff', icon: '🧳', weight: 2, description: 'Visitors fill the city: guests arrive 30% faster and pay 10% more.', effects: { arrival: .7, pay: 1.1 } },
+  { id: 'wine-festival', name: 'Wine Festival', kind: 'buff', icon: '🍷', weight: 1, description: 'The city celebrates its harvest: guests are generous (tips +25%) and suppliers give 10% off.', effects: { tips: 1.25, supply: .9 } },
+  { id: 'holiday', name: 'Public Holiday', kind: 'buff', icon: '🎊', weight: 2, description: 'Nobody is at work: guests arrive 35% faster and tip 20% more.', effects: { arrival: .65, tips: 1.2 } },
+  { id: 'harvest', name: 'Good Harvest', kind: 'buff', icon: '🌾', weight: 2, description: 'Fruit and sugar are plentiful: every pack costs 15% less.', effects: { supply: .85 } },
+  { id: 'fuel-strike', name: 'Fuel Strike', kind: 'disaster', icon: '⛽', weight: 2, description: 'Trucks are stuck: some goods cost 50% more, and other bars pay 30% more for yours.', effects: { shortage: 1.5, buyback: 1.3 } },
+  { id: 'import-ban', name: 'Import Ban', kind: 'disaster', icon: '🚫', weight: 1, description: 'Imported goods are held at the border: some cost double, other bars pay 80% more for yours.', effects: { shortage: 2, buyback: 1.8 } },
+  { id: 'competitor', name: 'New Competitor', kind: 'disaster', icon: '🏪', weight: 2, description: 'A new bar opened down the street: guests arrive 30% slower and pay 5% less.', effects: { arrival: 1.3, pay: .95 } },
+  { id: 'heatwave', name: 'Heat Wave', kind: 'disaster', icon: '🥵', weight: 1, description: 'Too hot to go out: guests arrive 40% slower.', effects: { arrival: 1.4 } },
   { id: 'storm', name: 'Storm Warning', kind: 'disaster', icon: '⛈️', weight: 2, description: 'Heavy rain keeps people at home: guests take 70% longer to arrive.', effects: { arrival: 1.7 } }
 ];
 export const EVENT_CATALOG = EVENTS.map(({ weight: _weight, ...event }) => event);
