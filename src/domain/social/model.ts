@@ -61,6 +61,8 @@ export interface GuestSocial {
   /** What the guest is drinking now, for pairing food with it. */
   lastDrink?: { recipeId?: string; productId?: string };
   ate?: string[];
+  /** The guest has already steered the chat back to the order once. */
+  nudged?: boolean;
   /** Drinks counted towards a promotion tonight. */
   promo?: { drinks: number; wine: number };
   /** An offer in progress: another drink or some food, and how the dialogue has changed the chance. */

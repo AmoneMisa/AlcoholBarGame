@@ -1098,7 +1098,8 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
           : { text: 'Sorry, I don’t understand.', expression: 'confused', facts: [] });
   // After a little chat the guest remembers why they came: they nudge the order along.
   const guestSocial = guest.social;
-  if (social && !leaving && guestSocial && guest.orderKind === 'cocktail' && !guest.orderRevealed && guestSocial.phase === 'ordering' && guestSocial.chatted.length >= 2 && guestSocial.rapport >= 45 && !guestSocial.refused) {
+  if (social && !leaving && guestSocial && guest.orderKind === 'cocktail' && !guest.orderRevealed && guestSocial.phase === 'ordering' && guestSocial.chatted.length >= 2 && guestSocial.rapport >= 45 && !guestSocial.refused && !guestSocial.nudged) {
+    guestSocial.nudged = true;
     reply.text += ` ${backToOrder(`${guest.id}:${transcript.lines.length}`)}`;
   }
 

@@ -44,7 +44,38 @@ const DRUNK_OPENERS: Record<DrunkStage, string[]> = {
   drunk: ['Heeey! I am… totally fine. *hic*', 'Hello, hello! Is this… is this the bar? Good. Good!', 'Hiii! I am not drunk. Why does everybody ask?'],
   'very-drunk': ['Heyyy… *hic* …can I sit here? Is this chair… yours?', 'Whoa. The floor is moving. Hello! One drink. Just one more drink.']
 };
-const ASKS = ['Can you help me choose a drink?', 'What would you recommend?', 'Can you help me pick something?', 'I do not know what to order. Can you help?'];
+const ASKS = ['Can you help me choose a drink?', 'What would you recommend?', 'Can you help me pick something?', 'I do not know what to order. Can you help?', 'What do you suggest?', 'Any ideas?'];
+
+// The first clue is said the way a person would say it, in a few different ways.
+const CLUE_TASTE = [(c: string) => `I love the taste of ${c}.`, (c: string) => `Something with ${c} would be nice.`, (c: string) => `I have been thinking about ${c} all day.`, (c: string) => `I feel like having something with ${c}.`, (c: string) => `I am in the mood for ${c}, I think.`];
+const CLUE_BUBBLES = ['I love drinks with bubbles.', 'Something with bubbles would be nice.', 'I am in the mood for bubbles tonight.'];
+const CLUE_STYLE = [(c: string) => `I like ${c} drinks.`, (c: string) => `I usually go for something ${c}.`, (c: string) => `Something ${c} would be good.`, (c: string) => `I am more of a ${c} person, honestly.`];
+export function clueLine(label: string, kind: 'taste' | 'bubbles' | 'style', seed: string) {
+  if (kind === 'bubbles') return choose(CLUE_BUBBLES, seed);
+  return choose(kind === 'taste' ? CLUE_TASTE : CLUE_STYLE, seed)(label);
+}
+
+// A guest says what they want once. Often they do not ask at all, because the clue is already a hint.
+export function askLine(seed: string, hasClue: boolean) {
+  if (hasClue && hash(seed + 'noask') % 100 < 45) return '';
+  return choose(ASKS, seed + 'a');
+}
+
+// After some chat the guest remembers why they came.
+const BACK_TO_ORDER = ['Anyway, can you help me choose a drink?', 'Sorry, I am talking too much. What do you have for me?', 'But enough about me. What would you recommend?', 'Right, the drink! What would you suggest?', 'Anyway… I should order something, shouldn’t I?'];
+export const backToOrder = (seed: string) => choose(BACK_TO_ORDER, seed);
+
+// A short, human answer to a hello that does not repeat the ask.
+const HELLO_BACK: Record<string, string[]> = {
+  warm: ['Hello! Nice to meet you.', 'Hi there!', 'Good evening to you too!', 'Hey! Lovely place you have.'],
+  flat: ['Hello.', 'Hi.', 'Evening.'],
+  shy: ['Um… hello.', 'Hi… thanks.']
+};
+export function helloBack(customer: Customer, seed: string) {
+  const emotion = customer.social?.emotion;
+  const tone = emotion === 'angry' || emotion === 'upset' || emotion === 'tired' ? 'flat' : emotion === 'nervous' ? 'shy' : 'warm';
+  return choose(HELLO_BACK[tone]!, seed);
+}
 
 // A guest who comes back for another drink after a while.
 const RETURNING: Record<Emotion, string[]> = {
@@ -65,12 +96,12 @@ export function openingFor(customer: Customer) {
   const stage = stageOf(social);
   if (social.rounds > 0) {
     const extra = stage === 'drunk' || stage === 'very-drunk' ? ' *hic*' : '';
-    return { text: `${choose(RETURNING[social.emotion], seed)}${extra}`, ask: choose(['What would you suggest this time?', 'Can you choose something for me?'], seed + 'r') };
+    return { text: `${choose(RETURNING[social.emotion], seed)}${extra}`, ask: choose(['What would you suggest this time?', 'Can you choose something for me?', 'Surprise me?'], seed + 'r'), seed };
   }
   const drunkLine = DRUNK_OPENERS[stage].length ? choose(DRUNK_OPENERS[stage], seed + 'd') : undefined;
   const feeling = drunkLine && stage !== 'tipsy' ? drunkLine : choose(OPENERS[social.emotion], seed);
   const extra = drunkLine && stage === 'tipsy' ? ` ${drunkLine}` : '';
-  return { text: `${feeling}${extra}`, ask: choose(ASKS, seed + 'a') };
+  return { text: `${feeling}${extra}`, ask: choose(ASKS, seed + 'a'), seed };
 }
 
 // ---- Small talk ----
@@ -123,6 +154,23 @@ const STORIES: Record<TalkTopic, { bad: string[]; good: string[] }> = {
     good: ['What a beautiful warm evening!', 'I love this weather. It is perfect for a walk.', 'It is the first sunny day in weeks. I am so happy.']
   }
 };
+// Said again later, so the guest seems to remember the story they told.
+const CALLBACK: Record<TalkTopic, { bad: string[]; good: string[] }> = {
+  work: { bad: ['Work has been so heavy lately, you know.', 'Sorry, I keep thinking about work.'], good: ['I still cannot believe the news from work!', 'Work is going so well. It feels strange.'] },
+  relationship: { bad: ['I keep thinking about my partner, sorry.', 'It is hard not to think about us tonight.'], good: ['I cannot stop thinking about my date.', 'I keep smiling about it.'] },
+  money: { bad: ['Money is still on my mind, to be honest.', 'Sorry, I keep adding up numbers in my head.'], good: ['It is nice not to worry about money for once.', 'I can finally relax about it.'] },
+  family: { bad: ['My family is still on my mind.', 'I should call home later.'], good: ['I am so happy about my family news.', 'I cannot wait to tell everyone.'] },
+  sports: { bad: ['That match is still on my mind.', 'I will not forget that game for a while.'], good: ['I am still thinking about that match!', 'What a game. I will remember it for years.'] },
+  celebration: { bad: ['It is a strange birthday, but this helps.', 'Today has not gone as I hoped.'], good: ['It is such a special day for me.', 'I want tonight to last forever.'] },
+  travel: { bad: ['I am still annoyed about the trip.', 'Travel is harder than it looks.'], good: ['I am already dreaming about the trip.', 'I cannot wait to go.'] },
+  health: { bad: ['I hope tomorrow goes well.', 'Health worries are tiring.'], good: ['It feels good to be well.', 'I feel lighter than I have in months.'] },
+  weather: { bad: ['I am still cold, to be honest.', 'This weather is not on my side.'], good: ['What a night it is outside.', 'The weather is making my day.'] }
+};
+const REPEAT_HOW: Record<Emotion, string[]> = {
+  happy: ['Still great, thank you!', 'Even better than before, to be honest.'], upset: ['A bit better, actually. Thanks.', 'The same, but talking helps.'], angry: ['Calmer. A little.', 'Still angry, but less so.'],
+  tired: ['Still tired. This chair is helping.', 'A bit less tired. Thank you.'], excited: ['Still excited!', 'Even more excited now!'], lonely: ['Better now that I have someone to talk to.', 'Less lonely, thanks.'],
+  nervous: ['A little calmer now.', 'Still a bit nervous, but OK.'], relaxed: ['Still relaxed. This is nice.', 'Good, thanks. Nothing has changed.']
+};
 const REPEAT_STORY = ['Like I said… but thank you for listening.', 'I already told you. But talking helps, honestly.'];
 
 const EMPATHY: Record<Emotion, string[]> = {
@@ -136,7 +184,7 @@ const EMPATHY: Record<Emotion, string[]> = {
   relaxed: ['Thanks, that is kind.', 'Thank you. You are easy to talk to.']
 };
 const COMPLIMENT: { good: string[]; bad: string[] } = {
-  good: ['Ha, thank you! You made my night.', 'Oh, thank you! You are very kind.', 'You are sweet. Thank you!'],
+  good: ['Ha, thank you! You made my night.', 'Oh, thank you! You are very kind.', 'You are sweet. Thank you!', 'Stop it, you are making me blush!', 'That is really nice to hear. Thanks!'],
   bad: ['Flattery… but thanks. It did make me smile a little.', 'You are sweet. OK, that helped a little.', 'Hmm. Thank you. I needed that.']
 };
 const JOBS = ['I am a nurse.', 'I work in a bank.', 'I am a teacher.', 'I drive a delivery van.', 'I am an engineer.', 'I am a student.', 'I work in a restaurant kitchen.', 'I am a web designer.'];
@@ -152,7 +200,7 @@ const WATER: Record<DrunkStage, string[]> = {
   drunk: ['Water? I am not thirsty… OK, maybe a small glass.', 'Hehe, you think I am drunk? …Maybe a little. Yes, water, please.'],
   'very-drunk': ['I am fine! …Oh, water. Yes. Thank you.', 'Whaaat? …OK. OK. Water.']
 };
-const FOOD = ['Yes! I am starving. What do you have?', 'Maybe something small. What do you have?', 'No, thanks. I already ate.'];
+const FOOD = ['Yes! I am starving. What do you have?', 'Maybe something small. What do you have?', 'Now that you say it, I am a bit hungry. What is good here?', 'Yes, please. Something to share, if you have it.'];
 const TAXI: Record<DrunkStage, string[]> = {
   sober: ['That is kind, but I am fine for now. Thank you!', 'Yes, a taxi would be great when I am ready.'],
   tipsy: ['Maybe later, thanks. That is a good idea.'],
@@ -165,9 +213,9 @@ const CHECK_IN: Record<Emotion, string[]> = {
   tired: ['Yes, thanks. I am just resting.', 'It is good. I am so sleepy.'], excited: ['It is amazing!', 'Perfect! Everything is perfect tonight.'], lonely: ['Yes, thank you. It is nice that you ask.', 'It is good. I like it here.'],
   nervous: ['Yes, thanks. It is helping a bit.', 'It is fine. Thank you.'], relaxed: ['Lovely, thank you.', 'It is just right.']
 };
-const NOT_YET_ORDER = ['Not yet, thanks. Maybe in a few minutes.', 'I am still enjoying this one. Ask me again later!'];
-const THANKS = ['No problem!', 'Anytime.', 'Ha, that is my line!'];
-const APOLOGY = ['It is OK. Do not worry about it.', 'Thanks for saying that.', 'No problem. It happens.'];
+const NOT_YET_ORDER = ['Not yet, thanks. Maybe in a few minutes.', 'I am still enjoying this one. Ask me again later!', 'Let me finish this one first.', 'Give me a little time, I am not in a hurry.'];
+const THANKS = ['No problem!', 'Anytime.', 'Ha, that is my line!', 'My pleasure.', 'Of course!', 'Do not mention it.'];
+const APOLOGY = ['It is OK. Do not worry about it.', 'Thanks for saying that.', 'No problem. It happens.', 'Do not worry. These things happen.', 'That is fine, really.'];
 const NOT_YET = ['Oh, I am not leaving yet. I am still enjoying my drink!', 'Not yet! I want to stay a little longer.'];
 const RUDE: string[] = ['Excuse me? That was rude.', 'Wow. Is that how you talk to guests?', 'I do not have to listen to that.'];
 const REFUSE: Record<DrunkStage, string[]> = {
@@ -207,7 +255,9 @@ export function voice(customer: Customer, line: string, turn: number, local = tr
   const social = customer.social;
   if (!social) return line;
   // Where the guest comes from changes the spelling and adds a local word now and then.
-  const text = local ? localize(customer, line, turn) : spellFor(originOf(customer), line);
+  // Local words belong in light moments: not when the guest is drunk, angry, upset or nervous.
+  const light = drunkStage(social.drunk) === 'sober' && !['angry', 'upset', 'nervous'].includes(social.emotion);
+  const text = local && light ? localize(customer, line, turn) : spellFor(originOf(customer), line);
   const seed = `${customer.id}:${turn}`;
   const stage = stageOf(social);
   if (stage === 'sober') return social.emotion === 'tired' && hash(seed) % 3 === 0 && !text.startsWith('…') ? `Hmm… ${text.charAt(0).toLowerCase()}${text.slice(1)}` : text;
@@ -253,6 +303,7 @@ export function socialReply(customer: Customer, acts: Act[], turn: number): Soci
     return { text: choose(EMPATHY[emotion], seed), expression: bad(emotion) ? 'smile' : 'happy', rapport: rapportBy(social, 9), emotion: comfort, chatted: 'empathy' };
   }
   if (main === 'compliment') return { text: choose(bad(emotion) ? COMPLIMENT.bad : COMPLIMENT.good, seed), expression: 'happy', rapport: rapportBy(social, 5) };
+  if (main === 'howAreYou' && social.chatted.includes('how')) return { text: choose(REPEAT_HOW[emotion], seed), expression: 'smile', rapport: rapportBy(social, 3) };
   if (main === 'howAreYou') return { text: choose(HOW_ARE_YOU[emotion], seed), expression: bad(emotion) ? 'thinking' : 'smile', rapport: rapportBy(social, 6), chatted: 'how' };
   if (main === 'askWork') return { text: `${choose(JOBS, customer.id)} And you? Do you like being a bartender?`, expression: 'smile', rapport: rapportBy(social, 4), chatted: 'work' };
   if (main === 'askName') return { text: `I am ${customer.name}. Nice to meet you!`, expression: 'smile', rapport: rapportBy(social, 3) };
@@ -260,14 +311,21 @@ export function socialReply(customer: Customer, acts: Act[], turn: number): Soci
     // Asking is always good service. A guest with an allergy says so, and now the bartender knows.
     if (social.allergy) {
       social.allergyKnown = true;
-      return { text: social.allergy === 'nuts' ? 'Yes, actually. I am allergic to nuts. Thank you for asking, that is very kind!' : 'Yes, I cannot have dairy. No cheese or cream for me, please. Thank you for asking!', expression: 'smile', rapport: rapportBy(social, 8) };
+      const nuts = ['Yes, actually. I am allergic to nuts. Thank you for asking, that is very kind!', 'Oh, good question. Yes, nuts. Please keep them away from me.', 'I do have one: nuts. Even a little is a problem. Thanks for checking!'];
+      const dairy = ['Yes, I cannot have dairy. No cheese or cream for me, please. Thank you for asking!', 'Good that you ask. Milk and cheese make me ill, so none of those, please.', 'Dairy, yes. I just cannot eat it. Thanks for being careful!'];
+      return { text: choose(social.allergy === 'nuts' ? nuts : dairy, seed), expression: 'smile', rapport: rapportBy(social, 8) };
     }
-    return { text: choose(['No, I can eat everything. But thank you for asking!', 'Nothing special, thanks. That is a nice question to ask.'], seed), expression: 'smile', rapport: rapportBy(social, 4) };
+    return { text: choose(['No, I can eat everything, thanks.', 'Nope, nothing like that. Thanks for asking!', 'No allergies. Why, is something in it?', 'I am fine with everything, thank you.', 'No, nothing. That is thoughtful of you.'], seed), expression: 'smile', rapport: rapportBy(social, 4) };
   }
   if (main === 'offerFood') return { text: social.hungry === false ? 'No, thanks. I am not hungry right now.' : choose(FOOD.slice(0, 2), customer.id + 'food'), expression: 'smile', rapport: 2 };
   if (main === 'checkIn') return { text: choose(CHECK_IN[emotion], seed), expression: 'smile', rapport: rapportBy(social, 3) };
   if (main === 'offerAnother' && social.phase === 'enjoying') return { text: choose(NOT_YET_ORDER, seed), expression: 'smile', rapport: 1 };
-  if (main === 'thanks') return { text: choose(THANKS, seed), expression: 'smile', rapport: 1 };
+  if (main === 'thanks') {
+    // Now and then a guest who told a story comes back to it.
+    const told = social.chatted.includes('empathy') || social.chatted.includes('story');
+    const back = told && hash(seed + 'cb') % 100 < 40 ? ` ${choose(CALLBACK[social.topic][bad(emotion) ? 'bad' : 'good'], seed + 'c')}` : '';
+    return { text: `${choose(THANKS, seed)}${back}`, expression: 'smile', rapport: 1 };
+  }
   if (main === 'apology') return { text: choose(APOLOGY, seed), expression: 'smile', rapport: rapportBy(social, 5) };
   if (main === 'goodbye') return { text: choose(NOT_YET, seed), expression: 'smile', rapport: 0 };
   if (main === 'weather' || main === 'sports' || main === 'music' || main === 'travel') {

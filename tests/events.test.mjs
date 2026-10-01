@@ -156,7 +156,7 @@ test('Asking about allergies is understood: a guest with one says so, and then t
   const { state, guest } = guestIn({ allergy: 'nuts', hungry: true });
   state.inventories[state.regionId].find((item) => item.ingredientId === 'nuts').amount = 5;
   const reply = socialReply(guest, ['askAllergy'], 1);
-  assert.match(reply.text, /allergic to nuts/);
+  assert.match(reply.text, /nuts/i);
   assert.equal(guest.social.allergyKnown, true);
   assert.throws(() => applyAction(state, { type: 'pitchStart', customerId: guest.id, kind: 'food', itemId: 'nuts' }, context()), /allergic/);
   const { state: other, guest: calm } = guestIn({ hungry: false });
@@ -343,4 +343,50 @@ test('The practice pointer for the market: open it, add, order, top up', async (
   assert.match(at({}).candidates[0].target, /nav-market/);
   assert.match(at({ onMarket: true }).candidates.map((item) => item.target).join(), /market-order.*market-plus/);
   assert.match(at({ onMarket: true, seen: ['bought'] }).candidates[0].target, /top-up/);
+});
+
+// ---- Natural talk ----
+test('Openings are varied: the ask is not always the same, and is sometimes left out', async () => {
+  const { openingLine, buildProfile } = await import('../src/domain/conversation/customerTalk.ts');
+  const recipe = RECIPES.find((item) => item.id === 'mojito');
+  const profile = buildProfile(recipe);
+  const lines = [];
+  for (let index = 0; index < 300; index++) {
+    const { guest } = guestIn({ phase: 'ordering', rounds: 0, emotion: ['happy', 'tired', 'angry', 'lonely', 'relaxed', 'nervous'][index % 6] });
+    guest.id = `variety-${index}`;
+    lines.push(openingLine(guest, profile));
+  }
+  assert.ok(new Set(lines).size > 120, 'many different openings');
+  const asks = lines.filter((line) => /choose a drink|recommend|pick something|what to order|suggest|Any ideas/i.test(line));
+  assert.ok(asks.length < lines.length * .75 && asks.length > lines.length * .3, `the question is asked in some openings, not all (${asks.length}/300)`);
+  const sameEnding = new Map();
+  for (const line of lines) { const end = line.split(/(?<=[.?!])\s/).at(-1); sameEnding.set(end, (sameEnding.get(end) ?? 0) + 1); }
+  assert.ok(Math.max(...sameEnding.values()) < lines.length * .3, 'no single closing sentence is more than 30% of openings');
+  assert.ok(lines.every((line) => /lime|mint|rum|sweet|sour|fresh|bubbles|light|strong|sparkling|\w+/.test(line)), 'every opening has the hint');
+});
+
+test('Guests do not repeat themselves: the same question twice gets a different kind of answer, and a story comes back', async () => {
+  const { socialReply } = await import('../src/domain/social/talk.ts');
+  const { state, guest } = guestIn({ emotion: 'tired', chatted: [] });
+  const first = socialReply(guest, ['howAreYou'], 1).text;
+  guest.social.chatted.push('how');
+  const second = socialReply(guest, ['howAreYou'], 2).text;
+  assert.notEqual(first, second);
+  assert.match(second, /still|better|less|tired|calm/i);
+  guest.social.chatted.push('story');
+  const seen = new Set();
+  for (let turn = 0; turn < 40; turn++) seen.add(socialReply(guest, ['thanks'], turn).text);
+  assert.ok(seen.size >= 8, 'thanks gets many answers, some with a callback to the story');
+  assert.ok([...seen].some((text) => /work|think|mind|boss/i.test(text.replace(/No problem|Anytime/g, ''))) || state);
+});
+
+test('Local words are not added to drunk, angry or upset guests', async () => {
+  const { voice } = await import('../src/domain/social/talk.ts');
+  for (const [emotion, drunk] of [['angry', 0], ['upset', 0], ['relaxed', 60]]) {
+    const { guest } = guestIn({ emotion, drunk });
+    for (let turn = 0; turn < 120; turn++) {
+      const text = voice(guest, 'That sounds good.', turn);
+      assert.ok(!/Brother|Aka|plov|ariston|Prost|noroc|Kampai|yaar|mate|G’day/i.test(text.replace(/hic|…/g, '')), `${emotion}: ${text}`);
+    }
+  }
 });

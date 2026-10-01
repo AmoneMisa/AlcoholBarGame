@@ -1,6 +1,6 @@
 import type { Customer, Recipe } from '../types';
 import { withArticle } from '../english/articles';
-import { openingFor } from '../social/talk';
+import { askLine, clueLine, helloBack, openingFor } from '../social/talk';
 export { withArticle } from '../english/articles';
 
 // Turns a customer's hidden order into a taste profile they can talk about,
@@ -89,12 +89,15 @@ const MOOD_INTRO: Record<string, string> = {
 export function openingLine(customer: Customer, profile: DrinkProfile) {
   if (customer.specialRecipeRewardId) return `${customer.greeting} ${customer.request}`;
   const clue = TOPIC_LABEL[profile.clue];
-  const likeLine = SPIRITS.includes(profile.clue) || FRUITS.includes(profile.clue) ? `I love the taste of ${clue}.` : profile.clue === 'sparkling' ? 'I love drinks with bubbles.' : `I like ${clue} drinks.`;
+  const kind = SPIRITS.includes(profile.clue) || FRUITS.includes(profile.clue) ? 'taste' : profile.clue === 'sparkling' ? 'bubbles' : 'style';
+  const likeLine = clueLine(clue, kind, `${customer.id}:clue`);
   // A guest with feelings opens with how they feel (and an ashtray request, if they smoke), then names what they like.
+  // The question is not always asked: the hint is already a way in.
   const lively = openingFor(customer);
   if (lively) {
     const ashtray = customer.social?.need?.kind === 'ashtray' ? ' Could I have an ashtray, please?' : '';
-    return `${lively.text} ${likeLine} ${lively.ask}${ashtray}`;
+    const ask = customer.social && customer.social.rounds === 0 ? askLine(lively.seed, true) : lively.ask;
+    return [lively.text, likeLine, ask].filter(Boolean).join(' ') + ashtray;
   }
   return `${MOOD_INTRO[customer.mood] ?? 'Hello.'} ${likeLine} Can you help me choose a drink?`;
 }
@@ -180,9 +183,9 @@ export function replyTo(text: string, customer: Customer, profile: DrinkProfile,
   const asksWhat = words.some((word) => ['what', 'which', 'kind', 'type', 'flavour', 'flavours', 'flavor', 'taste', 'favourite', 'favorite', 'recommend', 'suggest'].includes(word));
   // “How are you?” gets small talk; a plain “Hello” gets a hello; “Hello, what would you like?” answers the question.
   if (words.includes('how') && words.includes('you') && !asksWhat) {
-    return { text: `Hi! ${customer.mood === 'sad' || customer.mood === 'tired' ? 'I’m a bit tired.' : 'I’m good, thanks.'} Can you help me choose a drink?`, expression: 'smile', facts: [] };
+    return { text: `Hi! ${customer.mood === 'sad' || customer.mood === 'tired' ? 'I’m a bit tired.' : 'I’m good, thanks.'} ${revealedFacts.length ? 'And you?' : 'Can you help me choose a drink?'}`, expression: 'smile', facts: [] };
   }
-  if (greeted && !asksWhat) return { text: 'Hello! Can you help me choose a drink?', expression: 'smile', facts: [] };
+  if (greeted && !asksWhat) return { text: customer.social ? `${helloBack(customer, customer.id + text)}` : 'Hello! Can you help me choose a drink?', expression: 'smile', facts: [] };
   if (asksWhat) {
     const known = new Set(revealedFacts.map((fact) => fact.topic));
     // Asked about flavour or taste: answer with a flavour or fruit first, the spirit last.

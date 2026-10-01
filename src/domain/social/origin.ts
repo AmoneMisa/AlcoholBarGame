@@ -71,13 +71,13 @@ export function spellFor(origin: Origin, text: string) {
 }
 
 // Spelling, and now and then a local word at the start or the end, so people from different places do not all talk alike.
-export function localize(customer: Pick<Customer, 'id' | 'characterId'>, text: string, turn: number) {
+export function localize(customer: Pick<Customer, 'id' | 'characterId' | 'social'>, text: string, turn: number) {
   const origin = originOf(customer);
   let result = spellFor(origin, text);
   const roll = hash(`${key(customer)}:${turn}:local`) % 100;
   if (roll < 14 && /^[A-Z]/.test(result) && !/^(Hmm|…)/.test(result)) {
     const opener = origin.openers[hash(`${turn}:o`) % origin.openers.length]!;
     result = `${opener} ${/^I/.test(result) ? result : result.charAt(0).toLowerCase() + result.slice(1)}`;
-  } else if (roll >= 90 && /[.!]$/.test(result) && result.length < 90) result = `${result} ${origin.remarks[hash(`${turn}:r`) % origin.remarks.length]}`;
+  } else if (roll >= 94 && /[.!]$/.test(result) && result.length < 90 && ['happy', 'relaxed', 'excited'].includes(customer.social?.emotion ?? '')) result = `${result} ${origin.remarks[hash(`${turn}:r`) % origin.remarks.length]}`;
   return result;
 }
