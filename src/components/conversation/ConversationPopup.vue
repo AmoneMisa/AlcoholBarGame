@@ -34,6 +34,8 @@ import { haptic } from '../../telegram/webapp';
 import CharacterModel from '../characters/CharacterModel.vue';
 import UiIcon from '../ui/UiIcon.vue';
 import CloseButton from '../ui/CloseButton.vue';
+import UiButton from '../ui/UiButton.vue';
+import ModalDialog from '../ui/ModalDialog.vue';
 
 const inputMode = ref<'type' | 'words'>('words');
 
@@ -100,8 +102,11 @@ const guideOpen = ref(false);
 // "Show me" circles the part of the screen a guide item explains, for a few seconds.
 let helpTimer: ReturnType<typeof setTimeout> | undefined;
 function showMe(step: ChatGuideStep) {
-  if (!step.show) return;
-  setPointer('help', [{ target: `[data-guide="${step.show.name}"]`, gesture: step.show.gesture, label: step.show.label }]);
+  const show = step.show;
+  if (!show) return;
+  // The guide is a popup over the conversation, so it closes first and then the part it explains is circled.
+  guideOpen.value = false;
+  void nextTick(() => setPointer('help', [{ target: `[data-guide="${show.name}"]`, gesture: show.gesture, label: show.label }]));
   if (helpTimer) clearTimeout(helpTimer);
   helpTimer = setTimeout(() => setPointer('help', undefined), 6000);
 }
@@ -353,10 +358,10 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         <button type="button" class="talk-help" :aria-expanded="guideOpen" aria-label="How does this screen work?" @click="guideOpen = !guideOpen">?</button>
         <CloseButton class="talk-close" data-guide="talk-close" label="Close conversation" @click="game.closeConversation()" />
       </header>
-      <section v-if="guideOpen" class="chat-guide" aria-label="Conversation guide">
-        <header><b>How conversations work</b><CloseButton label="Close the guide" size="sm" @click="guideOpen = false" /></header>
-        <ol><li v-for="step in CHAT_GUIDE" :key="step.title"><b>{{ step.title }}.</b> {{ step.text }} <button v-if="step.show" type="button" class="show-me" @click="showMe(step)">Show me</button></li></ol>
-      </section>
+      <ModalDialog v-if="guideOpen" title="How conversations work" width="480px" close-label="Close the guide" @close="guideOpen = false">
+        <ol class="chat-guide-list"><li v-for="step in CHAT_GUIDE" :key="step.title"><b>{{ step.title }}.</b> {{ step.text }} <UiButton v-if="step.show" size="sm" class="show-me" @click="showMe(step)">Show me</UiButton></li></ol>
+        <template #footer><UiButton block variant="solid" @click="guideOpen = false">Got it</UiButton></template>
+      </ModalDialog>
       <div class="talk-extras">
       <section v-if="situation" class="situation-panel" :class="'sev-' + situation.severity" aria-label="Situation">
         <header><b>{{ situation.icon }} {{ situation.title }}</b><button type="button" class="situation-type" @click="composerOpen = !composerOpen">{{ composerOpen ? 'Hide typing' : 'Type it yourself' }}</button></header>
