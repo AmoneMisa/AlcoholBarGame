@@ -71,7 +71,14 @@ export function askLine(seed: string, hasClue: boolean) {
 }
 
 // After some chat the guest remembers why they came.
-const BACK_TO_ORDER = ['Anyway, can you help me choose a drink?', 'Sorry, I am talking too much. What do you have for me?', 'But enough about me. What would you recommend?', 'Right, the drink! What would you suggest?', 'Anyway… I should order something, shouldn’t I?'];
+// This is a bar, not a chat room: after a few words the guest comes back to the order.
+const BACK_TO_ORDER = ['Anyway, what would you recommend?', 'So, what can you offer me?', 'But enough talking. What do you suggest?', 'Right, the drink! What would you suggest?', 'Can we talk about my drink now?', 'Anyway… can you help me choose something?'];
+/** The guest’s own questions in a small-talk answer are dropped: the order is the question. */
+export const withoutTrailingQuestion = (text: string) => {
+  const sentences = text.match(/[^.!?…]+[.!?…]*\s*/g) ?? [text];
+  const kept = sentences.filter((part) => !part.trim().endsWith('?')).join('').trim();
+  return kept.length > 8 ? kept : text;
+};
 export const backToOrder = (seed: string) => choose(BACK_TO_ORDER, seed);
 
 // A short, human answer to a hello that does not repeat the ask.
@@ -260,10 +267,10 @@ export function socialReply(customer: Customer, acts: Act[], turn: number, said 
     // A guest with something heavy on their mind does not switch subject at once.
     const distracted = (social.emotion === 'upset' || social.emotion === 'angry' || social.emotion === 'tired' || social.emotion === 'nervous') && social.thread?.kind === 'bad';
     const reaction = reactToMention(customer, mention, `${customer.id}:${turn}:m`, { stance: stanceOf(said), distracted, topic: social.thread?.topic ?? social.topic });
-    return { text: reaction.text, expression: reaction.opinion === 'love' ? 'happy' : 'smile', rapport: reaction.opinion === 'love' ? 6 : reaction.opinion === 'meh' ? 3 : 1, heard: mention, asked: reaction.asks, chatted: 'mention' };
+    return { text: reaction.text, expression: reaction.opinion === 'love' ? 'happy' : 'smile', rapport: reaction.opinion === 'love' ? 6 : reaction.opinion === 'meh' ? 3 : 1, heard: mention, asked: reaction.asks && social.phase === 'enjoying', chatted: 'mention' };
   }
   // A guest who asked the bartender a question reacts to whatever comes back, in a human way.
-  if (social && social.asked && (!acts.length || ['weather', 'sports', 'music', 'travel'].includes(acts[0]!))) return { text: reactToAnswer(`${customer.id}:${turn}`), expression: 'smile', rapport: 3 };
+  if (social && social.asked && social.phase === 'enjoying' && (!acts.length || ['weather', 'sports', 'music', 'travel'].includes(acts[0]!))) return { text: reactToAnswer(`${customer.id}:${turn}`), expression: 'smile', rapport: 3 };
   if (!social || !acts.length) return undefined;
   const seed = `${customer.id}:${turn}`;
   const emotion = social.emotion;

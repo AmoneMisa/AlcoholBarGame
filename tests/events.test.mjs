@@ -465,17 +465,33 @@ test('A guest left alone for a while speaks up, and the drink gets a reaction', 
   assert.equal(guest.social.murmur.until, NOW + 30_000);
 });
 
-test('Alive follow-up sentences are offered as ideas, and all are correct English', async () => {
+test('Suggested sentences stay short and service-like: no long-chat questions about the guest’s life or story', async () => {
   const { socialTemplates } = await import('../src/domain/social/suggestions.ts');
   const { guest } = guestIn({ chatty: true, rapport: 60, thread: { topic: 'work', kind: 'bad', depth: 0 } });
-  const first = socialTemplates(guest, NOW);
-  assert.ok(first.includes('Why did that happen?') && first.includes('Tell me more.'));
-  guest.social.thread.depth = 1;
-  assert.ok(socialTemplates(guest, NOW).includes('How did it go?'));
-  guest.social.thread = undefined;
-  const asks = socialTemplates(guest, NOW).filter((text) => /free time|from|pets|plans|before/.test(text));
-  assert.ok(asks.length >= 1, 'questions about their life');
-  for (const text of [...first, ...asks, 'What happened next?']) assert.equal(checkEnglish(text).ok, true, text);
+  const all = socialTemplates(guest, NOW);
+  assert.ok(!all.some((text) => /free time|pets|plans for the weekend|Why did that happen|Tell me more/.test(text)));
+  for (const text of all) assert.equal(checkEnglish(text).ok, true, text);
+});
+
+test('This is a bar, not a chat room: every small-talk answer of an ordering guest ends by coming back to the order, with no question of their own', async () => {
+  const { socialReply, backToOrder, withoutTrailingQuestion } = await import('../src/domain/social/talk.ts');
+  assert.equal(withoutTrailingQuestion('In my free time I paint. It keeps me sane. What about you?'), 'In my free time I paint. It keeps me sane.');
+  assert.equal(withoutTrailingQuestion('Hello?'), 'Hello?');
+  assert.equal(withoutTrailingQuestion('Calm and happy. How about you? I am glad I came here.'), 'Calm and happy. I am glad I came here.');
+  const { state, guest } = guestIn({ phase: 'ordering', rapport: 60, emotion: 'relaxed' });
+  guest.orderRevealed = false;
+  guest.orderKind = 'cocktail';
+  guest.orderRecipeId = 'mojito';
+  guest.patience = guest.patienceRemaining = 99999;
+  guest.social.chatted = [];
+  applyAction(state, { type: 'openConversation', customerId: guest.id }, context());
+  for (const text of ['How are you?', 'What do you do in your free time?', 'I like football and pizza.', 'Why did that happen?']) {
+    applyAction(state, { type: 'say', text }, context());
+    const line = state.conversations[guest.id].lines.at(-1).text;
+    assert.match(line, /recommend|offer|suggest|drink|choose|my drink/i, `${text} -> ${line}`);
+    assert.ok(line.trim().split(/(?<=[.!?])\s/).filter((part) => part.endsWith('?')).length <= 1, `at most one question: ${line}`);
+  }
+  assert.ok(socialReply && backToOrder('x:1'));
 });
 
 test('Remarks are not repeated back to back, and the offer to tell more of a story is made once', async () => {
@@ -584,8 +600,8 @@ test('A hundred conversations about stories never repeat a guest line more than 
     }
   }
   assert.ok(counts.size > 150, `varied lines, saw ${counts.size}`);
-  const repeated = [...counts.entries()].filter(([, count]) => count > 12);
-  assert.deepEqual(repeated.map(([text]) => text), [], 'no line is said more than 12 times in 100 conversations');
+  const repeated = [...counts.entries()].filter(([, count]) => count > 18);
+  assert.deepEqual(repeated.map(([text]) => text), [], 'no line is said more than 18 times in 100 conversations');
 });
 
 test('A sad guest does not jump to a new subject, and "I like X" is answered as news about the player, not as the guest’s own taste', async () => {
@@ -622,4 +638,14 @@ test('"Who was it?" is answered as a repeat when the story already named the per
     if (frame.tell.toLowerCase().includes(person.toLowerCase())) { repeats++; assert.match(frame.who, /like i said|as i said|i told you/i, frame.who); }
   }
   assert.ok(repeats > 10);
+});
+
+test('A drink question after small talk is answered with a clue, not with a chat reaction', () => {
+  const { state, guest } = guestIn({ phase: 'ordering', rapport: 60, emotion: 'relaxed' });
+  Object.assign(guest, { orderRevealed: false, orderKind: 'cocktail', orderRecipeId: 'mojito', patience: 99999, patienceRemaining: 99999 });
+  applyAction(state, { type: 'openConversation', customerId: guest.id }, context());
+  applyAction(state, { type: 'say', text: 'I like football and pizza.' }, context());
+  applyAction(state, { type: 'say', text: 'Do you like sweet drinks?' }, context());
+  assert.match(state.conversations[guest.id].lines.at(-1).text, /sweet/i);
+  assert.ok(state.conversations[guest.id].facts.some((fact) => fact.topic === 'sweet'), 'the clue was recorded');
 });

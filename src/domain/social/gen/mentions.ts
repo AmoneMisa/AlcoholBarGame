@@ -73,7 +73,7 @@ const SHARE: Record<Opinion, string[]> = {
   dislike: ['{Thing}? [Nice|Good for you]! It is not for me, but I like it when people have something they love. {askback}', '[Oh|Really], {thing}. I never got into it, but tell me more.']
 };
 // A guest whose mind is on something sad does not jump into a new subject.
-const DISTRACTED = ['[Hm|Oh], {thing}. [That sounds nice.|Good for you.] Sorry, I am still thinking about {hook}.', '{Thing}? [Maybe later|Not now], if you do not mind. My mind is somewhere else tonight.', '[Yes|Sure], {thing} is nice. Sorry, I cannot think about it now. {Hook} is on my mind.'];
+const DISTRACTED = ['[Hm|Oh|Ah], {thing}. [That sounds nice.|Good for you.|Sounds good.] Sorry, I am [still thinking about|stuck on|worried about] {hook}.', '{Thing}? [Maybe later|Not now|Another time], if you do not mind. [My mind is somewhere else tonight.|I am not in the mood.|I cannot think about it now.]', '[Yes|Sure|OK], {thing} is nice. Sorry, {hook} is [on my mind|all I can think about|still in my head].', '[Hmm|Oh], {thing}. [Sorry|I am sorry], I am a bit [distracted|far away|tired] tonight.'];
 export const TOPIC_HOOK: Record<string, string> = { work: 'work', relationship: 'my partner', money: 'money', family: 'my family', sports: 'the match', celebration: 'my day', travel: 'my trip', health: 'my health', weather: 'the weather' };
 
 export interface MentionContext { stance: Stance; distracted?: boolean; topic?: string }

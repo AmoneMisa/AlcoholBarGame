@@ -139,7 +139,6 @@ const ROOM_BY_EVENT: Record<string, string[]> = {
   'rainy-evening': ['Listen to the rain. It is cosy in here.', 'I am glad I am not outside.']
 };
 const ROOM = ['I like the lights in here.', 'It smells good in here. Is that orange?', 'Nice music. Who is it?', 'This is a cosy place.', 'I like the bottles on the shelf. They look like art.'];
-const ASKS = ['Do you have a favourite cocktail?', 'Have you worked here long?', 'What is the best thing on the menu, in your opinion?', 'Do you ever get tired of the noise?', 'What is the strangest order you ever had?'];
 const BORED = ['Excuse me? Are you busy?', 'Hello? Is anyone there?', 'Sorry to bother you, but could I ask you something?'];
 const DRINK_LINES: Record<string, string[]> = {
   sweet: ['This is nicely sweet.', 'I think I could drink this all night.'], strong: ['Strong, but I like it.', 'Oh, this one has a kick!'], sparkling: ['I love the bubbles.', 'The bubbles tickle my nose.'],
@@ -164,7 +163,6 @@ export function chatterFor(context: ChatterContext): Chatter | undefined {
   if (social.told && social.thread && social.thread.depth < 3 && !social.offeredStory) options.push({ kind: 'story', text: 'Sorry, I keep thinking about it. Do you mind if I tell you more?' });
   if (p.pet) options.push({ kind: 'life', text: `My ${p.pet.kind} ${p.pet.name} is probably asleep on the sofa right now.` });
   options.push({ kind: 'life', text: choose([`I should call my family later.`, `I have to be at work early tomorrow, sadly.`, `I really need a holiday, you know.`], seed + 'l') });
-  options.push({ kind: 'ask', text: choose(ASKS, seed + 'a'), asks: true });
   // A guest who has been ignored for a while speaks up, if they are the kind who talks.
   if (context.silentMinutes >= 4 && social.rapport < 60) return { kind: 'bored', text: choose(BORED, seed + 'b'), rapport: -2 };
   // Never the same remark twice in a row.

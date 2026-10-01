@@ -1,5 +1,4 @@
 import { RECIPES } from '../domain/catalog';
-import { memoryLine } from '../domain/social/gen/mentions';
 import { buildProfile } from '../domain/conversation/customerTalk';
 import { chatterFor, chatterGap, drinkReaction, talksOnOwn, type Chatter } from '../domain/social/alive';
 import { ensureSocial } from '../domain/social/generate';
@@ -36,9 +35,7 @@ export function collectChatter(state: PlayerState, now: number, random: () => nu
     if (!talksOnOwn(social) && random() < .6) continue;
     const others = state.customers.filter((item) => item !== guest && item.social);
     const neighbour = { drunk: others.some((item) => (item.social?.drunk ?? 0) >= 50), sad: others.some((item) => item.social?.emotion === 'upset' || item.social?.emotion === 'lonely') };
-    // Something the player said earlier comes back: the guest remembers.
-    const memory = social.heard?.length && random() < .4 ? social.heard[Math.floor(random() * social.heard.length)] : undefined;
-    const chatter = memory ? { kind: 'memory' as const, text: memoryLine(guest, memory, `${guest.id}:mem:${social.chatterCount ?? 0}`), asks: true } : chatterFor({
+    const chatter = chatterFor({
       guest, roll: random(), eventId: event?.id, neighbour, traits: traitsOf(guest),
       silentMinutes: (now - (social.spokenAt ?? now)) / 60_000
     });

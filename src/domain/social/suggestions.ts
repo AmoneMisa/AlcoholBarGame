@@ -29,9 +29,6 @@ export function socialTemplates(customer: Customer, now: number): string[] {
 
   if (customer.smoker && social.ashtray !== 'given') list.push('Would you like an ashtray?');
   if (social.chatty) list.push('How are you tonight?', 'What do you do for work?');
-  // A story invites follow-up questions; a chatty guest invites questions about their life.
-  if (social.thread && social.thread.depth < 3) list.push(...(social.thread.depth === 0 ? ['Why did that happen?', 'Tell me more.'] : ['What happened next?', 'How did it go?']));
-  if (social.chatty && social.rapport >= 45 && !social.thread) list.push(...[['What do you do in your free time?', 'hobby'], ['Where are you from?', 'from'], ['Do you have any pets?', 'pet'], ['Do you have plans for the weekend?', 'plans'], ['Have you been here before?', 'first']].filter(([, topic]) => !social.chatted.includes(`ask${topic![0]!.toUpperCase()}${topic!.slice(1)}`)).map(([text]) => text!).slice(0, 2));
   if (social.phase === 'enjoying') list.push('Is everything OK with your drink?', 'Would you like another drink?');
   return [...new Set(list)];
 }
