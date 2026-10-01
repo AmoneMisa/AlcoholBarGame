@@ -8,6 +8,7 @@ import { SHARD_GIFT_AMOUNTS } from '../../sim/gifts';
 import { useGameStore } from '../../stores/game';
 import { NOTIFICATION_EVENTS, useNotificationsStore } from '../../stores/notifications';
 import CharacterModel from '../characters/CharacterModel.vue';
+import ProfileCard from '../profile/ProfileCard.vue';
 import UiIcon from '../ui/UiIcon.vue';
 
 const PRESTIGE_GOAL = 30;
@@ -18,6 +19,7 @@ const code = ref(new URLSearchParams(location.search).get('friend') ?? '');
 const renaming = ref('');
 const draftName = ref('');
 const visitPanel = ref<HTMLElement>();
+const giftsPanel = ref<HTMLElement>();
 const accepted = computed(() => game.friends.filter((friend) => friend.status === 'accepted'));
 const incoming = computed(() => game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'incoming'));
 const outgoing = computed(() => game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'outgoing'));
@@ -141,6 +143,12 @@ onMounted(() => { void game.loadFriends(); });
 
     <section v-if="visit" ref="visitPanel" class="card visit">
       <header><div><small>VISITING NOW</small><h3>{{ visit.customName || visit.nickname }}’s bar</h3></div><button type="button" @click="game.leaveVisit()">Leave</button></header>
+      <ProfileCard v-if="visit.profile" :name="visit.customName || visit.nickname" :level="visit.level" :profile="visit.profile" :look="visitBar">
+        <template #actions>
+          <button type="button" class="gold" @click="giftsPanel?.scrollIntoView({ behavior: 'smooth', block: 'center' })">Send a gift</button>
+          <button type="button" class="danger" @click="remove(visit.code, visit.customName || visit.nickname)">Remove from friends</button>
+        </template>
+      </ProfileCard>
       <div class="visit-scene" :style="{ backgroundImage: `url('${visitBackground}')` }">
         <CharacterModel role="bartender" :character-id="visitBar?.bartenderCharacter ?? 'noa'" :outfit="visitBar?.bartender" :hair-style="visitBar?.hairStyle" :hair-color="visitBar?.hairColor" :body-shape="visitBar?.bodyShape" :skin-detail="visitBar?.skinDetail" :skin-tone="visitBar?.skinTone" :pose="visitBar?.pose" :eye-shape="visitBar?.eyeShape" :brow-shape="visitBar?.browShape" :nose-shape="visitBar?.noseShape" :lip-shape="visitBar?.lipShape" :cheek-shape="visitBar?.cheekShape" :eye-color="visitBar?.eyeColor" :eyeliner="visitBar?.eyeliner" :eyeshadow="visitBar?.eyeshadow" :lip-color="visitBar?.lipColor" :blush="visitBar?.blush" :facial-hair="visitBar?.facialHair" :outfit-color="visitBar?.outfitColor" animation="idle" />
         <span class="ribbon">{{ visitBar?.name || visit.name }}</span>
@@ -152,8 +160,8 @@ onMounted(() => { void game.loadFriends(); });
         <li><UiIcon name="pin" />{{ visit.interiors }} backgrounds</li>
       </ul>
       <p v-if="visit.mastered.length" class="mastered">Mastered: {{ visit.mastered.map((item) => `${item.name} (lv ${item.level})`).join(' · ') }}</p>
-      <div class="gifts">
-        <header><UiIcon name="gift" /><div><small>GIFT FROM YOUR INVENTORY</small><p>Only spare copies can be given away — you keep everything else.</p></div></header>
+      <div ref="giftsPanel" class="gifts">
+        <header><UiIcon name="gift" /><div><small>GIFT FROM YOUR INVENTORY</small><p>Only spare copies can be given away — you keep everything else. Workshop items: up to 5 gifts a day.</p></div></header>
         <article v-for="item in recipeCards" :key="item.recipe.id"><span><b>{{ item.recipe.name }}</b><small>Recipe card · you have {{ item.quantity }}</small></span><button class="gold" type="button" @click="gift({ kind: 'recipe-copy', recipeId: item.recipe.id })">Give</button></article>
         <article v-for="item in styleItems" :key="item.cosmetic.id"><span><b>{{ item.cosmetic.label }}</b><small>Style · you have {{ item.quantity }}</small></span><button class="gold" type="button" @click="gift({ kind: 'cosmetic-copy', cosmeticId: item.cosmetic.id })">Give</button></article>
         <article v-for="item in itemGifts" :key="item.id"><span><b>{{ item.name }}</b><small>Workshop item · you have {{ item.quantity }}</small></span><button class="gold" type="button" @click="gift({ kind: 'consumable', id: item.id })">Give</button></article>

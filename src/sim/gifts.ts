@@ -1,3 +1,4 @@
+import { buildPlayerProfile } from '../domain/profile';
 import { RECIPES } from '../domain/catalog';
 import { calendarDate, coins, recipePurchase } from '../domain/economy';
 import { INTERIORS, isEventInterior } from '../data/cosmetics/bars';
@@ -166,7 +167,7 @@ export function publicBar(state: PlayerState, name: string) {
     .sort((a, b) => b.level - a.level).slice(0, 3)
     .map((item) => ({ name: RECIPES.find((recipe) => recipe.id === item.id)?.name ?? item.id, level: item.level }));
   return {
-    name, level: levelFor(state.xp), regionId: state.regionId, bar,
+    name, level: levelFor(state.xp), regionId: state.regionId, bar, profile: buildPlayerProfile(state),
     recipes: state.knownRecipeIds.length, interiors: state.ownedInteriorIds.length, mastered,
     knownRecipeIds: state.knownRecipeIds.filter((id) => !isStarterRecipe(id)), ownedInteriorIds: state.ownedInteriorIds
   };

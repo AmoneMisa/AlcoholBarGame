@@ -22,6 +22,7 @@ import { actsIn } from '../domain/social/acts';
 import { backToOrder, withoutTrailingQuestion, enjoyingOpening, openingFor, socialReply, voice, type Expression } from '../domain/social/talk';
 import { ensureSocial, genderOf, rollSocial } from '../domain/social/generate';
 import { guestLine, hasSituation, matchChoice, overdue, pickSituation, resolveChoice, resolveIgnored, startSituation, visibleChoices, type Resolution } from './situations';
+import { FEATURED_MAX } from '../domain/profile';
 import { endTraining, finishGuide, isPractice, noteTraining, startTraining, tidyTraining } from './training';
 import { collectChatter, reactionToServed } from './chatter';
 import { accrueStaff, hireStaff, upgradeStaff } from './staff';
@@ -112,6 +113,7 @@ export type GameAction =
   | { type: 'prestige' }
   | { type: 'designSignature'; name: string; items: { ingredientId: string; amount: number }[]; needsShake: boolean }
   | { type: 'claimLeaderboardReward' }
+  | { type: 'setFeaturedAchievements'; ids: string[] }
   | { type: 'claimQuest'; questId: string }
   | { type: 'claimAchievement'; id: string }
   | { type: 'buyPrestigePerk'; perk: string };
@@ -465,6 +467,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.xp += xpGain(state, 110 + Math.min(state.streak * 2, 14), now);
       state.streak += 1;
       track(state, 'bottles', request.quantity, now);
+      countServed(state);
       const note = `Sold ${request.quantity} × ${product.name} for ${revenue.toFixed(2)} coins and ${crystalPayment} crystals.${tip ? ` Tip +${tip}.` : ' No tip this time.'}`;
       scheduleNextCustomer(state, now, random);
       state.message = note;
@@ -548,6 +551,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         state.streak += 1;
         // Hands-on play earns the Workshop rewards; Auto-serve is paid and gives XP, but no drops, quest progress or loyalty.
         let found = '';
+        if (!guest.training) countServed(state);
         if (!auto) {
           track(state, 'serves', 1, now);
           track(state, 'servesCoins', Math.floor(revenue + tip), now);
@@ -967,6 +971,14 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       noteTraining(state, 'toppedUp');
       break;
     }
+    case 'setFeaturedAchievements': {
+      // Only achievements the player has earned can be shown, at most four; an empty list goes back to "the last four".
+      const earned = new Set(state.loot.achievements);
+      const ids = Array.isArray(action.ids) ? [...new Set(action.ids.filter((id) => typeof id === 'string' && earned.has(id)))].slice(0, FEATURED_MAX) : [];
+      state.featuredAchievements = ids.length ? ids : undefined;
+      state.message = ids.length ? 'Your profile shows the achievements you picked.' : 'Your profile shows your latest achievements.';
+      break;
+    }
     case 'setTour':
       state.tour = action.value === 'done' ? 'done' : 'skipped';
       break;
@@ -1078,6 +1090,12 @@ function auditEntry(state: PlayerState, action: GameAction): LootAudit | undefin
   else if (action.type === 'prestige') Object.assign(detail, { prestige: state.loot.prestige });
   else if (action.type === 'openBox' && state.loot.pendingChoice) Object.assign(detail, { offered: state.loot.pendingChoice });
   return { action: action.type, message: state.message, detail };
+}
+
+// A guest was served (a drink or a bottle): the profile counts all bars and each bar.
+function countServed(state: PlayerState) {
+  state.served += 1;
+  state.servedByBar[state.regionId] = (state.servedByBar[state.regionId] ?? 0) + 1;
 }
 
 function offerSimilar(state: PlayerState, target: Customer, marketFactor: number) {

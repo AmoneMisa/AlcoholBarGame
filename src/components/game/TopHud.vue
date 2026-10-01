@@ -59,7 +59,7 @@ onUnmounted(() => {
 <template>
   <header ref="hud" class="top-hud">
     <div class="venue-card">
-      <div class="venue-mark"><UiIcon name="glass" /></div>
+      <button type="button" class="venue-mark profile-open" data-guide="profile" aria-label="Open your profile" title="Your profile" @click="$emit('goto', 'profile')"><UiIcon name="glass" /></button>
       <div><small>YOUR BAR · {{ game.region.name }}<em v-if="game.mode !== 'online'" class="sync-badge" :class="game.mode" :title="game.mode === 'offline' ? 'No connection to the game server: progress is saved on this device only and is not added to your account.' : 'Connecting to your account…'">{{ game.mode === 'offline' ? 'Offline practice' : 'Connecting…' }}</em></small><b>{{ game.decor.name }}</b><div class="xp-line"><span :style="{ width: xpPercent + '%' }"></span></div></div>
       <em>LV. {{ game.level }}</em>
     </div>

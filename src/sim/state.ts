@@ -67,6 +67,10 @@ export interface PlayerState {
   autoSupply?: boolean;
   tradeLog: string[];
   languageStats: { sentences: number; correct: number };
+  // The player profile: guests served (drinks and bottles) in all, per bar, and the achievements the player chose to show.
+  served: number;
+  servedByBar: Record<string, number>;
+  featuredAchievements?: string[];
   // Correct sentences already rewarded per customer, so talking cannot be farmed for XP.
   rewardedSentences: Record<string, number>;
   // Haggling with a supplier's sales rep (see sim/trade.ts); one open negotiation at a time.
@@ -229,6 +233,8 @@ export function createInitialState(now = Date.now()): PlayerState {
     deliveryOrders: [],
     tradeLog: [],
     languageStats: { sentences: 0, correct: 0 },
+    served: 0,
+    servedByBar: {},
     rewardedSentences: {},
     conversations: {},
     message: 'Tap a customer to talk, find out what they want, then build the cocktail.'
@@ -273,6 +279,11 @@ export function normalizePlayerState(state: PlayerState) {
   } else state.popularityBoost = undefined;
   state.friendVisits = state.friendVisits && typeof state.friendVisits === 'object' ? state.friendVisits : {};
   state.friendLabels = state.friendLabels && typeof state.friendLabels === 'object' ? state.friendLabels : {};
+  // Saves from before the profile existed: the lifetime serve counter is the best guess, all in the current bar.
+  state.served = Number.isFinite(state.served) && state.served >= 0 ? Math.floor(state.served) : Math.floor(state.loot?.stats?.serves ?? 0);
+  state.servedByBar = state.servedByBar && typeof state.servedByBar === 'object' ? Object.fromEntries(Object.entries(state.servedByBar).filter(([, count]) => Number.isFinite(count) && count > 0).map(([id, count]) => [id, Math.floor(count)])) : {};
+  if (!Object.keys(state.servedByBar).length && state.served > 0) state.servedByBar = { [state.regionId]: state.served };
+  state.featuredAchievements = Array.isArray(state.featuredAchievements) ? [...new Set(state.featuredAchievements.filter((id) => typeof id === 'string'))].slice(0, 4) : undefined;
   state.customers = Array.isArray(state.customers) ? state.customers : [];
   for (const customer of state.customers) {
     customer.smoker ??= [...customer.id].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 7 === 0;

@@ -1347,3 +1347,8 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:clip}
 .top-up-row small { display:block;opacity:.75;font-size:11px; }
 .top-up-row button { padding:7px 14px;border:1px solid #e0a14a;border-radius:10px;background:#a9702b;color:#fff6e0;font-weight:700;cursor:pointer; }
 .academy-resource { position: relative; }
+
+.profile-open { border: 0; background: transparent; color: inherit; cursor: pointer; }
+.profile-open:focus-visible { outline: 2px solid #ffd35a; border-radius: 10px; }
+.profile-actions .danger { padding: 7px 12px; border: 1px solid #a14a4a; border-radius: 10px; background: #3a1d1d; color: #ffd6d6; font-weight: 700; cursor: pointer; }
+.profile-actions .gold { padding: 7px 12px; border: 1px solid #a97938; border-radius: 10px; background: #5f3d1c; color: #ffe9bd; font-weight: 700; cursor: pointer; }

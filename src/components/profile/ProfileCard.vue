@@ -1,0 +1,78 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+import { REGIONS } from '../../domain/catalog';
+import type { PlayerProfile } from '../../domain/profile';
+import CharacterModel from '../characters/CharacterModel.vue';
+
+// The player card: avatar, level, favourite bar, opened bars, guests served, share of correct English and
+// achievements. Used for the player's own screen and for a friend's bar (the actions go in the slot).
+const props = defineProps<{
+  name: string;
+  level: number;
+  profile: PlayerProfile;
+  /** The bar's look (bartender and decor), as saved in the bar profile. */
+  look?: Record<string, string>;
+}>();
+
+const regionName = (id?: string) => REGIONS.find((region) => region.id === id)?.name ?? '—';
+const opened = computed(() => props.profile.ownedBarIds.map((id) => ({ id, name: regionName(id), served: props.profile.servedByBar[id] ?? 0 })));
+const english = computed(() => props.profile.englishPercent === undefined ? '—' : `${props.profile.englishPercent}%`);
+</script>
+
+<template>
+  <section class="profile-card" aria-label="Player profile">
+    <header class="profile-head">
+      <div class="profile-avatar">
+        <CharacterModel role="bartender" :character-id="look?.bartenderCharacter ?? 'noa'" :outfit="look?.bartender" :hair-style="look?.hairStyle" :hair-color="look?.hairColor" :body-shape="look?.bodyShape" :skin-detail="look?.skinDetail" :skin-tone="look?.skinTone" :pose="look?.pose" animation="idle" />
+      </div>
+      <div class="profile-title">
+        <small>PLAYER</small>
+        <h2>{{ name }}</h2>
+        <span class="profile-level">Level {{ level }}</span>
+      </div>
+      <div class="profile-actions"><slot name="actions" /></div>
+    </header>
+
+    <dl class="profile-stats">
+      <div><dt>Favourite bar</dt><dd>{{ profile.favoriteBarId ? regionName(profile.favoriteBarId) : 'Not yet' }}<small v-if="profile.favoriteBarId">{{ profile.servedByBar[profile.favoriteBarId] }} guests served there</small></dd></div>
+      <div><dt>Guests served</dt><dd>{{ profile.served.toLocaleString('en-US') }}</dd></div>
+      <div><dt>Correct English</dt><dd>{{ english }}<small v-if="profile.sentences">{{ profile.sentences }} sentences</small></dd></div>
+      <div><dt>Achievements</dt><dd>{{ profile.achievementCount }} / {{ profile.achievementTotal }}</dd></div>
+    </dl>
+
+    <section class="profile-bars">
+      <h3>Opened bars <small>{{ opened.length }} of {{ REGIONS.length }}</small></h3>
+      <ul><li v-for="bar in opened" :key="bar.id" :class="{ favourite: bar.id === profile.favoriteBarId }"><b>{{ bar.name }}</b><small>{{ bar.served }} served</small></li></ul>
+    </section>
+
+    <section class="profile-achievements">
+      <h3>{{ profile.picked ? 'Chosen achievements' : 'Latest achievements' }}<slot name="achievements-action" /></h3>
+      <ul v-if="profile.shown.length"><li v-for="item in profile.shown" :key="item.id">🏅 {{ item.name }}</li></ul>
+      <p v-else class="empty">No achievements yet.</p>
+    </section>
+  </section>
+</template>
+
+<style scoped>
+.profile-card { display: grid; gap: 14px; padding: 16px; border: 1px solid #354762; border-radius: 16px; background: #111c2d; color: #e9eef7; }
+.profile-head { display: grid; grid-template-columns: 88px 1fr auto; gap: 14px; align-items: center; }
+.profile-avatar { position: relative; width: 88px; height: 110px; overflow: hidden; border-radius: 14px; background: radial-gradient(circle at 50% 30%, #4f334b, #16243a 70%); }
+.profile-title small { color: #e4b35c; letter-spacing: .12em; font-weight: 800; font-size: 10px; }
+.profile-title h2 { margin: 2px 0; font: 700 24px Georgia, serif; }
+.profile-level { display: inline-block; padding: 2px 10px; border-radius: 999px; background: #3b2b1f; border: 1px solid #b78649; color: #ffe9bd; font-weight: 700; font-size: 12px; }
+.profile-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.profile-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 0; }
+.profile-stats div { padding: 10px 12px; border-radius: 12px; background: #17253a; }
+.profile-stats dt { color: #91a2b5; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.profile-stats dd { margin: 4px 0 0; font: 700 20px Georgia, serif; }
+.profile-stats dd small { display: block; font: 400 11px system-ui, sans-serif; color: #9eafc1; }
+h3 { margin: 0 0 8px; font-size: 14px; }
+h3 small { margin-left: 8px; color: #91a2b5; font-weight: 400; }
+ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.profile-bars li { padding: 6px 12px; border-radius: 10px; background: #17253a; border: 1px solid #2d4059; }
+.profile-bars li.favourite { border-color: #e0a14a; }
+.profile-bars li small { margin-left: 8px; color: #9eafc1; }
+.profile-achievements li { padding: 6px 12px; border-radius: 10px; background: #2a2418; border: 1px solid #6b5a2e; }
+.empty { margin: 0; color: #9eafc1; font-size: 13px; }
+@media (max-width: 560px) { .profile-head { grid-template-columns: 72px 1fr; } .profile-actions { grid-column: 1 / -1; justify-content: flex-start; } .profile-avatar { width: 72px; height: 92px; } }
+</style>

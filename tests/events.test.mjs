@@ -489,7 +489,7 @@ test('This is a bar, not a chat room: every small-talk answer of an ordering gue
     applyAction(state, { type: 'say', text }, context());
     const line = state.conversations[guest.id].lines.at(-1).text;
     assert.match(line, /recommend|offer|suggest|drink|choose|my drink/i, `${text} -> ${line}`);
-    assert.ok(line.trim().split(/(?<=[.!?])\s/).filter((part) => part.endsWith('?')).length <= 1, `at most one question: ${line}`);
+    assert.ok(line.trim().split(/(?<=[.!?])\s/).filter((part) => part.endsWith('?') && part.split(/\s+/).length > 2).length <= 1, `at most one real question (a one-word echo like "Football?" is fine): ${line}`);
   }
   assert.ok(socialReply && backToOrder('x:1'));
 });
@@ -648,4 +648,68 @@ test('A drink question after small talk is answered with a clue, not with a chat
   applyAction(state, { type: 'say', text: 'Do you like sweet drinks?' }, context());
   assert.match(state.conversations[guest.id].lines.at(-1).text, /sweet/i);
   assert.ok(state.conversations[guest.id].facts.some((fact) => fact.topic === 'sweet'), 'the clue was recorded');
+});
+
+// ---- Player profile ----
+test('The profile shows the favourite bar, English share, opened bars and four achievements (picked, or the latest)', async () => {
+  const { buildPlayerProfile, earnedAchievements, FEATURED_MAX } = await import('../src/domain/profile.ts');
+  const base = { served: 12, servedByBar: { london: 3, 'new-york': 9 }, languageStats: { sentences: 40, correct: 30 }, ownedBarIds: ['new-york', 'london'], loot: { achievements: ['a-serve-10', 'a-vip-10', 'a-bottles-25', 'a-boxes-20', 'a-draws-30', 'a-fake'] } };
+  const profile = buildPlayerProfile(base);
+  assert.equal(profile.favoriteBarId, 'new-york');
+  assert.equal(profile.englishPercent, 75);
+  assert.equal(profile.achievementCount, 5, 'unknown achievement ids are ignored');
+  assert.equal(profile.shown.length, FEATURED_MAX);
+  assert.equal(profile.shown[0].id, 'a-draws-30', 'the latest first');
+  assert.equal(profile.picked, false);
+  const picked = buildPlayerProfile({ ...base, featuredAchievements: ['a-serve-10', 'a-vip-10', 'not-earned'] });
+  assert.deepEqual(picked.shown.map((item) => item.id), ['a-serve-10', 'a-vip-10']);
+  assert.equal(picked.picked, true);
+  assert.equal(buildPlayerProfile({ ...base, languageStats: { sentences: 0, correct: 0 }, servedByBar: {} }).englishPercent, undefined);
+  assert.equal(buildPlayerProfile({ ...base, servedByBar: {} }).favoriteBarId, undefined);
+  assert.equal(earnedAchievements(base).length, 5);
+});
+
+test('Serving counts guests for the profile (drinks per bar), but practice guests do not count; picks are validated', () => {
+  const state = academy();
+  state.nextCustomerAt = 0;
+  doAction(state, { type: 'startTraining', moduleId: 'mix' });
+  const practice = state.customers.find((item) => item.training);
+  const recipe = RECIPES.find((item) => item.id === practice.orderRecipeId);
+  for (const part of recipe.ingredients) state.inventories[state.regionId].find((stock) => stock.ingredientId === part.ingredientId).amount += 1000;
+  doAction(state, { type: 'serve', mix: recipe.ingredients.map((item) => ({ ...item })), shaken: true, pourBrands: {} });
+  assert.equal(state.served, 0, 'a practice drink is not a served guest');
+
+  const bar = guestIn({ phase: 'ordering' }).state;
+  const before = bar.served;
+  bar.customers = [bar.customers[0]];
+  const target = bar.customers[0];
+  Object.assign(target, { orderKind: 'cocktail', orderRevealed: true, orderRecipeId: recipe.id, patience: 99999, patienceRemaining: 99999 });
+  for (const part of recipe.ingredients) bar.inventories[bar.regionId].find((stock) => stock.ingredientId === part.ingredientId).amount += 1000;
+  doAction(bar, { type: 'serve', mix: recipe.ingredients.map((item) => ({ ...item })), shaken: true, pourBrands: {} });
+  assert.equal(bar.served, before + 1);
+  assert.equal(bar.servedByBar[bar.regionId], 1);
+
+  bar.loot.achievements = ['a-serve-10', 'a-vip-10', 'a-bottles-25', 'a-boxes-20', 'a-draws-30'];
+  doAction(bar, { type: 'setFeaturedAchievements', ids: ['a-serve-10', 'a-vip-10', 'a-bottles-25', 'a-boxes-20', 'a-draws-30', 'nope'] });
+  assert.equal(bar.featuredAchievements.length, 4, 'at most four');
+  doAction(bar, { type: 'setFeaturedAchievements', ids: ['nope', 'a-draws-30'] });
+  assert.deepEqual(bar.featuredAchievements, ['a-draws-30'], 'only earned achievements');
+  doAction(bar, { type: 'setFeaturedAchievements', ids: [] });
+  assert.equal(bar.featuredAchievements, undefined, 'empty goes back to the latest four');
+});
+
+test('A friend’s bar carries the profile, old saves get a served count, and the profile is built from the state only', async () => {
+  const { publicBar } = await import('../src/sim/gifts.ts');
+  const { normalizePlayerState } = await import('../src/sim/state.ts');
+  const state = createInitialState(NOW);
+  state.served = 7; state.servedByBar = { 'new-york': 7 };
+  const bar = publicBar(state, 'Friend');
+  assert.equal(bar.profile.served, 7);
+  assert.equal(bar.profile.favoriteBarId, 'new-york');
+  const old = createInitialState(NOW);
+  delete old.served; delete old.servedByBar;
+  old.loot.stats.serves = 42;
+  normalizePlayerState(old);
+  assert.equal(old.served, 42);
+  assert.deepEqual(old.servedByBar, { [old.regionId]: 42 });
 });

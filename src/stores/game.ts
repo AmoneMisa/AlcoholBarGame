@@ -1,4 +1,5 @@
 import { computed, ref, toRaw } from 'vue';
+import { buildPlayerProfile, earnedAchievements as earnedAchievementList } from '../domain/profile';
 import { rulesFor } from '../domain/situations/houseRules';
 import { barEventFor } from '../sim/events';
 import { pitchChance } from '../sim/pitch';
@@ -139,6 +140,10 @@ export const useGameStore = defineStore('game', () => {
   const cosmeticRouletteAvailable = computed(() => state.value.cosmeticRouletteKey !== today.value);
   const cosmeticRouletteResult = computed(() => state.value.cosmeticRouletteResult);
   const loot = computed(() => state.value.loot);
+  // The player profile (guests served, English, favourite bar, achievements) and the achievements the player may show.
+  const profile = computed(() => buildPlayerProfile(state.value));
+  const earnedAchievements = computed(() => earnedAchievementList(state.value));
+  const setFeaturedAchievements = (ids: string[]) => dispatch({ type: 'setFeaturedAchievements', ids });
   const cosmeticGiftLog = computed(() => state.value.cosmeticGiftLog ?? []);
 
   // Decor edits (Design screen) go through a validated action; the proxy keeps `game.decor.wall = 'x'` working.
@@ -665,7 +670,7 @@ export const useGameStore = defineStore('game', () => {
 
   const act = (action: GameAction) => dispatch(action);
   return {
-    mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, act, visibleInventory, connectEpoch,
+    profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, act, visibleInventory, connectEpoch,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, sessionReady, ownedInteriorIds, barBackground, barInteriorStyle,
