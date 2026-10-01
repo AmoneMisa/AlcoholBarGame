@@ -19,7 +19,7 @@ const category = ref('all');
 // One window for supplies: it shows what a top-up would order now and the switch for doing it automatically.
 const confirm = ref(false);
 // Opens at level 5 (the training lesson may use it earlier, as practice).
-const supplyLocked = computed(() => game.level < AUTO_SUPPLY_LEVEL && !game.training.active);
+const supplyLocked = computed(() => game.level < AUTO_SUPPLY_LEVEL);
 const autoChoice = ref(false);
 const topUp = computed(() => (confirm.value ? game.topUpPreview() : { orders: [], total: 0 } as ReturnType<typeof game.topUpPreview>));
 const openSupply = () => { autoChoice.value = game.autoSupply; confirm.value = true; };

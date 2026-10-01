@@ -6,15 +6,11 @@ import UiIcon from '../ui/UiIcon.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
 import UiButton from '../ui/UiButton.vue';
 import { MAX_STAFF, MAX_STAFF_LEVEL, STAFF_PROFILES, STAFF_UNLOCK_LEVELS, hireCost, teamShare, upgradeCost } from '../../domain/staff';
-import { TRAINING_MODULES } from '../../domain/training';
-import AcademyPanel from './AcademyPanel.vue';
 defineEmits<{ design:[]; goto:[view: string] }>();
 
 const game = useGameStore();
 const exchangeOpen = ref(false);
 const staffOpen = ref(false);
-const academyOpen = ref(false);
-const lessonsLeft = computed(() => TRAINING_MODULES.length - game.training.done.length);
 const slots = computed(() => Array.from({ length: MAX_STAFF }, (_, index) => ({ index, profile: STAFF_PROFILES[index]!, unlockAt: STAFF_UNLOCK_LEVELS[index]!, member: game.staff[index], open: game.level >= STAFF_UNLOCK_LEVELS[index]! })));
 // Why a hire or training button is off, said in words under the row.
 const staffReason = (slot: { index: number; member?: { level: number }; open: boolean }) => {
@@ -24,7 +20,7 @@ const staffReason = (slot: { index: number; member?: { level: number }; open: bo
 };
 const teamPercent = computed(() => Math.round(teamShare(game.staff) * 100));
 // Only one header panel is open at a time, so they never pile up on top of each other.
-const panels = { exchange: exchangeOpen, staff: staffOpen, academy: academyOpen };
+const panels = { exchange: exchangeOpen, staff: staffOpen };
 for (const [name, flag] of Object.entries(panels)) watch(flag, (open) => { if (open) for (const [other, ref] of Object.entries(panels)) if (other !== name) ref.value = false; });
 const xpPercent = computed(() => game.xpProgress.percent);
 function exchange(crystals: number) {
@@ -71,10 +67,6 @@ onUnmounted(() => {
           <p>This exchange only works from crystals to coins and cannot be reversed.</p>
           <button v-for="bundle in CRYSTAL_EXCHANGE_BUNDLES" :key="bundle.crystals" type="button" :disabled="game.crystals < bundle.crystals" @click="exchange(bundle.crystals)"><span><UiIcon name="crystal" /><b>{{ bundle.crystals }}</b></span><i><UiIcon name="arrow-right" /></i><span><UiIcon name="coin" /><b>{{ bundle.coins.toLocaleString('en-US') }}</b></span></button>
         </PopoverPanel>
-      </div>
-      <div class="academy-resource">
-        <button class="staff-open" data-guide="academy" type="button" :aria-expanded="academyOpen" aria-label="Open the training academy" @click="academyOpen = !academyOpen"><span class="staff-icons"><i class="hired"><UiIcon name="cap" /></i></span><span><small>TRAINING</small><b>{{ lessonsLeft ? `${lessonsLeft} to do` : 'All done' }}</b></span></button>
-        <AcademyPanel v-if="academyOpen" @close="academyOpen = false" @goto="(view) => $emit('goto', view)" />
       </div>
       <div v-if="game.level >= STAFF_UNLOCK_LEVELS[0]!" class="staff-resource">
         <button class="staff-open" type="button" :aria-expanded="staffOpen" :aria-label="`Servers: ${game.staff.length} of ${MAX_STAFF} hired`" @click="staffOpen = !staffOpen"><span class="staff-icons"><i v-for="slot in slots" :key="slot.index" :class="{ hired: !!slot.member, locked: !slot.open }"><UiIcon name="server" /></i></span><span><small>SERVERS</small><b>{{ game.staff.length ? `${teamPercent}% of you` : 'Hire' }}</b></span></button>

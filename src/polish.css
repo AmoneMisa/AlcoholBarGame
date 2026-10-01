@@ -11,7 +11,6 @@
   header.top-hud .hud-resources > .crystal-resource { grid-column: span 2; order: 2; border-top: 0; }
   header.top-hud .hud-resources > .daily-hud-gift { grid-column: span 2; order: 3; border-top: 0; }
   header.top-hud .hud-resources > .staff-resource { grid-column: span 3; order: 4; }
-  header.top-hud .hud-resources > .academy-resource { grid-column: span 2; order: 5; }
   header.top-hud .hud-resources > .sound-resource { grid-column: span 1; order: 6; }
   header.top-hud .hud-resources > div, header.top-hud .daily-hud-gift { padding: 6px 8px; }
 }
@@ -231,3 +230,7 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .talk-scroll .talk-log { max-height: min(44dvh, 420px); }
 .talk-scroll .talk-clues { max-height: none; overflow: visible; }
 .talk-popup > .talk-compose { flex: none; max-height: min(52dvh, 520px); overflow-y: auto; overscroll-behavior: contain; }
+
+/* The daily gift tile sits in the top right corner of the rounded header panel, so it follows that corner. */
+.hud-resources > .daily-hud-gift { border-top-right-radius: 17px; }
+@media (min-width: 761px) { .hud-resources > .daily-hud-gift:last-child { border-bottom-right-radius: 17px; } }

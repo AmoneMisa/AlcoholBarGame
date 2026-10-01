@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import UiInput from '../ui/UiInput.vue';
-import { CHAT_GUIDE, type ChatGuideStep } from '../../domain/training';
+import { CHAT_GUIDE, type ChatGuideStep } from '../../domain/chatGuide';
 import { setPointer } from '../../guide/pointer';
 import SpeakTrainer from '../learning/SpeakTrainer.vue';
 import { voiceProfileOf } from '../../domain/social/origin';

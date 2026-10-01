@@ -1342,7 +1342,6 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:clip}
 .top-up-row { display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0;padding:8px 12px;border:1px solid #43536b;border-radius:12px;background:#131f31; }
 .top-up-row small { display:block;opacity:.75;font-size:11px; }
 .top-up-row button { padding:7px 14px;border:1px solid #e0a14a;border-radius:10px;background:#a9702b;color:#fff6e0;font-weight:700;cursor:pointer; }
-.academy-resource { position: relative; }
 
 .profile-open { border: 0; background: transparent; color: inherit; cursor: pointer; }
 .profile-open:focus-visible { outline: 2px solid #ffd35a; border-radius: 10px; }

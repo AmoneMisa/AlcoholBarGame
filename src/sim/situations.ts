@@ -92,7 +92,6 @@ export function startSituation(state: PlayerState, guest: Customer, def: Situati
 
 // Which situation (if any) starts for this guest now.
 export function pickSituation(state: PlayerState, guest: Customer, trigger: Trigger, random: () => number): SituationDef | undefined {
-  if (guest.training) return undefined;
   // Something happens at least once in every 10–12 guests, and never more often than every 4th guest.
   if (trigger === 'arrival') state.guestsSinceEvent = (state.guestsSinceEvent ?? 0) + 1;
   if (anySituation(state)) return undefined;

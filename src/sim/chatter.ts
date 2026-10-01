@@ -27,7 +27,7 @@ export function collectChatter(state: PlayerState, now: number, random: () => nu
   const event = barEventFor(state, now);
   for (const guest of state.customers) {
     const social = ensureSocial(guest, now);
-    if (guest.training || hasSituation(guest) || social.need || state.conversationCustomerId === guest.id) continue;
+    if (hasSituation(guest) || social.need || state.conversationCustomerId === guest.id) continue;
     // The first remark comes after a couple of minutes, so a guest first gets a chance to be greeted.
     if (social.chatterAt === undefined) { social.chatterAt = now + chatterGap(social, random()); social.spokenAt ??= now; continue; }
     if (now < social.chatterAt || (social.chatterCount ?? 0) >= MAX_CHATTER) continue;

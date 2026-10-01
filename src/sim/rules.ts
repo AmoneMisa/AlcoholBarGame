@@ -23,7 +23,6 @@ import { backToOrder, withoutTrailingQuestion, enjoyingOpening, openingFor, soci
 import { ensureSocial, genderOf, rollSocial } from '../domain/social/generate';
 import { guestLine, hasSituation, matchChoice, overdue, pickSituation, resolveChoice, resolveIgnored, startSituation, visibleChoices, type Resolution } from './situations';
 import { FEATURED_MAX } from '../domain/profile';
-import { endTraining, finishGuide, isPractice, noteTraining, startTraining, tidyTraining } from './training';
 import { collectChatter, reactionToServed } from './chatter';
 import { addStat, raiseStat, syncDerivedStats } from '../domain/achievementStats';
 import { accrueStaff, hireStaff, upgradeStaff } from './staff';
@@ -83,10 +82,7 @@ export type GameAction =
   | { type: 'giveAshtray'; customerId: string }
   | { type: 'cleanAshtrays' }
   | { type: 'setTour'; value: 'done' | 'skipped' }
-  // The training academy and one-tap restock.
-  | { type: 'startTraining'; moduleId: string }
-  | { type: 'endTraining' }
-  | { type: 'trainingDone'; moduleId: string }
+  // One-tap restock.
   | { type: 'topUp' }
   | { type: 'recruitCompanion'; id: string }
   | { type: 'giveKeepsake'; id: string; kind: string }
@@ -571,20 +567,20 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const revenue = coins(verdict.recipe.price * priceFactorOf(guest, region.marketFactor) * mastery.pay * specialty * lootBonuses(state, now).payFactor * (golden ? 1.5 : 1) * (guest.orderKind === 'serve' ? 1 : regularPriceBonus(state, guest.characterId, verdict.recipe.id)) * (guest.signature ? signatureFameFactor(state) : 1));
         const bonus = guest.orderKind === 'serve' ? undefined : signatureBonus(verdict.recipe.id, pourBrands);
         // Tips are a chance, never a given; drinks made with Auto-serve are paid but never tipped.
-        const tipped = !auto && !guest.training && (golden || rollTip(state, guest, now, random));
+        const tipped = !auto && (golden || rollTip(state, guest, now, random));
         const tip = tipped ? Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .2 : .1) * economyOf(state, now).tips * mastery.tips) + (bonus ? 2 : 0) : 0;
         // Sometimes the guest has a problem with paying: then the bill is held until it is sorted out.
         // A drink made with damaged or old goods can bring a complaint instead.
         const promo = applyPromo(state, guest, verdict.recipe, now);
         const complaint = !promo.free && lowGradeUsed.size && random() < (lowGradeUsed.has('expiring') ? .4 : .2) ? situationById('complaint-quality') : undefined;
-        const payTrouble = promo.free || guest.training ? undefined : complaint ?? pickSituation(state, guest, 'payment', random);
+        const payTrouble = promo.free ? undefined : complaint ?? pickSituation(state, guest, 'payment', random);
         if (!payTrouble && !promo.free) state.money = coins(state.money + revenue + tip);
         // About 170 successful orders reach level 25 and about 700 reach the level 50 cap.
         state.xp += xpGain(state, 100 + Math.min(state.streak * 2, 14), now);
         state.streak += 1;
         // Hands-on play earns the Workshop rewards; Auto-serve is paid and gives XP, but no drops, quest progress or loyalty.
         let found = '';
-        if (!guest.training) countServed(state);
+        countServed(state);
         if (!auto) {
           track(state, 'serves', 1, now);
           track(state, 'servesCoins', Math.floor(revenue + tip), now);
@@ -594,16 +590,15 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           if (guest.orderKind !== 'serve' && !guest.signature) found += tasteFirst(state, verdict.recipe.id, 'recipe', now);
           if (guest.orderKind !== 'serve') found += earnLoyalty(state, guest.characterId, guest.name, verdict.recipe.id, guest.mood === 'vip');
           // A person of the Circle at the bar: shards if they have not joined yet, bond points if they have.
-          if (!guest.training) found += companionVisit(state, guest.characterId, { eventId: barEventFor(state, now)?.id }, now, random);
+          found += companionVisit(state, guest.characterId, { eventId: barEventFor(state, now)?.id }, now, random);
           for (const productId of Object.values(pourBrands)) found += tasteFirst(state, productId, 'brand', now);
         }
         const serveProduct = serve ? ALCOHOL_PRODUCTS.find((item) => item.id === serve.productId) : undefined;
         ensureSocial(guest, now).lastDrink = serveProduct ? { productId: serveProduct.id } : { recipeId: verdict.recipe.id };
         // A word about the drink, in the bubble and (if the chat is open) in the conversation.
-        const reaction = guest.training ? undefined : reactionToServed(guest, now, `${guest.id}:${state.streak}`);
+        const reaction = reactionToServed(guest, now, `${guest.id}:${state.streak}`);
         const openTalk = state.conversations?.[guest.id];
         if (reaction && openTalk) addLine(openTalk, 'customer', voice(guest, reaction, openTalk.lines.length));
-        if (guest.training) noteTraining(state, 'served');
         const brandedPayment = serveProduct ? brandedServeCrystalReward(serveProduct) : 0;
         const specialPayment = guest.specialRecipeRewardId || guest.mood === 'vip' ? conversationCrystalReward(guest, verdict.recipe) : 0;
         const crystalPayment = brandedPayment + specialPayment;
@@ -993,15 +988,6 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       addLine(transcript, 'customer', voice(target, result.text, transcript.lines.length));
       break;
     }
-    case 'startTraining': {
-      try { startTraining(state, String(action.moduleId), now, random); } catch (error) { throw new RuleError((error as Error).message); }
-      break;
-    }
-    case 'endTraining': endTraining(state); state.message = 'Practice ended.'; break;
-    case 'trainingDone': {
-      try { finishGuide(state, String(action.moduleId)); } catch (error) { throw new RuleError((error as Error).message); }
-      break;
-    }
     case 'wipeAccount': {
       // Starts the account over from nothing, at any level. Only the "tour done" mark is kept, so nobody sees it again.
       if (action.confirm !== true) throw new RuleError('Confirm the reset first.');
@@ -1013,11 +999,10 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       return { moneyDelta: 0, crystalDelta: 0, weekly: { week: state.loot.weekly.week, score: 0, label: '', level: 1 } };
     }
     case 'topUp': {
-      // Supplying stock opens at the same level as auto-supply; the training lesson may try it earlier.
-      if (levelFor(state.xp) < AUTO_SUPPLY_LEVEL && !state.training?.active) throw new RuleError(`Supplying stock unlocks at level ${AUTO_SUPPLY_LEVEL}.`);
+      // Supplying stock opens at the same level as auto-supply.
+      if (levelFor(state.xp) < AUTO_SUPPLY_LEVEL) throw new RuleError(`Supplying stock unlocks at level ${AUTO_SUPPLY_LEVEL}.`);
       const ordered = autoRestock(state, now, true);
       if (!ordered) throw new RuleError(state.message.includes('paused') ? state.message : 'Nothing is running low, or an order for it is already on the way.');
-      noteTraining(state, 'toppedUp');
       break;
     }
     case 'setFeaturedAchievements': {
@@ -1123,30 +1108,15 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     default: throw new RuleError('Unknown action.');
   }
 
-  // Training academy: note what the player did. A practice guest never pays and never brings crystals.
-  const practising = guest && isPractice(guest) && ['serve', 'situationChoice', 'pitchAsk', 'say', 'autoServe'].includes(action.type);
-  if (practising) { state.money = moneyBefore; state.crystals = crystalsBefore; }
-  // Achievements count what the player spent in all (a Grand Opening resetting the purse is not spending).
-  if (!practising && action.type !== 'prestige') {
-    addStat(state, 'coinsSpent', Math.floor(moneyBefore - state.money));
-    addStat(state, 'crystalsSpent', crystalsBefore - state.crystals);
-  }
-  switch (action.type) {
-    case 'say': if (guest && isPractice(guest)) { noteTraining(state, 'asked'); if (guest.orderRevealed) noteTraining(state, 'confirmed'); } break;
-    case 'giveWater': noteTraining(state, 'water'); break;
-    case 'giveAshtray': noteTraining(state, 'ashtray'); break;
-    case 'pitchAsk': noteTraining(state, 'offered'); break;
-    case 'buy': noteTraining(state, 'bought'); break;
-    case 'situationChoice': if (guest && isPractice(guest) && !hasSituation(guest)) noteTraining(state, 'situationSolved'); break;
-    default: break;
-  }
-  tidyTraining(state);
+  // Achievements count what the player spent in all.
+  addStat(state, 'coinsSpent', Math.floor(moneyBefore - state.money));
+  addStat(state, 'crystalsSpent', crystalsBefore - state.crystals);
   // Coins earned by serving and selling bottles decide the stars of the next Grand Opening.
   if (['serve', 'autoServe', 'sellBottle'].includes(action.type) && state.money > moneyBefore) state.loot.runEarned += Math.floor(state.money - moneyBefore);
   grantLevelBoxes(state);
   syncDerivedStats(state);
   // Auto-serve XP does not count for the leaderboard: the ranking rewards hands-on service.
-  addWeeklyScore(state, action.type === 'prestige' || (action.type === 'serve' && action.auto) ? 0 : state.xp - xpBefore, now);
+  addWeeklyScore(state, (action.type === 'serve' && action.auto) ? 0 : state.xp - xpBefore, now);
   if (!Number.isFinite(state.money) || state.money < 0) throw new RuleError('Not enough money.');
   if (!Number.isFinite(state.crystals) || state.crystals < 0) throw new RuleError('Not enough crystals.');
   return { moneyDelta: coins(state.money - moneyBefore), crystalDelta: state.crystals - crystalsBefore, audit: auditEntry(state, action),
@@ -1353,7 +1323,7 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
   // After a little chat the guest remembers why they came: they nudge the order along.
   const guestSocial = guest.social;
   // After a few words the guest comes back to the order: this is a bar, not a chat room.
-  if (social && !leaving && guestSocial && !guest.orderRevealed && guestSocial.phase === 'ordering' && !guestSocial.refused && reply.text && !guest.training) {
+  if (social && !leaving && guestSocial && !guest.orderRevealed && guestSocial.phase === 'ordering' && !guestSocial.refused && reply.text) {
     reply.text = `${withoutTrailingQuestion(reply.text)} ${backToOrder(`${guest.id}:${transcript.lines.length}`)}`;
   }
 

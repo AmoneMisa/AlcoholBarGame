@@ -49,11 +49,10 @@ const STEPS: Step[] = [
     action: 'Open the English tab.', point: [{ target: selector('nav-english'), gesture: 'tap', label: '{Tap} English' }], until: () => shown('.learning-page') },
   { id: 'market', title: 'Stock and deliveries', text: 'Buy ingredients, bottles and food in the Market. Deliveries can be late, damaged or wrong. Report a problem politely, in English, and the supplier will help.',
     action: 'Open Manage, then the Market tab.', point: [{ target: selector('nav-market'), gesture: 'tap', label: '{Tap} Market' }, { target: selector('nav-manage'), gesture: 'tap', label: '{Tap} Manage' }], until: () => shown(selector('top-up')) },
-  { id: 'hud', title: 'Coins, crystals and servers', text: 'Coins buy stock and upgrades. Crystals unlock recipes and styles. From level 8 you can hire servers: they earn coins while you are away, but never as much as you. The graduation cap opens Training.', view: 'service',
-    action: 'Open Training to see the lessons.', point: [{ target: selector('academy'), gesture: 'tap', label: '{Tap} Training' }], until: () => shown('.academy-panel') },
+  { id: 'hud', title: 'Coins, crystals and servers', text: 'Coins buy stock and upgrades. Crystals unlock recipes and styles. From level 8 you can hire servers: they earn coins while you are away, but never as much as you.', view: 'service' },
   { id: 'rules', title: 'House rules and events', text: 'Every city has its own rules, such as checking ID or paying by card only. Inspectors count every rule you break. Special nights, like ladies’ night or happy hour, change who comes and what they pay.', view: 'service',
     action: 'Press Rules to read them.', point: [{ target: selector('rules-button'), gesture: 'tap', label: '{Tap} Rules' }], until: () => shown('.house-rules-panel') },
-  { id: 'done', title: 'You are ready!', text: 'Open Training (the graduation cap in the header) for a guide and a risk-free practice of every mechanic. Small mistakes are fine: every sentence you try makes your English better. Have a good shift!', view: 'service' }
+  { id: 'done', title: 'You are ready!', text: 'The help button (?) in every conversation explains the screen again. Small mistakes are fine: every sentence you try makes your English better. Have a good shift!', view: 'service' }
 ];
 
 const open = ref(false);

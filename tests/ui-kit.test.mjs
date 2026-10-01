@@ -17,12 +17,12 @@ test('Text inputs and selects come from the UI kit, not from raw elements', () =
 });
 
 test('The standard form buttons use UiButton', () => {
-  const mustUse = ['workshop/WorkshopPage.vue', 'workshop/CompanionsPanel.vue', 'settings/SettingsPage.vue', 'settings/SoundControls.vue', 'profile/ProfilePage.vue', 'friends/FriendsPage.vue', 'game/AcademyPanel.vue', 'game/DeliveryProblems.vue'];
+  const mustUse = ['workshop/WorkshopPage.vue', 'workshop/CompanionsPanel.vue', 'settings/SettingsPage.vue', 'settings/SoundControls.vue', 'profile/ProfilePage.vue', 'friends/FriendsPage.vue', 'game/DeliveryProblems.vue'];
   for (const name of mustUse) {
     const source = vue.find(([path]) => path.endsWith(name))?.[1] ?? '';
     assert.match(source, /<UiButton\b/, `${name} uses UiButton`);
     // the only raw buttons left are navigation-style (tabs, accordion heads), never action buttons
-    const raw = (source.match(/<button\b[^>]*>/g) ?? []).filter((tag) => !/workshop-tabs|academy-head|class="story|aria-expanded/.test(tag));
+    const raw = (source.match(/<button\b[^>]*>/g) ?? []).filter((tag) => !/workshop-tabs|class="story|aria-expanded/.test(tag));
     assert.ok(raw.length <= 2, `${name} still has raw buttons: ${raw.map((tag) => tag.slice(0, 50)).join(' | ')}`);
   }
 });

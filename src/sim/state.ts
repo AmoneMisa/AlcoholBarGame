@@ -1,4 +1,3 @@
-import { TRAINING_MODULES } from '../domain/training';
 import { INGREDIENTS, RECIPES, REGIONS, STARTING_INVENTORY } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
@@ -25,7 +24,6 @@ export interface Transcript { lines: ChatLine[]; facts: Fact[]; /** Drinks and b
 export interface DeliveryOrder { id: string; supplier: string; barId: RegionId; dueAt: number; items: InventoryItem[]; total: number; }
 export type PopularityBoost = { kind: 'no-cooldown'; until: number } | { kind: 'vip-run'; remaining: number };
 
-const TRAINING_IDS = TRAINING_MODULES.map((module) => module.id);
 
 export interface PlayerState {
   version: 1;
@@ -105,8 +103,6 @@ export interface PlayerState {
   guestsSinceEvent?: number;
   // The guided tour: finished or skipped. Kept on the account, so it shows once, not once per device.
   tour?: 'done' | 'skipped';
-  // Training academy: finished lessons, what was done in the lesson that is on, and the practice that is running.
-  training?: import('./training').TrainingState;
   // Servers hired (up to four), when their work was last counted, and what they have earned in all.
   // The Circle: companions who joined, shards, keepsakes and who works where (see sim/companions.ts).
   companions?: import('./companions').CompanionState;
@@ -322,10 +318,9 @@ export function normalizePlayerState(state: PlayerState) {
   state.cosmeticRouletteKey = typeof state.cosmeticRouletteKey === 'string' ? state.cosmeticRouletteKey : '';
   state.cosmeticRouletteResult = typeof state.cosmeticRouletteResult === 'string' ? state.cosmeticRouletteResult : 'Your daily style draw is ready.';
   state.cosmeticGiftLog = Array.isArray(state.cosmeticGiftLog) ? state.cosmeticGiftLog.slice(0, 30) : [];
-  if (state.training) {
-    const known = new Set(TRAINING_IDS);
-    state.training = { done: Array.isArray(state.training.done) ? state.training.done.filter((id) => known.has(id)) : [], progress: state.training.progress && typeof state.training.progress === 'object' ? state.training.progress : {}, active: state.training.active && known.has(state.training.active.moduleId) ? state.training.active : undefined };
-  }
+  // The training academy was removed: old saves drop its progress and any practice guest still at the bar.
+  delete (state as { training?: unknown }).training;
+  state.customers = state.customers.filter((guest) => !(guest as { training?: boolean }).training);
   if (state.tour !== 'done' && state.tour !== 'skipped') delete state.tour;
   state.companions = normalizeCompanions(state.companions);
   // Servers belong to a bar. Older saves had one team: it stays in the bar that was being managed.
