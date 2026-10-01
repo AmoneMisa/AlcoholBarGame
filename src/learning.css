@@ -19,7 +19,7 @@
 .word-card dt { color:#8a5a2b;font-weight:800; }
 .word-card dd { margin:0; }
 .word-note { margin:0 0 10px;padding:7px 9px;border-radius:8px;background:#f0dfbd;font-size:12px; }
-.word-card .secondary-button { min-height:36px;border-color:#b98b45;background:#fff;color:#5a3a12; }
+.word-card .ui-btn-secondary { min-height:36px;border-color:#b98b45;background:#fff;color:#5a3a12; }
 .speak-button { display:inline-grid;width:32px;height:32px;flex:0 0 32px;place-items:center;padding:0;border:1px solid #cbb89c;border-radius:50%;background:#fff;color:#31506f;cursor:pointer;line-height:1; }
 .speak-button .ui-icon { display:block;width:17px;height:17px;margin:0; }
 .inline-speak-button { display:inline-grid;width:25px;height:25px;place-items:center;margin:-3px 0;padding:0;border:0;border-radius:50%;background:#20304a;color:#c9d8ea;cursor:pointer;vertical-align:middle; }
@@ -242,6 +242,5 @@ b.role-helper, b.role-person { padding:0 4px;border-bottom:2px solid; }
   .learning-filters button { font-size:11px; }
 }
 
-.bottle-recommendations .bottle-info { background:transparent;border-color:#3c5a7a;color:#a9d3ff; }
 .shop-brand-bottle { width:30px;height:60px;margin:auto; }
 .talk-confirmed .serve-missing { display:block;margin-top:3px;color:#ffb4a8;font-size:12px; }

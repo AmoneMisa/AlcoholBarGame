@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiButton from '../ui/UiButton.vue';
 import UiInput from '../ui/UiInput.vue';
 import SpeakTrainer from './SpeakTrainer.vue';
 import { computed, ref } from 'vue';
@@ -291,9 +292,9 @@ function when(at: number) {
       </div>
       <p v-else class="learning-empty">You marked every word as known. Great work!</p>
       <div v-if="card" class="practice-actions">
-        <button type="button" class="secondary-button listen-button" @click="speak(card.word)"><UiIcon name="speaker" />Listen</button>
-        <button type="button" class="secondary-button" @click="nextCard(false)">Again later</button>
-        <button type="button" class="primary-button" :disabled="!revealed" @click="nextCard(true)">I knew it <UiIcon class="inline-icon" name="check" /></button>
+        <UiButton variant="secondary" class="listen-button" @click="speak(card.word)"><UiIcon name="speaker" />Listen</UiButton>
+        <UiButton variant="secondary" @click="nextCard(false)">Again later</UiButton>
+        <UiButton variant="solid" :disabled="!revealed" @click="nextCard(true)">I knew it <UiIcon class="inline-icon" name="check" /></UiButton>
       </div>
       <p class="practice-count">{{ deck.length }} words left to learn</p>
     </div>

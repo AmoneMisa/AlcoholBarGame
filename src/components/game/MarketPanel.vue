@@ -96,22 +96,22 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
       </div>
       <aside class="trade-checkout">
         <template v-if="mode === 'buy'">
-          <small>YOUR ORDER</small><h3>{{ game.purchaseQuote.packs }} supplier units</h3><p>To {{ game.decor.name }} · {{ game.region.name }}</p>
+          <small>YOUR ORDER</small><h3>{{ game.purchaseQuote.packs }} supplier {{ game.purchaseQuote.packs === 1 ? 'unit' : 'units' }}</h3><p>To {{ game.decor.name }} · {{ game.region.name }}</p>
           <div v-for="line in game.purchaseQuote.lines" :key="line.ingredientId" class="checkout-line"><span>{{ ingredient(line.ingredientId).name }} · {{ line.packs }} {{ buyUnit(line.ingredientId, line.packs !== 1) }}<em>+{{ receivedAmount(line.ingredientId, line.packs) }} stock</em></span><b>{{ line.subtotal.toFixed(2) }}</b></div>
           <p v-if="!game.purchaseQuote.lines.length" class="cart-empty">Choose bottles or packs with +, or type a quantity.</p>
           <dl><div><dt>Supplies</dt><dd>{{ game.purchaseQuote.subtotal.toFixed(2) }}</dd></div><div><dt>Bulk discount {{ game.purchaseQuote.discountRate * 100 }}%</dt><dd>−{{ game.purchaseQuote.discount.toFixed(2) }}</dd></div><div><dt>Delivery</dt><dd>{{ game.purchaseQuote.delivery ? game.purchaseQuote.delivery.toFixed(2) : 'Free' }}</dd></div><div class="checkout-total"><dt>Total coins</dt><dd>{{ game.purchaseQuote.total.toFixed(2) }}</dd></div></dl>
           <div class="delivery-progress"><span>{{ game.purchaseQuote.freeDeliveryRemaining ? `${game.purchaseQuote.freeDeliveryRemaining.toFixed(2)} more coins for free delivery` : 'Free delivery unlocked' }}</span><progress :max="game.supplier.freeDeliveryAt" :value="game.purchaseQuote.subtotal - game.purchaseQuote.discount"></progress></div>
-          <p class="discount-help">5+ supplier units: 5% off · 10+: 10% off<br />Arrives in {{ game.supplier.deliveryDays }} shifts.</p>
-          <button class="secondary-button negotiate-button" type="button" :disabled="!game.purchaseQuote.lines.length" title="Talk to the sales rep in English to lower the price" @click="game.startNegotiation()">Negotiate</button>
-          <button class="primary-button" type="button" data-guide="market-order" :disabled="!game.purchaseQuote.lines.length || game.purchaseQuote.total > game.money" @click="game.checkoutPurchase()">Place order</button>
-          <button class="checkout-clear" type="button" @click="game.purchaseCart = {}">Clear</button>
+          <p class="discount-help">5+ supplier units: 5% off · 10+: 10% off<br />Arrives in {{ game.supplier.deliveryDays }} {{ game.supplier.deliveryDays === 1 ? 'shift' : 'shifts' }}.</p>
+          <UiButton variant="secondary" class="negotiate-button" :disabled="!game.purchaseQuote.lines.length" title="Talk to the sales rep in English to lower the price" @click="game.startNegotiation()">Negotiate</UiButton>
+          <UiButton variant="solid" data-guide="market-order" :disabled="!game.purchaseQuote.lines.length || game.purchaseQuote.total > game.money" @click="game.checkoutPurchase()">Place order</UiButton>
+          <UiButton variant="secondary" size="sm" @click="game.purchaseCart = {}">Clear</UiButton>
         </template>
         <template v-else>
           <small>STOCK BUYBACK</small><h3>Sell by volume</h3><p>Liquids are sold from open stock in 5 ml steps. Fresh items are sold one piece at a time. Payment is immediate.</p>
           <div v-for="line in game.saleQuote" :key="line.ingredientId" class="checkout-line"><span>{{ ingredient(line.ingredientId).name }} · {{ line.quantity }} {{ ingredient(line.ingredientId).unit }}</span><b>{{ line.revenue.toFixed(2) }}</b></div>
           <dl><div class="checkout-total"><dt>Receive coins</dt><dd>{{ game.saleRevenue.toFixed(2) }}</dd></div></dl>
-          <button class="primary-button" type="button" :disabled="!game.saleQuote.length || game.saleQuote.some(line => line.quantity > line.available)" @click="game.checkoutSale()">Sell</button>
-          <button class="checkout-clear" type="button" @click="sellAll">Select all</button><button class="checkout-clear" type="button" @click="game.saleCart = {}">Clear</button>
+          <UiButton variant="solid" :disabled="!game.saleQuote.length || game.saleQuote.some(line => line.quantity > line.available)" @click="game.checkoutSale()">Sell</UiButton>
+          <UiButton variant="secondary" size="sm" @click="sellAll">Select all</UiButton><UiButton variant="secondary" size="sm" @click="game.saleCart = {}">Clear</UiButton>
         </template>
         <p class="trade-feedback" aria-live="polite">{{ game.message }}</p>
       </aside>

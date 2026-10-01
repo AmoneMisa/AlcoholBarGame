@@ -72,9 +72,8 @@
 .delivery-progress span { display:block;color:#bad8bf;font-size:10px;line-height:1.4; }
 .delivery-progress progress { display:block;width:100%;height:6px;margin-top:6px;accent-color:#62bb82; }
 .trade-checkout .discount-help { color:#d2bd91;font-size:10px; }
-.trade-checkout .primary-button { width:100%;min-height:46px;font-size:13px; }
-.primary-button:disabled { opacity:.45;cursor:not-allowed; }
-.checkout-clear { display:block;width:100%;min-height:38px;margin-top:5px;border:0;background:transparent;color:#b7c4d5;font-size:11px;cursor:pointer; }
+.trade-checkout .ui-btn-solid { width:100%;min-height:48px;font-size:15px; }
+.trade-checkout .ui-btn-secondary.ui-btn-sm { width:100%;margin-top:6px;border-color:transparent;background:transparent;color:#b7c4d5; }
 .trade-checkout .trade-feedback { margin-bottom:0;padding-top:10px;border-top:1px solid #43536b;color:#b8d2bf;font-size:10px; }
 .incoming-deliveries { display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;margin:0 16px 16px;padding:16px;border:1px solid #354762;border-radius:12px;background:#101c2b; }
 .incoming-deliveries h3 { margin:4px 0;font:700 19px Georgia,serif; }

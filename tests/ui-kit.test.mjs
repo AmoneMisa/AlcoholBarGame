@@ -27,6 +27,11 @@ test('The standard form buttons use UiButton', () => {
   }
 });
 
+test('There is one button system: no screen still uses the old primary/secondary button classes', () => {
+  const old = vue.filter(([, source]) => /class="[^"]*(primary-button|secondary-button|reject-order-button|checkout-clear)/.test(source) || /'(primary-button|secondary-button)'/.test(source)).map(([path]) => path);
+  assert.deepEqual(old, [], 'use UiButton (variant solid / secondary / danger, size sm / md / lg)');
+});
+
 test('The device voice gets drink words respelled so they sound right', async () => {
   const { forDeviceVoice } = await import('../src/domain/english/pronounce.ts');
   assert.equal(forDeviceVoice('Orange liqueur'), 'Orange lih-kyur');

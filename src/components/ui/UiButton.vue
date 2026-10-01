@@ -4,13 +4,13 @@ import UiIcon from './UiIcon.vue';
 
 // The standard button. One height, content centred, the same look on every screen.
 //   variant: primary (brown, the main action), solid (gold, the one big call to action), secondary (dark), danger, ghost.
-//   size: md (40px) or sm (32px).
+//   size: md (40px), sm (32px), or lg (48px) for the main action of a screen.
 //   reason: why the button cannot be pressed right now; the button is dimmed and the reason is shown under it, so nobody
 //   faces a dead button without knowing why.
 defineOptions({ inheritAttrs: false });
 const props = withDefaults(defineProps<{
   variant?: 'primary' | 'solid' | 'secondary' | 'danger' | 'ghost';
-  size?: 'md' | 'sm';
+  size?: 'lg' | 'md' | 'sm';
   icon?: string;
   block?: boolean;
   reason?: string;

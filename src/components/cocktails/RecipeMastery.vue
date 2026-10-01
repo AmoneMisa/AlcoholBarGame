@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiButton from '../ui/UiButton.vue';
 import UiIcon from '../ui/UiIcon.vue';
 import { computed } from 'vue';
 import { RECIPES } from '../../domain/catalog';
@@ -38,14 +39,14 @@ const pct = (value: number) => `+${Math.round((value - 1) * 100)}%`;
     </header>
     <p>Level {{ level }} · guests pay <b>{{ pct(bonus.pay) }}</b> and tip <b>{{ pct(bonus.tips) }}</b> more for this drink.</p>
     <div class="recipe-card-balance"><span>{{ recipe.name.toUpperCase() }} CARDS</span><b>×{{ copies }}</b><em>{{ !next ? 'Mastery is complete; extra cards may be gifted.' : cardsRequired ? `Level ${level + 1} needs ${cardsRequired} cards.` : `Level ${level + 1} needs coins only.` }}</em></div>
-    <button v-if="next && cost !== undefined" type="button" class="primary-button" :disabled="!canUpgrade" @click="game.upgradeRecipe(recipe.id)">
+    <UiButton variant="solid" v-if="next && cost !== undefined" :disabled="!canUpgrade" @click="game.upgradeRecipe(recipe.id)">
       Upgrade to level {{ level + 1 }} · {{ cost.toLocaleString('en-US') }} coins<span v-if="cardsRequired"> + {{ cardsRequired }} cards</span><em>pay {{ pct(next.pay) }}, tips {{ pct(next.tips) }}</em>
-    </button>
+    </UiButton>
     <p v-if="next && cardsRequired && copies < cardsRequired" class="mastery-help">You need {{ cardsRequired - copies }} more {{ recipe.name }} card{{ cardsRequired - copies === 1 ? '' : 's' }}. Earn duplicates from VIP recipe challenges, daily gifts, the recipe shop, or friends.</p>
     <p v-else-if="!next" class="mastery-max">Top level reached.</p>
     <footer>
       <span>Duplicate cards can upgrade this recipe or be gifted.</span>
-      <button type="button" class="secondary-button" :disabled="sparePrice.currency === 'coins' ? game.money < sparePrice.amount : game.crystals < sparePrice.amount" @click="game.buyRecipe(recipe.id)">Get another card · <UiIcon v-if="sparePrice.currency !== 'coins'" class="inline-icon" name="crystal" /> {{ sparePrice.amount }}{{ sparePrice.currency === 'coins' ? ' coins' : '' }}</button>
+      <UiButton variant="secondary" :disabled="sparePrice.currency === 'coins' ? game.money < sparePrice.amount : game.crystals < sparePrice.amount" @click="game.buyRecipe(recipe.id)">Get another card · <UiIcon v-if="sparePrice.currency !== 'coins'" class="inline-icon" name="crystal" /> {{ sparePrice.amount }}{{ sparePrice.currency === 'coins' ? ' coins' : '' }}</UiButton>
     </footer>
   </section>
 </template>
@@ -62,8 +63,7 @@ const pct = (value: number) => `+${Math.round((value - 1) * 100)}%`;
 .mastery-levels i.current { box-shadow:0 0 0 2px #f2c35f44,0 0 10px #f2c35f44; }
 .recipe-mastery p { margin: 0; color: #d9e0ea; font-size: 11px; }
 .recipe-mastery p b { color: #91dbad; }
-.recipe-mastery .primary-button em { display: block; font-size: 9px; font-style: normal; font-weight: 700; opacity: .8; }
-.recipe-mastery .primary-button:disabled { opacity: .5; cursor: default; }
+.recipe-mastery .ui-btn-solid em { display: block; font-size: 9px; font-style: normal; font-weight: 700; opacity: .8; }
 .recipe-card-balance { display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:8px;padding:8px 10px;border:1px solid #394a60;border-radius:9px;background:#101a2a; }
 .recipe-card-balance span { color:#aab7c8;font-size:8px;font-weight:900;letter-spacing:.1em; }
 .recipe-card-balance b { display:grid;width:27px;height:27px;place-items:center;border-radius:7px;background:#49351e;color:#ffd37e;font-size:13px; }
@@ -72,6 +72,5 @@ const pct = (value: number) => `+${Math.round((value - 1) * 100)}%`;
 .mastery-max { color: #91dbad !important; font-weight: 800; }
 .recipe-mastery footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-top: 8px; border-top: 1px solid #34435a; color: #a9b3c1; font-size: 10px; }
 .recipe-mastery footer b { color: #ffe3a3; }
-.recipe-mastery footer .secondary-button { padding: 6px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; }
 @media(max-width:560px){.recipe-mastery header{display:grid}.mastery-levels{width:100%;justify-content:space-between}.mastery-levels i{width:29px;height:29px}.recipe-card-balance{grid-template-columns:auto auto}.recipe-card-balance em{grid-column:1/-1}}
 </style>

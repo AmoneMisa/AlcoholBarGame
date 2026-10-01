@@ -371,7 +371,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
       <div class="talk-scroll">
       <div class="talk-extras">
       <section v-if="situation" class="situation-panel" :class="'sev-' + situation.severity" aria-label="Situation">
-        <header><b>{{ situation.icon }} {{ situation.title }}</b><button type="button" class="situation-type" @click="composerOpen = !composerOpen">{{ composerOpen ? 'Hide typing' : 'Type it yourself' }}</button></header>
+        <header><b>{{ situation.icon }} {{ situation.title }}</b><UiButton variant="ghost" size="sm" class="situation-type" @click="composerOpen = !composerOpen">{{ composerOpen ? 'Hide typing' : 'Type it yourself' }}</UiButton></header>
         <p v-if="situation.line" class="situation-line">“{{ situation.line }}”</p>
         <small class="situation-hint">Choose what to say:</small>
         <div class="situation-choices">
@@ -403,7 +403,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <div class="chance-meter" role="meter" :aria-valuenow="Math.round(offer.chance * 100)" aria-valuemin="0" aria-valuemax="100"><i :style="{ width: Math.round(offer.chance * 100) + '%' }" /><span>{{ Math.round(offer.chance * 100) }}% chance</span></div>
           <ul class="chance-parts"><li v-for="part in offer.parts" :key="part.label" :class="part.value < 0 ? 'minus' : 'plus'"><span>{{ part.label }}</span><b>{{ part.value > 0 ? '+' : '' }}{{ Math.round(part.value * 100) }}%</b></li></ul>
           <small>Talk to raise it: tell its story, say how it pairs, offer a discount or a free taste. Do not push.</small>
-          <div class="offer-buttons"><button type="button" class="primary" data-guide="offer-ask" @click="game.pitchAsk(customer.id)">Make the offer</button><button type="button" @click="game.pitchCancel(customer.id)">Cancel</button></div>
+          <div class="offer-buttons"><UiButton variant="solid" data-guide="offer-ask" @click="game.pitchAsk(customer.id)">Make the offer</UiButton><button type="button" @click="game.pitchCancel(customer.id)">Cancel</button></div>
         </template>
       </section>
       <div v-if="social" class="talk-actions" data-guide="talk-actions" aria-label="Look after this guest">
@@ -452,7 +452,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
             <template v-if="activeWord.related?.length"><dt>Related</dt><dd>{{ activeWord.related.join(', ') }}</dd></template>
           </dl>
           <p v-if="activeWord.note" class="word-note">💡 {{ activeWord.note }}</p>
-          <button type="button" class="secondary-button" @click="learning.toggleSaved(activeWord.word)"><UiIcon class="inline-icon" :name="learning.savedWords.includes(activeWord.word) ? 'star-fill' : 'star'" /> {{ learning.savedWords.includes(activeWord.word) ? 'Saved to my words' : 'Save to my words' }}</button>
+          <UiButton variant="secondary" @click="learning.toggleSaved(activeWord.word)"><UiIcon class="inline-icon" :name="learning.savedWords.includes(activeWord.word) ? 'star-fill' : 'star'" /> {{ learning.savedWords.includes(activeWord.word) ? 'Saved to my words' : 'Save to my words' }}</UiButton>
         </div>
 
         <aside v-if="!situation" class="talk-clues" data-guide="clue-board">
@@ -468,8 +468,8 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
                 <div class="shop-brand-bottle"><BrandBottle :brand="match.product.brand" :category="guideIdForProduct(match.product)" :color="match.product.color" /></div>
                 <div><b>{{ match.product.name }}</b><span>{{ ALCOHOL_TYPE_LABELS[match.product.type] }} · {{ match.product.abv }}% ABV</span><small>{{ match.reasons.slice(0, 2).join(' · ') || 'popular choice' }}</small><em>{{ bottleTotal(match.product, talk.bottleFacts.quantity ?? 1, game.guestPriceFactor) }} coins · {{ bottleStock(match.product.id) }} in stock</em></div>
                 <strong>{{ match.score }}%</strong>
-                <button type="button" @click="suggest(`Would you like ${match.product.name}?`)">Recommend</button>
-                <button type="button" class="bottle-info" :aria-label="`About ${match.product.brand}`" @click="openGuide('ingredient', guideIdForProduct(match.product))">About the brand</button>
+                <UiButton variant="primary" size="sm" block @click="suggest(`Would you like ${match.product.name}?`)">Recommend</UiButton>
+                <UiButton variant="secondary" size="sm" block class="bottle-info" :aria-label="`About ${match.product.brand}`" @click="openGuide('ingredient', guideIdForProduct(match.product))">About the brand</UiButton>
               </article>
               <em v-if="!bottleRecommendations.length">No stocked bottle covers the known request.</em>
             </div>
@@ -492,19 +492,19 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
       <div v-if="confirmed && !situation" class="talk-confirmed">
         <template v-if="bottleOrder && confirmedBottle && customer.bottleRequest">
           <div><small>SEALED-BOTTLE SALE CONFIRMED</small><b>{{ customer.bottleRequest.quantity }} × {{ confirmedBottle.name }}</b><span>{{ confirmedBottle.volumeMl }} ml · {{ confirmedBottle.abv }}% ABV · total {{ bottleTotal(confirmedBottle, customer.bottleRequest.quantity, game.guestPriceFactor) }} coins</span></div>
-          <button class="primary-button" type="button" :disabled="game.serving || bottleStock(confirmedBottle.id) < customer.bottleRequest.quantity" @click="completeBottleSale">Sell full bottle{{ customer.bottleRequest.quantity === 1 ? '' : 's' }} <UiIcon class="inline-icon" name="arrow-right" /></button>
+          <UiButton variant="solid" :disabled="game.serving || bottleStock(confirmedBottle.id) < customer.bottleRequest.quantity" @click="completeBottleSale">Sell full bottle{{ customer.bottleRequest.quantity === 1 ? '' : 's' }} <UiIcon class="inline-icon" name="arrow-right" /></UiButton>
         </template>
         <template v-else>
           <div v-if="serveOrder"><small>BRAND ORDER</small><b>{{ customer.request.replace(/, please\.$/, '') }}</b><span v-if="!game.brandOnShelf(serveOrder.productId)" class="serve-missing">Not on your shelf — offer another brand of the same spirit.</span></div>
           <div v-else><small>ORDER CONFIRMED</small><b>{{ recipe?.name }}<template v-if="modifierLabel"> · {{ modifierLabel }}</template></b></div>
-          <button class="primary-button" type="button" @click="startMixing">Start mixing <UiIcon class="inline-icon" name="arrow-right" /></button>
+          <UiButton variant="solid" @click="startMixing">Start mixing <UiIcon class="inline-icon" name="arrow-right" /></UiButton>
         </template>
       </div>
 
       <div v-if="!situation" class="service-decisions">
         <div><small>CAN’T SERVE THIS ORDER?</small><span>The guest can accept the closest stocked alternative, or you can decline the order and let them leave.</span></div>
-        <button class="secondary-button" type="button" @click="offerAlternative">Offer similar</button>
-        <button class="reject-order-button" type="button" @click="rejectOrder">Reject order</button>
+        <UiButton variant="secondary" @click="offerAlternative">Offer similar</UiButton>
+        <UiButton variant="danger" @click="rejectOrder">Reject order</UiButton>
       </div>
 
       </div>
@@ -536,8 +536,8 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <p v-if="feedback.corrected !== feedbackFor" class="feedback-fix">{{ feedback.reliable ? 'Correct' : 'Try' }}: <b>{{ feedback.corrected }}</b></p>
           <p v-else class="feedback-fix">Rebuild the sentence: start with “Do you …” or “Would you …”.</p>
           <div class="feedback-actions">
-            <button v-if="feedback.corrected !== feedbackFor" class="primary-button compact" type="button" @click="useCorrection">{{ inputMode === 'type' ? 'Use correction' : 'Build corrected sentence' }}</button>
-            <button class="secondary-button" type="button" @click="send(feedbackFor, true)">Send anyway</button>
+            <UiButton variant="solid" v-if="feedback.corrected !== feedbackFor" @click="useCorrection">{{ inputMode === 'type' ? 'Use correction' : 'Build corrected sentence' }}</UiButton>
+            <UiButton variant="secondary" @click="send(feedbackFor, true)">Send anyway</UiButton>
           </div>
         </div>
 
@@ -550,9 +550,9 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
             <button v-for="tile in tiles" :key="tile.id" type="button" class="word-tile" :class="{ used: picked.includes(tile.id) }" :disabled="picked.includes(tile.id)" @click="pick(tile.id)">{{ tile.text }}</button>
           </div>
           <div class="compose-actions">
-            <button class="secondary-button" type="button" data-guide="new-question" @click="nextTemplate">New question <UiIcon class="inline-icon" name="refresh" /></button>
-            <button class="secondary-button" type="button" :disabled="!picked.length" @click="picked = []">Clear</button>
-            <button class="primary-button compact" type="button" data-guide="talk-send" :disabled="!picked.length || customerTyping" @click="send(builtSentence)">Check & send</button>
+            <UiButton variant="secondary" data-guide="new-question" @click="nextTemplate">New question <UiIcon class="inline-icon" name="refresh" /></UiButton>
+            <UiButton variant="secondary" :disabled="!picked.length" @click="picked = []">Clear</UiButton>
+            <UiButton variant="solid" data-guide="talk-send" :disabled="!picked.length || customerTyping" @click="send(builtSentence)">Check & send</UiButton>
           </div>
         </template>
 
@@ -560,7 +560,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <div class="phrase-ideas"><button v-for="idea in phraseIdeas" :key="idea" type="button" data-guide="phrase-idea" @click="suggest(idea)">{{ idea }}</button></div>
           <form class="type-row" @submit.prevent="send(draft)">
             <UiInput label="Your question or answer" ref="input" data-guide="talk-input" v-model="draft" type="text" autocomplete="off" autocapitalize="sentences" spellcheck="false" placeholder="Ask a question, e.g. Do you like sour drinks?" @input="feedback = undefined" />
-            <button class="primary-button compact" type="submit" :disabled="!draft.trim() || customerTyping">Check & send</button>
+            <UiButton variant="solid" type="submit" :disabled="!draft.trim() || customerTyping">Check & send</UiButton>
           </form>
         </template>
       </footer>

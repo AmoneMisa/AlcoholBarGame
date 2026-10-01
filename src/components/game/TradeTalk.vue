@@ -151,7 +151,7 @@ function accept() {
         </form>
         <div class="haggle-actions">
           <UiButton variant="ghost" @click="game.leaveNegotiation()">Leave</UiButton>
-          <UiButton variant="secondary" :class="agreed ? 'primary-button' : 'secondary-button quick-buy'" :disabled="quote.total > game.money" @click="accept()">{{ agreed ? 'Accept deal' : 'Buy at list price' }} · {{ quote.total.toFixed(2) }} coins</UiButton>
+          <UiButton :variant="agreed ? 'solid' : 'secondary'" :class="{ 'quick-buy': !agreed }" :disabled="quote.total > game.money" @click="accept()">{{ agreed ? 'Accept deal' : 'Buy at list price' }} · {{ quote.total.toFixed(2) }} coins</UiButton>
         </div>
       </footer>
     </section>
@@ -240,7 +240,6 @@ function accept() {
 .haggle-history li.yes { color: #91dbad; }
 .haggle-history li.no { color: #ffb6bd; }
 .haggle-history small { opacity: .7; }
-.quick-buy { min-height: 46px; padding: 9px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; }
 @media (max-width: 760px) {
   .haggle-backdrop { padding: 0; }
   .haggle-popup { max-height: 100vh; height: 100%; border-radius: 0; }

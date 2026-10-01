@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiButton from './UiButton.vue';
 import { computed, onUnmounted } from 'vue';
 import { DAILY_COINS, dailyCrystalsFor } from '../../domain/economy';
 import { useGameStore } from '../../stores/game';
@@ -35,9 +36,9 @@ function claim() { game.claimDailyGift(); }
         <RewardList :lines="justClaimed.lines" />
       </div>
       <p v-else-if="!game.dailyGiftAvailable" class="daily-wait">Today's gift is already in your bar. The next one opens tomorrow.</p>
-      <button class="primary-button daily-claim" type="button" :disabled="!game.dailyGiftAvailable" @click="claim">
+      <UiButton variant="solid" class="daily-claim" :disabled="!game.dailyGiftAvailable" @click="claim">
         <UiIcon name="gift" /><template v-if="game.dailyGiftAvailable">Claim +{{ game.dailyCoinReward }}<template v-if="game.dailyCrystalReward"> · +{{ game.dailyCrystalReward }} <UiIcon class="inline-icon" name="crystal" /></template></template><template v-else>Claimed</template>
-      </button>
+      </UiButton>
     </div>
   </ModalDialog>
 </template>

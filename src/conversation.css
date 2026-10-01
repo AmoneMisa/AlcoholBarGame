@@ -50,12 +50,12 @@
 .bottle-recommendations > article.over { opacity:.68; }
 .bottle-recommendations article > div:nth-child(2) { min-width:0; }
 .bottle-recommendations article > div:nth-child(2) > b,.bottle-recommendations article span,.bottle-recommendations article small,.bottle-recommendations article em { display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-.bottle-recommendations article > div:nth-child(2) > b { color:#f6eddf;font-size:10px; }
-.bottle-recommendations article span { color:#b9c8da;font-size:8px; }
-.bottle-recommendations article small { color:#8fdfaa;font-size:8px; }
-.bottle-recommendations article em { color:#d9ae5d;font-size:8px;font-style:normal; }
-.bottle-recommendations article > strong { align-self:start;padding:4px;border-radius:999px;background:#183826;color:#94e5ad;font-size:9px; }
-.bottle-recommendations article > button { grid-column:2/-1;padding:5px 7px;border:1px solid #8c6938;border-radius:7px;background:#31271b;color:#ffd98a;font-size:9px;font-weight:900;cursor:pointer; }
+.bottle-recommendations article > div:nth-child(2) > b { color:#f6eddf;font-size:13px; }
+.bottle-recommendations article span { color:#b9c8da;font-size:11px; }
+.bottle-recommendations article small { color:#8fdfaa;font-size:11px; }
+.bottle-recommendations article em { color:#d9ae5d;font-size:11px;font-style:normal; }
+.bottle-recommendations article > strong { align-self:start;padding:4px;border-radius:999px;background:#183826;color:#94e5ad;font-size:11px; }
+.bottle-recommendations article > .ui-btn { grid-column:2/-1; }
 .mini-brand-bottle { position:relative;display:grid;place-items:center;width:32px;height:48px;margin:auto;border:2px solid #bac8cf;border-radius:7px 7px 9px 9px;background:linear-gradient(90deg,#ffffff35,transparent 32%),var(--bottle-color);box-shadow:0 5px 9px #0007; }
 .mini-brand-bottle i { position:absolute;bottom:100%;width:13px;height:9px;border:2px solid #bac8cf;border-bottom:0;border-radius:3px 3px 0 0;background:#b99752; }
 .mini-brand-bottle b { padding:3px;border-radius:3px;background:#f5ead4;color:#332216;font:900 8px Georgia,serif; }
@@ -64,7 +64,7 @@
 .talk-confirmed small { display:block;color:#9fe6b2;font-size:9px;font-weight:900;letter-spacing:.13em; }
 .talk-confirmed b { font:700 18px Georgia,serif; }
 .talk-confirmed div > span { display:block;margin-top:2px;color:#b8cdbf;font-size:10px; }
-.service-decisions { display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:8px 16px;border-top:1px solid #33445e;background:#111b2b; }.service-decisions small,.service-decisions span { display:block; }.service-decisions small { color:#e4b35c;font-size:8px;font-weight:900;letter-spacing:.12em; }.service-decisions span { margin-top:2px;color:#95a6bc;font-size:9px; }.service-decisions .secondary-button,.reject-order-button { min-height:38px;padding:7px 12px; }.reject-order-button { border:1px solid #98535b;border-radius:9px;background:#32191e;color:#ffb6bd;font-weight:800;cursor:pointer; }
+.service-decisions { display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:8px 16px;border-top:1px solid #33445e;background:#111b2b; }.service-decisions small,.service-decisions span { display:block; }.service-decisions small { color:#e4b35c;font-size:8px;font-weight:900;letter-spacing:.12em; }.service-decisions span { margin-top:2px;color:#95a6bc;font-size:9px; }.service-decisions .ui-btn { min-height:38px;padding:7px 12px; }
 
 .talk-compose { display:grid;gap:9px;padding:12px 16px 14px;border-top:1px solid #33445e;background:#0e1726; }
 .talk-modes { display:flex;gap:6px; }
@@ -78,8 +78,6 @@
 .word-tile.placed { border-color:#d9a44a;background:linear-gradient(#4a3620,#35271a);color:#ffe7b3; }
 .word-tile.used { opacity:.25;cursor:default; }
 .compose-actions, .feedback-actions { display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px; }
-.compose-actions .secondary-button, .feedback-actions .secondary-button, .talk-popup .primary-button.compact { min-height:40px; }
-.talk-popup .primary-button:disabled, .talk-popup .secondary-button:disabled { opacity:.45;cursor:default; }
 .phrase-ideas { display:flex;flex-wrap:wrap;gap:6px; }
 .phrase-ideas button { padding:5px 10px;border:1px solid #3c4d66;border-radius:999px;background:#152033;color:#bccadf;font-size:11px;cursor:pointer; }
 .phrase-ideas button:hover { border-color:#e4b35c;color:#ffd98a; }
@@ -112,7 +110,7 @@
   .talk-line { max-width:92%; }
   .talk-clues { max-height:112px;padding:10px 12px;border-top:1px solid #2c3b53;border-left:0; }
   .talk-compose { padding:10px 12px 14px; }
-  .service-decisions { grid-template-columns:1fr 1fr;padding:8px 12px; }.service-decisions > div { grid-column:1/-1; }.service-decisions .secondary-button,.reject-order-button { width:100%; }
+  .service-decisions { grid-template-columns:1fr 1fr;padding:8px 12px; }.service-decisions > div { grid-column:1/-1; }.service-decisions .ui-btn { width:100%; }
   .word-tile { min-height:34px;padding:5px 10px;font-size:13px; }
 }
 /* Portrait crop tuned on all 25 guest sprites: the face sits in the middle of the circle, chin included. */
@@ -149,7 +147,6 @@
 .talk-extras:empty { display:none; }
 .situation-line { margin:0 0 8px;padding:8px 10px;border-radius:10px;background:#f6f0e0;color:#2a2418;font-size:14px;line-height:1.4; }
 .situation-hint { display:block;margin-bottom:6px;color:#b8a67a;font-size:11px; }
-.situation-type { padding:3px 9px;border:1px solid #6a5a2c;border-radius:8px;background:transparent;color:#d9c68f;font-size:11px;cursor:pointer; }
 
 .offer-panel { display: grid; gap: 6px; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.06); font-size: .85rem; }
 .offer-panel header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
