@@ -88,9 +88,9 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
 </template>
 
 <style scoped>
-.circle { display: grid; gap: 12px; }
+.circle { display: grid; gap: 12px; padding: 14px; }
 .card { padding: 12px 14px; border: 1px solid #354762; border-radius: 14px; background: #111c2d; color: #e9eef7; }
-.hint { margin: 0; color: #9eafc1; font-size: 13px; }
+.hint { margin: 0; color: #93a5b9; font-size: 12px; line-height: 1.5; }
 h3 { margin: 0 0 6px; font-size: 14px; }
 h3 b { margin-left: 8px; color: #e4b35c; }
 .crew ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
@@ -100,7 +100,8 @@ h3 b { margin-left: 8px; color: #e4b35c; }
 .keep { display: grid; justify-items: center; gap: 2px; padding: 6px 10px; border-radius: 10px; background: #17253a; }
 .keep i { font-size: 22px; font-style: normal; }
 .keep small { color: #9eafc1; font-size: 11px; }
-.people { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+.people { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.person { display: grid; align-content: start; gap: 4px; }
 .person.joined { border-color: #b78649; }
 .person header { display: grid; grid-template-columns: 72px 1fr; gap: 10px; align-items: center; cursor: pointer; }
 .face { position: relative; width: 72px; height: 72px; overflow: hidden; border: 2px solid #d4a44d; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #5b3a4a, #1b1522); }
@@ -113,13 +114,16 @@ h3 b { margin-left: 8px; color: #e4b35c; }
 .meta { margin: 2px 0 6px; color: #9eafc1; font-size: 12px; }
 progress { width: 100%; height: 8px; }
 .gifts { display: flex; gap: 6px; margin: 6px 0; }
-.gifts button { padding: 4px 8px; font-size: 16px; }
+.gifts button { padding: 4px 8px; font-size: 16px; background: #1d283b; border-color: #5a6b86; }
 .gifts button.loved { border-color: #ff8fb1; }
-button { padding: 5px 10px; border: 1px solid #5a6b86; border-radius: 8px; background: #1d283b; color: inherit; font-weight: 600; cursor: pointer; }
+.crew li button { background: #1d283b; border-color: #5a6b86; color: #e9eef7; }
+button { padding: 7px 11px; border: 1px solid #a97938; border-radius: 8px; background: #5f3d1c; color: #ffe9bd; font-weight: 800; font-size: 12px; cursor: pointer; }
 button:disabled { opacity: .45; cursor: default; }
 .story { margin-top: 10px; padding-top: 8px; border-top: 1px solid #2d4059; font-size: 13px; line-height: 1.45; }
 .story blockquote { margin: 0 0 6px; color: #e4b35c; font-style: italic; }
 .story p { margin: 6px 0; }
 .story .locked { color: #6f819a; }
-.story-toggle { margin-top: 8px; background: transparent; }
+.story-toggle { margin-top: 8px; background: transparent; border-color: #5a6b86; color: #c7d3e0; }
+.keep button { padding: 4px 8px; font-size: 11px; }
+.person > button:not(.story-toggle) { margin-top: 4px; }
 </style>

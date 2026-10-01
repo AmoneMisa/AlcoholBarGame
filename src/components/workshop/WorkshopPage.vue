@@ -127,7 +127,7 @@ const boostLeft = (id: string) => {
       </dl>
     </header>
     <nav class="workshop-tabs"><button v-for="[id, label] in tabs" :key="id" type="button" :class="{ active: tab === id }" @click="tab = id">{{ label }}</button></nav>
-    <aside v-if="gettingStarted" class="getting-started"><b>Getting started</b><ol><li v-for="step in started" :key="step.label" :class="{ done: step.done }">{{ step.label }}</li></ol></aside>
+    <aside v-if="gettingStarted && (tab === 'equipment' || tab === 'boxes')" class="getting-started"><b>Getting started</b><ol><li v-for="step in started" :key="step.label" :class="{ done: step.done }">{{ step.label }}</li></ol></aside>
     <p v-if="game.loot.log[0]" class="workshop-log">{{ game.loot.log[0] }}</p>
 
     <div v-if="tab === 'equipment'" class="grid">
