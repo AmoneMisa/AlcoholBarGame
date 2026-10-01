@@ -174,7 +174,7 @@ onMounted(() => { void game.loadFriends(); });
 .friend-status { padding: 9px 12px; border: 1px solid #3e7756; border-radius: 10px; background: #173425; color: #b9e5c6; font-size: 12px; }
 .friend-top { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 .friend-top > .card { display: grid; align-content: start; gap: 8px; }
-.friend-code b { color: #fff0c8; font: 700 28px Georgia, serif; letter-spacing: .1em; }
+.friend-code b { color: #fff0c8; font: 800 26px ui-monospace, Consolas, "Courier New", monospace; letter-spacing: .12em; font-variant-numeric: lining-nums tabular-nums; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; }
 .row > * { flex: 1 1 120px; }
 input { min-width: 0; min-height: 42px; padding: 8px 10px; border: 1px solid #40536c; border-radius: 10px; background: #0c1625; color: #fff; font-size: 16px; }

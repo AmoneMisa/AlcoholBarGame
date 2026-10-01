@@ -141,9 +141,10 @@ watch(() => game.message,(message,previous) => {
 
 // Small counters on the tabs: what is waiting for the player.
 const badges = computed<Record<string, number>>(() => ({
-  service: (game.barEvent ? 1 : 0) + game.deliveryIssues.filter((issue) => issue.status === 'open').length,
+  // A number on a tab means something is waiting for the player to act, not just that something is going on.
+  service: game.deliveryIssues.filter((issue) => issue.status === 'open').length,
   english: game.dailyLessonsComplete ? 0 : 1,
-  manage: game.economy.event ? 1 : 0,
+  manage: 0,
   friends: game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'incoming').length
 }));
 

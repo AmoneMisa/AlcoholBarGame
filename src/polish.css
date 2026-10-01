@@ -244,3 +244,19 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .house-rules-panel .rule-row b { display: block; font-size: 15px; line-height: 1.25; }
 .house-rules-panel .rule-row small { margin-top: 2px; font-size: 13px; line-height: 1.4; }
 .house-rules-panel .rule-icon { display: grid; place-items: center; width: 30px; height: 30px; font-size: 20px; }
+
+/* ==== Readability and touch size (checked at phone width) ==== */
+/* Labels were 6-8px on phones; nothing in the header or the bottom bar is smaller than 9-10px now. */
+.top-hud small, .top-hud em { font-size: 10px; }
+.hud-resources small { font-size: 9.5px; letter-spacing: .08em; }
+.game-nav b { font-size: 10px; }
+.sync-badge { font-size: 9.5px; }
+/* The free-spin dot next to the bar name is a good-news marker, not an alarm. */
+.venue-dot { background: #f2bd58 !important; box-shadow: 0 0 0 2px #f2bd5844; }
+/* Buttons that sit on the bar scene or in lists reach a comfortable touch size. */
+.venue-name { min-height: 34px; }
+.house-rules-button, .clean-ashtrays { min-height: 36px; }
+.speak-button, .speak-button.ui-btn-sm { min-width: 36px; min-height: 36px; width: 36px; height: 36px; }
+/* On phones the night's event card goes under the city chip instead of on top of it. */
+@media (max-width: 760px) { .bar-event { top: 64px; } }
+.house-rules-button { bottom: 58px; }

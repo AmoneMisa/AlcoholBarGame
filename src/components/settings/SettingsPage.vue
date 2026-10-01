@@ -22,7 +22,7 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
 
 <template>
   <div class="settings-page game-panel">
-    <header class="settings-head"><small>SETTINGS</small><h2>Sound, voices and help</h2></header>
+    <header class="settings-head"><small>SETTINGS</small><h2>Sound, notifications and help</h2></header>
 
     <section class="settings-card">
       <h3>Sound</h3>
