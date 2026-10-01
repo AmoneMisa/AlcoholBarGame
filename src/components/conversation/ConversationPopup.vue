@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { guestVoice, speakLine } from '../../audio/index';
 import { FOODS } from '../../domain/foods';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { CUSTOMER_ART_BY_SLOT } from '../../data/cosmetics/artCatalog';
@@ -129,7 +130,13 @@ function phraseCandidates() {
 
 // New guest lines: remember the words the learner has seen, then scroll.
 watch(() => talk.value?.lines.length ?? 0, (_count, before) => {
-  for (const line of talk.value?.lines.slice(before ?? 0) ?? []) if (line.speaker === 'customer') noteSeenWords(line.text);
+  for (const line of talk.value?.lines.slice(before ?? 0) ?? []) {
+    if (line.speaker === 'customer') noteSeenWords(line.text);
+    // Only lines that arrive while the conversation is open are voiced, not the old ones when it opens.
+    if (before === undefined || !customer.value) continue;
+    const profile = { seed: customer.value.characterId ?? customer.value.id, gender: (social.value?.gender ?? 'x') as 'f' | 'm' | 'x', emotion: social.value?.emotion, drunk: social.value?.drunk };
+    if (line.speaker === 'customer') { guestVoice(profile, line.text); speakLine(line.text, 'guest', profile); } else speakLine(line.text, 'bartender');
+  }
   scrollLog();
 }, { immediate: true });
 

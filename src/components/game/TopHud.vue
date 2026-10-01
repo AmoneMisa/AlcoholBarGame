@@ -4,7 +4,7 @@ import { CRYSTAL_EXCHANGE_BUNDLES, STAR_CRYSTAL_PACKS } from '../../domain/econo
 import { useGameStore } from '../../stores/game';
 import UiIcon from '../ui/UiIcon.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
-import { musicOn, musicVolume, sfxOn, sfxVolume, speechOn, speechVolume } from '../../audio/index';
+import { musicOn, musicVolume, sfxOn, sfxVolume, speechOn, speechVolume, voiceMode } from '../../audio/index';
 defineEmits<{ design:[] }>();
 
 const game = useGameStore();
@@ -87,6 +87,10 @@ onUnmounted(() => {
             <input type="range" min="0" max="100" step="5" aria-labelledby="volume-speech" :value="Math.round(speechVolume * 100)" :style="{ '--fill': percent(speechVolume) }" :aria-valuetext="speechOn ? percent(speechVolume) : 'Muted'" @input="setVolume('speech', $event)" />
             <output>{{ speechOn ? percent(speechVolume) : 'Off' }}</output>
             <button type="button" :aria-pressed="!speechOn" aria-label="Mute English voice" @click="speechOn = !speechOn">{{ speechOn ? 'Mute' : 'Unmute' }}</button>
+          </div>
+          <div class="volume-row voice-mode">
+            <span id="voice-mode"><UiIcon name="chat" /> Guest voices</span>
+            <select aria-labelledby="voice-mode" v-model="voiceMode"><option value="murmur">Murmur</option><option value="speech">Read aloud</option><option value="off">Off</option></select>
           </div>
         </PopoverPanel>
       </div>
