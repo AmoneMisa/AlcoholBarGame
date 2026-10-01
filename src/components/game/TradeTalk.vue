@@ -208,10 +208,10 @@ function accept() {
 .haggle-tactics { display: flex; flex-wrap: wrap; gap: 4px; }
 .haggle-tactics button { padding: 4px 7px; border: 1px solid #4a5c75; border-radius: 12px; background: #142238; color: #cfd8e4; font-size: 9px; cursor: pointer; }
 .haggle-tactics button.used { border-color: #3b8c62; color: #91dbad; }
-.haggle-compose { display: grid; gap: 8px; padding: 12px 16px; border-top: 1px solid #34435a; background: #0e1726; }
-.haggle-compose form { display: flex; gap: 8px; }
+.haggle-compose { display: grid; gap: 14px; padding: 12px 16px 16px; border-top: 1px solid #34435a; background: #0e1726; }
+.haggle-compose form { display: flex; align-items: flex-end; gap: 8px; }
 .haggle-compose input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid #4a5c75; border-radius: 10px; background: #0a111d; color: #eef1f5; font-size: 13px; }
-.haggle-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.haggle-actions { display: flex; justify-content: flex-end; gap: 10px; padding-top: 12px; border-top: 1px solid #263449; }
 .haggle-offer { display: grid; gap: 7px; padding: 10px; border: 1px solid #5d4a2e; border-radius: 12px; background: radial-gradient(120% 90% at 50% 0%, #2c2418, #121821 70%); }
 .haggle-offer > header { display: flex; flex-direction: column; align-items: center; gap: 1px; }
 .haggle-offer > header small { padding: 1px 8px; border-radius: 8px; background: #3a2d1a; color: #f3d38c; font-size: 8px; font-weight: 900; letter-spacing: .12em; }
