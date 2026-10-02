@@ -125,10 +125,41 @@ test('A damaged pass in a save is cleaned up', () => {
   assert.deepEqual(state.pass.claimed.sort(), ['f1', 'p20']);
 });
 
-test('The premium price is fair: the premium track pays back most of it in crystals, the rest is boxes, shards and the Circle', () => {
+test('The premium price is fair: the premium track pays back part of it in crystals, the rest is boxes, shards and the Circle', () => {
   const rows = passRewards(PASS_THEMES[0]);
   const crystals = rows.flatMap((row) => row.premium).filter((reward) => reward.kind === 'crystals').reduce((sum, reward) => sum + reward.amount, 0);
   const free = rows.flatMap((row) => row.free).filter((reward) => reward.kind === 'crystals').reduce((sum, reward) => sum + reward.amount, 0);
-  assert.ok(crystals >= PASS_PREMIUM_PRICE * .5 && crystals <= PASS_PREMIUM_PRICE, `premium crystals ${crystals} for a price of ${PASS_PREMIUM_PRICE}`);
+  assert.ok(crystals >= 100 && crystals < PASS_PREMIUM_PRICE * .5, `premium crystals ${crystals} for a price of ${PASS_PREMIUM_PRICE}`);
   assert.ok(free >= 80 && free <= 160, `free crystals ${free}`);
+});
+
+// What a free player earns in the 14 days of a pass, by the days they play: the daily reward (with its streak), the
+// three lessons, the three wheel spins, two weeks of weekly quests (one for every two days played, up to three a
+// week) and the free track's crystals as the levels are reached.
+async function earned(days) {
+  const { dailyCrystalsFor } = await import('../src/domain/economy.ts');
+  const { learningStreakBonus } = await import('../src/domain/dailyLessons.ts');
+  const FREE_CRYSTALS = { 3: 10, 7: 15, 10: 20, 15: 20, 19: 25, 20: 30 };
+  let streak = 0, total = 0, points = 0;
+  const week = [0, 0];
+  for (let day = 0; day < 14; day++) {
+    if (!days.includes(day)) { streak = 0; continue; }
+    streak++; week[day < 7 ? 0 : 1]++;
+    total += dailyCrystalsFor(streak) + 3 * 2.5 * (1 + learningStreakBonus(streak)) + 3 * 1.66;
+    points += 100;
+  }
+  for (const played of week) total += Math.min(3, Math.floor(played / 2)) * 23.3;
+  const level = Math.min(PASS_LEVELS, Math.floor(points / PASS_LEVEL_POINTS));
+  for (const [at, amount] of Object.entries(FREE_CRYSTALS)) if (level >= Number(at)) total += amount;
+  return total;
+}
+
+test('Only a free player who plays about nine days in ten, weeklies included, can afford the premium track', async () => {
+  const days = (miss) => Array.from({ length: 14 }, (_, day) => day).filter((day) => !miss.includes(day));
+  const diligent = await earned(days([6]));                  // 13 of 14 days
+  const regular = await earned(days([1, 5, 9, 12]));         // 10 of 14 days
+  const casual = await earned(days([1, 2, 4, 5, 8, 9, 11]));  // 7 of 14 days
+  assert.ok(diligent >= PASS_PREMIUM_PRICE, `a diligent player earns ${Math.round(diligent)} for ${PASS_PREMIUM_PRICE}`);
+  assert.ok(regular < PASS_PREMIUM_PRICE, `playing 10 days in 14 earns only ${Math.round(regular)}`);
+  assert.ok(casual < PASS_PREMIUM_PRICE * .6, `a casual player earns ${Math.round(casual)}`);
 });

@@ -11,7 +11,10 @@ export const PASS_MS = PASS_DAYS * 24 * 60 * 60 * 1000;
 export const PASS_EPOCH = Date.UTC(2026, 0, 5);
 export const PASS_LEVELS = 20;
 export const PASS_LEVEL_POINTS = 75;
-export const PASS_PREMIUM_PRICE = 200;
+// Priced so that a free player can only afford it by playing about nine days in ten and finishing the weekly quests:
+// over 14 days that is roughly 540 crystals (daily reward, lessons, the wheel, weekly quests, the free track), while
+// someone playing seven days in ten ends near 330. Premium rewards stay claimable, so buying late loses nothing.
+export const PASS_PREMIUM_PRICE = 450;
 
 // How many pass points each thing is worth. Only counters that the server rules raise are used.
 export const PASS_POINTS: Partial<Record<StatId, number>> = {
