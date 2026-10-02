@@ -190,3 +190,32 @@ test('The schedule does not move: the running season stays, the next ones follow
   const rotation = PASS_THEMES.map((_, step) => passThemeAt(Date.UTC(2026, 9, 12) + step * PASS_MS).id);
   assert.equal(new Set(rotation).size, PASS_THEMES.length);
 });
+
+test('Game backgrounds that are not a pass season are kept for boxes: not for sale, not giftable, in the box pool', async () => {
+  const { BOX_ONLY_GAME_IDS, BOX_INTERIOR_IDS, isEventInterior } = await import('../src/data/cosmetics/bars.ts');
+  const { giftPrice } = await import('../src/sim/gifts.ts');
+  const { grantReward } = await import('../src/sim/loot.ts');
+  const { styleSource, INTERIOR_STYLE } = await import('../src/data/cosmetics/styleSources.ts');
+  assert.equal(BOX_ONLY_GAME_IDS.length, 7);
+  for (const id of BOX_ONLY_GAME_IDS) {
+    assert.ok(INTERIORS.some((item) => item.id === id), id);
+    assert.ok(!PASS_THEMES.some((theme) => theme.interior === id), `${id} is a pass season: take it off the box-only list`);
+    assert.ok(isEventInterior(id) && BOX_INTERIOR_IDS.includes(id), `${id} is in the box pool`);
+    assert.equal(giftPrice({ kind: 'interior', interiorId: id }), undefined, `${id} cannot be gifted`);
+    const state = fresh();
+    state.crystals = 1e6;
+    assert.throws(() => act(state, { type: 'buyInterior', interiorId: id }), /special event/, `${id} cannot be bought`);
+    assert.equal(styleSource(INTERIOR_STYLE[id].character, INTERIOR_STYLE[id].value), 'background');
+  }
+  // A box can give one of them, together with its connected style.
+  const state = fresh();
+  const owned = () => BOX_ONLY_GAME_IDS.filter((id) => state.ownedInteriorIds.includes(id));
+  for (let i = 0; i < 40 && owned().length < BOX_ONLY_GAME_IDS.length; i++) grantReward(state, { kind: 'eventInterior' }, () => (i * 0.137) % 1);
+  assert.ok(owned().length >= 1, 'the box pool reaches these backgrounds');
+  for (const id of owned()) assert.ok(state.ownedCosmeticIds.includes(`bartender:${INTERIOR_STYLE[id].value}:${INTERIOR_STYLE[id].character}`), `${id} brought its style`);
+});
+
+test('The box pool lists every background once', async () => {
+  const { BOX_INTERIOR_IDS } = await import('../src/data/cosmetics/bars.ts');
+  assert.equal(new Set(BOX_INTERIOR_IDS).size, BOX_INTERIOR_IDS.length);
+});

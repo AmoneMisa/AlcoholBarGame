@@ -36,10 +36,13 @@ export const INTERIORS = [
 export type InteriorId = typeof INTERIORS[number]['id'];
 // The most expensive backgrounds are special-event rewards: they cannot be bought or gifted, only found in boxes
 // (Gold and Choice boxes, season and leaderboard rewards). Players who already bought one keep it.
-export const EVENT_INTERIOR_IDS = ['inferno-penthouse', 'parisian', 'cyberpunk', 'marina', 'rooftop'] as const;
+// Game backgrounds that are not a season pass: they are kept for boxes only, like the event backgrounds.
+// (A game that becomes a pass season has to come off this list: see tests/pass.test.mjs.)
+export const BOX_ONLY_GAME_IDS = ['cs-2', 'watch-dogs', 'sleeping-dogs', 'neighbours-from-hell', 'gta', 'repo', 'among-us'] as const;
+export const EVENT_INTERIOR_IDS = ['inferno-penthouse', 'parisian', 'cyberpunk', 'marina', 'rooftop', ...BOX_ONLY_GAME_IDS] as const;
 // Silver and Gold boxes draw their background reward from this pool: the event backgrounds (box-only) and the
 // themed ones (which can also be bought). Each background comes with its one connected style.
-export const BOX_INTERIOR_IDS: readonly string[] = [...EVENT_INTERIOR_IDS, ...THEMED_INTERIORS.map((item) => item.id)];
+export const BOX_INTERIOR_IDS: readonly string[] = [...new Set<string>([...EVENT_INTERIOR_IDS, ...THEMED_INTERIORS.map((item) => item.id)])];
 export const isEventInterior = (id: string) => (EVENT_INTERIOR_IDS as readonly string[]).includes(id);
 export const DUPLICATE_INTERIOR_SHARDS = 30;
 export const WALLS = ['neon','burgundy','emerald','navy','plum','charcoal','ivory','terracotta'] as const;
