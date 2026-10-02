@@ -26,11 +26,13 @@ export interface PassTheme { id: string; name: string; tagline: string; interior
 const outfit = (character: 'noa' | 'leo', value: string) => `bartender:${value}:${character}`;
 export const themeStyleIds = (theme: PassTheme) => [outfit('noa', theme.noa), outfit('leo', theme.leo)];
 
-// The pass rotates through these seasons. Each is a background plus a matching costume for Noa and for Leo.
+// The pass rotates through these seasons. Every season is built on a game: its background plus a costume for Noa and
+// one for Leo from that game. Only some of the game themes are passes (the others stay in boxes and the shop).
 export const PASS_THEMES: readonly PassTheme[] = [
-  { id: 'deep-sea', name: 'Deep Sea', tagline: 'A reef bar under the waves, and the sharks that run it.', interior: 'underwater', noa: 'reference-shark-noa', leo: 'reference-shark-leo' },
-  { id: 'fairy-grove', name: 'Fairy Grove', tagline: 'Lanterns, moss and a bar the woodland folk keep open all night.', interior: 'fairy', noa: 'theme-fairy-noa', leo: 'theme-fairy-leo' },
-  { id: 'fairytale-castle', name: 'Fairytale Castle', tagline: 'A royal bar where every guest arrives with a story.', interior: 'fairytale', noa: 'theme-fairytale-noa', leo: 'theme-fairytale-leo' }
+  { id: 'lineage-2', name: 'Lineage II', tagline: 'The Aden tavern: elves, mages and a long night at the bar.', interior: 'lineage-2', noa: 'theme-l2-elf-noa', leo: 'theme-l2-elf-leo' },
+  { id: 'warcraft-3', name: 'Warcraft III', tagline: 'The crossroads bar, where heroes of every side share a table.', interior: 'warcraft-3', noa: 'theme-wc3-sylvanas-noa', leo: 'theme-wc3-arthas-leo' },
+  { id: 'mass-effect', name: 'Mass Effect', tagline: 'The Citadel lounge: a drink between missions.', interior: 'mass-effect', noa: 'theme-shepard-noa', leo: 'theme-shepard-leo' },
+  { id: 'lost-ark', name: 'Lost Ark', tagline: 'A beach club at the end of the world, sunset included.', interior: 'lost-ark', noa: 'theme-lost-ark-bard-noa', leo: 'theme-lost-ark-berserker-leo' }
 ];
 
 export const passCycle = (now: number) => Math.floor((now - PASS_EPOCH) / PASS_MS);

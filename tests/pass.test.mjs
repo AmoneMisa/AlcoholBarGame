@@ -163,3 +163,16 @@ test('Only a free player who plays about nine days in ten, weeklies included, ca
   assert.ok(regular < PASS_PREMIUM_PRICE, `playing 10 days in 14 earns only ${Math.round(regular)}`);
   assert.ok(casual < PASS_PREMIUM_PRICE * .6, `a casual player earns ${Math.round(casual)}`);
 });
+
+test('Passes are built only on games, and only on some of them; the costumes come from the same game as the background', async () => {
+  const { THEMED_INTERIOR_COSTUMES } = await import('../src/data/cosmetics/themedBars.ts');
+  const generic = ['underwater', 'underground', 'fairy', 'fairytale'];                 // themed, but not based on a game
+  const games = Object.keys(THEMED_INTERIOR_COSTUMES).filter((id) => !generic.includes(id));
+  assert.ok(PASS_THEMES.length >= 3 && PASS_THEMES.length < games.length, `${PASS_THEMES.length} of ${games.length} game themes`);
+  for (const theme of PASS_THEMES) {
+    assert.ok(games.includes(theme.interior), `${theme.id} is a game theme`);
+    assert.ok(THEMED_INTERIOR_COSTUMES[theme.interior].noa.includes(theme.noa), `${theme.id}: Noa's costume is from the game`);
+    assert.ok(THEMED_INTERIOR_COSTUMES[theme.interior].leo.includes(theme.leo), `${theme.id}: Leo's costume is from the game`);
+  }
+  assert.equal(new Set(PASS_THEMES.map((theme) => theme.interior)).size, PASS_THEMES.length, 'no game twice');
+});
