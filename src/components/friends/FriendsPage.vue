@@ -5,6 +5,7 @@ import PanelHeading from '../ui/PanelHeading.vue';
 import { computed, nextTick, onMounted, ref } from 'vue';
 import { RECIPES } from '../../domain/catalog';
 import { CONSUMABLES } from '../../domain/loot';
+import { COSMETICS } from '../../domain/cosmetics';
 import { SHARD_GIFT_AMOUNTS, STYLE_SHARD_GIFT_AMOUNTS } from '../../sim/gifts';
 import { useGameStore } from '../../stores/game';
 import BarShowcase from '../profile/BarShowcase.vue';
@@ -27,6 +28,8 @@ const styleItems = computed(() => game.cosmetics.map((cosmetic) => ({ cosmetic, 
 const itemGifts = computed(() => CONSUMABLES.map((item) => ({ id: item.id, name: item.name, quantity: game.loot.consumables[item.id] ?? 0 })).filter((item) => item.quantity > 0));
 const shardGifts = SHARD_GIFT_AMOUNTS;
 const styleShardGifts = STYLE_SHARD_GIFT_AMOUNTS;
+// Style shards are kept per style: one entry for each pile the player has.
+const shardPiles = computed(() => Object.entries(game.loot.styleShards).map(([id, quantity]) => ({ id, quantity, label: COSMETICS.find((item) => item.id === id)?.label ?? id })).filter((item) => item.quantity > 0));
 const visit = computed(() => game.visitedFriend);
 const visitBar = computed(() => visit.value?.bar as Record<string, string> | undefined);
 const friendName = (friend: { nickname: string; customName: string }) => friend.customName || friend.nickname;
@@ -150,7 +153,7 @@ onMounted(() => { void game.loadFriends(); });
         <article v-for="item in styleItems" :key="item.cosmetic.id"><span><b>{{ item.cosmetic.label }}</b><small>Style · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'cosmetic-copy', cosmeticId: item.cosmetic.id })">Give</UiButton></article>
         <article v-for="item in itemGifts" :key="item.id"><span><b>{{ item.name }}</b><small>Workshop item · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'consumable', id: item.id })">Give</UiButton></article>
         <article v-for="amount in shardGifts" :key="amount"><span><b>{{ amount }} skin shards</b><small>You have {{ game.loot.skinShards }}</small></span><UiButton variant="solid" size="sm" :disabled="game.loot.skinShards < amount" @click="gift({ kind: 'skin-shards', amount })">Give</UiButton></article>
-        <article v-for="amount in styleShardGifts" :key="`style-${amount}`"><span><b>{{ amount }} style shards</b><small>You give them away and lose them · you have {{ game.loot.stylePieces }}</small></span><UiButton variant="solid" size="sm" :disabled="game.loot.stylePieces < amount" @click="gift({ kind: 'style-shards', amount })">Give</UiButton></article>
+        <article v-for="pile in shardPiles" :key="`style-${pile.id}`"><span><b>{{ pile.label }} shards</b><small>You give them away and lose them · you have {{ pile.quantity }}</small></span><span class="gift-amounts"><UiButton v-for="amount in styleShardGifts" :key="amount" variant="solid" size="sm" :disabled="pile.quantity < amount" @click="gift({ kind: 'style-shards', cosmeticId: pile.id, amount })">Give {{ amount }}</UiButton></span></article>
         <article v-for="item in game.giftableStyleItems" :key="item.id"><span><b>{{ item.label }}</b><small>Whole style · you lose it · not worn in any bar</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'style-transfer', cosmeticId: item.id })">Give</UiButton></article>
         <article v-for="item in game.giftableBackgrounds" :key="item.id"><span><b>{{ item.name }}</b><small>Background with its style · you lose both · not used by any bar</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'interior-transfer', interiorId: item.id })">Give</UiButton></article>
         <p v-if="!recipeCards.length && !styleItems.length && !itemGifts.length" class="empty">You have no spare cards or styles yet. Duplicates from VIP guests, lessons and the daily style draw show up here.</p>
@@ -161,6 +164,7 @@ onMounted(() => { void game.loadFriends(); });
 </template>
 
 <style scoped>
+.gift-amounts { display: flex; flex-wrap: wrap; gap: 6px; }
 .friends-page { display: grid; gap: 12px; padding-bottom: 14px; overflow: hidden; }
 .friends-page > .panel-heading { margin: 0; }
 .friends-page > * { margin-inline: 12px; }

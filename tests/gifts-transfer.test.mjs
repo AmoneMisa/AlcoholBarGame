@@ -4,7 +4,7 @@ import { COSMETICS } from '../src/domain/cosmetics.ts';
 import { BOX_ONLY_GAME_IDS, EVENT_INTERIOR_IDS } from '../src/data/cosmetics/bars.ts';
 import { INTERIOR_STYLE } from '../src/data/cosmetics/styleSources.ts';
 import { GiftError, LOOT_GIFTS_PER_DAY, giftableInteriors, giftableStyles, giftPrice, payForGift, receiveGift } from '../src/sim/gifts.ts';
-import { grantCosmetic } from '../src/sim/loot.ts';
+import { grantCosmetic, shardStyles } from '../src/sim/loot.ts';
 import { createInitialState } from '../src/sim/state.ts';
 
 const NOW = new Date(2026, 8, 30, 12).getTime();
@@ -14,15 +14,17 @@ const boxStyle = (character = 'noa') => COSMETICS.find((item) => item.source ===
 
 test('Style shards move from the sender to the friend: the sender must have them and loses them', () => {
   const sender = fresh();
-  sender.loot.stylePieces = 12;
-  assert.throws(() => payForGift(sender, { kind: 'style-shards', amount: 25 }, NOW), /need 25 style shards/);
-  assert.throws(() => payForGift(sender, { kind: 'style-shards', amount: 7 }, NOW), /5, 10 or 25/);
-  assert.equal(sender.loot.stylePieces, 12, 'a refused gift costs nothing');
-  const gift = payForGift(sender, { kind: 'style-shards', amount: 10 }, NOW);
-  assert.equal(sender.loot.stylePieces, 2, 'the sender loses them');
+  const style = shardStyles()[0].id, other = shardStyles()[1].id;
+  sender.loot.styleShards[style] = 12;
+  assert.throws(() => payForGift(sender, { kind: 'style-shards', cosmeticId: style, amount: 25 }, NOW), /need 25/);
+  assert.throws(() => payForGift(sender, { kind: 'style-shards', cosmeticId: style, amount: 7 }, NOW), /5, 10 or 25/);
+  assert.throws(() => payForGift(sender, { kind: 'style-shards', cosmeticId: other, amount: 5 }, NOW), /need 5/, 'only the pile of that style counts');
+  assert.equal(sender.loot.styleShards[style], 12, 'a refused gift costs nothing');
+  const gift = payForGift(sender, { kind: 'style-shards', cosmeticId: style, amount: 10 }, NOW);
+  assert.equal(sender.loot.styleShards[style], 2, 'the sender loses them');
   const receiver = fresh();
   receiveGift(receiver, gift, 'Ana');
-  assert.equal(receiver.loot.stylePieces, 10, 'the friend gets them');
+  assert.equal(receiver.loot.styleShards[style], 10, 'the friend gets the same style');
 });
 
 test('A whole box style moves too, but only if it is owned and not worn; a copy the friend already has becomes a spare', () => {
@@ -102,8 +104,9 @@ test('Only box-only backgrounds can be given away; the ordinary ones and the pri
 
 test('These gifts count towards the daily limit of Workshop gifts', () => {
   const sender = fresh();
-  sender.loot.stylePieces = 5 * (LOOT_GIFTS_PER_DAY + 1);
-  for (let i = 0; i < LOOT_GIFTS_PER_DAY; i++) payForGift(sender, { kind: 'style-shards', amount: 5 }, NOW);
-  assert.throws(() => payForGift(sender, { kind: 'style-shards', amount: 5 }, NOW), /per day/);
-  assert.equal(sender.loot.stylePieces, 5, 'nothing is taken once the limit is reached');
+  const style = shardStyles()[0].id;
+  sender.loot.styleShards[style] = 5 * (LOOT_GIFTS_PER_DAY + 1);
+  for (let i = 0; i < LOOT_GIFTS_PER_DAY; i++) payForGift(sender, { kind: 'style-shards', cosmeticId: style, amount: 5 }, NOW);
+  assert.throws(() => payForGift(sender, { kind: 'style-shards', cosmeticId: style, amount: 5 }, NOW), /per day/);
+  assert.equal(sender.loot.styleShards[style], 5, 'nothing is taken once the limit is reached');
 });

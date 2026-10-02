@@ -3,21 +3,37 @@ import type { StatId } from './quests';
 
 // The season pass: one pass every two weeks, twenty levels. Points come from normal play (serving, lessons, VIPs,
 // bottles, boxes …), counted from the day the pass starts, so there is nothing extra to do. Every level has a free
-// reward and a premium reward (the premium track is bought once per pass with crystals). Level 14 gives the season's
+// reward and a premium reward (the premium track is bought once per pass with crystals). Crystals and shards are only on
+// the premium track. Level 14 gives the season's
 // costumes (one for each bartender) and level 20 its background.
 export const PASS_DAYS = 14;
 export const PASS_MS = PASS_DAYS * 24 * 60 * 60 * 1000;
 export const PASS_LEVELS = 20;
 export const PASS_LEVEL_POINTS = 75;
 // Priced so that a free player can only afford it by playing about nine days in ten and finishing the weekly quests:
-// over 14 days that is roughly 540 crystals (daily reward, lessons, the wheel, weekly quests, the free track), while
+// over 14 days that is roughly 440 crystals (daily reward, lessons, the wheel, weekly quests), while
 // someone playing seven days in ten ends near 330. Premium rewards stay claimable, so buying late loses nothing.
 export const PASS_PREMIUM_PRICE = 450;
+// Crystals can also buy levels: one level costs this much, whatever part of the level is already filled.
+export const PASS_LEVEL_PRICE = 40;
 
 // How many pass points each thing is worth. Only counters that the server rules raise are used.
 export const PASS_POINTS: Partial<Record<StatId, number>> = {
   serves: 2, vips: 6, bottles: 4, boxes: 3, lessons: 12, perfectTalks: 5, tasted: 4, upgrades: 3, signatures: 3
 };
+
+// What gives pass points, in words, for the pass screen: the same list the points are counted from.
+export const PASS_SOURCES: readonly { stat: StatId; label: string }[] = [
+  { stat: 'lessons', label: 'Finish a daily English lesson set' },
+  { stat: 'vips', label: 'Serve a VIP guest' },
+  { stat: 'perfectTalks', label: 'Have a perfect English conversation' },
+  { stat: 'bottles', label: 'Sell a sealed bottle' },
+  { stat: 'tasted', label: 'Serve a recipe or brand for the first time' },
+  { stat: 'boxes', label: 'Open a box' },
+  { stat: 'upgrades', label: 'Upgrade equipment' },
+  { stat: 'signatures', label: 'Serve your signature cocktail' },
+  { stat: 'serves', label: 'Serve a perfect drink' }
+];
 
 export type PassReward = Reward | { kind: 'interior'; id: string } | { kind: 'cosmetics'; ids: string[] };
 export interface PassTheme { id: string; name: string; tagline: string; interior: string; noa: string; leo: string }
@@ -61,6 +77,7 @@ export const PASS_SHARED_EPOCH = Date.UTC(2026, 0, 5);
 export const sharedPassStart = (now: number) => PASS_SHARED_EPOCH + Math.floor((now - PASS_SHARED_EPOCH) / PASS_MS) * PASS_MS;
 export const sharedPassId = (now: number) => `pass-${Math.floor((now - PASS_SHARED_EPOCH) / PASS_MS)}`;
 
+export const passLevelPoints = (stats: Partial<Record<string, number>>, base: Partial<Record<string, number>>, bonus = 0) => passPointsFor(stats, base) + Math.max(0, bonus);
 export const passLevel = (points: number) => Math.min(PASS_LEVELS, Math.floor(Math.max(0, points) / PASS_LEVEL_POINTS));
 export const passPointsFor = (stats: Partial<Record<string, number>>, base: Partial<Record<string, number>>) =>
   Object.entries(PASS_POINTS).reduce((sum, [stat, weight]) => sum + Math.max(0, (stats[stat] ?? 0) - (base[stat] ?? 0)) * weight!, 0);
@@ -76,17 +93,19 @@ const circle = (amount: number): Reward => ({ kind: 'companionShards', amount })
 // boosters and prestige.
 export const PASS_STYLES_LEVEL = 14;
 const FREE: Reward[] = [
-  coins(200), { kind: 'parts', amount: 10 }, crystals(10), box('bronze'), shards(3), { kind: 'skinShards', amount: 8 }, crystals(15), box('silver'), circle(2), crystals(20),
-  coins(400), shards(5), box('bronze'), { kind: 'xp', amount: 200 }, crystals(20), box('silver'), circle(3), shards(8), crystals(25)
+  coins(200), { kind: 'parts', amount: 10 }, coins(250), box('bronze'), { kind: 'parts', amount: 12 }, { kind: 'xp', amount: 150 }, coins(300), box('silver'), { kind: 'parts', amount: 15 }, coins(350),
+  coins(400), { kind: 'xp', amount: 150 }, box('bronze'), { kind: 'xp', amount: 200 }, coins(450), box('silver'), { kind: 'parts', amount: 20 }, { kind: 'xp', amount: 250 }, coins(500)
 ];
 const booster = (id: 'xp-boost' | 'coin-boost' | 'tip-boost' | 'happy-hour', amount = 1): Reward => ({ kind: 'consumable', id, amount });
 const supplies = (size: 'small' | 'medium' | 'large'): Reward => ({ kind: 'supplies', size });
 const prestige = (amount: number): Reward => ({ kind: 'prestige', amount });
+// Crystals and every kind of shard are premium rewards, so the free track never hands out the pass's best currency.
+const skin = (amount: number): Reward => ({ kind: 'skinShards', amount });
 const PREMIUM: Reward[][] = [
-  [supplies('small')], [coins(300)], [booster('coin-boost')], [prestige(1)], [supplies('medium')],
-  [coins(400)], [booster('tip-boost')], [prestige(1)], [supplies('medium')], [coins(600), prestige(1)],
-  [booster('xp-boost', 2)], [supplies('large')], [coins(600)], [prestige(2)], [booster('coin-boost', 2)],
-  [supplies('large')], [coins(800)], [booster('happy-hour', 2)], [prestige(2)], [supplies('large'), coins(1000), prestige(3), booster('xp-boost', 3)]
+  [supplies('small')], [coins(300)], [crystals(10), booster('coin-boost')], [prestige(1)], [shards(3), supplies('medium')],
+  [skin(8), coins(400)], [crystals(15), booster('tip-boost')], [prestige(1)], [circle(2), supplies('medium')], [crystals(20), coins(600), prestige(1)],
+  [booster('xp-boost', 2)], [shards(5), supplies('large')], [coins(600)], [prestige(2)], [crystals(20), booster('coin-boost', 2)],
+  [supplies('large')], [circle(3), coins(800)], [shards(8), booster('happy-hour', 2)], [crystals(25), prestige(2)], [crystals(30), supplies('large'), coins(1000), prestige(3), booster('xp-boost', 3)]
 ];
 
 export interface PassLevelRewards { level: number; free: PassReward[]; premium: PassReward[] }
@@ -94,14 +113,14 @@ export function passRewards(theme: PassTheme): PassLevelRewards[] {
   return Array.from({ length: PASS_LEVELS }, (_, index) => {
     const level = index + 1;
     const free: PassReward[] = level === PASS_STYLES_LEVEL ? [{ kind: 'cosmetics', ids: themeStyleIds(theme) }]
-      : level === PASS_LEVELS ? [{ kind: 'interior', id: theme.interior }, crystals(30)]
+      : level === PASS_LEVELS ? [{ kind: 'interior', id: theme.interior }, box('gold')]
       : [FREE[index]!];
     return { level, free, premium: PREMIUM[index]! };
   });
 }
 
-export interface PassState { id: string; /** When this player's first pass began (0 until the game has seen them). */ epoch: number; base: Record<string, number>; premium: boolean; claimed: string[] }
-export const emptyPass = (): PassState => ({ id: '', epoch: 0, base: {}, premium: false, claimed: [] });
+export interface PassState { /** Points bought with crystals in this pass (see PASS_LEVEL_PRICE). */ bonus: number; id: string; /** When this player's first pass began (0 until the game has seen them). */ epoch: number; base: Record<string, number>; premium: boolean; claimed: string[] }
+export const emptyPass = (): PassState => ({ bonus: 0, id: '', epoch: 0, base: {}, premium: false, claimed: [] });
 export const passClaimKey = (track: 'free' | 'premium', level: number) => `${track === 'free' ? 'f' : 'p'}${level}`;
 
 /** How many rewards the player can claim right now: every reached level not yet claimed, and the premium ones once bought. */

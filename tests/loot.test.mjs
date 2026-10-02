@@ -874,3 +874,24 @@ test('A save keeps every earned achievement (there are more than a hundred) and 
   assert.equal(loot.achievements.length, ids.length);
   assert.ok(!loot.achievements.includes('a-prestige-1'));
 });
+
+test('Delete in the inventory throws away boxes, boosters, parts and shards, only what the player has', () => {
+  const state = fresh();
+  state.loot.boxes = { bronze: 2 };
+  state.loot.consumables = { 'xp-boost': 1 };
+  state.loot.styleShards = { 'some-style': 7 };
+  state.loot.skinShards = 5; state.loot.parts = 9;
+  run(state, { type: 'discardLoot', kind: 'box', id: 'bronze', amount: 1 });
+  assert.equal(state.loot.boxes.bronze, 1);
+  run(state, { type: 'discardLoot', kind: 'consumable', id: 'xp-boost', amount: 1 });
+  assert.equal(state.loot.consumables['xp-boost'], undefined, 'an empty pile disappears');
+  run(state, { type: 'discardLoot', kind: 'styleShards', id: 'some-style', amount: 99 });
+  assert.equal(state.loot.styleShards['some-style'], undefined, 'it never takes more than there is');
+  run(state, { type: 'discardLoot', kind: 'skinShards', id: '', amount: 5 });
+  run(state, { type: 'discardLoot', kind: 'parts', id: '', amount: 4 });
+  assert.equal(state.loot.skinShards, 0);
+  assert.equal(state.loot.parts, 5);
+  assert.throws(() => run(state, { type: 'discardLoot', kind: 'box', id: 'gold', amount: 1 }), /do not have/);
+  assert.throws(() => run(state, { type: 'discardLoot', kind: 'crystals', id: '', amount: 1 }), /Choose what/, 'only items can be thrown away');
+  assert.throws(() => run(state, { type: 'discardLoot', kind: 'parts', id: '', amount: -3 }), /Choose what/);
+});

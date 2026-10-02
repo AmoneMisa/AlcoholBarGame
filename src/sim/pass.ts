@@ -2,7 +2,7 @@ import { INTERIORS } from '../data/cosmetics/bars';
 import { styleForInterior } from '../data/cosmetics/styleSources';
 import { COSMETICS } from '../domain/cosmetics';
 import {
-  PASS_LEVELS, PASS_PREMIUM_PRICE, passClaimKey, passIdOf, passLevel, passPointsFor, passRewards, passThemeOf, sharedPassId, sharedPassStart
+  PASS_LEVELS, PASS_LEVEL_POINTS, PASS_LEVEL_PRICE, PASS_PREMIUM_PRICE, passClaimKey, passIdOf, passLevel, passPointsFor, passRewards, passThemeOf, sharedPassId, sharedPassStart
 } from '../domain/pass';
 import { grantCosmetic, grantReward } from './loot';
 import type { PlayerState } from './state';
@@ -22,10 +22,10 @@ export function syncPass(state: PlayerState, now: number) {
   }
   const id = passIdOf(pass.epoch, now);
   if (pass.id === id) return;
-  state.pass = { id, epoch: pass.epoch, base: { ...state.loot.stats }, premium: false, claimed: [] };
+  state.pass = { bonus: 0, id, epoch: pass.epoch, base: { ...state.loot.stats }, premium: false, claimed: [] };
 }
 
-export const passPoints = (state: PlayerState) => passPointsFor(state.loot.stats, state.pass.base);
+export const passPoints = (state: PlayerState) => passPointsFor(state.loot.stats, state.pass.base) + state.pass.bonus;
 export const passLevelOf = (state: PlayerState) => passLevel(passPoints(state));
 
 export function claimPass(state: PlayerState, trackInput: unknown, levelInput: unknown, random: () => number, now: number): string {
@@ -70,4 +70,20 @@ export function buyPassPremium(state: PlayerState, now: number): string {
   state.crystals -= PASS_PREMIUM_PRICE;
   state.pass.premium = true;
   return 'Premium track unlocked for this pass: its rewards for the levels you have reached are ready to claim.';
+}
+
+/** Buys levels with crystals: each one fills the rest of the current level (the bought points are kept as a bonus). */
+export function buyPassLevels(state: PlayerState, countInput: unknown, now: number): string {
+  syncPass(state, now);
+  const count = Math.floor(Number(countInput));
+  if (!Number.isInteger(count) || count < 1 || count > PASS_LEVELS) throw new PassError('Choose how many levels to buy.');
+  const level = passLevelOf(state);
+  if (level >= PASS_LEVELS) throw new PassError('You have reached the last level of this pass.');
+  const buying = Math.min(count, PASS_LEVELS - level);
+  const cost = buying * PASS_LEVEL_PRICE;
+  if (state.crystals < cost) throw new PassError(`You need ${cost} crystals for ${buying} level${buying === 1 ? '' : 's'} (you have ${Math.floor(state.crystals)}).`);
+  state.crystals -= cost;
+  const target = (level + buying) * PASS_LEVEL_POINTS;
+  state.pass.bonus += target - passPoints(state);
+  return `Pass level ${level + buying} reached for ${cost} crystals. Claim its rewards below.`;
 }

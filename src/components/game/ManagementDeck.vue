@@ -46,7 +46,7 @@ const stockTabs = computed(() => {
   const loot = game.loot;
   const tabs: { id: typeof stockCategory.value; label: string }[] = [{ id: 'all', label: 'All' }, { id: 'spirit', label: 'Spirits' }, { id: 'mixer', label: 'Mixers' }, { id: 'fresh', label: 'Fresh' }, { id: 'food', label: 'Food' }];
   const hasItems = loot.parts > 0 || Object.values(loot.boxes).some((n) => n > 0) || Object.values(loot.consumables).some((n) => n > 0) || Object.values(game.circle.keepsakes).some((n) => n > 0);
-  const hasShards = loot.skinShards > 0 || Object.values(loot.itemShards).some((n) => n > 0) || Object.values(game.circle.shards).some((n) => n > 0);
+  const hasShards = loot.skinShards > 0 || Object.values(loot.styleShards).some((n) => n > 0) || Object.values(loot.itemShards).some((n) => n > 0) || Object.values(game.circle.shards).some((n) => n > 0);
   if (hasItems) tabs.push({ id: 'items', label: 'Items' });
   if (hasShards) tabs.push({ id: 'shards', label: 'Shards' });
   if (recipeCardInventory.value.length) tabs.push({ id: 'cards', label: 'Cards' });

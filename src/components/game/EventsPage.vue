@@ -4,8 +4,13 @@ import Glyph from '../ui/Glyph.vue';
 import PanelHeading from '../ui/PanelHeading.vue';
 import DailyRewardCard from '../ui/DailyRewardCard.vue';
 import CityEvent from './CityEvent.vue';
+import DailyWheel from '../workshop/DailyWheel.vue';
+import SeasonPass from '../workshop/SeasonPass.vue';
+import QuestsPanel from '../workshop/QuestsPanel.vue';
 
-// Everything that is going on, in one place: the login streak, what is happening in the city, and tonight at the bar.
+// Everything that is going on, in one place: the login streak, the city and the bar tonight, the season pass, the daily
+// wheel and the weekly quests. The tabs above it (App.vue) pick the part to show.
+defineProps<{ section: string }>();
 const game = useGameStore();
 </script>
 
@@ -13,17 +18,18 @@ const game = useGameStore();
   <section class="events-page game-panel">
     <PanelHeading eyebrow="WHAT IS GOING ON" title="Events" :aside="game.dailyGiftAvailable ? 'Reward ready' : `Day ${game.loginStreak} streak`" />
 
-    <article class="card events-card">
+    <div v-if="section === 'today'" class="events-body">
+    <article class="events-card">
       <header><small>LOGIN STREAK</small><h3>Your daily reward</h3></header>
       <DailyRewardCard />
     </article>
 
-    <article class="card events-card">
+    <article class="events-card">
       <header><small>IN THE CITY</small><h3>{{ game.region.name }}</h3></header>
       <CityEvent />
     </article>
 
-    <article class="card events-card">
+    <article class="events-card">
       <header><small>TONIGHT AT THE BAR</small><h3>{{ game.barEvent ? game.barEvent.title : 'A quiet night' }}</h3></header>
       <div v-if="game.barEvent" class="bar-night" :class="game.barEvent.mood">
         <span class="bar-night-icon" aria-hidden="true"><Glyph :g="game.barEvent.icon" /></span>
@@ -31,12 +37,16 @@ const game = useGameStore();
       </div>
       <p v-else class="bar-night-quiet">Nothing special is happening in your bar tonight. Special nights show up here when they start.</p>
     </article>
+    </div>
+    <div v-else-if="section === 'pass'" class="events-body"><SeasonPass /></div>
+    <div v-else-if="section === 'wheel'" class="events-body"><article class="events-card"><header><small>FREE EVERY DAY</small><h3>Daily wheel</h3></header><DailyWheel /></article></div>
+    <div v-else-if="section === 'quests'" class="events-body"><QuestsPanel /></div>
   </section>
 </template>
 
 <style>
-.events-page { display: grid; gap: 12px; }
-.events-card { display: grid; gap: 10px; }
+.events-body { display: grid; gap: 12px; padding: 12px; }
+.events-card { display: grid; gap: 10px; padding: 14px; border: 1px solid #354762; border-radius: 13px; background: #111c2d; }
 .events-card > header { display: grid; gap: 2px; }
 .events-card > header small { color: #9eafc1; letter-spacing: .1em; font-size: 10px; font-weight: 800; }
 .events-card > header h3 { margin: 0; font-size: 18px; color: #f8efe7; }

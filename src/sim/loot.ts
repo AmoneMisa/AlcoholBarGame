@@ -88,7 +88,7 @@ export function grantReward(state: PlayerState, reward: Reward, random: () => nu
     case 'crystals': state.crystals += reward.amount; break;
     case 'parts': loot.parts += reward.amount; break;
     case 'skinShards': loot.skinShards += reward.amount; break;
-    case 'stylePieces': loot.stylePieces += reward.amount; break;
+    case 'stylePieces': return addStyleShards(state, reward.amount, random);
     case 'xp': state.xp += reward.amount; break;
     case 'box': grantBox(state, reward.box); break;
     case 'companionShards': return addCompanionShards(state, reward.amount, random);
@@ -110,7 +110,7 @@ export function grantReward(state: PlayerState, reward: Reward, random: () => nu
     case 'style': {
       const missing = boxStyles().filter((entry) => !state.ownedCosmeticIds.includes(entry.id));
       // Every box style owned: the drop turns into pieces instead of being wasted.
-      if (!missing.length) { loot.stylePieces += STYLE_PIECES_TO_CRAFT; return `${STYLE_PIECES_TO_CRAFT} style shards (you own every box style)`; }
+      if (!missing.length) { loot.skinShards += STYLE_PIECES_TO_CRAFT; return `${STYLE_PIECES_TO_CRAFT} skin shards (you own every box style)`; }
       const chosen = missing[Math.min(missing.length - 1, Math.floor(random() * missing.length))]!;
       grantCosmetic(state, chosen.id);
       return `the full style “${chosen.label}”`;
@@ -350,12 +350,29 @@ export function craftSkin(state: PlayerState, cosmeticId: unknown) {
 export const boxStyles = () => COSMETICS.filter((entry) => entry.source === 'box');
 // Style shards craft the box styles and the styles of ordinary backgrounds (the event backgrounds stay box-only).
 export const shardStyles = () => COSMETICS.filter((entry) => entry.source === 'box' || (entry.source === 'background' && !!entry.character && !isEventInterior(interiorForCosmetic(entry.id) ?? '')));
+// A drop of style shards is a pile for ONE style or background the player does not own yet, picked at random.
+// When every craftable style is owned, the shards turn into skin shards instead of being wasted.
+export const ownedAside = (state: PlayerState) => shardStyles().filter((item) => !state.ownedCosmeticIds.includes(item.id));
+export function addStyleShards(state: PlayerState, amount: number, random: () => number): string {
+  const open = ownedAside(state);
+  if (!open.length) { state.loot.skinShards += amount; return `${amount} skin shards (you own every craftable style)`; }
+  const chosen = open[Math.min(open.length - 1, Math.floor(random() * open.length))]!;
+  state.loot.styleShards[chosen.id] = (state.loot.styleShards[chosen.id] ?? 0) + amount;
+  return `${amount} ${chosen.label} shard${amount === 1 ? '' : 's'}`;
+}
+// Old saves: the one shared pool is split into random piles of up to 10 over the styles that are still missing.
+export function migrateStylePool(state: PlayerState, random: () => number = Math.random) {
+  let left = state.loot.stylePieces;
+  state.loot.stylePieces = 0;
+  while (left > 0) { const part = Math.min(10, left); addStyleShards(state, part, random); left -= part; }
+}
 export function craftStyle(state: PlayerState, cosmeticId: unknown) {
   const item = shardStyles().find((entry) => entry.id === cosmeticId);
   if (!item) throw new LootError('This style cannot be crafted from style shards.');
   if (state.ownedCosmeticIds.includes(item.id)) throw new LootError('You already own this style.');
-  if (state.loot.stylePieces < STYLE_PIECES_TO_CRAFT) throw new LootError(`You need ${STYLE_PIECES_TO_CRAFT} style shards for ${item.label} (you have ${state.loot.stylePieces}).`);
-  state.loot.stylePieces -= STYLE_PIECES_TO_CRAFT;
+  const have = state.loot.styleShards[item.id] ?? 0;
+  if (have < STYLE_PIECES_TO_CRAFT) throw new LootError(`You need ${STYLE_PIECES_TO_CRAFT} ${item.label} shards (you have ${have}).`);
+  if (have === STYLE_PIECES_TO_CRAFT) delete state.loot.styleShards[item.id]; else state.loot.styleShards[item.id] = have - STYLE_PIECES_TO_CRAFT;
   grantCosmetic(state, item.id);
   note(state, `${item.label} crafted from ${STYLE_PIECES_TO_CRAFT} style shards.`);
 }
@@ -612,4 +629,24 @@ export const deliveryFactorFor = (state: PlayerState, regionId: string) => 1 - f
 export function orderDiscount(state: PlayerState, now: number) {
   const voucher = (state.loot.armed['voucher'] ?? 0) > 0;
   return { factor: lootBonuses(state, now).supplyFactor * (voucher ? .8 : 1), voucher };
+}
+
+// ---- Throwing things away ----
+// The inventory's Delete button: boxes, consumables, parts and shards can be thrown away (it is final, the client asks first).
+export const DISCARD_KINDS = ['box', 'consumable', 'styleShards', 'itemShards', 'skinShards', 'parts'] as const;
+export type DiscardKind = typeof DISCARD_KINDS[number];
+export function discardLoot(state: PlayerState, kindInput: unknown, idInput: unknown, amountInput: unknown) {
+  const kind = DISCARD_KINDS.find((item) => item === kindInput);
+  const id = typeof idInput === 'string' ? idInput : '';
+  const amount = Math.floor(Number(amountInput));
+  if (!kind || !Number.isInteger(amount) || amount < 1) throw new LootError('Choose what to throw away.');
+  const loot = state.loot;
+  const pile: Record<string, number> | undefined = kind === 'box' ? loot.boxes : kind === 'consumable' ? loot.consumables : kind === 'styleShards' ? loot.styleShards : kind === 'itemShards' ? loot.itemShards : undefined;
+  const have = pile ? pile[id] ?? 0 : kind === 'skinShards' ? loot.skinShards : loot.parts;
+  if (have < 1) throw new LootError('You do not have that.');
+  const taken = Math.min(amount, have);
+  if (pile) { if (have === taken) delete pile[id]; else pile[id] = have - taken; }
+  else if (kind === 'skinShards') loot.skinShards -= taken;
+  else loot.parts -= taken;
+  note(state, `You threw away ${taken}.`);
 }

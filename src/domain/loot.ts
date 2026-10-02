@@ -195,7 +195,7 @@ export function describeReward(reward: Reward, names: { consumable: (id: string)
     case 'crystals': return `${reward.amount} crystals`;
     case 'parts': return `${reward.amount} workshop parts`;
     case 'skinShards': return `${reward.amount} skin shards`;
-    case 'stylePieces': return `${reward.amount} style shard${reward.amount === 1 ? '' : 's'}`;
+    case 'stylePieces': return `${reward.amount} style shard${reward.amount === 1 ? '' : 's'} of a random style`;
     case 'xp': return `${reward.amount} XP`;
     case 'box': return `a ${reward.box} box`;
     case 'companionShards': return `${reward.amount} Circle shard${reward.amount === 1 ? '' : 's'}`;

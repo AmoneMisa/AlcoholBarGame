@@ -50,7 +50,7 @@ input::placeholder, textarea::placeholder { text-align: center; }
 
 /* Any icon without its own size follows the text around it (an SVG with no size would fill its container). */
 :where(.ui-icon) { width: 1.2em; height: 1.2em; flex: none; }
-button > .ui-icon, i > .ui-icon, em > .ui-icon { vertical-align: -.2em; }
+button > .ui-icon, i > .ui-icon, em > .ui-icon { vertical-align: middle; }
 
 /* ---- Bottle shelves: a finger swipes the shelf sideways; pulling a bottle up or down lifts it (see BarScene.vue) ---- */
 .pshelf-bottles > button { touch-action: pan-x; }
@@ -62,7 +62,7 @@ button > .ui-icon, i > .ui-icon, em > .ui-icon { vertical-align: -.2em; }
 }
 .guest-nudge { height: 34px; top: calc(var(--back, 40%) - 17px); }
 .pshelf-row .shelf-nudge { gap: 2px; }
-.pshelf-row .shelf-nudge button .ui-icon, .guest-nudge .ui-icon, .arrow-btn .ui-icon { width: 22px; height: 22px; stroke-width: 2.6; filter: drop-shadow(0 1px 2px #000c); }
+.pshelf-row .shelf-nudge button .ui-icon, .guest-nudge .ui-icon, .arrow-btn .ui-icon { width: 22px; height: 22px; mask-image: var(--icon-b); -webkit-mask-image: var(--icon-b); filter: drop-shadow(0 1px 2px #000c); }
 .pshelf-row .shelf-nudge button:hover, .guest-nudge:hover:enabled, .arrow-btn:hover:enabled { background: #1b2233cc; color: #fff0c8; }
 .pshelf-row .shelf-nudge button:focus-visible, .guest-nudge:focus-visible, .arrow-btn:focus-visible { outline: 2px solid #d8aa57; outline-offset: 1px; }
 
@@ -76,7 +76,7 @@ button > .ui-icon, i > .ui-icon, em > .ui-icon { vertical-align: -.2em; }
 :where(input, select, textarea):disabled { opacity: .5; cursor: not-allowed; }
 :where(select) {
   appearance: none; -webkit-appearance: none; padding-right: 38px; cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f6cf7a' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9.500 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("./assets/ui/marks/mark-chevron.webp");
   background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;
 }
 :where(select) option { background: #101a2b; color: #f6ead1; }

@@ -2,7 +2,7 @@ import { INGREDIENTS, MODIFIERS, RECIPES, REGIONS, SUPPLIERS, estimateRecipeAbv 
 import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost, bottleSaleCrystalReward, bottleTotal, brandedServeCrystalReward } from '../domain/bottleCatalog';
 import { arrivalSkipCrystalCost, calendarDate, coins, specialtyFactor, supplierInCity, consecutiveDays, conversationCrystalReward, conversationDifficulty, crystalExchange, dailyCoinsFor, dailyCrystalsFor, quotePurchase, recipePurchase } from '../domain/economy';
 import { withArticle } from '../domain/english/articles';
-import { PassError, buyPassPremium, claimPass, syncPass } from './pass';
+import { PassError, buyPassLevels, buyPassPremium, claimPass, syncPass } from './pass';
 import { ROULETTE_SPINS_PER_DAY, spinWheel } from '../domain/roulette';
 import { STYLE_SHOP_PRICE, styleForInterior, styleSource } from '../data/cosmetics/styleSources';
 import { BAR_PROFILE_OPTIONS, DEFAULT_BARS, INTERIORS, isEventInterior } from '../data/cosmetics/bars';
@@ -18,7 +18,7 @@ import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL, economyAt, formatDeliveryTime, mar
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
-import { LootError, orderDiscount, claimSpark, grantCosmetic, grantReward, craftStyle, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
+import { LootError, orderDiscount, claimSpark, grantCosmetic, grantReward, craftStyle, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, promoteEquipment, upgradeEquipment, useConsumable, xpGain, discardLoot } from './loot';
 import { usableIngredientIds } from '../domain/usableStock';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { actsIn } from '../domain/social/acts';
@@ -68,6 +68,7 @@ export type GameAction =
   | { type: 'spinRoulette' }
   | { type: 'claimPass'; track: 'free' | 'premium'; level: number }
   | { type: 'buyPassPremium' }
+  | { type: 'buyPassLevels'; count: number }
   | { type: 'activatePopularityBoost'; boost: 'no-cooldown' | 'vip-run' }
   | { type: 'selectCustomer'; customerId: string }
   | { type: 'openConversation'; customerId: string }
@@ -119,6 +120,7 @@ export type GameAction =
   | { type: 'buyBox'; box: string; quantity?: number }
   | { type: 'buyConsumable'; id: string; quantity?: number }
   | { type: 'useConsumable'; id: string; recipeId?: string }
+  | { type: 'discardLoot'; kind: string; id: string; amount: number }
   | { type: 'drawStyle'; count: 1 | 10; banner?: 'standard' | 'seasonal' }
   | { type: 'claimSpark'; cosmeticId: string }
   | { type: 'craftSkin'; cosmeticId: string }
@@ -945,9 +947,10 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       break;
     }
     case 'claimPass':
-    case 'buyPassPremium': {
+    case 'buyPassPremium':
+    case 'buyPassLevels': {
       try {
-        state.message = action.type === 'claimPass' ? claimPass(state, action.track, action.level, random, now) : buyPassPremium(state, now);
+        state.message = action.type === 'claimPass' ? claimPass(state, action.track, action.level, random, now) : action.type === 'buyPassLevels' ? buyPassLevels(state, action.count, now) : buyPassPremium(state, now);
       } catch (error) {
         if (error instanceof PassError) throw new RuleError(error.message);
         throw error;
@@ -1111,6 +1114,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'buyBox':
     case 'buyConsumable':
     case 'useConsumable':
+    case 'discardLoot':
     case 'drawStyle':
     case 'claimSpark':
     case 'craftSkin':
@@ -1128,6 +1132,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           case 'buyBox': buyBox(state, action.box, action.quantity); break;
           case 'buyConsumable': buyConsumable(state, action.id, action.quantity); break;
           case 'useConsumable': useConsumable(state, action.id, action.recipeId, now); break;
+          case 'discardLoot': discardLoot(state, action.kind, action.id, action.amount); break;
           case 'drawStyle': drawStyle(state, action.count, action.banner, now, random); break;
           case 'claimSpark': claimSpark(state, action.cosmeticId, now); break;
           case 'craftSkin': craftSkin(state, action.cosmeticId); break;
@@ -1161,7 +1166,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
 }
 
 // Loot actions leave a trail (what was rolled, pity) for the server's loot ledger.
-const AUDITED = new Set<GameAction['type']>(['openBox', 'pickReward', 'buyBox', 'buyConsumable', 'drawStyle', 'claimSpark', 'craftSkin', 'craftStyle', 'claimLeaderboardReward', 'claimQuest', 'claimAchievement']);
+const AUDITED = new Set<GameAction['type']>(['discardLoot', 'openBox', 'pickReward', 'buyBox', 'buyConsumable', 'drawStyle', 'claimSpark', 'craftSkin', 'craftStyle', 'claimLeaderboardReward', 'claimQuest', 'claimAchievement']);
 export interface LootAudit { action: string; message: string; detail: Record<string, unknown>; }
 function auditEntry(state: PlayerState, action: GameAction): LootAudit | undefined {
   if (!AUDITED.has(action.type)) return undefined;

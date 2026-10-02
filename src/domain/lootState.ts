@@ -10,7 +10,10 @@ export interface DrawResult { id: string; label: string; rarity: 'common' | 'rar
 export interface LootState {
   parts: number;
   skinShards: number;
-  stylePieces: number;   // 50 craft one whole box style
+  // Style shards are kept per style: each style (and the background that comes with it) has its own pile, 50 craft it.
+  styleShards: Record<string, number>;
+  // Old saves had one shared pool; it is split into per-style piles on load (see migrateStylePool) and then stays 0.
+  stylePieces: number;
   itemShards: Record<string, number>;
   consumables: Record<string, number>;
   boxes: Record<string, number>;
@@ -48,7 +51,7 @@ export interface LootState {
 }
 
 export const createLoot = (): LootState => ({
-  parts: 0, skinShards: 0, stylePieces: 0, itemShards: {}, consumables: {}, boxes: {}, armed: {}, boosts: {},
+  parts: 0, skinShards: 0, styleShards: {}, stylePieces: 0, itemShards: {}, consumables: {}, boxes: {}, armed: {}, boosts: {},
   equipment: Object.fromEntries(REGIONS.map((region) => [region.id, Object.fromEntries(EQUIPMENT.map((item) => [item.id, newSlot()]))])),
   pity: { sinceRare: 0, sinceLegendary: 0 }, lastDraw: [],
   levelRewarded: 1, log: [],
@@ -56,6 +59,17 @@ export const createLoot = (): LootState => ({
 });
 
 const count = (value: unknown, max = 1_000_000) => Number.isFinite(value) && (value as number) > 0 ? Math.min(max, Math.floor(value as number)) : 0;
+// Piles of style shards: the key is the id of a style (cosmetic), so it only has to look like one.
+function cleanPiles(value: unknown) {
+  const result: Record<string, number> = {};
+  if (!value || typeof value !== 'object') return result;
+  for (const [key, amount] of Object.entries(value as Record<string, unknown>).slice(0, 400)) {
+    if (!/^[\w:.-]{1,80}$/.test(key)) continue;
+    const clean = count(amount);
+    if (clean) result[key] = clean;
+  }
+  return result;
+}
 function counts(value: unknown, allowed?: readonly string[], max = 1_000_000) {
   const result: Record<string, number> = {};
   if (!value || typeof value !== 'object') return result;
@@ -80,7 +94,7 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
   const boosts: Record<string, number> = {};
   for (const kind of BOOST_KINDS) if (Number.isFinite(source.boosts?.[kind])) boosts[kind] = source.boosts![kind]!;
   return {
-    parts: count(source.parts), skinShards: count(source.skinShards), stylePieces: count(source.stylePieces),
+    parts: count(source.parts), skinShards: count(source.skinShards), styleShards: cleanPiles(source.styleShards), stylePieces: count(source.stylePieces),
     itemShards: counts(source.itemShards, EQUIPMENT.map((item) => item.id)),
     consumables: counts(source.consumables), boxes: counts(source.boxes, ['bronze', 'silver', 'gold', 'choice']),
     armed: counts(source.armed, ARMED_CHARGES), boosts, equipment,

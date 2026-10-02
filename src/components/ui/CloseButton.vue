@@ -12,7 +12,7 @@ withDefaults(defineProps<{ label?: string; tone?: 'dark' | 'light'; size?: 'sm' 
 <style>
 .ui-close { display: grid; flex: 0 0 auto; place-items: center; padding: 0; border: 1px solid #475a74; border-radius: 50%; background: #1b2940; color: #e8eef6; line-height: 0; cursor: pointer; transition: border-color .15s, color .15s, background .15s; }
 .ui-close:hover, .ui-close:focus-visible { border-color: #e4b35c; color: #ffd98a; }
-.ui-close .ui-icon { stroke-width: 2.2; }
+.ui-close .ui-icon { mask-image: var(--icon-b); -webkit-mask-image: var(--icon-b); }
 .ui-close-md { width: 36px; height: 36px; }
 .ui-close-md .ui-icon { width: 18px; height: 18px; }
 .ui-close-sm { width: 28px; height: 28px; }

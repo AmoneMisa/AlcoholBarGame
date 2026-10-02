@@ -4,7 +4,7 @@ import { RECIPES } from '../domain/catalog';
 import { calendarDate, coins, recipePurchase } from '../domain/economy';
 import { DUPLICATE_INTERIOR_SHARDS, INTERIORS, isEventInterior } from '../data/cosmetics/bars';
 import { styleForInterior } from '../data/cosmetics/styleSources';
-import { grantCosmetic } from './loot';
+import { grantCosmetic, shardStyles } from './loot';
 import { addSpareCopy, isStarterRecipe, recipeCopies, recipeLevel } from './recipes';
 import { levelFor, type PlayerState } from './state';
 import { COSMETICS } from '../domain/cosmetics';
@@ -24,7 +24,7 @@ export type GiftRequest =
   | { kind: 'skin-shards'; amount: number }     // 5, 10 or 20 skin shards
   // Things that only boxes give move from one player to the other: the sender loses them, the receiver gets them.
   // Only what the sender really has, and (for whole items) only what is not in use in any of their bars.
-  | { kind: 'style-shards'; amount: number }    // 5, 10 or 25 style shards
+  | { kind: 'style-shards'; cosmeticId: string; amount: number }    // 5, 10 or 25 shards of one style
   | { kind: 'style-transfer'; cosmeticId: string }       // a whole box style
   | { kind: 'interior-transfer'; interiorId: string };   // a box-only background, together with its connected style
 export const SHARD_GIFT_AMOUNTS = [5, 10, 20] as const;
@@ -128,9 +128,12 @@ function payForTransfer(state: PlayerState, gift: { kind?: string; amount?: numb
   if (gift.kind === 'style-shards') {
     const amount = (STYLE_SHARD_GIFT_AMOUNTS as readonly number[]).find((value) => value === gift.amount);
     if (!amount) throw new GiftError('Send 5, 10 or 25 style shards.');
-    if (state.loot.stylePieces < amount) throw new GiftError(`You need ${amount} style shards.`);
-    state.loot.stylePieces -= amount;
-    clean = { kind: 'style-shards', amount };
+    const style = shardStyles().find((entry) => entry.id === gift.cosmeticId);
+    if (!style) throw new GiftError('These shards cannot be given away.');
+    const have = state.loot.styleShards[style.id] ?? 0;
+    if (have < amount) throw new GiftError(`You need ${amount} ${style.label} shards.`);
+    if (have === amount) delete state.loot.styleShards[style.id]; else state.loot.styleShards[style.id] = have - amount;
+    clean = { kind: 'style-shards', cosmeticId: style.id, amount };
   } else if (gift.kind === 'style-transfer') {
     const item = COSMETICS.find((entry) => entry.id === gift.cosmeticId);
     if (!item || item.source !== 'box') throw new GiftError('This style cannot be gifted.');
@@ -180,9 +183,12 @@ export function receiveGift(state: PlayerState, gift: Gift, from: string) {
   }
   if (gift.kind === 'style-shards') {
     const amount = (STYLE_SHARD_GIFT_AMOUNTS as readonly number[]).includes(gift.amount) ? gift.amount : 0;
-    if (!amount) return `${from}'s gift could not be opened.`;
-    state.loot.stylePieces += amount;
-    return `${from} gave you ${amount} style shards!`;
+    const style = shardStyles().find((entry) => entry.id === gift.cosmeticId);
+    if (!amount || !style) return `${from}'s gift could not be opened.`;
+    // Shards of a style the friend already owns would be useless: they become skin shards.
+    if (state.ownedCosmeticIds.includes(style.id)) { state.loot.skinShards += amount; return `${from} gave you ${amount} ${style.label} shards. You own that style, so they became skin shards.`; }
+    state.loot.styleShards[style.id] = (state.loot.styleShards[style.id] ?? 0) + amount;
+    return `${from} gave you ${amount} ${style.label} shards!`;
   }
   if (gift.kind === 'style-transfer') {
     const item = COSMETICS.find((entry) => entry.id === gift.cosmeticId);

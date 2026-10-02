@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { COSMETICS } from '../src/domain/cosmetics.ts';
 import {
-  PASS_DAYS, PASS_LEVELS, PASS_STYLES_LEVEL, PASS_LEVEL_POINTS, PASS_MS, PASS_PREMIUM_PRICE, PASS_THEMES, passEndsOf, passIdOf, passLevel, passPointsFor, passRewards, passStartsOf, passThemeOf, sharedPassId, sharedPassStart, themeStyleIds
+  PASS_DAYS, PASS_LEVELS, PASS_STYLES_LEVEL, PASS_LEVEL_POINTS, PASS_LEVEL_PRICE, PASS_SOURCES, PASS_POINTS, PASS_MS, PASS_PREMIUM_PRICE, PASS_THEMES, passEndsOf, passIdOf, passLevel, passPointsFor, passRewards, passStartsOf, passThemeOf, sharedPassId, sharedPassStart, themeStyleIds
 } from '../src/domain/pass.ts';
 import { INTERIORS } from '../src/data/cosmetics/bars.ts';
 import { applyAction } from '../src/sim/rules.ts';
@@ -137,16 +137,18 @@ test('A damaged pass in a save is cleaned up', () => {
   assert.deepEqual(state.pass.claimed.sort(), ['f1', 'p20']);
 });
 
-test('The premium track is for the bar: supplies, coins, boosters and prestige, with no crystals to pay the price back', () => {
+test('Crystals and every kind of shard are premium rewards only; the free track has none', () => {
   const rows = passRewards(PASS_THEMES[0]);
   const premium = rows.flatMap((row) => row.premium);
-  assert.deepEqual([...new Set(premium.map((reward) => reward.kind))].sort(), ['coins', 'consumable', 'prestige', 'supplies']);
+  const free = rows.flatMap((row) => row.free);
+  const currency = ['crystals', 'stylePieces', 'skinShards', 'companionShards', 'itemShards'];
+  assert.ok(free.every((reward) => !currency.includes(reward.kind)), 'nothing of the kind on the free track');
+  for (const kind of ['crystals', 'stylePieces', 'skinShards', 'companionShards']) assert.ok(premium.some((reward) => reward.kind === kind), `premium has ${kind}`);
   assert.ok(rows.every((row) => row.premium.length >= 1));
   const total = (kind) => premium.filter((reward) => reward.kind === kind).reduce((sum, reward) => sum + (reward.amount ?? 1), 0);
   assert.equal(total('prestige'), 10, 'ten prestige over the pass');
   assert.ok(total('coins') >= 3000 && total('supplies') >= 6 && total('consumable') >= 10);
-  const free = rows.flatMap((row) => row.free).filter((reward) => reward.kind === 'crystals').reduce((sum, reward) => sum + reward.amount, 0);
-  assert.ok(free >= 80 && free <= 160, `free crystals ${free}`);
+  assert.ok(total('crystals') < PASS_PREMIUM_PRICE, 'the premium crystals do not pay the price back');
   assert.ok(PASS_PREMIUM_PRICE >= 400, 'the premium track is not cheap');
 });
 
@@ -303,4 +305,32 @@ test('The number of pass rewards ready to claim counts reached, unclaimed levels
   assert.equal(readyPassRewards(3, true, ['f1', 'p1', 'f2']), 3, 'claimed ones do not count');
   assert.equal(readyPassRewards(99, true, []), PASS_LEVELS * 2, 'never past the last level');
   assert.equal(readyPassRewards(20, false, Array.from({ length: PASS_LEVELS }, (_, i) => `f${i + 1}`)), 0, 'all free rewards claimed');
+});
+
+test('Crystals buy levels: each fills the rest of the current level, the price is flat, and a new pass starts without the bonus', () => {
+  const state = fresh();
+  act(state, { type: 'tick' });
+  play(state, { serves: 10 });                                // 20 points, level 0
+  state.crystals = PASS_LEVEL_PRICE * 3;
+  assert.throws(() => act(state, { type: 'buyPassLevels', count: 0 }), /Choose how many/);
+  act(state, { type: 'buyPassLevels', count: 1 });
+  assert.equal(passLevelOf(state), 1);
+  assert.equal(passPoints(state), PASS_LEVEL_POINTS, 'it lands exactly on the level');
+  assert.equal(state.crystals, PASS_LEVEL_PRICE * 2);
+  assert.throws(() => act(state, { type: 'buyPassLevels', count: 3 }), /crystals/, 'not enough for three');
+  assert.equal(state.crystals, PASS_LEVEL_PRICE * 2, 'a refused purchase costs nothing');
+  play(state, { serves: 5 });                                 // earned points stack on top
+  assert.equal(passPoints(state), PASS_LEVEL_POINTS + 10);
+  act(state, { type: 'claimPass', track: 'free', level: 1 });
+  state.crystals = 100000;
+  act(state, { type: 'buyPassLevels', count: PASS_LEVELS });  // more than are left: only the missing levels are bought
+  assert.equal(passLevelOf(state), PASS_LEVELS);
+  assert.equal(state.crystals, 100000 - (PASS_LEVELS - 1) * PASS_LEVEL_PRICE);
+  assert.throws(() => act(state, { type: 'buyPassLevels', count: 1 }), /last level/);
+  act(state, { type: 'tick' }, T0 + PASS_MS);
+  assert.equal(state.pass.bonus, 0);
+});
+
+test('The pass screen lists exactly the things that give points', () => {
+  assert.deepEqual(PASS_SOURCES.map((item) => item.stat).sort(), Object.keys(PASS_POINTS).sort());
 });

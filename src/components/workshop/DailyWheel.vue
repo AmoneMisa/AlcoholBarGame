@@ -28,8 +28,16 @@ const point = (degrees: number, radius: number) => {
   const radians = degrees * Math.PI / 180;
   return `${(radius * Math.sin(radians)).toFixed(2)} ${(-radius * Math.cos(radians)).toFixed(2)}`;
 };
+// The picture on each segment: WebP art from public/assets/workshop (the emoji stays underneath if a file is missing).
+const ART: Record<string, string> = {
+  'crystals-5': 'resources/crystals', 'crystals-15': 'resources/crystals', 'crystals-40': 'resources/crystals', coins: 'resources/coins', xp: 'resources/xp',
+  'style-shard': 'shards/style', 'style-shards-5': 'shards/style', parts: 'shards/parts', 'circle-shard': 'shards/circle', 'skin-shards': 'shards/skin',
+  'bronze-box': 'boxes/bronze', booster: 'items/xp-boost'
+};
+const artUrl = (id: string) => ART[id] ? `${import.meta.env.BASE_URL}assets/workshop/${ART[id]}.webp` : '';
 const slices = WHEEL.map((segment, index) => ({
   ...segment,
+  art: artUrl(segment.id),
   path: `M0 0 L${point(index * SEGMENT, 96)} A96 96 0 0 1 ${point((index + 1) * SEGMENT, 96)} Z`,
   turn: index * SEGMENT + SEGMENT / 2
 }));
@@ -85,6 +93,7 @@ onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); });
           <path :d="slice.path" :fill="slice.color" stroke="#0c1421" stroke-width="1" />
           <g :transform="`rotate(${slice.turn})`">
             <text y="-70" text-anchor="middle" font-size="13">{{ slice.icon }}</text>
+            <image v-if="slice.art" :href="slice.art" x="-8.5" y="-80" width="17" height="17" />
             <text y="-57" text-anchor="middle" font-size="5.2" fill="#fff" font-weight="700">{{ slice.label }}</text>
           </g>
         </g>

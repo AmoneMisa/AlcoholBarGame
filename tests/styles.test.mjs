@@ -119,27 +119,42 @@ test('The new reward kinds are applied: XP, bar prestiges and shards', () => {
   grantReward(state, { kind: 'stylePieces', amount: 25 }, () => .5);
   assert.equal(state.xp, xp + 250);
   assert.equal(state.popularity, 1);
-  assert.equal(state.loot.stylePieces, 25);
+  const piles = Object.entries(state.loot.styleShards);
+  assert.equal(piles.length, 1, 'a drop is one pile for one style');
+  assert.equal(piles[0][1], 25);
+  assert.ok(shardStyles().some((item) => item.id === piles[0][0]) && !state.ownedCosmeticIds.includes(piles[0][0]), 'for a craftable style the player does not own');
 });
 
 test('50 style shards craft one full box style; fewer do not, and other styles cannot be crafted', () => {
   const state = fresh();
   const target = boxStyles()[0].id;
-  state.loot.stylePieces = STYLE_PIECES_TO_CRAFT - 1;
-  assert.throws(() => applyAction(state, { type: 'craftStyle', cosmeticId: target }, context()), /style shards/);
-  state.loot.stylePieces = STYLE_PIECES_TO_CRAFT + 3;
+  const other = boxStyles()[1].id;
+  state.loot.styleShards[target] = STYLE_PIECES_TO_CRAFT - 1;
+  assert.throws(() => applyAction(state, { type: 'craftStyle', cosmeticId: target }, context()), /shards/);
+  state.loot.styleShards = { [other]: STYLE_PIECES_TO_CRAFT + 9 };
+  assert.throws(() => applyAction(state, { type: 'craftStyle', cosmeticId: target }, context()), /shards/, 'shards of another style do not count');
+  state.loot.styleShards[target] = STYLE_PIECES_TO_CRAFT + 3;
   applyAction(state, { type: 'craftStyle', cosmeticId: target }, context());
-  assert.equal(state.loot.stylePieces, 3);
+  assert.equal(state.loot.styleShards[target], 3);
   assert.ok(state.ownedCosmeticIds.includes(target));
   assert.throws(() => applyAction(state, { type: 'craftStyle', cosmeticId: target }, context()), /already own/);
-  state.loot.stylePieces = STYLE_PIECES_TO_CRAFT;
+  state.loot.styleShards[id('noa', 'reference-sakura')] = STYLE_PIECES_TO_CRAFT;
   applyAction(state, { type: 'craftStyle', cosmeticId: id('noa', 'reference-sakura') }, context());   // an ordinary background's style
   assert.ok(state.ownedInteriorIds.includes('izakaya'), 'its background comes with it');
   assert.ok(shardStyles().every((item) => item.id !== id('noa', 'reference-flame')), 'event styles stay box-only');
-  state.loot.stylePieces = 200;
   for (const cosmeticId of [id('noa', 'reference-flame'), id('noa', 'reference-biker'), id('noa', 'reference-gothic'), id('noa', 'reference-streetwear')]) {
     assert.throws(() => applyAction(state, { type: 'craftStyle', cosmeticId }, context()), /cannot be crafted/, cosmeticId);
   }
+});
+
+test('An old shared pool of style shards is split into piles for single styles when the save loads', () => {
+  const state = fresh();
+  state.loot.stylePieces = 23;
+  const loaded = normalizePlayerState(JSON.parse(JSON.stringify(state)));
+  assert.equal(loaded.loot.stylePieces, 0);
+  const total = Object.values(loaded.loot.styleShards).reduce((sum, n) => sum + n, 0);
+  assert.equal(total, 23, 'nothing is lost');
+  assert.ok(Object.keys(loaded.loot.styleShards).every((key) => shardStyles().some((item) => item.id === key)));
 });
 
 test('Painted styles are not in the style draw, the roulette or skin-shard crafting', () => {

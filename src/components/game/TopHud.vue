@@ -80,7 +80,7 @@ onUnmounted(() => {
           </article>
         </PopoverPanel>
       </div>
-      <button class="daily-hud-gift events-hud" :class="{ ready: game.dailyGiftAvailable }" type="button" aria-label="Events and login streak" @click="$emit('goto', 'events')"><UiIcon name="gift" /><span><small>EVENTS</small><b>{{ game.dailyGiftAvailable ? 'Claim' : game.economy.event || game.barEvent ? 'Live' : `Day ${game.loginStreak}` }}</b></span></button>
+      <button class="daily-hud-gift events-hud" :class="{ ready: game.dailyGiftAvailable || game.passReady + game.rouletteSpinsLeft > 0 }" type="button" aria-label="Events, season pass and daily wheel" @click="$emit('goto', 'events')"><UiIcon name="gift" /><span><small>EVENTS</small><b>{{ game.dailyGiftAvailable || game.passReady + game.rouletteSpinsLeft > 0 ? 'Claim' : game.economy.event || game.barEvent ? 'Live' : `Day ${game.loginStreak}` }}</b></span></button>
     </div>
     <div class="shift-card"><small>LIVE SERVICE</small><b>{{ game.hasCustomer ? game.orderCountdown : game.nextCustomerCountdown }}</b><span>{{ game.hasCustomer ? 'Order time' : 'Next arrival' }}</span></div>
   </header>

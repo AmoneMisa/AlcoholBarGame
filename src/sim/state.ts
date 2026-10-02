@@ -13,6 +13,7 @@ import { buildProfile, shortWish, type CustomerReply, type Fact } from '../domai
 import type { BottleConversationFacts } from '../domain/conversation/bottleTalk';
 import { ensureSocial, rollSocial } from '../domain/social/generate';
 import { createLoot, normalizeLoot, type LootState } from '../domain/lootState';
+import { migrateStylePool } from './loot';
 
 // The complete, serializable game state of one player. The server owns it; the client only displays it
 // (and, in offline practice mode, simulates it locally with the same rules).
@@ -211,7 +212,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     ownedCosmeticIds: [],
     cosmeticCopies: {},
     roulette: { day: '', spins: 0 },
-    pass: { id: '', epoch: 0, base: {}, premium: false, claimed: [] },
+    pass: { bonus: 0, id: '', epoch: 0, base: {}, premium: false, claimed: [] },
     cosmeticGiftLog: [],
     knownRecipeIds,
     recipeUnlockSources: Object.fromEntries(knownRecipeIds.map((id) => [id, 'starter'])),
@@ -275,6 +276,7 @@ export function normalizePlayerState(state: PlayerState) {
     ? state.tradeLog.filter((entry) => entry !== 'Each city bar now keeps its own stock.').slice(0, 40)
     : [];
   state.loot = normalizeLoot(state.loot, levelFor(state.xp));
+  if (state.loot.stylePieces > 0) migrateStylePool(state);
   state.popularity = Number.isFinite(state.popularity) ? Math.max(0, Math.floor(state.popularity)) : 0;
   if (state.popularityBoost?.kind === 'no-cooldown') {
     if (!Number.isFinite(state.popularityBoost.until)) state.popularityBoost = undefined;
@@ -323,6 +325,7 @@ export function normalizePlayerState(state: PlayerState) {
   state.cosmeticCopies = state.cosmeticCopies && typeof state.cosmeticCopies === 'object' ? state.cosmeticCopies : {};
   const season = (state.pass ?? {}) as Partial<import('../domain/pass').PassState>;
   state.pass = {
+    bonus: Number.isFinite(season.bonus) ? Math.max(0, Math.min(100_000, Math.floor(Number(season.bonus)))) : 0,
     id: typeof season.id === 'string' ? season.id.slice(0, 24) : '',
     epoch: Number.isFinite(season.epoch) && Number(season.epoch) > 0 ? Math.floor(Number(season.epoch)) : 0,
     base: Object.fromEntries(Object.entries(season.base && typeof season.base === 'object' ? season.base : {}).filter(([key, value]) => key.length < 32 && Number.isFinite(value) && Number(value) >= 0).map(([key, value]) => [key, Math.floor(Number(value))])),

@@ -9,6 +9,7 @@ import { weekOf } from '../src/domain/quests.ts';
 import { BOX_ONLY_GAME_IDS } from '../src/data/cosmetics/bars.ts';
 import { INTERIOR_STYLE } from '../src/data/cosmetics/styleSources.ts';
 import { COSMETICS } from '../src/domain/cosmetics.ts';
+import { shardStyles } from '../src/sim/loot.ts';
 
 const identity = (id) => ({ kind: 'dev', key: `dev:${id}`, telegramId: null, name: `Player ${id}`, username: null });
 let counter = 0;
@@ -74,19 +75,20 @@ test('Box-only items given to a friend during a visit leave the sender and arriv
   const mine = repository.states.get(sa.player.id).state;
   mine.ownedInteriorIds.push(game);
   mine.ownedCosmeticIds.push(styleId);
-  mine.loot.stylePieces = 30;
-  assert.equal((await service.sendGift(ana, sb.player.friendCode, { kind: 'style-shards', amount: 5 })).status, 403, 'no gift without a visit');
+  const pile = shardStyles()[0].id;
+  mine.loot.styleShards[pile] = 30;
+  assert.equal((await service.sendGift(ana, sb.player.friendCode, { kind: 'style-shards', cosmeticId: pile, amount: 5 })).status, 403, 'no gift without a visit');
   await service.visitFriend(ana, sb.player.friendCode);
-  const shards = await service.sendGift(ana, sb.player.friendCode, { kind: 'style-shards', amount: 25 });
+  const shards = await service.sendGift(ana, sb.player.friendCode, { kind: 'style-shards', cosmeticId: pile, amount: 25 });
   assert.equal(shards.status, 200);
-  assert.equal(shards.body.state.loot.stylePieces, 5, 'the sender lost them');
-  assert.equal((await service.sendGift(ana, sb.player.friendCode, { kind: 'style-shards', amount: 25 })).status, 409, 'and cannot give what is gone');
+  assert.equal(shards.body.state.loot.styleShards[pile], 5, 'the sender lost them');
+  assert.equal((await service.sendGift(ana, sb.player.friendCode, { kind: 'style-shards', cosmeticId: pile, amount: 25 })).status, 409, 'and cannot give what is gone');
   const place = await service.sendGift(ana, sb.player.friendCode, { kind: 'interior-transfer', interiorId: game });
   assert.equal(place.status, 200);
   assert.ok(!place.body.state.ownedInteriorIds.includes(game) && !place.body.state.ownedCosmeticIds.includes(styleId), 'the sender lost the pair');
   const claimed = await service.claimGifts(ben);
   assert.equal(claimed.body.received.length, 2);
-  assert.equal(claimed.body.state.loot.stylePieces, 25);
+  assert.equal(claimed.body.state.loot.styleShards[pile], 25);
   assert.ok(claimed.body.state.ownedInteriorIds.includes(game) && claimed.body.state.ownedCosmeticIds.includes(styleId), 'the friend got both');
 });
 

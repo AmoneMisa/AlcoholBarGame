@@ -21,6 +21,7 @@ import DailyRewardPopup from './components/ui/DailyRewardPopup.vue';
 import { useGameStore } from './stores/game';
 import { useNotificationsStore } from './stores/notifications';
 import { calendarDate } from './domain/economy';
+import { ACHIEVEMENTS, questsForWeek, weekOf } from './domain/quests';
 import { initMusic, musicOn, playSfx, refreshMusic, setMusicInterior } from './audio/index';
 
 // Only the bar scene is needed for the first paint; every other screen is fetched when the player opens it.
@@ -50,13 +51,15 @@ const nav = [
 const SECTIONS: Record<string, { id: string; label: string }[]> = {
   english: [{ id: 'learn', label: 'Learn' }, { id: 'recipes', label: 'Recipes' }, { id: 'advisor', label: 'Pairings' }],
   manage: [{ id: 'market', label: 'Market' }, { id: 'inventory', label: 'Inventory' }, { id: 'workshop', label: 'Workshop' }],
+  events: [{ id: 'today', label: 'Today' }, { id: 'pass', label: 'Season pass' }, { id: 'wheel', label: 'Daily wheel' }, { id: 'quests', label: 'Quests' }],
   bar: [{ id: 'regions', label: 'Bars' }, { id: 'design', label: 'Design' }],
   character: [{ id: 'profile', label: 'Profile' }, { id: 'look', label: 'Look' }]
 };
-const sub = reactive<Record<string, string>>({ english: 'learn', manage: 'market', bar: 'regions', character: 'profile' });
+const sub = reactive<Record<string, string>>({ events: 'today', english: 'learn', manage: 'market', bar: 'regions', character: 'profile' });
 // Older names (the tour, the training lessons and the header use them) lead to the right tab.
 const LEGACY: Record<string, [string, string]> = {
   inventory: ['manage', 'inventory'], market: ['manage', 'market'], workshop: ['manage', 'workshop'],
+  pass: ['events', 'pass'], wheel: ['events', 'wheel'], quests: ['events', 'quests'],
   recipes: ['english', 'recipes'], advisor: ['english', 'advisor'], regions: ['bar', 'regions'], design: ['bar', 'design'], profile: ['character', 'profile']
 };
 // Which part of the big management screen shows in each tab.
@@ -65,7 +68,17 @@ const DECK: Record<string, Record<string, string>> = {
 };
 const deckView = computed(() => DECK[view.value]?.[sub[view.value] ?? ''] ?? '');
 const designSection = computed(() => (view.value === 'bar' ? 'bar' : view.value === 'character' ? 'character' : undefined));
-const sectionTabs = computed(() => (SECTIONS[view.value] ?? []).map((tab) => ({ ...tab, badge: view.value === 'manage' && tab.id === 'workshop' && game.rouletteSpinsLeft + game.passReady > 0 ? game.rouletteSpinsLeft + game.passReady : undefined })));
+// What is waiting on the Events tabs: the pass rewards to claim, the wheel spins left, the quests ready to claim.
+const questsReady = computed(() => {
+  const week = weekOf(Date.now());
+  const current = game.loot.quests.week === week;
+  const quests = questsForWeek(week).filter((quest) => current && !game.loot.quests.claimed.includes(quest.id) && (game.loot.quests.progress[quest.stat] ?? 0) >= quest.target).length;
+  const goals = ACHIEVEMENTS.filter((item) => !game.loot.achievements.includes(item.id) && game.achievementStat(item.stat) >= item.target
+    && ACHIEVEMENTS.filter((other) => other.series === item.series && other.target < item.target).every((other) => game.loot.achievements.includes(other.id))).length;
+  return quests + goals;
+});
+const eventBadge = (id: string) => view.value !== 'events' ? undefined : (id === 'pass' ? game.passReady : id === 'wheel' ? game.rouletteSpinsLeft : id === 'quests' ? questsReady.value : id === 'today' && game.dailyGiftAvailable ? 1 : 0) || undefined;
+const sectionTabs = computed(() => (SECTIONS[view.value] ?? []).map((tab) => ({ ...tab, badge: eventBadge(tab.id) })));
 
 // Music follows the bar's interior; taps on buttons get a soft click.
 watch(() => game.decor.interior, (id) => setMusicInterior(id), { immediate: true });
@@ -162,7 +175,7 @@ const badges = computed<Record<string, number>>(() => ({
   // A number on a tab means something is waiting for the player to act, not just that something is going on.
   service: game.deliveryIssues.filter((issue) => issue.status === 'open').length,
   english: game.dailyLessonsComplete ? 0 : 1,
-  manage: game.rouletteSpinsLeft + game.passReady > 0 ? 1 : 0,
+  manage: 0,
   friends: game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'incoming').length
 }));
 
@@ -188,7 +201,7 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
       <LearningPage v-if="view === 'english' && sub.english === 'learn'" />
       <section v-if="view === 'circle'" class="circle-page game-panel"><CompanionsPanel /></section>
       <FriendsPage v-if="view === 'friends'" />
-      <EventsPage v-if="view === 'events'" />
+      <EventsPage v-if="view === 'events'" :section="sub.events ?? 'today'" />
       <WorkshopPage v-if="view === 'manage' && sub.manage === 'workshop'" />
       <ProfilePage v-if="view === 'character' && sub.character === 'profile'" />
       <SettingsPage v-if="view === 'settings'" @goto="selectView" />
