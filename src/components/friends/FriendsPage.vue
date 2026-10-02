@@ -6,7 +6,7 @@ import { computed, nextTick, onMounted, ref } from 'vue';
 import { RECIPES } from '../../domain/catalog';
 import { INTERIORS } from '../../data/cosmetics/bars';
 import { CONSUMABLES } from '../../domain/loot';
-import { SHARD_GIFT_AMOUNTS } from '../../sim/gifts';
+import { SHARD_GIFT_AMOUNTS, STYLE_SHARD_GIFT_AMOUNTS } from '../../sim/gifts';
 import { useGameStore } from '../../stores/game';
 import CharacterModel from '../characters/CharacterModel.vue';
 import ProfileCard from '../profile/ProfileCard.vue';
@@ -27,6 +27,7 @@ const recipeCards = computed(() => RECIPES.map((recipe) => ({ recipe, quantity: 
 const styleItems = computed(() => game.cosmetics.map((cosmetic) => ({ cosmetic, quantity: game.cosmeticCopies[cosmetic.id] ?? 0 })).filter((item) => item.quantity > 0));
 const itemGifts = computed(() => CONSUMABLES.map((item) => ({ id: item.id, name: item.name, quantity: game.loot.consumables[item.id] ?? 0 })).filter((item) => item.quantity > 0));
 const shardGifts = SHARD_GIFT_AMOUNTS;
+const styleShardGifts = STYLE_SHARD_GIFT_AMOUNTS;
 const visit = computed(() => game.visitedFriend);
 const visitBar = computed(() => visit.value?.bar as Record<string, string> | undefined);
 const visitBackground = computed(() => INTERIORS.find((item) => item.id === visitBar.value?.interior)?.asset ?? INTERIORS[0]!.asset);
@@ -149,11 +150,14 @@ onMounted(() => { void game.loadFriends(); });
       </ul>
       <p v-if="visit.mastered.length" class="mastered">Mastered: {{ visit.mastered.map((item) => `${item.name} (lv ${item.level})`).join(' · ') }}</p>
       <div ref="giftsPanel" class="gifts">
-        <header><UiIcon name="gift" /><div><small>GIFT FROM YOUR INVENTORY</small><p>Only spare copies can be given away — you keep everything else. Workshop items: up to 5 gifts a day.</p></div></header>
+        <header><UiIcon name="gift" /><div><small>GIFT FROM YOUR INVENTORY</small><p>Spare copies can be given away, and so can things that only come from boxes (style shards, whole styles, event backgrounds): they leave you and go to your friend, and only if you have them and are not using them. Workshop gifts: up to 5 a day.</p></div></header>
         <article v-for="item in recipeCards" :key="item.recipe.id"><span><b>{{ item.recipe.name }}</b><small>Recipe card · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'recipe-copy', recipeId: item.recipe.id })">Give</UiButton></article>
         <article v-for="item in styleItems" :key="item.cosmetic.id"><span><b>{{ item.cosmetic.label }}</b><small>Style · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'cosmetic-copy', cosmeticId: item.cosmetic.id })">Give</UiButton></article>
         <article v-for="item in itemGifts" :key="item.id"><span><b>{{ item.name }}</b><small>Workshop item · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'consumable', id: item.id })">Give</UiButton></article>
         <article v-for="amount in shardGifts" :key="amount"><span><b>{{ amount }} skin shards</b><small>You have {{ game.loot.skinShards }}</small></span><UiButton variant="solid" size="sm" :disabled="game.loot.skinShards < amount" @click="gift({ kind: 'skin-shards', amount })">Give</UiButton></article>
+        <article v-for="amount in styleShardGifts" :key="`style-${amount}`"><span><b>{{ amount }} style shards</b><small>You give them away and lose them · you have {{ game.loot.stylePieces }}</small></span><UiButton variant="solid" size="sm" :disabled="game.loot.stylePieces < amount" @click="gift({ kind: 'style-shards', amount })">Give</UiButton></article>
+        <article v-for="item in game.giftableStyleItems" :key="item.id"><span><b>{{ item.label }}</b><small>Whole style · you lose it · not worn in any bar</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'style-transfer', cosmeticId: item.id })">Give</UiButton></article>
+        <article v-for="item in game.giftableBackgrounds" :key="item.id"><span><b>{{ item.name }}</b><small>Background with its style · you lose both · not used by any bar</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'interior-transfer', interiorId: item.id })">Give</UiButton></article>
         <p v-if="!recipeCards.length && !styleItems.length && !itemGifts.length" class="empty">You have no spare cards or styles yet. Duplicates from VIP guests, lessons and the daily style draw show up here.</p>
       </div>
     </section>
