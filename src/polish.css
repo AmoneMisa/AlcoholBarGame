@@ -313,3 +313,8 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 /* The Rules button sits in the scene's top-left corner (it used to cover the first guest's card). */
 .bar-scene > .house-rules-button { top: 10px; bottom: auto; left: 12px; }
 .bar-scene > .house-rules-panel { top: 56px; bottom: auto; left: 12px; }
+
+/* "Hide shelves" hides the whole shelf: the frosted band behind the bottles and the plank line under them as well. */
+.bar-scene.full-view.fv-no-shelves .pshelf-row::before,
+.bar-scene.full-view.fv-no-shelves .pshelf-row::after { display: none !important; }
+.bar-scene.full-view.fv-no-shelves .pshelf-row { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: transparent !important; box-shadow: none !important; }
