@@ -2,11 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { COSMETICS } from '../src/domain/cosmetics.ts';
 import {
-  PASS_DAYS, PASS_EPOCH, PASS_LEVELS, PASS_LEVEL_POINTS, PASS_MS, PASS_PREMIUM_PRICE, PASS_THEMES, passEndsAt, passId, passLevel, passPointsFor, passRewards, passStartsAt, passThemeAt, themeStyleIds
+  PASS_DAYS, PASS_EPOCH, PASS_LEVELS, PASS_STYLES_LEVEL, PASS_LEVEL_POINTS, PASS_MS, PASS_PREMIUM_PRICE, PASS_THEMES, passEndsAt, passId, passLevel, passPointsFor, passRewards, passStartsAt, passThemeAt, themeStyleIds
 } from '../src/domain/pass.ts';
 import { INTERIORS } from '../src/data/cosmetics/bars.ts';
 import { applyAction } from '../src/sim/rules.ts';
 import { passLevelOf, passPoints } from '../src/sim/pass.ts';
+import { capacityOf, grantReward } from '../src/sim/loot.ts';
 import { createInitialState, normalizePlayerState } from '../src/sim/state.ts';
 
 const T0 = PASS_EPOCH + 3 * 24 * 3600 * 1000;       // three days into the first pass
@@ -27,15 +28,18 @@ test('The pass runs in fixed two-week cycles, rotating through the seasons', () 
   assert.equal(passThemeAt(PASS_EPOCH + PASS_THEMES.length * PASS_MS).id, PASS_THEMES[0].id, 'then it starts again');
 });
 
-test('Every season ends with its background and a costume for each bartender, all of which exist', () => {
+test('Every season gives a costume for each bartender at level 14 and its background at level 20, all of which exist', () => {
   for (const theme of PASS_THEMES) {
     assert.ok(INTERIORS.some((item) => item.id === theme.interior), theme.id);
     for (const id of themeStyleIds(theme)) assert.ok(COSMETICS.some((item) => item.id === id), id);
     const rows = passRewards(theme);
     assert.equal(rows.length, PASS_LEVELS);
+    const styles = rows[PASS_STYLES_LEVEL - 1];
     const last = rows.at(-1);
-    assert.ok(last.free.some((reward) => reward.kind === 'interior' && reward.id === theme.interior), 'the background is the grand prize');
-    assert.ok(last.free.some((reward) => reward.kind === 'cosmetics' && reward.ids.length === 2), 'and the two costumes');
+    assert.equal(PASS_STYLES_LEVEL, 14);
+    assert.ok(styles.free.some((reward) => reward.kind === 'cosmetics' && reward.ids.length === 2), 'the two costumes come at level 14');
+    assert.ok(last.free.some((reward) => reward.kind === 'interior' && reward.id === theme.interior), 'the background comes at level 20');
+    assert.ok(!last.free.some((reward) => reward.kind === 'cosmetics') && !styles.free.some((reward) => reward.kind === 'interior'), 'each prize on its own level');
     assert.ok(rows.every((row) => row.free.length >= 1 && row.premium.length >= 1), 'every level has a free and a premium reward');
   }
 });
@@ -72,22 +76,27 @@ test('Claiming: the level must be reached, each reward once, the premium track o
   act(state, { type: 'buyPassPremium' });
   assert.equal(state.crystals, 5);
   assert.throws(() => act(state, { type: 'buyPassPremium' }), /already have/);
-  const boxes = Object.values(state.loot.boxes).reduce((sum, count) => sum + count, 0);
-  act(state, { type: 'claimPass', track: 'premium', level: 1 });      // a bronze box
-  assert.equal(Object.values(state.loot.boxes).reduce((sum, count) => sum + count, 0), boxes + 1);
+  const stock = () => state.inventories[state.regionId].reduce((sum, item) => sum + item.amount, 0);
+  const before = stock();
+  act(state, { type: 'claimPass', track: 'premium', level: 1 });      // a small pack of supplies
+  assert.ok(stock() > before, 'the supplies reached the storeroom');
 });
 
-test('The last level gives the background and both costumes; costumes already owned turn into shards', () => {
+test('Level 14 gives both costumes and level 20 the background; costumes already owned turn into shards', () => {
   const state = fresh();
   act(state, { type: 'tick' });
   play(state, { serves: 1000 });
   const theme = passThemeAt(T0);
-  for (let level = 1; level < PASS_LEVELS; level++) act(state, { type: 'claimPass', track: 'free', level });
+  for (let level = 1; level < PASS_STYLES_LEVEL; level++) act(state, { type: 'claimPass', track: 'free', level });
+  assert.ok(!state.ownedInteriorIds.includes(theme.interior), 'no background before level 20');
+  act(state, { type: 'claimPass', track: 'free', level: PASS_STYLES_LEVEL });
+  assert.match(state.message, /costumes/);
+  for (const id of themeStyleIds(theme)) assert.ok(state.ownedCosmeticIds.includes(id), id);
+  for (let level = PASS_STYLES_LEVEL + 1; level < PASS_LEVELS; level++) act(state, { type: 'claimPass', track: 'free', level });
+  assert.ok(!state.ownedInteriorIds.includes(theme.interior), 'the background waits for level 20');
   act(state, { type: 'claimPass', track: 'free', level: PASS_LEVELS });
   assert.ok(state.ownedInteriorIds.includes(theme.interior), 'the background');
-  for (const id of themeStyleIds(theme)) assert.ok(state.ownedCosmeticIds.includes(id), id);
   assert.match(state.message, /background/);
-  assert.match(state.message, /costumes/);
   // Someone who already owns a costume gets shards for it instead of nothing.
   const owner = fresh();
   act(owner, { type: 'tick' });
@@ -125,12 +134,32 @@ test('A damaged pass in a save is cleaned up', () => {
   assert.deepEqual(state.pass.claimed.sort(), ['f1', 'p20']);
 });
 
-test('The premium price is fair: the premium track pays back part of it in crystals, the rest is boxes, shards and the Circle', () => {
+test('The premium track is for the bar: supplies, coins, boosters and prestige, with no crystals to pay the price back', () => {
   const rows = passRewards(PASS_THEMES[0]);
-  const crystals = rows.flatMap((row) => row.premium).filter((reward) => reward.kind === 'crystals').reduce((sum, reward) => sum + reward.amount, 0);
+  const premium = rows.flatMap((row) => row.premium);
+  assert.deepEqual([...new Set(premium.map((reward) => reward.kind))].sort(), ['coins', 'consumable', 'prestige', 'supplies']);
+  assert.ok(rows.every((row) => row.premium.length >= 1));
+  const total = (kind) => premium.filter((reward) => reward.kind === kind).reduce((sum, reward) => sum + (reward.amount ?? 1), 0);
+  assert.equal(total('prestige'), 10, 'ten prestige over the pass');
+  assert.ok(total('coins') >= 3000 && total('supplies') >= 6 && total('consumable') >= 10);
   const free = rows.flatMap((row) => row.free).filter((reward) => reward.kind === 'crystals').reduce((sum, reward) => sum + reward.amount, 0);
-  assert.ok(crystals >= 100 && crystals < PASS_PREMIUM_PRICE * .5, `premium crystals ${crystals} for a price of ${PASS_PREMIUM_PRICE}`);
   assert.ok(free >= 80 && free <= 160, `free crystals ${free}`);
+  assert.ok(PASS_PREMIUM_PRICE >= 400, 'the premium track is not cheap');
+});
+
+test('Supplies fill the storeroom with what the known recipes use, and never past what it holds', () => {
+  const state = fresh();
+  const shelf = () => state.inventories[state.regionId];
+  const used = new Set(['white-rum', 'lime-juice', 'mint', 'sugar-syrup', 'soda', 'ice', 'lime-wedge']);
+  for (const item of shelf()) item.amount = 0;
+  grantReward(state, { kind: 'supplies', size: 'small' }, () => .5);
+  const after = Object.fromEntries(shelf().map((item) => [item.ingredientId, item.amount]));
+  for (const id of used) assert.ok(after[id] > 0, `${id} was stocked`);
+  assert.equal(after['dark-rum'], 0, 'nothing for a recipe the player does not know');
+  grantReward(state, { kind: 'supplies', size: 'large' }, () => .5);
+  for (let i = 0; i < 40; i++) grantReward(state, { kind: 'supplies', size: 'large' }, () => .5);
+  for (const item of shelf()) assert.ok(item.amount <= capacityOf(state, state.regionId, item.ingredientId), `${item.ingredientId} stays within the storeroom`);
+  assert.match(grantReward(state, { kind: 'supplies', size: 'large' }, () => .5), /already full/);
 });
 
 // What a free player earns in the 14 days of a pass, by the days they play: the daily reward (with its streak), the

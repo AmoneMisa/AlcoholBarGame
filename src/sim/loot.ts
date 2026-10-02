@@ -93,6 +93,20 @@ export function grantReward(state: PlayerState, reward: Reward, random: () => nu
     case 'box': grantBox(state, reward.box); break;
     case 'companionShards': return addCompanionShards(state, reward.amount, random);
     case 'prestige': state.popularity += reward.amount; break;
+    case 'supplies': {
+      // Stock for the recipes this player knows (liquids in ml, fresh things in pieces), only as much as fits.
+      const per = { small: { ml: 150, piece: 6 }, medium: { ml: 300, piece: 12 }, large: { ml: 600, piece: 24 } }[reward.size];
+      const shelf = state.inventories[state.regionId];
+      let lines = 0;
+      for (const id of usableIngredientIds(state.knownRecipeIds)) {
+        const ingredient = INGREDIENTS.find((item) => item.id === id);
+        const entry = shelf.find((item) => item.ingredientId === id);
+        if (!ingredient || !entry) continue;
+        const add = Math.min(ingredient.unit === 'ml' ? per.ml : per.piece, roomFor(state, state.regionId, id));
+        if (add > 0) { entry.amount += add; lines++; }
+      }
+      return lines ? `a ${reward.size} pack of supplies for ${state.bars[state.regionId].name} (${lines} ingredients)` : 'a pack of supplies (your storeroom is already full)';
+    }
     case 'style': {
       const missing = boxStyles().filter((entry) => !state.ownedCosmeticIds.includes(entry.id));
       // Every box style owned: the drop turns into pieces instead of being wasted.

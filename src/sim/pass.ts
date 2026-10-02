@@ -43,7 +43,9 @@ export function claimPass(state: PlayerState, trackInput: unknown, levelInput: u
       if (linked) grantCosmetic(state, `bartender:${linked.value}:${linked.character}`);
     } else if (reward.kind === 'cosmetics') {
       for (const id of reward.ids) {
-        if (stylesBefore.includes(id)) { state.loot.skinShards += 10; parts.push('10 skin shards (you already had a costume)'); } else grantCosmetic(state, id);
+        // The costumes come at their own level, without the background that normally goes with a connected style: that
+        // arrives at level 20.
+        if (stylesBefore.includes(id)) { state.loot.skinShards += 10; parts.push('10 skin shards (you already had a costume)'); } else state.ownedCosmeticIds.push(id);
       }
     } else parts.push(grantReward(state, reward, random));
   }

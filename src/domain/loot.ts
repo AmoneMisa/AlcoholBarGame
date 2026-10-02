@@ -81,6 +81,7 @@ export type Reward =
   | { kind: 'box'; box: Exclude<BoxKind, 'choice'> }
   | { kind: 'companionShards'; amount: number }   // shards of one Circle person who has not joined yet
   | { kind: 'prestige'; amount: number }   // bar prestige (popularity)
+  | { kind: 'supplies'; size: 'small' | 'medium' | 'large' }   // stock of every ingredient the player's recipes use
   | { kind: 'style' }   // a whole painted style that only boxes give, picked at random from those you do not own
   | { kind: 'itemShards'; id: EquipmentId; amount: number }
   | { kind: 'consumable'; id: ConsumableId; amount: number }
@@ -199,6 +200,7 @@ export function describeReward(reward: Reward, names: { consumable: (id: string)
     case 'box': return `a ${reward.box} box`;
     case 'companionShards': return `${reward.amount} Circle shard${reward.amount === 1 ? '' : 's'}`;
     case 'prestige': return `${reward.amount} bar prestige`;
+    case 'supplies': return `a ${reward.size} pack of supplies`;
     case 'style': return 'a full bartender style'; 
     case 'itemShards': return `${reward.amount} ${names.equipment(reward.id)} shards`;
     case 'consumable': return `${reward.amount} × ${names.consumable(reward.id)}`;

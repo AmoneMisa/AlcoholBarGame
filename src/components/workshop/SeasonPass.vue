@@ -4,7 +4,7 @@ import { INTERIORS, interiorStyle, type InteriorId } from '../../data/cosmetics/
 import { COSMETICS } from '../../domain/cosmetics';
 import { formatCountdown } from '../../domain/customerTiming';
 import { CONSUMABLES, EQUIPMENT, describeReward } from '../../domain/loot';
-import { PASS_LEVELS, PASS_LEVEL_POINTS, PASS_PREMIUM_PRICE, passClaimKey, passRewards, themeStyleIds, type PassReward } from '../../domain/pass';
+import { PASS_LEVELS, PASS_LEVEL_POINTS, PASS_PREMIUM_PRICE, PASS_STYLES_LEVEL, passClaimKey, passRewards, themeStyleIds, type PassReward } from '../../domain/pass';
 import { useGameStore } from '../../stores/game';
 import CharacterModel from '../characters/CharacterModel.vue';
 import StylePreview from '../game/StylePreview.vue';
@@ -51,27 +51,29 @@ const previewOpen = ref(false);
       </div>
     </header>
 
-    <section class="pass-prize" aria-label="Grand prize">
+    <section class="pass-prize" aria-label="Season prizes">
       <div class="pass-scene" :style="interiorStyle(theme.interior as InteriorId)">
         <CharacterModel role="bartender" character-id="noa" :outfit="theme.noa" />
         <CharacterModel role="bartender" character-id="leo" :outfit="theme.leo" />
       </div>
       <div class="pass-prize-text">
-        <small>GRAND PRIZE · LEVEL {{ PASS_LEVELS }}</small>
-        <b>{{ interiorName }}</b>
+        <small>SEASON PRIZES</small>
+        <b>Level {{ PASS_STYLES_LEVEL }}: the costumes</b>
         <span>Noa: {{ label(styleIds[0]!) }}</span>
         <span>Leo: {{ label(styleIds[1]!) }}</span>
-        <UiButton size="sm" variant="secondary" @click="previewOpen = true">Preview the prize</UiButton>
+        <b>Level {{ PASS_LEVELS }}: the background</b>
+        <span>{{ interiorName }}</span>
+        <UiButton size="sm" variant="secondary" @click="previewOpen = true">Preview the prizes</UiButton>
       </div>
       <div class="pass-premium">
         <b>{{ game.passPremium ? 'Premium track unlocked' : 'Premium track' }}</b>
-        <small>Extra boxes, crystals, style shards and Circle shards on every level, plus a Gold box and 50 crystals at the end.</small>
+        <small>Supplies for your bar, coins, boosters and prestige on every level, with a big pack at the end.</small>
         <UiButton v-if="!game.passPremium" variant="primary" :disabled="game.crystals < PASS_PREMIUM_PRICE" @click="game.buyPassPremium()">Unlock · <CrystalAmount :value="PASS_PREMIUM_PRICE" /></UiButton>
       </div>
     </section>
 
     <ol class="pass-track" aria-label="Pass rewards">
-      <li v-for="row in rows" :key="row.level" :class="{ reached: level >= row.level, final: row.level === PASS_LEVELS }">
+      <li v-for="row in rows" :key="row.level" :class="{ reached: level >= row.level, final: row.level === PASS_LEVELS || row.level === PASS_STYLES_LEVEL }">
         <span class="pass-num">{{ row.level }}</span>
         <div class="pass-cell free">
           <small>Free</small>

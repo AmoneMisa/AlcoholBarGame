@@ -3,8 +3,8 @@ import type { StatId } from './quests';
 
 // The season pass: one pass every two weeks, twenty levels. Points come from normal play (serving, lessons, VIPs,
 // bottles, boxes …), counted from the day the pass starts, so there is nothing extra to do. Every level has a free
-// reward and a premium reward (the premium track is bought once per pass with crystals). The last level gives the
-// season's background and the costumes of both bartenders that go with it.
+// reward and a premium reward (the premium track is bought once per pass with crystals). Level 14 gives the season's
+// costumes (one for each bartender) and level 20 its background.
 export const PASS_DAYS = 14;
 export const PASS_MS = PASS_DAYS * 24 * 60 * 60 * 1000;
 // Passes run in fixed two-week cycles counted from a Monday, so every player sees the same pass at the same time.
@@ -69,26 +69,32 @@ const coins = (amount: number): Reward => ({ kind: 'coins', amount });
 const shards = (amount: number): Reward => ({ kind: 'stylePieces', amount });
 const circle = (amount: number): Reward => ({ kind: 'companionShards', amount });
 
-// Rewards per level. The last free level is the season's grand prize (filled in from the season's theme).
+// Rewards per level. The free track ends with the season's two prizes: the costumes of both bartenders at level 14 and
+// the background (with its connected style) at level 20. The premium track is for the bar itself: supplies, coins,
+// boosters and prestige.
+export const PASS_STYLES_LEVEL = 14;
 const FREE: Reward[] = [
   coins(200), { kind: 'parts', amount: 10 }, crystals(10), box('bronze'), shards(3), { kind: 'skinShards', amount: 8 }, crystals(15), box('silver'), circle(2), crystals(20),
   coins(400), shards(5), box('bronze'), { kind: 'xp', amount: 200 }, crystals(20), box('silver'), circle(3), shards(8), crystals(25)
 ];
-const PREMIUM: Reward[] = [
-  box('bronze'), crystals(10), shards(3), coins(300), box('silver'), crystals(15), circle(2), { kind: 'parts', amount: 20 }, crystals(15), box('gold'),
-  shards(5), crystals(20), box('silver'), { kind: 'skinShards', amount: 15 }, circle(3), crystals(25), box('silver'), crystals(25), shards(10), box('gold')
+const booster = (id: 'xp-boost' | 'coin-boost' | 'tip-boost' | 'happy-hour', amount = 1): Reward => ({ kind: 'consumable', id, amount });
+const supplies = (size: 'small' | 'medium' | 'large'): Reward => ({ kind: 'supplies', size });
+const prestige = (amount: number): Reward => ({ kind: 'prestige', amount });
+const PREMIUM: Reward[][] = [
+  [supplies('small')], [coins(300)], [booster('coin-boost')], [prestige(1)], [supplies('medium')],
+  [coins(400)], [booster('tip-boost')], [prestige(1)], [supplies('medium')], [coins(600), prestige(1)],
+  [booster('xp-boost', 2)], [supplies('large')], [coins(600)], [prestige(2)], [booster('coin-boost', 2)],
+  [supplies('large')], [coins(800)], [booster('happy-hour', 2)], [prestige(2)], [supplies('large'), coins(1000), prestige(3), booster('xp-boost', 3)]
 ];
 
 export interface PassLevelRewards { level: number; free: PassReward[]; premium: PassReward[] }
 export function passRewards(theme: PassTheme): PassLevelRewards[] {
   return Array.from({ length: PASS_LEVELS }, (_, index) => {
     const level = index + 1;
-    const final = level === PASS_LEVELS;
-    return {
-      level,
-      free: final ? [{ kind: 'interior', id: theme.interior }, { kind: 'cosmetics', ids: themeStyleIds(theme) }, crystals(30)] : [FREE[index]!],
-      premium: [PREMIUM[index]!, ...(final ? [crystals(50)] : [])]
-    };
+    const free: PassReward[] = level === PASS_STYLES_LEVEL ? [{ kind: 'cosmetics', ids: themeStyleIds(theme) }]
+      : level === PASS_LEVELS ? [{ kind: 'interior', id: theme.interior }, crystals(30)]
+      : [FREE[index]!];
+    return { level, free, premium: PREMIUM[index]! };
   });
 }
 
