@@ -27,12 +27,18 @@ const outfit = (character: 'noa' | 'leo', value: string) => `bartender:${value}:
 export const themeStyleIds = (theme: PassTheme) => [outfit('noa', theme.noa), outfit('leo', theme.leo)];
 
 // The pass rotates through these seasons. Every season is built on a game: its background plus a costume for Noa and
-// one for Leo from that game. Only some of the game themes are passes (the others stay in boxes and the shop).
+// one for Leo from that game. The order matters: the pass in progress must not change under the players, so the
+// season now running stays where it is (see the schedule test) and new ones are added after it.
 export const PASS_THEMES: readonly PassTheme[] = [
+  { id: 'nfs-underground', name: 'Need for Speed: Underground', tagline: 'The tuner bar: neon, nitrous and a long line at the garage door.', interior: 'nfs-underground', noa: 'theme-nfs-underground-noa', leo: 'theme-nfs-underground-leo' },
+  { id: 'lost-ark', name: 'Lost Ark', tagline: 'A beach club at the end of the world, sunset included.', interior: 'lost-ark', noa: 'theme-lost-ark-bard-noa', leo: 'theme-lost-ark-berserker-leo' },
   { id: 'lineage-2', name: 'Lineage II', tagline: 'The Aden tavern: elves, mages and a long night at the bar.', interior: 'lineage-2', noa: 'theme-l2-elf-noa', leo: 'theme-l2-elf-leo' },
   { id: 'warcraft-3', name: 'Warcraft III', tagline: 'The crossroads bar, where heroes of every side share a table.', interior: 'warcraft-3', noa: 'theme-wc3-sylvanas-noa', leo: 'theme-wc3-arthas-leo' },
   { id: 'mass-effect', name: 'Mass Effect', tagline: 'The Citadel lounge: a drink between missions.', interior: 'mass-effect', noa: 'theme-shepard-noa', leo: 'theme-shepard-leo' },
-  { id: 'lost-ark', name: 'Lost Ark', tagline: 'A beach club at the end of the world, sunset included.', interior: 'lost-ark', noa: 'theme-lost-ark-bard-noa', leo: 'theme-lost-ark-berserker-leo' }
+  { id: 'perfect-world', name: 'Perfect World', tagline: 'A celestial bar above the clouds, open to every race.', interior: 'perfect-world', noa: 'theme-pw-winged-elf-noa', leo: 'theme-pw-winged-elf-leo' },
+  { id: 'nfs-most-wanted', name: 'Need for Speed: Most Wanted', tagline: 'The garage bar: every regular has a story about the chase.', interior: 'nfs-most-wanted', noa: 'theme-mw-noa', leo: 'theme-mw-leo' },
+  { id: 'allods', name: 'Allods Online', tagline: 'The astral bar, floating between worlds.', interior: 'allods', noa: 'theme-allods-elf-noa', leo: 'theme-allods-elf-leo' },
+  { id: 'nfs-carbon', name: 'Need for Speed: Carbon', tagline: 'The night garage bar, canyon runs and cold drinks.', interior: 'nfs-carbon', noa: 'theme-carbon-noa', leo: 'theme-carbon-leo' }
 ];
 
 export const passCycle = (now: number) => Math.floor((now - PASS_EPOCH) / PASS_MS);
