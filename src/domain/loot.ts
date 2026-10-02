@@ -1,4 +1,6 @@
-// Pure tables for the loot layer: equipment, consumables, boxes, and the style draw.
+import { BOX_STYLE_CHANCE } from '../data/cosmetics/styleSources';
+
+// Pure tables for the loot layer: equipment, consumables, boxes, the style draw and prestige.
 // Nothing here touches state; sim/loot.ts applies these rules on the server.
 
 // ---- Bar equipment ----
@@ -74,6 +76,9 @@ export type Reward =
   | { kind: 'crystals'; amount: number }
   | { kind: 'parts'; amount: number }
   | { kind: 'skinShards'; amount: number }
+  | { kind: 'stylePieces'; amount: number }   // style shards
+  | { kind: 'xp'; amount: number }
+  | { kind: 'style' }   // a whole painted style that only boxes give, picked at random from those you do not own
   | { kind: 'itemShards'; id: EquipmentId; amount: number }
   | { kind: 'consumable'; id: ConsumableId; amount: number }
   | { kind: 'recipeCard' }
@@ -120,6 +125,43 @@ export const BOX_TABLES: Record<Exclude<BoxKind, 'choice'>, Entry[]> = {
   ]
 };
 
+// Extra drops, each given as its exact chance per box (the older entries share what is left). Style shards drip out
+// of every box: 1 shard is 22%, and bigger piles of 2, 5, 10 and 25 are rarer. Every box also has a 0.5% chance of a
+// whole style, and a small chance of XP, a prestige star, a coin jackpot, a double booster or a pile of upgrade items.
+type Chance = [percent: number, make: Entry['make']];
+const shardsOf = (amount: number): Entry['make'] => () => ({ kind: 'stylePieces', amount });
+const anyBooster = (amount: number): Entry['make'] => consumable(['xp-boost', 'coin-boost', 'tip-boost', 'happy-hour'], amount);
+const LOW_CHANCE: Record<Exclude<BoxKind, 'choice'>, Chance[]> = {
+  bronze: [
+    [22, shardsOf(1)], [6, shardsOf(2)], [1.5, shardsOf(5)], [.4, shardsOf(10)], [.1, shardsOf(25)],
+    [BOX_STYLE_CHANCE * 100, () => ({ kind: 'style' })],
+    [3, (_l, r) => ({ kind: 'xp', amount: between(r, 30, 60) })]
+  ],
+  silver: [
+    [22, shardsOf(1)], [8, shardsOf(2)], [3, shardsOf(5)], [1, shardsOf(10)], [.3, shardsOf(25)],
+    [BOX_STYLE_CHANCE * 100, () => ({ kind: 'style' })],
+    [4, (_l, r) => ({ kind: 'xp', amount: between(r, 100, 200) })],
+    [1.5, (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 400, 700) * (1 + l / 25)) })],
+    [3, anyBooster(2)],
+    [3, shards(10, 18)],
+  ],
+  gold: [
+    [22, shardsOf(1)], [12, shardsOf(2)], [6, shardsOf(5)], [2.5, shardsOf(10)], [.8, shardsOf(25)],
+    [BOX_STYLE_CHANCE * 100, () => ({ kind: 'style' })],
+    [5, (_l, r) => ({ kind: 'xp', amount: between(r, 300, 600) })],
+    [3, (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 800, 1500) * (1 + l / 25)) })],
+    [5, anyBooster(3)],
+    [5, shards(20, 30)],
+  ]
+};
+for (const kind of Object.keys(LOW_CHANCE) as (keyof typeof LOW_CHANCE)[]) {
+  const table = BOX_TABLES[kind];
+  const extra = LOW_CHANCE[kind];
+  const share = extra.reduce((sum, [percent]) => sum + percent, 0) / 100;
+  const total = table.reduce((sum, entry) => sum + entry.weight, 0) / (1 - share);
+  for (const [percent, make] of extra) table.push({ weight: total * percent / 100, make });
+}
+
 export function rollFromTable(entries: Entry[], level: number, random: () => number): Reward {
   const total = entries.reduce((sum, entry) => sum + entry.weight, 0);
   let roll = random() * total;
@@ -144,11 +186,14 @@ export function describeReward(reward: Reward, names: { consumable: (id: string)
     case 'crystals': return `${reward.amount} crystals`;
     case 'parts': return `${reward.amount} workshop parts`;
     case 'skinShards': return `${reward.amount} skin shards`;
+    case 'stylePieces': return `${reward.amount} style shard${reward.amount === 1 ? '' : 's'}`;
+    case 'xp': return `${reward.amount} XP`;
+    case 'style': return 'a full bartender style'; 
     case 'itemShards': return `${reward.amount} ${names.equipment(reward.id)} shards`;
     case 'consumable': return `${reward.amount} × ${names.consumable(reward.id)}`;
     case 'recipeCard': return 'a recipe card';
     case 'mysteryBottle': return 'a mystery bottle';
-    case 'eventInterior': return 'a special event background';
+    case 'eventInterior': return 'a special event background with its matching style';
   }
 }
 

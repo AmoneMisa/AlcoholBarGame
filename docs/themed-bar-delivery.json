@@ -1,0 +1,662 @@
+{
+  "tool": "built-in image_gen",
+  "expectedBackgroundCount": 13,
+  "expectedCostumeCount": 72,
+  "backgroundCount": 13,
+  "costumeCount": 72,
+  "assets": [
+    {
+      "key": "interior-underwater",
+      "asset": "public/assets/bar/backgrounds/interior-underwater.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-4d09e340-4900-4571-8844-c5aebe8e49f5.png"
+    },
+    {
+      "key": "interior-underground",
+      "asset": "public/assets/bar/backgrounds/interior-underground.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-a091a0f4-2351-4412-b89c-93095b1350a0.png"
+    },
+    {
+      "key": "interior-fairy",
+      "asset": "public/assets/bar/backgrounds/interior-fairy.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-077efa14-8366-4dd2-b7ae-fa2c4ecb9d9d.png"
+    },
+    {
+      "key": "interior-fairytale",
+      "asset": "public/assets/bar/backgrounds/interior-fairytale.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-35b96493-9f5e-4a61-b7df-1ee90f60b968.png"
+    },
+    {
+      "key": "interior-lineage-2",
+      "asset": "public/assets/bar/backgrounds/interior-lineage-2.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-9f14df4d-8d39-4d8b-a9cb-c81d50cbf511.png"
+    },
+    {
+      "key": "interior-perfect-world",
+      "asset": "public/assets/bar/backgrounds/interior-perfect-world.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-b9114e08-be9c-441f-8913-ba432f0ddff1.png"
+    },
+    {
+      "key": "interior-warcraft-3",
+      "asset": "public/assets/bar/backgrounds/interior-warcraft-3.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-2fec8972-c055-4b87-81ad-e0bbbfd1ca93.png"
+    },
+    {
+      "key": "interior-allods",
+      "asset": "public/assets/bar/backgrounds/interior-allods.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-6d6c9399-9f9d-46ec-8fe5-29070de8dca4.png"
+    },
+    {
+      "key": "interior-lost-ark",
+      "asset": "public/assets/bar/backgrounds/interior-lost-ark.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-74cb4322-fa27-41ad-922f-be28b4cba1c3.png"
+    },
+    {
+      "key": "interior-mass-effect",
+      "asset": "public/assets/bar/backgrounds/interior-mass-effect.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-2d93338b-2005-484f-a166-d8a69b84f089.png"
+    },
+    {
+      "key": "interior-nfs-most-wanted",
+      "asset": "public/assets/bar/backgrounds/interior-nfs-most-wanted.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-3c9a0db6-d859-46d3-9fbb-c56aa5fd36ef.png"
+    },
+    {
+      "key": "interior-nfs-carbon",
+      "asset": "public/assets/bar/backgrounds/interior-nfs-carbon.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-ebaca60e-3cb4-45ff-b6b7-10a8dba7a75a.png"
+    },
+    {
+      "key": "interior-nfs-underground",
+      "asset": "public/assets/bar/backgrounds/interior-nfs-underground.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-3ad68281-eaeb-4fd8-8b76-7708a3079f87.png"
+    },
+    {
+      "key": "noa-themed-atlas-v1",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v1.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-underground-noa",
+          "label": "Underground · cave keeper",
+          "theme": "underground",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-b9242165-3506-4794-a957-db9bc47a3c1b.png"
+        },
+        {
+          "value": "theme-fairy-noa",
+          "label": "Fairy · woodland host",
+          "theme": "fairy",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-7aec8c4e-d5e7-4bae-929e-d65987dde41a.png"
+        },
+        {
+          "value": "theme-fairytale-noa",
+          "label": "Fairytale · royal host",
+          "theme": "fairytale",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-8e5d713f-5581-4d6b-b205-75a26ed9bd6d.png"
+        },
+        {
+          "value": "theme-l2-human-noa",
+          "label": "Lineage II · Human",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-2b0c8390-3d80-43a4-a959-71c1c2ebd90a.png"
+        },
+        {
+          "value": "theme-l2-elf-noa",
+          "label": "Lineage II · Elf",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-f72f71ae-9f3a-4251-bb54-ad3207844450.png"
+        },
+        {
+          "value": "theme-l2-dark-elf-noa",
+          "label": "Lineage II · Dark Elf",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-da081f3c-e133-40a2-a12a-dab5a08d6e34.png"
+        }
+      ]
+    },
+    {
+      "key": "noa-themed-atlas-v2",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v2.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-l2-orc-noa",
+          "label": "Lineage II · Orc",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-b15cf8bf-95c8-4e1c-9efe-fd2cee2e2395.png"
+        },
+        {
+          "value": "theme-l2-dwarf-noa",
+          "label": "Lineage II · Dwarf",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-829ce861-fa63-440c-ac6c-8316333d4af2.png"
+        },
+        {
+          "value": "theme-l2-kamael-noa",
+          "label": "Lineage II · Kamael",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-d2b8a2b1-f8f1-4044-bcdf-d8fb3b0aa807.png"
+        },
+        {
+          "value": "theme-l2-ertheia-noa",
+          "label": "Lineage II · Ertheia",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-84bcdf5c-2cb6-4956-9e60-347ee3147deb.png"
+        },
+        {
+          "value": "theme-pw-human-noa",
+          "label": "Perfect World · Human",
+          "theme": "perfect-world",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-6ecfd84e-6181-44ce-a4ba-cdc2b85f98f6.png"
+        },
+        {
+          "value": "theme-pw-winged-elf-noa",
+          "label": "Perfect World · Winged Elf",
+          "theme": "perfect-world",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-a2c1d3ef-3ac9-4f3a-ba8e-d7e978719bfd.png"
+        }
+      ]
+    },
+    {
+      "key": "noa-themed-atlas-v3",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v3.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-pw-untamed-noa",
+          "label": "Perfect World · Untamed",
+          "theme": "perfect-world",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-a54325b6-7447-44e9-a1d0-3699a4b8e56d.png"
+        },
+        {
+          "value": "theme-pw-tideborn-noa",
+          "label": "Perfect World · Tideborn",
+          "theme": "perfect-world",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-a3801ae8-7a1e-4d89-bc76-f8e455913f17.png"
+        },
+        {
+          "value": "theme-pw-earthguard-noa",
+          "label": "Perfect World · Earthguard",
+          "theme": "perfect-world",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-deaa6108-34f9-4311-be73-aa9955a1cdd8.png"
+        },
+        {
+          "value": "theme-pw-nightshade-noa",
+          "label": "Perfect World · Nightshade",
+          "theme": "perfect-world",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-404378af-b7c7-43ef-949e-902de83eb83c.png"
+        },
+        {
+          "value": "theme-allods-kanian-noa",
+          "label": "Allods Online · Kanian",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-069f3742-283d-45a7-97a5-2b2193e61541.png"
+        },
+        {
+          "value": "theme-allods-elf-noa",
+          "label": "Allods Online · Elf",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-9fcdae99-acb4-46f1-8ced-ec606ffcd850.png"
+        }
+      ]
+    },
+    {
+      "key": "noa-themed-atlas-v4",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v4.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-allods-gibberling-noa",
+          "label": "Allods Online · Gibberling",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-e2939857-8b65-46ce-821b-0b3a52d6b344.png"
+        },
+        {
+          "value": "theme-allods-xadaganian-noa",
+          "label": "Allods Online · Xadaganian",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-64ca9fed-7a9f-4ac1-8381-f71bb571d5c1.png"
+        },
+        {
+          "value": "theme-allods-orc-noa",
+          "label": "Allods Online · Orc",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-d065d945-5e8c-4396-8118-dae41b846917.png"
+        },
+        {
+          "value": "theme-allods-arisen-noa",
+          "label": "Allods Online · Arisen",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-93b0b234-b449-40cf-a82e-3225c0d1a687.png"
+        },
+        {
+          "value": "theme-allods-priden-noa",
+          "label": "Allods Online · Priden",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-e5ebb987-19f6-4bb7-a633-7b1408f9efdb.png"
+        },
+        {
+          "value": "theme-allods-aoidos-noa",
+          "label": "Allods Online · Aoidos",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-b4f139f4-eeca-4d16-b480-8463c7456809.png"
+        }
+      ]
+    },
+    {
+      "key": "noa-themed-atlas-v5",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v5.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-wc3-sylvanas-noa",
+          "label": "Warcraft III · Sylvanas",
+          "theme": "warcraft-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-9cc70bdc-0398-4a7b-8f14-c7863af560ae.png"
+        },
+        {
+          "value": "theme-wc3-maiev-noa",
+          "label": "Warcraft III · Maiev",
+          "theme": "warcraft-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-45e1bf3b-60bd-406e-a337-7ef7dde75a0b.png"
+        },
+        {
+          "value": "theme-wc3-jaina-noa",
+          "label": "Warcraft III · Jaina",
+          "theme": "warcraft-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-21aeafa5-fe91-46c9-b918-a1d539f4ce10.png"
+        },
+        {
+          "value": "theme-wc3-tyrande-noa",
+          "label": "Warcraft III · Tyrande",
+          "theme": "warcraft-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-5348c2b8-8db8-4c32-a9ca-fda1b6928139.png"
+        },
+        {
+          "value": "theme-lost-ark-bard-noa",
+          "label": "Lost Ark · beach Bard",
+          "theme": "lost-ark",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-36bb7fb5-f20b-4243-bd1b-d40b4a1ae215.png"
+        },
+        {
+          "value": "theme-shepard-noa",
+          "label": "Mass Effect · Shepard",
+          "theme": "mass-effect",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-52d4c8d7-afa6-430f-9445-764b6a3ee9d5.png"
+        }
+      ]
+    },
+    {
+      "key": "noa-themed-atlas-v6",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v6.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-miranda-noa",
+          "label": "Mass Effect · Miranda",
+          "theme": "mass-effect",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-e6392dab-cb33-41ec-84bd-b60dcb34f72d.png"
+        },
+        {
+          "value": "theme-liara-noa",
+          "label": "Mass Effect · Liara",
+          "theme": "mass-effect",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-2c8f731d-7914-4027-848b-539b7e20f94b.png"
+        },
+        {
+          "value": "theme-mw-noa",
+          "label": "NFS Most Wanted · street racer",
+          "theme": "nfs-most-wanted",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-00f857e2-75a8-4d0e-b81b-65c90906045e.png"
+        },
+        {
+          "value": "theme-carbon-noa",
+          "label": "NFS Carbon · street racer",
+          "theme": "nfs-carbon",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-ed11a076-6b6a-4d47-8c6d-70b65e7f0205.png"
+        },
+        {
+          "value": "theme-nfs-underground-noa",
+          "label": "NFS Underground · street racer",
+          "theme": "nfs-underground",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-6ea5c774-0913-4203-bf1a-793f88e2b9dc.png"
+        },
+        {
+          "value": "theme-l2-dark-elf-mage-noa",
+          "label": "Lineage II · Dark Elf mage",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-25764c46-a18f-41e5-afd5-199261c5efd2.png"
+        }
+      ]
+    },
+    {
+      "key": "leo-themed-atlas-v1",
+      "asset": "public/assets/characters/bartender/leo-themed-atlas-v1.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-underground-leo",
+          "label": "Underground · cave keeper",
+          "theme": "underground",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-beef6f89-c3b6-47f9-8e90-2ac245c53b7a.png"
+        },
+        {
+          "value": "theme-fairy-leo",
+          "label": "Fairy · woodland host",
+          "theme": "fairy",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-eb7fa64a-5728-467a-8ae6-324d55917243.png"
+        },
+        {
+          "value": "theme-fairytale-leo",
+          "label": "Fairytale · royal host",
+          "theme": "fairytale",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-eef9ec6e-7a4f-4a24-9077-fad4737c4a71.png"
+        },
+        {
+          "value": "theme-l2-human-leo",
+          "label": "Lineage II · Human",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-97b2e312-4e89-4afe-b90c-6bfa1fd5117d.png"
+        },
+        {
+          "value": "theme-l2-elf-leo",
+          "label": "Lineage II · Elf",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-6ce3aba7-ac35-4d2e-a331-b453b8e9b8f8.png"
+        },
+        {
+          "value": "theme-l2-dark-elf-leo",
+          "label": "Lineage II · Dark Elf",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-886178c9-5ba9-4579-9bef-36c04f6e456d.png"
+        }
+      ]
+    },
+    {
+      "key": "leo-themed-atlas-v2",
+      "asset": "public/assets/characters/bartender/leo-themed-atlas-v2.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-l2-orc-leo",
+          "label": "Lineage II · Orc",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-f2d0a359-302e-4a82-b35d-c5a1ab4c7047.png"
+        },
+        {
+          "value": "theme-l2-dwarf-leo",
+          "label": "Lineage II · Dwarf",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-84158a98-07bc-4b2a-a68b-17255d38010e.png"
+        },
+        {
+          "value": "theme-l2-kamael-leo",
+          "label": "Lineage II · Kamael",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-d7050525-dc42-432c-86f1-7e3bd1993447.png"
+        },
+        {
+          "value": "theme-l2-ertheia-leo",
+          "label": "Lineage II · Ertheia",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-9d2cf0f6-6ba0-467b-b63f-5f262913ed5b.png"
+        },
+        {
+          "value": "theme-pw-human-leo",
+          "label": "Perfect World · Human",
+          "theme": "perfect-world",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-6fbafcfb-5aa1-4a75-9555-1abee9e4c3b3.png"
+        },
+        {
+          "value": "theme-pw-winged-elf-leo",
+          "label": "Perfect World · Winged Elf",
+          "theme": "perfect-world",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-acd1b4dd-e07c-4190-87eb-9dbc6465c888.png"
+        }
+      ]
+    },
+    {
+      "key": "leo-themed-atlas-v3",
+      "asset": "public/assets/characters/bartender/leo-themed-atlas-v3.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-pw-untamed-leo",
+          "label": "Perfect World · Untamed",
+          "theme": "perfect-world",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-919fcc76-b3b7-477a-a44f-1dbb70195dff.png"
+        },
+        {
+          "value": "theme-pw-tideborn-leo",
+          "label": "Perfect World · Tideborn",
+          "theme": "perfect-world",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-4cae4d7e-adfd-46a8-bc40-f939709beac4.png"
+        },
+        {
+          "value": "theme-pw-earthguard-leo",
+          "label": "Perfect World · Earthguard",
+          "theme": "perfect-world",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-4a984f37-5199-447f-b0de-17008cfc8f98.png"
+        },
+        {
+          "value": "theme-pw-nightshade-leo",
+          "label": "Perfect World · Nightshade",
+          "theme": "perfect-world",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-d4f19ba5-5cce-4f32-b7a2-1e091d87420f.png"
+        },
+        {
+          "value": "theme-allods-kanian-leo",
+          "label": "Allods Online · Kanian",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-eca50675-5beb-4ccb-bb54-fa4e033a0f0d.png"
+        },
+        {
+          "value": "theme-allods-elf-leo",
+          "label": "Allods Online · Elf",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-c846ba9e-8e9f-4e7f-bc9b-7084eb6fec56.png"
+        }
+      ]
+    },
+    {
+      "key": "leo-themed-atlas-v4",
+      "asset": "public/assets/characters/bartender/leo-themed-atlas-v4.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-allods-gibberling-leo",
+          "label": "Allods Online · Gibberling",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-60f2a19d-db70-4584-8cbb-6968d4ff10c7.png"
+        },
+        {
+          "value": "theme-allods-xadaganian-leo",
+          "label": "Allods Online · Xadaganian",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-713cd290-6164-4963-919f-e2d4e69b16c3.png"
+        },
+        {
+          "value": "theme-allods-orc-leo",
+          "label": "Allods Online · Orc",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-9dee2e5d-eedf-480e-a5af-782a9d048874.png"
+        },
+        {
+          "value": "theme-allods-arisen-leo",
+          "label": "Allods Online · Arisen",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-b841d631-c68f-4879-a8d3-8f76a7187bbb.png"
+        },
+        {
+          "value": "theme-allods-priden-leo",
+          "label": "Allods Online · Priden",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-bf0a08c7-3d91-44ea-bc51-3a86aa1fc9fd.png"
+        },
+        {
+          "value": "theme-allods-aoidos-leo",
+          "label": "Allods Online · Aoidos",
+          "theme": "allods",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-1e9cf9f4-4a85-4475-9984-9222481abea3.png"
+        }
+      ]
+    },
+    {
+      "key": "leo-themed-atlas-v5",
+      "asset": "public/assets/characters/bartender/leo-themed-atlas-v5.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-wc3-illidan-leo",
+          "label": "Warcraft III · Illidan",
+          "theme": "warcraft-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-4ec2a6e9-f711-49e8-bc5d-668229efb0dd.png"
+        },
+        {
+          "value": "theme-wc3-malfurion-leo",
+          "label": "Warcraft III · Malfurion",
+          "theme": "warcraft-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-d6eb2727-2caf-40ec-8d17-a62fe9a86e23.png"
+        },
+        {
+          "value": "theme-wc3-arthas-leo",
+          "label": "Warcraft III · Arthas",
+          "theme": "warcraft-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-3aa04e4c-383b-4a0a-bfad-b0351a81e692.png"
+        },
+        {
+          "value": "theme-wc3-thrall-leo",
+          "label": "Warcraft III · Thrall",
+          "theme": "warcraft-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-b5012ee2-c0ad-47c3-a6de-0956ba5a93ac.png"
+        },
+        {
+          "value": "theme-lost-ark-berserker-leo",
+          "label": "Lost Ark · casual Berserker",
+          "theme": "lost-ark",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-ea15f668-94cd-4330-b7ae-45df93e3fa9a.png"
+        },
+        {
+          "value": "theme-shepard-leo",
+          "label": "Mass Effect · Shepard",
+          "theme": "mass-effect",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-cd03ef04-3139-4157-8f34-e9f6d9033493.png"
+        }
+      ]
+    },
+    {
+      "key": "leo-themed-atlas-v6",
+      "asset": "public/assets/characters/bartender/leo-themed-atlas-v6.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-garrus-leo",
+          "label": "Mass Effect · Garrus",
+          "theme": "mass-effect",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-f2a851ef-752d-464f-bafe-0c30153298d9.png"
+        },
+        {
+          "value": "theme-thane-leo",
+          "label": "Mass Effect · Thane",
+          "theme": "mass-effect",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-3692ba4b-7c0d-497f-8206-e79dab11a9a8.png"
+        },
+        {
+          "value": "theme-mw-leo",
+          "label": "NFS Most Wanted · street racer",
+          "theme": "nfs-most-wanted",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-6829789a-b3a2-4f40-87c7-e7b1efe04b0f.png"
+        },
+        {
+          "value": "theme-carbon-leo",
+          "label": "NFS Carbon · street racer",
+          "theme": "nfs-carbon",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-4e51c64d-685b-40ff-bd6a-aba9fa7b928c.png"
+        },
+        {
+          "value": "theme-nfs-underground-leo",
+          "label": "NFS Underground · street racer",
+          "theme": "nfs-underground",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-10e0206c-f90d-4298-92b1-67d18429f2a5.png"
+        },
+        {
+          "value": "theme-l2-dark-elf-mage-leo",
+          "label": "Lineage II · Dark Elf mage",
+          "theme": "lineage-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-8691bfc7-53ee-414e-8a6b-0f93c84324d3.png"
+        }
+      ]
+    }
+  ]
+}

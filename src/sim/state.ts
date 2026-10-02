@@ -1,5 +1,7 @@
 import { INGREDIENTS, RECIPES, REGIONS, STARTING_INVENTORY } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
+import { cosmeticFor } from '../domain/cosmetics';
+import { REFERENCE_COSTUME_IDS } from '../data/cosmetics/bartenderCostumes';
 import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
 import { CHARACTER_ART, CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { generateCustomer } from '../domain/engine';
@@ -349,6 +351,9 @@ export function normalizePlayerState(state: PlayerState) {
     // `base` was an editor-only wooden mannequin. It must never be presented
     // as a wearable look, including for old local saves.
     if ((bar.bartender as string) === 'base') bar.bartender = 'vest';
+    // A painted style that is now earned or bought stays with whoever is already wearing it.
+    const worn = cosmeticFor('bartender', bar.bartender, bar.bartenderCharacter);
+    if (worn?.character && !state.ownedCosmeticIds.includes(worn.id) && (REFERENCE_COSTUME_IDS as readonly string[]).includes(worn.value)) state.ownedCosmeticIds.push(worn.id);
     if (state.ownedBarIds.includes(region.id) && !state.ownedInteriorIds.includes(bar.interior)) {
       bar.interior = defaultInterior;
       if (!state.ownedInteriorIds.includes(defaultInterior)) state.ownedInteriorIds.push(defaultInterior);

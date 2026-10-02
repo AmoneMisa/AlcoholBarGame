@@ -1,4 +1,4 @@
-import { COSMETICS } from './cosmetics';
+import { DRAWABLE_COSMETICS } from './cosmetics';
 
 // Seasonal banner: one season per UTC calendar month. Its banner raises the odds of two featured legendary styles,
 // counts the player's draws, pays milestone boxes, and lets them pick a featured style after SPARK_DRAWS draws.
@@ -22,7 +22,7 @@ export interface Season { id: string; month: number; name: string; tagline: stri
 export function seasonAt(now: number): Season {
   const date = new Date(now);
   const year = date.getUTCFullYear(), month = date.getUTCMonth();
-  const legendary = COSMETICS.filter((item) => item.rarity === 'legendary');
+  const legendary = DRAWABLE_COSMETICS.filter((item) => item.rarity === 'legendary');
   const [name, tagline] = SEASON_THEMES[month]!;
   // Two legendary styles per month; twelve months cover all twelve legendaries exactly once.
   const featuredIds = legendary.length ? [legendary[(2 * month) % legendary.length]!.id, legendary[(2 * month + 1) % legendary.length]!.id] : [];

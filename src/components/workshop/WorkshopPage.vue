@@ -6,7 +6,9 @@ import { computed, ref, watch } from 'vue';
 import { fetchLeaderboard, type LeaderboardResult } from '../../telegram/api';
 import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE, leaderboardReward, describeLeaderboardReward } from '../../domain/leaderboard';
 import { RECIPES } from '../../domain/catalog';
-import { COSMETICS } from '../../domain/cosmetics';
+import { COSMETICS, DRAWABLE_COSMETICS } from '../../domain/cosmetics';
+import { shardStyles } from '../../sim/loot';
+import { ACHIEVEMENT_STYLES, BOX_STYLE_CHANCE, STYLE_PIECES_TO_CRAFT } from '../../data/cosmetics/styleSources';
 import {
   BOXES, CONSUMABLES, DRAW_COST, DRAW_ODDS, DUPLICATE_SHARDS, EQUIPMENT, LEGENDARY_PITY, SHARD_CRAFT_COST, TIER_SHARD_COST,
   consumableDef, describeReward, equipmentDef, levelCap, upgradeCostFor
@@ -53,7 +55,15 @@ function tierReason(id: string) {
 const boxCount = (id: string) => game.loot.boxes[id] ?? 0;
 const knownRecipes = computed(() => RECIPES.filter((recipe) => game.knownRecipeIds.includes(recipe.id)));
 const featured = computed(() => featuredLegendary(Date.now()));
-const lockedSkins = computed(() => COSMETICS.filter((item) => !game.ownedCosmeticIds.includes(item.id)));
+// The pair of styles an achievement gives (one per bartender), with the matching backgrounds that come along.
+const achievementStyles = (goalId: string) => {
+  const pair = ACHIEVEMENT_STYLES[goalId];
+  return pair ? Object.entries(pair).map(([character, value]) => COSMETICS.find((item) => item.id === `bartender:${value}:${character}`)?.label).filter(Boolean).join(' · ') : '';
+};
+// Style shards craft the box styles and the styles of ordinary backgrounds (the matching background comes with it).
+const pieceCharacter = ref<'noa' | 'leo'>(game.decor.bartenderCharacter === 'leo' ? 'leo' : 'noa');
+const craftableStyles = computed(() => shardStyles().filter((item) => item.character === pieceCharacter.value && !game.ownedCosmeticIds.includes(item.id)));
+const lockedSkins = computed(() => DRAWABLE_COSMETICS.filter((item) => !game.ownedCosmeticIds.includes(item.id)));
 const week = computed(() => weekOf(Date.now()));
 const quests = computed(() => questsForWeek(week.value).map((quest) => {
   const current = game.loot.quests.week === week.value;
@@ -147,10 +157,11 @@ const boostLeft = (id: string) => {
       <dl>
         <div><dt>Parts</dt><dd>{{ game.loot.parts }}</dd></div>
         <div><dt>Skin shards</dt><dd>{{ game.loot.skinShards }}</dd></div>
+        <div><dt>Style shards</dt><dd>{{ game.loot.stylePieces }}</dd></div>
         <div><dt>Crystals</dt><dd>{{ game.crystals }}</dd></div>
       </dl>
     </header>
-    <nav class="workshop-tabs"><button v-for="[id, label] in tabs" :key="id" type="button" :class="{ active: tab === id }" @click="tab = id">{{ label }}</button></nav>
+    <nav class="workshop-tabs"><UiButton v-for="[id, label] in tabs" :key="id" type="button" :class="{ active: tab === id }" @click="tab = id">{{ label }}</UiButton></nav>
     <aside v-if="gettingStarted && (tab === 'equipment' || tab === 'boxes')" class="getting-started"><b>Getting started</b><ol><li v-for="step in started" :key="step.label" :class="{ done: step.done }">{{ step.label }}</li></ol></aside>
     <p v-if="game.loot.log[0]" class="workshop-log">{{ game.loot.log[0] }}</p>
 
@@ -226,6 +237,18 @@ const boostLeft = (id: string) => {
         <ul v-if="game.loot.lastDraw.length" class="results"><li v-for="(result, index) in game.loot.lastDraw" :key="index" :class="result.rarity">{{ result.label }}<small v-if="result.duplicate"> · duplicate +{{ result.shards }} shards</small></li></ul>
       </article>
       <article class="card">
+        <h3>🧵 Craft a full style</h3>
+        <p>Boxes drop style shards (1 shard in 22% of boxes, bigger piles of 2, 5, 10 and 25 are rarer), and every box has a {{ BOX_STYLE_CHANCE * 100 }}% chance to hold a whole style. {{ STYLE_PIECES_TO_CRAFT }} pieces craft one style of your choice, including the style of an ordinary background (you get the background too). You have {{ game.loot.stylePieces }}.</p>
+        <div class="crafts">
+          <UiButton type="button" :class="{ active: pieceCharacter === 'noa' }" @click="pieceCharacter = 'noa'">Noa</UiButton>
+          <UiButton type="button" :class="{ active: pieceCharacter === 'leo' }" @click="pieceCharacter = 'leo'">Leo</UiButton>
+        </div>
+        <div class="crafts">
+          <UiButton v-for="item in craftableStyles" :key="item.id" type="button" :disabled="game.loot.stylePieces < STYLE_PIECES_TO_CRAFT" @click="game.act({ type: 'craftStyle', cosmeticId: item.id })">{{ item.label }} · {{ STYLE_PIECES_TO_CRAFT }} pieces</UiButton>
+          <p v-if="!craftableStyles.length">You own every box style for {{ pieceCharacter === 'noa' ? 'Noa' : 'Leo' }}.</p>
+        </div>
+      </article>
+      <article class="card">
         <h3>🧩 Craft with shards</h3>
         <p>Common {{ SHARD_CRAFT_COST.common }} · Rare {{ SHARD_CRAFT_COST.rare }} · Legendary {{ SHARD_CRAFT_COST.legendary }} skin shards.</p>
         <div class="crafts">
@@ -254,6 +277,7 @@ const boostLeft = (id: string) => {
         <p class="tiers"><span v-for="tier in row.tiers" :key="tier.id" :class="['tier', `tier-${tier.tier}`, { done: tier.done }]" :title="`${tier.tierName}: ${tier.target}`">{{ tier.tierName }}</span></p>
         <progress :value="Math.min(stat(row.goal.stat), row.goal.target)" :max="row.goal.target"></progress>
         <b>{{ Math.min(stat(row.goal.stat), row.goal.target) }} / {{ row.goal.target }} · +{{ row.goal.crystals }} crystals + {{ row.goal.box }} box</b>
+        <small v-if="achievementStyles(row.goal.id)">Styles: {{ achievementStyles(row.goal.id) }}</small>
         <UiButton variant="primary" :disabled="row.finished || stat(row.goal.stat) < row.goal.target" @click="game.act({ type: 'claimAchievement', id: row.goal.id })">{{ row.finished ? 'All tiers claimed' : `Claim ${row.goal.tierName}` }}</UiButton>
       </article>
     </div>

@@ -2,6 +2,7 @@ import { INGREDIENTS, MODIFIERS, RECIPES, REGIONS, SUPPLIERS, estimateRecipeAbv 
 import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost, bottleSaleCrystalReward, bottleTotal, brandedServeCrystalReward } from '../domain/bottleCatalog';
 import { arrivalSkipCrystalCost, calendarDate, coins, specialtyFactor, supplierInCity, consecutiveDays, conversationCrystalReward, conversationDifficulty, crystalExchange, dailyCoinsFor, dailyCrystalsFor, quotePurchase, recipePurchase } from '../domain/economy';
 import { withArticle } from '../domain/english/articles';
+import { STYLE_SHOP_PRICE, styleForInterior, styleSource } from '../data/cosmetics/styleSources';
 import { BAR_PROFILE_OPTIONS, DEFAULT_BARS, INTERIORS, isEventInterior } from '../data/cosmetics/bars';
 import { consumeMix, generateCustomer, judgeMix, nearMiss, requiredRecipe } from '../domain/engine';
 import type { Customer, InventoryItem, Recipe, RegionId, Supplier } from '../domain/types';
@@ -14,8 +15,8 @@ import { canWelcomeVip, nextCustomerArrival, nextVipAvailability, orderTimeSecon
 import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL, economyAt, formatDeliveryTime, marketFor } from '../domain/progression';
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
-import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
-import { LootError, orderDiscount, claimSpark, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
+import { COSMETICS, DRAWABLE_COSMETICS, canUseCosmetic } from '../domain/cosmetics';
+import { LootError, orderDiscount, claimSpark, grantCosmetic, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, craftSkin, craftStyle, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
 import { usableIngredientIds } from '../domain/usableStock';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { actsIn } from '../domain/social/acts';
@@ -53,6 +54,7 @@ export type GameAction =
   | { type: 'buyRecipe'; recipeId: string }
   | { type: 'upgradeRecipe'; recipeId: string }
   | { type: 'buyInterior'; interiorId: string }
+  | { type: 'buyStyle'; cosmeticId: string }
   | { type: 'buyBottleStock'; productId: string; quantity?: number }
   | { type: 'expediteCustomer' }
   | { type: 'switchBar'; regionId: RegionId }
@@ -117,6 +119,8 @@ export type GameAction =
   | { type: 'claimSpark'; cosmeticId: string }
   | { type: 'craftSkin'; cosmeticId: string }
   | { type: 'wipeAccount'; confirm: true }
+  | { type: 'craftStyle'; cosmeticId: string }
+
   | { type: 'designSignature'; name: string; items: { ingredientId: string; amount: number }[]; needsShake: boolean }
   | { type: 'claimLeaderboardReward' }
   | { type: 'setFeaturedAchievements'; ids: string[] }
@@ -831,7 +835,19 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.crystals -= interior.crystalCost;
       state.ownedInteriorIds.push(interior.id);
       state.bars[state.regionId].interior = interior.id;
-      state.message = `${interior.name} purchased and applied to ${state.bars[state.regionId].name}.`;
+      // The background's own style comes with it (it cannot be bought on its own).
+      const linked = styleForInterior(interior.id);
+      const styleName = linked ? grantCosmetic(state, `bartender:${linked.value}:${linked.character}`) : '';
+      state.message = `${interior.name} purchased and applied to ${state.bars[state.regionId].name}.${styleName ? ` Its style ${styleName} is yours too.` : ''}`;
+      break;
+    }
+    case 'buyStyle': {
+      const style = COSMETICS.find((entry) => entry.id === action.cosmeticId);
+      if (!style || style.key !== 'bartender' || !style.character || styleSource(style.character, style.value) !== 'shop') throw new RuleError('This style is not for sale.');
+      if (state.ownedCosmeticIds.includes(style.id)) throw new RuleError('You already own this style.');
+      if (state.crystals < STYLE_SHOP_PRICE) throw new RuleError(`You need ${STYLE_SHOP_PRICE} crystals for ${style.label}.`);
+      state.crystals -= STYLE_SHOP_PRICE;
+      state.message = `${grantCosmetic(state, style.id)} unlocked.`;
       break;
     }
     case 'buyBottleStock': {
@@ -920,19 +936,19 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const allowed = (BAR_PROFILE_OPTIONS as Record<string, readonly string[]>)[action.key];
       if (!allowed || !allowed.includes(action.value)) throw new RuleError('That style is not available.');
       if (action.key === 'interior' && !state.ownedInteriorIds.includes(action.value)) throw new RuleError('Purchase this background before using it.');
-      if (!canUseCosmetic(state.ownedCosmeticIds, action.key, action.value, state.bars[state.regionId].bartenderCharacter)) throw new RuleError('Unlock this style in the daily roulette first.');
+      if (!canUseCosmetic(state.ownedCosmeticIds, action.key, action.value, state.bars[state.regionId].bartenderCharacter)) throw new RuleError('Unlock this style first: buy it, earn it from an achievement or a box, or win it in a style draw.');
       (state.bars[state.regionId] as unknown as Record<string, string>)[action.key] = action.value;
       break;
     }
     case 'spinCosmeticRoulette': {
       const today = calendarDate(new Date(now));
       if (state.cosmeticRouletteKey === today) throw new RuleError('Today’s style draw is already claimed.');
-      const locked = COSMETICS.filter((entry) => !state.ownedCosmeticIds.includes(entry.id));
-      const pool = locked.length ? locked : COSMETICS;
+      const locked = DRAWABLE_COSMETICS.filter((entry) => !state.ownedCosmeticIds.includes(entry.id));
+      const pool = locked.length ? locked : DRAWABLE_COSMETICS;
       const reward = pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))]!;
       state.cosmeticRouletteKey = today;
       if (state.ownedCosmeticIds.includes(reward.id)) state.cosmeticCopies[reward.id] = (state.cosmeticCopies[reward.id] ?? 0) + 1;
-      else state.ownedCosmeticIds.push(reward.id);
+      else grantCosmetic(state, reward.id);
       state.cosmeticRouletteResult = `${reward.label} ${reward.character ? `for ${reward.character === 'noa' ? 'woman' : 'man'}` : ''} unlocked${state.cosmeticCopies[reward.id] ? ' as a giftable duplicate' : ''}.`;
       state.message = state.cosmeticRouletteResult;
       break;
@@ -1086,6 +1102,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'drawStyle':
     case 'claimSpark':
     case 'craftSkin':
+    case 'craftStyle':
+
     case 'designSignature':
     case 'claimLeaderboardReward':
     case 'claimQuest':
@@ -1102,6 +1120,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           case 'drawStyle': drawStyle(state, action.count, action.banner, now, random); break;
           case 'claimSpark': claimSpark(state, action.cosmeticId, now); break;
           case 'craftSkin': craftSkin(state, action.cosmeticId); break;
+          case 'craftStyle': craftStyle(state, action.cosmeticId); break;
           case 'designSignature': designSignature(state, { name: action.name, items: action.items, needsShake: action.needsShake }); break;
           case 'claimLeaderboardReward': claimLeaderboardReward(state, context.leaderboard, now); break;
           case 'claimQuest': claimQuest(state, action.questId, now); break;
@@ -1130,8 +1149,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     weekly: { week: state.loot.weekly.week, score: state.loot.weekly.score, label: state.bars[state.regionId].name, level: levelFor(state.xp) } };
 }
 
-// Loot actions leave a trail (what was rolled, pity) for the server's loot ledger.
-const AUDITED = new Set<GameAction['type']>(['openBox', 'pickReward', 'buyBox', 'buyConsumable', 'drawStyle', 'claimSpark', 'craftSkin', 'claimLeaderboardReward', 'claimQuest', 'claimAchievement']);
+// Loot actions leave a trail (what was rolled, pity, prestige) for the server's loot ledger.
+const AUDITED = new Set<GameAction['type']>(['openBox', 'pickReward', 'buyBox', 'buyConsumable', 'drawStyle', 'claimSpark', 'craftSkin', 'craftStyle', 'claimLeaderboardReward', 'claimQuest', 'claimAchievement']);
 export interface LootAudit { action: string; message: string; detail: Record<string, unknown>; }
 function auditEntry(state: PlayerState, action: GameAction): LootAudit | undefined {
   if (!AUDITED.has(action.type)) return undefined;

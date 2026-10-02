@@ -560,6 +560,7 @@ export const useGameStore = defineStore('game', () => {
     return recipePurchase(recipe, RECIPES.indexOf(recipe));
   };
   const buyInterior = (interiorId: string) => dispatch({ type: 'buyInterior', interiorId });
+  const buyStyle = (cosmeticId: string) => dispatch({ type: 'buyStyle', cosmeticId });
   const chooseInterior = (interiorId: string) => state.value.ownedInteriorIds.includes(interiorId)
     ? dispatch({ type: 'setDecor', key: 'interior', value: interiorId }) : buyInterior(interiorId);
   const bottleCrystalCost = (productId: string) => bottleRestockCrystalCost(ALCOHOL_PRODUCTS.find((item) => item.id === productId)!);
@@ -698,6 +699,6 @@ export const useGameStore = defineStore('game', () => {
     pourBrands, brandOnShelf, shelfBrandsFor, setPourBrand,
     selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, tickGameClock, welcomeNextCustomer, offerSimilarOrder, rejectCustomer, buy, sell, switchBar, isBarOwned, nextBarPrice, barPurchaseLevel:BAR_PURCHASE_LEVEL, chooseStartingBar, buyBar, transferStock,
     supplier, localSuppliers, purchaseCart, saleCart, purchaseQuote, saleQuote, saleRevenue, deliveryOrders, deliveryCountdown, selectSupplier, checkoutPurchase, checkoutSale, renameBar, renameBartender,
-    buyRecipe, recipePrice, buyInterior, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, giveAshtray, giveWater, callTaxi, pitchStart, pitchAsk, pitchCancel, topUp, tourSeen, setTour, staff, hireStaff, upgradeStaff, barEvent, offerChance, houseRules, ruleViolations, askToLeave, cleanAshtrays, ashtrays, situationOf, answerSituation, deliveryIssues, quarantine, lowGrade, reportIssue, discardStock, buyCrystalPack, buyingCrystals, starterPackAvailable, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
+    buyRecipe, recipePrice, buyInterior, buyStyle, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, giveAshtray, giveWater, callTaxi, pitchStart, pitchAsk, pitchCancel, topUp, tourSeen, setTour, staff, hireStaff, upgradeStaff, barEvent, offerChance, houseRules, ruleViolations, askToLeave, cleanAshtrays, ashtrays, situationOf, answerSituation, deliveryIssues, quarantine, lowGrade, reportIssue, discardStock, buyCrystalPack, buyingCrystals, starterPackAvailable, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
   };
 });

@@ -10,6 +10,7 @@ export interface DrawResult { id: string; label: string; rarity: 'common' | 'rar
 export interface LootState {
   parts: number;
   skinShards: number;
+  stylePieces: number;   // 50 craft one whole box style
   itemShards: Record<string, number>;
   consumables: Record<string, number>;
   boxes: Record<string, number>;
@@ -47,7 +48,7 @@ export interface LootState {
 }
 
 export const createLoot = (): LootState => ({
-  parts: 0, skinShards: 0, itemShards: {}, consumables: {}, boxes: {}, armed: {}, boosts: {},
+  parts: 0, skinShards: 0, stylePieces: 0, itemShards: {}, consumables: {}, boxes: {}, armed: {}, boosts: {},
   equipment: Object.fromEntries(REGIONS.map((region) => [region.id, Object.fromEntries(EQUIPMENT.map((item) => [item.id, newSlot()]))])),
   pity: { sinceRare: 0, sinceLegendary: 0 }, lastDraw: [],
   levelRewarded: 1, log: [],
@@ -79,7 +80,7 @@ export function normalizeLoot(input: unknown, currentLevel: number): LootState {
   const boosts: Record<string, number> = {};
   for (const kind of BOOST_KINDS) if (Number.isFinite(source.boosts?.[kind])) boosts[kind] = source.boosts![kind]!;
   return {
-    parts: count(source.parts), skinShards: count(source.skinShards),
+    parts: count(source.parts), skinShards: count(source.skinShards), stylePieces: count(source.stylePieces),
     itemShards: counts(source.itemShards, EQUIPMENT.map((item) => item.id)),
     consumables: counts(source.consumables), boxes: counts(source.boxes, ['bronze', 'silver', 'gold', 'choice']),
     armed: counts(source.armed, ARMED_CHARGES), boosts, equipment,

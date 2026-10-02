@@ -1,5 +1,6 @@
 /** Every value any imported avatar can show; keep saved legacy cosmetics valid. Use avatarOptionsFor() for what one character offers. */
 import { OUTFIT_COLORS } from './bars';
+import { BARTENDER_AVATARS } from './bartenderAvatars';
 export const AVATAR_OPTIONS = [
   { key: 'bodyShape', label: 'Body shape', values: ['slim', 'athletic', 'curvy', 'muscular', 'broad'] },
   { key: 'hairStyle', label: 'Hair', values: ['updo', 'bun', 'bob', 'pixie', 'waves', 'slick', 'buzz'] },
@@ -19,14 +20,9 @@ export const AVATAR_OPTIONS = [
 ] as const;
 export type AvatarOptionKey = typeof AVATAR_OPTIONS[number]['key'];
 export interface AvatarOption { key: AvatarOptionKey; label: string; values: readonly string[] }
-const MAKEUP_KEYS: readonly AvatarOptionKey[] = ['lipColor', 'eyeshadow', 'eyeliner', 'blush'];
-/** Options a character really has geometry for (each bartender has one fixed body shape, so there is no body option): Noa has hair styles and makeup, Leo has beards and a shorter hair list. */
+/** Painted appearances preserve the face; each hairstyle includes its painted hair color. */
 export function avatarOptionsFor(character: string): AvatarOption[] {
-  const leo = character === 'leo';
-  return AVATAR_OPTIONS
-    .filter((option) => option.key !== 'bodyShape' && (leo ? !MAKEUP_KEYS.includes(option.key) : option.key !== 'facialHair' && option.key !== 'browShape'))   // Noa's brows are painted on her skin
-    .map((option): AvatarOption => option.key === 'hairStyle'
-      ? { ...option, values: leo ? ['slick', 'buzz'] : ['updo', 'bun', 'bob', 'pixie', 'waves'] } : option);
+  return [{ key: 'hairStyle', label: 'Hairstyle', values: (BARTENDER_AVATARS[character] ?? []).map(avatar => avatar.hairStyle) }];
 }
 export const avatarLabel = (value: string) => value.replaceAll('-', ' ').replace(/^./, c => c.toUpperCase());
 export const OUTFIT_PALETTE: Record<string, string> = { natural:'#ffffff', black:'#3a3a42', white:'#f3f0ea', red:'#c23b3b', blue:'#3b63c2', green:'#3a8a5a', plum:'#8a4a8f', sand:'#d9c39a' };
