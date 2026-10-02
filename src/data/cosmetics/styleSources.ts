@@ -1,5 +1,5 @@
 import { BARTENDER_COSTUMES } from './bartenderCostumes';
-import { THEMED_INTERIOR_COSTUMES } from './themedBars';
+import { GAME_THEME_PRIMARY_STYLES } from './gameThemeExpansion';
 
 // Where each painted bartender style comes from. Every style is exactly one of:
 //   basic       — open from the start (three per bartender)
@@ -18,16 +18,21 @@ export const BASIC_COSTUMES: Record<Bartender, readonly string[]> = {
 
 // One background ↔ one style. A background has exactly one connected style (never two, even where several would
 // fit), and getting the style by any route gives the player its background too.
-// The themed backgrounds list several matching costumes each; only the first one of one bartender is connected
-// (alternating Noa and Leo), the others are ordinary box styles.
-const THEMED_LINKS: Record<string, { character: Bartender; value: string }> = Object.fromEntries(
-  Object.entries(THEMED_INTERIOR_COSTUMES).map(([interiorId, pair], index) => {
-    const character: Bartender = index % 2 ? 'leo' : 'noa';
-    return [interiorId, { character, value: pair[character][0]! }];
-  }));
-
 export const INTERIOR_STYLE: Readonly<Record<string, { character: Bartender; value: string }>> = {
-  ...THEMED_LINKS,
+  ...GAME_THEME_PRIMARY_STYLES,
+  'underwater': { character: 'noa', value: 'reference-shark-noa' },
+  'underground': { character: 'noa', value: 'theme-underground-noa' },
+  'fairy': { character: 'noa', value: 'theme-fairy-noa' },
+  'fairytale': { character: 'noa', value: 'theme-fairytale-noa' },
+  'lineage-2': { character: 'noa', value: 'theme-l2-human-noa' },
+  'perfect-world': { character: 'noa', value: 'theme-pw-human-noa' },
+  'warcraft-3': { character: 'noa', value: 'theme-wc3-sylvanas-noa' },
+  'allods': { character: 'noa', value: 'theme-allods-kanian-noa' },
+  'lost-ark': { character: 'noa', value: 'theme-lost-ark-bard-noa' },
+  'mass-effect': { character: 'noa', value: 'theme-shepard-noa' },
+  'nfs-most-wanted': { character: 'noa', value: 'theme-mw-noa' },
+  'nfs-carbon': { character: 'noa', value: 'theme-carbon-noa' },
+  'nfs-underground': { character: 'noa', value: 'theme-nfs-underground-noa' },
   garden: { character: 'noa', value: 'reference-final-57' },
   skyline: { character: 'leo', value: 'reference-final-94' },
   'inferno-penthouse': { character: 'noa', value: 'reference-flame' },

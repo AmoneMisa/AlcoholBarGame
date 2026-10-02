@@ -27,10 +27,10 @@ const outfit = (character: 'noa' | 'leo', value: string) => `bartender:${value}:
 export const themeStyleIds = (theme: PassTheme) => [outfit('noa', theme.noa), outfit('leo', theme.leo)];
 
 // The pass rotates through these seasons. Every season is built on a game: its background plus a costume for Noa and
-// one for Leo from that game. The order matters: the pass in progress must not change under the players, so the
-// season now running stays where it is (see the schedule test) and new ones are added after it.
+// one for Leo from that game. The first one is the pass that began on 28 September 2026 (cycle 19) and the rest
+// follow in this order, so new seasons are only ever added at the END: the schedule of every pass already running or
+// announced stays as it is (see the schedule test).
 export const PASS_THEMES: readonly PassTheme[] = [
-  { id: 'nfs-underground', name: 'Need for Speed: Underground', tagline: 'The tuner bar: neon, nitrous and a long line at the garage door.', interior: 'nfs-underground', noa: 'theme-nfs-underground-noa', leo: 'theme-nfs-underground-leo' },
   { id: 'lost-ark', name: 'Lost Ark', tagline: 'A beach club at the end of the world, sunset included.', interior: 'lost-ark', noa: 'theme-lost-ark-bard-noa', leo: 'theme-lost-ark-berserker-leo' },
   { id: 'lineage-2', name: 'Lineage II', tagline: 'The Aden tavern: elves, mages and a long night at the bar.', interior: 'lineage-2', noa: 'theme-l2-elf-noa', leo: 'theme-l2-elf-leo' },
   { id: 'warcraft-3', name: 'Warcraft III', tagline: 'The crossroads bar, where heroes of every side share a table.', interior: 'warcraft-3', noa: 'theme-wc3-sylvanas-noa', leo: 'theme-wc3-arthas-leo' },
@@ -38,12 +38,24 @@ export const PASS_THEMES: readonly PassTheme[] = [
   { id: 'perfect-world', name: 'Perfect World', tagline: 'A celestial bar above the clouds, open to every race.', interior: 'perfect-world', noa: 'theme-pw-winged-elf-noa', leo: 'theme-pw-winged-elf-leo' },
   { id: 'nfs-most-wanted', name: 'Need for Speed: Most Wanted', tagline: 'The garage bar: every regular has a story about the chase.', interior: 'nfs-most-wanted', noa: 'theme-mw-noa', leo: 'theme-mw-leo' },
   { id: 'allods', name: 'Allods Online', tagline: 'The astral bar, floating between worlds.', interior: 'allods', noa: 'theme-allods-elf-noa', leo: 'theme-allods-elf-leo' },
-  { id: 'nfs-carbon', name: 'Need for Speed: Carbon', tagline: 'The night garage bar, canyon runs and cold drinks.', interior: 'nfs-carbon', noa: 'theme-carbon-noa', leo: 'theme-carbon-leo' }
+  { id: 'nfs-carbon', name: 'Need for Speed: Carbon', tagline: 'The night garage bar, canyon runs and cold drinks.', interior: 'nfs-carbon', noa: 'theme-carbon-noa', leo: 'theme-carbon-leo' },
+  { id: 'nfs-underground', name: 'Need for Speed: Underground', tagline: 'The tuner bar: neon, nitrous and a long line at the garage door.', interior: 'nfs-underground', noa: 'theme-nfs-underground-noa', leo: 'theme-nfs-underground-leo' },
+  { id: 'witcher-3', name: 'The Witcher 3', tagline: 'The Novigrad tavern, where every contract starts over a drink.', interior: 'witcher-3', noa: 'theme-witcher-3-noa', leo: 'theme-witcher-3-leo' },
+  { id: 'cyberpunk-2077', name: 'Cyberpunk 2077', tagline: 'The Night City lounge: chrome, neon and quiet deals.', interior: 'cyberpunk-2077', noa: 'theme-cyberpunk-2077-noa', leo: 'theme-cyberpunk-2077-leo' },
+  { id: 'minecraft', name: 'Minecraft', tagline: 'A taproom in the block village, built one cube at a time.', interior: 'minecraft', noa: 'theme-minecraft-noa', leo: 'theme-minecraft-leo' },
+  { id: 'skyrim', name: 'Skyrim', tagline: 'The Whiterun mead hall, warm fire and louder songs.', interior: 'skyrim', noa: 'theme-skyrim-noa', leo: 'theme-skyrim-leo' },
+  { id: 'stellar-blade', name: 'Stellar Blade', tagline: 'The Xion lounge, the last bright place on a broken Earth.', interior: 'stellar-blade', noa: 'theme-stellar-blade-noa', leo: 'theme-stellar-blade-leo' },
+  { id: 'heroes-3', name: 'Heroes of Might and Magic III', tagline: 'The Erathia inn, where armies rest between campaigns.', interior: 'heroes-3', noa: 'theme-heroes-3-noa', leo: 'theme-heroes-3-leo' },
+  { id: 'borderlands', name: 'Borderlands', tagline: 'The Pandora saloon: loot, bullets and very cold beer.', interior: 'borderlands', noa: 'theme-borderlands-noa', leo: 'theme-borderlands-leo' },
+  { id: 'elden-ring', name: 'Elden Ring', tagline: 'A tavern in the Lands Between for those who still hope.', interior: 'elden-ring', noa: 'theme-elden-ring-noa', leo: 'theme-elden-ring-leo' },
+  { id: 'detroit', name: 'Detroit: Become Human', tagline: 'The android lounge, where nobody asks who is who.', interior: 'detroit', noa: 'theme-detroit-noa', leo: 'theme-detroit-leo' },
+  { id: 'assassins-creed', name: 'Assassin’s Creed', tagline: 'A hidden tavern in Venice, the best seat has a view of the door.', interior: 'assassins-creed', noa: 'theme-assassins-creed-noa', leo: 'theme-assassins-creed-leo' }
 ];
 
 export const passCycle = (now: number) => Math.floor((now - PASS_EPOCH) / PASS_MS);
 export const passId = (now: number) => `pass-${passCycle(now)}`;
-export const passThemeAt = (now: number) => PASS_THEMES[((passCycle(now) % PASS_THEMES.length) + PASS_THEMES.length) % PASS_THEMES.length]!;
+const FIRST_THEME_CYCLE = 19;
+export const passThemeAt = (now: number) => PASS_THEMES[(((passCycle(now) - FIRST_THEME_CYCLE) % PASS_THEMES.length) + PASS_THEMES.length) % PASS_THEMES.length]!;
 export const passStartsAt = (now: number) => PASS_EPOCH + passCycle(now) * PASS_MS;
 export const passEndsAt = (now: number) => passStartsAt(now) + PASS_MS;
 

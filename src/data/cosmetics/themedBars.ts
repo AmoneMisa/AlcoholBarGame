@@ -1,3 +1,5 @@
+import { GAME_THEME_INTERIORS, GAME_THEME_COSTUMES, GAME_THEME_RECOMMENDATIONS } from './gameThemeExpansion';
+
 export const THEMED_INTERIORS = [
   {
     "id": "underwater",
@@ -115,7 +117,8 @@ export const THEMED_INTERIORS = [
     "position": "center",
     "blend": "multiply",
     "crystalCost": 2750
-  }
+  },
+  ...GAME_THEME_INTERIORS,
 ] as const;
 
 export const THEMED_COSTUMES = {
@@ -294,7 +297,13 @@ export const THEMED_COSTUMES = {
       "value": "theme-nfs-underground-noa",
       "label": "NFS Underground · street racer",
       "theme": "nfs-underground"
-    }
+    },
+    {
+      "value": "theme-l2-dark-elf-mage-noa",
+      "label": "Lineage II · Dark Elf mage",
+      "theme": "lineage-2"
+    },
+    ...GAME_THEME_COSTUMES.noa,
   ],
   "leo": [
     {
@@ -471,11 +480,18 @@ export const THEMED_COSTUMES = {
       "value": "theme-nfs-underground-leo",
       "label": "NFS Underground · street racer",
       "theme": "nfs-underground"
-    }
+    },
+    {
+      "value": "theme-l2-dark-elf-mage-leo",
+      "label": "Lineage II · Dark Elf mage",
+      "theme": "lineage-2"
+    },
+    ...GAME_THEME_COSTUMES.leo,
   ]
 } as const;
 
 export const THEMED_INTERIOR_COSTUMES: Readonly<Record<string, { noa: readonly string[]; leo: readonly string[] }>> = {
+  ...GAME_THEME_RECOMMENDATIONS,
   "underwater": {
     "noa": [
       "reference-shark-noa"
@@ -516,7 +532,8 @@ export const THEMED_INTERIOR_COSTUMES: Readonly<Record<string, { noa: readonly s
       "theme-l2-orc-noa",
       "theme-l2-dwarf-noa",
       "theme-l2-kamael-noa",
-      "theme-l2-ertheia-noa"
+      "theme-l2-ertheia-noa",
+      "theme-l2-dark-elf-mage-noa"
     ],
     "leo": [
       "theme-l2-human-leo",
@@ -525,7 +542,8 @@ export const THEMED_INTERIOR_COSTUMES: Readonly<Record<string, { noa: readonly s
       "theme-l2-orc-leo",
       "theme-l2-dwarf-leo",
       "theme-l2-kamael-leo",
-      "theme-l2-ertheia-leo"
+      "theme-l2-ertheia-leo",
+      "theme-l2-dark-elf-mage-leo"
     ]
   },
   "perfect-world": {

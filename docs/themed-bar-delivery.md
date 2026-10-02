@@ -1,8 +1,10 @@
 # Themed bars and bartender wardrobe
 
-Thirteen individually generated 2D painted bar scenes, with seventy new costumes: thirty-five for Noa and thirty-five for Leo. Every original and new background offers matching outfit recommendations for both bartenders. The underwater scene uses the existing male and female shark costumes.
+Thirty individually generated 2D painted bar scenes, with 106 themed costumes: 53 for Noa and 53 for Leo. Every original and new background offers matching outfit recommendations for both bartenders. The underwater scene uses the existing male and female shark costumes.
 
-Each costume has one pose and preserves the existing bartender's human face. Hair uses natural colors. Costumes are packed into twelve transparent WebP atlases, six per bartender, with at most six outfits per atlas. The installer fits each figure without changing its proportions.
+Each costume has one pose. Human looks retain the bartender's identity; named fantasy and alien looks include character-specific wigs, makeup and prosthetics. Costumes are packed into eighteen transparent WebP atlases, nine per bartender, with at most six outfits per atlas. The installer fits each figure without changing its proportions.
+
+The latest [17-game expansion](game-theme-expansion-delivery.md) adds Witcher 3, Heroes III, Elden Ring, Minecraft, Skyrim, Cyberpunk 2077, CS2, Assassin's Creed, Watch Dogs, Sleeping Dogs, Detroit, Neighbours from Hell, GTA, Stellar Blade, R.E.P.O., Among Us and Borderlands. Each has one new bar and a Noa/Leo costume pair. [View these 17 matching scenes](game-theme-expansion-preview.webp).
 
 | Bar | Matching costumes |
 | --- | --- |
@@ -10,7 +12,7 @@ Each costume has one pose and preserves the existing bartender's human face. Hai
 | Underground | Cave keeper for both |
 | Fairy grove | Woodland fairy host for both |
 | Fairytale castle | Royal storybook host for both |
-| Lineage II | Human, Elf, Dark Elf, Orc, Dwarf, Kamael, Ertheia; both sexes |
+| Lineage II | Human, Elf, Dark Elf, Orc, Dwarf, Kamael, Ertheia; both sexes, plus a Dark Elf mage pair |
 | Perfect World | Human, Winged Elf, Untamed, Tideborn, Earthguard, Nightshade; both sexes |
 | Warcraft III | Noa: Sylvanas, Maiev, Jaina, Tyrande. Leo: Illidan, Malfurion, Arthas, Thrall |
 | Allods Online | Kanian, Elf, Gibberling, Xadaganian, Orc, Arisen, Priden, Aoidos; both sexes |
@@ -20,7 +22,7 @@ Each costume has one pose and preserves the existing bartender's human face. Hai
 | NFS Carbon | Nikki-inspired and Darius-inspired racing outfits |
 | NFS Underground | Samantha-inspired and Eddie-inspired tuner outfits |
 
-The race sets follow the user's confirmed PC-game selection. Ertheia's male outfit is an adaptation for Leo. Race and alien features are conveyed through clothing and accessories while retaining the original human bartender faces.
+The race sets follow the user's confirmed PC-game selection. Ertheia's male outfit is an adaptation for Leo. Race collections use human bartender faces with themed clothing and accessories. The sixteen named Warcraft, Lost Ark and Mass Effect costumes have been [revised with recognizable character details and individual poses](iconic-costume-delivery.md), including alien costume masks and makeup.
 
 The Mass Effect lounge was revised to show the Citadel through its panoramic windows, removing the planetary horizon while preserving the bar interior.
 The Most Wanted scene was corrected to remove the erroneous wing from the car's front hood; the coupe and garage bar remain in place.
@@ -35,4 +37,6 @@ Each new background brings its primary costume through the existing background p
 
 Previews: [Backgrounds](themed-backgrounds-preview.webp), [matching bartender pairs](themed-bars-preview.webp), [Noa's complete set](noa-themed-costumes-preview.webp), [Leo's complete set](leo-themed-costumes-preview.webp).
 
-Validation: all 83 final generations installed as 13 backgrounds and 12 costume atlases containing 70 outfits. Transparency and proportions checked during packing and on the complete preview sheets. All 33 backgrounds have different file hashes. Type checking and client/server production builds pass. The full suite passes 220 of 221 tests; the remaining existing failure flags raw form controls in the unused CharacterStudio component.
+Validation: all 136 final generations installed as 30 backgrounds and 18 costume atlases containing 106 outfits. Transparency and proportions checked during packing and on the complete preview sheets. All 50 original and themed backgrounds have different file hashes. Type checking and client/server production builds pass. All 23 targeted wardrobe, background and ownership checks pass. The full suite passes 220 of 221 tests; the remaining existing failure flags raw form controls in the unused CharacterStudio component.
+
+The additional [Dark Elf mage pair](lineage-mage-pair-preview.webp) fills the last empty cell in each sixth themed atlas, adding two costumes without adding more runtime image files.

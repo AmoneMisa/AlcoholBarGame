@@ -183,6 +183,9 @@ test('The schedule does not move: the running season stays, the next ones follow
   assert.equal(day(10, 12), 'lineage-2');
   assert.equal(day(10, 26), 'warcraft-3');
   assert.equal(day(11, 9), 'mass-effect');
+  assert.equal(passThemeAt(Date.UTC(2027, 0, 18)).id, 'nfs-underground');
+  assert.equal(passThemeAt(Date.UTC(2027, 1, 1)).id, 'witcher-3', 'the first of the ten newest');
+  assert.equal(passThemeAt(Date.UTC(2026, 8, 28)).id, 'lost-ark', 'the pass began 28 September');
   // Over a full rotation every season comes exactly once.
   const rotation = PASS_THEMES.map((_, step) => passThemeAt(Date.UTC(2026, 9, 12) + step * PASS_MS).id);
   assert.equal(new Set(rotation).size, PASS_THEMES.length);
