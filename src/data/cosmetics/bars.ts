@@ -30,6 +30,9 @@ export type InteriorId = typeof INTERIORS[number]['id'];
 // The most expensive backgrounds are special-event rewards: they cannot be bought or gifted, only found in boxes
 // (Gold and Choice boxes, season and leaderboard rewards). Players who already bought one keep it.
 export const EVENT_INTERIOR_IDS = ['inferno-penthouse', 'parisian', 'cyberpunk', 'marina', 'rooftop'] as const;
+// Silver and Gold boxes draw their background reward from this pool: the event backgrounds (box-only) and the
+// themed ones (which can also be bought). Each background comes with its one connected style.
+export const BOX_INTERIOR_IDS: readonly string[] = [...EVENT_INTERIOR_IDS, ...THEMED_INTERIORS.map((item) => item.id)];
 export const isEventInterior = (id: string) => (EVENT_INTERIOR_IDS as readonly string[]).includes(id);
 export const DUPLICATE_INTERIOR_SHARDS = 30;
 export const WALLS = ['neon','burgundy','emerald','navy','plum','charcoal','ivory','terracotta'] as const;

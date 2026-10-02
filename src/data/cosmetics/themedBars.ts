@@ -15,7 +15,7 @@ export const THEMED_INTERIORS = [
     "tint": "#10162222",
     "position": "center",
     "blend": "multiply",
-    "crystalCost": 1200
+    "crystalCost": 1350
   },
   {
     "id": "fairy",
@@ -24,7 +24,7 @@ export const THEMED_INTERIORS = [
     "tint": "#10162222",
     "position": "center",
     "blend": "multiply",
-    "crystalCost": 1200
+    "crystalCost": 1450
   },
   {
     "id": "fairytale",
@@ -33,7 +33,7 @@ export const THEMED_INTERIORS = [
     "tint": "#10162222",
     "position": "center",
     "blend": "multiply",
-    "crystalCost": 1200
+    "crystalCost": 1550
   },
   {
     "id": "lineage-2",
@@ -42,7 +42,7 @@ export const THEMED_INTERIORS = [
     "tint": "#10162222",
     "position": "center",
     "blend": "multiply",
-    "crystalCost": 1200
+    "crystalCost": 1700
   },
   {
     "id": "perfect-world",
@@ -51,7 +51,7 @@ export const THEMED_INTERIORS = [
     "tint": "#10162222",
     "position": "center",
     "blend": "multiply",
-    "crystalCost": 1200
+    "crystalCost": 1750
   },
   {
     "id": "warcraft-3",
@@ -60,7 +60,7 @@ export const THEMED_INTERIORS = [
     "tint": "#10162222",
     "position": "center",
     "blend": "multiply",
-    "crystalCost": 1200
+    "crystalCost": 1850
   },
   {
     "id": "allods",
@@ -69,7 +69,7 @@ export const THEMED_INTERIORS = [
     "tint": "#10162222",
     "position": "center",
     "blend": "multiply",
-    "crystalCost": 1200
+    "crystalCost": 2000
   },
   {
     "id": "lost-ark",
@@ -78,7 +78,7 @@ export const THEMED_INTERIORS = [
     "tint": "#10162222",
     "position": "center",
     "blend": "multiply",
-    "crystalCost": 1200
+    "crystalCost": 2250
   },
   {
     "id": "mass-effect",
@@ -87,7 +87,7 @@ export const THEMED_INTERIORS = [
     "tint": "#10162222",
     "position": "center",
     "blend": "multiply",
-    "crystalCost": 1200
+    "crystalCost": 2300
   },
   {
     "id": "nfs-most-wanted",
@@ -96,7 +96,7 @@ export const THEMED_INTERIORS = [
     "tint": "#10162222",
     "position": "center",
     "blend": "multiply",
-    "crystalCost": 1200
+    "crystalCost": 2400
   },
   {
     "id": "nfs-carbon",
@@ -105,7 +105,7 @@ export const THEMED_INTERIORS = [
     "tint": "#10162222",
     "position": "center",
     "blend": "multiply",
-    "crystalCost": 1200
+    "crystalCost": 2600
   },
   {
     "id": "nfs-underground",
@@ -114,7 +114,7 @@ export const THEMED_INTERIORS = [
     "tint": "#10162222",
     "position": "center",
     "blend": "multiply",
-    "crystalCost": 1200
+    "crystalCost": 2750
   }
 ] as const;
 
@@ -632,7 +632,177 @@ export const themedCostumeFor = (character: string, outfit: string) => {
   const choices = THEMED_COSTUMES[character as keyof typeof THEMED_COSTUMES] ?? [];
   const index = choices.findIndex(choice => choice.value === outfit);
   if (index < 0) return undefined;
-  return { ...choices[index]!, index: index % 6, columns: 3, rows: 2, frameRatio: 316 / 552,
+  return { ...choices[index]!, index: index % 6, columns: 3, rows: 2, frameRatio: 420 / 552,
     sheet: `/assets/characters/bartender/${character}-themed-atlas-v${Math.floor(index / 6) + 1}.webp` };
 };
+
+// Recommendations offer both bartenders a look for every original and new bar.
+export const INTERIOR_COSTUME_RECOMMENDATIONS: Readonly<Record<string, { noa: readonly string[]; leo: readonly string[] }>> = {
+  ...{
+  "velvet": {
+    "noa": [
+      "vest"
+    ],
+    "leo": [
+      "vest"
+    ]
+  },
+  "garden": {
+    "noa": [
+      "reference-final-57"
+    ],
+    "leo": [
+      "reference-frost-mage"
+    ]
+  },
+  "skyline": {
+    "noa": [
+      "reference-trench"
+    ],
+    "leo": [
+      "reference-final-94"
+    ]
+  },
+  "inferno-penthouse": {
+    "noa": [
+      "reference-flame"
+    ],
+    "leo": [
+      "reference-final-54"
+    ]
+  },
+  "speakeasy": {
+    "noa": [
+      "reference-final-115"
+    ],
+    "leo": [
+      "reference-final-54"
+    ]
+  },
+  "jazz-cellar": {
+    "noa": [
+      "reference-final-12"
+    ],
+    "leo": [
+      "reference-black-tie"
+    ]
+  },
+  "art-deco": {
+    "noa": [
+      "reference-violet-gown"
+    ],
+    "leo": [
+      "reference-tailcoat"
+    ]
+  },
+  "library": {
+    "noa": [
+      "reference-teal-mage"
+    ],
+    "leo": [
+      "reference-frost-mage"
+    ]
+  },
+  "palace": {
+    "noa": [
+      "reference-royal"
+    ],
+    "leo": [
+      "reference-court"
+    ]
+  },
+  "tropical": {
+    "noa": [
+      "reference-turquoise"
+    ],
+    "leo": [
+      "reference-final-60"
+    ]
+  },
+  "desert": {
+    "noa": [
+      "reference-desert"
+    ],
+    "leo": [
+      "reference-explorer"
+    ]
+  },
+  "winter": {
+    "noa": [
+      "reference-ice-gown"
+    ],
+    "leo": [
+      "reference-ice-king"
+    ]
+  },
+  "beach": {
+    "noa": [
+      "reference-final-79"
+    ],
+    "leo": [
+      "reference-final-51"
+    ]
+  },
+  "rooftop": {
+    "noa": [
+      "reference-final-47"
+    ],
+    "leo": [
+      "reference-final-21"
+    ]
+  },
+  "cyberpunk": {
+    "noa": [
+      "reference-neon-hood"
+    ],
+    "leo": [
+      "reference-tech"
+    ]
+  },
+  "izakaya": {
+    "noa": [
+      "reference-sakura"
+    ],
+    "leo": [
+      "reference-samurai"
+    ]
+  },
+  "marina": {
+    "noa": [
+      "reference-traveler"
+    ],
+    "leo": [
+      "reference-final-61"
+    ]
+  },
+  "parisian": {
+    "noa": [
+      "reference-final-97"
+    ],
+    "leo": [
+      "reference-tailored"
+    ]
+  },
+  "loft": {
+    "noa": [
+      "reference-streetwear"
+    ],
+    "leo": [
+      "reference-denim"
+    ]
+  },
+  "riad": {
+    "noa": [
+      "reference-final-85"
+    ],
+    "leo": [
+      "reference-historical"
+    ]
+  }
+},
+  ...THEMED_INTERIOR_COSTUMES,
+};
+export const costumesForInterior = (interior: string, character: string): readonly string[] =>
+  INTERIOR_COSTUME_RECOMMENDATIONS[interior]?.[character as 'noa' | 'leo'] ?? [];
+
 

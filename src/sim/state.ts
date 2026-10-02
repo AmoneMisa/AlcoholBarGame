@@ -1,5 +1,5 @@
 import { INGREDIENTS, RECIPES, REGIONS, STARTING_INVENTORY } from '../domain/catalog';
-import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
+import { ALCOHOL_PRODUCTS, isStarterBottle } from '../domain/bottleCatalog';
 import { cosmeticFor } from '../domain/cosmetics';
 import { REFERENCE_COSTUME_IDS } from '../data/cosmetics/bartenderCostumes';
 import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
@@ -224,7 +224,8 @@ export function createInitialState(now = Date.now()): PlayerState {
     dailyLessonResult: 'Complete today’s three lessons to grow your learning streak.',
     inventories: Object.fromEntries(REGIONS.map((region) => [region.id, makeBarInventory(starting)])) as Record<RegionId, InventoryItem[]>,
     bottleInventories: Object.fromEntries(REGIONS.map((region, barIndex) => [region.id, ALCOHOL_PRODUCTS.map((product, productIndex) => ({
-      productId: product.id, quantity: 1 + ((barIndex + productIndex * 2) % 4)
+      // Only the mainstream basics are on the shelf at the start; every other label has to be topped up first.
+      productId: product.id, quantity: isStarterBottle(product) ? 2 + ((barIndex + productIndex) % 2) : 0
     }))])) as Record<RegionId, BottleInventoryItem[]>,
     customers: starterGuests,
     activeCustomerId: firstGuest.id,

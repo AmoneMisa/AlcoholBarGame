@@ -15,11 +15,25 @@ import CharacterModel from '../characters/CharacterModel.vue';
 import CityEvent from './CityEvent.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
 import UiIcon from '../ui/UiIcon.vue';
+import UiButton from '../ui/UiButton.vue';
+import UiCheckbox from '../ui/UiCheckbox.vue';
 import Glyph from '../ui/Glyph.vue';
 import { INTERIORS, shelfStyleFor } from '../../data/cosmetics/bars';
 import { sceneLayout } from '../../data/cosmetics/barLines';
 
 const game = useGameStore();
+// Full view: the bar as one clean picture. The player can hide the shelf labels and arrows, the bottles, the guests
+// and the bartender, to look at (or screenshot) the background on its own.
+const fullView = ref(false);
+const hide = ref({ shelves: false, bottles: false, guests: false, barman: false });
+const HIDE_OPTIONS = [['shelves', 'Hide shelves'], ['bottles', 'Hide bottles'], ['guests', 'Hide guests'], ['barman', 'Hide bartender']] as const;
+function setFullView(open: boolean) {
+  fullView.value = open;
+  document.body.classList.toggle('modal-open', open);
+  if (open) window.addEventListener('keydown', onFullViewKey); else window.removeEventListener('keydown', onFullViewKey);
+}
+function onFullViewKey(event: KeyboardEvent) { if (event.key === 'Escape') setFullView(false); }
+onBeforeUnmount(() => { if (fullView.value) setFullView(false); });
 const ashtrayArt = `${import.meta.env.BASE_URL}assets/bar/props/ashtray.webp`;
 // `preview` renders the bar exactly as decorated (shelves always on, no guests or glass) for the Design tab.
 const props = withDefaults(defineProps<{ active?: boolean; preview?: boolean }>(), { active: true, preview: false });
@@ -467,9 +481,14 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section ref="sceneRef" class="bar-scene" :class="{ 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack && !preview, 'is-preview': preview }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
+  <section ref="sceneRef" class="bar-scene" :class="{ 'full-view': fullView, 'fv-no-shelves': fullView && hide.shelves, 'fv-no-bottles': fullView && hide.bottles, 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack && !preview, 'is-preview': preview }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
     <div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div>
-    <CityEvent v-if="!preview" compact />
+    <CityEvent v-if="!preview && !fullView" compact />
+    <UiButton v-if="!preview && !fullView" class="fv-open" size="sm" variant="secondary" @click="setFullView(true)"><UiIcon name="eye" />Full view</UiButton>
+    <div v-if="fullView" class="fv-panel" role="group" aria-label="Full view options">
+      <UiCheckbox v-for="[key, label] in HIDE_OPTIONS" :key="key" v-model="hide[key]" :label="label" />
+      <UiButton variant="solid" size="sm" @click="setFullView(false)">Close full view</UiButton>
+    </div>
     <div v-if="buildingEnabled || preview" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
       <small v-if="shelfRows.length && !preview" class="pshelf-hint" :style="{ left: shelfRows[0]!.style.left, top: `calc(${shelfRows[0]!.style.top} - 18px)` }">Use the arrows to browse a shelf · pull a bottle down to the glass</small>
       <div v-for="row in shelfRows" :key="row.id" class="pshelf-row" :style="row.style">
@@ -483,11 +502,11 @@ onBeforeUnmount(() => {
         <span class="shelf-nudge"><button type="button" :aria-label="`Scroll ${row.label} left`" @pointerdown.stop @click.stop="nudgeLine(row.id, -1)"><UiIcon name="chevron-left" /></button><button type="button" :aria-label="`Scroll ${row.label} right`" @pointerdown.stop @click.stop="nudgeLine(row.id, 1)"><UiIcon name="chevron-right" /></button></span>
       </div>
     </div>
-    <div class="bartender-layer">
+    <div v-if="!(fullView && hide.barman)" class="bartender-layer">
       <CharacterModel role="bartender" :character-id="game.decor.bartenderCharacter ?? 'noa'" :outfit="game.decor.bartender" :face-style="game.decor.face" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :skin-detail="game.decor.skinDetail" :skin-tone="game.decor.skinTone" :tan-level="game.decor.tanLevel" :bust="game.decor.bust" :pose="game.decor.pose" :eye-shape="game.decor.eyeShape" :brow-shape="game.decor.browShape" :nose-shape="game.decor.noseShape" :lip-shape="game.decor.lipShape" :cheek-shape="game.decor.cheekShape" :eye-color="game.decor.eyeColor" :eyeliner="game.decor.eyeliner" :eyeshadow="game.decor.eyeshadow" :lip-color="game.decor.lipColor" :blush="game.decor.blush" :facial-hair="game.decor.facialHair" :outfit-color="game.decor.outfitColor" animation="idle" />
       <span class="name-ribbon">{{ (game.decor.bartenderNickname || (game.decor.bartenderCharacter === 'leo' ? 'Leo' : 'Noa')).toUpperCase() }} · BARTENDER</span>
     </div>
-    <div v-if="!preview" ref="castRef" class="bar-cast" @scroll.passive="onGuestScroll">
+    <div v-if="!preview && !(fullView && hide.guests)" ref="castRef" class="bar-cast" @scroll.passive="onGuestScroll">
       <!-- Only the figure and the card take taps; the rest of the guest's column lets presses reach the shelves. -->
       <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" data-guide="guest" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" :style="customerStyle(index)" :aria-label="`Talk to ${customer.name}`" @click="game.openConversation(customer.id)">
         <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="faceOf(customer)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
@@ -508,11 +527,11 @@ onBeforeUnmount(() => {
       <button v-if="game.ashtrays.dirty" type="button" class="clean-ashtrays" @click="game.cleanAshtrays()"><UiIcon class="inline-icon" name="brush" /> Clean {{ game.ashtrays.dirty }} ashtray{{ game.ashtrays.dirty === 1 ? '' : 's' }}</button>
       <!-- The wait for the next guest is shown once, in the panel below the scene (with “Welcome now”). -->
     </div>
-    <template v-if="guestsOverflow && !preview && !rulesOpen">
+    <template v-if="guestsOverflow && !preview && !rulesOpen && !fullView">
       <button class="guest-nudge prev" type="button" aria-label="Show earlier guests" :disabled="guestScroll <= 2" @click="nudgeGuests(-1)"><UiIcon name="chevron-left" /></button>
       <button class="guest-nudge next" type="button" aria-label="Show more guests" :disabled="guestScroll >= phoneTrack!.content - phoneTrack!.zone - 2" @click="nudgeGuests(1)"><UiIcon name="chevron-right" /></button>
     </template>
-    <div v-if="buildingEnabled && !preview" ref="glassTarget" class="live-glass-station" data-guide="glass" :class="{ 'drag-over': dragOverGlass }">
+    <div v-if="buildingEnabled && !preview && !fullView" ref="glassTarget" class="live-glass-station" data-guide="glass" :class="{ 'drag-over': dragOverGlass }">
       <div v-if="dragOverGlass || totalAmount || itemCount" class="live-glass-copy"><b>{{ dragOverGlass ? 'POURING' : totalAmount ? `${totalAmount} ML` : 'FRESH' }}</b><small v-if="itemCount">+ {{ itemCount }} fresh item{{ itemCount === 1 ? '' : 's' }}</small></div>
       <div class="live-glass-wrap">
         <div v-if="dragOverGlass" class="live-pour-stream" :style="{ '--stream-color': selectedIngredient ? colorMap[selectedIngredient.id] : liquidColor }"></div>

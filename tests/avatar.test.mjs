@@ -32,7 +32,8 @@ test('Avatars share compact atlases with unique hairstyle cells and fixed natura
     assert.equal(bartenderAvatarFor(character, 'legacy-unknown'), BARTENDER_AVATARS[character][0]);
   }
   assert.equal(bartenderAvatarFor('marin', 'waves'), undefined);
-  assert.deepEqual(readdirSync(new URL('../public/assets/characters/bartender/', import.meta.url)).sort(), [
+  // The themed sheets (one pair of backgrounds and costumes per theme) are checked with the themed styles; here only the others.
+  assert.deepEqual(readdirSync(new URL('../public/assets/characters/bartender/', import.meta.url)).filter((name) => !name.includes('-themed-atlas-')).sort(), [
     'leo-costumes-atlas-v1.webp',
     'leo-costumes-atlas-v2.webp',
     'leo-costumes-atlas-v3.webp',

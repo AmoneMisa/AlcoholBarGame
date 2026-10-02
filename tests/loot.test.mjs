@@ -587,7 +587,7 @@ test('Week-end notice appears only for a claimable reward, once per week key', a
 });
 
 test('Event backgrounds cannot be bought or gifted, come from boxes, and duplicates become shards', async () => {
-  const { EVENT_INTERIOR_IDS, INTERIORS: all, DUPLICATE_INTERIOR_SHARDS, DEFAULT_BARS: bars } = await import('../src/data/cosmetics/bars.ts');
+  const { EVENT_INTERIOR_IDS, BOX_INTERIOR_IDS, INTERIORS: all, DUPLICATE_INTERIOR_SHARDS, DEFAULT_BARS: bars } = await import('../src/data/cosmetics/bars.ts');
   const { giftPrice } = await import('../src/sim/gifts.ts');
   const { BOX_TABLES, rollFromTable } = await import('../src/domain/loot.ts');
   const { grantReward } = await import('../src/sim/loot.ts');
@@ -607,11 +607,13 @@ test('Event backgrounds cannot be bought or gifted, come from boxes, and duplica
   assert.ok(BOX_TABLES.silver.some((entry) => entry.make(1, () => 0).kind === 'eventInterior'));
   // Granting picks a background the player does not own; once all are owned it pays skin shards.
   const owned = new Set();
-  for (let i = 0; i < EVENT_INTERIOR_IDS.length; i++) {
+  // The pool is the event backgrounds plus the themed ones (which can also be bought).
+  const before0 = BOX_INTERIOR_IDS.filter((id) => state.ownedInteriorIds.includes(id)).length;
+  for (let i = before0; i < BOX_INTERIOR_IDS.length; i++) {
     const text = grantReward(state, { kind: 'eventInterior' }, () => 0);
-    assert.match(text, /special event background/);
+    assert.match(text, /the background/);
   }
-  assert.ok(EVENT_INTERIOR_IDS.every((id) => state.ownedInteriorIds.includes(id)));
+  assert.ok(BOX_INTERIOR_IDS.every((id) => state.ownedInteriorIds.includes(id)));
   const before = state.loot.skinShards;
   assert.match(grantReward(state, { kind: 'eventInterior' }, () => 0), /skin shards/);
   assert.equal(state.loot.skinShards, before + DUPLICATE_INTERIOR_SHARDS);

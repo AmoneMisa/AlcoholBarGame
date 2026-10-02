@@ -34,8 +34,9 @@ import { BAR_PROFILE_OPTIONS } from '../../data/cosmetics/bars';
 import { bartenderAvatarFor } from '../../data/cosmetics/bartenderAvatars';
 import { bartenderCostumeFor, bartenderCostumesFor } from '../../data/cosmetics/bartenderCostumes';
 import { COSMETICS } from '../../domain/cosmetics';
-import { achievementForStyle, interiorForStyle, STYLE_PIECES_TO_CRAFT, STYLE_SHOP_PRICE, styleSource } from '../../data/cosmetics/styleSources';
-import { ACHIEVEMENTS } from '../../domain/quests';
+import { STYLE_SHOP_PRICE } from '../../data/cosmetics/styleSources';
+import { styleOrigin } from '../../domain/styleInfo';
+import StylePreview from './StylePreview.vue';
 
 const props = withDefaults(defineProps<{ activeView?: string; designSection?: 'bar' | 'character' }>(), { activeView: 'inventory' });
 const game = useGameStore();
@@ -96,15 +97,14 @@ const styleInfo = computed(() => {
   const value = pendingStyle.value; const character = selectedBartender.value;
   const item = COSMETICS.find((entry) => entry.key === 'bartender' && entry.value === value && entry.character === character);
   if (!item || game.ownedCosmeticIds.includes(item.id)) return null;
-  const source = styleSource(character, value);
-  const interior = INTERIORS.find((entry) => entry.id === interiorForStyle(character, value));
-  const goal = ACHIEVEMENTS.find((entry) => entry.id === achievementForStyle(character, value));
-  const how = source === 'shop' ? `Buy it for ${STYLE_SHOP_PRICE} crystals.`
-    : source === 'achievement' ? `Achievement reward: ${goal?.name ?? ''}.`
-    : source === 'background' ? (interior && isEventInterior(interior.id) ? `Comes with its special-event background, found in Silver and Gold boxes. It is not sold on its own.` : `Comes with its background — buy the background in Design › Bar, or craft the style from ${STYLE_PIECES_TO_CRAFT} style shards. It is not sold on its own.`)
-    : `Comes from boxes: a rare full-style drop, or craft it from ${STYLE_PIECES_TO_CRAFT} style shards in the Workshop.`;
-  return { item, source, how, background: source === 'background' ? (interior?.name ?? '') : '' };
+  return { item, ...styleOrigin(character, value) };
 });
+// The preview: try a background and a style before owning them. Locked backgrounds open it instead of being bought on a tap.
+const previewOpen = ref(false);
+const previewInterior = ref('');
+const previewOutfit = ref('');
+function openPreview(interior?: string, outfit?: string) { previewInterior.value = interior ?? game.decor.interior; previewOutfit.value = outfit ?? game.decor.bartender; previewOpen.value = true; }
+function pickInterior(id: string) { if (isInteriorOwned(id)) game.chooseInterior(id); else openPreview(id); }
 function pickOutfit(outfit: typeof BARTENDER_OUTFITS[number]) {
   if (cosmeticLocked('bartender',outfit)) { pendingStyle.value = outfit; return; }
   pendingStyle.value = ''; game.decor.bartender = outfit;
@@ -273,7 +273,7 @@ function selectBartender(id: 'noa' | 'leo') {
       <form class="bar-name-editor" @submit.prevent="game.renameBar(barName)"><label :for="'bar-name'">Bar name in {{ game.region.name }}<UiInput id="bar-name" v-model="barName" maxlength="32" required placeholder="Name your bar" /></label><UiButton type="submit" variant="solid">Save name</UiButton></form>
           <div class="design-preview" aria-label="Live preview of your bar"><BarScene preview :active="false" /></div>
         <div class="design-options">
-          <section class="background-picker"><small>{{ INTERIORS.length }} BACKGROUNDS · {{ game.ownedInteriorIds.length }} OWNED</small><div><button v-for="interior in INTERIORS" :key="interior.id" :class="{active:game.decor.interior === interior.id,locked:!isInteriorOwned(interior.id),special:'special' in interior && interior.special}" :style="interiorStyle(interior.id)" type="button" @click="game.chooseInterior(interior.id)"><em v-if="!isInteriorOwned(interior.id)"><template v-if="isEventInterior(interior.id)">★ Event · boxes</template><CrystalAmount v-else :value="interior.crystalCost" /></em><span>{{ interior.name }}</span></button></div></section>
+          <section class="background-picker"><small>{{ INTERIORS.length }} BACKGROUNDS · {{ game.ownedInteriorIds.length }} OWNED</small><UiButton size="sm" variant="secondary" class="preview-open" @click="openPreview()">Preview backgrounds &amp; styles</UiButton><div><button v-for="interior in INTERIORS" :key="interior.id" :class="{active:game.decor.interior === interior.id,locked:!isInteriorOwned(interior.id),special:'special' in interior && interior.special}" :style="interiorStyle(interior.id)" type="button" @click="pickInterior(interior.id)"><em v-if="!isInteriorOwned(interior.id)"><template v-if="isEventInterior(interior.id)">★ Event · boxes</template><CrystalAmount v-else :value="interior.crystalCost" /></em><span>{{ interior.name }}</span></button></div></section>
           <section><small>WALL COLOR</small><div><button v-for="wall in WALLS" :key="wall" :class="{ active: game.decor.wall === wall }" type="button" @click="game.decor.wall = wall"><i :data-color="wall"></i>{{ wall }}</button></div></section>
           <section class="shelf-style-picker"><small>BACK-BAR SHELVES · {{ shelfStyleFor(game.decor) }}</small><div><button v-for="shelf in SHELF_STYLES" :key="shelf" :class="{ active: (game.decor.shelf ?? 'auto') === shelf }" :data-shelf-swatch="shelf === 'auto' ? shelfStyleFor({ interior: game.decor.interior }) : shelf" type="button" @click="game.decor.shelf = shelf">{{ shelf === 'auto' ? 'Match background' : shelf }}</button></div></section>
           <section><small>HIGHLIGHT COLOR</small><div><button v-for="light in HIGHLIGHTS" :key="light" :class="{ active: game.decor.lighting === light }" type="button" @click="game.decor.lighting = light"><i :data-color="light"></i>{{ light }}</button></div></section>
@@ -294,6 +294,7 @@ function selectBartender(id: 'noa' | 'leo') {
             <b>{{ styleInfo.item.label }}</b>
             <span>{{ styleInfo.how }}</span>
             <span v-if="styleInfo.background">Background: “{{ styleInfo.background }}”.</span>
+            <UiButton size="sm" variant="secondary" @click="openPreview(undefined, pendingStyle)">Preview this style</UiButton>
             <button v-if="styleInfo.source === 'shop'" class="ui-btn ui-btn-primary ui-btn-sm" type="button" :disabled="game.crystals < STYLE_SHOP_PRICE" @click="game.buyStyle(styleInfo.item.id); pendingStyle = ''">Buy · {{ STYLE_SHOP_PRICE }} 💎</button>
           </div>
             <div class="avatar-options">
@@ -319,5 +320,6 @@ function selectBartender(id: 'noa' | 'leo') {
     </article>
 
     <PairingAdvisor v-show="activeView === 'advisor'" />
+    <StylePreview v-if="previewOpen" :character="selectedBartender === 'leo' ? 'leo' : 'noa'" :interior="previewInterior" :outfit="previewOutfit" @close="previewOpen = false" />
   </section>
 </template>

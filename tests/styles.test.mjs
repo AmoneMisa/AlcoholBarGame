@@ -160,7 +160,7 @@ test('Achievements give both bartenders their styles', () => {
 test('A box background brings its own style, and event backgrounds are only in boxes', () => {
   const state = fresh();
   grantReward(state, { kind: 'eventInterior' }, () => .5);   // the special-event background reward of Silver and Gold boxes
-  const gained = state.ownedInteriorIds.filter((interiorId) => isEventInterior(interiorId));
+  const gained = state.ownedInteriorIds.filter((interiorId) => interiorId !== 'velvet');
   assert.equal(gained.length, 1);
   const style = INTERIOR_STYLE[gained[0]];
   assert.ok(state.ownedCosmeticIds.includes(id(style.character, style.value)), 'the background came with its style');
@@ -174,4 +174,19 @@ test('A style someone is already wearing stays theirs after the update', () => {
   state.bars[state.regionId].bartender = 'reference-qipao';
   normalizePlayerState(state);
   assert.ok(state.ownedCosmeticIds.includes(id('noa', 'reference-qipao')));
+});
+
+test('A new bar starts with a few basic bottles only; premium and other labels are topped up with crystals', async () => {
+  const { ALCOHOL_PRODUCTS, STARTER_BOTTLE_IDS, isPremiumBottle, bottleRestockCrystalCost } = await import('../src/domain/bottleCatalog.ts');
+  const state = fresh();
+  for (const shelf of Object.values(state.bottleInventories)) {
+    const onShelf = shelf.filter((item) => item.quantity > 0).map((item) => item.productId).sort();
+    assert.deepEqual(onShelf, [...STARTER_BOTTLE_IDS].sort());
+    assert.ok(ALCOHOL_PRODUCTS.filter(isPremiumBottle).every((product) => (shelf.find((item) => item.productId === product.id)?.quantity ?? 0) === 0), 'no premium bottle at the start');
+  }
+  const premium = ALCOHOL_PRODUCTS.find((product) => product.id === 'moet-imperial');
+  state.crystals = 500;
+  applyAction(state, { type: 'buyBottleStock', productId: premium.id, quantity: 2 }, context());
+  assert.equal(state.bottleInventories[state.regionId].find((item) => item.productId === premium.id).quantity, 2);
+  assert.equal(state.crystals, 500 - bottleRestockCrystalCost(premium) * 2);
 });

@@ -3,7 +3,7 @@ import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { coins } from '../domain/economy';
 import { COSMETICS, DRAWABLE_COSMETICS, interiorForCosmetic } from '../domain/cosmetics';
 import { ACHIEVEMENT_STYLES, STYLE_PIECES_TO_CRAFT, styleForInterior } from '../data/cosmetics/styleSources';
-import { DUPLICATE_INTERIOR_SHARDS, EVENT_INTERIOR_IDS, INTERIORS, isEventInterior } from '../data/cosmetics/bars';
+import { BOX_INTERIOR_IDS, DUPLICATE_INTERIOR_SHARDS, INTERIORS, isEventInterior } from '../data/cosmetics/bars';
 import { levelFor, MAX_LEVEL } from '../domain/progression';
 import {
   BOOST_KINDS, BOXES, CONSUMABLES, DRAW_COST, DUPLICATE_SHARDS, EQUIPMENT, FEATURED_SHARE, SHARD_CRAFT_COST,
@@ -110,14 +110,14 @@ export function grantReward(state: PlayerState, reward: Reward, random: () => nu
       return `a ${recipe.name} recipe card`;
     }
     case 'eventInterior': {
-      const missing = EVENT_INTERIOR_IDS.filter((id) => !state.ownedInteriorIds.includes(id));
-      if (!missing.length) { loot.skinShards += DUPLICATE_INTERIOR_SHARDS; return `${DUPLICATE_INTERIOR_SHARDS} skin shards (you own every event background)`; }
+      const missing = BOX_INTERIOR_IDS.filter((id) => !state.ownedInteriorIds.includes(id));
+      if (!missing.length) { loot.skinShards += DUPLICATE_INTERIOR_SHARDS; return `${DUPLICATE_INTERIOR_SHARDS} skin shards (you own every box background)`; }
       const id = missing[Math.min(missing.length - 1, Math.floor(random() * missing.length))]!;
       state.ownedInteriorIds.push(id);
       // The background's own style comes with it.
       const style = styleForInterior(id);
       const styleName = style ? grantCosmetic(state, `bartender:${style.value}:${style.character}`) : '';
-      return `the special event background “${INTERIORS.find((item) => item.id === id)!.name}”${styleName ? ` and its style ${styleName}` : ''}`;
+      return `the background “${INTERIORS.find((item) => item.id === id)!.name}”${styleName ? ` and its style ${styleName}` : ''}`;
     }
     case 'mysteryBottle': {
       const product = randomBottle(random);

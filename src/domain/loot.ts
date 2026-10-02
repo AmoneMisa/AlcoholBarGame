@@ -197,7 +197,7 @@ export function describeReward(reward: Reward, names: { consumable: (id: string)
     case 'consumable': return `${reward.amount} × ${names.consumable(reward.id)}`;
     case 'recipeCard': return 'a recipe card';
     case 'mysteryBottle': return 'a mystery bottle';
-    case 'eventInterior': return 'a special event background with its matching style';
+    case 'eventInterior': return 'a special background with its matching style';
   }
 }
 

@@ -293,3 +293,12 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .style-info { display: grid; gap: 4px; margin-top: 10px; padding: 10px 12px; border: 1px solid #d8aa5766; border-radius: 10px; background: #d8aa570f; font-size: 13px; }
 .style-info b { color: #e4b35c; }
 .style-info .ui-btn { justify-self: start; margin-top: 4px; }
+
+/* Full view of the bar: the scene fills the screen as one picture; the controls and labels step aside. */
+.bar-scene .fv-open { position: absolute; z-index: 6; top: 10px; right: 10px; }
+.bar-scene.full-view { position: fixed; z-index: 1400; inset: 0; min-height: 0; height: 100dvh; border: 0; border-radius: 0; }
+.bar-scene.full-view :is(.scene-customer .guest-card, .house-rules-button, .bar-event, .clean-ashtrays, .name-ribbon, .pshelf-hint) { display: none !important; }
+.bar-scene.full-view .bar-cast, .bar-scene.full-view .scene-customer { pointer-events: none; }
+.bar-scene.full-view.fv-no-shelves :is(.pshelf-label, .shelf-nudge) { display: none !important; }
+.bar-scene.full-view.fv-no-bottles .pshelf-bottles { visibility: hidden; }
+.fv-panel { position: absolute; z-index: 8; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 16px; width: max-content; max-width: calc(100% - 24px); padding: 10px 14px; border: 1px solid #d8aa5766; border-radius: 14px; background: #0c1421ee; backdrop-filter: blur(10px); }

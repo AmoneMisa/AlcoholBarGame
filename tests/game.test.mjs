@@ -6,7 +6,7 @@ import { nextTick } from 'vue';
 import { checkText } from '../src/domain/english/checker.ts';
 import { questionTemplates,tilesFor,withArticle,buildProfile,matchesFacts,sentenceWords,correctedTileSelection } from '../src/domain/conversation/customerTalk.ts';
 import { INGREDIENTS,RECIPES,REGIONS,SUPPLIERS,estimateRecipeAbv,recipeAlcoholLabel } from '../src/domain/catalog.ts';
-import { ALCOHOL_PRODUCTS,bottleRestockCrystalCost,bottleSaleCrystalReward } from '../src/domain/bottleCatalog.ts';
+import { ALCOHOL_PRODUCTS,bottleRestockCrystalCost,bottleSaleCrystalReward,isPremiumBottle } from '../src/domain/bottleCatalog.ts';
 import { brandBottleArtIndex,ingredientBottleArtIndex,PAINTED_BOTTLE_COLUMNS,PAINTED_BOTTLE_ROWS } from '../src/domain/bottleArt.ts';
 import { bottleQuestionTemplates,rankBottles } from '../src/domain/conversation/bottleTalk.ts';
 import { createMarket,generateCustomer } from '../src/domain/engine.ts';
@@ -186,8 +186,9 @@ test('Crystal prices cover locked backgrounds, advanced recipes, waiting time an
   assert.equal(Math.min(...advanced.filter((price) => price.currency === 'crystals').map((price) => price.amount)),120);
   assert.equal(Math.max(...advanced.filter((price) => price.currency === 'crystals').map((price) => price.amount)),550);
   assert.equal(arrivalSkipCrystalCost(1),1);assert.equal(arrivalSkipCrystalCost(30 * 60_000),6);assert.equal(arrivalSkipCrystalCost(2 * 60 * 60_000),24);
-  const premium = ALCOHOL_PRODUCTS.filter((product) => bottleRestockCrystalCost(product) > 0);
+  const premium = ALCOHOL_PRODUCTS.filter(isPremiumBottle);
   assert.ok(premium.length >= 10 && premium.length < ALCOHOL_PRODUCTS.length);
+  assert.ok(ALCOHOL_PRODUCTS.every((product) => bottleRestockCrystalCost(product) >= 2), 'every label can be topped up');
   for (const product of premium) assert.ok(bottleSaleCrystalReward(product) > bottleRestockCrystalCost(product),product.name);
 });
 
@@ -449,6 +450,8 @@ test('Brand calls: the guest names a brand, the bartender must pick that brand; 
   assert.equal(checkText('Sorry, we don’t have Jack Daniel’s. Would you like Jameson instead?').ok, true, 'brand names are valid English');
 
   const game = freshGame();
+  // A new bar starts with basics only; these two premium labels have to be topped up first.
+  for (const id of ['jack-daniels-old-7', 'jameson']) game.bottleInventory.find((item) => item.productId === id).quantity = 2;
   const guest = game.customers[0];
   Object.assign(guest, { orderKind: 'serve', serveRequest: request, orderRevealed: true, request: serveRequestText(request) });
   game.selectCustomer(guest.id);
