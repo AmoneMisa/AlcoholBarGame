@@ -1,6 +1,6 @@
 import { calendarDate, coins } from '../domain/economy';
 import {
-  COMPANION_START_LEVEL, MAX_COMPANION_LEVEL, companionLevelCost, levelCapForGrade, companionPower, linksOf, linkStrength, SPOTLIGHT_COOLDOWN_MS, SPOTLIGHT_MIN_BOND, SPOTLIGHT_MS, KEEPSAKE_CRYSTAL_PRICE, KEEPSAKE_LIKED_POINTS, KEEPSAKE_POINTS, KEEPSAKE_VISIT_CHANCE, MAX_BOND, BOND_STEPS, VISITS_PER_DAY, VISIT_POINTS,
+  COMPANIONS, COMPANION_START_LEVEL, MAX_COMPANION_LEVEL, companionLevelCost, levelCapForGrade, companionPower, linksOf, linkStrength, SPOTLIGHT_COOLDOWN_MS, SPOTLIGHT_MIN_BOND, SPOTLIGHT_MS, KEEPSAKE_CRYSTAL_PRICE, KEEPSAKE_LIKED_POINTS, KEEPSAKE_POINTS, KEEPSAKE_VISIT_CHANCE, MAX_BOND, BOND_STEPS, VISITS_PER_DAY, VISIT_POINTS,
   bondLevel, bonusAmount, describeBonus, companionById, companionName, companionSlots, keepsakeDef, KEEPSAKE_IDS, type BonusId, type KeepsakeId
 } from '../domain/companions';
 import { levelFor, type PlayerState } from './state';
@@ -164,6 +164,21 @@ export function spotlightCompanion(state: PlayerState, id: unknown, now: number)
   slot.until = now + SPOTLIGHT_MS;
   slot.ready = now + SPOTLIGHT_COOLDOWN_MS;
   return `${companionName(companion.id)} is in the spotlight for ${SPOTLIGHT_MS / 60_000} minutes: ${describeBonus(companion.bonus, powerOf(state, companion.id) * 2)}.`;
+}
+
+/** Shards of one Circle person who has not joined yet, picked at random (a box or the wheel). With everyone joined, a keepsake instead. */
+export function addCompanionShards(state: PlayerState, amount: number, random: () => number): string {
+  const data = circle(state);
+  const waiting = COMPANIONS.filter((person) => !(person.id in data.owned));
+  if (!waiting.length) {
+    const kind = KEEPSAKE_IDS[Math.floor(random() * KEEPSAKE_IDS.length)]!;
+    addKeepsakes(state, kind, amount);
+    return `${amount} keepsake${amount > 1 ? 's' : ''} (${keepsakeDef(kind)!.name.toLowerCase()}): everyone is already in your circle`;
+  }
+  const person = waiting[Math.min(waiting.length - 1, Math.floor(random() * waiting.length))]!;
+  const have = Math.min(person.shards, (data.shards[person.id] ?? 0) + amount);
+  data.shards[person.id] = have;
+  return `${amount} shard${amount > 1 ? 's' : ''} of ${companionName(person.id)} (${have} / ${person.shards})`;
 }
 
 /** A guest who is a companion was served well: shards if they have not joined, bond points if they have. */

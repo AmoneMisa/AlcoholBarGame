@@ -2,6 +2,7 @@ import { INGREDIENTS, MODIFIERS, RECIPES, REGIONS, SUPPLIERS, estimateRecipeAbv 
 import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost, bottleSaleCrystalReward, bottleTotal, brandedServeCrystalReward } from '../domain/bottleCatalog';
 import { arrivalSkipCrystalCost, calendarDate, coins, specialtyFactor, supplierInCity, consecutiveDays, conversationCrystalReward, conversationDifficulty, crystalExchange, dailyCoinsFor, dailyCrystalsFor, quotePurchase, recipePurchase } from '../domain/economy';
 import { withArticle } from '../domain/english/articles';
+import { ROULETTE_SPINS_PER_DAY, spinWheel } from '../domain/roulette';
 import { STYLE_SHOP_PRICE, styleForInterior, styleSource } from '../data/cosmetics/styleSources';
 import { BAR_PROFILE_OPTIONS, DEFAULT_BARS, INTERIORS, isEventInterior } from '../data/cosmetics/bars';
 import { consumeMix, generateCustomer, judgeMix, nearMiss, requiredRecipe } from '../domain/engine';
@@ -15,8 +16,8 @@ import { canWelcomeVip, nextCustomerArrival, nextVipAvailability, orderTimeSecon
 import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL, economyAt, formatDeliveryTime, marketFor } from '../domain/progression';
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
-import { COSMETICS, DRAWABLE_COSMETICS, canUseCosmetic } from '../domain/cosmetics';
-import { LootError, orderDiscount, claimSpark, grantCosmetic, craftStyle, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
+import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
+import { LootError, orderDiscount, claimSpark, grantCosmetic, grantReward, craftStyle, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, promoteEquipment, upgradeEquipment, useConsumable, xpGain } from './loot';
 import { usableIngredientIds } from '../domain/usableStock';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { actsIn } from '../domain/social/acts';
@@ -63,7 +64,7 @@ export type GameAction =
   | { type: 'renameBar'; name: string }
   | { type: 'renameBartender'; name: string }
   | { type: 'setDecor'; key: string; value: string }
-  | { type: 'spinCosmeticRoulette' }
+  | { type: 'spinRoulette' }
   | { type: 'activatePopularityBoost'; boost: 'no-cooldown' | 'vip-run' }
   | { type: 'selectCustomer'; customerId: string }
   | { type: 'openConversation'; customerId: string }
@@ -939,17 +940,15 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       (state.bars[state.regionId] as unknown as Record<string, string>)[action.key] = action.value;
       break;
     }
-    case 'spinCosmeticRoulette': {
+    case 'spinRoulette': {
       const today = calendarDate(new Date(now));
-      if (state.cosmeticRouletteKey === today) throw new RuleError('Today’s style draw is already claimed.');
-      const locked = DRAWABLE_COSMETICS.filter((entry) => !state.ownedCosmeticIds.includes(entry.id));
-      const pool = locked.length ? locked : DRAWABLE_COSMETICS;
-      const reward = pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))]!;
-      state.cosmeticRouletteKey = today;
-      if (state.ownedCosmeticIds.includes(reward.id)) state.cosmeticCopies[reward.id] = (state.cosmeticCopies[reward.id] ?? 0) + 1;
-      else grantCosmetic(state, reward.id);
-      state.cosmeticRouletteResult = `${reward.label} ${reward.character ? `for ${reward.character === 'noa' ? 'woman' : 'man'}` : ''} unlocked${state.cosmeticCopies[reward.id] ? ' as a giftable duplicate' : ''}.`;
-      state.message = state.cosmeticRouletteResult;
+      if (state.roulette.day !== today) state.roulette = { day: today, spins: 0, last: state.roulette.last };
+      if (state.roulette.spins >= ROULETTE_SPINS_PER_DAY) throw new RuleError(`You used all ${ROULETTE_SPINS_PER_DAY} spins today. Come back tomorrow.`);
+      const { index, reward } = spinWheel(levelFor(state.xp), random);
+      const text = grantReward(state, reward, random);
+      state.roulette.spins += 1;
+      state.roulette.last = { index, text: `Wheel: ${text}.`, n: (state.roulette.last?.n ?? 0) + 1 };
+      state.message = state.roulette.last.text;
       break;
     }
     case 'giveAshtray':

@@ -19,7 +19,7 @@ import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipe
 import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import type { Customer } from '../domain/types';
 import { statValue } from '../domain/achievementStats';
-import { companionBonus, joinCompanion, addKeepsakes } from './companions';
+import { companionBonus, joinCompanion, addKeepsakes, addCompanionShards } from './companions';
 import { companionJoiningWith, keepsakeFor } from '../domain/companions';
 import { ACHIEVEMENTS, TASTING_REWARD, achievementById, achievementSeries, questsForWeek, weekOf, type StatId } from '../domain/quests';
 import type { DrawResult } from '../domain/lootState';
@@ -90,6 +90,8 @@ export function grantReward(state: PlayerState, reward: Reward, random: () => nu
     case 'skinShards': loot.skinShards += reward.amount; break;
     case 'stylePieces': loot.stylePieces += reward.amount; break;
     case 'xp': state.xp += reward.amount; break;
+    case 'box': grantBox(state, reward.box); break;
+    case 'companionShards': return addCompanionShards(state, reward.amount, random);
     case 'prestige': state.popularity += reward.amount; break;
     case 'style': {
       const missing = boxStyles().filter((entry) => !state.ownedCosmeticIds.includes(entry.id));

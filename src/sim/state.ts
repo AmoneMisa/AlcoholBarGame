@@ -1,5 +1,6 @@
 import { INGREDIENTS, RECIPES, REGIONS, STARTING_INVENTORY } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS, isStarterBottle } from '../domain/bottleCatalog';
+import { ROULETTE_SPINS_PER_DAY, WHEEL } from '../domain/roulette';
 import { cosmeticFor } from '../domain/cosmetics';
 import { REFERENCE_COSTUME_IDS } from '../data/cosmetics/bartenderCostumes';
 import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
@@ -42,8 +43,8 @@ export interface PlayerState {
   ownedInteriorIds: string[];
   ownedCosmeticIds: string[];
   cosmeticCopies: Record<string, number>;
-  cosmeticRouletteKey: string;
-  cosmeticRouletteResult: string;
+  /** The daily wheel: spins used today and the last result (the screen animates to its segment). */
+  roulette: import('../domain/roulette').RouletteState;
   cosmeticGiftLog: { cosmeticId:string; recipient:string; at:number }[];
   knownRecipeIds: string[];
   recipeUnlockSources: Record<string, UnlockSource>;
@@ -207,8 +208,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     ownedInteriorIds: ['velvet'],
     ownedCosmeticIds: [],
     cosmeticCopies: {},
-    cosmeticRouletteKey: '',
-    cosmeticRouletteResult: 'Your daily style draw is ready.',
+    roulette: { day: '', spins: 0 },
     cosmeticGiftLog: [],
     knownRecipeIds,
     recipeUnlockSources: Object.fromEntries(knownRecipeIds.map((id) => [id, 'starter'])),
@@ -318,8 +318,9 @@ export function normalizePlayerState(state: PlayerState) {
     : ['velvet'];
   state.ownedCosmeticIds = Array.isArray(state.ownedCosmeticIds) ? [...new Set(state.ownedCosmeticIds.filter((id) => typeof id === 'string'))] : [];
   state.cosmeticCopies = state.cosmeticCopies && typeof state.cosmeticCopies === 'object' ? state.cosmeticCopies : {};
-  state.cosmeticRouletteKey = typeof state.cosmeticRouletteKey === 'string' ? state.cosmeticRouletteKey : '';
-  state.cosmeticRouletteResult = typeof state.cosmeticRouletteResult === 'string' ? state.cosmeticRouletteResult : 'Your daily style draw is ready.';
+  const wheel = (state.roulette ?? {}) as Partial<import('../domain/roulette').RouletteState>;
+  const last = wheel.last && Number.isInteger(wheel.last.index) && wheel.last.index >= 0 && wheel.last.index < WHEEL.length ? { index: wheel.last.index, text: String(wheel.last.text ?? '').slice(0, 200), n: Math.max(0, Math.floor(Number(wheel.last.n) || 0)) } : undefined;
+  state.roulette = { day: typeof wheel.day === 'string' ? wheel.day : '', spins: Math.max(0, Math.min(ROULETTE_SPINS_PER_DAY, Math.floor(Number(wheel.spins) || 0))), ...(last ? { last } : {}) };
   state.cosmeticGiftLog = Array.isArray(state.cosmeticGiftLog) ? state.cosmeticGiftLog.slice(0, 30) : [];
   // The training academy was removed: old saves drop its progress and any practice guest still at the bar.
   delete (state as { training?: unknown }).training;

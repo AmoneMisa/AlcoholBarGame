@@ -204,3 +204,51 @@ test('Economy: selling a topped-up bottle pays a small margin, and the themed ba
   assert.ok(prices[0] <= 600 && prices.at(-1) >= 1800, 'a cheap first tier up to the big ones');
   assert.equal(new Set(prices).size, prices.length, 'every themed background has its own price');
 });
+
+test('Daily wheel: three spins a day, a new day resets them, every segment can be granted, prizes stay small', async () => {
+  const { WHEEL, ROULETTE_SPINS_PER_DAY, spinWheel, spinsLeft } = await import('../src/domain/roulette.ts');
+  assert.equal(ROULETTE_SPINS_PER_DAY, 3);
+  const state = fresh();
+  assert.equal(spinsLeft(state.roulette, '2026-09-30'), 3);
+  for (let spin = 1; spin <= 3; spin++) {
+    applyAction(state, { type: 'spinRoulette' }, context(() => .3));
+    assert.equal(state.roulette.spins, spin);
+    assert.equal(state.roulette.last.n, spin);
+    assert.ok(state.roulette.last.index >= 0 && state.roulette.last.index < WHEEL.length);
+    assert.match(state.message, /^Wheel:/);
+  }
+  assert.throws(() => applyAction(state, { type: 'spinRoulette' }, context(() => .3)), /all 3 spins/);
+  const tomorrow = { ...context(() => .3), now: NOW + 24 * 3600 * 1000 };
+  applyAction(state, { type: 'spinRoulette' }, tomorrow);
+  assert.equal(state.roulette.spins, 1, 'a new day starts again');
+  // Every segment hands over something real.
+  for (const [index, segment] of WHEEL.entries()) {
+    const copy = fresh();
+    const reward = segment.make(1, () => .5);
+    assert.doesNotThrow(() => grantReward(copy, reward, () => .5), segment.id);
+    assert.ok(WHEEL[index].weight > 0);
+  }
+  // The crystal prize is small: the average spin pays a couple of crystals at most.
+  const total = WHEEL.reduce((sum, segment) => sum + segment.weight, 0);
+  const crystals = WHEEL.reduce((sum, segment) => { const reward = segment.make(1, () => .5); return sum + (reward.kind === 'crystals' ? reward.amount * segment.weight / total : 0); }, 0);
+  assert.ok(crystals > .5 && crystals < 3, `${crystals.toFixed(2)} crystals per spin`);
+  // The same random numbers give the same spin (the server decides, the screen only animates).
+  assert.deepEqual(spinWheel(5, () => .42), spinWheel(5, () => .42));
+});
+
+test('Circle shards drop from boxes for one person who has not joined, and become keepsakes once everyone has', async () => {
+  const { COMPANIONS } = await import('../src/domain/companions.ts');
+  for (const kind of ['bronze', 'silver', 'gold']) assert.ok(BOX_TABLES[kind].some((entry) => entry.make(1, () => .5).kind === 'companionShards'), kind);
+  const state = fresh();
+  const text = grantReward(state, { kind: 'companionShards', amount: 2 }, () => 0);
+  const person = COMPANIONS.find((item) => (state.companions?.shards?.[item.id] ?? 0) > 0);
+  assert.ok(person, 'one person got shards');
+  assert.equal(state.companions.shards[person.id], 2);
+  assert.ok(text.startsWith('2 shards of ') && text.includes(`(2 / ${person.shards})`), text);
+  state.companions.owned = Object.fromEntries(COMPANIONS.map((item) => [item.id, 0]));
+  assert.match(grantReward(state, { kind: 'companionShards', amount: 1 }, () => 0), /keepsake/);
+  // The wheel and the boxes never push a person past the shards needed to join.
+  const capped = fresh();
+  for (let i = 0; i < 60; i++) grantReward(capped, { kind: 'companionShards', amount: 3 }, () => 0);
+  assert.ok(COMPANIONS.every((item) => (capped.companions.shards[item.id] ?? 0) <= item.shards));
+});

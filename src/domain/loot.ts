@@ -78,6 +78,8 @@ export type Reward =
   | { kind: 'skinShards'; amount: number }
   | { kind: 'stylePieces'; amount: number }   // style shards
   | { kind: 'xp'; amount: number }
+  | { kind: 'box'; box: Exclude<BoxKind, 'choice'> }
+  | { kind: 'companionShards'; amount: number }   // shards of one Circle person who has not joined yet
   | { kind: 'prestige'; amount: number }   // bar prestige (popularity)
   | { kind: 'style' }   // a whole painted style that only boxes give, picked at random from those you do not own
   | { kind: 'itemShards'; id: EquipmentId; amount: number }
@@ -87,7 +89,7 @@ export type Reward =
   | { kind: 'eventInterior' };   // a special-event background, picked at random from those you do not own
 
 interface Entry { weight: number; make: (level: number, random: () => number) => Reward; }
-const between = (random: () => number, min: number, max: number) => min + Math.floor(random() * (max - min + 1));
+export const between = (random: () => number, min: number, max: number) => min + Math.floor(random() * (max - min + 1));
 const pick = <T,>(items: readonly T[], random: () => number) => items[Math.min(items.length - 1, Math.floor(random() * items.length))]!;
 const consumable = (ids: ConsumableId[], amount = 1): Entry['make'] => (_l, random) => ({ kind: 'consumable', id: pick(ids, random), amount });
 const shards = (min: number, max: number): Entry['make'] => (_l, random) => ({ kind: 'itemShards', id: pick(EQUIPMENT, random).id, amount: between(random, min, max) });
@@ -136,11 +138,13 @@ const LOW_CHANCE: Record<Exclude<BoxKind, 'choice'>, Chance[]> = {
   bronze: [
     [22, shardsOf(1)], [6, shardsOf(2)], [1.5, shardsOf(5)], [.4, shardsOf(10)], [.1, shardsOf(25)],
     [BOX_STYLE_CHANCE * 100, () => ({ kind: 'style' })],
+    [6, () => ({ kind: 'companionShards', amount: 1 })],
     [3, (_l, r) => ({ kind: 'xp', amount: between(r, 30, 60) })]
   ],
   silver: [
     [22, shardsOf(1)], [8, shardsOf(2)], [3, shardsOf(5)], [1, shardsOf(10)], [.3, shardsOf(25)],
     [BOX_STYLE_CHANCE * 100, () => ({ kind: 'style' })],
+    [8, (_l, r) => ({ kind: 'companionShards', amount: between(r, 1, 2) })],
     [4, (_l, r) => ({ kind: 'xp', amount: between(r, 100, 200) })],
     [1.5, (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 400, 700) * (1 + l / 25)) })],
     [3, anyBooster(2)],
@@ -150,6 +154,7 @@ const LOW_CHANCE: Record<Exclude<BoxKind, 'choice'>, Chance[]> = {
   gold: [
     [22, shardsOf(1)], [12, shardsOf(2)], [6, shardsOf(5)], [2.5, shardsOf(10)], [.8, shardsOf(25)],
     [BOX_STYLE_CHANCE * 100, () => ({ kind: 'style' })],
+    [10, (_l, r) => ({ kind: 'companionShards', amount: between(r, 2, 3) })],
     [5, (_l, r) => ({ kind: 'xp', amount: between(r, 300, 600) })],
     [3, (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 800, 1500) * (1 + l / 25)) })],
     [5, anyBooster(3)],
@@ -191,6 +196,8 @@ export function describeReward(reward: Reward, names: { consumable: (id: string)
     case 'skinShards': return `${reward.amount} skin shards`;
     case 'stylePieces': return `${reward.amount} style shard${reward.amount === 1 ? '' : 's'}`;
     case 'xp': return `${reward.amount} XP`;
+    case 'box': return `a ${reward.box} box`;
+    case 'companionShards': return `${reward.amount} Circle shard${reward.amount === 1 ? '' : 's'}`;
     case 'prestige': return `${reward.amount} bar prestige`;
     case 'style': return 'a full bartender style'; 
     case 'itemShards': return `${reward.amount} ${names.equipment(reward.id)} shards`;

@@ -34,14 +34,9 @@ test('Daily style draw unlocks modular face parts and a duplicate becomes a spar
   const first = COSMETICS.find((item) => item.character === 'noa');
   assert.ok(first);
   assert.throws(() => applyAction(state,{type:'setDecor',key:first.key,value:first.value},context),RuleError);
-  applyAction(state,{type:'spinCosmeticRoulette'},context);
-  assert.equal(state.ownedCosmeticIds.length,1);
-  assert.throws(() => applyAction(state,{type:'spinCosmeticRoulette'},context),RuleError,'one draw per day');
-  state.ownedCosmeticIds = COSMETICS.map((item) => item.id);
-  state.cosmeticRouletteKey = '';
-  applyAction(state,{type:'spinCosmeticRoulette'},context);
-  const duplicate = COSMETICS[0];
-  assert.equal(state.cosmeticCopies[duplicate.id],1);
+  // The daily wheel replaced the old one-a-day style draw: three spins a day (see styles.test.mjs).
+  applyAction(state,{type:'spinRoulette'},context);
+  assert.equal(state.roulette.spins,1);
 });
 
 test('Customer smoking trait is stable and never injected as incompatible dialogue text',() => {

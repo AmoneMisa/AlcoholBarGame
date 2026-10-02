@@ -64,7 +64,7 @@ const DECK: Record<string, Record<string, string>> = {
 };
 const deckView = computed(() => DECK[view.value]?.[sub[view.value] ?? ''] ?? '');
 const designSection = computed(() => (view.value === 'bar' ? 'bar' : view.value === 'character' ? 'character' : undefined));
-const sectionTabs = computed(() => (SECTIONS[view.value] ?? []).map((tab) => ({ ...tab, badge: view.value === 'bar' && tab.id === 'design' && game.cosmeticRouletteAvailable ? 1 : undefined })));
+const sectionTabs = computed(() => (SECTIONS[view.value] ?? []).map((tab) => ({ ...tab, badge: view.value === 'manage' && tab.id === 'workshop' && game.rouletteSpinsLeft > 0 ? game.rouletteSpinsLeft : undefined })));
 
 // Music follows the bar's interior; taps on buttons get a soft click.
 watch(() => game.decor.interior, (id) => setMusicInterior(id), { immediate: true });
@@ -154,7 +154,7 @@ const badges = computed<Record<string, number>>(() => ({
   // A number on a tab means something is waiting for the player to act, not just that something is going on.
   service: game.deliveryIssues.filter((issue) => issue.status === 'open').length,
   english: game.dailyLessonsComplete ? 0 : 1,
-  manage: 0,
+  manage: game.rouletteSpinsLeft > 0 ? 1 : 0,
   friends: game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'incoming').length
 }));
 
