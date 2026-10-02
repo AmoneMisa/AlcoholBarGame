@@ -2,6 +2,7 @@ import { INGREDIENTS, MODIFIERS, RECIPES, REGIONS, SUPPLIERS, estimateRecipeAbv 
 import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost, bottleSaleCrystalReward, bottleTotal, brandedServeCrystalReward } from '../domain/bottleCatalog';
 import { arrivalSkipCrystalCost, calendarDate, coins, specialtyFactor, supplierInCity, consecutiveDays, conversationCrystalReward, conversationDifficulty, crystalExchange, dailyCoinsFor, dailyCrystalsFor, quotePurchase, recipePurchase } from '../domain/economy';
 import { withArticle } from '../domain/english/articles';
+import { PassError, buyPassPremium, claimPass, syncPass } from './pass';
 import { ROULETTE_SPINS_PER_DAY, spinWheel } from '../domain/roulette';
 import { STYLE_SHOP_PRICE, styleForInterior, styleSource } from '../data/cosmetics/styleSources';
 import { BAR_PROFILE_OPTIONS, DEFAULT_BARS, INTERIORS, isEventInterior } from '../data/cosmetics/bars';
@@ -65,6 +66,8 @@ export type GameAction =
   | { type: 'renameBartender'; name: string }
   | { type: 'setDecor'; key: string; value: string }
   | { type: 'spinRoulette' }
+  | { type: 'claimPass'; track: 'free' | 'premium'; level: number }
+  | { type: 'buyPassPremium' }
   | { type: 'activatePopularityBoost'; boost: 'no-cooldown' | 'vip-run' }
   | { type: 'selectCustomer'; customerId: string }
   | { type: 'openConversation'; customerId: string }
@@ -365,6 +368,7 @@ function processDeliveries(state: PlayerState, now: number, random: () => number
 // patience runs down, the next guest walks in.
 export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now' | 'random' | 'spawnCustomers'>) {
   normalizePlayerState(state);
+  syncPass(state, context.now);
   state.conversations ??= {};
   const now = context.now;
   const random = context.random ?? Math.random;
@@ -938,6 +942,16 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       if (action.key === 'interior' && !state.ownedInteriorIds.includes(action.value)) throw new RuleError('Purchase this background before using it.');
       if (!canUseCosmetic(state.ownedCosmeticIds, action.key, action.value, state.bars[state.regionId].bartenderCharacter)) throw new RuleError('Unlock this style first: buy it, earn it from an achievement or a box, or win it in a style draw.');
       (state.bars[state.regionId] as unknown as Record<string, string>)[action.key] = action.value;
+      break;
+    }
+    case 'claimPass':
+    case 'buyPassPremium': {
+      try {
+        state.message = action.type === 'claimPass' ? claimPass(state, action.track, action.level, random, now) : buyPassPremium(state, now);
+      } catch (error) {
+        if (error instanceof PassError) throw new RuleError(error.message);
+        throw error;
+      }
       break;
     }
     case 'spinRoulette': {

@@ -23,13 +23,14 @@ import { SEASON_FEATURED_SHARE, SEASON_MILESTONES, SPARK_DRAWS, seasonAt } from 
 import { featuredLegendary } from '../../sim/loot';
 import UiButton from '../ui/UiButton.vue';
 import DailyWheel from './DailyWheel.vue';
+import SeasonPass from './SeasonPass.vue';
 import { REGIONS } from '../../domain/catalog';
 import OptionSelect from '../game/OptionSelect.vue';
 import { useGameStore } from '../../stores/game';
 
 const game = useGameStore();
-const tab = ref<'wheel' | 'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'signature' | 'weekly'>('equipment');
-const tabs = [['wheel', 'Daily wheel'], ['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['signature', 'Signature'], ['weekly', 'Weekly']] as const;
+const tab = ref<'pass' | 'wheel' | 'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'signature' | 'weekly'>('equipment');
+const tabs = [['pass', 'Season pass'], ['wheel', 'Daily wheel'], ['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['signature', 'Signature'], ['weekly', 'Weekly']] as const;
 const scrollRecipe = ref('');
 const names = { consumable: (id: string) => consumableDef(id)?.name ?? id, equipment: (id: string) => equipmentDef(id)?.name ?? id };
 // Equipment is kept per bar. The bar shown here can be picked without leaving the page.
@@ -166,7 +167,8 @@ const boostLeft = (id: string) => {
     <aside v-if="gettingStarted && (tab === 'equipment' || tab === 'boxes')" class="getting-started"><b>Getting started</b><ol><li v-for="step in started" :key="step.label" :class="{ done: step.done }">{{ step.label }}</li></ol></aside>
     <p v-if="game.loot.log[0]" class="workshop-log">{{ game.loot.log[0] }}</p>
 
-    <DailyWheel v-if="tab === 'wheel'" />
+    <SeasonPass v-if="tab === 'pass'" />
+    <DailyWheel v-else-if="tab === 'wheel'" />
     <div v-else-if="tab === 'equipment'" class="grid">
       <nav v-if="ownedBars.length > 1" class="bar-chips" aria-label="Bar to upgrade"><UiButton v-for="region in ownedBars" :key="region.id" size="sm" :variant="region.id === equipBar ? 'solid' : 'secondary'" @click="pickedBar = region.id">{{ region.name }}</UiButton></nav>
       <article v-for="item in EQUIPMENT" :key="item.id" class="card">

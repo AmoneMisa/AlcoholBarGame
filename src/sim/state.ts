@@ -45,6 +45,8 @@ export interface PlayerState {
   cosmeticCopies: Record<string, number>;
   /** The daily wheel: spins used today and the last result (the screen animates to its segment). */
   roulette: import('../domain/roulette').RouletteState;
+  /** The season pass (see domain/pass.ts): the counters when it began, the premium track and the claimed rewards. */
+  pass: import('../domain/pass').PassState;
   cosmeticGiftLog: { cosmeticId:string; recipient:string; at:number }[];
   knownRecipeIds: string[];
   recipeUnlockSources: Record<string, UnlockSource>;
@@ -209,6 +211,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     ownedCosmeticIds: [],
     cosmeticCopies: {},
     roulette: { day: '', spins: 0 },
+    pass: { id: '', base: {}, premium: false, claimed: [] },
     cosmeticGiftLog: [],
     knownRecipeIds,
     recipeUnlockSources: Object.fromEntries(knownRecipeIds.map((id) => [id, 'starter'])),
@@ -318,6 +321,13 @@ export function normalizePlayerState(state: PlayerState) {
     : ['velvet'];
   state.ownedCosmeticIds = Array.isArray(state.ownedCosmeticIds) ? [...new Set(state.ownedCosmeticIds.filter((id) => typeof id === 'string'))] : [];
   state.cosmeticCopies = state.cosmeticCopies && typeof state.cosmeticCopies === 'object' ? state.cosmeticCopies : {};
+  const season = (state.pass ?? {}) as Partial<import('../domain/pass').PassState>;
+  state.pass = {
+    id: typeof season.id === 'string' ? season.id.slice(0, 24) : '',
+    base: Object.fromEntries(Object.entries(season.base && typeof season.base === 'object' ? season.base : {}).filter(([key, value]) => key.length < 32 && Number.isFinite(value) && Number(value) >= 0).map(([key, value]) => [key, Math.floor(Number(value))])),
+    premium: season.premium === true,
+    claimed: Array.isArray(season.claimed) ? [...new Set(season.claimed.filter((key): key is string => typeof key === 'string' && /^[fp]\d{1,2}$/.test(key)))].slice(0, 60) : []
+  };
   const wheel = (state.roulette ?? {}) as Partial<import('../domain/roulette').RouletteState>;
   const last = wheel.last && Number.isInteger(wheel.last.index) && wheel.last.index >= 0 && wheel.last.index < WHEEL.length ? { index: wheel.last.index, text: String(wheel.last.text ?? '').slice(0, 200), n: Math.max(0, Math.floor(Number(wheel.last.n) || 0)) } : undefined;
   state.roulette = { day: typeof wheel.day === 'string' ? wheel.day : '', spins: Math.max(0, Math.min(ROULETTE_SPINS_PER_DAY, Math.floor(Number(wheel.spins) || 0))), ...(last ? { last } : {}) };

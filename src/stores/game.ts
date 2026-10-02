@@ -23,6 +23,7 @@ import type { Customer, InventoryItem, RegionId, SupplierOffer } from '../domain
 import { pourableBrand } from '../domain/brandServe';
 import { formatCountdown } from '../domain/customerTiming';
 import { spinsLeft } from '../domain/roulette';
+import { passEndsAt, passId, passLevel, passPointsFor, passThemeAt } from '../domain/pass';
 import { checkText } from '../domain/english/checker';
 import { advanceClock, applyAction, previewTopUp, RuleError, type GameAction } from '../sim/rules';
 import { createInitialState, levelFor, normalizePlayerState, type PlayerState } from '../sim/state';
@@ -144,6 +145,15 @@ export const useGameStore = defineStore('game', () => {
   const cosmeticCopies = computed(() => state.value.cosmeticCopies ?? {});
   const rouletteSpinsLeft = computed(() => spinsLeft(state.value.roulette, today.value));
   const rouletteLast = computed(() => state.value.roulette.last);
+  // The season pass: shown from the loot counters; a pass that has not been started by an action yet counts from zero.
+  const passNow = computed(() => passId(nowMs.value));
+  const passCurrent = computed(() => state.value.pass.id === passNow.value);
+  const passPoints = computed(() => passPointsFor(state.value.loot.stats, passCurrent.value ? state.value.pass.base : state.value.loot.stats));
+  const passLevelNow = computed(() => passLevel(passPoints.value));
+  const passPremium = computed(() => passCurrent.value && state.value.pass.premium);
+  const passClaimed = computed(() => (passCurrent.value ? state.value.pass.claimed : []));
+  const passTheme = computed(() => passThemeAt(nowMs.value));
+  const passEnds = computed(() => passEndsAt(nowMs.value));
   const cosmeticRouletteAvailable = computed(() => rouletteSpinsLeft.value > 0);
   const loot = computed(() => state.value.loot);
   // Progress of an achievement counter (counted ones and ones read from what the player owns).
@@ -206,7 +216,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: mode.value !== 'online' });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson', 'spinRoulette', 'giveAshtray', 'cleanAshtrays', 'pitchStart', 'pitchAsk', 'pitchCancel', 'hireStaff', 'upgradeStaff', 'giveWater', 'callTaxi', 'askToLeave', 'situationChoice', 'reportIssue', 'discardStock', 'openBox', 'pickReward', 'drawStyle', 'claimLeaderboardReward']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson', 'spinRoulette', 'claimPass', 'buyPassPremium', 'giveAshtray', 'cleanAshtrays', 'pitchStart', 'pitchAsk', 'pitchCancel', 'hireStaff', 'upgradeStaff', 'giveWater', 'callTaxi', 'askToLeave', 'situationChoice', 'reportIssue', 'discardStock', 'openBox', 'pickReward', 'drawStyle', 'claimLeaderboardReward']);
 
   function saveOffline() {
     if (mode.value === 'online') return;
@@ -223,7 +233,7 @@ export const useGameStore = defineStore('game', () => {
   // The popup that tells the player what an action paid. Only actions that can give something are reported.
   const REWARD_TITLES: Partial<Record<GameAction['type'], string>> = {
     serve: 'Drink served', autoServe: 'Drink served', sellBottle: 'Bottle sold', claimDaily: 'Daily reward', completeDailyLesson: 'Lesson complete',
-    sell: 'Stock sold', exchangeCrystals: 'Crystals exchanged', situationChoice: 'Guest situation resolved'
+    claimPass: 'Season pass reward', sell: 'Stock sold', exchangeCrystals: 'Crystals exchanged', situationChoice: 'Guest situation resolved'
   };
   function showRewards(title: string, lines: RewardLine[]) {
     if (lines.length) rewardReport.value = { id: ++reportId, title, lines };
@@ -660,6 +670,8 @@ export const useGameStore = defineStore('game', () => {
     }
   }
   const spinRoulette = () => dispatch({ type:'spinRoulette' });
+  const claimPass = (track: 'free' | 'premium', level: number) => dispatch({ type:'claimPass', track, level });
+  const buyPassPremium = () => dispatch({ type:'buyPassPremium' });
   const activatePopularityBoost = (boost:'no-cooldown'|'vip-run') => dispatch({ type:'activatePopularityBoost', boost });
   const popularity = computed(() => state.value.popularity ?? 0);
   const popularityBoost = computed(() => state.value.popularityBoost);
@@ -692,7 +704,7 @@ export const useGameStore = defineStore('game', () => {
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, sessionReady, ownedInteriorIds, barBackground, barInteriorStyle,
-    cosmetics:COSMETICS, ownedCosmeticIds, cosmeticCopies, cosmeticRouletteAvailable, rouletteSpinsLeft, rouletteLast, cosmeticGiftLog, canUseCosmetic, spinRoulette, popularity, popularityBoost, activatePopularityBoost,
+    cosmetics:COSMETICS, ownedCosmeticIds, cosmeticCopies, cosmeticRouletteAvailable, rouletteSpinsLeft, rouletteLast, passPoints, passLevelNow, passPremium, passClaimed, passTheme, passEnds, claimPass, buyPassPremium, cosmeticGiftLog, canUseCosmetic, spinRoulette, popularity, popularityBoost, activatePopularityBoost,
     inventories, inventory, bottleInventories, bottleInventory, currentMix, shaken, customers, activeCustomerId, customer, hasCustomer, recipe, mixJudge,
     knownRecipeIds, recipeUnlockSources, knownRecipes, lockedRecipes, dailyGiftAvailable, dailyGiftResult, loginStreak, upcomingLoginDay, dailyCoinReward, dailyCrystalReward,
     dailyLessons, dailyLessonCompletedIds, dailyLessonsComplete, dailyLessonResult, learningStreak, learningStreakForToday, learningBonusPercent, completeDailyLesson,
