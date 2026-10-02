@@ -28,6 +28,7 @@ const ConversationPopup = lazyPage(() => import('./components/conversation/Conve
 const ManagementDeck = lazyPage(() => import('./components/game/ManagementDeck.vue'));
 const LearningPage = lazyPage(() => import('./components/learning/LearningPage.vue'));
 const FriendsPage = lazyPage(() => import('./components/friends/FriendsPage.vue'));
+const EventsPage = lazyPage(() => import('./components/game/EventsPage.vue'));
 const StartingBarPicker = lazyPage(() => import('./components/game/StartingBarPicker.vue'));
 
 const game = useGameStore();
@@ -64,7 +65,7 @@ const DECK: Record<string, Record<string, string>> = {
 };
 const deckView = computed(() => DECK[view.value]?.[sub[view.value] ?? ''] ?? '');
 const designSection = computed(() => (view.value === 'bar' ? 'bar' : view.value === 'character' ? 'character' : undefined));
-const sectionTabs = computed(() => (SECTIONS[view.value] ?? []).map((tab) => ({ ...tab, badge: view.value === 'manage' && tab.id === 'workshop' && game.rouletteSpinsLeft > 0 ? game.rouletteSpinsLeft : undefined })));
+const sectionTabs = computed(() => (SECTIONS[view.value] ?? []).map((tab) => ({ ...tab, badge: view.value === 'manage' && tab.id === 'workshop' && game.rouletteSpinsLeft + game.passReady > 0 ? game.rouletteSpinsLeft + game.passReady : undefined })));
 
 // Music follows the bar's interior; taps on buttons get a soft click.
 watch(() => game.decor.interior, (id) => setMusicInterior(id), { immediate: true });
@@ -75,6 +76,13 @@ onMounted(() => {
     if ((event.target as Element | null)?.closest('button, [role="button"], a')) playSfx('tap');
   });
 });
+// The first time the player is back in a day, the login reward opens by itself (after the first-bar choice and the tour).
+let dailyShown = false;
+watch(() => [game.sessionReady, game.startingBarChosen, game.tourSeen, game.dailyGiftAvailable] as const, ([ready, chosen, toured, available]) => {
+  if (dailyShown || !ready || !chosen || !toured || !available) return;
+  dailyShown = true;
+  game.dailyOpen = true;
+}, { immediate: true });
 let socialTimer: ReturnType<typeof setInterval>;
 onMounted(() => { socialTimer = setInterval(() => game.loadFriends(),60_000); });
 onUnmounted(() => clearInterval(socialTimer));
@@ -154,7 +162,7 @@ const badges = computed<Record<string, number>>(() => ({
   // A number on a tab means something is waiting for the player to act, not just that something is going on.
   service: game.deliveryIssues.filter((issue) => issue.status === 'open').length,
   english: game.dailyLessonsComplete ? 0 : 1,
-  manage: game.rouletteSpinsLeft > 0 ? 1 : 0,
+  manage: game.rouletteSpinsLeft + game.passReady > 0 ? 1 : 0,
   friends: game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'incoming').length
 }));
 
@@ -180,6 +188,7 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
       <LearningPage v-if="view === 'english' && sub.english === 'learn'" />
       <section v-if="view === 'circle'" class="circle-page game-panel"><CompanionsPanel /></section>
       <FriendsPage v-if="view === 'friends'" />
+      <EventsPage v-if="view === 'events'" />
       <WorkshopPage v-if="view === 'manage' && sub.manage === 'workshop'" />
       <ProfilePage v-if="view === 'character' && sub.character === 'profile'" />
       <SettingsPage v-if="view === 'settings'" @goto="selectView" />

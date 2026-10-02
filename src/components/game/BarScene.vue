@@ -12,7 +12,6 @@ import { haptic } from '../../telegram/webapp';
 import BottleModel from '../cocktails/BottleModel.vue';
 import GlassModel from '../cocktails/GlassModel.vue';
 import CharacterModel from '../characters/CharacterModel.vue';
-import CityEvent from './CityEvent.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
 import UiIcon from '../ui/UiIcon.vue';
 import UiButton from '../ui/UiButton.vue';
@@ -193,7 +192,12 @@ let dragStartX = 0;
 let dragStartY = 0;
 let dragTravelled = false;
 
-const liquidIngredients = computed(() => INGREDIENTS.filter((item) => item.unit === 'ml'));
+// Only bottles the bar can use: in stock, or needed by a recipe the player knows (an empty one stays so it is clear what to
+// restock). Bottles for recipes nobody has learned yet are not shown at all.
+const liquidIngredients = computed(() => {
+  const shown = new Set(game.visibleInventory.map((item) => item.ingredientId));
+  return INGREDIENTS.filter((item) => item.unit === 'ml' && shown.has(item.id));
+});
 // The back bar has four shelf lines, all visible at once, so every bottle can be reached without scrolling.
 const SHELF_LINES = [
   { id: 'spirits', label: 'Spirits & wine', ids: ['white-rum', 'dark-rum', 'gin', 'vodka', 'tequila', 'whiskey', 'sparkling-wine', 'fruit-wine'] },
@@ -483,8 +487,14 @@ onBeforeUnmount(() => {
 <template>
   <section ref="sceneRef" class="bar-scene" :class="{ 'full-view': fullView, 'fv-no-shelves': fullView && hide.shelves, 'fv-no-bottles': fullView && hide.bottles, 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack && !preview, 'is-preview': preview }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
     <div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div>
-    <CityEvent v-if="!preview && !fullView" compact />
     <UiButton v-if="!preview && !fullView" class="fv-open" size="sm" variant="secondary" @click="setFullView(true)"><UiIcon name="eye" />Full view</UiButton>
+    <template v-if="!preview">
+    <button type="button" class="house-rules-button" data-guide="rules-button" :aria-expanded="rulesOpen" @click="rulesOpen = !rulesOpen"><UiIcon class="inline-icon" name="book" /> Rules<i v-if="game.ruleViolations" class="rules-count" :title="`${game.ruleViolations} rule breaks so far`">{{ game.ruleViolations }}</i></button>
+    <PopoverPanel v-if="rulesOpen" class="house-rules-panel" padded eyebrow="HOUSE RULES" :title="`Rules in ${game.region.name}`" close-label="Close house rules" @close="rulesOpen = false">
+      <p class="rules-note">These are game rules for practice, not legal advice. Explain them politely to guests. Inspectors count every rule you break{{ game.ruleViolations ? ` (so far: ${game.ruleViolations})` : '' }}.</p>
+      <article v-for="rule in game.houseRules" :key="rule.id" class="rule-row"><span class="rule-icon"><Glyph :g="rule.icon" /></span><span><b>{{ rule.title }}</b><small>{{ rule.text }}</small></span></article>
+    </PopoverPanel>
+    </template>
     <div v-if="fullView" class="fv-panel" role="group" aria-label="Full view options">
       <UiCheckbox v-for="[key, label] in HIDE_OPTIONS" :key="key" v-model="hide[key]" :label="label" />
       <UiButton variant="solid" size="sm" @click="setFullView(false)">Close full view</UiButton>
@@ -518,12 +528,6 @@ onBeforeUnmount(() => {
           <footer><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customer.social?.phase === 'enjoying' ? 'Enjoying the drink' : customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
         </div>
       </button>
-      <button type="button" class="house-rules-button" data-guide="rules-button" :aria-expanded="rulesOpen" @click="rulesOpen = !rulesOpen"><UiIcon class="inline-icon" name="book" /> Rules<i v-if="game.ruleViolations" class="rules-count" :title="`${game.ruleViolations} rule breaks so far`">{{ game.ruleViolations }}</i></button>
-      <PopoverPanel v-if="rulesOpen" class="house-rules-panel" padded eyebrow="HOUSE RULES" :title="`Rules in ${game.region.name}`" close-label="Close house rules" @close="rulesOpen = false">
-        <p class="rules-note">These are game rules for practice, not legal advice. Explain them politely to guests. Inspectors count every rule you break{{ game.ruleViolations ? ` (so far: ${game.ruleViolations})` : '' }}.</p>
-        <article v-for="rule in game.houseRules" :key="rule.id" class="rule-row"><span class="rule-icon"><Glyph :g="rule.icon" /></span><span><b>{{ rule.title }}</b><small>{{ rule.text }}</small></span></article>
-      </PopoverPanel>
-      <div v-if="game.barEvent" class="bar-event" :class="game.barEvent.mood" :title="game.barEvent.description"><b><Glyph :g="game.barEvent.icon" /> {{ game.barEvent.title }}</b><span>{{ game.barEvent.description }}</span></div>
       <button v-if="game.ashtrays.dirty" type="button" class="clean-ashtrays" @click="game.cleanAshtrays()"><UiIcon class="inline-icon" name="brush" /> Clean {{ game.ashtrays.dirty }} ashtray{{ game.ashtrays.dirty === 1 ? '' : 's' }}</button>
       <!-- The wait for the next guest is shown once, in the panel below the scene (with “Welcome now”). -->
     </div>

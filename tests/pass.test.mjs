@@ -294,3 +294,13 @@ test('On the server a new player\'s pass starts with their first visit, whatever
   assert.notEqual(back.state.pass.id, 'pass-0');
   assert.equal(back.state.pass.epoch, repository.states.get(first.player.id).state.pass.epoch, 'their own clock did not move');
 });
+
+test('The number of pass rewards ready to claim counts reached, unclaimed levels, and premium ones only once bought', async () => {
+  const { readyPassRewards } = await import('../src/domain/pass.ts');
+  assert.equal(readyPassRewards(0, false, []), 0, 'nothing before level 1');
+  assert.equal(readyPassRewards(3, false, []), 3, 'three free rewards');
+  assert.equal(readyPassRewards(3, true, []), 6, 'and three premium ones after buying it');
+  assert.equal(readyPassRewards(3, true, ['f1', 'p1', 'f2']), 3, 'claimed ones do not count');
+  assert.equal(readyPassRewards(99, true, []), PASS_LEVELS * 2, 'never past the last level');
+  assert.equal(readyPassRewards(20, false, Array.from({ length: PASS_LEVELS }, (_, i) => `f${i + 1}`)), 0, 'all free rewards claimed');
+});

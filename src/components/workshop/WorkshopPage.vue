@@ -175,7 +175,7 @@ const boostLeft = (id: string) => {
         <div><dt>Crystals</dt><dd>{{ game.crystals }}</dd></div>
       </dl>
     </header>
-    <nav class="workshop-tabs"><button v-for="[id, label] in tabs" :key="id" type="button" :class="{ active: tab === id }" @click="tab = id">{{ label }}</button></nav>
+    <nav class="workshop-tabs"><button v-for="[id, label] in tabs" :key="id" type="button" :class="{ active: tab === id, hot: (id === 'pass' && game.passReady > 0) || (id === 'wheel' && game.rouletteSpinsLeft > 0) }" @click="tab = id">{{ label }}<i v-if="id === 'pass' && game.passReady > 0" class="tab-count">{{ game.passReady }}</i></button></nav>
     <aside v-if="gettingStarted && (tab === 'equipment' || tab === 'boxes')" class="getting-started"><b>Getting started</b><ol><li v-for="step in started" :key="step.label" :class="{ done: step.done }">{{ step.label }}</li></ol></aside>
     <p v-if="game.loot.log[0]" class="workshop-log">{{ game.loot.log[0] }}</p>
 

@@ -103,3 +103,13 @@ export function passRewards(theme: PassTheme): PassLevelRewards[] {
 export interface PassState { id: string; /** When this player's first pass began (0 until the game has seen them). */ epoch: number; base: Record<string, number>; premium: boolean; claimed: string[] }
 export const emptyPass = (): PassState => ({ id: '', epoch: 0, base: {}, premium: false, claimed: [] });
 export const passClaimKey = (track: 'free' | 'premium', level: number) => `${track === 'free' ? 'f' : 'p'}${level}`;
+
+/** How many rewards the player can claim right now: every reached level not yet claimed, and the premium ones once bought. */
+export function readyPassRewards(level: number, premium: boolean, claimed: readonly string[]): number {
+  let ready = 0;
+  for (let at = 1; at <= Math.min(level, PASS_LEVELS); at++) {
+    if (!claimed.includes(passClaimKey('free', at))) ready++;
+    if (premium && !claimed.includes(passClaimKey('premium', at))) ready++;
+  }
+  return ready;
+}

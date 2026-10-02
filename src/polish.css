@@ -257,10 +257,10 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .venue-name { min-height: 34px; }
 .house-rules-button, .clean-ashtrays { min-height: 36px; }
 .speak-button, .speak-button.ui-btn-sm { min-width: 36px; min-height: 36px; width: 36px; height: 36px; }
-/* On phones the night's event card goes under the city chip instead of on top of it. */
+/* The night event banner (now only used where it still appears) stays a one-line banner on phones. */
 @media (max-width: 760px) {
   /* A one-line banner (the description is in its tooltip), so it never squeezes into a narrow tall box over the shelf. */
-  .bar-event { top: 64px; left: auto; right: 12px; width: max-content; max-width: calc(100% - 24px); transform: none; padding: 5px 10px; }
+  .bar-event { top: 46px; left: 10px; right: auto; width: max-content; max-width: calc(100% - 150px); transform: none; padding: 5px 10px; }
   .bar-event > span { display: none; }
 }
 .house-rules-button { bottom: 58px; }
@@ -295,10 +295,21 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .style-info .ui-btn { justify-self: start; margin-top: 4px; }
 
 /* Full view of the bar: the scene fills the screen as one picture; the controls and labels step aside. */
-.bar-scene .fv-open { position: absolute; z-index: 6; top: 10px; right: 10px; }
+.bar-scene .fv-open { position: absolute; z-index: 15; top: 52px; right: 10px; }
 .bar-scene.full-view { position: fixed; z-index: 1400; inset: 0; min-height: 0; height: 100dvh; border: 0; border-radius: 0; }
 .bar-scene.full-view :is(.scene-customer .guest-card, .house-rules-button, .bar-event, .clean-ashtrays, .name-ribbon, .pshelf-hint) { display: none !important; }
 .bar-scene.full-view .bar-cast, .bar-scene.full-view .scene-customer { pointer-events: none; }
 .bar-scene.full-view.fv-no-shelves :is(.pshelf-label, .shelf-nudge) { display: none !important; }
 .bar-scene.full-view.fv-no-bottles .pshelf-bottles { visibility: hidden; }
 .fv-panel { position: absolute; z-index: 8; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 16px; width: max-content; max-width: calc(100% - 24px); padding: 10px 14px; border: 1px solid #d8aa5766; border-radius: 14px; background: #0c1421ee; backdrop-filter: blur(10px); }
+
+/* The amount poured from a shelf bottle: a small badge on the bottom corner of the bottle, clear of the row's label. */
+.pshelf-bottles .bottle-visual > b { top: auto; bottom: 2px; right: -4px; padding: 1px 4px; font-size: 8px; }
+
+/* A workshop tab with something waiting (a pass reward to claim, wheel spins left) glows gold. */
+.workshop-tabs button.hot { border-color: #f2c96a; box-shadow: 0 0 0 1px #f2c96a66, 0 0 12px #f2c96a55; color: #ffe6a8; }
+.workshop-tabs button .tab-count { display: inline-grid; place-items: center; min-width: 17px; height: 17px; margin-left: 6px; padding: 0 4px; border-radius: 999px; background: #d94f4f; color: #fff; font-size: 10px; font-style: normal; font-weight: 800; }
+
+/* The Rules button sits in the scene's top-left corner (it used to cover the first guest's card). */
+.bar-scene > .house-rules-button { top: 10px; bottom: auto; left: 12px; }
+.bar-scene > .house-rules-panel { top: 56px; bottom: auto; left: 12px; }

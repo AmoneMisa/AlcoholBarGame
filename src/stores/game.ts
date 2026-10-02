@@ -23,7 +23,7 @@ import type { Customer, InventoryItem, RegionId, SupplierOffer } from '../domain
 import { pourableBrand } from '../domain/brandServe';
 import { formatCountdown } from '../domain/customerTiming';
 import { spinsLeft } from '../domain/roulette';
-import { passEndsOf, passIdOf, passLevel, passPointsFor, passThemeOf } from '../domain/pass';
+import { passEndsOf, passIdOf, passLevel, passPointsFor, passThemeOf, readyPassRewards } from '../domain/pass';
 import { checkText } from '../domain/english/checker';
 import { advanceClock, applyAction, previewTopUp, RuleError, type GameAction } from '../sim/rules';
 import { createInitialState, levelFor, normalizePlayerState, type PlayerState } from '../sim/state';
@@ -157,6 +157,7 @@ export const useGameStore = defineStore('game', () => {
   const passLevelNow = computed(() => passLevel(passPoints.value));
   const passPremium = computed(() => passCurrent.value && state.value.pass.premium);
   const passClaimed = computed(() => (passCurrent.value ? state.value.pass.claimed : []));
+  const passReady = computed(() => readyPassRewards(passLevelNow.value, passPremium.value, passClaimed.value));
   const passTheme = computed(() => passThemeOf(passEpoch.value, nowMs.value));
   const passEnds = computed(() => passEndsOf(passEpoch.value, nowMs.value));
   const cosmeticRouletteAvailable = computed(() => rouletteSpinsLeft.value > 0);
@@ -709,7 +710,7 @@ export const useGameStore = defineStore('game', () => {
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, sessionReady, ownedInteriorIds, barBackground, barInteriorStyle,
-    cosmetics:COSMETICS, ownedCosmeticIds, cosmeticCopies, cosmeticRouletteAvailable, giftableStyleItems, giftableBackgrounds, rouletteSpinsLeft, rouletteLast, passPoints, passLevelNow, passPremium, passClaimed, passTheme, passEnds, claimPass, buyPassPremium, cosmeticGiftLog, canUseCosmetic, spinRoulette, popularity, popularityBoost, activatePopularityBoost,
+    cosmetics:COSMETICS, ownedCosmeticIds, cosmeticCopies, cosmeticRouletteAvailable, passReady, giftableStyleItems, giftableBackgrounds, rouletteSpinsLeft, rouletteLast, passPoints, passLevelNow, passPremium, passClaimed, passTheme, passEnds, claimPass, buyPassPremium, cosmeticGiftLog, canUseCosmetic, spinRoulette, popularity, popularityBoost, activatePopularityBoost,
     inventories, inventory, bottleInventories, bottleInventory, currentMix, shaken, customers, activeCustomerId, customer, hasCustomer, recipe, mixJudge,
     knownRecipeIds, recipeUnlockSources, knownRecipes, lockedRecipes, dailyGiftAvailable, dailyGiftResult, loginStreak, upcomingLoginDay, dailyCoinReward, dailyCrystalReward,
     dailyLessons, dailyLessonCompletedIds, dailyLessonsComplete, dailyLessonResult, learningStreak, learningStreakForToday, learningBonusPercent, completeDailyLesson,
