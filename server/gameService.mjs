@@ -226,8 +226,12 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       const player = await tx.findOrCreatePlayer(identity);
       const { targetId, target, isFriend } = await resolveFriend(tx, player, code);
       if (!isFriend) return { status: 403, body: { ok: false, error: 'Add this player as a friend before visiting.' } };
-      const visitorRecord = await tx.lockState(player.id);
-      const friendRecord = await tx.lockState(targetId);
+      // Lock both rows in id order: two friends visiting each other at once must not wait on each other's lock.
+      const ids = [Number(player.id), targetId].sort((x, y) => x - y);
+      const locked = new Map();
+      for (const id of ids) locked.set(id, await tx.lockState(id));
+      const visitorRecord = locked.get(Number(player.id));
+      const friendRecord = locked.get(targetId);
       const visitor = normalizePlayerState(visitorRecord?.state ?? createInitialState(now()));
       const owner = normalizePlayerState(friendRecord?.state ?? createInitialState(now()));
       const key = String(targetId);

@@ -280,7 +280,7 @@ function when(at: number) {
     <!-- PRACTICE -->
     <div v-else class="learning-body practice">
       <p class="learning-lead">Look at the word. Say what it means — out loud! Then turn the card. Saved words come first.</p>
-      <div v-if="card" class="flashcard" :class="{ revealed }" role="button" tabindex="0" @click="revealed = true" @keydown.enter="revealed = true">
+      <div v-if="card" class="flashcard" :class="{ revealed }" role="button" tabindex="0" @click="revealed = true" @keydown.enter.prevent="revealed = true" @keydown.space.prevent="revealed = true">
         <small>{{ card.topic }} · {{ card.level }}</small>
         <h3>{{ card.word }}</h3>
         <span class="ipa">{{ card.ipa }}</span>

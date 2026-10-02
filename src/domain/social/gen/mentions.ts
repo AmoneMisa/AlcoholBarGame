@@ -77,7 +77,7 @@ const DISTRACTED = ['[Hm|Oh|Ah], {thing}. [That sounds nice.|Good for you.|Sound
 export const TOPIC_HOOK: Record<string, string> = { work: 'work', relationship: 'my partner', money: 'money', family: 'my family', sports: 'the match', celebration: 'my day', travel: 'my trip', health: 'my health', weather: 'the weather' };
 
 export interface MentionContext { stance: Stance; distracted?: boolean; topic?: string; /** The guest still has to order: a few words, then back to the drink. */ ordering?: boolean }
-const BRIEF = ['{Thing}? Nice.', 'Oh, {thing}. Cool.', 'Nice, {thing}.', 'OK, {thing}. Good for you.', '{Thing}, nice.', 'Ah, {thing}. Fine.'];
+const BRIEF = ['{Thing}. Nice.', 'Oh, {thing}. Cool.', 'Nice, {thing}.', 'OK, {thing}. Good for you.', '{Thing}, nice.', 'Ah, {thing}. Fine.'];
 const BRIEF_DISTRACTED = ['Hm, OK.', 'Sorry, my mind is elsewhere.', 'Mm. Not now, sorry.'];
 
 export function reactToMention(customer: Customer, mention: Mention, seed: string, context: MentionContext = { stance: 'ask' }): { text: string; opinion: Opinion; asks: boolean } {

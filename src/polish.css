@@ -282,3 +282,9 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .trade-checkout .ui-btn { margin-top: 12px; }
 .trade-checkout .ui-btn.negotiate-button { margin-top: 12px; }
 .trade-checkout .ui-btn-secondary.ui-btn-sm { margin-top: 8px; }
+
+/* Accessibility baseline: a visible keyboard focus everywhere, and no motion for people who ask for none. */
+:where(button, [role="button"], a, summary):focus-visible { outline: 2px solid #d8aa57; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

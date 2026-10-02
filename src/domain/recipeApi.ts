@@ -21,8 +21,17 @@ export async function hydrateCocktailCatalog(fetcher: typeof fetch = fetch) {
     if (!Array.isArray(payload) || !payload.length || !payload.every(isRecipe)) throw new Error('Cocktail API returned invalid data');
     // Keep the exported array identity stable: every domain module imports this
     // same object, so hydrating it before Vue mounts updates the whole game.
-    RECIPES.splice(0, RECIPES.length, ...payload);
-    return { source: 'database' as const, count: payload.length };
+    // The server's rules always use the bundled recipes, so anything that affects play (price, shaking,
+    // ingredients) stays as bundled; the database only supplies the descriptive text. Unknown ids are ignored.
+    const bundled = new Map(RECIPES.map((recipe) => [recipe.id, recipe]));
+    const merged = payload.flatMap((row) => {
+      const base = bundled.get(row.id);
+      return base ? [{ ...base, name: row.name, origin: row.origin, story: row.story, tastingNotes: row.tastingNotes, occasions: row.occasions, method: row.method }] : [];
+    });
+    if (!merged.length) throw new Error('Cocktail API returned no known recipes');
+    const missing = RECIPES.filter((recipe) => !merged.some((item) => item.id === recipe.id));
+    RECIPES.splice(0, RECIPES.length, ...merged, ...missing);
+    return { source: 'database' as const, count: merged.length };
   } catch (error) {
     console.warn('Using bundled cocktail fallback because the database API is unavailable.', error);
     return { source: 'fallback' as const, count: RECIPES.length };

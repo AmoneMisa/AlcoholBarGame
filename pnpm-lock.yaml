@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@vitejs/plugin-vue':
-        specifier: latest
+        specifier: ^6.0.9
         version: 6.0.9(vite@8.3.1(@types/node@26.6.3))(vue@3.5.43(typescript@5.9.3))
       dictionary-en:
         specifier: ^4.0.0
@@ -24,16 +24,16 @@ importers:
         specifier: ^8.23.0
         version: 8.23.0
       pinia:
-        specifier: latest
+        specifier: ^4.0.3
         version: 4.0.3(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))
       three:
         specifier: 0.180.0
         version: 0.180.0
       vite:
-        specifier: latest
+        specifier: ^8.3.1
         version: 8.3.1(@types/node@26.6.3)
       vue:
-        specifier: latest
+        specifier: ^3.5.43
         version: 3.5.43(typescript@5.9.3)
     devDependencies:
       '@types/nspell':

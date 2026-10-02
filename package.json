@@ -19,15 +19,15 @@
     "docker:clean": "powershell -ExecutionPolicy Bypass -File scripts/docker-clean.ps1"
   },
   "dependencies": {
-    "@vitejs/plugin-vue": "latest",
+    "@vitejs/plugin-vue": "^6.0.9",
     "dictionary-en": "^4.0.0",
     "express": "^5.2.1",
     "nspell": "^2.1.5",
     "pg": "^8.23.0",
-    "pinia": "latest",
+    "pinia": "^4.0.3",
     "three": "0.180.0",
-    "vite": "latest",
-    "vue": "latest"
+    "vite": "^8.3.1",
+    "vue": "^3.5.43"
   },
   "devDependencies": {
     "@types/nspell": "^2.1.6",

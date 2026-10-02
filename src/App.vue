@@ -78,6 +78,16 @@ onMounted(() => {
 let socialTimer: ReturnType<typeof setInterval>;
 onMounted(() => { socialTimer = setInterval(() => game.loadFriends(),60_000); });
 onUnmounted(() => clearInterval(socialTimer));
+// The loader in index.html stays until the game has connected (online or offline practice).
+// Never trap the player behind the loader if the server does not answer.
+const bootGuard = setTimeout(() => document.getElementById('boot')?.remove(), 20_000);
+watch(() => game.sessionReady, (ready) => {
+  if (!ready) return;
+  clearTimeout(bootGuard);
+  const boot = document.getElementById('boot');
+  boot?.classList.add('done');
+  setTimeout(() => boot?.remove(), 400);
+}, { immediate: true });
 watch(() => game.sessionReady, (ready) => {
   if (!ready) return;
   const today = calendarDate(new Date());
@@ -184,7 +194,7 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
     <TutorialTour :ready="game.sessionReady && game.startingBarChosen" :seen="game.tourSeen" @finish="game.setTour" />
     <StartingBarPicker v-if="game.sessionReady && !game.startingBarChosen" />
     <nav class="game-nav" aria-label="Game views">
-      <button v-for="item in nav" :key="item.id" :class="{ active: view === item.id }" :data-guide="'nav-' + item.id" type="button" @click="selectView(item.id)"><UiIcon :name="item.mark" /><b>{{ item.label }}</b><i v-if="badges[item.id]" class="nav-badge" :aria-label="`${badges[item.id]} waiting`">{{ badges[item.id] }}</i></button>
+      <button v-for="item in nav" :key="item.id" :class="{ active: view === item.id }" :aria-current="view === item.id ? 'page' : undefined" :data-guide="'nav-' + item.id" type="button" @click="selectView(item.id)"><UiIcon :name="item.mark" /><b>{{ item.label }}</b><i v-if="badges[item.id]" class="nav-badge" :aria-label="`${badges[item.id]} waiting`">{{ badges[item.id] }}</i></button>
     </nav>
   </div>
 </template>

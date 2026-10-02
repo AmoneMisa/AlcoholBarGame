@@ -8,12 +8,25 @@ import { authenticate } from './auth.mjs';
 export function createApp({ service, botToken, allowDevLogin = false, extraRoutes, createInvoiceLink }) {
   const app = express();
   app.disable('x-powered-by');
+  // Behind the host's nginx / Caddy: use the real client address for rate limits.
+  app.set('trust proxy', 'loopback, linklocal, uniquelocal');
+  app.use((_request, response, next) => {
+    response.set({
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Content-Security-Policy': "frame-ancestors 'self' https://web.telegram.org https://*.telegram.org"
+    });
+    next();
+  });
   app.use('/api', express.json({ limit: '16kb' }));
 
   extraRoutes?.(app);
 
   const auth = authenticate({ botToken, allowDevLogin });
   const limiter = rateLimit({ windowMs: 10_000, max: 40 });
+  // Per-address limit before sign-in, so unsigned floods cannot make the server compute signatures endlessly.
+  const ipLimiter = rateLimit({ windowMs: 10_000, max: 120, key: (request) => `ip:${request.ip}` });
+  app.use('/api', (request, response, next) => request.path === '/health' || request.path === '/cocktails' ? next() : ipLimiter(request, response, next));
 
   // One place for the shared plumbing: sign-in, rate limit, errors. A handler returns { status, body }, or a plain answer for 200.
   const route = (path, handle) => app.post(path, auth, limiter, async (request, response, next) => {
@@ -65,10 +78,10 @@ export function handleErrors(app) {
 }
 
 // Simple per-player sliding-window limit against scripted spamming.
-function rateLimit({ windowMs, max }) {
+function rateLimit({ windowMs, max, key: keyOf = (request) => request.identity?.key ?? request.ip }) {
   const hits = new Map();
   return (request, response, next) => {
-    const key = request.identity?.key ?? request.ip;
+    const key = keyOf(request);
     const now = Date.now();
     const recent = (hits.get(key) ?? []).filter((time) => now - time < windowMs);
     if (recent.length >= max) return response.status(429).json({ ok: false, error: 'Too many actions. Slow down a little.' });
