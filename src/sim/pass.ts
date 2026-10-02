@@ -2,7 +2,7 @@ import { INTERIORS } from '../data/cosmetics/bars';
 import { styleForInterior } from '../data/cosmetics/styleSources';
 import { COSMETICS } from '../domain/cosmetics';
 import {
-  PASS_LEVELS, PASS_PREMIUM_PRICE, passClaimKey, passId, passLevel, passPointsFor, passRewards, passThemeAt
+  PASS_LEVELS, PASS_PREMIUM_PRICE, passClaimKey, passIdOf, passLevel, passPointsFor, passRewards, passThemeOf, sharedPassId, sharedPassStart
 } from '../domain/pass';
 import { grantCosmetic, grantReward } from './loot';
 import type { PlayerState } from './state';
@@ -11,11 +11,18 @@ import type { PlayerState } from './state';
 // server needs no extra bookkeeping while the player plays. Only the claims and the premium purchase are stored.
 export class PassError extends Error {}
 
-/** Starts the current pass when a new one has begun (or for the first time): the counters at that moment are the base. */
+/** Starts this player's pass clock the first time, and a new pass whenever the previous one has run its 14 days. */
 export function syncPass(state: PlayerState, now: number) {
-  const id = passId(now);
-  if (state.pass?.id === id) return;
-  state.pass = { id, base: { ...state.loot.stats }, premium: false, claimed: [] };
+  const pass = state.pass;
+  if (!pass.epoch) {
+    // Someone who was already in the shared pass keeps it as their first one (nothing is lost); everybody else starts now.
+    if (pass.id && pass.id === sharedPassId(now)) { pass.epoch = sharedPassStart(now); pass.id = passIdOf(pass.epoch, now); return; }
+    pass.epoch = now;
+    pass.id = '';
+  }
+  const id = passIdOf(pass.epoch, now);
+  if (pass.id === id) return;
+  state.pass = { id, epoch: pass.epoch, base: { ...state.loot.stats }, premium: false, claimed: [] };
 }
 
 export const passPoints = (state: PlayerState) => passPointsFor(state.loot.stats, state.pass.base);
@@ -30,7 +37,7 @@ export function claimPass(state: PlayerState, trackInput: unknown, levelInput: u
   if (track === 'premium' && !state.pass.premium) throw new PassError('Unlock the premium track first.');
   const key = passClaimKey(track, level);
   if (state.pass.claimed.includes(key)) throw new PassError('This reward is already claimed.');
-  const row = passRewards(passThemeAt(now)).find((item) => item.level === level)!;
+  const row = passRewards(passThemeOf(state.pass.epoch, now)).find((item) => item.level === level)!;
   state.pass.claimed.push(key);
 
   const interiorsBefore = [...state.ownedInteriorIds];

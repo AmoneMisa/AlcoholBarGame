@@ -7,8 +7,6 @@ import type { StatId } from './quests';
 // costumes (one for each bartender) and level 20 its background.
 export const PASS_DAYS = 14;
 export const PASS_MS = PASS_DAYS * 24 * 60 * 60 * 1000;
-// Passes run in fixed two-week cycles counted from a Monday, so every player sees the same pass at the same time.
-export const PASS_EPOCH = Date.UTC(2026, 0, 5);
 export const PASS_LEVELS = 20;
 export const PASS_LEVEL_POINTS = 75;
 // Priced so that a free player can only afford it by playing about nine days in ten and finishing the weekly quests:
@@ -27,9 +25,8 @@ const outfit = (character: 'noa' | 'leo', value: string) => `bartender:${value}:
 export const themeStyleIds = (theme: PassTheme) => [outfit('noa', theme.noa), outfit('leo', theme.leo)];
 
 // The pass rotates through these seasons. Every season is built on a game: its background plus a costume for Noa and
-// one for Leo from that game. The first one is the pass that began on 28 September 2026 (cycle 19) and the rest
-// follow in this order, so new seasons are only ever added at the END: the schedule of every pass already running or
-// announced stays as it is (see the schedule test).
+// one for Leo from that game. A player's first pass is the first season below and the rest follow in this order, so new
+// seasons are only ever added at the END: nobody's running or announced season changes (see the schedule test).
 export const PASS_THEMES: readonly PassTheme[] = [
   { id: 'lost-ark', name: 'Lost Ark', tagline: 'A beach club at the end of the world, sunset included.', interior: 'lost-ark', noa: 'theme-lost-ark-bard-noa', leo: 'theme-lost-ark-berserker-leo' },
   { id: 'lineage-2', name: 'Lineage II', tagline: 'The Aden tavern: elves, mages and a long night at the bar.', interior: 'lineage-2', noa: 'theme-l2-elf-noa', leo: 'theme-l2-elf-leo' },
@@ -52,12 +49,17 @@ export const PASS_THEMES: readonly PassTheme[] = [
   { id: 'assassins-creed', name: 'Assassin’s Creed', tagline: 'A hidden tavern in Venice, the best seat has a view of the door.', interior: 'assassins-creed', noa: 'theme-assassins-creed-noa', leo: 'theme-assassins-creed-leo' }
 ];
 
-export const passCycle = (now: number) => Math.floor((now - PASS_EPOCH) / PASS_MS);
-export const passId = (now: number) => `pass-${passCycle(now)}`;
-const FIRST_THEME_CYCLE = 19;
-export const passThemeAt = (now: number) => PASS_THEMES[(((passCycle(now) - FIRST_THEME_CYCLE) % PASS_THEMES.length) + PASS_THEMES.length) % PASS_THEMES.length]!;
-export const passStartsAt = (now: number) => PASS_EPOCH + passCycle(now) * PASS_MS;
-export const passEndsAt = (now: number) => passStartsAt(now) + PASS_MS;
+// Every player has their own pass clock: it starts the first time the game sees them, so a new player begins with the
+// first season and then follows the rotation from there, 14 days at a time. Nothing depends on the date on the server.
+export const passCycleOf = (epoch: number, now: number) => Math.max(0, Math.floor((now - epoch) / PASS_MS));
+export const passIdOf = (epoch: number, now: number) => `pass-${passCycleOf(epoch, now)}`;
+export const passThemeOf = (epoch: number, now: number) => PASS_THEMES[passCycleOf(epoch, now) % PASS_THEMES.length]!;
+export const passStartsOf = (epoch: number, now: number) => epoch + passCycleOf(epoch, now) * PASS_MS;
+export const passEndsOf = (epoch: number, now: number) => passStartsOf(epoch, now) + PASS_MS;
+// The old shared clock (one pass for everybody). Only used to carry players who were already in a pass over to their own.
+export const PASS_SHARED_EPOCH = Date.UTC(2026, 0, 5);
+export const sharedPassStart = (now: number) => PASS_SHARED_EPOCH + Math.floor((now - PASS_SHARED_EPOCH) / PASS_MS) * PASS_MS;
+export const sharedPassId = (now: number) => `pass-${Math.floor((now - PASS_SHARED_EPOCH) / PASS_MS)}`;
 
 export const passLevel = (points: number) => Math.min(PASS_LEVELS, Math.floor(Math.max(0, points) / PASS_LEVEL_POINTS));
 export const passPointsFor = (stats: Partial<Record<string, number>>, base: Partial<Record<string, number>>) =>
@@ -98,6 +100,6 @@ export function passRewards(theme: PassTheme): PassLevelRewards[] {
   });
 }
 
-export interface PassState { id: string; base: Record<string, number>; premium: boolean; claimed: string[] }
-export const emptyPass = (): PassState => ({ id: '', base: {}, premium: false, claimed: [] });
+export interface PassState { id: string; /** When this player's first pass began (0 until the game has seen them). */ epoch: number; base: Record<string, number>; premium: boolean; claimed: string[] }
+export const emptyPass = (): PassState => ({ id: '', epoch: 0, base: {}, premium: false, claimed: [] });
 export const passClaimKey = (track: 'free' | 'premium', level: number) => `${track === 'free' ? 'f' : 'p'}${level}`;

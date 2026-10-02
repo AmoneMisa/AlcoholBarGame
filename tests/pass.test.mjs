@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { COSMETICS } from '../src/domain/cosmetics.ts';
 import {
-  PASS_DAYS, PASS_EPOCH, PASS_LEVELS, PASS_STYLES_LEVEL, PASS_LEVEL_POINTS, PASS_MS, PASS_PREMIUM_PRICE, PASS_THEMES, passEndsAt, passId, passLevel, passPointsFor, passRewards, passStartsAt, passThemeAt, themeStyleIds
+  PASS_DAYS, PASS_LEVELS, PASS_STYLES_LEVEL, PASS_LEVEL_POINTS, PASS_MS, PASS_PREMIUM_PRICE, PASS_THEMES, passEndsOf, passIdOf, passLevel, passPointsFor, passRewards, passStartsOf, passThemeOf, sharedPassId, sharedPassStart, themeStyleIds
 } from '../src/domain/pass.ts';
 import { INTERIORS } from '../src/data/cosmetics/bars.ts';
 import { applyAction } from '../src/sim/rules.ts';
@@ -10,22 +10,24 @@ import { passLevelOf, passPoints } from '../src/sim/pass.ts';
 import { capacityOf, grantReward } from '../src/sim/loot.ts';
 import { createInitialState, normalizePlayerState } from '../src/sim/state.ts';
 
-const T0 = PASS_EPOCH + 3 * 24 * 3600 * 1000;       // three days into the first pass
+const T0 = Date.UTC(2026, 9, 2, 12);                   // any day: a player's pass starts when the game first sees them
 const context = (now = T0, random = () => .5) => ({ now, random, checkEnglish: (text) => ({ ok: true, corrected: text }) });
 const fresh = (now = T0) => { const state = createInitialState(now); state.startingBarChosen = true; return state; };
 const act = (state, action, now = T0) => applyAction(state, action, context(now));
 // Plays: the same counters the real rules raise (a serve, a lesson …), so the pass sees normal play.
 const play = (state, stats) => { for (const [key, amount] of Object.entries(stats)) state.loot.stats[key] = (state.loot.stats[key] ?? 0) + amount; };
 
-test('The pass runs in fixed two-week cycles, rotating through the seasons', () => {
+test('A pass runs 14 days from the player\'s own start and then moves to the next season', () => {
   assert.equal(PASS_DAYS, 14);
-  assert.equal(passStartsAt(T0), PASS_EPOCH);
-  assert.equal(passEndsAt(T0) - passStartsAt(T0), PASS_MS);
-  assert.notEqual(passId(T0), passId(T0 + PASS_MS));
-  assert.equal(passId(T0), passId(T0 + 5 * 24 * 3600 * 1000));
-  const seen = PASS_THEMES.map((_, cycle) => passThemeAt(PASS_EPOCH + cycle * PASS_MS).id);
-  assert.equal(new Set(seen).size, PASS_THEMES.length, 'each cycle has its own season');
-  assert.equal(passThemeAt(PASS_EPOCH + PASS_THEMES.length * PASS_MS).id, PASS_THEMES[0].id, 'then it starts again');
+  const start = T0;
+  assert.equal(passStartsOf(start, start + 3 * 24 * 3600 * 1000), start);
+  assert.equal(passEndsOf(start, start) - passStartsOf(start, start), PASS_MS);
+  assert.equal(passIdOf(start, start), passIdOf(start, start + 5 * 24 * 3600 * 1000));
+  assert.notEqual(passIdOf(start, start), passIdOf(start, start + PASS_MS));
+  const seen = PASS_THEMES.map((_, cycle) => passThemeOf(start, start + cycle * PASS_MS).id);
+  assert.deepEqual(seen, PASS_THEMES.map((theme) => theme.id), 'the rotation goes through the seasons in order');
+  assert.equal(passThemeOf(start, start + PASS_THEMES.length * PASS_MS).id, PASS_THEMES[0].id, 'then it starts again');
+  assert.equal(passThemeOf(start, start - 5 * PASS_MS).id, PASS_THEMES[0].id, 'a clock that runs backwards never goes before the first season');
 });
 
 test('Every season gives a costume for each bartender at level 14 and its background at level 20, all of which exist', () => {
@@ -48,7 +50,8 @@ test('Points come from normal play since the pass began, and set the level', () 
   const state = fresh();
   play(state, { serves: 100, lessons: 3 });                 // before the first action of the pass: not counted
   act(state, { type: 'tick' });
-  assert.equal(state.pass.id, passId(T0));
+  assert.equal(state.pass.epoch, T0, 'the player\'s own clock starts at their first action');
+  assert.equal(state.pass.id, passIdOf(T0, T0));
   assert.equal(passPoints(state), 0, 'what was done before the pass began does not count');
   play(state, { serves: 20, vips: 2, lessons: 1 });         // 40 + 12 + 12 = 64
   assert.equal(passPoints(state), 64);
@@ -86,7 +89,7 @@ test('Level 14 gives both costumes and level 20 the background; costumes already
   const state = fresh();
   act(state, { type: 'tick' });
   play(state, { serves: 1000 });
-  const theme = passThemeAt(T0);
+  const theme = PASS_THEMES[0];   // a new player begins with the first season
   for (let level = 1; level < PASS_STYLES_LEVEL; level++) act(state, { type: 'claimPass', track: 'free', level });
   assert.ok(!state.ownedInteriorIds.includes(theme.interior), 'no background before level 20');
   act(state, { type: 'claimPass', track: 'free', level: PASS_STYLES_LEVEL });
@@ -116,7 +119,7 @@ test('A new two-week pass starts clean: counters from that moment, no claims, no
   act(state, { type: 'claimPass', track: 'free', level: 1 });
   const later = T0 + PASS_MS;
   act(state, { type: 'tick' }, later);
-  assert.equal(state.pass.id, passId(later));
+  assert.equal(state.pass.id, passIdOf(T0, later));
   assert.deepEqual(state.pass.claimed, []);
   assert.equal(state.pass.premium, false);
   assert.equal(passPoints(state), 0);
@@ -206,18 +209,41 @@ test('Passes are built only on games; the costumes come from the same game as th
   assert.equal(new Set(PASS_THEMES.map((theme) => theme.interior)).size, PASS_THEMES.length, 'no game twice');
 });
 
-test('The schedule does not move: the running season stays, the next ones follow in the announced order', () => {
-  const day = (month, date) => passThemeAt(Date.UTC(2026, month - 1, date)).id;
-  assert.equal(day(10, 2), 'lost-ark', 'the pass in progress on 2 October 2026');
-  assert.equal(day(10, 12), 'lineage-2');
-  assert.equal(day(10, 26), 'warcraft-3');
-  assert.equal(day(11, 9), 'mass-effect');
-  assert.equal(passThemeAt(Date.UTC(2027, 0, 18)).id, 'nfs-underground');
-  assert.equal(passThemeAt(Date.UTC(2027, 1, 1)).id, 'witcher-3', 'the first of the ten newest');
-  assert.equal(passThemeAt(Date.UTC(2026, 8, 28)).id, 'lost-ark', 'the pass began 28 September');
-  // Over a full rotation every season comes exactly once.
-  const rotation = PASS_THEMES.map((_, step) => passThemeAt(Date.UTC(2026, 9, 12) + step * PASS_MS).id);
-  assert.equal(new Set(rotation).size, PASS_THEMES.length);
+test('New players start the rotation from the first season, whatever the date on the server', () => {
+  // Two players who join months apart each begin with the first season and then follow the same order.
+  const early = fresh(T0), late = fresh(T0 + 90 * 24 * 3600 * 1000);
+  act(early, { type: 'tick' }, T0);
+  act(late, { type: 'tick' }, T0 + 90 * 24 * 3600 * 1000);
+  assert.equal(passThemeOf(early.pass.epoch, T0).id, PASS_THEMES[0].id);
+  assert.equal(passThemeOf(late.pass.epoch, T0 + 90 * 24 * 3600 * 1000).id, PASS_THEMES[0].id);
+  const day = T0 + 100 * 24 * 3600 * 1000;
+  assert.notEqual(passThemeOf(early.pass.epoch, day).id, passThemeOf(late.pass.epoch, day).id, 'on the same date each player is in their own season');
+  // Each player\'s second pass is the second season, 14 days after their own start.
+  act(late, { type: 'tick' }, late.pass.epoch + PASS_MS);
+  assert.equal(passThemeOf(late.pass.epoch, late.pass.epoch + PASS_MS).id, PASS_THEMES[1].id);
+  assert.equal(late.pass.id, 'pass-1');
+  // The first order is the announced one.
+  assert.deepEqual(PASS_THEMES.slice(0, 4).map((theme) => theme.id), ['lost-ark', 'lineage-2', 'warcraft-3', 'mass-effect']);
+  assert.equal(PASS_THEMES.at(-1).id, 'assassins-creed', 'new seasons are added at the end');
+});
+
+test('A player who was already in the shared pass keeps it as their own first pass, with their claims; a lapsed one starts fresh', () => {
+  const now = T0;
+  const kept = fresh(now);
+  kept.pass = { id: sharedPassId(now), base: { serves: 3 }, premium: true, claimed: ['f1', 'p1'] };   // a save from before the pass was per player
+  kept.loot.stats.serves = 3;
+  act(kept, { type: 'tick' }, now);
+  assert.equal(kept.pass.epoch, sharedPassStart(now), 'their pass keeps its real start');
+  assert.equal(kept.pass.id, passIdOf(kept.pass.epoch, now));
+  assert.equal(kept.pass.premium, true);
+  assert.deepEqual(kept.pass.claimed, ['f1', 'p1']);
+  assert.equal(passThemeOf(kept.pass.epoch, now).id, PASS_THEMES[0].id);
+  const lapsed = fresh(now);
+  lapsed.pass = { id: 'pass-3', base: { serves: 9 }, premium: true, claimed: ['f1'] };
+  act(lapsed, { type: 'tick' }, now);
+  assert.equal(lapsed.pass.epoch, now, 'a pass that ended long ago is not carried over');
+  assert.deepEqual(lapsed.pass.claimed, []);
+  assert.equal(lapsed.pass.premium, false);
 });
 
 test('Game backgrounds that are not a pass season are kept for boxes: not for sale, not giftable, in the box pool', async () => {
@@ -247,4 +273,24 @@ test('Game backgrounds that are not a pass season are kept for boxes: not for sa
 test('The box pool lists every background once', async () => {
   const { BOX_INTERIOR_IDS } = await import('../src/data/cosmetics/bars.ts');
   assert.equal(new Set(BOX_INTERIOR_IDS).size, BOX_INTERIOR_IDS.length);
+});
+
+test('On the server a new player\'s pass starts with their first visit, whatever the date is', async () => {
+  const { createGameService } = await import('../server/gameService.mjs');
+  const { createMemoryRepository } = await import('../server/playerRepository.mjs');
+  const { checkEnglish } = await import('../server/english.mjs');
+  let clock = Date.UTC(2026, 9, 2, 12);
+  const repository = createMemoryRepository();
+  const service = createGameService({ repository, checkEnglish, now: () => clock });
+  const identity = (id) => ({ kind: 'dev', key: `dev:${id}`, telegramId: null, name: `P${id}`, username: null });
+  const first = await service.session(identity(1));
+  assert.equal(repository.states.get(first.player.id).state.pass.epoch, clock, 'the clock starts at the first visit');
+  assert.equal(first.state.pass.id, 'pass-0');
+  clock += 200 * 24 * 3600 * 1000;                                    // much later, a different player joins
+  const second = await service.session(identity(2));
+  assert.equal(repository.states.get(second.player.id).state.pass.id, 'pass-0', 'a new player is in their first pass');
+  assert.equal(passThemeOf(repository.states.get(second.player.id).state.pass.epoch, clock).id, PASS_THEMES[0].id, 'with the first season');
+  const back = await service.session(identity(1));                    // the first player returns 200 days later
+  assert.notEqual(back.state.pass.id, 'pass-0');
+  assert.equal(back.state.pass.epoch, repository.states.get(first.player.id).state.pass.epoch, 'their own clock did not move');
 });

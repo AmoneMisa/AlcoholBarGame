@@ -211,7 +211,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     ownedCosmeticIds: [],
     cosmeticCopies: {},
     roulette: { day: '', spins: 0 },
-    pass: { id: '', base: {}, premium: false, claimed: [] },
+    pass: { id: '', epoch: 0, base: {}, premium: false, claimed: [] },
     cosmeticGiftLog: [],
     knownRecipeIds,
     recipeUnlockSources: Object.fromEntries(knownRecipeIds.map((id) => [id, 'starter'])),
@@ -324,6 +324,7 @@ export function normalizePlayerState(state: PlayerState) {
   const season = (state.pass ?? {}) as Partial<import('../domain/pass').PassState>;
   state.pass = {
     id: typeof season.id === 'string' ? season.id.slice(0, 24) : '',
+    epoch: Number.isFinite(season.epoch) && Number(season.epoch) > 0 ? Math.floor(Number(season.epoch)) : 0,
     base: Object.fromEntries(Object.entries(season.base && typeof season.base === 'object' ? season.base : {}).filter(([key, value]) => key.length < 32 && Number.isFinite(value) && Number(value) >= 0).map(([key, value]) => [key, Math.floor(Number(value))])),
     premium: season.premium === true,
     claimed: Array.isArray(season.claimed) ? [...new Set(season.claimed.filter((key): key is string => typeof key === 'string' && /^[fp]\d{1,2}$/.test(key)))].slice(0, 60) : []

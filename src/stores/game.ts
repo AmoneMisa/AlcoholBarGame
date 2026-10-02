@@ -23,7 +23,7 @@ import type { Customer, InventoryItem, RegionId, SupplierOffer } from '../domain
 import { pourableBrand } from '../domain/brandServe';
 import { formatCountdown } from '../domain/customerTiming';
 import { spinsLeft } from '../domain/roulette';
-import { passEndsAt, passId, passLevel, passPointsFor, passThemeAt } from '../domain/pass';
+import { passEndsOf, passIdOf, passLevel, passPointsFor, passThemeOf } from '../domain/pass';
 import { checkText } from '../domain/english/checker';
 import { advanceClock, applyAction, previewTopUp, RuleError, type GameAction } from '../sim/rules';
 import { createInitialState, levelFor, normalizePlayerState, type PlayerState } from '../sim/state';
@@ -149,14 +149,16 @@ export const useGameStore = defineStore('game', () => {
   const rouletteSpinsLeft = computed(() => spinsLeft(state.value.roulette, today.value));
   const rouletteLast = computed(() => state.value.roulette.last);
   // The season pass: shown from the loot counters; a pass that has not been started by an action yet counts from zero.
-  const passNow = computed(() => passId(nowMs.value));
+  // The pass clock is the player's own: it began when the game first saw them (until then it starts now).
+  const passEpoch = computed(() => state.value.pass.epoch || nowMs.value);
+  const passNow = computed(() => passIdOf(passEpoch.value, nowMs.value));
   const passCurrent = computed(() => state.value.pass.id === passNow.value);
   const passPoints = computed(() => passPointsFor(state.value.loot.stats, passCurrent.value ? state.value.pass.base : state.value.loot.stats));
   const passLevelNow = computed(() => passLevel(passPoints.value));
   const passPremium = computed(() => passCurrent.value && state.value.pass.premium);
   const passClaimed = computed(() => (passCurrent.value ? state.value.pass.claimed : []));
-  const passTheme = computed(() => passThemeAt(nowMs.value));
-  const passEnds = computed(() => passEndsAt(nowMs.value));
+  const passTheme = computed(() => passThemeOf(passEpoch.value, nowMs.value));
+  const passEnds = computed(() => passEndsOf(passEpoch.value, nowMs.value));
   const cosmeticRouletteAvailable = computed(() => rouletteSpinsLeft.value > 0);
   const loot = computed(() => state.value.loot);
   // Progress of an achievement counter (counted ones and ones read from what the player owns).
