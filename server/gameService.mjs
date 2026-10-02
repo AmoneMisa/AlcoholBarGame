@@ -97,34 +97,40 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
   }
 
   // The weekly leaderboard: the top bars by XP earned this week, the player's own rank, and last week's claimable reward.
+  // The rows of this week's board for one player, with the ids that the screen never sees.
+  async function boardFor(tx, player, own, scope, week) {
+    const ownId = Number(player.id);
+    let top;
+    let mine;
+    if (scope === 'friends') {
+      // Friends only: accepted friends plus me, including friends with no score yet. Names are the friends' own names.
+      const friendIds = new Map();
+      for (const row of await tx.listFriendships(player.id)) {
+        if (row.status !== 'accepted') continue;
+        const otherId = Number(row.playerId) === ownId ? Number(row.friendId) : Number(row.playerId);
+        friendIds.set(otherId, own.friendLabels?.[String(otherId)] || row.name);
+      }
+      const scored = new Map((await tx.weeklyFor(week, [ownId, ...friendIds.keys()])).map((row) => [row.playerId, row]));
+      const entries = [ownId, ...friendIds.keys()].map((id) => ({ playerId: id, score: scored.get(id)?.score ?? 0, label: id === ownId ? (scored.get(id)?.label ?? own.bars[own.regionId].name) : (friendIds.get(id) || scored.get(id)?.label || 'Friend'), level: scored.get(id)?.level ?? null, order: [...scored.keys()].indexOf(id) }));
+      // Stable order: higher score first; equal scores keep the database order (who got there first); unscored last.
+      entries.sort((a, b) => b.score - a.score || (a.order < 0) - (b.order < 0) || a.order - b.order || a.playerId - b.playerId);
+      top = entries.slice(0, 50).map((row, index) => ({ playerId: row.playerId, rank: index + 1, score: row.score, label: row.label, level: row.level }));
+      const at = entries.findIndex((row) => row.playerId === ownId);
+      mine = at < 0 ? null : { week, rank: at + 1, size: entries.length, score: entries[at].score };
+    } else {
+      top = await tx.topWeekly(week, LEADERBOARD_SIZE);
+      mine = await tx.weeklyStanding(week, ownId);
+    }
+    return { top, mine };
+  }
+
   async function leaderboard(identity, scope = 'global') {
     return repository.transaction(async (tx) => {
       const player = await tx.findOrCreatePlayer(identity);
       const week = weekOf(now());
-      const ownId = Number(player.id);
       // Read-only: the state is read once, without the row lock that actions take.
       const own = normalizePlayerState((await tx.readState(player.id)) ?? createInitialState(now()));
-      let top;
-      let mine;
-      if (scope === 'friends') {
-        // Friends only: accepted friends plus me, including friends with no score yet. Names are the friends' own names.
-        const friendIds = new Map();
-        for (const row of await tx.listFriendships(player.id)) {
-          if (row.status !== 'accepted') continue;
-          const otherId = Number(row.playerId) === ownId ? Number(row.friendId) : Number(row.playerId);
-          friendIds.set(otherId, own.friendLabels?.[String(otherId)] || row.name);
-        }
-        const scored = new Map((await tx.weeklyFor(week, [ownId, ...friendIds.keys()])).map((row) => [row.playerId, row]));
-        const entries = [ownId, ...friendIds.keys()].map((id) => ({ playerId: id, score: scored.get(id)?.score ?? 0, label: id === ownId ? (scored.get(id)?.label ?? own.bars[own.regionId].name) : (friendIds.get(id) || scored.get(id)?.label || 'Friend'), level: scored.get(id)?.level ?? null, order: [...scored.keys()].indexOf(id) }));
-        // Stable order: higher score first; equal scores keep the database order (who got there first); unscored last.
-        entries.sort((a, b) => b.score - a.score || (a.order < 0) - (b.order < 0) || a.order - b.order || a.playerId - b.playerId);
-        top = entries.slice(0, 50).map((row, index) => ({ playerId: row.playerId, rank: index + 1, score: row.score, label: row.label, level: row.level }));
-        const at = entries.findIndex((row) => row.playerId === ownId);
-        mine = at < 0 ? null : { week, rank: at + 1, size: entries.length, score: entries[at].score };
-      } else {
-        top = await tx.topWeekly(week, LEADERBOARD_SIZE);
-        mine = await tx.weeklyStanding(week, ownId);
-      }
+      const { top, mine } = await boardFor(tx, player, own, scope, week);
       const previous = await tx.weeklyStanding(week - 1, Number(player.id));
       const claimed = own.loot.leaderboardClaimed;
       const reward = previous ? leaderboardReward(previous.rank, previous.score) : undefined;
@@ -133,6 +139,27 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
         top: top.map((row) => ({ rank: row.rank, label: row.label, level: row.level, score: row.score, me: row.playerId === Number(player.id) })),
         me: mine, previous: previous ? { ...previous, tier: reward?.tier ?? null, reward: reward ? describeLeaderboardReward(reward) : null, claimable: !!reward && claimed < previous.week } : null
       };
+    });
+  }
+
+  // A look at the bar of someone on this week's board: read-only, no prestige, no gifts. A stranger sees the bar
+  // (look, background, level, prestige) and the public profile, not which recipes or backgrounds they own.
+  async function leaderboardBar(identity, body) {
+    return repository.transaction(async (tx) => {
+      const player = await tx.findOrCreatePlayer(identity);
+      const scope = body?.scope === 'friends' ? 'friends' : 'global';
+      const week = weekOf(now());
+      const rank = Math.floor(Number(body?.rank));
+      if (Number(body?.week) !== week) return { status: 409, body: { ok: false, error: 'The board has changed. Refresh it and try again.' } };
+      const own = normalizePlayerState((await tx.readState(player.id)) ?? createInitialState(now()));
+      const { top } = await boardFor(tx, player, own, scope, week);
+      const row = Number.isInteger(rank) && rank >= 1 ? top[rank - 1] : undefined;
+      if (!row || (Number.isFinite(Number(body?.score)) && Number(body.score) !== row.score)) return { status: 409, body: { ok: false, error: 'The board has changed. Refresh it and try again.' } };
+      const theirs = await tx.readState(row.playerId);
+      if (!theirs) return { status: 404, body: { ok: false, error: 'This bar is not available.' } };
+      const state = normalizePlayerState(theirs);
+      const { knownRecipeIds, ownedInteriorIds, ...bar } = publicBar(state, row.label);
+      return { status: 200, body: { ok: true, rank: row.rank, score: row.score, bar: { ...bar, prestige: state.popularity } } };
     });
   }
 
@@ -341,5 +368,5 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
   // Request ids only need to survive long enough for a retry; older rows are pure bloat.
   const pruneRequests = (olderThanMs = 7 * 24 * 60 * 60 * 1000) => repository.transaction((tx) => tx.pruneRequests(now() - olderThanMs));
 
-  return { pruneRequests, session, act, leaderboard, friends, addFriend, answerFriend, removeFriend, labelFriend, visitFriend, sendGift, claimGifts, startStarPurchase, approveStarCheckout, fulfilStarPayment };
+  return { pruneRequests, session, act, leaderboard, leaderboardBar, friends, addFriend, answerFriend, removeFriend, labelFriend, visitFriend, sendGift, claimGifts, startStarPurchase, approveStarCheckout, fulfilStarPayment };
 }

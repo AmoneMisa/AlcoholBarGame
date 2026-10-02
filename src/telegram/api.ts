@@ -44,6 +44,9 @@ export interface LeaderboardResult {
   me: { rank: number; size: number; score: number } | null;
   previous: { week: number; rank: number; size: number; score: number; tier: string | null; reward: string | null; claimable: boolean } | null;
 }
+// A look at the bar of someone on the weekly board (read-only). The rank, week and score identify the row.
+export interface BoardBar { ok: boolean; error?: string; rank: number; score: number; bar: { name: string; level: number; prestige: number; regionId: string; bar: Record<string, any>; recipes: number; interiors: number; mastered: { name: string; level: number }[]; profile?: any } }
+export const viewBoardBar = (scope: 'global' | 'friends', rank: number, week: number, score: number) => post<BoardBar>('/api/leaderboard/bar', { scope, rank, week, score });
 export const fetchLeaderboard = (scope: 'global' | 'friends' = 'global') => post<LeaderboardResult>('/api/leaderboard', { scope });
 export const fetchFriends = () => post<SocialResult>('/api/friends', {});
 export const requestFriend = (code:string) => post<SocialResult>('/api/friends/add', { code });

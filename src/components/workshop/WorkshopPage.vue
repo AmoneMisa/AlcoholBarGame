@@ -3,7 +3,8 @@ import ItemArt from '../ui/ItemArt.vue';
 import UiCheckbox from '../ui/UiCheckbox.vue';
 import UiInput from '../ui/UiInput.vue';
 import { computed, ref, watch } from 'vue';
-import { fetchLeaderboard, type LeaderboardResult } from '../../telegram/api';
+import { fetchLeaderboard, viewBoardBar, type BoardBar, type LeaderboardResult } from '../../telegram/api';
+import BoardBarView from '../profile/BoardBarView.vue';
 import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE, leaderboardReward, describeLeaderboardReward } from '../../domain/leaderboard';
 import { RECIPES } from '../../domain/catalog';
 import { COSMETICS, DRAWABLE_COSMETICS } from '../../domain/cosmetics';
@@ -80,6 +81,17 @@ const achievementRows = computed(() => [...new Set(ACHIEVEMENTS.map((item) => it
   const next = tiers.find((item) => !item.done);
   return { series, seriesName: tiers[0]!.seriesName, tiers, goal: next ?? tiers[tiers.length - 1]!, finished: !next };
 }));
+// A look at the bar of someone on the board (read-only).
+const viewing = ref<BoardBar>();
+const viewError = ref('');
+async function viewRow(row: { rank: number; score: number }) {
+  if (!board.value) return;
+  viewError.value = '';
+  try {
+    const result = await viewBoardBar(boardScope.value, row.rank, board.value.week, row.score);
+    if (result.ok) viewing.value = result; else viewError.value = result.error ?? 'This bar is not available.';
+  } catch (error) { viewError.value = (error as Error).message; }
+}
 const cosmeticKind = (key: string) => key.replace(/([A-Z])/g, ' $1').toLowerCase();
 const started = computed(() => [
   { label: 'Open your welcome box in the Boxes tab', done: (game.loot.stats.boxes ?? 0) >= 1 },
@@ -324,9 +336,9 @@ const boostLeft = (id: string) => {
           <h3>🏆 This week's {{ boardScope === 'friends' ? 'friends' : 'top bars' }}</h3>
           <div class="row"><UiButton :variant="boardScope === 'global' ? 'solid' : 'secondary'" @click="boardScope = 'global'">Everyone</UiButton><UiButton :variant="boardScope === 'friends' ? 'solid' : 'secondary'" @click="boardScope = 'friends'">Friends</UiButton></div>
           <p>Score = XP you earn this week (serving, English, lessons). A drink pays the same XP at every level, so newcomers can win. Resets in {{ daysLeft }} day{{ daysLeft === 1 ? '' : 's' }}.</p>
-          <p v-if="boardLoading">Loading…</p><p v-if="boardError" class="sig-error">{{ boardError }}</p>
+          <p v-if="boardLoading">Loading…</p><p v-if="boardError || viewError" class="sig-error">{{ boardError || viewError }}</p>
           <ol v-if="board" class="board">
-            <li v-for="row in board.top" :key="row.rank" :class="{ me: row.me }"><b>{{ row.rank }}</b><span>{{ row.label }}<small v-if="row.level"> · level {{ row.level }}</small></span><em>{{ row.score }}</em></li>
+            <li v-for="row in board.top" :key="row.rank" :class="{ me: row.me }"><b>{{ row.rank }}</b><span>{{ row.label }}<small v-if="row.level"> · level {{ row.level }}</small></span><em>{{ row.score }}</em><UiButton size="sm" variant="secondary" @click="viewRow(row)">View bar</UiButton></li>
             <li v-if="!board.top.length" class="empty">{{ boardScope === 'friends' ? 'Add friends in the Friends tab to compete with them.' : 'Nobody has scored yet this week. Serve a drink to take the lead.' }}</li>
           </ol>
           <p v-if="board?.me">You are <b>#{{ board.me.rank }}</b> of {{ board.me.size }} with {{ board.me.score }} XP.<template v-if="board.me.rank > LEADERBOARD_SIZE"> The list shows the top {{ LEADERBOARD_SIZE }}.</template></p>
@@ -359,6 +371,7 @@ const boostLeft = (id: string) => {
       <p class="hint">{{ regulars.length - metRegulars.length }} guests have not been served yet.</p>
     </div>
 
+    <BoardBarView v-if="viewing" :view="viewing" @close="viewing = undefined" />
   </section>
 </template>
 
@@ -383,7 +396,7 @@ const boostLeft = (id: string) => {
 .card progress{width:100%;accent-color:#e7b556}.row{display:flex;flex-wrap:wrap;gap:6px}
 .results{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:11px}.results li{padding:5px 8px;border-radius:7px;background:#17253a}.results li.rare,.crafts .rare{border-color:#3f86b8;color:#bfe2ff}.results li.legendary,.crafts .legendary{background:#4a3210;color:#ffe0a0}
 .crafts{display:flex;flex-wrap:wrap;gap:5px;max-height:260px;overflow:auto}input[type=text],.card>input{padding:8px;border:1px solid #40536c;border-radius:8px;background:#0c1625;color:#fff}.sig-row{align-items:center}.sig-row select{flex:1;min-width:120px}.sig-row b{min-width:58px;text-align:center;color:#fff0c8}.sig-error{color:#f2a0a0}.card label{color:#c7d3e0;font-size:11px}
-.board{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:12px}.board li{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;padding:6px 8px;border-radius:7px;background:#17253a}.board li.me{background:#4a3210;color:#ffe0a0}.board li b{color:#f4d08e}.board li em{font-style:normal;color:#fff0c8}.board .empty{display:block;color:#93a5b9}
+.board{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:12px}.board li{display:grid;grid-template-columns:30px 1fr auto auto;gap:8px;align-items:center;padding:6px 8px;border-radius:7px;background:#17253a}.board li.me{background:#4a3210;color:#ffe0a0}.board li b{color:#f4d08e}.board li em{font-style:normal;color:#fff0c8}.board .empty{display:block;color:#93a5b9}
 .gotit{color:#8fd1a0;text-decoration:line-through}
 .bar-chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
 
