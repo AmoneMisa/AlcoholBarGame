@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, ref } from 'vue';
-const Bartender3D = defineAsyncComponent(() => import('./Bartender3D.vue'));
-const modelFailed = ref(false);
-// The bartender is painted 2D art again. The 3D model is kept in the code and comes back with VITE_BARTENDER_3D=true.
-const USE_3D_BARTENDER = import.meta.env?.VITE_BARTENDER_3D === 'true';
+import { computed } from 'vue';
+import { bartenderAvatarFor } from '../../data/cosmetics/bartenderAvatars';
+import { bartenderCostumeFor } from '../../data/cosmetics/bartenderCostumes';
 import { CHARACTER_ART, GUEST_FIGURE_BOTTOM, GUEST_SEAT_LINE } from '../../data/cosmetics/artCatalog';
 import { createCharacterLook } from '../../domain/customers/characterFactory';
 import type { CharacterExpression } from '../../domain/dialogue/types';
@@ -56,7 +54,6 @@ const FRAME_RATIO: Record<string, number> = {
   'extended-seated-cast-v2':(1568 / 5) / (1003 / 2),'extended-seated-cast-2-v2':(1568 / 5) / (1003 / 2),'velvet-hour-seated-cast-v2':(2122 / 5) / 741
 };
 const sheetName = (sheet?: string) => (sheet ?? '/velvet-hour-seated-cast-v2.webp').split('/').pop()!.replace(/\.(?:png|webp)$/, '');
-const poseFrame = computed(() => ({ neutral:0, relaxed:0, confident:1, hip:1, working:2, lean:2, crossed:2 }[props.pose] ?? 0));
 const spriteStyle = (sheet: string, columns: number, rows: number, index: number, frameRatio?: number) => ({
   backgroundImage:`url('${sheet}')`,
   backgroundSize:`${columns * 100}% ${rows * 100}%`,
@@ -64,6 +61,8 @@ const spriteStyle = (sheet: string, columns: number, rows: number, index: number
   '--frame-ratio':String(frameRatio ?? .6)
 });
 const castStyle = computed(() => {
+  const costume = props.role === 'bartender' ? bartenderCostumeFor(art.value.id, props.outfit) : undefined;
+  if (costume) return spriteStyle(costume.sheet, costume.columns, costume.rows, costume.index, costume.frameRatio);
   const columns = art.value.columns ?? 5;
   const rows = art.value.rows ?? 1;
   const special = props.outfit.startsWith('special-');
@@ -73,12 +72,13 @@ const castStyle = computed(() => {
       : { 'special-cyberpunk':[0,0], 'special-steampunk':[0,1], 'special-post-apocalypse':[0,2], 'special-historical':[1,0], 'special-fantasy':[1,1], 'special-masquerade':[1,2], 'special-gala':[1,2] } as Record<string,[number,number]>;
     const [sheetIndex,row] = specialRows[props.outfit] ?? [0,0];
     const sheet = art.value.specialSheets?.[sheetIndex] ?? art.value.sheet ?? '';
-    return spriteStyle(sheet, 3, 3, row * 3 + poseFrame.value, .572);
+    return spriteStyle(sheet, 1, 3, row, 316 / 552);
   }
   const outfitRow = Math.max(0,['vest','shirt','apron'].indexOf(props.outfit));
-  const index = props.role === 'bartender' ? outfitRow * columns + poseFrame.value : art.value.castIndex ?? 0;
-  const sheet = art.value.sheet ?? '/assets/characters/customers/velvet-hour-seated-cast-v2.webp';
-  return spriteStyle(sheet, columns, rows, index, FRAME_RATIO[sheetName(sheet)] ?? .6);
+  const avatar = props.role === 'bartender' ? bartenderAvatarFor(art.value.id, props.hairStyle) : undefined;
+  const index = props.role === 'bartender' ? outfitRow * columns + (avatar?.column ?? 0) : art.value.castIndex ?? 0;
+  const sheet = avatar?.sheet ?? art.value.sheet ?? '/assets/characters/customers/velvet-hour-seated-cast-v2.webp';
+  return spriteStyle(sheet, columns, rows, index, avatar?.frameRatio ?? FRAME_RATIO[sheetName(sheet)] ?? .6);
 });
 </script>
 

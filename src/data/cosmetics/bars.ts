@@ -1,4 +1,5 @@
 import type { RegionId } from '../../domain/types';
+import { REFERENCE_COSTUME_IDS } from './bartenderCostumes';
 
 export const INTERIORS = [
   { id:'velvet',name:'Velvet lounge',asset:'/assets/bar/backgrounds/velvet-hour-bar.webp',tint:'#2d0d1e55',position:'center',blend:'multiply',crystalCost:0 },
@@ -72,7 +73,7 @@ export const BUST_OPTIONS = ['petite','balanced','full'] as const;
 export const POSES = ['neutral','confident','working'] as const;
 // Recolours the main garment of the current outfit ('natural' keeps the original look).
 export const OUTFIT_COLORS = ['natural','black','white','red','blue','green','plum','sand'] as const;
-export const BARTENDER_OUTFITS = ['vest','shirt','apron','biker','tee-skirt','suit-jeans','bunny','kimono','baggy-tee','streetwear','special-gala','special-cyberpunk','special-steampunk','special-post-apocalypse','special-historical','special-fantasy','special-masquerade'] as const;
+export const BARTENDER_OUTFITS = ['vest','shirt','apron','biker','tee-skirt','suit-jeans','bunny','kimono','baggy-tee','streetwear','special-gala','special-cyberpunk','special-steampunk','special-post-apocalypse','special-historical','special-fantasy','special-masquerade', ...REFERENCE_COSTUME_IDS] as const;
 export const BAR_PROFILE_OPTIONS = {
   wall:WALLS,counter:COUNTER_MATERIALS,counterColor:COUNTER_COLORS,counterSize:COUNTER_SIZES,
   lighting:HIGHLIGHTS,highlightStrength:HIGHLIGHT_STRENGTHS,shelf:SHELF_STYLES,bartenderCharacter:['noa','leo'] as const,
@@ -120,8 +121,8 @@ export interface BarProfile {
   shelf?: typeof SHELF_STYLES[number];
 }
 
-const femaleStyle = { outfitColor:'natural',face:'soft',hairStyle:'updo',hairColor:'espresso',bodyShape:'curvy',skinDetail:'clean',skinTone:'warm',tanLevel:'sun-kissed',bust:'balanced',pose:'confident',eyeShape:'almond',browShape:'soft-arch',noseShape:'soft',lipShape:'full',cheekShape:'high',eyeColor:'hazel',eyeliner:'winged',eyeshadow:'bronze',lipColor:'rose',blush:'soft',facialHair:'clean' } as const;
-const maleStyle = { outfitColor:'natural',face:'angular',hairStyle:'slick',hairColor:'chestnut',bodyShape:'muscular',skinDetail:'tattoo-bold',skinTone:'warm',tanLevel:'sun-kissed',bust:'balanced',pose:'neutral',eyeShape:'hooded',browShape:'bold',noseShape:'straight',lipShape:'balanced',cheekShape:'defined',eyeColor:'brown',eyeliner:'none',eyeshadow:'none',lipColor:'bare',blush:'none',facialHair:'short-beard' } as const;
+const femaleStyle = { outfitColor:'natural',face:'soft',hairStyle:'updo',hairColor:'espresso',bodyShape:'curvy',skinDetail:'clean',skinTone:'fair',tanLevel:'none',bust:'balanced',pose:'confident',eyeShape:'almond',browShape:'soft-arch',noseShape:'soft',lipShape:'full',cheekShape:'high',eyeColor:'hazel',eyeliner:'winged',eyeshadow:'bronze',lipColor:'rose',blush:'soft',facialHair:'clean' } as const;
+const maleStyle = { outfitColor:'natural',face:'angular',hairStyle:'slick',hairColor:'chestnut',bodyShape:'muscular',skinDetail:'clean',skinTone:'fair',tanLevel:'none',bust:'balanced',pose:'neutral',eyeShape:'hooded',browShape:'bold',noseShape:'straight',lipShape:'balanced',cheekShape:'defined',eyeColor:'brown',eyeliner:'none',eyeshadow:'none',lipColor:'bare',blush:'none',facialHair:'short-beard' } as const;
 export const DEFAULT_BARS: Record<RegionId, BarProfile> = {
   'new-york': { name:'The Velvet Hour',wall:'neon',counter:'classic',counterColor:'ruby',counterSize:'standard',lighting:'amber',highlightStrength:'medium',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'vest',interior:'velvet',...femaleStyle },
   london: { name:'Juniper & Oak',wall:'emerald',counter:'walnut',counterColor:'espresso',counterSize:'grand',lighting:'amber',highlightStrength:'soft',bartenderCharacter:'leo',bartenderNickname:'Leo',bartender:'shirt',interior:'speakeasy',...maleStyle },

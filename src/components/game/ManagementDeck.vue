@@ -12,7 +12,7 @@ import UiIcon from '../ui/UiIcon.vue';
 import BrandBottle from '../knowledge/BrandBottle.vue';
 import { guideIdForProduct } from '../../data/knowledge/alcohol';
 import { isEventInterior } from '../../data/cosmetics/bars';
-import { HIGHLIGHTS, HIGHLIGHT_STRENGTHS, INTERIORS, POSES, SHELF_STYLES, WALLS, interiorStyle, shelfStyleFor } from '../../data/cosmetics/bars';
+import { BARTENDER_OUTFITS, HIGHLIGHTS, HIGHLIGHT_STRENGTHS, INTERIORS, SHELF_STYLES, WALLS, interiorStyle, shelfStyleFor } from '../../data/cosmetics/bars';
 import { capacityFor, isPerishable } from '../../domain/warehouse';
 import { SPECIALTY_PREMIUM, isCitySpecialty, specialtyFactor } from '../../domain/economy';
 import type { Ingredient, RegionId } from '../../domain/types';
@@ -31,6 +31,9 @@ import DeliveryProblems from './DeliveryProblems.vue';
 import CharacterModel from '../characters/CharacterModel.vue';
 import { avatarOptionsFor, avatarLabel, type AvatarOption, type AvatarOptionKey } from '../../data/cosmetics/avatar';
 import { BAR_PROFILE_OPTIONS } from '../../data/cosmetics/bars';
+import { bartenderAvatarFor } from '../../data/cosmetics/bartenderAvatars';
+import { bartenderCostumeFor, bartenderCostumesFor } from '../../data/cosmetics/bartenderCostumes';
+import { COSMETICS } from '../../domain/cosmetics';
 
 const props = withDefaults(defineProps<{ activeView?: string; designSection?: 'bar' | 'character' }>(), { activeView: 'inventory' });
 const game = useGameStore();
@@ -75,9 +78,10 @@ const targetRegions = computed(() => REGIONS.filter((region) => region.id !== ga
 const barUnits = (id: RegionId) => game.inventories[id].reduce((sum, stock) => sum + stock.amount, 0);
 const barBottles = (id: RegionId) => game.bottleInventories[id].reduce((sum, stock) => sum + stock.quantity, 0);
 const selectedBartender = computed(() => game.decor.bartenderCharacter ?? 'noa');
-const visibleOutfits = computed(() => selectedBartender.value === 'noa' ? ['vest','shirt','tee-skirt','suit-jeans','biker','bunny','kimono','baggy-tee','streetwear'] as const : ['vest','shirt','biker'] as const);
-const outfitLabel = (outfit: string) => ({
-  vest:'Leather jacket',shirt:selectedBartender.value === 'leo' ? 'Plaid shirt' : 'Cropped tee',biker:selectedBartender.value === 'leo' ? 'Biker jeans' : 'Leather set','tee-skirt':'Tee & skirt','suit-jeans':'Jacket & jeans',bunny:'Bunny suit',kimono:'Kimono','baggy-tee':'Baggy tee',streetwear:'Streetwear',
+const visibleOutfits = computed(() => BARTENDER_OUTFITS.filter(value => ['vest', 'shirt', 'apron'].includes(value) || bartenderCostumesFor(selectedBartender.value).some(costume => costume.value === value) || COSMETICS.some(item => item.key === 'bartender' && item.character === selectedBartender.value && item.value === value)));
+const fixedCostume = computed(() => game.decor.bartender.startsWith('special-') || !!bartenderCostumeFor(selectedBartender.value, game.decor.bartender));
+const outfitLabel = (outfit: string) => bartenderCostumeFor(selectedBartender.value, outfit)?.label ?? ({
+  vest:'Burgundy vest',shirt:selectedBartender.value === 'leo' ? 'Shirt & suspenders' : 'Ivory jacket',apron:'Emerald apron',biker:'Leather set','tee-skirt':'Tee & skirt','suit-jeans':'Jacket & jeans',bunny:'Bunny suit',kimono:'Kimono','baggy-tee':'Baggy tee',streetwear:'Streetwear',
   'special-gala':'Midnight gown','special-cyberpunk':'Cyberpunk','special-steampunk':'Steampunk','special-post-apocalypse':'Wasteland','special-historical':'Historical','special-fantasy':'Fantasy','special-masquerade':'Masquerade'
 }[outfit] ?? outfit);
 const isRecipeKnown = (id: string) => game.knownRecipeIds.includes(id);
@@ -91,18 +95,19 @@ const designTabsShown = computed(() => (props.designSection === 'bar' ? [] : pro
 watch(() => props.designSection, (section) => { if (section === 'bar') designTab.value = 'bar'; else if (section === 'character' && designTab.value === 'bar') designTab.value = 'clothes'; }, { immediate: true });
 const avatarOptions = computed(() => avatarOptionsFor(selectedBartender.value));
 const clothesOptions = computed(() => avatarOptions.value.filter((option) => option.key === 'outfitColor'));
-const characterOptions = computed(() => avatarOptions.value.filter((option) => option.key !== 'outfitColor'));
+const characterOptions = computed(() => fixedCostume.value ? [] : avatarOptions.value.filter((option) => option.key !== 'outfitColor'));
 // Every choice plus the saved one (legacy values stay visible but cannot be re-picked).
 function avatarChoices(option: AvatarOption): SelectOption[] {
   const saved: string = game.decor[option.key];
   const values = option.values;
-  const choices = values.map((value) => ({ value, label: avatarLabel(value), locked: cosmeticLocked(option.key, value) }));
+  const choices = values.map((value) => ({ value, label: option.key === 'hairStyle' ? bartenderAvatarFor(selectedBartender.value, value)!.label : avatarLabel(value), locked: cosmeticLocked(option.key, value) }));
   return values.includes(saved) ? choices : [{ value: saved, label: `${avatarLabel(saved)} (saved style)`, locked: true }, ...choices];
 }
 function setAvatarOption(key: AvatarOptionKey, value: string) {
   if (cosmeticLocked(key,value) || !(BAR_PROFILE_OPTIONS[key] as readonly string[]).includes(value)) return;
   // The catalog and profile options above validate the dynamic field/value pair.
   Object.assign(game.decor, { [key]: value });
+  if (key === 'hairStyle') game.decor.hairColor = bartenderAvatarFor(selectedBartender.value, value)!.hairColor as typeof game.decor.hairColor;
 }
 const recipePriceLabel = (id: string) => {
   const price = game.recipePrice(id);
@@ -123,8 +128,11 @@ function regionAction(id: RegionId) {
 function selectBartender(id: 'noa' | 'leo') {
   const oldDefault = selectedBartender.value === 'leo' ? 'Leo' : 'Noa';
   game.decor.bartenderCharacter = id;
+  game.decor.hairColor = id === 'leo' ? 'chestnut' : 'espresso';
+  game.decor.skinTone = 'fair';
+  game.decor.tanLevel = 'none';
   if (game.decor.bartender.startsWith('special-')) game.decor.bartender = id === 'leo' ? 'shirt' : 'vest';
-  if (id === 'leo' && !['shirt','biker'].includes(game.decor.bartender)) game.decor.bartender = 'shirt';
+  if (!['vest','shirt','apron'].includes(game.decor.bartender)) game.decor.bartender = 'vest';
   if (id === 'leo') {
     game.decor.bodyShape = 'muscular';
     game.decor.hairStyle = 'slick';
@@ -249,10 +257,9 @@ function selectBartender(id: 'noa' | 'leo') {
           <section class="shelf-style-picker"><small>BACK-BAR SHELVES · {{ shelfStyleFor(game.decor) }}</small><div><button v-for="shelf in SHELF_STYLES" :key="shelf" :class="{ active: (game.decor.shelf ?? 'auto') === shelf }" :data-shelf-swatch="shelf === 'auto' ? shelfStyleFor({ interior: game.decor.interior }) : shelf" type="button" @click="game.decor.shelf = shelf">{{ shelf === 'auto' ? 'Match background' : shelf }}</button></div></section>
           <section><small>HIGHLIGHT COLOR</small><div><button v-for="light in HIGHLIGHTS" :key="light" :class="{ active: game.decor.lighting === light }" type="button" @click="game.decor.lighting = light"><i :data-color="light"></i>{{ light }}</button></div></section>
           <section><small>HIGHLIGHT STRENGTH</small><div><button v-for="strength in HIGHLIGHT_STRENGTHS" :key="strength" :class="{ active: game.decor.highlightStrength === strength }" type="button" @click="game.decor.highlightStrength = strength">{{ strength }}</button></div></section>
-          <section><small>POSE · OUTFITS HAVE THEIR OWN GESTURE</small><div><button v-for="(pose,index) in POSES" :key="pose" :class="{active:game.decor.pose === pose}" type="button" @click="game.decor.pose = pose">Pose {{ index + 1 }}</button></div></section>
         </div>
         </div>
-        <!-- Clothes and Character share one pinned 3D viewer; the options scroll underneath it. -->
+        <!-- Clothes and Character share one painted avatar preview. -->
         <div v-show="designTab !== 'bar'" class="bartender-custom">
           <div class="avatar-stage">
             <CharacterModel role="bartender" interactive :character-id="selectedBartender" :outfit="game.decor.bartender" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :eye-shape="game.decor.eyeShape" :eye-color="game.decor.eyeColor" :brow-shape="game.decor.browShape" :nose-shape="game.decor.noseShape" :cheek-shape="game.decor.cheekShape" :lip-shape="game.decor.lipShape" :lip-color="game.decor.lipColor" :eyeshadow="game.decor.eyeshadow" :eyeliner="game.decor.eyeliner" :blush="game.decor.blush" :facial-hair="game.decor.facialHair" :outfit-color="game.decor.outfitColor" :pose="game.decor.pose" />
@@ -261,14 +268,14 @@ function selectBartender(id: 'noa' | 'leo') {
           <div class="bartender-selector" aria-label="Choose bartender">
             <button v-for="person in [{id:'noa',label:'Woman bartender'},{id:'leo',label:'Man bartender'}] as const" :key="person.id" :class="{ active: selectedBartender === person.id }" type="button" @click="selectBartender(person.id)">{{ person.label }}</button>
           </div>
-          <div class="outfit-selector" aria-label="Choose bartender outfit"><button v-for="outfit in visibleOutfits" :key="outfit" :class="{ active: game.decor.bartender === outfit || (outfit === 'shirt' && game.decor.bartender === 'apron'), special:outfit.startsWith('special-'), locked:cosmeticLocked('bartender',outfit) }" type="button" :disabled="cosmeticLocked('bartender',outfit)" :title="cosmeticLocked('bartender',outfit) ? 'Unlock in the daily style draw' : outfitLabel(outfit)" @click="game.decor.bartender = outfit"><em v-if="cosmeticLocked('bartender',outfit)"><UiIcon class="inline-icon" name="lock" /></em>{{ outfitLabel(outfit) }}</button></div>
+          <div class="outfit-selector" aria-label="Choose bartender outfit"><button v-for="outfit in visibleOutfits" :key="outfit" :class="{ active: game.decor.bartender === outfit, locked:cosmeticLocked('bartender',outfit) }" type="button" :disabled="cosmeticLocked('bartender',outfit)" @click="game.decor.bartender = outfit">{{ outfitLabel(outfit) }}</button></div>
             <div class="avatar-options">
               <OptionSelect v-for="option in clothesOptions" :key="option.key" :label="option.label" :model-value="game.decor[option.key]" :options="avatarChoices(option)" @update:model-value="setAvatarOption(option.key, $event)" />
             </div>
           </div>
           <div v-show="designTab === 'character'" class="design-tab-character">
       <form class="bartender-name-editor" @submit.prevent="game.renameBartender(bartenderNickname)"><label for="bartender-nickname">Bartender nickname<UiInput id="bartender-nickname" v-model="bartenderNickname" maxlength="18" required placeholder="Enter a nickname" /></label><UiButton type="submit" variant="solid">Save nickname</UiButton><span>This is the name guests see.</span></form>
-            <p class="avatar-help">Drag to turn your character. Changes are saved with this bar.</p>
+            <p class="avatar-help">{{ fixedCostume ? 'This costume includes its hairstyle, hair color and makeup. Choose an everyday outfit to change your hairstyle.' : 'Choose a hairstyle while keeping the same face and natural hair color.' }} Changes are saved with this bar.</p>
             <div class="avatar-options">
               <OptionSelect v-for="option in characterOptions" :key="option.key" :label="option.label" :model-value="game.decor[option.key]" :options="avatarChoices(option)" @update:model-value="setAvatarOption(option.key, $event)" />
             </div>

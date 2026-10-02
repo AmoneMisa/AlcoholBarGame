@@ -1,72 +1,82 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
 import { AVATAR_OPTIONS, avatarOptionsFor } from '../src/data/cosmetics/avatar.ts';
 import { BAR_PROFILE_OPTIONS } from '../src/data/cosmetics/bars.ts';
 import { canUseCosmetic } from '../src/domain/cosmetics.ts';
 import { avatarIdleAt } from '../src/domain/avatarMotion.ts';
+import { BARTENDER_AVATARS, bartenderAvatarFor } from '../src/data/cosmetics/bartenderAvatars.ts';
+import { INTERIORS } from '../src/data/cosmetics/bars.ts';
+import { bartenderCostumesFor, bartenderCostumeFor } from '../src/data/cosmetics/bartenderCostumes.ts';
 
-const load = (file) => {
-  const data = readFileSync(new URL(`../public/assets/characters/3d/${file}`, import.meta.url));
-  return { data, model: JSON.parse(data.subarray(20, 20 + data.readUInt32LE(12)).toString()) };
-};
-const noa = load('amber.glb');
-const leo = load('leo.glb');
-const FACE_MORPHS = ['blink', 'eyesWide', 'eyesNarrow', 'lipsFull', 'lipsThin', 'lipsWide', 'lipsSmall', 'browArch', 'browInner', 'noseWide', 'noseNarrow', 'noseUp', 'cheekHigh', 'cheekFull', 'cheekHollow'];
-const LEO_ONLY_MORPHS = ['mouthClose'];   // closes the male mouth, which the source leaves slightly open
-
-for (const [label, { data, model }, parts, garments] of [
-  ['Noa', noa, ['CC_Base_Body', 'CC_Base_Eye', 'Bun', 'Bang', 'Hair_Base', 'SKM_Hair_Bangs', 'Crop_T_Shirt', 'Punk_Leather_Jacket', 'Jeans', 'Suit_Jacket', 'Suit_Skirt', 'Punk_Strap_Boots', 'Boots', 'Bunny_Leotard', 'Bunny_Jacket', 'Bunny_Stockings', 'Bunny_BunnyEars'],
-    ['CC_Base_Body', 'Jeans', 'Crop_T_Shirt', 'Punk_Leather_Jacket', 'Boots', 'Suit_Jacket', 'Suit_Skirt', 'Punk_Strap_Boots']],
-  ['Leo', leo, ['CC_Base_Body', 'CC_Base_Eye', 'Male_Bushy', 'Short_blowback', 'Plaid_Punk_Shirt', 'Mens_Jacket', 'Jeans', 'Boots', 'Biker_Jeans', 'Chinstrap_Thick', 'Circle_Thick', 'Mustache_Horseshoe', 'Soul_Path_Thick'],
-    ['CC_Base_Body', 'Jeans', 'Plaid_Punk_Shirt', 'Mens_Jacket', 'Boots']]
-]) {
-  test(`${label}: the avatar is self-contained and has every editable part`, () => {
-    assert.equal(data.toString('ascii', 0, 4), 'glTF');
-    assert.equal(data.readUInt32LE(8), data.length);
-    assert.ok(model.images.every((image) => image.bufferView !== undefined && !image.uri));
-    const names = new Set(model.meshes.map((mesh) => mesh.name));
-    for (const name of parts) assert.ok(names.has(name), name);
-  });
-  test(`${label}: has a fixed body shape and keeps face UVs and expressions`, () => {
-    // The body shape is baked in: garments carry no runtime body morphs, only the face keeps expression targets.
-    for (const mesh of model.meshes.filter((mesh) => garments.includes(mesh.name) && mesh.name !== 'CC_Base_Body')) assert.ok(!mesh.extras?.targetNames?.includes('bodyCurvy'), mesh.name);
-    const body = model.meshes.find((mesh) => mesh.name === 'CC_Base_Body');
-    for (const morph of [...FACE_MORPHS, ...(label === 'Leo' ? LEO_ONLY_MORPHS : [])]) assert.ok(body.extras.targetNames.includes(morph), morph);
-    assert.ok(!body.extras.targetNames.includes('bodyBroad'));
-    assert.ok(body.primitives.every((part) => part.attributes.TEXCOORD_1 !== undefined));
-    for (const mesh of model.meshes) assert.ok((mesh.weights ?? []).every((weight) => weight === 0), `${mesh.name}: expressions must start neutral`);
-    const lashes = model.materials.filter((material) => /Eyelash/.test(material.name));
-    assert.ok(lashes.length > 0);
-    for (const material of lashes) {
-      const colour = material.pbrMetallicRoughness?.baseColorFactor ?? [1, 1, 1, 1];
-      assert.ok(colour.slice(0, 3).every((channel) => channel < .05), `${material.name}: lashes must not export white`);
+test('Avatars share compact atlases with unique hairstyle cells and fixed natural hair colors', () => {
+  const paths = new Set();
+  for (const character of ['noa', 'leo']) {
+    assert.equal(BARTENDER_AVATARS[character].length, 6);
+    assert.deepEqual(avatarOptionsFor(character).map(option => option.key), ['hairStyle']);
+    for (const avatar of BARTENDER_AVATARS[character]) {
+      assert.equal(bartenderAvatarFor(character, avatar.hairStyle), avatar);
+      const bytes = readFileSync(new URL(`../public${avatar.sheet}`, import.meta.url));
+      assert.equal(bytes.toString('ascii', 0, 4), 'RIFF');
+      assert.equal(bytes.toString('ascii', 8, 12), 'WEBP');
+      assert.ok(bytes.length > 10000);
+      assert.ok(avatar.frameRatio > .5 && avatar.frameRatio < .7);
+      const cell = `${avatar.sheet}:${avatar.column}`;
+      assert.ok(!paths.has(cell));
+      paths.add(cell);
+      assert.equal(avatar.hairColor, character === 'noa' ? 'espresso' : 'chestnut');
+      assert.ok(avatar.column >= 0 && avatar.column < 6);
+      assert.ok(BAR_PROFILE_OPTIONS.hairColor.includes(avatar.hairColor));
     }
-  });
-  test(`${label}: stays light enough for mobile`, () => {
-    let vertices = 0;
-    for (const mesh of model.meshes) for (const primitive of mesh.primitives) vertices += model.accessors[primitive.attributes.POSITION].count;
-    // Every outfit and hair style is stored in the file, but only one outfit and one hairstyle are drawn at a time.
-    assert.ok(vertices < 130000, `stored vertices: ${vertices}`);
-    const count = (mesh) => mesh.primitives.reduce((sum, p) => sum + model.accessors[p.attributes.POSITION].count, 0);
-    const heaviest = model.meshes.filter((mesh) => /^(Loose_|Bunny_|Suit_)/.test(mesh.name)).map(count).sort((a, b) => b - a)[0] ?? 0;
-    assert.ok(heaviest <= 17000, `heaviest garment: ${heaviest}`);
-    assert.ok(data.length < 12 * 1024 * 1024, `bytes: ${data.length}`);
-    // Units are metres: a centimetre-scale export would be 100x taller.
-    const body = model.meshes.find((mesh) => mesh.name === 'CC_Base_Body');
-    const height = Math.max(...body.primitives.map((p) => model.accessors[p.attributes.POSITION].max[1]));
-    assert.ok(height > 1.5 && height < 2.1, `height: ${height}`);
-  });
-}
+    assert.equal(bartenderAvatarFor(character, 'legacy-unknown'), BARTENDER_AVATARS[character][0]);
+  }
+  assert.equal(bartenderAvatarFor('marin', 'waves'), undefined);
+  assert.deepEqual(readdirSync(new URL('../public/assets/characters/bartender/', import.meta.url)).sort(), [
+    'leo-costumes-atlas-v1.webp',
+    'leo-costumes-atlas-v2.webp',
+    'leo-costumes-atlas-v3.webp',
+    'leo-costumes-atlas-v4.webp',
+    'leo-costumes-atlas-v5.webp',
+    'leo-costumes-atlas-v6.webp',
+    'leo-costumes-atlas-v7.webp',
+    'leo-costumes-atlas-v8.webp',
+    'leo-natural-atlas-v2.webp', 'leo-special-a-v1.webp', 'leo-special-b-v1.webp',
+    'noa-costumes-atlas-v1.webp',
+    'noa-costumes-atlas-v2.webp',
+    'noa-costumes-atlas-v3.webp',
+    'noa-costumes-atlas-v4.webp',
+    'noa-costumes-atlas-v5.webp',
+    'noa-costumes-atlas-v6.webp',
+    'noa-costumes-atlas-v7.webp',
+    'noa-costumes-atlas-v8.webp',
+    'noa-costumes-atlas-v9.webp',
+    'noa-natural-atlas-v2.webp', 'noa-special-a-v1.webp', 'noa-special-b-v1.webp',
+  ]);
+});
 
-test('Leo jacket preserves separate leather, lining and metal materials', () => {
-  const jacket=leo.model.meshes.find((mesh)=>mesh.name==='Mens_Jacket');
-  assert.ok(leo.model.meshes.some((mesh)=>mesh.name==='Jacket_Shirt'),'fitted shirt insert must accompany the open jacket');
-  const used=jacket.primitives.map((part)=>leo.model.materials[part.material]);
-  for(const name of ['Leather','Lining','Metal']) assert.ok(used.some((material)=>material.name==='Cloth_Jacket_'+name));
-  const leather=used.find((material)=>material.name==='Cloth_Jacket_Leather');
-  assert.ok(leather.normalTexture && leather.pbrMetallicRoughness.baseColorTexture);
-  assert.ok(!jacket.extras?.targetNames?.length,'jacket fit is baked, without facial expressions');
+test('Reference costumes are selectable, valid saved outfits and exclusive to their bartender', () => {
+  for (const character of ['noa', 'leo']) {
+    const costumes = bartenderCostumesFor(character);
+    assert.equal(costumes.length, character === 'noa' ? 50 : 44);
+    for (const choice of costumes) {
+      const costume = bartenderCostumeFor(character, choice.value);
+      assert.ok(BAR_PROFILE_OPTIONS.bartender.includes(choice.value));
+      assert.equal(canUseCosmetic([], 'bartender', choice.value, character), true);
+      assert.equal(canUseCosmetic([], 'bartender', choice.value, character === 'noa' ? 'leo' : 'noa'), false);
+      assert.equal(bartenderCostumeFor(character === 'noa' ? 'leo' : 'noa', choice.value), undefined);
+      assert.ok(costume.index >= 0 && costume.index < 6);
+      const bytes = readFileSync(new URL(`../public${costume.sheet}`, import.meta.url));
+      assert.equal(bytes.toString('ascii', 8, 12), 'WEBP');
+    }
+  }
+});
+
+test('Every bar theme has an installed background', () => {
+  assert.equal(INTERIORS.length, 20);
+  for (const interior of INTERIORS) {
+    const bytes = readFileSync(new URL(`../public${interior.asset}`, import.meta.url));
+    assert.equal(bytes.toString('ascii', 8, 12), 'WEBP', interior.id);
+  }
 });
 
 test('Every editor choice remains valid for saved profiles and server validation', () => {
@@ -77,17 +87,6 @@ test('Every editor choice remains valid for saved profiles and server validation
       for (const value of option.values) assert.ok(BAR_PROFILE_OPTIONS[option.key].includes(value), `${character} ${option.key}: ${value}`);
     }
   }
-});
-
-test('Each character only offers what its model can show', () => {
-  const keys = (character) => avatarOptionsFor(character).map((option) => option.key);
-  assert.ok(!keys('noa').includes('facialHair'));
-  assert.ok(!keys('noa').includes('bodyShape') && !keys('leo').includes('bodyShape'));   // one fixed shape each
-  assert.ok(keys('leo').includes('facialHair'));
-  assert.ok(!keys('leo').includes('lipColor'));
-  assert.ok(keys('noa').includes('lipColor'));
-  assert.ok(avatarOptionsFor('noa').find((option) => option.key === 'hairStyle').values.includes('waves'));
-  assert.ok(avatarOptionsFor('leo').find((option) => option.key === 'hairStyle').values.includes('buzz'));
 });
 
 test('Idle motion stays subtle, blinks briefly, and fully stops when paused', () => {

@@ -2,6 +2,7 @@ import {
   BLUSH_OPTIONS, BROW_SHAPES, CHEEK_SHAPES, EYELINER_OPTIONS, EYESHADOW_OPTIONS, EYE_COLORS, EYE_SHAPES,
   FACE_SHAPES, FACIAL_HAIR_OPTIONS, LEO_HAIR_STYLES, LIP_COLORS, LIP_SHAPES, NOA_HAIR_STYLES, NOSE_SHAPES
 } from '../data/cosmetics/bars';
+import { bartenderCostumeFor, REFERENCE_COSTUME_IDS } from '../data/cosmetics/bartenderCostumes';
 
 export type CosmeticKey = 'bartender' | 'hairStyle' | 'face' | 'eyeShape' | 'browShape' | 'noseShape' | 'lipShape' | 'cheekShape' | 'eyeColor' | 'eyeliner' | 'eyeshadow' | 'lipColor' | 'blush' | 'facialHair';
 export interface CosmeticItem { id:string; key:CosmeticKey; value:string; label:string; character?:'noa'|'leo'; rarity:'common'|'rare'|'legendary' }
@@ -34,6 +35,7 @@ export const COSMETICS: CosmeticItem[] = [
 const matchesCharacter = (entry:CosmeticItem, character?:string) => !entry.character || entry.character === character || entry.key === 'facialHair';
 export const cosmeticFor = (key:string,value:string,character?:string) => COSMETICS.find((entry) => entry.key === key && entry.value === value && matchesCharacter(entry,character));
 export const canUseCosmetic = (owned:readonly string[], key:string,value:string,character?:string) => {
+  if (key === 'bartender' && character && (REFERENCE_COSTUME_IDS as readonly string[]).includes(value) && !bartenderCostumeFor(character, value)) return false;
   const variants = COSMETICS.filter((entry) => entry.key === key && entry.value === value);
   if (variants.length && !variants.some((entry) => matchesCharacter(entry,character))) return false;
   const cosmetic = cosmeticFor(key,value,character);

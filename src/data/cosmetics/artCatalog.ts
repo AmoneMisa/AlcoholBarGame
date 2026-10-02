@@ -50,8 +50,8 @@ export const CHARACTER_ART: CharacterArtDefinition[] = [
     ['zahra','Zahra','female','straight','#bd805b'],['kenji','Kenji','male','broad','#b78462'],['raven','Raven','female','straight','#dfb293'],['niko','Niko','neutral','broad','#75472f'],['edith','Edith','female','soft','#d6a07f']
   ].map(([id,name,presentation,body,skinTone],castIndex) => ({ id,name,presentation:presentation as CharacterArtDefinition['presentation'],body:body as CharacterArtDefinition['body'],skinTone,castIndex,sheet:'/assets/characters/customers/extended-seated-cast-2-v2.webp',columns:5,rows:2 })),
   ...COMPANION_ART,
-  { id: 'noa', name: 'Noa', presentation: 'female', body: 'straight', skinTone: '#a86643', sheet:'/assets/characters/bartender/noa-wardrobe-v3.webp',specialSheets:['/assets/characters/bartender/noa-special-a-v1.webp','/assets/characters/bartender/noa-special-b-v1.webp'],columns:3,rows:3,castIndex:0 },
-  { id: 'leo', name: 'Leo', presentation: 'male', body: 'broad', skinTone: '#a96f4d', sheet:'/assets/characters/bartender/leo-wardrobe-v7.webp',specialSheets:['/assets/characters/bartender/leo-special-a-v1.webp','/assets/characters/bartender/leo-special-b-v1.webp'],columns:3,rows:3,castIndex:0 }
+  { id: 'noa', name: 'Noa', presentation: 'female', body: 'straight', skinTone: '#efcbb7', sheet:'/assets/characters/bartender/noa-natural-atlas-v2.webp',specialSheets:['/assets/characters/bartender/noa-special-a-v1.webp','/assets/characters/bartender/noa-special-b-v1.webp'],columns:6,rows:3,castIndex:0 },
+  { id: 'leo', name: 'Leo', presentation: 'male', body: 'broad', skinTone: '#eac6b2', sheet:'/assets/characters/bartender/leo-natural-atlas-v2.webp',specialSheets:['/assets/characters/bartender/leo-special-a-v1.webp','/assets/characters/bartender/leo-special-b-v1.webp'],columns:6,rows:3,castIndex:0 }
 ];
 
 const COMPANION_IDS = new Set(COMPANION_ART.map((art) => art.id));
