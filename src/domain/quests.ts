@@ -9,15 +9,16 @@ export interface Goal { id: string; name: string; stat: StatId; target: number; 
 export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 export const weekOf = (now: number) => Math.floor(now / WEEK_MS);
 
+// Weekly quests pay double crystals: they are the steady crystal income for players who do not buy any.
 const QUEST_POOL: Goal[] = [
-  { id: 'q-serve', name: 'Serve 15 perfect drinks', stat: 'serves', target: 15, box: 'bronze', crystals: 10 },
-  { id: 'q-earn', name: 'Earn 1,500 coins from drinks', stat: 'servesCoins', target: 1500, box: 'bronze', crystals: 10 },
-  { id: 'q-vip', name: 'Serve 3 VIP guests', stat: 'vips', target: 3, box: 'silver', crystals: 15 },
-  { id: 'q-bottles', name: 'Sell 3 sealed bottles', stat: 'bottles', target: 3, box: 'bronze', crystals: 10 },
-  { id: 'q-upgrade', name: 'Upgrade equipment twice', stat: 'upgrades', target: 2, box: 'bronze', crystals: 10 },
-  { id: 'q-talk', name: 'Have 5 perfect English conversations', stat: 'perfectTalks', target: 5, box: 'bronze', crystals: 10 },
-  { id: 'q-lessons', name: 'Finish 3 daily English lesson sets', stat: 'lessons', target: 3, box: 'silver', crystals: 15 },
-  { id: 'q-taste', name: 'Serve 3 recipes for the first time', stat: 'tasted', target: 3, box: 'silver', crystals: 15 }
+  { id: 'q-serve', name: 'Serve 15 perfect drinks', stat: 'serves', target: 15, box: 'bronze', crystals: 20 },
+  { id: 'q-earn', name: 'Earn 1,500 coins from drinks', stat: 'servesCoins', target: 1500, box: 'bronze', crystals: 20 },
+  { id: 'q-vip', name: 'Serve 3 VIP guests', stat: 'vips', target: 3, box: 'silver', crystals: 30 },
+  { id: 'q-bottles', name: 'Sell 3 sealed bottles', stat: 'bottles', target: 3, box: 'bronze', crystals: 20 },
+  { id: 'q-upgrade', name: 'Upgrade equipment twice', stat: 'upgrades', target: 2, box: 'bronze', crystals: 20 },
+  { id: 'q-talk', name: 'Have 5 perfect English conversations', stat: 'perfectTalks', target: 5, box: 'bronze', crystals: 20 },
+  { id: 'q-lessons', name: 'Finish 3 daily English lesson sets', stat: 'lessons', target: 3, box: 'silver', crystals: 30 },
+  { id: 'q-taste', name: 'Serve 3 recipes for the first time', stat: 'tasted', target: 3, box: 'silver', crystals: 30 }
 ];
 // Three quests per week, rotating deterministically from the server clock.
 export function questsForWeek(week: number): Goal[] {

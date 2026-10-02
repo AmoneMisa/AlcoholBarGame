@@ -2,6 +2,12 @@ import type { RegionId } from '../../domain/types';
 import { REFERENCE_COSTUME_IDS } from './bartenderCostumes';
 import { THEMED_INTERIORS } from './themedBars';
 
+// Themed backgrounds are priced from a cheap first tier up to the big ones, instead of one flat price.
+const THEMED_PRICES: Record<string, number> = {
+  underground: 400, fairy: 500, 'nfs-underground': 600, underwater: 750, fairytale: 900, 'nfs-carbon': 1000, 'nfs-most-wanted': 1100,
+  'lost-ark': 1200, 'mass-effect': 1450, allods: 1550, 'warcraft-3': 1700, 'perfect-world': 1850, 'lineage-2': 2000
+};
+
 export const INTERIORS = [
   { id:'velvet',name:'Velvet lounge',asset:'/assets/bar/backgrounds/velvet-hour-bar.webp',tint:'#2d0d1e55',position:'center',blend:'multiply',crystalCost:0 },
   { id:'garden',name:'Botanical room',asset:'/assets/bar/backgrounds/botanical-room.webp',tint:'#123d2b44',position:'center',blend:'multiply',crystalCost:350 },
@@ -23,7 +29,7 @@ export const INTERIORS = [
   { id:'parisian',name:'Parisian salon',asset:'/assets/bar/backgrounds/interior-parisian.webp',tint:'#713f5e11',position:'center 62%',blend:'soft-light',crystalCost:2500 },
   { id:'loft',name:'Industrial loft',asset:'/assets/bar/backgrounds/interior-loft.webp',tint:'#343a3e18',position:'center 62%',blend:'saturation',crystalCost:1300 },
   { id:'riad',name:'Moroccan riad',asset:'/assets/bar/backgrounds/interior-riad.webp',tint:'#5a1f0c11',position:'center 62%',blend:'soft-light',crystalCost:2100 },
-  ...THEMED_INTERIORS,
+  ...THEMED_INTERIORS.map((item) => ({ ...item, crystalCost: THEMED_PRICES[item.id] ?? item.crystalCost })),
 ] as const;
 
 export type InteriorId = typeof INTERIORS[number]['id'];

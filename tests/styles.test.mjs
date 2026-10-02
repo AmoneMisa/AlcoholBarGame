@@ -190,3 +190,17 @@ test('A new bar starts with a few basic bottles only; premium and other labels a
   assert.equal(state.bottleInventories[state.regionId].find((item) => item.productId === premium.id).quantity, 2);
   assert.equal(state.crystals, 500 - bottleRestockCrystalCost(premium) * 2);
 });
+
+test('Economy: selling a topped-up bottle pays a small margin, and the themed backgrounds have graded prices', async () => {
+  const { ALCOHOL_PRODUCTS, bottleRestockCrystalCost, bottleSaleCrystalReward } = await import('../src/domain/bottleCatalog.ts');
+  for (const product of ALCOHOL_PRODUCTS) {
+    const cost = bottleRestockCrystalCost(product);
+    const reward = bottleSaleCrystalReward(product);
+    assert.ok(reward > cost, product.id);
+    assert.ok(reward <= Math.max(cost + 1, Math.ceil(cost * 1.5)), `${product.id}: margin stays small (${cost} -> ${reward})`);
+  }
+  const { THEMED_INTERIORS } = await import('../src/data/cosmetics/themedBars.ts');
+  const prices = THEMED_INTERIORS.map((item) => INTERIORS.find((entry) => entry.id === item.id).crystalCost).sort((a, b) => a - b);
+  assert.ok(prices[0] <= 600 && prices.at(-1) >= 1800, 'a cheap first tier up to the big ones');
+  assert.equal(new Set(prices).size, prices.length, 'every themed background has its own price');
+});

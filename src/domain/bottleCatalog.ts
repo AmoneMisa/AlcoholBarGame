@@ -92,7 +92,9 @@ export const isPremiumBottle = (product: AlcoholProduct) => !isStarterBottle(pro
 export const bottleRestockCrystalCost = (product: AlcoholProduct) => Math.min(24, Math.max(isPremiumBottle(product) ? 5 : 2, Math.round(product.price / 4)));
 export const bottleSaleCrystalReward = (product: AlcoholProduct, quantity = 1) => {
   const cost = bottleRestockCrystalCost(product);
-  return (cost ? cost + Math.max(2, Math.ceil(cost * .3)) : 3) * Math.max(1, quantity);
+  // Selling a topped-up bottle pays a small margin (about a fifth, at least 1 crystal): enough to be worth it, too
+  // little to be a crystal machine.
+  return (cost + Math.max(1, Math.round(cost * .2))) * Math.max(1, quantity);
 };
 export const brandedServeCrystalReward = (product: AlcoholProduct) => Math.max(3, Math.min(15, Math.ceil(product.popularity / 12)));
 
