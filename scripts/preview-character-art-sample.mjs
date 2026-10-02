@@ -1,0 +1,21 @@
+// QA composition only; never marks an asset production-ready or alters the live renderer.
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { DEFAULTS } from '../src/domain/characterStudio/rig.ts';
+import { composeLayers, renderSvg } from '../src/domain/characterStudio/art.ts';
+const [model,assetId,sourceFile,outputFile]=process.argv.slice(2);
+if(!['woman','man'].includes(model))throw new Error('Invalid model');
+const manifest=JSON.parse(await readFile(`assets-src/character-studio/production/guides/${model}.json`,'utf8'));
+const guide=manifest.assets.find(a=>a.id===assetId);
+if(!guide)throw new Error('Unknown asset');
+const look={...DEFAULTS[model]};
+if(assetId.startsWith('Hair/'))look.hair=assetId.split('/').at(-1);
+const asset=composeLayers(look,model).find(a=>a.id===assetId);
+if(!asset)throw new Error('Asset not part of this look');
+const [x,y,width,height]=guide.logicalBounds;
+const bitmap=await readFile(sourceFile);
+const replacement=`<image x="${x}" y="${y}" width="${width}" height="${height}" preserveAspectRatio="none" href="data:image/png;base64,${bitmap.toString('base64')}"/>`;
+const svg=renderSvg(look,undefined,false,model).replace(asset.svg,replacement);
+await mkdir(resolve(outputFile,'..'),{recursive:true});
+await writeFile(outputFile,svg);
+console.log(`QA preview only: ${outputFile}`);

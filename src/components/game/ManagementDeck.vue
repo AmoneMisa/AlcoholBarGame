@@ -34,6 +34,8 @@ import { BAR_PROFILE_OPTIONS } from '../../data/cosmetics/bars';
 import { bartenderAvatarFor } from '../../data/cosmetics/bartenderAvatars';
 import { bartenderCostumeFor, bartenderCostumesFor } from '../../data/cosmetics/bartenderCostumes';
 import { COSMETICS } from '../../domain/cosmetics';
+import { achievementForStyle, interiorForStyle, STYLE_PIECES_TO_CRAFT, STYLE_SHOP_PRICE, styleSource } from '../../data/cosmetics/styleSources';
+import { ACHIEVEMENTS } from '../../domain/quests';
 
 const props = withDefaults(defineProps<{ activeView?: string; designSection?: 'bar' | 'character' }>(), { activeView: 'inventory' });
 const game = useGameStore();
@@ -88,6 +90,25 @@ const isRecipeKnown = (id: string) => game.knownRecipeIds.includes(id);
 const recipeCardInventory = computed(() => RECIPES.map((recipe) => ({ recipe, quantity: game.recipeCopies[recipe.id] ?? 0 })).filter((item) => item.quantity > 0));
 const isInteriorOwned = (id: string) => game.ownedInteriorIds.includes(id);
 const cosmeticLocked = (key:string,value:string) => !game.canUseCosmetic(key,value);
+// A locked painted style: tapping it explains how to get it (and which background comes with it) instead of doing nothing.
+const pendingStyle = ref('');
+const styleInfo = computed(() => {
+  const value = pendingStyle.value; const character = selectedBartender.value;
+  const item = COSMETICS.find((entry) => entry.key === 'bartender' && entry.value === value && entry.character === character);
+  if (!item || game.ownedCosmeticIds.includes(item.id)) return null;
+  const source = styleSource(character, value);
+  const interior = INTERIORS.find((entry) => entry.id === interiorForStyle(character, value));
+  const goal = ACHIEVEMENTS.find((entry) => entry.id === achievementForStyle(character, value));
+  const how = source === 'shop' ? `Buy it for ${STYLE_SHOP_PRICE} crystals.`
+    : source === 'achievement' ? `Achievement reward: ${goal?.name ?? ''}.`
+    : source === 'background' ? (interior && isEventInterior(interior.id) ? `Comes with its special-event background, found in Silver and Gold boxes. It is not sold on its own.` : `Comes with its background — buy the background in Design › Bar, or craft the style from ${STYLE_PIECES_TO_CRAFT} style shards. It is not sold on its own.`)
+    : `Comes from boxes: a rare full-style drop, or craft it from ${STYLE_PIECES_TO_CRAFT} style shards in the Workshop.`;
+  return { item, source, how, background: source === 'background' ? (interior?.name ?? '') : '' };
+});
+function pickOutfit(outfit: typeof BARTENDER_OUTFITS[number]) {
+  if (cosmeticLocked('bartender',outfit)) { pendingStyle.value = outfit; return; }
+  pendingStyle.value = ''; game.decor.bartender = outfit;
+}
 const DESIGN_TABS = [{ id: 'bar', label: 'Bar' }, { id: 'clothes', label: 'Clothes' }, { id: 'character', label: 'Character' }] as const;
 const designTab = ref<typeof DESIGN_TABS[number]['id']>('bar');
 // Inside the Bar screen the design is only the bar; inside the Character screen it is only clothes and character.
@@ -268,7 +289,13 @@ function selectBartender(id: 'noa' | 'leo') {
           <div class="bartender-selector" aria-label="Choose bartender">
             <button v-for="person in [{id:'noa',label:'Woman bartender'},{id:'leo',label:'Man bartender'}] as const" :key="person.id" :class="{ active: selectedBartender === person.id }" type="button" @click="selectBartender(person.id)">{{ person.label }}</button>
           </div>
-          <div class="outfit-selector" aria-label="Choose bartender outfit"><button v-for="outfit in visibleOutfits" :key="outfit" :class="{ active: game.decor.bartender === outfit, locked:cosmeticLocked('bartender',outfit) }" type="button" :disabled="cosmeticLocked('bartender',outfit)" @click="game.decor.bartender = outfit">{{ outfitLabel(outfit) }}</button></div>
+          <div class="outfit-selector" aria-label="Choose bartender outfit"><button v-for="outfit in visibleOutfits" :key="outfit" :class="{ active: game.decor.bartender === outfit, locked:cosmeticLocked('bartender',outfit) }" type="button" :aria-pressed="pendingStyle === outfit" @click="pickOutfit(outfit)">{{ cosmeticLocked('bartender',outfit) ? '🔒 ' : '' }}{{ outfitLabel(outfit) }}</button></div>
+          <div v-if="styleInfo" class="style-info" role="status">
+            <b>{{ styleInfo.item.label }}</b>
+            <span>{{ styleInfo.how }}</span>
+            <span v-if="styleInfo.background">Background: “{{ styleInfo.background }}”.</span>
+            <button v-if="styleInfo.source === 'shop'" class="ui-btn ui-btn-primary ui-btn-sm" type="button" :disabled="game.crystals < STYLE_SHOP_PRICE" @click="game.buyStyle(styleInfo.item.id); pendingStyle = ''">Buy · {{ STYLE_SHOP_PRICE }} 💎</button>
+          </div>
             <div class="avatar-options">
               <OptionSelect v-for="option in clothesOptions" :key="option.key" :label="option.label" :model-value="game.decor[option.key]" :options="avatarChoices(option)" @update:model-value="setAvatarOption(option.key, $event)" />
             </div>

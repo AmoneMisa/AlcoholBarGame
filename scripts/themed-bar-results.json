@@ -1,0 +1,42 @@
+[
+  {
+    "key": "interior-underwater",
+    "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-4d09e340-4900-4571-8844-c5aebe8e49f5.png"
+  },
+  {
+    "key": "interior-underground",
+    "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-a091a0f4-2351-4412-b89c-93095b1350a0.png"
+  },
+  {
+    "key": "interior-fairy",
+    "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-077efa14-8366-4dd2-b7ae-fa2c4ecb9d9d.png"
+  },
+  {
+    "key": "interior-fairytale",
+    "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-35b96493-9f5e-4a61-b7df-1ee90f60b968.png"
+  },
+  {
+    "key": "theme-underground-noa",
+    "error": "unable to read referenced image at `C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\characters\\bartender\\noa-natural-atlas-v2.webp`: Не удается найти указанный файл. (os error 2)"
+  },
+  {
+    "key": "theme-underground-leo",
+    "error": "unable to read referenced image at `C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\characters\\bartender\\leo-natural-atlas-v2.webp`: Не удается найти указанный файл. (os error 2)"
+  },
+  {
+    "key": "theme-fairy-noa",
+    "error": "unable to read referenced image at `C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\characters\\bartender\\noa-natural-atlas-v2.webp`: Не удается найти указанный файл. (os error 2)"
+  },
+  {
+    "key": "theme-fairy-leo",
+    "error": "unable to read referenced image at `C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\characters\\bartender\\leo-natural-atlas-v2.webp`: Не удается найти указанный файл. (os error 2)"
+  },
+  {
+    "key": "theme-fairytale-noa",
+    "error": "unable to read referenced image at `C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\characters\\bartender\\noa-natural-atlas-v2.webp`: Не удается найти указанный файл. (os error 2)"
+  },
+  {
+    "key": "theme-fairytale-leo",
+    "error": "unable to read referenced image at `C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\characters\\bartender\\leo-natural-atlas-v2.webp`: Не удается найти указанный файл. (os error 2)"
+  }
+]

@@ -1,8 +1,9 @@
 import { INGREDIENTS, RECIPES, REGIONS } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { coins } from '../domain/economy';
-import { COSMETICS } from '../domain/cosmetics';
-import { DUPLICATE_INTERIOR_SHARDS, EVENT_INTERIOR_IDS, INTERIORS } from '../data/cosmetics/bars';
+import { COSMETICS, DRAWABLE_COSMETICS, interiorForCosmetic } from '../domain/cosmetics';
+import { ACHIEVEMENT_STYLES, STYLE_PIECES_TO_CRAFT, styleForInterior } from '../data/cosmetics/styleSources';
+import { DUPLICATE_INTERIOR_SHARDS, EVENT_INTERIOR_IDS, INTERIORS, isEventInterior } from '../data/cosmetics/bars';
 import { levelFor, MAX_LEVEL } from '../domain/progression';
 import {
   BOOST_KINDS, BOXES, CONSUMABLES, DRAW_COST, DUPLICATE_SHARDS, EQUIPMENT, FEATURED_SHARE, SHARD_CRAFT_COST,
@@ -87,6 +88,17 @@ export function grantReward(state: PlayerState, reward: Reward, random: () => nu
     case 'crystals': state.crystals += reward.amount; break;
     case 'parts': loot.parts += reward.amount; break;
     case 'skinShards': loot.skinShards += reward.amount; break;
+    case 'stylePieces': loot.stylePieces += reward.amount; break;
+    case 'xp': state.xp += reward.amount; break;
+    case 'prestige': state.popularity += reward.amount; break;
+    case 'style': {
+      const missing = boxStyles().filter((entry) => !state.ownedCosmeticIds.includes(entry.id));
+      // Every box style owned: the drop turns into pieces instead of being wasted.
+      if (!missing.length) { loot.stylePieces += STYLE_PIECES_TO_CRAFT; return `${STYLE_PIECES_TO_CRAFT} style shards (you own every box style)`; }
+      const chosen = missing[Math.min(missing.length - 1, Math.floor(random() * missing.length))]!;
+      grantCosmetic(state, chosen.id);
+      return `the full style “${chosen.label}”`;
+    }
     case 'itemShards': add(loot.itemShards, reward.id, reward.amount); break;
     case 'consumable': add(loot.consumables, reward.id, reward.amount); break;
     case 'recipeCard': {
@@ -102,7 +114,10 @@ export function grantReward(state: PlayerState, reward: Reward, random: () => nu
       if (!missing.length) { loot.skinShards += DUPLICATE_INTERIOR_SHARDS; return `${DUPLICATE_INTERIOR_SHARDS} skin shards (you own every event background)`; }
       const id = missing[Math.min(missing.length - 1, Math.floor(random() * missing.length))]!;
       state.ownedInteriorIds.push(id);
-      return `the special event background “${INTERIORS.find((item) => item.id === id)!.name}”`;
+      // The background's own style comes with it.
+      const style = styleForInterior(id);
+      const styleName = style ? grantCosmetic(state, `bartender:${style.value}:${style.character}`) : '';
+      return `the special event background “${INTERIORS.find((item) => item.id === id)!.name}”${styleName ? ` and its style ${styleName}` : ''}`;
     }
     case 'mysteryBottle': {
       const product = randomBottle(random);
@@ -225,9 +240,21 @@ export function promoteEquipment(state: PlayerState, id: string, regionId: strin
   note(state, `${equipmentDef(id)!.name} in ${barLabel(regionId)} is now ${slot.tier} tier (level cap ${levelCap(slot.tier)}).`);
 }
 
+// ---- Styles and their backgrounds ----
+// Owning a bartender style also gives the one background connected to it. Returns what was added, for the message.
+export function grantCosmetic(state: PlayerState, cosmeticId: string): string {
+  const parts: string[] = [];
+  const item = COSMETICS.find((entry) => entry.id === cosmeticId);
+  if (item && !state.ownedCosmeticIds.includes(item.id)) { state.ownedCosmeticIds.push(item.id); parts.push(item.label); }
+  const interiorId = interiorForCosmetic(cosmeticId);
+  const interior = interiorId ? INTERIORS.find((entry) => entry.id === interiorId) : undefined;
+  if (interior && !state.ownedInteriorIds.includes(interior.id)) { state.ownedInteriorIds.push(interior.id); parts.push(`the matching background “${interior.name}”`); }
+  return parts.join(' + ');
+}
+
 // ---- Style draw ----
 export const featuredLegendary = (now: number) => {
-  const legendary = COSMETICS.filter((item) => item.rarity === 'legendary');
+  const legendary = DRAWABLE_COSMETICS.filter((item) => item.rarity === 'legendary');
   return legendary[featuredIndex(now, legendary.length)];
 };
 // The season's progress restarts when the UTC month changes.
@@ -253,13 +280,13 @@ export function drawStyle(state: PlayerState, count: unknown, banner: unknown, n
     const rarity = rollRarity(loot.pity, random);
     loot.pity.sinceRare = rarity === 'common' ? loot.pity.sinceRare + 1 : 0;
     loot.pity.sinceLegendary = rarity === 'legendary' ? 0 : loot.pity.sinceLegendary + 1;
-    const pool = COSMETICS.filter((item) => item.rarity === rarity);
+    const pool = DRAWABLE_COSMETICS.filter((item) => item.rarity === rarity);
     const reward = rarity === 'legendary' && featuredList.length && random() < share
       ? featuredList[Math.min(featuredList.length - 1, Math.floor(random() * featuredList.length))]!
       : pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))]!;
     const duplicate = state.ownedCosmeticIds.includes(reward.id);
     const shards = duplicate ? DUPLICATE_SHARDS[rarity] : 0;
-    if (duplicate) loot.skinShards += shards; else state.ownedCosmeticIds.push(reward.id);
+    if (duplicate) loot.skinShards += shards; else grantCosmetic(state, reward.id);
     results.push({ id: reward.id, label: reward.label, rarity, duplicate, shards });
   }
   loot.lastDraw = results;
@@ -289,18 +316,32 @@ export function claimSpark(state: PlayerState, cosmeticId: unknown, now: number)
   if (!item || !season.featuredIds.includes(item.id)) throw new LootError('Pick one of this season’s featured styles.');
   if (state.ownedCosmeticIds.includes(item.id)) throw new LootError('You already own this style.');
   state.loot.season.spark = true;
-  state.ownedCosmeticIds.push(item.id);
-  note(state, `${item.label} claimed with Spark!`);
+  const gained = grantCosmetic(state, item.id);
+  note(state, `${item.label} claimed with Spark!${gained.includes('background') ? ` You also got ${gained.split(' + ')[1]}.` : ''}`);
 }
 export function craftSkin(state: PlayerState, cosmeticId: unknown) {
-  const item = COSMETICS.find((entry) => entry.id === cosmeticId);
+  const item = DRAWABLE_COSMETICS.find((entry) => entry.id === cosmeticId);
   if (!item) throw new LootError('Unknown style.');
   if (state.ownedCosmeticIds.includes(item.id)) throw new LootError('You already own this style.');
   const cost = SHARD_CRAFT_COST[item.rarity];
   if (state.loot.skinShards < cost) throw new LootError(`You need ${cost} skin shards for ${item.label}.`);
   state.loot.skinShards -= cost;
-  state.ownedCosmeticIds.push(item.id);
-  note(state, `${item.label} crafted from ${cost} skin shards.`);
+  const gained = grantCosmetic(state, item.id);
+  note(state, `${item.label} crafted from ${cost} skin shards.${gained.includes('background') ? ` You also got ${gained.split(' + ')[1]}.` : ''}`);
+}
+
+// Whole painted styles that only boxes give: a rare drop, or 50 style pieces crafted into the one the player picks.
+export const boxStyles = () => COSMETICS.filter((entry) => entry.source === 'box');
+// Style shards craft the box styles and the styles of ordinary backgrounds (the event backgrounds stay box-only).
+export const shardStyles = () => COSMETICS.filter((entry) => entry.source === 'box' || (entry.source === 'background' && !!entry.character && !isEventInterior(interiorForCosmetic(entry.id) ?? '')));
+export function craftStyle(state: PlayerState, cosmeticId: unknown) {
+  const item = shardStyles().find((entry) => entry.id === cosmeticId);
+  if (!item) throw new LootError('This style cannot be crafted from style shards.');
+  if (state.ownedCosmeticIds.includes(item.id)) throw new LootError('You already own this style.');
+  if (state.loot.stylePieces < STYLE_PIECES_TO_CRAFT) throw new LootError(`You need ${STYLE_PIECES_TO_CRAFT} style shards for ${item.label} (you have ${state.loot.stylePieces}).`);
+  state.loot.stylePieces -= STYLE_PIECES_TO_CRAFT;
+  grantCosmetic(state, item.id);
+  note(state, `${item.label} crafted from ${STYLE_PIECES_TO_CRAFT} style shards.`);
 }
 
 // ---- Drops from normal play ----
@@ -377,7 +418,9 @@ export function claimAchievement(state: PlayerState, id: unknown) {
   addKeepsakes(state, keepsakeFor(goal.id), keepsakes);
   const joining = companionJoiningWith(goal.id);
   const joined = joining ? ` ${joinCompanion(state, joining.id)}` : '';
-  note(state, `Achievement: ${goal.name}. +${crystals} crystals, a ${boxDef(goal.box)!.name} and ${keepsakes} keepsake${keepsakes > 1 ? 's' : ''}.${joined}`);
+  const pair = ACHIEVEMENT_STYLES[goal.id];
+  const styles = pair ? Object.entries(pair).map(([character, value]) => grantCosmetic(state, `bartender:${value}:${character}`)).filter(Boolean) : [];
+  note(state, `Achievement: ${goal.name}. +${crystals} crystals, a ${boxDef(goal.box)!.name} and ${keepsakes} keepsake${keepsakes > 1 ? 's' : ''}.${joined}${styles.length ? ` Styles: ${styles.join('; ')}.` : ''}`);
 }
 // First time a recipe is served (or a brand poured) pays a small one-time reward.
 export function tasteFirst(state: PlayerState, key: string, kind: 'recipe' | 'brand', now: number) {

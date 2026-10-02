@@ -169,3 +169,13 @@ Preview sheets: [5](bartender-costumes-batch-5-preview.webp), [6](bartender-cost
 
 
 Completion: all 46 remaining clothing references have generated, installed costumes. 95 used references were removed from the desktop folder; 22 unused portrait/editor/other materials remain. Full tests: 191 passed. Client and server production builds passed. The reference queue has zero pending costumes. Cleanup paths and hashes are in removed-modelling-references.json; retained filenames are in modelling-reference-review.json.
+
+## Shark costumes for both bartenders
+
+Two original shark outfits bring the wardrobe total to 96: 51 for Noa and 45 for Leo. The existing 94 modelling-folder costumes are retained. Each new outfit has a blue-gray shark onesie, white belly panel, fin details and a shark hood framing the recognizable human face. Noa holds a blue cocktail coupe; Leo holds a shaker. Each costume has one pose and natural hair.
+
+The shark cutouts occupy the third cell in the first row of public/assets/characters/bartender/noa-costumes-atlas-v9.webp and public/assets/characters/bartender/leo-costumes-atlas-v8.webp. Existing figures stay in their previous cells; no additional runtime sheets are needed. Saved outfit IDs are reference-shark-noa and reference-shark-leo.
+
+Created with the built-in image_gen tool using each character's existing face atlas as the identity reference. Exact final prompts and source paths are in scripts/painted-avatar-assets.json and docs/painted-avatar-delivery.json.
+
+[Both shark costumes over current backgrounds](shark-costumes-preview.webp)

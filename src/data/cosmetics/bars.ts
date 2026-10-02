@@ -1,5 +1,6 @@
 import type { RegionId } from '../../domain/types';
 import { REFERENCE_COSTUME_IDS } from './bartenderCostumes';
+import { THEMED_INTERIORS } from './themedBars';
 
 export const INTERIORS = [
   { id:'velvet',name:'Velvet lounge',asset:'/assets/bar/backgrounds/velvet-hour-bar.webp',tint:'#2d0d1e55',position:'center',blend:'multiply',crystalCost:0 },
@@ -21,7 +22,8 @@ export const INTERIORS = [
   { id:'marina',name:'Midnight marina',asset:'/assets/bar/backgrounds/interior-marina.webp',tint:'#082a4818',position:'center 62%',blend:'multiply',crystalCost:1950 },
   { id:'parisian',name:'Parisian salon',asset:'/assets/bar/backgrounds/interior-parisian.webp',tint:'#713f5e11',position:'center 62%',blend:'soft-light',crystalCost:2500 },
   { id:'loft',name:'Industrial loft',asset:'/assets/bar/backgrounds/interior-loft.webp',tint:'#343a3e18',position:'center 62%',blend:'saturation',crystalCost:1300 },
-  { id:'riad',name:'Moroccan riad',asset:'/assets/bar/backgrounds/interior-riad.webp',tint:'#5a1f0c11',position:'center 62%',blend:'soft-light',crystalCost:2100 }
+  { id:'riad',name:'Moroccan riad',asset:'/assets/bar/backgrounds/interior-riad.webp',tint:'#5a1f0c11',position:'center 62%',blend:'soft-light',crystalCost:2100 },
+  ...THEMED_INTERIORS,
 ] as const;
 
 export type InteriorId = typeof INTERIORS[number]['id'];

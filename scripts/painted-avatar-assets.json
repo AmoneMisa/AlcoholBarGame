@@ -884,7 +884,7 @@
   {
     "key": "noa-costumes-atlas-v9",
     "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-3fbc0750-e3f6-4b41-8b14-f6cbba630d73.png",
-    "prompt": "Remaining modelling-folder costumes. One identity-preserving cutout per reference, one matching pose. Exact prompts and source references in frames.",
+    "prompt": "Three individually generated costumes, one pose per outfit. Includes shark costume with preserved bartender face. Exact prompts in frames.",
     "reference": [
       "C:/Users/kubai/Desktop/Samples for modelling/微信图片_20210818142308.jpg",
       "C:/Users/kubai/Desktop/Samples for modelling/card-1.png"
@@ -909,6 +909,16 @@
         "reference": "C:/Users/kubai/Desktop/Samples for modelling/card-1.png",
         "hair": "natural chestnut low braided ponytail",
         "makeup": "subtle plum eyeshadow and muted rose lipstick"
+      },
+      {
+        "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-8c797664-6c13-4333-89ac-afaa61a09f07.png",
+        "prompt": "Use case: identity-preserve. Create ONE isolated transparent 2D painted game costume cutout of adult bartender noa, age 28. Reference image is identity target ONLY: preserve upper-left person's recognizable face, eyes, nose, lips, fair skin and warm confident smile. Dress the SAME person in a playful shark costume: slate blue-gray soft fabric zip-front shark onesie, cream white belly panel, matching trousers, sleeves with subtle fin-shaped fabric trims, a dorsal fin behind shoulder, and a shark-shaped hood worn up. The hood has small black shark eyes and neat soft felt white triangular teeth around its open rim; the ENTIRE human face is clearly visible through the hood opening. Neatly fitted feminine cut, natural waist, tasteful fully covered body. Hair original espresso brunette curls tucked naturally into hood. Pose holding a blue cocktail coupe near waist, other hand on hip. Human hands, normal anatomy. Fully opaque modest clothing. Match polished semi-realistic painted illustration of identity reference, no 3D. Head to MID-THIGH portrait only, canvas ratio 316:552, clear transparent margins above hood and beside arms, all hood/hair/elbows/hands inside. Preserve natural proportions, no shrinking, no horizontal stretching. Exactly one human wearing a costume, not an actual shark or animal transformation. No extra figures, fragments, text, grid, background scenery or floor shadow. Real transparent alpha background.",
+        "outfit": "reference-shark-noa",
+        "label": "Shark costume",
+        "pose": "holding a blue cocktail coupe near waist, other hand on hip",
+        "hair": "original espresso brunette curls tucked naturally into hood",
+        "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/characters/bartender/noa-natural-atlas-v2.webp",
+        "referenceRole": "identity"
       }
     ]
   },
@@ -1141,7 +1151,7 @@
   {
     "key": "leo-costumes-atlas-v8",
     "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-980d8262-a462-4c13-8e80-3517d7ce69ca.png",
-    "prompt": "Remaining modelling-folder costumes. One identity-preserving cutout per reference, one matching pose. Exact prompts and source references in frames.",
+    "prompt": "Three individually generated costumes, one pose per outfit. Includes shark costume with preserved bartender face. Exact prompts in frames.",
     "reference": [
       "C:/Users/kubai/Desktop/Samples for modelling/images (42).jpg",
       "C:/Users/kubai/Desktop/Samples for modelling/pngtree-anthropomorphic-pigeon-cartoon-character-in-modern-street-clothes-png-image_19071147.webp"
@@ -1166,6 +1176,16 @@
         "reference": "C:/Users/kubai/Desktop/Samples for modelling/pngtree-anthropomorphic-pigeon-cartoon-character-in-modern-street-clothes-png-image_19071147.webp",
         "hair": "natural chestnut textured crop",
         "makeup": "natural groomed face, matching short beard"
+      },
+      {
+        "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-91c91a58-d1f7-4a65-b4a9-cad6102385b2.png",
+        "prompt": "Use case: identity-preserve. Create ONE isolated transparent 2D painted game costume cutout of adult bartender leo, age 28. Reference image is identity target ONLY: preserve upper-left person's recognizable face, eyes, nose, lips, fair skin and strong jaw and neat short beard. Dress the SAME person in a playful shark costume: slate blue-gray soft fabric zip-front shark onesie, cream white belly panel, matching trousers, sleeves with subtle fin-shaped fabric trims, a dorsal fin behind shoulder, and a shark-shaped hood worn up. The hood has small black shark eyes and neat soft felt white triangular teeth around its open rim; the ENTIRE human face is clearly visible through the hood opening. Comfortable masculine cut and confident broad-shouldered upright stance. Hair original chestnut swept-back hair, neat short beard. Pose holding stainless cocktail shaker near waist, other hand on hip. Human hands, normal anatomy. Fully opaque modest clothing. Match polished semi-realistic painted illustration of identity reference, no 3D. Head to MID-THIGH portrait only, canvas ratio 316:552, clear transparent margins above hood and beside arms, all hood/hair/elbows/hands inside. Preserve natural proportions, no shrinking, no horizontal stretching. Exactly one human wearing a costume, not an actual shark or animal transformation. No extra figures, fragments, text, grid, background scenery or floor shadow. Real transparent alpha background.",
+        "outfit": "reference-shark-leo",
+        "label": "Shark costume",
+        "pose": "holding stainless cocktail shaker near waist, other hand on hip",
+        "hair": "original chestnut swept-back hair, neat short beard",
+        "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/characters/bartender/leo-natural-atlas-v2.webp",
+        "referenceRole": "identity"
       }
     ]
   }

@@ -1,3 +1,5 @@
+import { THEMED_COSTUMES, themedCostumeFor } from './themedBars';
+
 export const BARTENDER_COSTUMES = {
   noa: [
     { value: 'reference-kimono', label: 'Rose kimono' },
@@ -50,6 +52,8 @@ export const BARTENDER_COSTUMES = {
     { value: 'reference-final-115', label: 'Gothic lace blouse' },
     { value: 'reference-final-116', label: 'Midnight star gown' },
     { value: 'reference-final-34', label: 'Violet ranger layers' },
+    { value: 'reference-shark-noa', label: 'Shark costume' },
+    ...THEMED_COSTUMES.noa,
   ],
   leo: [
     { value: 'reference-tailored', label: 'Navy tailored suit' },
@@ -96,6 +100,8 @@ export const BARTENDER_COSTUMES = {
     { value: 'reference-final-93', label: 'Charcoal casual hoodie' },
     { value: 'reference-final-94', label: 'Graphite formal suit' },
     { value: 'reference-final-109', label: 'Rose street jacket' },
+    { value: 'reference-shark-leo', label: 'Shark costume' },
+    ...THEMED_COSTUMES.leo,
   ],
 } as const;
 
@@ -105,6 +111,8 @@ export const bartenderCostumesFor = (character: string) =>
   BARTENDER_COSTUMES[character as keyof typeof BARTENDER_COSTUMES] ?? [];
 
 export const bartenderCostumeFor = (character: string, outfit: string) => {
+  const themed = themedCostumeFor(character, outfit);
+  if (themed) return themed;
   const costumes = bartenderCostumesFor(character);
   const index = costumes.findIndex(costume => costume.value === outfit);
   if (index < 0) return undefined;

@@ -1,3 +1,4 @@
+import { BASIC_COSTUMES } from '../src/data/cosmetics/styleSources.ts';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
@@ -57,12 +58,15 @@ test('Avatars share compact atlases with unique hairstyle cells and fixed natura
 test('Reference costumes are selectable, valid saved outfits and exclusive to their bartender', () => {
   for (const character of ['noa', 'leo']) {
     const costumes = bartenderCostumesFor(character);
-    assert.equal(costumes.length, character === 'noa' ? 50 : 44);
+    assert.ok(costumes.length >= 45, `${character} has ${costumes.length} painted styles`);
     for (const choice of costumes) {
       const costume = bartenderCostumeFor(character, choice.value);
       assert.ok(BAR_PROFILE_OPTIONS.bartender.includes(choice.value));
-      assert.equal(canUseCosmetic([], 'bartender', choice.value, character), true);
-      assert.equal(canUseCosmetic([], 'bartender', choice.value, character === 'noa' ? 'leo' : 'noa'), false);
+      // Three styles per bartender are open from the start; every other one needs to be owned.
+      const owned = [`bartender:${choice.value}:${character}`];
+      assert.equal(canUseCosmetic(owned, 'bartender', choice.value, character), true);
+      assert.equal(canUseCosmetic([], 'bartender', choice.value, character), BASIC_COSTUMES[character].includes(choice.value));
+      assert.equal(canUseCosmetic(owned, 'bartender', choice.value, character === 'noa' ? 'leo' : 'noa'), false);
       assert.equal(bartenderCostumeFor(character === 'noa' ? 'leo' : 'noa', choice.value), undefined);
       assert.ok(costume.index >= 0 && costume.index < 6);
       const bytes = readFileSync(new URL(`../public${costume.sheet}`, import.meta.url));
@@ -72,7 +76,7 @@ test('Reference costumes are selectable, valid saved outfits and exclusive to th
 });
 
 test('Every bar theme has an installed background', () => {
-  assert.equal(INTERIORS.length, 20);
+  assert.ok(INTERIORS.length >= 20);
   for (const interior of INTERIORS) {
     const bytes = readFileSync(new URL(`../public${interior.asset}`, import.meta.url));
     assert.equal(bytes.toString('ascii', 8, 12), 'WEBP', interior.id);

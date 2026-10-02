@@ -1,3 +1,4 @@
+import { THEMED_INTERIORS } from '../src/data/cosmetics/themedBars.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPinia,setActivePinia } from 'pinia';
@@ -176,7 +177,9 @@ test('Every liquid and retail brand resolves to painted fantasy-label bottle art
 test('Crystal prices cover locked backgrounds, advanced recipes, waiting time and profitable brand reserves',() => {
   assert.equal(INTERIORS[0].crystalCost,0);
   assert.ok(INTERIORS.slice(1).every((item) => item.crystalCost >= 350 && item.crystalCost <= 3500));
-  assert.equal(new Set(INTERIORS.map((item) => item.crystalCost)).size,INTERIORS.length);
+  // The themed backgrounds share one price on purpose; the original ones each have their own.
+  const original = INTERIORS.filter((item) => !THEMED_INTERIORS.some((themed) => themed.id === item.id));
+  assert.equal(new Set(original.map((item) => item.crystalCost)).size,original.length);
   const advanced = RECIPES.slice(10).map((recipe) => recipePurchase(recipe,RECIPES.indexOf(recipe)));
   assert.ok(advanced.filter((price) => price.currency === 'crystals').length > advanced.length / 2);
   assert.ok(advanced.filter((price) => price.currency === 'crystals').every((price) => price.amount >= 120 && price.amount <= 550));

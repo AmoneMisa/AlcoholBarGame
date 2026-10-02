@@ -1143,48 +1143,6 @@
       "poses": 1
     },
     {
-      "key": "noa-costumes-atlas-v9",
-      "prompt": "Remaining modelling-folder costumes. One identity-preserving cutout per reference, one matching pose. Exact prompts and source references in frames.",
-      "reference": [
-        "C:/Users/kubai/Desktop/Samples for modelling/微信图片_20210818142308.jpg",
-        "C:/Users/kubai/Desktop/Samples for modelling/card-1.png"
-      ],
-      "frames": [
-        {
-          "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-3fbc0750-e3f6-4b41-8b14-f6cbba630d73.png",
-          "prompt": "Use case: identity-preserve. Generate ONE transparent 2D painted game bartender cutout of adult noa, age 28. Image 1 edit target supplies ONLY upper-left person's face identity: preserve eyes, nose, lips, face shape, fair skin, adult age and warm confident smile. Image 2 supplies clothing palette, fabric and silhouette ONLY; ignore its face, body, animal species, logos or revealing cut. Outfit: navy layered celestial gown with silver trim and flowing sleeves. Hair: black long braided ponytail, natural shades only, no pink blue green hair. Makeup/grooming: subtle coordinated eyeshadow, soft blush and muted rose lipstick. SINGLE pose: holding shaker near waist, other hand on hip. Modest fully opaque clothing with covered chest and abdomen, closed neckline, no cutouts, opaque skirt or trousers covering thighs. Match polished semi-realistic painted illustration in image 1, human bartender, no fantasy facial changes. Upright natural anatomical proportions, never shrink, hunch or stretch sideways. Portrait 316:552 aspect, from above head to MID-THIGH ONLY, crop at mid-thigh, not full body. All hair, shoulders, hands and elbows completely inside canvas with clean transparent margins. Exactly one person, no additional body fragments or grid, no weapons, text, background scenery or floor shadow. REAL transparent alpha background; not 3D.",
-          "outfit": "reference-final-116",
-          "label": "Midnight star gown",
-          "pose": "holding shaker near waist, other hand on hip",
-          "reference": "C:/Users/kubai/Desktop/Samples for modelling/微信图片_20210818142308.jpg",
-          "hair": "black long braided ponytail",
-          "makeup": "subtle coordinated eyeshadow, soft blush and muted rose lipstick"
-        },
-        {
-          "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-470a5382-81db-4582-86ca-4e235470e6eb.png",
-          "prompt": "Use case: identity-preserve. Create one isolated transparent 2D painted bartender costume portrait of adult Noa, age 28. Image 1 supplies ONLY the upper-left woman's face identity: keep exact recognizable face structure, fair skin, eyes, nose, lips and warm smile. Image 2 supplies garment design only. Outfit: dark violet and charcoal layered ranger tunic with fitted leather waist belt, long sleeves and opaque dark trousers, no weapons. Hair: natural chestnut low braided ponytail. Makeup: subtle plum eyeshadow and muted rose lipstick. Single pose: one hand at leather belt, other holding folded white bar towel. Modest closed-neck fully opaque outfit with covered chest and abdomen. Head to mid-thigh portrait, normal upright anatomical proportions, no stretching or shrinking. All hair, arms and hands visible with clean transparent margins. Polished semi-realistic painted game illustration matching image 1. Exactly one human figure, no grid, weapons, logo or extra fragments. Natural hair colors only. Real transparent alpha background, no scenery or shadow.",
-          "outfit": "reference-final-34",
-          "label": "Violet ranger layers",
-          "pose": "one hand at leather belt, other holding folded white bar towel",
-          "reference": "C:/Users/kubai/Desktop/Samples for modelling/card-1.png",
-          "hair": "natural chestnut low braided ponytail",
-          "makeup": "subtle plum eyeshadow and muted rose lipstick"
-        }
-      ],
-      "native": [
-        949,
-        1657
-      ],
-      "sheet": "public/assets/characters/bartender/noa-costumes-atlas-v9.webp",
-      "dimensions": [
-        948,
-        1104
-      ],
-      "columns": 3,
-      "rows": 2,
-      "poses": 1
-    },
-    {
       "key": "leo-costumes-atlas-v5",
       "prompt": "Remaining modelling-folder costumes. One identity-preserving cutout per reference, one matching pose. Exact prompts and source references in frames.",
       "reference": [
@@ -1444,8 +1402,60 @@
       "poses": 1
     },
     {
+      "key": "noa-costumes-atlas-v9",
+      "prompt": "Three individually generated costumes, one pose per outfit. Includes shark costume with preserved bartender face. Exact prompts in frames.",
+      "reference": [
+        "C:/Users/kubai/Desktop/Samples for modelling/微信图片_20210818142308.jpg",
+        "C:/Users/kubai/Desktop/Samples for modelling/card-1.png"
+      ],
+      "frames": [
+        {
+          "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-3fbc0750-e3f6-4b41-8b14-f6cbba630d73.png",
+          "prompt": "Use case: identity-preserve. Generate ONE transparent 2D painted game bartender cutout of adult noa, age 28. Image 1 edit target supplies ONLY upper-left person's face identity: preserve eyes, nose, lips, face shape, fair skin, adult age and warm confident smile. Image 2 supplies clothing palette, fabric and silhouette ONLY; ignore its face, body, animal species, logos or revealing cut. Outfit: navy layered celestial gown with silver trim and flowing sleeves. Hair: black long braided ponytail, natural shades only, no pink blue green hair. Makeup/grooming: subtle coordinated eyeshadow, soft blush and muted rose lipstick. SINGLE pose: holding shaker near waist, other hand on hip. Modest fully opaque clothing with covered chest and abdomen, closed neckline, no cutouts, opaque skirt or trousers covering thighs. Match polished semi-realistic painted illustration in image 1, human bartender, no fantasy facial changes. Upright natural anatomical proportions, never shrink, hunch or stretch sideways. Portrait 316:552 aspect, from above head to MID-THIGH ONLY, crop at mid-thigh, not full body. All hair, shoulders, hands and elbows completely inside canvas with clean transparent margins. Exactly one person, no additional body fragments or grid, no weapons, text, background scenery or floor shadow. REAL transparent alpha background; not 3D.",
+          "outfit": "reference-final-116",
+          "label": "Midnight star gown",
+          "pose": "holding shaker near waist, other hand on hip",
+          "reference": "C:/Users/kubai/Desktop/Samples for modelling/微信图片_20210818142308.jpg",
+          "hair": "black long braided ponytail",
+          "makeup": "subtle coordinated eyeshadow, soft blush and muted rose lipstick"
+        },
+        {
+          "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-470a5382-81db-4582-86ca-4e235470e6eb.png",
+          "prompt": "Use case: identity-preserve. Create one isolated transparent 2D painted bartender costume portrait of adult Noa, age 28. Image 1 supplies ONLY the upper-left woman's face identity: keep exact recognizable face structure, fair skin, eyes, nose, lips and warm smile. Image 2 supplies garment design only. Outfit: dark violet and charcoal layered ranger tunic with fitted leather waist belt, long sleeves and opaque dark trousers, no weapons. Hair: natural chestnut low braided ponytail. Makeup: subtle plum eyeshadow and muted rose lipstick. Single pose: one hand at leather belt, other holding folded white bar towel. Modest closed-neck fully opaque outfit with covered chest and abdomen. Head to mid-thigh portrait, normal upright anatomical proportions, no stretching or shrinking. All hair, arms and hands visible with clean transparent margins. Polished semi-realistic painted game illustration matching image 1. Exactly one human figure, no grid, weapons, logo or extra fragments. Natural hair colors only. Real transparent alpha background, no scenery or shadow.",
+          "outfit": "reference-final-34",
+          "label": "Violet ranger layers",
+          "pose": "one hand at leather belt, other holding folded white bar towel",
+          "reference": "C:/Users/kubai/Desktop/Samples for modelling/card-1.png",
+          "hair": "natural chestnut low braided ponytail",
+          "makeup": "subtle plum eyeshadow and muted rose lipstick"
+        },
+        {
+          "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-8c797664-6c13-4333-89ac-afaa61a09f07.png",
+          "prompt": "Use case: identity-preserve. Create ONE isolated transparent 2D painted game costume cutout of adult bartender noa, age 28. Reference image is identity target ONLY: preserve upper-left person's recognizable face, eyes, nose, lips, fair skin and warm confident smile. Dress the SAME person in a playful shark costume: slate blue-gray soft fabric zip-front shark onesie, cream white belly panel, matching trousers, sleeves with subtle fin-shaped fabric trims, a dorsal fin behind shoulder, and a shark-shaped hood worn up. The hood has small black shark eyes and neat soft felt white triangular teeth around its open rim; the ENTIRE human face is clearly visible through the hood opening. Neatly fitted feminine cut, natural waist, tasteful fully covered body. Hair original espresso brunette curls tucked naturally into hood. Pose holding a blue cocktail coupe near waist, other hand on hip. Human hands, normal anatomy. Fully opaque modest clothing. Match polished semi-realistic painted illustration of identity reference, no 3D. Head to MID-THIGH portrait only, canvas ratio 316:552, clear transparent margins above hood and beside arms, all hood/hair/elbows/hands inside. Preserve natural proportions, no shrinking, no horizontal stretching. Exactly one human wearing a costume, not an actual shark or animal transformation. No extra figures, fragments, text, grid, background scenery or floor shadow. Real transparent alpha background.",
+          "outfit": "reference-shark-noa",
+          "label": "Shark costume",
+          "pose": "holding a blue cocktail coupe near waist, other hand on hip",
+          "hair": "original espresso brunette curls tucked naturally into hood",
+          "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/characters/bartender/noa-natural-atlas-v2.webp",
+          "referenceRole": "identity"
+        }
+      ],
+      "native": [
+        949,
+        1657
+      ],
+      "sheet": "public/assets/characters/bartender/noa-costumes-atlas-v9.webp",
+      "dimensions": [
+        948,
+        1104
+      ],
+      "columns": 3,
+      "rows": 2,
+      "poses": 1
+    },
+    {
       "key": "leo-costumes-atlas-v8",
-      "prompt": "Remaining modelling-folder costumes. One identity-preserving cutout per reference, one matching pose. Exact prompts and source references in frames.",
+      "prompt": "Three individually generated costumes, one pose per outfit. Includes shark costume with preserved bartender face. Exact prompts in frames.",
       "reference": [
         "C:/Users/kubai/Desktop/Samples for modelling/images (42).jpg",
         "C:/Users/kubai/Desktop/Samples for modelling/pngtree-anthropomorphic-pigeon-cartoon-character-in-modern-street-clothes-png-image_19071147.webp"
@@ -1470,6 +1480,16 @@
           "reference": "C:/Users/kubai/Desktop/Samples for modelling/pngtree-anthropomorphic-pigeon-cartoon-character-in-modern-street-clothes-png-image_19071147.webp",
           "hair": "natural chestnut textured crop",
           "makeup": "natural groomed face, matching short beard"
+        },
+        {
+          "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-91c91a58-d1f7-4a65-b4a9-cad6102385b2.png",
+          "prompt": "Use case: identity-preserve. Create ONE isolated transparent 2D painted game costume cutout of adult bartender leo, age 28. Reference image is identity target ONLY: preserve upper-left person's recognizable face, eyes, nose, lips, fair skin and strong jaw and neat short beard. Dress the SAME person in a playful shark costume: slate blue-gray soft fabric zip-front shark onesie, cream white belly panel, matching trousers, sleeves with subtle fin-shaped fabric trims, a dorsal fin behind shoulder, and a shark-shaped hood worn up. The hood has small black shark eyes and neat soft felt white triangular teeth around its open rim; the ENTIRE human face is clearly visible through the hood opening. Comfortable masculine cut and confident broad-shouldered upright stance. Hair original chestnut swept-back hair, neat short beard. Pose holding stainless cocktail shaker near waist, other hand on hip. Human hands, normal anatomy. Fully opaque modest clothing. Match polished semi-realistic painted illustration of identity reference, no 3D. Head to MID-THIGH portrait only, canvas ratio 316:552, clear transparent margins above hood and beside arms, all hood/hair/elbows/hands inside. Preserve natural proportions, no shrinking, no horizontal stretching. Exactly one human wearing a costume, not an actual shark or animal transformation. No extra figures, fragments, text, grid, background scenery or floor shadow. Real transparent alpha background.",
+          "outfit": "reference-shark-leo",
+          "label": "Shark costume",
+          "pose": "holding stainless cocktail shaker near waist, other hand on hip",
+          "hair": "original chestnut swept-back hair, neat short beard",
+          "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/characters/bartender/leo-natural-atlas-v2.webp",
+          "referenceRole": "identity"
         }
       ],
       "native": [

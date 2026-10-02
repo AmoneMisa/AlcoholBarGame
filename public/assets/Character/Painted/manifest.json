@@ -1,0 +1,667 @@
+{
+  "woman": {
+    "rig": "atelier-adult-01",
+    "assets": {
+      "face": {
+        "file": "face.png",
+        "bounds": [
+          247.375,
+          86.625,
+          103.875,
+          139.75
+        ],
+        "native": [
+          831,
+          1118
+        ]
+      },
+      "brows": {
+        "file": "brows.png",
+        "bounds": [
+          253.625,
+          127,
+          92.125,
+          14
+        ],
+        "native": [
+          737,
+          112
+        ]
+      },
+      "nose": {
+        "file": "nose.png",
+        "bounds": [
+          287,
+          153,
+          26,
+          29
+        ],
+        "native": [
+          208,
+          232
+        ]
+      },
+      "mouth": {
+        "file": "mouth.png",
+        "bounds": [
+          278,
+          182,
+          44,
+          23
+        ],
+        "native": [
+          352,
+          184
+        ]
+      },
+      "eyes": {
+        "file": "eyes.png",
+        "bounds": [
+          254,
+          141,
+          92,
+          23
+        ],
+        "native": [
+          736,
+          184
+        ]
+      },
+      "irisPaint": {
+        "file": "iris-painted.png",
+        "bounds": [
+          268.625,
+          146.125,
+          62.875,
+          9.875
+        ],
+        "native": [
+          503,
+          79
+        ]
+      },
+      "aperture": {
+        "file": "eye-aperture-mask.png",
+        "bounds": [
+          268.625,
+          146.125,
+          62.875,
+          9.875
+        ],
+        "native": [
+          503,
+          79
+        ]
+      },
+      "catchlights": {
+        "file": "catchlights.png",
+        "bounds": [
+          273.75,
+          148.375,
+          51.75,
+          1.25
+        ],
+        "native": [
+          414,
+          10
+        ]
+      },
+      "blink": {
+        "file": "blink.png",
+        "bounds": [
+          254,
+          141,
+          92,
+          23
+        ],
+        "native": [
+          736,
+          184
+        ]
+      },
+      "lipMask": {
+        "file": "lip-color-mask.png",
+        "bounds": [
+          280,
+          184,
+          40,
+          16
+        ],
+        "native": [
+          320,
+          128
+        ]
+      },
+      "outfit": {
+        "file": "outfit.png",
+        "bounds": [
+          218,
+          251,
+          164,
+          677.6666666666666
+        ],
+        "native": [
+          492,
+          2033
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/woman-outfit-painterly-v2.png"
+      },
+      "primaryMask": {
+        "file": "outfit-primary-mask.png",
+        "bounds": [
+          218,
+          251,
+          164,
+          677.6666666666666
+        ]
+      },
+      "secondaryMask": {
+        "file": "outfit-secondary-mask.png",
+        "bounds": [
+          218,
+          251,
+          164,
+          677.6666666666666
+        ]
+      },
+      "trimMask": {
+        "file": "outfit-trim-mask.png",
+        "bounds": [
+          218,
+          251,
+          164,
+          677.6666666666666
+        ]
+      },
+      "skin": {
+        "file": "skin.png",
+        "bounds": [
+          174.75,
+          86.25,
+          250.5,
+          486.75
+        ],
+        "native": [
+          900,
+          1746
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/woman-skin-painterly-v2.png",
+        "sha256": "2a5cfe011b6af5c23ead445dd11bfdc504a3c5d866505626f4b4926874bab726"
+      },
+      "hairFront": {
+        "file": "hairFront.png",
+        "bounds": [
+          237.5,
+          77.75,
+          124.75,
+          211.5
+        ],
+        "native": [
+          962,
+          1629
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/woman-hair-front-painterly-v2.png",
+        "sha256": "a18064965d2d8786772f50f2f230831ea47cf1457661e59592aa1b0d4bec875a"
+      },
+      "hairBack": {
+        "file": "hairBack.png",
+        "bounds": [
+          219.75,
+          69.25,
+          160.75,
+          353.5
+        ],
+        "native": [
+          842,
+          1859
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/woman-hair-back-painterly-v2.png",
+        "sha256": "889141fa04a4df0f0a05c17942e2580c18624c50892893ef11ae915aede0ea2a"
+      },
+      "collar": {
+        "file": "collar.png",
+        "bounds": [
+          270,
+          287,
+          60,
+          38.5
+        ],
+        "native": [
+          1490,
+          910
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/woman-collar-v1.png",
+        "sha256": "690d47592f63c36cd0226687985adefb6544de9cd9aecec0422279716c73a8c5"
+      },
+      "belt": {
+        "file": "belt.png",
+        "bounds": [
+          262,
+          396,
+          76,
+          18.5
+        ],
+        "native": [
+          2011,
+          513
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/woman-belt-v1.png",
+        "sha256": "4d6fee0f4f3dd85934b7ba3686fc788e549a371785821028657decdc0749dc7e"
+      },
+      "shoes": {
+        "file": "shoes.png",
+        "bounds": [
+          241,
+          916,
+          118,
+          32.75
+        ],
+        "native": [
+          2122,
+          558
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/woman-shoes-v1.png",
+        "sha256": "c1febd73e7a370b7472cdc0aa097099a2c8005fcecbce5eda4065a1984ad3c78"
+      },
+      "accessory": {
+        "file": "accessory.png",
+        "bounds": [
+          239,
+          175.5,
+          118,
+          36.5
+        ],
+        "native": [
+          2136,
+          674
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/woman-accessory-v1.png",
+        "sha256": "d5071a380d392bc41e8178de68dfe0d02c1143c16d0564267ad411034f195847"
+      },
+      "iris": {
+        "file": "iris.png",
+        "bounds": [
+          -6.5,
+          -6.5,
+          13,
+          13
+        ],
+        "native": [
+          1182,
+          1170
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/iris-v1.png",
+        "sha256": "814bc3b302f0ad021e019e259a19c7054da9a96dc140b25b27f68d2936b533c4"
+      },
+      "sclera": {
+        "file": "sclera.png",
+        "bounds": [
+          250,
+          139,
+          100,
+          26
+        ],
+        "native": [
+          692,
+          248
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/woman-eye-v1.png"
+      },
+      "beltMask": {
+        "file": "belt-metal-mask.png",
+        "bounds": [
+          262,
+          396,
+          76,
+          18.5
+        ]
+      }
+    }
+  },
+  "man": {
+    "rig": "atelier-adult-man-01",
+    "assets": {
+      "face": {
+        "file": "face.png",
+        "bounds": [
+          246.125,
+          81.375,
+          107.625,
+          145
+        ],
+        "native": [
+          861,
+          1160
+        ]
+      },
+      "brows": {
+        "file": "brows.png",
+        "bounds": [
+          252.25,
+          125,
+          95.25,
+          16
+        ],
+        "native": [
+          762,
+          128
+        ]
+      },
+      "nose": {
+        "file": "nose.png",
+        "bounds": [
+          287,
+          153,
+          26,
+          32
+        ],
+        "native": [
+          208,
+          256
+        ]
+      },
+      "mouth": {
+        "file": "mouth.png",
+        "bounds": [
+          278,
+          186,
+          44,
+          23
+        ],
+        "native": [
+          352,
+          184
+        ]
+      },
+      "eyes": {
+        "file": "eyes.png",
+        "bounds": [
+          253,
+          141,
+          94,
+          23
+        ],
+        "native": [
+          752,
+          184
+        ]
+      },
+      "irisPaint": {
+        "file": "iris-painted.png",
+        "bounds": [
+          267.625,
+          146.125,
+          64.875,
+          9.875
+        ],
+        "native": [
+          519,
+          79
+        ]
+      },
+      "aperture": {
+        "file": "eye-aperture-mask.png",
+        "bounds": [
+          267.625,
+          146.125,
+          64.875,
+          9.875
+        ],
+        "native": [
+          519,
+          79
+        ]
+      },
+      "catchlights": {
+        "file": "catchlights.png",
+        "bounds": [
+          271.125,
+          147.375,
+          55.25,
+          6.25
+        ],
+        "native": [
+          442,
+          50
+        ]
+      },
+      "blink": {
+        "file": "blink.png",
+        "bounds": [
+          253,
+          141,
+          94,
+          23
+        ],
+        "native": [
+          752,
+          184
+        ]
+      },
+      "lipMask": {
+        "file": "lip-color-mask.png",
+        "bounds": [
+          280,
+          188,
+          40,
+          16
+        ],
+        "native": [
+          320,
+          128
+        ]
+      },
+      "outfit": {
+        "file": "outfit.png",
+        "bounds": [
+          164,
+          235,
+          272,
+          689
+        ],
+        "native": [
+          816,
+          2067
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/man-outfit-painterly-v2.png"
+      },
+      "primaryMask": {
+        "file": "outfit-primary-mask.png",
+        "bounds": [
+          164,
+          235,
+          272,
+          689
+        ]
+      },
+      "secondaryMask": {
+        "file": "outfit-secondary-mask.png",
+        "bounds": [
+          164,
+          235,
+          272,
+          689
+        ]
+      },
+      "trimMask": {
+        "file": "outfit-trim-mask.png",
+        "bounds": [
+          164,
+          235,
+          272,
+          689
+        ]
+      },
+      "skin": {
+        "file": "skin.png",
+        "bounds": [
+          238,
+          81.75,
+          124,
+          177
+        ],
+        "native": [
+          392,
+          590
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/man-skin-painterly-v2.png"
+      },
+      "handLeft": {
+        "file": "handLeft.png",
+        "bounds": [
+          158.75,
+          535.5,
+          38.5,
+          53.25
+        ],
+        "native": [
+          143,
+          279
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/man-skin-painterly-v2.png"
+      },
+      "handRight": {
+        "file": "handRight.png",
+        "bounds": [
+          402.75,
+          535.5,
+          38.5,
+          53.25
+        ],
+        "native": [
+          143,
+          277
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/man-skin-painterly-v2.png"
+      },
+      "hairFront": {
+        "file": "hairFront.png",
+        "bounds": [
+          236.25,
+          67.75,
+          119.5,
+          96.5
+        ],
+        "native": [
+          1381,
+          1122
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/man-hair-front-painterly-v2.png",
+        "sha256": "77d6d7b397fa1340ed1decfde61a1d4bfe04de54f2ba4245d7aacd3bc6598c47"
+      },
+      "hairBack": {
+        "file": "hairBack.png",
+        "bounds": [
+          239.25,
+          68.75,
+          121.5,
+          146.75
+        ],
+        "native": [
+          1140,
+          1372
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/man-hair-back-painterly-v2.png",
+        "sha256": "1befa32bbbc5896bfe88555e28f4c0293f1e23a65e35795239ec871a57ca7f87"
+      },
+      "collar": {
+        "file": "collar.png",
+        "bounds": [
+          251,
+          236,
+          98,
+          107
+        ],
+        "native": [
+          1174,
+          1271
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/man-collar-v1.png",
+        "sha256": "aa89e42b2810413d12be4b50b8397582097a538d3f7a22b06706766c4dc087c6"
+      },
+      "belt": {
+        "file": "belt.png",
+        "bounds": [
+          252,
+          415,
+          96,
+          12
+        ],
+        "native": [
+          2089,
+          271
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/man-belt-v1.png",
+        "sha256": "66aed961969c4844f2ffb56748236a03d42b34e08e64496816e6dc78fbfa9f2e"
+      },
+      "shoes": {
+        "file": "shoes.png",
+        "bounds": [
+          231,
+          917,
+          138,
+          31.25
+        ],
+        "native": [
+          2137,
+          697
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/man-shoes-v1.png",
+        "sha256": "3a1fb9921090f18be0c42ef498aa2f6906cf85144252fcb20268ba12661192d2"
+      },
+      "accessory": {
+        "file": "accessory.png",
+        "bounds": [
+          261,
+          345,
+          33,
+          30.5
+        ],
+        "native": [
+          1228,
+          1097
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/man-accessory-v1.png",
+        "sha256": "9d3a2054cf169e2d218be84fa29b768990c1cb74493ce6e213aba254b23aeb65"
+      },
+      "iris": {
+        "file": "iris.png",
+        "bounds": [
+          -6.5,
+          -6.5,
+          13,
+          13
+        ],
+        "native": [
+          1182,
+          1170
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/iris-v1.png",
+        "sha256": "814bc3b302f0ad021e019e259a19c7054da9a96dc140b25b27f68d2936b533c4"
+      },
+      "sclera": {
+        "file": "sclera.png",
+        "bounds": [
+          250,
+          139,
+          100,
+          26
+        ],
+        "native": [
+          514,
+          160
+        ],
+        "source": "assets-src/character-studio/painted-look/sources/man-eye-v1.png"
+      },
+      "beltMask": {
+        "file": "belt-metal-mask.png",
+        "bounds": [
+          252,
+          415,
+          96,
+          12
+        ]
+      }
+    }
+  }
+}
