@@ -198,7 +198,11 @@ test('Tips are a chance, Auto-serve needs level 10 and a confirmed order, and ne
   const price = (state) => Math.round(requiredRecipe(state.customers[0]).price * (state.customers[0].priceFactor ?? REGIONS.find((region) => region.id === state.regionId).marketFactor) * 100) / 100;
 
   const lucky = setup(0);const luckyPrice = price(lucky);const before = lucky.money;serve(lucky, .1);
-  assert.ok(lucky.money - before > luckyPrice, 'a roll under the tip chance adds a tip');
+  assert.equal(Math.round((lucky.money-before)*100)/100,luckyPrice);
+  assert.ok(lucky.tipJar > 0, 'a tip waits in the jar');
+  const tip = lucky.tipJar; applyAction(lucky,{type:'collectTips'},at(.1));
+  assert.equal(lucky.tipJar,0); assert.equal(Math.round((lucky.money-before)*100)/100, Math.round((luckyPrice+tip)*100)/100);
+  assert.throws(()=>applyAction(lucky,{type:'collectTips'},at(.1)),/empty/i);
   const unlucky = setup(0);const unluckyPrice = price(unlucky);const start = unlucky.money;serve(unlucky, .9);
   assert.equal(Math.round((unlucky.money - start) * 100) / 100, unluckyPrice, 'no tip above the chance');
 

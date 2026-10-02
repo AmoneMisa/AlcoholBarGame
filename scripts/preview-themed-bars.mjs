@@ -8,7 +8,7 @@ const escape = text => text.replaceAll('&','&amp;').replaceAll('<','&lt;');
 const backgroundsOnly = process.argv.includes('--backgrounds');
 const partial = process.argv.includes('--partial');
 const cards=[];
-const interiors = THEMED_INTERIORS.filter(interior => !partial || ['noa','leo'].every(character => existsSync(`public${bartenderCostumeFor(character, THEMED_INTERIOR_COSTUMES[interior.id][character][0]).sheet}`)));
+const interiors = THEMED_INTERIORS.filter(interior => !partial || (existsSync(`public${interior.asset}`) && (backgroundsOnly || ['noa','leo'].every(character => existsSync(`public${bartenderCostumeFor(character, THEMED_INTERIOR_COSTUMES[interior.id][character][0]).sheet}`)))));
 for(const [index,interior] of interiors.entries()) {
   const backdrop=await sharp(`public${interior.asset}`).resize(640,360,{fit:'cover'}).png().toBuffer();
   const layers=[{input:backdrop,left:0,top:0}];

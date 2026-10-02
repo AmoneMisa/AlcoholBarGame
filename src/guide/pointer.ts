@@ -30,8 +30,9 @@ export const setPointer = (layer: PointerLayer, candidates?: PointerSpec[]) => {
 /** The data-guide names and attributes the lessons point at. Every one must exist in a component (see the tests). */
 export const GUIDE_ATTRIBUTES = [
   'guest', 'give-water', 'give-ashtray', 'offer-open', 'offer-item', 'offer-ask', 'new-question', 'tile-bank', 'talk-send',
-  'phrase-idea', 'talk-input', 'situation-choice', 'talk-close', 'glass', 'fresh-plus', 'rules-button', 'shake', 'serve', 'market-plus',
-  'market-order', 'top-up', 'nav-service', 'nav-english', 'nav-manage', 'nav-market', 'nav-recipes', 'nav-inventory', 'clue-board', 'talk-actions', 'data-guide-ingredient', 'data-guide-fresh'
+  'phrase-idea', 'talk-input', 'situation-choice', 'talk-close', 'glass', 'prepare', 'rules-button', 'shake', 'serve', 'market-plus',
+  'market-order', 'top-up', 'nav-service', 'nav-english', 'nav-manage', 'nav-market', 'nav-recipes', 'nav-inventory', 'clue-board', 'talk-actions', 'data-guide-ingredient',
+  'prep-back', 'prep-search', 'prep-bottle', 'prep-ingredient', 'prep-clear', 'prep-food', 'bottle-sale', 'coins', 'crystals', 'events', 'screenshot'
 ] as const;
 
 export const selector = (name: (typeof GUIDE_ATTRIBUTES)[number]) => `[data-guide="${name}"]`;
@@ -42,10 +43,20 @@ export const wording = (label: string) => label.replace(/\{Tap\}/g, isTouch() ? 
 const onScreen = (element: Element) => {
   const box = element.getBoundingClientRect();
   if (box.width <= 1 || box.height <= 1) return false;
+  if (element.closest('[inert]')) return false;
+  const style = window.getComputedStyle(element);
+  if (style.visibility === 'hidden' || style.display === 'none') return false;
   // A hidden browser pane reports a window of size 0: then only the size of the element tells if it is shown.
   const width = window.innerWidth || document.documentElement.clientWidth;
   const height = window.innerHeight || document.documentElement.clientHeight;
   if (width && height && !(box.bottom > 0 && box.right > 0 && box.top < height && box.left < width)) return false;
+  // Shelves and customer tracks crop their children even when those children still have a screen rectangle.
+  for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+    const style = window.getComputedStyle(parent);
+    const clip = parent.getBoundingClientRect();
+    if (/(auto|scroll|hidden|clip)/.test(style.overflowX) && (box.right <= clip.left || box.left >= clip.right)) return false;
+    if (/(auto|scroll|hidden|clip)/.test(style.overflowY) && (box.bottom <= clip.top || box.top >= clip.bottom)) return false;
+  }
   return !coveredByDialog(element, box, width, height);
 };
 

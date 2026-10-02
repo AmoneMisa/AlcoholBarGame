@@ -1,0 +1,29 @@
+{
+  "status": "anatomy-review-not-locked",
+  "canvas": [
+    600,
+    1000
+  ],
+  "models": {
+    "woman": {
+      "image": "woman-base.png",
+      "source": "Sources/woman-original.png",
+      "frame": [
+        30,
+        50,
+        540,
+        900
+      ]
+    },
+    "man": {
+      "image": "man-base.png",
+      "source": "Sources/man-original.png",
+      "frame": [
+        0,
+        50,
+        600,
+        900
+      ]
+    }
+  }
+}

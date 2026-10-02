@@ -1,4 +1,5 @@
 import { BARTENDER_COSTUMES } from './bartenderCostumes';
+import { GAME_THEME_PRIMARY_STYLES } from './gameThemeExpansion';
 
 // Where each painted bartender style comes from. Every style is exactly one of:
 //   basic       — open from the start (three per bartender)
@@ -11,13 +12,15 @@ export type Bartender = 'noa' | 'leo';
 export type StyleSource = 'basic' | 'background' | 'achievement' | 'shop' | 'box';
 
 export const BASIC_COSTUMES: Record<Bartender, readonly string[]> = {
-  noa: ['reference-streetwear', 'reference-trench', 'reference-kimono'],
-  leo: ['reference-tailored', 'reference-casual', 'reference-urban']
+  noa: [],
+  leo: []
 };
+export const EARNED_STARTER_COSTUMES = ['reference-streetwear', 'reference-trench', 'reference-kimono', 'reference-tailored', 'reference-casual', 'reference-urban'] as const;
 
 // One background ↔ one style. A background has exactly one connected style (never two, even where several would
 // fit), and getting the style by any route gives the player its background too.
 export const INTERIOR_STYLE: Readonly<Record<string, { character: Bartender; value: string }>> = {
+  ...GAME_THEME_PRIMARY_STYLES,
   'underwater': { character: 'noa', value: 'reference-shark-noa' },
   'underground': { character: 'noa', value: 'theme-underground-noa' },
   'fairy': { character: 'noa', value: 'theme-fairy-noa' },

@@ -2,26 +2,32 @@ import { RECIPES } from './catalog';
 import { COSMETICS } from './cosmetics';
 import { INTERIORS } from '../data/cosmetics/bars';
 import { levelFor, type PlayerState } from '../sim/state';
+import { companionById } from './companions';
+import { boxDef, consumableDef, equipmentDef } from './loot';
 
 // What the player just received. Built by comparing the state before and after an action, so every source
 // of income (service, tips, bottle sales, daily gift, lessons, friends) is reported the same way.
 
-export type RewardKind = 'coins' | 'tip' | 'crystals' | 'xp' | 'recipe' | 'style' | 'background' | 'card' | 'prestige' | 'level' | 'gift';
-export interface RewardLine { kind: RewardKind; text: string }
-export interface RewardReport { id: number; title: string; lines: RewardLine[] }
+export type RewardKind = 'coins' | 'tip' | 'crystals' | 'xp' | 'recipe' | 'style' | 'background' | 'card' | 'prestige' | 'level' | 'gift' | 'companion' | 'item' | 'box' | 'material';
+export interface RewardLine { kind: RewardKind; text: string; id?: string; rarity?: 'common' | 'rare' | 'legendary' }
+export interface RewardReport { id: number; title: string; lines: RewardLine[]; celebration?: boolean }
 
 export interface Snapshot {
-  money: number; crystals: number; xp: number; level: number; prestige: number;
+  money: number; crystals: number; xp: number; level: number; prestige: number; tipJar: number;
   recipes: string[]; styles: string[]; interiors: string[]; cards: number;
+  companions: string[]; materials: Record<string, number>; items: Record<string, number>; boxes: Record<string, number>;
 }
 
 const sum = (record: Record<string, number> | undefined) => Object.values(record ?? {}).reduce((total, value) => total + (Number(value) || 0), 0);
 
 export function snapshot(state: PlayerState): Snapshot {
   return {
-    money: state.money, crystals: state.crystals ?? 0, xp: state.xp, level: levelFor(state.xp), prestige: state.popularity ?? 0,
+    money: state.money, crystals: state.crystals ?? 0, xp: state.xp, level: levelFor(state.xp), prestige: state.popularity ?? 0, tipJar: state.tipJar ?? 0,
     recipes: [...state.knownRecipeIds], styles: [...(state.ownedCosmeticIds ?? [])], interiors: [...(state.ownedInteriorIds ?? [])],
-    cards: sum(state.recipeCopies) + sum(state.cosmeticCopies)
+    cards: sum(state.recipeCopies) + sum(state.cosmeticCopies),
+    companions: Object.keys(state.companions?.owned ?? {}),
+    materials: { parts: state.loot.parts, skinShards: state.loot.skinShards, stylePieces: state.loot.stylePieces, ...Object.fromEntries(Object.entries(state.loot.itemShards).map(([id, count]) => [`shard:${id}`, count])) },
+    items: { ...state.loot.consumables }, boxes: { ...state.loot.boxes }
   };
 }
 
@@ -31,8 +37,9 @@ const plural = (count: number, one: string, many = `${one}s`) => `${count} ${cou
 export function rewardLines(before: Snapshot, after: Snapshot, message = ''): RewardLine[] {
   const lines: RewardLine[] = [];
   const earned = Math.round((after.money - before.money) * 100) / 100;
+  const jarTips = Math.max(0, after.tipJar - before.tipJar);
   if (earned > 0) {
-    const tip = Number(/Tip \+(\d+(?:\.\d+)?)/i.exec(message)?.[1] ?? 0);
+    const tip = jarTips > 0 ? 0 : Number(/Tip \+(\d+(?:\.\d+)?)/i.exec(message)?.[1] ?? 0);
     if (tip > 0 && tip < earned) {
       lines.push({ kind: 'coins', text: `+${(Math.round((earned - tip) * 100) / 100).toLocaleString('en-US')} coins` });
       lines.push({ kind: 'tip', text: `+${tip.toLocaleString('en-US')} coins tip` });
@@ -40,11 +47,29 @@ export function rewardLines(before: Snapshot, after: Snapshot, message = ''): Re
     else lines.push({ kind: 'coins', text: `+${earned.toLocaleString('en-US')} coins` });
   }
   if (after.crystals > before.crystals) lines.push({ kind: 'crystals', text: `+${(after.crystals - before.crystals).toLocaleString('en-US')} crystals` });
+  if (jarTips > 0) lines.push({ kind: 'tip', text: `+${jarTips.toLocaleString('en-US')} tips in the jar` });
   if (after.xp > before.xp) lines.push({ kind: 'xp', text: `+${(after.xp - before.xp).toLocaleString('en-US')} XP` });
   if (after.level > before.level) lines.push({ kind: 'level', text: `Level ${after.level} reached` });
   for (const id of after.recipes.filter((item) => !before.recipes.includes(item))) lines.push({ kind: 'recipe', text: `New recipe: ${RECIPES.find((recipe) => recipe.id === id)?.name ?? id}` });
-  for (const id of after.styles.filter((item) => !before.styles.includes(item))) lines.push({ kind: 'style', text: `New style: ${COSMETICS.find((item) => item.id === id)?.label ?? id}` });
-  for (const id of after.interiors.filter((item) => !before.interiors.includes(item))) lines.push({ kind: 'background', text: `New background: ${INTERIORS.find((item) => item.id === id)?.name ?? id}` });
+  for (const id of after.styles.filter((item) => !before.styles.includes(item))) {
+    const style = COSMETICS.find((item) => item.id === id);
+    lines.push({ kind: 'style', id, rarity: style?.rarity, text: `New style: ${style?.label ?? id}` });
+  }
+  for (const id of after.interiors.filter((item) => !before.interiors.includes(item))) lines.push({ kind: 'background', id, rarity: 'rare', text: `New background: ${INTERIORS.find((item) => item.id === id)?.name ?? id}` });
+  for (const id of after.companions.filter((item) => !before.companions.includes(item))) lines.push({ kind: 'companion', id, rarity: 'rare', text: companionById(id)?.title ?? id });
+  for (const [id, count] of Object.entries(after.items)) {
+    const amount = count - (before.items[id] ?? 0);
+    if (amount > 0) lines.push({ kind: 'item', id, text: `${consumableDef(id)?.name ?? id} ×${amount}` });
+  }
+  for (const [id, count] of Object.entries(after.boxes)) {
+    const amount = count - (before.boxes[id] ?? 0);
+    if (amount > 0) lines.push({ kind: 'box', id, text: `${boxDef(id)?.name ?? id} ×${amount}` });
+  }
+  const materials: Record<string, string> = { parts: 'Workshop parts', skinShards: 'Skin shards', stylePieces: 'Style pieces' };
+  for (const [id, count] of Object.entries(after.materials)) {
+    const amount = count - (before.materials[id] ?? 0);
+    if (amount > 0) lines.push({ kind: 'material', id, text: `+${amount} ${materials[id] ?? `${equipmentDef(id.replace('shard:', ''))?.name ?? id} shards`}` });
+  }
   if (after.cards > before.cards) lines.push({ kind: 'card', text: `+${plural(after.cards - before.cards, 'spare card')}` });
   if (after.prestige > before.prestige) lines.push({ kind: 'prestige', text: `+${after.prestige - before.prestige} prestige` });
   return lines;

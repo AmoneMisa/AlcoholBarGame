@@ -295,8 +295,7 @@ function suggest(text: string) {
 }
 
 function startMixing() {
-  game.closeConversation();
-  nextTick(() => document.querySelector('.cocktail-workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  if (customer.value) game.openPreparation(customer.value.id);
 }
 
 function completeBottleSale() {
@@ -492,12 +491,12 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
       <div v-if="confirmed && !situation" class="talk-confirmed">
         <template v-if="bottleOrder && confirmedBottle && customer.bottleRequest">
           <div><small>SEALED-BOTTLE SALE CONFIRMED</small><b>{{ customer.bottleRequest.quantity }} × {{ confirmedBottle.name }}</b><span>{{ confirmedBottle.volumeMl }} ml · {{ confirmedBottle.abv }}% ABV · total {{ bottleTotal(confirmedBottle, customer.bottleRequest.quantity, game.guestPriceFactor) }} coins</span></div>
-          <UiButton variant="solid" :disabled="game.serving || bottleStock(confirmedBottle.id) < customer.bottleRequest.quantity" @click="completeBottleSale">Sell full bottle{{ customer.bottleRequest.quantity === 1 ? '' : 's' }} <UiIcon class="inline-icon" name="arrow-right" /></UiButton>
+          <UiButton variant="solid" data-guide="bottle-sale" :disabled="game.serving || bottleStock(confirmedBottle.id) < customer.bottleRequest.quantity" @click="completeBottleSale">Sell full bottle{{ customer.bottleRequest.quantity === 1 ? '' : 's' }} <UiIcon class="inline-icon" name="arrow-right" /></UiButton>
         </template>
         <template v-else>
           <div v-if="serveOrder"><small>BRAND ORDER</small><b>{{ customer.request.replace(/, please\.$/, '') }}</b><span v-if="!game.brandOnShelf(serveOrder.productId)" class="serve-missing">Not on your shelf — offer another brand of the same spirit.</span></div>
           <div v-else><small>ORDER CONFIRMED</small><b>{{ recipe?.name }}<template v-if="modifierLabel"> · {{ modifierLabel }}</template></b></div>
-          <UiButton variant="solid" @click="startMixing">Start mixing <UiIcon class="inline-icon" name="arrow-right" /></UiButton>
+          <UiButton variant="solid" data-guide="prepare" @click="startMixing">Start mixing <UiIcon class="inline-icon" name="arrow-right" /></UiButton>
         </template>
       </div>
 
@@ -567,3 +566,4 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
     </section>
   </div>
 </template>
+

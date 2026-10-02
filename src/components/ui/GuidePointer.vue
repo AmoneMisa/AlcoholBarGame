@@ -14,6 +14,7 @@ let timer: ReturnType<typeof setInterval> | undefined;
 const center = (box: DOMRect) => ({ x: box.left + box.width / 2, y: box.top + box.height / 2 });
 
 function refresh() {
+  if (document.querySelector('.bar-photo-screen, .modal-backdrop.celebration, .modal-backdrop.reveal')) { drawn.value = undefined; return; }
   const found = pickPointer(guide.tour) ?? pickPointer(guide.help) ?? pickPointer(guide.practice);
   if (!found) { drawn.value = undefined; return; }
   let { element } = found;
@@ -70,7 +71,7 @@ onBeforeUnmount(() => { if (timer) clearInterval(timer); window.removeEventListe
 </template>
 
 <style scoped>
-.guide-pointer { position: fixed; z-index: 450; width: 0; height: 0; pointer-events: none; }
+.guide-pointer { position: fixed; z-index: 1850; width: 0; height: 0; pointer-events: none; }
 .gp-ring { position: absolute; left: calc(var(--size) / -2); top: calc(var(--size) / -2); width: var(--size); height: var(--size); border-radius: 50%; border: 3px solid #ffd35a; box-shadow: 0 0 0 4px rgba(255, 211, 90, .25), 0 0 18px rgba(255, 211, 90, .8); animation: gp-pulse 1.3s ease-out infinite; }
 .gp-hand .ui-icon { width: 30px; height: 30px; }
 .gp-hand { position: absolute; left: -6px; top: -4px; width: 30px; height: 30px; color: #fff3dc; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }

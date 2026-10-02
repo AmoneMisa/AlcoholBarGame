@@ -15,11 +15,11 @@ const context = (random = () => .5) => ({ now: NOW, random, checkEnglish: (text)
 const fresh = () => { const state = createInitialState(NOW); state.startingBarChosen = true; state.loot.boxes = {}; return state; };
 const id = (character, value) => `bartender:${value}:${character}`;
 
-test('Only three painted styles per bartender are open from the start', () => {
+test('Painted costumes remain locked until earned', () => {
   for (const character of ['noa', 'leo']) {
     const open = bartenderCostumesFor(character).filter((costume) => canUseCosmetic([], 'bartender', costume.value, character));
     assert.deepEqual(open.map((costume) => costume.value).sort(), [...BASIC_COSTUMES[character]].sort());
-    assert.equal(BASIC_COSTUMES[character].length, 3);
+    assert.equal(BASIC_COSTUMES[character].length, 0);
   }
 });
 
@@ -73,7 +73,7 @@ test('Only a short list of unconnected styles is sold; background, achievement, 
 test('Backgrounds, achievements and the shop never share a style, and the rest belongs to boxes', () => {
   const sources = { basic: 0, background: 0, achievement: 0, shop: 0, box: 0 };
   for (const character of ['noa', 'leo']) for (const costume of bartenderCostumesFor(character)) sources[styleSource(character, costume.value)]++;
-  assert.equal(sources.basic, 6);
+  assert.equal(sources.basic, 0);
   assert.equal(sources.background, Object.keys(INTERIOR_STYLE).length);
   assert.equal(sources.achievement, Object.keys(ACHIEVEMENT_STYLES).length * 2);
   assert.equal(sources.shop, Object.values(SHOP_STYLES).flat().length);
@@ -134,7 +134,7 @@ test('50 style shards craft one full box style; fewer do not, and other styles c
   assert.ok(state.ownedInteriorIds.includes('izakaya'), 'its background comes with it');
   assert.ok(shardStyles().every((item) => item.id !== id('noa', 'reference-flame')), 'event styles stay box-only');
   state.loot.stylePieces = 200;
-  for (const cosmeticId of [id('noa', 'reference-flame'), id('noa', 'reference-biker'), id('noa', 'reference-gothic'), id('noa', 'reference-streetwear')]) {
+  for (const cosmeticId of [id('noa', 'reference-flame'), id('noa', 'reference-biker'), id('noa', 'reference-gothic')]) {
     assert.throws(() => applyAction(state, { type: 'craftStyle', cosmeticId }, context()), /cannot be crafted/, cosmeticId);
   }
 });
@@ -173,4 +173,15 @@ test('A style someone is already wearing stays theirs after the update', () => {
   state.bars[state.regionId].bartender = 'reference-qipao';
   normalizePlayerState(state);
   assert.ok(state.ownedCosmeticIds.includes(id('noa', 'reference-qipao')));
+});
+
+test('The six formerly free costumes need ownership, including migrated worn styles',()=>{
+  for(const [character,values] of Object.entries({noa:['reference-streetwear','reference-trench','reference-kimono'],leo:['reference-tailored','reference-casual','reference-urban']})) for(const value of values) {
+    const state=fresh(),cosmeticId=id(character,value),bar=state.bars[state.regionId];
+    bar.bartenderCharacter=character;bar.bartender=value;
+    normalizePlayerState(state);
+    assert.equal(state.bars[state.regionId].bartender,'vest');assert.equal(canUseCosmetic(state.ownedCosmeticIds,'bartender',value,character),false);
+    grantCosmetic(state,cosmeticId);state.bars[state.regionId].bartender=value;normalizePlayerState(state);
+    assert.equal(state.bars[state.regionId].bartender,value);assert.equal(canUseCosmetic(state.ownedCosmeticIds,'bartender',value,character),true);
+  }
 });

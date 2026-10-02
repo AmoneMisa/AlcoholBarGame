@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { INTERIORS, BAR_PROFILE_OPTIONS } from '../src/data/cosmetics/bars.ts';
 import { bartenderCostumeFor, bartenderCostumesFor } from '../src/data/cosmetics/bartenderCostumes.ts';
 import { THEMED_INTERIORS, THEMED_COSTUMES, costumesForInterior } from '../src/data/cosmetics/themedBars.ts';
+import { GAME_THEME_INTERIORS } from '../src/data/cosmetics/gameThemeExpansion.ts';
 
 test('Every bar recommends valid outfits for both bartender identities', () => {
   for (const interior of INTERIORS) for (const character of ['noa','leo']) {
@@ -21,7 +22,12 @@ test('Every bar recommends valid outfits for both bartender identities', () => {
 
 test('Race collections and requested characters are complete for both sexes', () => {
   for(const character of ['noa','leo']) {
-    assert.equal(THEMED_COSTUMES[character].length,36);
+    assert.equal(THEMED_COSTUMES[character].length,53);
+    assert.equal(GAME_THEME_INTERIORS.length,17);
+    for (const interior of GAME_THEME_INTERIORS) {
+      assert.equal(THEMED_COSTUMES[character].filter(style=>style.theme===interior.id).length,1);
+      assert.deepEqual(costumesForInterior(interior.id,character),[`theme-${interior.id}-${character}`]);
+    }
     assert.equal(THEMED_COSTUMES[character].filter(style=>style.theme==='lineage-2').length,8);
     assert.equal(THEMED_COSTUMES[character].filter(style=>style.theme==='perfect-world').length,6);
     assert.equal(THEMED_COSTUMES[character].filter(style=>style.theme==='allods').length,8);
@@ -41,7 +47,7 @@ test('Race collections and requested characters are complete for both sexes', ()
 });
 
 test('All original and new backgrounds are individually installed and unique', () => {
-  assert.equal(THEMED_INTERIORS.length,13);
+  assert.equal(THEMED_INTERIORS.length,30);
   const hashes=new Set();
   for(const interior of INTERIORS) {
     const bytes=readFileSync(new URL(`../public${interior.asset}`,import.meta.url));

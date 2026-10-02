@@ -141,7 +141,8 @@ function applyEffects(state: PlayerState, guest: Customer, effects: Effects, dat
   if (owesShare > 0 && held > 0) (state.tabs ??= []).push({ guest: guest.name, amount: coins(held * owesShare), since: state.lastClockAt });
   if (effects.settleTab && state.tabs?.length) {
     const tab = state.tabs.shift()!;
-    receive(state, coins(tab.amount * 1.1));
+    receive(state, tab.amount);
+    state.tipJar = coins((state.tipJar ?? 0) + coins(tab.amount * .1));
     state.message = `${tab.guest} paid back ${tab.amount.toFixed(2)} coins and left a tip.`;
   }
   if (effects.violation) state.ruleViolations = (state.ruleViolations ?? 0) + effects.violation;

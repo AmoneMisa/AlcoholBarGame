@@ -59,6 +59,7 @@ export interface Modifier {
 }
 
 export interface Customer {
+  seatId?: number;
   id: string;
   characterId?: string;
   name: string;

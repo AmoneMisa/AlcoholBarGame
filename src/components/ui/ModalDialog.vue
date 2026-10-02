@@ -10,6 +10,7 @@ const props = withDefaults(defineProps<{
   closable?: boolean;            // false: the player must choose (no close button, Escape and outside taps do nothing)
   placement?: 'center' | 'bottom'; // bottom: a sheet that rises from the screen edge on phones
   width?: string;
+  presentation?: 'default' | 'celebration' | 'reveal';
 }>(), { closable: true, placement: 'center', width: '520px' });
 const emit = defineEmits<{ close: [] }>();
 const sheet = ref<HTMLElement>();
@@ -32,7 +33,7 @@ onBeforeUnmount(() => document.body.classList.remove('modal-open'));
 
 <template>
   <Teleport to="body">
-    <div class="modal-backdrop" :class="placement" @pointerdown.self="request" @keydown="onKey">
+    <div class="modal-backdrop" :class="[placement, presentation]" @pointerdown.self="request" @keydown="onKey">
       <section ref="sheet" class="modal-sheet" role="dialog" aria-modal="true" :aria-label="title || label" tabindex="-1" :style="{ width: `min(${width}, 100%)` }">
         <header v-if="title || closable" class="modal-head">
           <div><small v-if="eyebrow">{{ eyebrow }}</small><b v-if="title">{{ title }}</b></div>

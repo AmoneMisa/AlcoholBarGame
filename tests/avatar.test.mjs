@@ -52,7 +52,7 @@ test('Avatars share compact atlases with unique hairstyle cells and fixed natura
     'noa-costumes-atlas-v8.webp',
     'noa-costumes-atlas-v9.webp',
     'noa-natural-atlas-v2.webp', 'noa-special-a-v1.webp', 'noa-special-b-v1.webp',
-    ...['noa', 'leo'].flatMap(character => Array.from({ length: 6 }, (_, i) => character + '-themed-atlas-v' + (i + 1) + '.webp')),
+    ...['noa', 'leo'].flatMap(character => Array.from({ length: 9 }, (_, i) => character + '-themed-atlas-v' + (i + 1) + '.webp')),
   ].sort());
 });
 
@@ -60,7 +60,7 @@ test('Avatars share compact atlases with unique hairstyle cells and fixed natura
 test('Reference costumes are selectable, valid saved outfits and exclusive to their bartender', () => {
   for (const character of ['noa', 'leo']) {
     const costumes = bartenderCostumesFor(character);
-    assert.equal(costumes.length, character === 'noa' ? 87 : 81);
+    assert.equal(costumes.length, character === 'noa' ? 104 : 98);
     for (const choice of costumes) {
       const costume = bartenderCostumeFor(character, choice.value);
       assert.ok(BAR_PROFILE_OPTIONS.bartender.includes(choice.value));
@@ -78,7 +78,7 @@ test('Reference costumes are selectable, valid saved outfits and exclusive to th
 });
 
 test('Every bar theme has an installed background', () => {
-  assert.equal(INTERIORS.length, 33);
+  assert.equal(INTERIORS.length, 50);
   for (const interior of INTERIORS) {
     const bytes = readFileSync(new URL(`../public${interior.asset}`, import.meta.url));
     assert.equal(bytes.toString('ascii', 8, 12), 'WEBP', interior.id);

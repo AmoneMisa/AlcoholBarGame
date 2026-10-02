@@ -12,8 +12,12 @@ import { haptic } from '../../telegram/webapp';
 import BottleModel from '../cocktails/BottleModel.vue';
 import GlassModel from '../cocktails/GlassModel.vue';
 import CharacterModel from '../characters/CharacterModel.vue';
-import CityEvent from './CityEvent.vue';
+import { MAX_CUSTOMER_SEATS, hiddenCustomerDirections } from '../../domain/customerTiming';
+import type { ScreenshotPreferences } from '../../stores/screenshot';
 import PopoverPanel from '../ui/PopoverPanel.vue';
+import TipJar from './TipJar.vue';
+import ConfirmDialog from '../ui/ConfirmDialog.vue';
+import CrystalAmount from '../ui/CrystalAmount.vue';
 import UiIcon from '../ui/UiIcon.vue';
 import Glyph from '../ui/Glyph.vue';
 import { INTERIORS, shelfStyleFor } from '../../data/cosmetics/bars';
@@ -22,7 +26,9 @@ import { sceneLayout } from '../../data/cosmetics/barLines';
 const game = useGameStore();
 const ashtrayArt = `${import.meta.env.BASE_URL}assets/bar/props/ashtray.webp`;
 // `preview` renders the bar exactly as decorated (shelves always on, no guests or glass) for the Design tab.
-const props = withDefaults(defineProps<{ active?: boolean; preview?: boolean }>(), { active: true, preview: false });
+const props = withDefaults(defineProps<{ active?: boolean; preview?: boolean; capture?:boolean; captureOptions?:ScreenshotPreferences; captureControls?:boolean }>(), { active: true, preview: false, capture:false, captureControls:true });
+defineEmits<{screenshot:[]}>();
+const captureClasses=computed(()=>props.capture ? {capture:true,...Object.fromEntries(Object.entries(props.captureOptions??{}).map(([key,value])=>[`hide-${key.replace(/[A-Z]/g,letter=>`-${letter.toLowerCase()}`)}`,!value])), 'hide-capture-controls':!props.captureControls} : {});
 const glassTarget = ref<HTMLElement>();
 // Everything lives in the painting: our bottles stand on the background's own back-bar planks, the bartender
 // is cut at the back edge of its counter, the glass stands on the counter and guests sit on its stools.
@@ -58,7 +64,7 @@ const people = computed(() => {
   const side = phone ? .84 : .86;
   const bartenderX = current.bartenderX ?? Math.round(width * (shelfOnRight ? 1 - side : side));
   // The glass stands at the bartender's left hand; only at the scene's left edge does it move to the right.
-  const glassOffset = bartender * (phone ? .5 : .46);
+  const glassOffset = bartender * (phone ? .20 : .22);
   const glassX = bartenderX - glassOffset < 60 ? bartenderX + glassOffset : bartenderX - glassOffset;
   return { guest, bartender, bartenderX, glassX, shelfOnRight, bartenderHalfWidth: bartender * .24 };
 });
@@ -99,25 +105,25 @@ const guestZone = computed(() => {
   if (!sizes || !width) return undefined;
   const reserve = sizes.bartenderHalfWidth + 14;
   const bartenderOnLeft = sizes.bartenderX < width / 2;
-  // While pouring, the glass stands between the guests and the bartender and needs its own room.
-  const glassEdge = buildingEnabled.value ? (width < 760 ? 48 : 70) : 0;
-  const start = bartenderOnLeft ? Math.min(width - 80, Math.round(Math.max(sizes.bartenderX + reserve, glassEdge ? sizes.glassX + glassEdge : 0))) : 0;
-  const end = bartenderOnLeft ? width : Math.max(80, Math.round(Math.min(sizes.bartenderX - reserve, glassEdge ? sizes.glassX - glassEdge : width)));
+  const start = bartenderOnLeft ? Math.min(width - 80, Math.round(sizes.bartenderX + reserve)) : 0;
+  const end = bartenderOnLeft ? width : Math.max(80, Math.round(sizes.bartenderX - reserve));
   return { start, end };
 });
 const phoneTrack = computed(() => {
   const sizes = people.value;
   const zone = guestZone.value;
-  if (!sizes || !zone || sceneBox.value.width >= 760 || !game.customers.length) return undefined;
+  if (!sizes || !zone || (sceneBox.value.width >= 760 && zone.end - zone.start >= MAX_CUSTOMER_SEATS * sizes.guest * .8)) return undefined;
   const spacing = Math.round(sizes.guest * .8) + 4;
-  return { ...zone, zone: zone.end - zone.start, spacing, content: game.customers.length * spacing };
+  const visible = Math.max(1, Math.floor((zone.end - zone.start) / spacing)) * spacing;
+  const start = people.value!.bartenderX < sceneBox.value.width / 2 ? zone.end - visible : zone.start;
+  return { start, end:start + visible, zone:visible, spacing, content: MAX_CUSTOMER_SEATS * spacing };
 });
 // Wider screens seat everyone at once: on the painted stools while there are enough distinct ones,
 // otherwise evenly along the free counter so no two guests share a spot.
 const wideSeats = computed(() => {
   const zone = guestZone.value;
   const sizes = people.value;
-  const count = game.customers.length;
+  const count = MAX_CUSTOMER_SEATS;
   if (!zone || !sizes || !count) return [];
   const gap = sizes.guest * .62;
   const stools: number[] = [];
@@ -131,6 +137,7 @@ const wideSeats = computed(() => {
 const castRef = ref<HTMLElement>();
 const guestScroll = ref(0);
 const guestsOverflow = computed(() => !!phoneTrack.value && phoneTrack.value.content > phoneTrack.value.zone + 4);
+const hiddenGuests = computed(() => hiddenCustomerDirections(game.customers.map(customer => customer.seatId ?? -1), guestScroll.value, phoneTrack.value?.spacing ?? 0, phoneTrack.value?.zone ?? 0));
 const trackX = (index: number) => phoneTrack.value!.spacing * (index + .5);
 function onGuestScroll() { guestScroll.value = castRef.value?.scrollLeft ?? 0; }
 // The track always stops on whole guests, so no one is left cut in half at the edge.
@@ -138,7 +145,7 @@ const guestsPerView = () => Math.max(1, Math.floor((phoneTrack.value?.zone ?? 0)
 function scrollToFirstGuest(first: number, behavior: ScrollBehavior = 'smooth') {
   const track = phoneTrack.value;
   if (!track || !castRef.value) return;
-  const index = Math.min(Math.max(0, first), Math.max(0, game.customers.length - guestsPerView()));
+  const index = Math.min(Math.max(0, first), Math.max(0, MAX_CUSTOMER_SEATS - guestsPerView()));
   castRef.value.scrollTo({ left: Math.max(0, Math.min(index * track.spacing, track.content - track.zone)), behavior });
 }
 function showGuest(index: number, behavior: ScrollBehavior = 'smooth') {
@@ -150,12 +157,21 @@ function nudgeGuests(direction: number) {
 }
 // Bring the guest being served into view, also when the phone track first appears or its width changes.
 watch([() => game.activeCustomerId, () => phoneTrack.value?.zone], ([id], previous) => {
-  void nextTick(() => showGuest(game.customers.findIndex((item) => item.id === id), previous[1] === undefined ? 'auto' : 'smooth'));
+  void nextTick(() => showGuest(game.customers.find((item) => item.id === id)?.seatId ?? -1, previous[1] === undefined ? 'auto' : 'smooth'));
 });
 const customerStyle = (index: number) => phoneTrack.value
   ? { left: `${Math.round(trackX(index))}px` }
   : { left: `${Math.round(wideSeats.value[index] ?? seatXs.value[index % seatXs.value.length] ?? sceneBox.value.width / 2)}px` };
-const rulesOpen = ref(false);
+const seats = computed(() => Array.from({length:MAX_CUSTOMER_SEATS}, (_, index) => ({
+  index, customer:game.customers.find(customer => customer.seatId === index),
+  countdown:game.seatArrivals.find(arrival => arrival.seat === index)?.countdown ?? 'Arriving…'
+})));
+const inviteSeat = ref<number>();
+const inviteArrival = computed(() => game.seatArrivals.find(arrival => arrival.seat === inviteSeat.value));
+watch(inviteArrival, arrival => { if (!arrival) inviteSeat.value = undefined; });
+function inviteCustomer() {
+  if (inviteSeat.value !== undefined && inviteArrival.value && game.expediteCustomer(inviteSeat.value)) inviteSeat.value = undefined;
+}
 const freshPickerOpen = ref(false);
 // The dragged bottle follows the finger, but while pouring it sits just above and left of the glass rim,
 // so the glass's stream starts at the bottle's neck instead of wherever the finger happens to be.
@@ -217,12 +233,12 @@ const shelfRows = computed(() => {
   if (!current) return [];
   // Planks cropped off the top of the scene, or squeezed out by the bartender's work area, are skipped;
   // their bottles move to the other planks.
-  const visible = current.shelf.planks.filter((plank) => plank - 56 >= 24);
+  const visible = current.shelf.planks.filter((plank) => plank - 76 >= 24).filter((plank, index, all) => index === 0 || plank - all[index - 1]! >= 80);
   const usable = visible.filter((plank) => rowSpan(plank).fits);
   const planks = usable.length ? usable : visible.length ? visible.slice(0, 1) : current.shelf.planks.slice(-1);
   // Small screens: when lower planks were squeezed out, stack rows upward above the top plank while there is room.
   const wanted = Math.min(3, Math.max(visible.length, 1));
-  while (planks.length < wanted && planks[0]! - 58 - 56 >= 24) planks.unshift(planks[0]! - 58);
+  while (planks.length < wanted && planks[0]! - 84 - 76 >= 24) planks.unshift(planks[0]! - 84);
   const lines = shelfLines.value;
   const groups = planks.length >= lines.length ? lines.map((line) => [line])
     : planks.length === 3 ? [[lines[0]!], [lines[1]!], lines.slice(2)]
@@ -230,8 +246,8 @@ const shelfRows = computed(() => {
   return groups.map((group, index) => {
     const plank = planks[index]!;
     const gap = index > 0 ? plank - planks[index - 1]! : (planks[1] ?? plank + 90) - plank;
-    const height = Math.round(Math.max(56, Math.min(118, gap - 4)));
-    const bottle = Math.round(Math.max(34, Math.min(76, height - 16)));
+    const height = Math.round(Math.max(76, Math.min(118, gap - 4)));
+    const bottle = Math.round(Math.max(20, Math.min(76, height - 48)));
     const span = rowSpan(plank);
     const left = span.fits ? span.left : current.shelf.left;
     const right = span.fits ? span.right : current.shelf.right;
@@ -239,7 +255,7 @@ const shelfRows = computed(() => {
       id: group.map((line) => line.id).join('-'),
       label: group.map((line) => line.label).join(' · '),
       bottles: group.flatMap((line) => line.bottles),
-      style: { left: `${left}px`, width: `${right - left}px`, top: `${plank - height}px`, height: `${height}px`, '--bottle': `${bottle}px` }
+      style: { left: `${left}px`, width: `${right - left}px`, top: `${plank - height}px`, height: `${height}px`, '--bottle': `${bottle}px`, '--slots': Math.max(1, Math.floor((right - left - 12) / 86)) }
     };
   });
 });
@@ -414,7 +430,7 @@ function endBottle(event: PointerEvent) {
 }
 
 // Only the live scene runs the game clock; a Design preview must not tick it a second time.
-const interval = props.preview ? undefined : window.setInterval(() => { if (!document.hidden) game.tickGameClock(); }, 1000);
+const interval = props.preview || props.capture ? undefined : window.setInterval(() => { if (!document.hidden) game.tickGameClock(); }, 1000);
 watch(sceneRef, (element, previous) => {
   if (previous) sceneObserver?.unobserve(previous);
   if (element) { sceneObserver?.observe(element); measureScene(); }
@@ -467,10 +483,13 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section ref="sceneRef" class="bar-scene" :class="{ 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack && !preview, 'is-preview': preview }" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
+  <div class="bar-scene-shell" :class="{ 'is-preview': preview }">
+    <div v-if="!preview && !capture && game.ashtrays.dirty" class="scene-info-dock">
+      <button type="button" class="clean-ashtrays" @click="game.cleanAshtrays()"><UiIcon name="brush" /> Clean {{ game.ashtrays.dirty }}</button>
+    </div>
+  <section ref="sceneRef" class="bar-scene" :class="[{ 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack && !preview, 'is-preview': preview },captureClasses]" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
     <div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div>
-    <CityEvent v-if="!preview" compact />
-    <div v-if="buildingEnabled || preview" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
+    <div v-if="preview" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
       <small v-if="shelfRows.length && !preview" class="pshelf-hint" :style="{ left: shelfRows[0]!.style.left, top: `calc(${shelfRows[0]!.style.top} - 18px)` }">Use the arrows to browse a shelf · pull a bottle down to the glass</small>
       <div v-for="row in shelfRows" :key="row.id" class="pshelf-row" :style="row.style">
         <small class="pshelf-label">{{ row.label }}</small>
@@ -489,47 +508,41 @@ onBeforeUnmount(() => {
     </div>
     <div v-if="!preview" ref="castRef" class="bar-cast" @scroll.passive="onGuestScroll">
       <!-- Only the figure and the card take taps; the rest of the guest's column lets presses reach the shelves. -->
-      <button v-for="(customer, index) in game.customers" :key="customer.id" type="button" class="scene-customer" data-guide="guest" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" :style="customerStyle(index)" :aria-label="`Talk to ${customer.name}`" @click="game.openConversation(customer.id)">
+      <template v-for="{ index, customer, countdown } in seats" :key="index">
+      <button v-if="customer" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" :style="customerStyle(index)" :aria-label="`Talk to ${customer.name}`" @click="game.openConversation(customer.id)">
         <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="faceOf(customer)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
         <img v-if="customer.social?.ashtray === 'given'" class="customer-ashtray" :src="ashtrayArt" alt="" draggable="false" />
-        <div class="guest-card">
+        <div class="guest-card" data-guide="guest">
           <header><b>{{ customer.name }}</b><time v-if="customer.id === game.activeCustomerId">{{ game.orderCountdown }}</time></header>
           <small class="guest-badges"><span v-for="badge in badges(customer)" :key="badge.label" :title="badge.label"><img v-if="badge.icon === 'ashtray'" class="ashtray-badge" :src="ashtrayArt" alt="" /><Glyph v-else :g="badge.icon" /></span><i v-if="!customer.social">{{ customer.mood }}</i><i v-else>{{ customer.social.phase === 'enjoying' ? 'enjoying' : EMOTION_LABEL[customer.social.emotion].toLowerCase() }}</i></small>
           <p>{{ bubbleText(customer) }}</p>
           <footer><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customer.social?.phase === 'enjoying' ? 'Enjoying the drink' : customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
         </div>
       </button>
-      <button type="button" class="house-rules-button" data-guide="rules-button" :aria-expanded="rulesOpen" @click="rulesOpen = !rulesOpen"><UiIcon class="inline-icon" name="book" /> Rules<i v-if="game.ruleViolations" class="rules-count" :title="`${game.ruleViolations} rule breaks so far`">{{ game.ruleViolations }}</i></button>
-      <PopoverPanel v-if="rulesOpen" class="house-rules-panel" padded eyebrow="HOUSE RULES" :title="`Rules in ${game.region.name}`" close-label="Close house rules" @close="rulesOpen = false">
-        <p class="rules-note">These are game rules for practice, not legal advice. Explain them politely to guests. Inspectors count every rule you break{{ game.ruleViolations ? ` (so far: ${game.ruleViolations})` : '' }}.</p>
-        <article v-for="rule in game.houseRules" :key="rule.id" class="rule-row"><span class="rule-icon"><Glyph :g="rule.icon" /></span><span><b>{{ rule.title }}</b><small>{{ rule.text }}</small></span></article>
-      </PopoverPanel>
-      <div v-if="game.barEvent" class="bar-event" :class="game.barEvent.mood" :title="game.barEvent.description"><b><Glyph :g="game.barEvent.icon" /> {{ game.barEvent.title }}</b><span>{{ game.barEvent.description }}</span></div>
-      <button v-if="game.ashtrays.dirty" type="button" class="clean-ashtrays" @click="game.cleanAshtrays()"><UiIcon class="inline-icon" name="brush" /> Clean {{ game.ashtrays.dirty }} ashtray{{ game.ashtrays.dirty === 1 ? '' : 's' }}</button>
-      <!-- The wait for the next guest is shown once, in the panel below the scene (with “Welcome now”). -->
+      <button v-else type="button" class="scene-customer empty-seat" :style="customerStyle(index)" :aria-label="`Invite guest to seat ${index + 1} · next guest in ${countdown}`" @click="inviteSeat = index">
+        <div class="seat-shadow">
+          <svg viewBox="0 0 160 180" aria-hidden="true"><path d="M0 180 8 140Q10 131 23 126L54 114Q64 109 63 98L62 91C53 84 49 73 47 62C40 60 39 50 43 47L43 34C42 12 57 2 79 2C102 2 116 15 116 36L115 47C121 49 120 61 113 63C111 75 106 85 98 91L97 101Q96 109 106 114L138 126Q151 131 153 141L160 180Z" /></svg>
+          <div class="seat-countdown"><time>{{ countdown }}</time></div>
+        </div>
+      </button>
+      </template>
     </div>
-    <template v-if="guestsOverflow && !preview && !rulesOpen">
-      <button class="guest-nudge prev" type="button" aria-label="Show earlier guests" :disabled="guestScroll <= 2" @click="nudgeGuests(-1)"><UiIcon name="chevron-left" /></button>
-      <button class="guest-nudge next" type="button" aria-label="Show more guests" :disabled="guestScroll >= phoneTrack!.content - phoneTrack!.zone - 2" @click="nudgeGuests(1)"><UiIcon name="chevron-right" /></button>
+    <template v-if="guestsOverflow && !preview">
+      <button class="guest-nudge prev" type="button" :aria-label="hiddenGuests.left ? 'Show earlier guests · customer off screen' : 'Show earlier guests'" :disabled="guestScroll <= 2" @click="nudgeGuests(-1)"><UiIcon name="chevron-left" /><span v-if="hiddenGuests.left" class="hidden-guest-dot" aria-hidden="true"></span></button>
+      <button class="guest-nudge next" type="button" :aria-label="hiddenGuests.right ? 'Show more guests · customer off screen' : 'Show more guests'" :disabled="guestScroll >= phoneTrack!.content - phoneTrack!.zone - 2" @click="nudgeGuests(1)"><UiIcon name="chevron-right" /><span v-if="hiddenGuests.right" class="hidden-guest-dot" aria-hidden="true"></span></button>
     </template>
-    <div v-if="buildingEnabled && !preview" ref="glassTarget" class="live-glass-station" data-guide="glass" :class="{ 'drag-over': dragOverGlass }">
-      <div v-if="dragOverGlass || totalAmount || itemCount" class="live-glass-copy"><b>{{ dragOverGlass ? 'POURING' : totalAmount ? `${totalAmount} ML` : 'FRESH' }}</b><small v-if="itemCount">+ {{ itemCount }} fresh item{{ itemCount === 1 ? '' : 's' }}</small></div>
-      <div class="live-glass-wrap">
-        <div v-if="dragOverGlass" class="live-pour-stream" :style="{ '--stream-color': selectedIngredient ? colorMap[selectedIngredient.id] : liquidColor }"></div>
-        <GlassModel type="highball" :fill="fill" :color="liquidColor" :ice="ice" :garnish="garnish" :bubbles="hasBubbles" animation="idle" />
-        <button class="fresh-plus" data-guide="fresh-plus" type="button" :aria-expanded="freshPickerOpen" aria-label="Add fruit, ice, herb, or garnish" @click="freshPickerOpen = !freshPickerOpen"><UiIcon name="plus" /></button>
-      </div>
-      <!-- Rendered on <body>: the glass station is scaled down on phones, which would shrink and trap a fixed popup. -->
-      <Teleport to="body">
-        <PopoverPanel v-if="freshPickerOpen" class="fresh-picker" eyebrow="FRESH INGREDIENTS" title="Add to the glass" close-label="Close fresh ingredients" @close="freshPickerOpen = false">
-          <div><button v-for="ingredient in freshIngredients" :key="ingredient.id" type="button" :data-guide-fresh="ingredient.id" @click="addFresh(ingredient.id)"><BottleModel :ingredient="ingredient" /><span>{{ ingredient.name }}</span><small>+1</small></button></div>
-        </PopoverPanel>
-      </Teleport>
-    </div>
+    <TipJar v-if="!preview" />
+    <button v-if="!preview && !capture" class="bar-screenshot-open" data-guide="screenshot" type="button" aria-label="Open full-screen bar for screenshots" title="Full-screen bar" @click="$emit('screenshot')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H4v16h4M16 4h4v16h-4" /></svg></button>
     <!-- Over the glass the bottle settles above its rim and tips; the glass draws the single pour stream. -->
     <div v-if="draggingIngredientId && selectedIngredient" class="drag-bottle-ghost" :class="{ pouring: dragOverGlass }" :style="ghostStyle" aria-hidden="true">
       <span class="ghost-bottle"><BottleModel :ingredient="selectedIngredient" /></span>
       <b class="ghost-name">{{ selectedIngredient.name }} · {{ pourable(selectedIngredient.id) }} ml</b>
     </div>
   </section>
+  </div>
+  <ConfirmDialog v-if="inviteArrival && inviteSeat !== undefined" :title="`Invite guest · Seat ${inviteSeat + 1}`" confirm-label="Invite now" :disabled="game.crystals < inviteArrival.cost || inviteArrival.cost <= 0" :reason="game.crystals < inviteArrival.cost ? 'Not enough crystals' : undefined" @cancel="inviteSeat = undefined" @confirm="inviteCustomer">
+    <p>This guest arrives in <b>{{ inviteArrival.countdown }}</b>.</p>
+    <p>Invite them to this seat now for <CrystalAmount :value="inviteArrival.cost" />.</p>
+  </ConfirmDialog>
 </template>
+

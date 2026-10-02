@@ -290,7 +290,7 @@ test('Customer arrivals, VIP rewards and the shared order timer follow the mobil
   assert.equal(game.rejectCustomer(guest.id),true);
   assert.equal(game.customers.length,4,'only the served guest leaves; the rest of the row keeps waiting');
   assert.equal(game.customer.id,game.customers[0].id,'the next guest in the row is served');
-  assert.equal(game.nextCustomerAt,0,'nobody new is scheduled while guests are still seated');
+  assert.ok(game.nextCustomerAt>0,'empty seats have their own arrival timers while others are occupied');
   while (game.customers.length) assert.equal(game.rejectCustomer(game.customer.id),true);
   assert.ok(game.nextCustomerAt - Date.now() >= CUSTOMER_ARRIVAL_MIN_MS - 1000);
   assert.ok(game.nextCustomerAt - Date.now() <= CUSTOMER_ARRIVAL_MAX_MS + 1000);

@@ -1,5 +1,15 @@
 /* Final layout pass. Loaded last, so these rules replace the older overrides they sit beside. */
 
+/* Scene controls have their own row; they never float over bottles or guest orders. */
+.bar-scene-shell { min-width: 0; }
+.bar-scene-shell.is-preview { display: contents; }
+.scene-toolbar { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; padding: 8px 0; }
+.scene-toolbar .city-event.compact, .scene-toolbar .bar-event, .scene-toolbar .house-rules-button, .scene-toolbar .clean-ashtrays { position: relative !important; inset: auto !important; transform: none !important; margin: 0; width: auto; max-width: 100%; }
+.scene-toolbar .city-event.compact { flex: 1 1 180px; }
+.scene-toolbar .bar-event { flex: 0 1 auto; pointer-events: auto; }
+.scene-toolbar .city-event-head { min-height: 38px; }
+.scene-toolbar .house-rules-button, .scene-toolbar .clean-ashtrays { min-height: 38px; display: flex; align-items: center; gap: 5px; }
+
 /* ---- Header: five resources never overflow a phone ---- */
 .daily-hud-gift.ready { background: #4a3720; box-shadow: inset 0 0 0 1px #e2b657; }
 .daily-hud-gift.ready .ui-icon { animation: gift-wiggle 1.8s ease-in-out infinite; }
@@ -293,3 +303,99 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .style-info { display: grid; gap: 4px; margin-top: 10px; padding: 10px 12px; border: 1px solid #d8aa5766; border-radius: 10px; background: #d8aa570f; font-size: 13px; }
 .style-info b { color: #e4b35c; }
 .style-info .ui-btn { justify-self: start; margin-top: 4px; }
+
+/* Reserve separate space for the row title, arrows, bottle art and full item names. */
+.bar-scene .pshelf-row { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 24px minmax(0, 1fr); align-items: stretch; padding: 0; }
+.bar-scene .pshelf-label { position: relative; inset: auto; align-self: center; width: auto; max-width: calc(100% - 74px); min-width: 0; margin-left: 6px; font-size: 9px; line-height: 11px; white-space: normal; overflow: visible; text-overflow: clip; }
+.bar-scene .pshelf-bottles { min-height: 0; padding: 0 6px; mask-image: none !important; -webkit-mask-image: none !important; }
+.bar-scene .pshelf-bottles > button { flex: 0 0 calc((100% - (var(--slots) - 1) * 2px) / var(--slots)); min-width: 0; scroll-snap-align: start; }
+.bar-scene .pshelf-bottles > button .bottle-visual { bottom: 23px; }
+.bar-scene .pshelf-bottles > button > span { bottom: 0; min-height: 22px; display: grid; align-items: center; font-size: 9px; line-height: 11px; white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
+.bar-scene .pshelf-row .shelf-nudge { top: 0; right: 4px; padding: 0; height: 24px; }
+.bar-scene .pshelf-row .shelf-nudge button { width: 30px; height: 24px; }
+.bar-scene .pshelf-row .shelf-nudge .ui-icon { width: 18px; height: 18px; }
+.bar-scene .pshelf-bottles .bottle-visual > b { top: 0; right: -3px; font-size: 8px; line-height: 12px; }
+.guest-card header b { white-space: normal; overflow: visible; overflow-wrap: anywhere; }
+.guest-card > p { display: block; overflow: visible; -webkit-line-clamp: unset; }
+.guest-card footer { flex-wrap: wrap; }
+.guest-card footer em { white-space: normal; }
+
+/* The service view fills the viewport; all preparation happens on its own screen. */
+.velvet-app.service-mode { height: 100dvh; min-height: 0; padding-bottom: 0; overflow: hidden; }
+.service-mode > main { height: calc(100dvh - var(--hud-h, 114px) - 74px - env(safe-area-inset-bottom, 0px)); max-width: none; padding: 0 6px; overflow: hidden; }
+.service-mode .service-layout { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 0; height: 100%; }
+.service-mode .bar-scene-shell { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+.service-mode .bar-scene { height: 100% !important; min-height: 0 !important; border-radius: 14px; }
+.scene-toolbar .city-event-head b, .scene-toolbar .bar-event b { font-size: 10px; }
+.scene-toolbar .city-event.compact { flex-basis: 140px; }
+.scene-toolbar .house-rules-button { padding: 6px 8px; }
+.scene-toolbar .city-event-body { position: absolute; z-index: 30; top: calc(100% + 6px); width: min(300px, calc(100vw - 24px)); border: 1px solid #725942; border-radius: 10px; background: #101724f5; }
+.reward-popup { z-index: 1300; }
+.panel-heading h2 + .guide-open { margin-top: 12px; }
+.bar-scene-shell:not(.is-preview) { position:relative; grid-template-rows:minmax(0,1fr); }
+.scene-info-dock { position:absolute; bottom:10px; left:10px; z-index:15; display:flex; gap:6px; }
+.scene-info-dock .house-rules-button,.scene-info-dock .clean-ashtrays { position:static!important; display:flex; align-items:center; gap:5px; padding:8px 10px; font-size:11px; }
+.game-nav { grid-template-columns:repeat(5,minmax(0,1fr)); }
+header.top-hud { display:flex; flex-wrap:wrap; align-items:center; min-height:52px; padding:max(5px,env(safe-area-inset-top)) 8px 5px; gap:6px; }
+header.top-hud .venue-card { display:flex; flex:1; align-items:center; min-width:125px; padding:0; border:0; background:none; box-shadow:none; gap:6px; }
+header.top-hud .venue-name { display:flex; gap:5px; min-width:0; }
+header.top-hud .venue-name b { font-size:12px; white-space:normal; overflow:visible; overflow-wrap:anywhere; }
+header.top-hud .venue-name em { font-size:10px; white-space:nowrap; }
+header.top-hud .hud-resources { display:flex!important; width:auto; flex:none; border:0; background:none; box-shadow:none; gap:7px; }
+header.top-hud .hud-resources > * { order:initial!important; grid-column:auto; border:0; padding:0; flex:none; }
+header.top-hud .hud-resources > div { display:flex; align-items:center; gap:3px; }
+header.top-hud .hud-resources b { font-size:11px; }
+header.top-hud .hud-resources .ui-icon { width:15px; height:15px; }
+header.top-hud .exchange-open { padding:0; gap:3px; }
+header.top-hud .hud-avatar .art-character { position:absolute; width:64px; height:112px; top:0; left:50%; translate:-50% 0; transform:none; animation:none; }
+header.top-hud .venue-name em { font-size:12px; }
+header.top-hud .hud-avatar .character-leo { margin-left:-8px; }
+header.top-hud .hud-avatar .character-noa { margin-left:-4px; }
+header.top-hud .hud-avatar .bartender-art { width:100%; height:100%; object-fit:contain; }
+header.top-hud .daily-hud-gift,header.top-hud .staff-open { width:26px; height:26px; padding:3px; border:1px solid #594b39; border-radius:9px; }
+header.top-hud .hud-events { width:26px; height:26px; }
+@media(max-width:600px) { header.top-hud .venue-card { flex:1 1 calc(100% - 32px); } header.top-hud .hud-events { order:1; } header.top-hud .hud-resources { order:2; width:100%; justify-content:flex-end; } }
+
+.seat-arrivals { display:flex; flex-wrap:wrap; justify-content:center; gap:4px 12px; font-size:10px; color:#c2b694; font-variant-numeric:tabular-nums; }
+
+.modal-backdrop.celebration,.modal-backdrop.reveal { z-index:1700; }
+.preparation-screen .preparation-body { grid-auto-rows:max-content; }
+.preparation-screen .preparation-item-art .brand-bottle { width:100px; height:110px; }
+.preparation-screen .preparation-item-art .brand-bottle i { width:110%; }
+@media(max-width:899px) {
+  .preparation-screen .preparation-glass .glass-model:not(.glass-painted) { width:100px; height:160px; }
+  .preparation-screen .preparation-workbench { padding:12px; }
+  .preparation-screen .preparation-glass { min-height:170px; }
+  .preparation-screen .auto-serve.locked { display:none; }
+  .preparation-screen .compact-recipe-progress { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .preparation-screen .compact-order-body { padding:8px; }
+  .preparation-screen .panel-heading { padding:10px 12px; }
+  .preparation-screen .panel-heading h2 { font-size:20px; }
+}
+
+.bar-scene .scene-customer.empty-seat,.bar-scene.phone-guests .scene-customer.empty-seat { display:block; top:calc(var(--seat-top) - var(--guest-h)) !important; bottom:auto !important; height:var(--guest-h) !important; pointer-events:auto !important; cursor:pointer; }
+.empty-seat .seat-shadow { top:0; }
+.seat-shadow { position:absolute; left:0; right:0; top:calc(var(--seat-top) - var(--guest-h)); height:var(--guest-h); display:grid; place-items:center; pointer-events:auto; cursor:pointer; }
+.empty-seat:focus-visible .seat-shadow { outline:2px solid #e9c577; border-radius:20px; }
+.bar-scene.phone-guests .bar-cast { pointer-events:auto; }
+.seat-shadow > svg { width:100%; height:auto; max-height:100%; align-self:end; fill:#06080af0; filter:drop-shadow(0 3px 8px #080a14aa); }
+.guest-nudge .hidden-guest-dot { position:absolute; top:2px; right:1px; width:8px; height:8px; border:1px solid #ffb2a2; border-radius:50%; background:#f04d4d; box-shadow:0 0 6px #eb393969; pointer-events:none; }
+.seat-countdown { position:absolute; bottom:12px; left:50%; translate:-50% 0; width:max-content; max-width:calc(100% - 16px); display:grid; place-items:center; padding:5px 10px; border:1px solid #ac936458; border-radius:8px; background:#11131fde; color:#e9d6af; text-align:center; }
+.seat-countdown time { font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+/* Two clear header rows: identity and events, then bar information and balances. */
+header.top-hud { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:5px 10px; padding:7px 12px; }
+header.top-hud .venue-card { grid-column:1; grid-row:1; min-width:0; }
+header.top-hud .hud-events { grid-column:2; grid-row:1; justify-self:end; position:relative; display:flex; align-items:center; justify-content:center; gap:5px; width:auto; height:30px; padding:0 10px; border-radius:10px; font:700 10px system-ui; }
+header.top-hud .hud-events .ui-icon {width:16px;height:16px;}
+header.top-hud .events-badge {position:absolute;right:-5px;top:-5px;min-width:17px;height:17px;display:grid;place-items:center;padding:0 4px;border:1px solid #f8d596;border-radius:20px;background:#ac473b;color:#fff6da;font:700 9px system-ui;box-sizing:border-box;}
+header.top-hud .hud-bar-info {grid-column:1;grid-row:2;justify-self:start;display:flex;align-items:center;justify-content:center;width:auto;height:24px;padding:0 9px;border:1px solid #b59a5c40;border-radius:7px;background:#ffffff06;color:#e6c78c;font:600 12px system-ui;white-space:nowrap;}
+header.top-hud .hud-resources {grid-column:2;grid-row:2;width:auto;justify-content:flex-end;gap:10px;margin:0;}
+header.top-hud .venue-name em {font-size:12px;}
+header.top-hud .exchange-open {display:flex;align-items:center;gap:4px;padding:3px 0;}
+@media(max-width:600px) {header.top-hud {padding:6px 8px;gap:4px 7px;}header.top-hud .hud-resources {gap:8px;}header.top-hud .venue-card {min-width:0;}}
+
+.bar-screenshot-open {position:absolute;right:10px;bottom:10px;z-index:35;display:grid;place-items:center;width:28px;height:28px;padding:5px;border:1px solid #b997574d;border-radius:7px;background:#0d1528a6;color:#ead1a3;cursor:pointer;}
+.bar-screenshot-open svg {width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.bar-screenshot-open:hover {background:#253247;}
+.bar-screenshot-open:focus-visible {outline:2px solid #eac780;outline-offset:2px;}

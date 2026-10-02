@@ -1,0 +1,303 @@
+{
+  "id": "atelier-adult-man-01",
+  "revision": 1,
+  "status": "prototype-awaiting-art-approval",
+  "canvas": {
+    "width": 600,
+    "height": 1000
+  },
+  "camera": {
+    "projection": "orthographic",
+    "view": "front",
+    "scale": 1
+  },
+  "lighting": "upper-left, soft key, warm ambient",
+  "anchors": {
+    "head": [
+      300,
+      150
+    ],
+    "eyeLeft": [
+      273,
+      151
+    ],
+    "eyeRight": [
+      327,
+      151
+    ],
+    "browLeft": [
+      273,
+      133
+    ],
+    "browRight": [
+      327,
+      133
+    ],
+    "nose": [
+      300,
+      177
+    ],
+    "mouth": [
+      300,
+      196
+    ],
+    "neck": [
+      300,
+      236
+    ],
+    "shoulderLeft": [
+      223,
+      256
+    ],
+    "shoulderRight": [
+      377,
+      256
+    ],
+    "waist": [
+      300,
+      422
+    ],
+    "hip": [
+      300,
+      492
+    ],
+    "handLeft": [
+      176,
+      557
+    ],
+    "handRight": [
+      424,
+      557
+    ],
+    "earLeft": [
+      246,
+      166
+    ],
+    "earRight": [
+      354,
+      166
+    ],
+    "crown": [
+      300,
+      89
+    ],
+    "feet": [
+      300,
+      943
+    ]
+  },
+  "pivots": {
+    "torso": [
+      300,
+      422
+    ],
+    "hair": [
+      300,
+      112
+    ],
+    "fabric": [
+      300,
+      422
+    ],
+    "accessory": [
+      300,
+      236
+    ]
+  },
+  "layers": [
+    "rearAccessories",
+    "hairBack",
+    "rearClothing",
+    "body",
+    "face",
+    "eyes",
+    "brows",
+    "nose",
+    "mouth",
+    "makeup",
+    "clothing",
+    "clothingOverlay",
+    "hairFront",
+    "accessories",
+    "foreground"
+  ],
+  "model": "man",
+  "sha256": "c7533033232df91124e7a51e0b12d365ba8b912bd177ea453c617863195db6e5",
+  "compatibleRigs": [
+    "atelier-adult-man-01"
+  ],
+  "colorRegions": [
+    "skin",
+    "hairColor",
+    "iris",
+    "lips",
+    "primary",
+    "secondary",
+    "trim"
+  ],
+  "assets": [
+    {
+      "id": "Hair/Back/swept",
+      "file": "Hair/Back/swept.svg",
+      "layer": "hairBack",
+      "motion": "hair",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Base/Body",
+      "file": "Base/Body.svg",
+      "layer": "body",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Face/Eyes/almond",
+      "file": "Face/Eyes/almond.svg",
+      "layer": "eyes",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Face/Eyebrows/straight",
+      "file": "Face/Eyebrows/straight.svg",
+      "layer": "brows",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Face/Nose/defined",
+      "file": "Face/Nose/defined.svg",
+      "layer": "nose",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Face/Mouth/neutral",
+      "file": "Face/Mouth/neutral.svg",
+      "layer": "mouth",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Clothing/Outfits/formal",
+      "file": "Clothing/Outfits/formal.svg",
+      "layer": "clothing",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Clothing/Overlays/formal",
+      "file": "Clothing/Overlays/formal.svg",
+      "layer": "clothingOverlay",
+      "motion": "fabric",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Hair/Front/swept",
+      "file": "Hair/Front/swept.svg",
+      "layer": "hairFront",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Accessories/chain",
+      "file": "Accessories/chain.svg",
+      "layer": "accessories",
+      "motion": "accessory",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Face/Eyes/round",
+      "file": "Face/Eyes/round.svg",
+      "layer": "eyes",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Face/Eyes/soft",
+      "file": "Face/Eyes/soft.svg",
+      "layer": "eyes",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Face/Eyebrows/arched",
+      "file": "Face/Eyebrows/arched.svg",
+      "layer": "brows",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Face/Eyebrows/gentle",
+      "file": "Face/Eyebrows/gentle.svg",
+      "layer": "brows",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Face/Mouth/smile",
+      "file": "Face/Mouth/smile.svg",
+      "layer": "mouth",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Face/Mouth/full",
+      "file": "Face/Mouth/full.svg",
+      "layer": "mouth",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Hair/Back/cropped",
+      "file": "Hair/Back/cropped.svg",
+      "layer": "hairBack",
+      "motion": "hair",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Hair/Front/cropped",
+      "file": "Hair/Front/cropped.svg",
+      "layer": "hairFront",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Hair/Back/tied",
+      "file": "Hair/Back/tied.svg",
+      "layer": "hairBack",
+      "motion": "hair",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Hair/Front/tied",
+      "file": "Hair/Front/tied.svg",
+      "layer": "hairFront",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Clothing/Outfits/casual",
+      "file": "Clothing/Outfits/casual.svg",
+      "layer": "clothing",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Clothing/Overlays/casual",
+      "file": "Clothing/Overlays/casual.svg",
+      "layer": "clothingOverlay",
+      "motion": "fabric",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Accessories/brooch",
+      "file": "Accessories/brooch.svg",
+      "layer": "accessories",
+      "motion": "accessory",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Face/Nose/soft",
+      "file": "Face/Nose/soft.svg",
+      "layer": "nose",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Face/Makeup/blush",
+      "file": "Face/Makeup/blush.svg",
+      "layer": "makeup",
+      "rig": "atelier-adult-man-01"
+    },
+    {
+      "id": "Face/Makeup/freckles",
+      "file": "Face/Makeup/freckles.svg",
+      "layer": "makeup",
+      "rig": "atelier-adult-man-01"
+    }
+  ]
+}

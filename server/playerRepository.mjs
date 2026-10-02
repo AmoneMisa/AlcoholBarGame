@@ -22,6 +22,18 @@ export function createPgRepository(pool) {
 
 function pgTx(client) {
   return {
+    async createPromo(promo) {
+      const {rowCount} = await client.query('INSERT INTO promo_codes(code,rewards,expires_at) VALUES($1,$2::jsonb,to_timestamp($3/1000.0)) ON CONFLICT DO NOTHING',[promo.code, JSON.stringify(promo.rewards), promo.expiresAt]);
+      return rowCount === 1;
+    },
+    async findPromo(code) {
+      const {rows:[row]} = await client.query('SELECT rewards, expires_at FROM promo_codes WHERE code=$1',[code]);
+      return row ? {code, rewards:row.rewards, expiresAt:new Date(row.expires_at).getTime()} : null;
+    },
+    async redeemPromo(code,playerId) {
+      const {rowCount} = await client.query('INSERT INTO promo_redemptions(code,player_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[code,playerId]);
+      return rowCount === 1;
+    },
     async findOrCreatePlayer(identity) {
       const { rows: [player] } = await client.query(
         `INSERT INTO players (auth_key, telegram_id, display_name, username) VALUES ($1, $2, $3, $4)
@@ -140,6 +152,8 @@ function pgTx(client) {
 }
 
 export function createMemoryRepository() {
+  const promos = new Map();
+  const redeemedPromos = new Set();
   const players = new Map();
   const states = new Map();
   const requests = new Map();
@@ -156,6 +170,9 @@ export function createMemoryRepository() {
   let queue = Promise.resolve();
   let nextId = 1;
   const tx = {
+    async createPromo(promo) { if (promos.has(promo.code)) return false; promos.set(promo.code,structuredClone(promo)); return true; },
+    async findPromo(code) { return structuredClone(promos.get(code) ?? null); },
+    async redeemPromo(code,id) { const key = `${code}:${id}`; if (redeemedPromos.has(key)) return false; redeemedPromos.add(key); return true; },
     async findOrCreatePlayer(identity) {
       if (!players.has(identity.key)) players.set(identity.key, { id: nextId++, name: identity.name });
       return players.get(identity.key);

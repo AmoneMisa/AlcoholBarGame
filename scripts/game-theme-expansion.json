@@ -1,0 +1,657 @@
+{
+  "tool": "built-in image_gen",
+  "themes": [
+    {
+      "id": "witcher-3",
+      "name": "Witcher 3 • Novigrad tavern",
+      "shelf": "walnut",
+      "crystalCost": 2800,
+      "noa": "Ciri",
+      "leo": "Geralt"
+    },
+    {
+      "id": "heroes-3",
+      "name": "Heroes of Might and Magic III • Erathia inn",
+      "shelf": "brass",
+      "crystalCost": 2840,
+      "noa": "Catherine Ironfist",
+      "leo": "Gelu"
+    },
+    {
+      "id": "elden-ring",
+      "name": "Elden Ring • Lands Between tavern",
+      "shelf": "brass",
+      "crystalCost": 2880,
+      "noa": "Ranni",
+      "leo": "Blaidd"
+    },
+    {
+      "id": "minecraft",
+      "name": "Minecraft • Block village taproom",
+      "shelf": "rustic",
+      "crystalCost": 2920,
+      "noa": "Alex",
+      "leo": "Steve"
+    },
+    {
+      "id": "skyrim",
+      "name": "Skyrim • Whiterun mead hall",
+      "shelf": "rustic",
+      "crystalCost": 2960,
+      "noa": "Dragonborn shieldmaiden",
+      "leo": "Dragonborn warrior"
+    },
+    {
+      "id": "cyberpunk-2077",
+      "name": "Cyberpunk 2077 • Night City lounge",
+      "shelf": "neon",
+      "crystalCost": 3000,
+      "noa": "V • female",
+      "leo": "V • male"
+    },
+    {
+      "id": "cs-2",
+      "name": "Counter-Strike 2 • Tactical clubhouse",
+      "shelf": "glass",
+      "crystalCost": 3040,
+      "noa": "Agent Ava",
+      "leo": "Counter-terrorist operator"
+    },
+    {
+      "id": "assassins-creed",
+      "name": "Assassin’s Creed • Venetian hidden tavern",
+      "shelf": "marble",
+      "crystalCost": 3080,
+      "noa": "Evie Frye",
+      "leo": "Ezio Auditore"
+    },
+    {
+      "id": "watch-dogs",
+      "name": "Watch Dogs • Chicago hacker bar",
+      "shelf": "neon",
+      "crystalCost": 3120,
+      "noa": "Sitara",
+      "leo": "Aiden Pearce"
+    },
+    {
+      "id": "sleeping-dogs",
+      "name": "Sleeping Dogs • Hong Kong night bar",
+      "shelf": "walnut",
+      "crystalCost": 3160,
+      "noa": "Hong Kong detective",
+      "leo": "Wei Shen"
+    },
+    {
+      "id": "detroit",
+      "name": "Detroit: Become Human • Android lounge",
+      "shelf": "glass",
+      "crystalCost": 3200,
+      "noa": "Kara",
+      "leo": "Connor"
+    },
+    {
+      "id": "neighbours-from-hell",
+      "name": "Neighbours from Hell • Prankster pub",
+      "shelf": "rustic",
+      "crystalCost": 3240,
+      "noa": "Prankster hostess",
+      "leo": "Woody"
+    },
+    {
+      "id": "gta",
+      "name": "Grand Theft Auto • Vice City beach bar",
+      "shelf": "bamboo",
+      "crystalCost": 3280,
+      "noa": "Vice City hostess",
+      "leo": "Tommy Vercetti"
+    },
+    {
+      "id": "stellar-blade",
+      "name": "Stellar Blade • Xion lounge",
+      "shelf": "marble",
+      "crystalCost": 3320,
+      "noa": "EVE",
+      "leo": "Adam"
+    },
+    {
+      "id": "repo",
+      "name": "R.E.P.O. • Salvage depot bar",
+      "shelf": "rustic",
+      "crystalCost": 3360,
+      "noa": "Salvage robot • female",
+      "leo": "Salvage robot • male"
+    },
+    {
+      "id": "among-us",
+      "name": "Among Us • Skeld cafeteria bar",
+      "shelf": "glass",
+      "crystalCost": 3400,
+      "noa": "Crewmate • red",
+      "leo": "Crewmate • cyan"
+    },
+    {
+      "id": "borderlands",
+      "name": "Borderlands • Pandora saloon",
+      "shelf": "rustic",
+      "crystalCost": 3440,
+      "noa": "Lilith",
+      "leo": "Mordecai"
+    }
+  ],
+  "jobs": [
+    {
+      "key": "interior-witcher-3",
+      "theme": "witcher-3",
+      "label": "Witcher 3 • Novigrad tavern",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Witcher 3 • Novigrad tavern. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: Novigrad medieval tavern, carved timber beams, amber candles, wolf-medallion carving, potion bottles, Gwent cards, distant red-tiled city and towers through side window. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-witcher-3-noa",
+      "value": "theme-witcher-3-noa",
+      "theme": "witcher-3",
+      "character": "noa",
+      "label": "Ciri",
+      "description": "ashen-white loose low ponytail, cream blouse with rolled sleeves and leather corset, brown fitted leather trousers, belts, small sword at hip; composed relaxed stance, one hand on sword belt and other holding a pewter mug",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Ciri cosplay from Witcher 3. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: ashen-white loose low ponytail, cream blouse with rolled sleeves and leather corset, brown fitted leather trousers, belts, small sword at hip; composed relaxed stance, one hand on sword belt and other holding a pewter mug. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-witcher-3-leo",
+      "value": "theme-witcher-3-leo",
+      "theme": "witcher-3",
+      "character": "leo",
+      "label": "Geralt",
+      "description": "long silver-white hair tied back, short white beard, wolf medallion, black leather and chainmail witcher armor, brown gloves; muscular normal proportions, shoulders squared, one forearm resting on belt, other holding a pewter tankard",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/characters/bartender/leo-natural-atlas-v2.webp",
+      "prompt": "Generate a single isolated painted game costume portrait of the adult male bartender Leo cosplaying Geralt in Witcher 3. Reference atlas provides Leo's facial identity and painted art style only. Render just ONE man with a NEW pose and NEW hair: long silver-white hair tied low, neat white beard, wolf necklace, fully clothed black quilted leather tunic over silver chainmail sleeves, brown gloves, leather belts and dark trousers. Calm friendly barkeeper, elbows relaxed, one gloved hand carrying a small pewter mug at waist level and the other adjusting a glove. Natural compact adult face and normal neck. Frame complete head to middle thighs. Transparent background, one figure, no scene, no text. No swords or weapons.",
+      "originalPrompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Geralt cosplay from Witcher 3. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: long silver-white hair tied back, short white beard, wolf medallion, black leather and chainmail witcher armor, brown gloves; muscular normal proportions, shoulders squared, one forearm resting on belt, other holding a pewter tankard. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait.",
+      "originalReference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png"
+    },
+    {
+      "key": "interior-heroes-3",
+      "theme": "heroes-3",
+      "label": "Heroes of Might and Magic III • Erathia inn",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Heroes of Might and Magic III • Erathia inn. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: Erathian castle inn, blue and gold banners, medieval stone arches, brass goblets, warm hearth, small griffin heraldry, view of white Castle towers and green rolling fields. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-heroes-3-noa",
+      "value": "theme-heroes-3-noa",
+      "theme": "heroes-3",
+      "character": "noa",
+      "label": "Catherine Ironfist",
+      "description": "long auburn braided hair, regal red and gold armored tunic and fitted royal cape, small golden coronet; elegant upright pose, one hand on waist and other presenting a goblet",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Catherine Ironfist cosplay from Heroes of Might and Magic III. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: long auburn braided hair, regal red and gold armored tunic and fitted royal cape, small golden coronet; elegant upright pose, one hand on waist and other presenting a goblet. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-heroes-3-leo",
+      "value": "theme-heroes-3-leo",
+      "theme": "heroes-3",
+      "character": "leo",
+      "label": "Gelu",
+      "description": "long straight bright natural-white elf hair, pointed ear prosthetics, red and black ranger leather, forest-green cloak, compact bow on back; lean normal proportions, three-quarter torso, one hand adjusting leather glove",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Gelu cosplay from Heroes of Might and Magic III. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: long straight bright natural-white elf hair, pointed ear prosthetics, red and black ranger leather, forest-green cloak, compact bow on back; lean normal proportions, three-quarter torso, one hand adjusting leather glove. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-elden-ring",
+      "theme": "elden-ring",
+      "label": "Elden Ring • Lands Between tavern",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Elden Ring • Lands Between tavern. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: weathered stone sanctuary tavern, golden Erdtree glowing far beyond arched window, amber grace-like lights, gothic arches, blue moonlight, old goblets and flasks, no enormous tree inside room. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-elden-ring-noa",
+      "value": "theme-elden-ring-noa",
+      "theme": "elden-ring",
+      "character": "noa",
+      "label": "Ranni",
+      "description": "signature four-armed Ranni witch cosplay, pale-blue makeup on the preserved adult face, long pale-blue canonical character wig, broad white witch hat and layered white robe; four well-separated elegant arms with natural visible hands, two folded lightly at waist and two holding small cup and gesturing",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Ranni cosplay from Elden Ring. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: signature four-armed Ranni witch cosplay, pale-blue makeup on the preserved adult face, long pale-blue canonical character wig, broad white witch hat and layered white robe; four well-separated elegant arms with natural visible hands, two folded lightly at waist and two holding small cup and gesturing. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-elden-ring-leo",
+      "value": "theme-elden-ring-leo",
+      "theme": "elden-ring",
+      "character": "leo",
+      "label": "Blaidd",
+      "description": "Blaidd full wolf-head cosplay mask with grey realistic fur, compact normal adult human torso, dark weathered silver armor, fur-trimmed cloak; relaxed protective stance, one hand resting at sword belt and other carrying a mug, mask covers entire human face",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Blaidd cosplay from Elden Ring. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: Blaidd full wolf-head cosplay mask with grey realistic fur, compact normal adult human torso, dark weathered silver armor, fur-trimmed cloak; relaxed protective stance, one hand resting at sword belt and other carrying a mug, mask covers entire human face. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-minecraft",
+      "theme": "minecraft",
+      "label": "Minecraft • Block village taproom",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Minecraft • Block village taproom. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: distinctively cubic oak-plank village tavern, block stone hearth, cubic bottle shelves, warm lanterns, green grass-block village and mountains outside squared windows, pixel-pattern woven rugs; painted illustration with square geometry rather than photographic 3D. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-minecraft-noa",
+      "value": "theme-minecraft-noa",
+      "theme": "minecraft",
+      "character": "noa",
+      "label": "Alex",
+      "description": "orange-red shoulder-length hair swept to one side, green short-sleeve shirt, brown pants, pixel-square sewn textile details and block-shaped copper mug; normal adult feminine silhouette, one hand on hip and other offering mug",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Alex cosplay from Minecraft. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: orange-red shoulder-length hair swept to one side, green short-sleeve shirt, brown pants, pixel-square sewn textile details and block-shaped copper mug; normal adult feminine silhouette, one hand on hip and other offering mug. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-minecraft-leo",
+      "value": "theme-minecraft-leo",
+      "theme": "minecraft",
+      "character": "leo",
+      "label": "Steve",
+      "description": "short dark brown square-cut hair, clean shaven, cyan tee and indigo jeans, square pixel seams, compact square pickaxe clipped at waist; normal human adult silhouette, relaxed leaning torso, both hands loosely holding a cubic mug",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Steve cosplay from Minecraft. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: short dark brown square-cut hair, clean shaven, cyan tee and indigo jeans, square pixel seams, compact square pickaxe clipped at waist; normal human adult silhouette, relaxed leaning torso, both hands loosely holding a cubic mug. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-skyrim",
+      "theme": "skyrim",
+      "label": "Skyrim • Whiterun mead hall",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Skyrim • Whiterun mead hall. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: Whiterun Nordic timber mead hall, dragon-head carved rafters, roaring hearth, mead bottles, antler decoration, stone foundations, snowy mountains and distant Dragonsreach outside window. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-skyrim-noa",
+      "value": "theme-skyrim-noa",
+      "theme": "skyrim",
+      "character": "noa",
+      "label": "Dragonborn shieldmaiden",
+      "description": "long natural blonde hair in two warrior braids, iron and brown leather Nordic armor with practical shoulder plates and fur trim, dragon amulet, no helmet; confident stance, one hand on belt and other raising mead cup",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Dragonborn shieldmaiden cosplay from Skyrim. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: long natural blonde hair in two warrior braids, iron and brown leather Nordic armor with practical shoulder plates and fur trim, dragon amulet, no helmet; confident stance, one hand on belt and other raising mead cup. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-skyrim-leo",
+      "value": "theme-skyrim-leo",
+      "theme": "skyrim",
+      "character": "leo",
+      "label": "Dragonborn warrior",
+      "description": "iconic iron horned Skyrim helmet, long dark-blond hair and short beard, iron breastplate and leather fur-trim armor; broad compact face, normal neck, three-quarter standing pose, one hand on waist and other holding tankard",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Dragonborn warrior cosplay from Skyrim. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: iconic iron horned Skyrim helmet, long dark-blond hair and short beard, iron breastplate and leather fur-trim armor; broad compact face, normal neck, three-quarter standing pose, one hand on waist and other holding tankard. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-cyberpunk-2077",
+      "theme": "cyberpunk-2077",
+      "label": "Cyberpunk 2077 • Night City lounge",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Cyberpunk 2077 • Night City lounge. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: Night City Afterlife-style industrial cocktail bar, turquoise neon edging, orange overhead lights, exposed pipes, bottles and chrome taps, distinct futuristic skyline with dense illuminated high-rise signage silhouettes through window, no readable words. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-cyberpunk-2077-noa",
+      "value": "theme-cyberpunk-2077-noa",
+      "theme": "cyberpunk-2077",
+      "character": "noa",
+      "label": "V • female",
+      "description": "short asymmetrical natural-dark bob with one side shaved, subtle facial cybernetic seams, black leather Samurai-style jacket with red lining, dark tank top and utility pants; hands open adjusting jacket lapels, relaxed assertive hips",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing V • female cosplay from Cyberpunk 2077. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: short asymmetrical natural-dark bob with one side shaved, subtle facial cybernetic seams, black leather Samurai-style jacket with red lining, dark tank top and utility pants; hands open adjusting jacket lapels, relaxed assertive hips. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-cyberpunk-2077-leo",
+      "value": "theme-cyberpunk-2077-leo",
+      "theme": "cyberpunk-2077",
+      "character": "leo",
+      "label": "V • male",
+      "description": "natural black undercut with swept-back top, clean-shaven angular compact face, facial cybernetic seam, dark bomber with high illuminated red collar, black shirt and utility belt; one hand holding lowball glass at waist and other tucked into pocket",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing V • male cosplay from Cyberpunk 2077. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: natural black undercut with swept-back top, clean-shaven angular compact face, facial cybernetic seam, dark bomber with high illuminated red collar, black shirt and utility belt; one hand holding lowball glass at waist and other tucked into pocket. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-cs-2",
+      "theme": "cs-2",
+      "label": "Counter-Strike 2 • Tactical clubhouse",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Counter-Strike 2 • Tactical clubhouse. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: dusty Mediterranean tactical-team clubhouse bar inspired by Dust II, sandstone arches, blue shutters, sunlit courtyard, wall map without text, metal equipment lockers and tasteful team patches, beer taps and bottles, calm empty room. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-cs-2-noa",
+      "value": "theme-cs-2-noa",
+      "theme": "cs-2",
+      "character": "noa",
+      "label": "Agent Ava",
+      "description": "brown hair in tight low bun, navy counter-terrorist uniform, ballistic vest, headset and navy cap, gloves and utility belt, no exposed skin aside from face; poised watchful stance, holding a mug with both hands",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Agent Ava cosplay from Counter-Strike 2. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: brown hair in tight low bun, navy counter-terrorist uniform, ballistic vest, headset and navy cap, gloves and utility belt, no exposed skin aside from face; poised watchful stance, holding a mug with both hands. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-cs-2-leo",
+      "value": "theme-cs-2-leo",
+      "theme": "cs-2",
+      "character": "leo",
+      "label": "Counter-terrorist operator",
+      "description": "black ballistic helmet with clear raised visor, close-cropped dark hair visible at sides, clean shaven, navy tactical uniform and vest, radio, gloves; upright calm stance, one hand on vest strap and other at belt, no weapon pointed toward viewer",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Counter-terrorist operator cosplay from Counter-Strike 2. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: black ballistic helmet with clear raised visor, close-cropped dark hair visible at sides, clean shaven, navy tactical uniform and vest, radio, gloves; upright calm stance, one hand on vest strap and other at belt, no weapon pointed toward viewer. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-assassins-creed",
+      "theme": "assassins-creed",
+      "label": "Assassin’s Creed • Venetian hidden tavern",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Assassin’s Creed • Venetian hidden tavern. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: Venetian Renaissance tavern, arched marble pillars, red drapery, old map and subtle assassin crest carving, warm candlelight, gondola canal and Renaissance roofs beyond balcony window. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-assassins-creed-noa",
+      "value": "theme-assassins-creed-noa",
+      "theme": "assassins-creed",
+      "character": "noa",
+      "label": "Evie Frye",
+      "description": "dark chestnut hair in neat Victorian bun with face-framing strands, black and burgundy tailored assassin coat, high white collar, fitted vest and leather bracers; poised three-quarter stance, gloved hand lightly pinching coat lapel and other holding small glass",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Evie Frye cosplay from Assassin’s Creed. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: dark chestnut hair in neat Victorian bun with face-framing strands, black and burgundy tailored assassin coat, high white collar, fitted vest and leather bracers; poised three-quarter stance, gloved hand lightly pinching coat lapel and other holding small glass. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-assassins-creed-leo",
+      "value": "theme-assassins-creed-leo",
+      "theme": "assassins-creed",
+      "character": "leo",
+      "label": "Ezio Auditore",
+      "description": "iconic white pointed assassin hood with human face fully visible, white Renaissance robes, red sash, brown leather harness and ornate steel bracer; mature compact handsome face with short dark beard, one hand across chest near harness and other relaxed at hip",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Ezio Auditore cosplay from Assassin’s Creed. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: iconic white pointed assassin hood with human face fully visible, white Renaissance robes, red sash, brown leather harness and ornate steel bracer; mature compact handsome face with short dark beard, one hand across chest near harness and other relaxed at hip. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-watch-dogs",
+      "theme": "watch-dogs",
+      "label": "Watch Dogs • Chicago hacker bar",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Watch Dogs • Chicago hacker bar. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: rainy Chicago hacker hideout bar, dark brick, server racks at edges, small surveillance screens without text, cyan LED shelves, whiskey glassware, city elevated tracks visible through rain-streaked window. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-watch-dogs-noa",
+      "value": "theme-watch-dogs-noa",
+      "theme": "watch-dogs",
+      "character": "noa",
+      "label": "Sitara",
+      "description": "long natural dark hair partly in loose topknot with shaved side, dark cropped street jacket, charcoal sleeveless tee, patterned black leggings, black bandana loosely at neck, warm eyeliner; casual leaning posture, one hand holding smartphone and other touching headphone earcup",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Sitara cosplay from Watch Dogs. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: long natural dark hair partly in loose topknot with shaved side, dark cropped street jacket, charcoal sleeveless tee, patterned black leggings, black bandana loosely at neck, warm eyeliner; casual leaning posture, one hand holding smartphone and other touching headphone earcup. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-watch-dogs-leo",
+      "value": "theme-watch-dogs-leo",
+      "theme": "watch-dogs",
+      "character": "leo",
+      "label": "Aiden Pearce",
+      "description": "brown cap with small stitched geometric emblem, dark brown trench coat, high-collar dark sweater, faded dark jeans, lower-face scarf lowered to neck so Leo face remains visible, short brown stubble; one hand holding phone down at waist and other in trench pocket",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Aiden Pearce cosplay from Watch Dogs. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: brown cap with small stitched geometric emblem, dark brown trench coat, high-collar dark sweater, faded dark jeans, lower-face scarf lowered to neck so Leo face remains visible, short brown stubble; one hand holding phone down at waist and other in trench pocket. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-sleeping-dogs",
+      "theme": "sleeping-dogs",
+      "label": "Sleeping Dogs • Hong Kong night bar",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Sleeping Dogs • Hong Kong night bar. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: Hong Kong night bar, mahogany counter, red lanterns, green ceramic bottles, jade details, rain-reflecting neon street and harbor skyline outside window, polished modern Cantonese interior, no readable signs. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-sleeping-dogs-noa",
+      "value": "theme-sleeping-dogs-noa",
+      "theme": "sleeping-dogs",
+      "character": "noa",
+      "label": "Hong Kong detective",
+      "description": "natural black sleek ponytail, charcoal tailored blazer over ivory shirt, fitted dark trousers, subtle detective badge at belt; professional feminine police-detective cosplay, hands gently arranging cuff, adult elegant face",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Hong Kong detective cosplay from Sleeping Dogs. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: natural black sleek ponytail, charcoal tailored blazer over ivory shirt, fitted dark trousers, subtle detective badge at belt; professional feminine police-detective cosplay, hands gently arranging cuff, adult elegant face. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-sleeping-dogs-leo",
+      "value": "theme-sleeping-dogs-leo",
+      "theme": "sleeping-dogs",
+      "character": "leo",
+      "label": "Wei Shen",
+      "description": "short natural black textured hair, clean shaven, black short-sleeved tee, dark jeans, visible dragon-inspired forearm tattoos, compact adult face; athletic normal torso, one forearm across waist and other hand holding lowball glass",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Wei Shen cosplay from Sleeping Dogs. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: short natural black textured hair, clean shaven, black short-sleeved tee, dark jeans, visible dragon-inspired forearm tattoos, compact adult face; athletic normal torso, one forearm across waist and other hand holding lowball glass. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-detroit",
+      "theme": "detroit",
+      "label": "Detroit: Become Human • Android lounge",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Detroit: Become Human • Android lounge. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: near-future Detroit minimalist cocktail lounge, white geometric walls, cyan luminous rails, sleek glass bottles, autonomous cars and snowy urban skyline through broad window, subtle android triangle motif on glassware. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-detroit-noa",
+      "value": "theme-detroit-noa",
+      "theme": "detroit",
+      "character": "noa",
+      "label": "Kara",
+      "description": "short natural chestnut pixie bob, blue-and-white android uniform with narrow teal trim, temple LED ring and triangular chest emblem, fitted trousers; gentle attentive stance, both palms open holding a serving tray at waist",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Kara cosplay from Detroit: Become Human. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: short natural chestnut pixie bob, blue-and-white android uniform with narrow teal trim, temple LED ring and triangular chest emblem, fitted trousers; gentle attentive stance, both palms open holding a serving tray at waist. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-detroit-leo",
+      "value": "theme-detroit-leo",
+      "theme": "detroit",
+      "character": "leo",
+      "label": "Connor",
+      "description": "neatly side-parted dark brown straight hair, clean-shaven, grey tailored RK800-inspired suit with black tie and blue armband, triangle emblem and temple LED; compact normal face, upright professional stance, one hand checking tie while other holds a small coin",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Connor cosplay from Detroit: Become Human. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: neatly side-parted dark brown straight hair, clean-shaven, grey tailored RK800-inspired suit with black tie and blue armband, triangle emblem and temple LED; compact normal face, upright professional stance, one hand checking tie while other holds a small coin. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-neighbours-from-hell",
+      "theme": "neighbours-from-hell",
+      "label": "Neighbours from Hell • Prankster pub",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Neighbours from Hell • Prankster pub. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: cartoon suburban pub inspired by a troublesome neighbor’s house, warm orange walls, crooked family pictures, comic mousetrap discreetly near snack bowl, flower wallpaper, garden beyond window, intact inviting bar, humorous painterly look. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-neighbours-from-hell-noa",
+      "value": "theme-neighbours-from-hell-noa",
+      "theme": "neighbours-from-hell",
+      "character": "noa",
+      "label": "Prankster hostess",
+      "description": "natural auburn hair in jaunty short bob, yellow collared blouse, burgundy vest and dark jeans, small playful eyebrow makeup; adult Noa as mischievous television prank-show hostess, one finger raised to lips and other holding rolled notepad",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Prankster hostess cosplay from Neighbours from Hell. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: natural auburn hair in jaunty short bob, yellow collared blouse, burgundy vest and dark jeans, small playful eyebrow makeup; adult Noa as mischievous television prank-show hostess, one finger raised to lips and other holding rolled notepad. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-neighbours-from-hell-leo",
+      "value": "theme-neighbours-from-hell-leo",
+      "theme": "neighbours-from-hell",
+      "character": "leo",
+      "label": "Woody",
+      "description": "signature swept-up natural brown Woody quiff, pale mint-green shirt, purple sleeveless sweater vest and dark blue trousers; normal adult Leo facial proportions, sly friendly grin, one hand behind back and other pointing playfully to small prank notepad",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/AppData/Local/Temp/codex-clipboard-4fcf6502-dc8c-4823-a519-89facca5c6c4.png",
+      "prompt": "Edit this existing transparent painted 2D adult male Leo costume sprite. Correct ONLY the raised hand and its wrist on the RIGHT SIDE OF THE IMAGE (the character's anatomical LEFT hand), plus the notepad grip. The current hand is anatomically reversed and the notepad is not properly held. Replace it with a clearly correct LEFT hand holding the lower-left edge of the spiral notepad: palm rotated toward the notepad, LEFT thumb visible resting naturally on the front cover near its lower left edge, four fingers curled around and behind the edge, coherent knuckles and normal wrist continuous with the forearm. Remove the pointing index-finger gesture entirely; use a simple believable gripping hand. The spiral notepad and yellow pencil stay together and are physically supported by that hand. Preserve exact adult facial identity, hair, beard, head angle, pale-green shirt, purple argyle vest, blue trousers, torso silhouette, other arm behind back, existing framing and painterly style. No additional arms or hands. Keep genuinely transparent alpha background and all existing subject proportions. One isolated figure, no scenery or lettering.",
+      "originalPrompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Woody cosplay from Neighbours from Hell. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: signature swept-up natural brown Woody quiff, pale mint-green shirt, purple sleeveless sweater vest and dark blue trousers; normal adult Leo facial proportions, sly friendly grin, one hand behind back and other pointing playfully to small prank notepad. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait.",
+      "originalReference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png"
+    },
+    {
+      "key": "interior-gta",
+      "theme": "gta",
+      "label": "Grand Theft Auto • Vice City beach bar",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Grand Theft Auto • Vice City beach bar. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: 1980s Vice City beach cocktail bar, pastel pink and turquoise Art Deco, flamingo ornament, chrome stools, rum bottles, Miami palms and ocean sunset outside huge windows, no game logo or text. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-gta-noa",
+      "value": "theme-gta-noa",
+      "theme": "gta",
+      "character": "noa",
+      "label": "Vice City hostess",
+      "description": "long natural honey-blonde blowout waves, stylish purple fitted evening mini-dress and gold hoop earrings, tasteful adult glamorous cocktail hostess look; hand resting on hip and other holding martini glass delicately",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Vice City hostess cosplay from Grand Theft Auto. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: long natural honey-blonde blowout waves, stylish purple fitted evening mini-dress and gold hoop earrings, tasteful adult glamorous cocktail hostess look; hand resting on hip and other holding martini glass delicately. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-gta-leo",
+      "value": "theme-gta-leo",
+      "theme": "gta",
+      "character": "leo",
+      "label": "Tommy Vercetti",
+      "description": "short dark slicked-back hair, clean-shaven compact face, iconic turquoise Hawaiian shirt with dark palm patterns, blue jeans and gold chain; relaxed confident three-quarter torso, one hand tucked into jeans pocket and other carrying a cocktail",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Tommy Vercetti cosplay from Grand Theft Auto. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: short dark slicked-back hair, clean-shaven compact face, iconic turquoise Hawaiian shirt with dark palm patterns, blue jeans and gold chain; relaxed confident three-quarter torso, one hand tucked into jeans pocket and other carrying a cocktail. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-stellar-blade",
+      "theme": "stellar-blade",
+      "label": "Stellar Blade • Xion lounge",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Stellar Blade • Xion lounge. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: Xion-inspired desert survivor lounge, weathered futuristic panels, amber hanging lamps, green hydroponic foliage, old-tech drink dispensers, ruined desert metropolis seen through angular opening, stylish elegant sci-fi bar. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-stellar-blade-noa",
+      "value": "theme-stellar-blade-noa",
+      "theme": "stellar-blade",
+      "character": "noa",
+      "label": "EVE",
+      "description": "signature long glossy natural-black high ponytail, green and black glossy futuristic Planet Diving Suit with white paneling and practical fitted silhouette, small hair accessory; adult Noa face preserved, poised athletic stance with one hand at waist and other open near side",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing EVE cosplay from Stellar Blade. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: signature long glossy natural-black high ponytail, green and black glossy futuristic Planet Diving Suit with white paneling and practical fitted silhouette, small hair accessory; adult Noa face preserved, poised athletic stance with one hand at waist and other open near side. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-stellar-blade-leo",
+      "value": "theme-stellar-blade-leo",
+      "theme": "stellar-blade",
+      "character": "leo",
+      "label": "Adam",
+      "description": "medium natural black hair loosely brushed back with center part, light stubble, worn brown cropped jacket over dark utilitarian shirt, grey utility trousers with straps; compact natural Leo face, relaxed stance examining small mechanical gadget held at waist",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Adam cosplay from Stellar Blade. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: medium natural black hair loosely brushed back with center part, light stubble, worn brown cropped jacket over dark utilitarian shirt, grey utility trousers with straps; compact natural Leo face, relaxed stance examining small mechanical gadget held at waist. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-repo",
+      "theme": "repo",
+      "label": "R.E.P.O. • Salvage depot bar",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for R.E.P.O. • Salvage depot bar. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: spooky salvage-depot breakroom bar, abandoned mansion fragments, extraction trolley at side, industrial hazard stripes, warm task light against cold dark corners, glass bottles and salvaged silverware, cartoon horror atmosphere without gore. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-repo-noa",
+      "value": "theme-repo-noa",
+      "theme": "repo",
+      "character": "noa",
+      "label": "Salvage robot • female",
+      "description": "recognizable R.E.P.O. rounded orange salvage robot costume on adult feminine body, full rounded mechanical helmet with two large circular white eyes, orange shell torso and mechanical gloves, narrow practical limbs; full mask hides face, one hand resting on toolbelt and other waving",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Salvage robot • female cosplay from R.E.P.O.. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: recognizable R.E.P.O. rounded orange salvage robot costume on adult feminine body, full rounded mechanical helmet with two large circular white eyes, orange shell torso and mechanical gloves, narrow practical limbs; full mask hides face, one hand resting on toolbelt and other waving. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-repo-leo",
+      "value": "theme-repo-leo",
+      "theme": "repo",
+      "character": "leo",
+      "label": "Salvage robot • male",
+      "description": "recognizable R.E.P.O. rounded yellow salvage robot costume on adult masculine body, full rounded mechanical helmet with two large circular white eyes, yellow shell torso, mechanical gloves and salvage belt; full mask hides face, shoulders level, hands holding small salvaged goblet at waist",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Salvage robot • male cosplay from R.E.P.O.. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: recognizable R.E.P.O. rounded yellow salvage robot costume on adult masculine body, full rounded mechanical helmet with two large circular white eyes, yellow shell torso, mechanical gloves and salvage belt; full mask hides face, shoulders level, hands holding small salvaged goblet at waist. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-among-us",
+      "theme": "among-us",
+      "label": "Among Us • Skeld cafeteria bar",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Among Us • Skeld cafeteria bar. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: Skeld spaceship cafeteria converted into bar, blue-grey bulkheads, rounded spaceship windows showing stars, cyan overhead lamps, red emergency button under glass at side, drink dispensers, compact task panels without text. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-among-us-noa",
+      "value": "theme-among-us-noa",
+      "theme": "among-us",
+      "character": "noa",
+      "label": "Crewmate • red",
+      "description": "recognizable red Among Us astronaut cosplay adapted to normal adult feminine silhouette, rounded red full helmet and broad opaque cyan visor, red fitted space suit, backpack glimpsed behind shoulder, gloves; full visor hides face, one hand presenting a juice cup and other at waist",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Crewmate • red cosplay from Among Us. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: recognizable red Among Us astronaut cosplay adapted to normal adult feminine silhouette, rounded red full helmet and broad opaque cyan visor, red fitted space suit, backpack glimpsed behind shoulder, gloves; full visor hides face, one hand presenting a juice cup and other at waist. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-among-us-leo",
+      "value": "theme-among-us-leo",
+      "theme": "among-us",
+      "character": "leo",
+      "label": "Crewmate • cyan",
+      "description": "recognizable cyan Among Us astronaut cosplay adapted to normal adult masculine silhouette, rounded cyan full helmet and broad opaque cyan visor, cyan space suit, compact backpack, gloves; full visor hides face, one hand giving relaxed thumbs-up and other holding a small mug",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Crewmate • cyan cosplay from Among Us. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: recognizable cyan Among Us astronaut cosplay adapted to normal adult masculine silhouette, rounded cyan full helmet and broad opaque cyan visor, cyan space suit, compact backpack, gloves; full visor hides face, one hand giving relaxed thumbs-up and other holding a small mug. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "interior-borderlands",
+      "theme": "borderlands",
+      "label": "Borderlands • Pandora saloon",
+      "kind": "background",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "prompt": "Create ONE new unique widescreen 16:9 painted 2D game bar background for Borderlands • Pandora saloon. Reference image is composition and polished painterly medium ONLY; invent a completely different architecture, lighting and decor for this theme: Pandora desert saloon, hand-painted bold ink outlines, rusty corrugated metal, orange wasteland outside broken-framed windows, vault-symbol wall carving, scavenged bottle racks, dusty amber lamps, coherent cel-shaded illustrated game atmosphere. Eye-level straight-on view, functioning stocked bar with attractive bottles and drinking glasses on shelves, long serving counter across lower quarter, open clear central space for bartender overlays, small stools along bottom edge. Strong readable layered depth. No characters, no people, no UI, no readable labels, no montage, no giant props blocking center, no generic reused neon crescent wall. Landscape image."
+    },
+    {
+      "key": "theme-borderlands-noa",
+      "value": "theme-borderlands-noa",
+      "theme": "borderlands",
+      "character": "noa",
+      "label": "Lilith",
+      "description": "signature natural copper-red asymmetrical short hair, warm smoky eyeliner, orange-yellow cropped utility vest over fitted dark top, tan cargo pants, fingerless gloves, glowing blue Siren tattoos on one arm; confident adult posture, tattooed hand slightly open and other on belt",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult female Noa wearing Lilith cosplay from Borderlands. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: signature natural copper-red asymmetrical short hair, warm smoky eyeliner, orange-yellow cropped utility vest over fitted dark top, tan cargo pants, fingerless gloves, glowing blue Siren tattoos on one arm; confident adult posture, tattooed hand slightly open and other on belt. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    },
+    {
+      "key": "theme-borderlands-leo",
+      "value": "theme-borderlands-leo",
+      "theme": "borderlands",
+      "character": "leo",
+      "label": "Mordecai",
+      "description": "long natural black dreadlocks tied back, dark goggles pushed up onto forehead, red-brown sleeveless leather ranger vest over dark fitted shirt, grey cargo trousers, fingerless gloves; lean adult normal face, one elbow bent near shoulder with gloved hand poised as bird perch, other hand at hip",
+      "kind": "costume",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/leo-costume-face-reference.png",
+      "prompt": "Create exactly ONE polished painted 2D game bartender costume sprite, portrait orientation, isolated on genuinely transparent alpha background. Character is adult male Leo wearing Mordecai cosplay from Borderlands. Reference is FACE IDENTITY and painted rendering only, NOT hairstyle, clothing or pose. Preserve reference adult face identity under human cosplay, fair natural skin, compact natural face width, normal jaw and neck, natural proportions. Costume and unique hairstyle/pose: long natural black dreadlocks tied back, dark goggles pushed up onto forehead, red-brown sleeveless leather ranger vest over dark fitted shirt, grey cargo trousers, fingerless gloves; lean adult normal face, one elbow bent near shoulder with gloved hand poised as bird perch, other hand at hip. One standing pose only, framed complete head through mid-thigh, all hands and costume visible within image, comfortable bartender stance, cohesive luxurious painterly illustration, richly detailed fabrics, normal human proportions except explicitly requested helmet/prosthetics. Do not reuse the reference hairstyle unless costume asks. No horizontal stretched face, no elongated neck, no squeezed torso, no huge weapon, no collage, no multiple poses, no text, no scenery, no floor shadow, no background. Transparent cutout, vertical portrait."
+    }
+  ]
+}

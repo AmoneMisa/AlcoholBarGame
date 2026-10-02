@@ -1,0 +1,58 @@
+{
+  "rig": "atelier-adult-man-01",
+  "durationSeconds": 6,
+  "seamless": true,
+  "breathing": {
+    "scaleY": [
+      1,
+      1.002,
+      1
+    ],
+    "pivot": [
+      300,
+      943
+    ]
+  },
+  "hair": {
+    "rotationDegrees": [
+      -0.12,
+      0.12,
+      -0.12
+    ],
+    "pivot": [
+      300,
+      112
+    ]
+  },
+  "fabric": {
+    "scaleX": [
+      1,
+      1.001,
+      1
+    ],
+    "pivot": [
+      300,
+      422
+    ]
+  },
+  "accessories": {
+    "rotationDegrees": [
+      -0.15,
+      0.15,
+      -0.15
+    ],
+    "pivot": [
+      300,
+      236
+    ]
+  },
+  "blink": {
+    "intervalMs": [
+      2800,
+      6700
+    ],
+    "durationMs": 150
+  },
+  "reducedMotion": "disabled",
+  "runtime": "CharacterStudio.vue; SVG exports are static"
+}

@@ -1,3 +1,5 @@
+import { eventAvailability } from '../domain/eventAvailability';
+import {redeemPromo} from '../telegram/api';
 import { computed, ref, toRaw } from 'vue';
 import { statValue } from '../domain/achievementStats';
 import { companionBonus, emptyCompanions } from '../sim/companions';
@@ -86,6 +88,17 @@ export const useGameStore = defineStore('game', () => {
   const friends = ref<FriendSummary[]>([]);
   const visitedFriend = ref<FriendBar>();
   const rewardReport = ref<RewardReport>();
+  const preparationCustomerId = ref('');
+  const tipJar = computed(() => state.value.tipJar ?? 0);
+  const collectTips = () => dispatch({ type: 'collectTips' });
+  function openPreparation(id: string) {
+    const customer = state.value.customers.find(customer => customer.id === id);
+    if (!customer?.orderRevealed) return;
+    if (customer.orderKind === 'bottle') { openConversation(id); return; }
+    selectCustomer(id);
+    closeConversation();
+    preparationCustomerId.value = id;
+  }
   const dailyOpen = ref(false);
   let reportId = 0;
   const serverOffset = ref(0);
@@ -137,6 +150,7 @@ export const useGameStore = defineStore('game', () => {
   const languageStats = computed(() => state.value.languageStats);
   const deliveryOrders = computed(() => state.value.deliveryOrders);
   const tradeLog = computed(() => state.value.tradeLog);
+  const seatArrivals = computed(() => (state.value.seatNextCustomerAt ?? []).map((at, seat) => ({ seat, at, cost: arrivalSkipCrystalCost(at-nowMs.value), countdown: formatCountdown(Math.max(0, (at-nowMs.value)/1000)) })).filter(item => item.at > 0));
   const nextCustomerAt = computed(() => state.value.nextCustomerAt);
   const vipCooldownUntil = computed(() => state.value.vipCooldownUntil);
   const ownedCosmeticIds = computed(() => state.value.ownedCosmeticIds ?? []);
@@ -144,6 +158,7 @@ export const useGameStore = defineStore('game', () => {
   const cosmeticRouletteAvailable = computed(() => state.value.cosmeticRouletteKey !== today.value);
   const cosmeticRouletteResult = computed(() => state.value.cosmeticRouletteResult);
   const loot = computed(() => state.value.loot);
+  const availableEvents = computed(() => eventAvailability(state.value, nowMs.value));
   // Progress of an achievement counter (counted ones and ones read from what the player owns).
   const achievementStat = (stat: StatId) => statValue(state.value, stat);
   // The player profile (guests served, English, favourite bar, achievements) and the achievements the player may show.
@@ -204,7 +219,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: mode.value !== 'online' });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson', 'spinCosmeticRoulette', 'giveAshtray', 'cleanAshtrays', 'pitchStart', 'pitchAsk', 'pitchCancel', 'hireStaff', 'upgradeStaff', 'giveWater', 'callTaxi', 'askToLeave', 'situationChoice', 'reportIssue', 'discardStock', 'openBox', 'pickReward', 'drawStyle', 'claimLeaderboardReward']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['collectTips', 'serveFood', 'say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson', 'spinCosmeticRoulette', 'giveAshtray', 'cleanAshtrays', 'pitchStart', 'pitchAsk', 'pitchCancel', 'hireStaff', 'upgradeStaff', 'giveWater', 'callTaxi', 'askToLeave', 'situationChoice', 'reportIssue', 'discardStock', 'openBox', 'pickReward', 'drawStyle', 'claimLeaderboardReward']);
 
   function saveOffline() {
     if (mode.value === 'online') return;
@@ -220,11 +235,13 @@ export const useGameStore = defineStore('game', () => {
 
   // The popup that tells the player what an action paid. Only actions that can give something are reported.
   const REWARD_TITLES: Partial<Record<GameAction['type'], string>> = {
-    serve: 'Drink served', autoServe: 'Drink served', sellBottle: 'Bottle sold', claimDaily: 'Daily reward', completeDailyLesson: 'Lesson complete',
-    spinCosmeticRoulette: 'Style draw', sell: 'Stock sold', exchangeCrystals: 'Crystals exchanged', situationChoice: 'Guest situation resolved'
+    serve: 'Drink served', autoServe: 'Drink served', sellBottle: 'Bottle sold', collectTips: 'Tips collected', serveFood: 'Food served', claimDaily: 'Daily reward', completeDailyLesson: 'Lesson complete',
+    spinCosmeticRoulette: 'Style draw', sell: 'Stock sold', exchangeCrystals: 'Crystals exchanged', situationChoice: 'Guest situation resolved',
+    openBox: 'Chest opened', pickReward: 'Chest reward', drawStyle: 'Style draw', claimSpark: 'Season reward', craftSkin: 'New style', craftStyle: 'New style',
+    claimQuest: 'Quest complete', claimAchievement: 'Achievement unlocked', claimLeaderboardReward: 'Weekly reward', recruitCompanion: 'Welcome to your Circle', buyInterior: 'New background', buyStyle: 'New style'
   };
   function showRewards(title: string, lines: RewardLine[]) {
-    if (lines.length) rewardReport.value = { id: ++reportId, title, lines };
+    if (lines.length) rewardReport.value = { id: ++reportId, title, lines, celebration: !['Drink served', 'Bottle sold', 'Stock sold', 'Crystals exchanged', 'Guest situation resolved', 'Tips collected', 'Food served'].includes(title) };
   }
   function reportAction(action: GameAction, before: Snapshot) {
     const title = REWARD_TITLES[action.type];
@@ -320,6 +337,15 @@ export const useGameStore = defineStore('game', () => {
 
   const friendPrestige = ref(0);
   const friendError = (error: unknown, fallback: string) => { message.value = (error as Error)?.message || fallback; return false; };
+  async function redeemPromoCode(code:string) {
+    if (mode.value !== 'online') throw new Error('Connect to your account to redeem a promo code.');
+    const before = stateSnapshot(state.value);
+    const result = await redeemPromo(code);
+    if (!result.ok) throw new Error(result.error || 'Could not redeem this code.');
+    if (result.state) adoptServerState(result.state,result.serverTime,result.message);
+    showRewards('Promo code reward',rewardLines(before,stateSnapshot(state.value),result.message));
+    return result.message || 'Rewards received.';
+  }
   async function loadFriends() {
     if (mode.value !== 'online') { friends.value = []; return false; }
     try {
@@ -391,7 +417,7 @@ export const useGameStore = defineStore('game', () => {
     const before = state.value.customers.length;
     const draft = state.value;
     advanceClock(draft, { now, spawnCustomers: mode.value !== 'online' });
-    const arrivalDue = !draft.customers.length && draft.nextCustomerAt > 0 && now >= draft.nextCustomerAt;
+    const arrivalDue = draft.nextCustomerAt > 0 && now >= draft.nextCustomerAt;
     if (draft.customers.length !== before || arrivalDue) {
       message.value = draft.message;
       if (draft.customers.length > before) playSfx('guest');
@@ -408,6 +434,7 @@ export const useGameStore = defineStore('game', () => {
   function welcomeNextCustomer() {
     if (mode.value === 'online') return dispatch({ type: 'tick' });
     state.value.nextCustomerAt = clientNow();
+    if (state.value.seatNextCustomerAt) { const seat = state.value.seatNextCustomerAt.findIndex(time => time > 0); if (seat >= 0) state.value.seatNextCustomerAt[seat] = clientNow(); }
     tickGameClock();
     return true;
   }
@@ -565,7 +592,7 @@ export const useGameStore = defineStore('game', () => {
     ? dispatch({ type: 'setDecor', key: 'interior', value: interiorId }) : buyInterior(interiorId);
   const bottleCrystalCost = (productId: string) => bottleRestockCrystalCost(ALCOHOL_PRODUCTS.find((item) => item.id === productId)!);
   const buyBottleStock = (productId: string, quantity = 1) => dispatch({ type: 'buyBottleStock', productId, quantity });
-  const expediteCustomer = () => dispatch({ type: 'expediteCustomer' });
+  const expediteCustomer = (seatId?: number) => dispatch({ type: 'expediteCustomer', seatId });
   const claimDailyGift = () => dispatch({ type: 'claimDaily' });
   const completeDailyLesson = (lessonId: string, answer: string) => dispatch({ type: 'completeDailyLesson', lessonId, answer });
   const exchangeCrystals = (crystals: number) => dispatch({ type: 'exchangeCrystals', crystals });
@@ -686,7 +713,8 @@ export const useGameStore = defineStore('game', () => {
 
   const act = (action: GameAction) => dispatch(action);
   return {
-    topUpPreview, circle, crewBonus, recruitCompanion, giveKeepsake, buyKeepsake, assignCompanion, dismissCompanion, spotlightCompanion, levelUpCompanion, achievementStat, profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, act, visibleInventory, connectEpoch,
+    preparationCustomerId, openPreparation, tipJar, collectTips,
+    topUpPreview, circle, crewBonus, recruitCompanion, giveKeepsake, buyKeepsake, assignCompanion, dismissCompanion, spotlightCompanion, levelUpCompanion, achievementStat, profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, availableEvents, act, visibleInventory, connectEpoch,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, sessionReady, ownedInteriorIds, barBackground, barInteriorStyle,
@@ -694,7 +722,7 @@ export const useGameStore = defineStore('game', () => {
     inventories, inventory, bottleInventories, bottleInventory, currentMix, shaken, customers, activeCustomerId, customer, hasCustomer, recipe, mixJudge,
     knownRecipeIds, recipeUnlockSources, knownRecipes, lockedRecipes, dailyGiftAvailable, dailyGiftResult, loginStreak, upcomingLoginDay, dailyCoinReward, dailyCrystalReward,
     dailyLessons, dailyLessonCompletedIds, dailyLessonsComplete, dailyLessonResult, learningStreak, learningStreakForToday, learningBonusPercent, completeDailyLesson,
-    conversationCustomerId, languageStats, nextCustomerAt, nextCustomerInSeconds, nextCustomerCountdown, nextCustomerCrystalCost, vipCooldownUntil, orderCountdown, orderTimerPaused,
+    redeemPromoCode, conversationCustomerId, languageStats, seatArrivals, nextCustomerAt, nextCustomerInSeconds, nextCustomerCountdown, nextCustomerCrystalCost, vipCooldownUntil, orderCountdown, orderTimerPaused,
     message, market, selectedSupplier, transferTargetId, tradeLog, recipeCategory, filteredRecipes,
     pourBrands, brandOnShelf, shelfBrandsFor, setPourBrand,
     selectCustomer, addIngredient, resetMix, shakeCurrentMix, serveMix, tickPatience, tickGameClock, welcomeNextCustomer, offerSimilarOrder, rejectCustomer, buy, sell, switchBar, isBarOwned, nextBarPrice, barPurchaseLevel:BAR_PURCHASE_LEVEL, chooseStartingBar, buyBar, transferStock,
@@ -702,3 +730,4 @@ export const useGameStore = defineStore('game', () => {
     buyRecipe, recipePrice, buyInterior, buyStyle, chooseInterior, bottleCrystalCost, buyBottleStock, expediteCustomer, claimDailyGift, exchangeCrystals, giveAshtray, giveWater, callTaxi, pitchStart, pitchAsk, pitchCancel, topUp, tourSeen, setTour, staff, hireStaff, upgradeStaff, barEvent, offerChance, houseRules, ruleViolations, askToLeave, cleanAshtrays, ashtrays, situationOf, answerSituation, deliveryIssues, quarantine, lowGrade, reportIssue, discardStock, buyCrystalPack, buyingCrystals, starterPackAvailable, refreshDailyGift, openConversation, closeConversation, say, conversations, sellBottleToCustomer
   };
 });
+

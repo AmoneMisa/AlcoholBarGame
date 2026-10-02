@@ -6,11 +6,13 @@ import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars
 import { CHARACTER_ART, CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { generateCustomer } from '../domain/engine';
 import { BOND_STEPS, COMPANIONS, COMPANION_START_LEVEL, KEEPSAKE_IDS, LEGACY_COMPANION_IDS, MAX_BOND, bondLevel, companionSlots, levelCapForGrade } from '../domain/companions';
+import { EARNED_STARTER_COSTUMES } from '../data/cosmetics/styleSources';
 import { MAX_LEVEL, levelFor, levelPerks, xpForLevel } from '../domain/progression';
 import type { BottleInventoryItem, Customer, InventoryItem, RegionId } from '../domain/types';
 import { buildProfile, shortWish, type CustomerReply, type Fact } from '../domain/conversation/customerTalk';
 import type { BottleConversationFacts } from '../domain/conversation/bottleTalk';
 import { ensureSocial, rollSocial } from '../domain/social/generate';
+import { MAX_CUSTOMER_SEATS } from '../domain/customerTiming';
 import { createLoot, normalizeLoot, type LootState } from '../domain/lootState';
 
 // The complete, serializable game state of one player. The server owns it; the client only displays it
@@ -28,6 +30,7 @@ export type PopularityBoost = { kind: 'no-cooldown'; until: number } | { kind: '
 
 
 export interface PlayerState {
+  tipJar?: number;
   version: 1;
   // XP curve of this save (see migrateXpCurve); missing = the original, shallower curve.
   xpCurve?: number;
@@ -61,6 +64,7 @@ export interface PlayerState {
   activeCustomerId: string;
   conversationCustomerId?: string;
   nextCustomerAt: number;
+  seatNextCustomerAt?: number[];
   vipCooldownUntil: number;
   lastClockAt: number;
   deliveryOrders: DeliveryOrder[];
@@ -197,7 +201,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     version: 1,
     xpCurve: XP_CURVE_VERSION,
     regionId: 'new-york',
-    money: 600,
+    money: 600, tipJar: 0,
     crystals: 0,
     xp: 0,
     streak: 0,
@@ -260,6 +264,7 @@ export function migrateXpCurve(state: Pick<PlayerState, 'xp' | 'xpCurve'>) {
 }
 
 export function normalizePlayerState(state: PlayerState) {
+  state.tipJar = Number.isFinite(state.tipJar) ? Math.max(0, Math.round(state.tipJar! * 100) / 100) : 0;
   migrateXpCurve(state);
   state.crystals = Number.isFinite(state.crystals) && state.crystals >= 0 ? Math.floor(state.crystals) : 0;
   state.dailyLessonKey = typeof state.dailyLessonKey === 'string' ? state.dailyLessonKey : '';
@@ -323,6 +328,14 @@ export function normalizePlayerState(state: PlayerState) {
   // The training academy was removed: old saves drop its progress and any practice guest still at the bar.
   delete (state as { training?: unknown }).training;
   state.customers = state.customers.filter((guest) => !(guest as { training?: boolean }).training);
+  // Migrate the former sixth seat without dropping the guest currently being served.
+  if (state.customers.length > MAX_CUSTOMER_SEATS) {
+    const active = state.customers.find(guest => guest.id === state.activeCustomerId);
+    state.customers = state.customers.slice(0, MAX_CUSTOMER_SEATS);
+    if (active && !state.customers.includes(active)) state.customers[MAX_CUSTOMER_SEATS - 1] = active;
+    if (state.conversationCustomerId && !state.customers.some(guest => guest.id === state.conversationCustomerId)) state.conversationCustomerId = undefined;
+  }
+  if (state.seatNextCustomerAt) state.seatNextCustomerAt = state.seatNextCustomerAt.slice(0, MAX_CUSTOMER_SEATS);
   if (state.tour !== 'done' && state.tour !== 'skipped') delete state.tour;
   state.companions = normalizeCompanions(state.companions);
   // Servers belong to a bar. Older saves had one team: it stays in the bar that was being managed.
@@ -353,7 +366,10 @@ export function normalizePlayerState(state: PlayerState) {
     if ((bar.bartender as string) === 'base') bar.bartender = 'vest';
     // A painted style that is now earned or bought stays with whoever is already wearing it.
     const worn = cosmeticFor('bartender', bar.bartender, bar.bartenderCharacter);
-    if (worn?.character && !state.ownedCosmeticIds.includes(worn.id) && (REFERENCE_COSTUME_IDS as readonly string[]).includes(worn.value)) state.ownedCosmeticIds.push(worn.id);
+    if (worn?.character && !state.ownedCosmeticIds.includes(worn.id) && (REFERENCE_COSTUME_IDS as readonly string[]).includes(worn.value)) {
+      if ((EARNED_STARTER_COSTUMES as readonly string[]).includes(worn.value)) bar.bartender = 'vest';
+      else state.ownedCosmeticIds.push(worn.id);
+    }
     if (state.ownedBarIds.includes(region.id) && !state.ownedInteriorIds.includes(bar.interior)) {
       bar.interior = defaultInterior;
       if (!state.ownedInteriorIds.includes(defaultInterior)) state.ownedInteriorIds.push(defaultInterior);

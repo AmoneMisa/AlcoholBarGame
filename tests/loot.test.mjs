@@ -426,7 +426,7 @@ test('Signature guests order the house special, pay its price with fame, and can
   const items = [{ ingredientId: 'gin', amount: 45 }, { ingredientId: 'tonic', amount: 90 }];
   run(state, { type: 'designSignature', name: 'Sky Tonic', items, needsShake: false });
   // Force the next arrival to be a signature guest (random() = 0 is below the guest chance).
-  state.customers = []; state.nextCustomerAt = 1; state.vipCooldownUntil = NOW + 1e12;
+  state.customers = []; delete state.seatNextCustomerAt; state.nextCustomerAt = 1; state.vipCooldownUntil = NOW + 1e12;
   applyAction(state, { type: 'tick' }, { now: NOW + 10_000, random: () => 0, checkEnglish: (t) => ({ ok: true, corrected: t }), spawnCustomers: true });
   const guest = state.customers[0];
   assert.ok(guest?.signature, 'a signature guest arrived');
@@ -491,7 +491,7 @@ test('The house special can also be asked for as "the house special"; wrong dish
   const state = fresh();
   state.xp = xpForLevel(15); state.money = 1000; state.vipCooldownUntil = NOW + 1e12;
   run(state, { type: 'designSignature', name: 'Amber Sour', items: [{ ingredientId: 'whiskey', amount: 45 }, { ingredientId: 'lemon-juice', amount: 25 }], needsShake: true });
-  state.customers = []; state.nextCustomerAt = 1;
+  state.customers = []; delete state.seatNextCustomerAt; state.nextCustomerAt = 1;
   applyAction(state, { type: 'tick' }, { now: NOW + 10_000, random: () => 0, checkEnglish: (t) => ({ ok: true, corrected: t }), spawnCustomers: true });
   const guest = state.customers[0];
   run(state, { type: 'openConversation', customerId: guest.id });
@@ -663,7 +663,7 @@ test('Review fixes: XP curve migration, first-box bonus, auto-serve gating, whol
   const sig = fresh();
   sig.xp = xpForLevel(15); sig.money = 1000; sig.vipCooldownUntil = NOW + 1e12;
   run(sig, { type: 'designSignature', name: 'Gin Fizz', items: [{ ingredientId: 'gin', amount: 45 }, { ingredientId: 'soda', amount: 60 }], needsShake: false });
-  sig.customers = []; sig.nextCustomerAt = 1;
+  sig.customers = []; delete sig.seatNextCustomerAt; sig.nextCustomerAt = 1;
   applyAction(sig, { type: 'tick' }, { now: NOW + 10_000, random: () => 0, checkEnglish: (t) => ({ ok: true, corrected: t }), spawnCustomers: true });
   const sg = sig.customers[0];
   run(sig, { type: 'openConversation', customerId: sg.id });

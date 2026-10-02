@@ -40,7 +40,7 @@ const perks = computed(() => {
       <p v-if="event">{{ event.description }}</p>
       <p v-if="shortage" class="shortage">Short supply: {{ shortage }}</p>
       <ul><li v-for="perk in perks" :key="perk">{{ perk }}</li></ul>
-      <small>Level {{ game.level }} · {{ game.xpProgress.into }}/{{ game.xpProgress.needed }} XP to level {{ game.level + 1 }}</small>
+
     </div>
   </div>
 </template>

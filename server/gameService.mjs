@@ -1,3 +1,4 @@
+import {cleanCode, validatePromo, applyPromoRewards} from './promocodes.mjs';
 import { randomBytes } from 'node:crypto';
 import { applyAction, advanceClock, RuleError } from '../src/sim/rules';
 import { createInitialState, levelFor, normalizePlayerState, publicState } from '../src/sim/state';
@@ -40,6 +41,33 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
   // Loot rolls use the operating system's secure random source, never Math.random.
   const secureRandom = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
   const context = () => ({ now: now(), random: secureRandom, checkEnglish, spawnCustomers: true });
+
+  async function createPromoCode(body) {
+    let promo;
+    try { promo = validatePromo(body,now()); } catch (error) { return {status:400,body:{ok:false,error:error.message}}; }
+    const created = await repository.transaction(tx=>tx.createPromo(promo));
+    return created ? {ok:true,promo} : {status:409,body:{ok:false,error:'This code already exists. Use a new code.'}};
+  }
+  async function redeemPromoCode(identity, code) {
+    return repository.transaction(async tx=> {
+      const player = await tx.findOrCreatePlayer(identity);
+      const record = await tx.lockState(player.id);
+      const promo = await tx.findPromo(cleanCode(code));
+      if (!promo || promo.expiresAt <= now()) return {status:409,body:{ok:false,error:'This code is invalid or expired.'}};
+      const state = normalizePlayerState(record?.state ?? createInitialState(now()));
+      const coinsBefore = state.money, crystalsBefore = state.crystals;
+      // The unique redemption is inside the same transaction as all rewards and ledgers.
+      if (!await tx.redeemPromo(promo.code,player.id)) return {status:409,body:{ok:false,error:'You have already redeemed this code.'}};
+      applyPromoRewards(state,promo.rewards);
+      state.message = 'Promo code redeemed. Enjoy your rewards!';
+      await tx.saveState(player.id,state,(record?.version ?? 0)+1);
+      const requestId = `promo:${promo.code}`;
+      if (state.money !== coinsBefore) await tx.addLedger(player.id,{requestId,action:'redeemPromoCode',delta:state.money-coinsBefore,balance:state.money});
+      if (state.crystals !== crystalsBefore) await tx.addCrystalLedger(player.id,{requestId,action:'redeemPromoCode',delta:state.crystals-crystalsBefore,balance:state.crystals});
+      await tx.addLootLedger(player.id,{requestId,action:'redeemPromoCode',message:state.message,detail:promo.rewards});
+      return {ok:true,state:publicState(state),message:state.message,serverTime:now()};
+    });
+  }
 
   async function session(identity) {
     return repository.transaction(async (tx) => {
@@ -128,9 +156,18 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       const previous = await tx.weeklyStanding(week - 1, Number(player.id));
       const claimed = own.loot.leaderboardClaimed;
       const reward = previous ? leaderboardReward(previous.rank, previous.score) : undefined;
+      // Only the podium needs art. Return public appearance fields, never the player's save.
+      const podiumLooks = new Map();
+      for (const row of top.slice(0, 3)) {
+        const saved = row.playerId === ownId ? own : await tx.readState(row.playerId);
+        const bar = saved?.bars?.[saved.regionId];
+        if (bar) podiumLooks.set(row.playerId, Object.fromEntries([
+          'interior', 'bartenderCharacter', 'bartender', 'hairStyle', 'hairColor', 'bodyShape', 'skinDetail', 'skinTone', 'pose', 'eyeShape', 'browShape', 'noseShape', 'lipShape', 'cheekShape', 'eyeColor', 'eyeliner', 'eyeshadow', 'lipColor', 'blush', 'facialHair', 'outfitColor'
+        ].filter(key => typeof bar[key] === 'string').map(key => [key, bar[key]])));
+      }
       return {
         ok: true, scope: scope === 'friends' ? 'friends' : 'global', week, endsAt: (week + 1) * WEEK_MS, minScore: MIN_WEEKLY_SCORE,
-        top: top.map((row) => ({ rank: row.rank, label: row.label, level: row.level, score: row.score, me: row.playerId === Number(player.id) })),
+        top: top.map((row) => ({ rank: row.rank, label: row.label, level: row.level, score: row.score, me: row.playerId === Number(player.id), ...(podiumLooks.has(row.playerId) ? { look: podiumLooks.get(row.playerId) } : {}) })),
         me: mine, previous: previous ? { ...previous, tier: reward?.tier ?? null, reward: reward ? describeLeaderboardReward(reward) : null, claimable: !!reward && claimed < previous.week } : null
       };
     });
@@ -341,5 +378,5 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
   // Request ids only need to survive long enough for a retry; older rows are pure bloat.
   const pruneRequests = (olderThanMs = 7 * 24 * 60 * 60 * 1000) => repository.transaction((tx) => tx.pruneRequests(now() - olderThanMs));
 
-  return { pruneRequests, session, act, leaderboard, friends, addFriend, answerFriend, removeFriend, labelFriend, visitFriend, sendGift, claimGifts, startStarPurchase, approveStarCheckout, fulfilStarPayment };
+  return { createPromoCode, redeemPromoCode, pruneRequests, session, act, leaderboard, friends, addFriend, answerFriend, removeFriend, labelFriend, visitFriend, sendGift, claimGifts, startStarPurchase, approveStarCheckout, fulfilStarPayment };
 }

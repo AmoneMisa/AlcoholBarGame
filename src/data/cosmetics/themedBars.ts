@@ -1,3 +1,5 @@
+import { GAME_THEME_INTERIORS, GAME_THEME_COSTUMES, GAME_THEME_RECOMMENDATIONS } from './gameThemeExpansion';
+
 export const THEMED_INTERIORS = [
   {
     "id": "underwater",
@@ -115,7 +117,8 @@ export const THEMED_INTERIORS = [
     "position": "center",
     "blend": "multiply",
     "crystalCost": 2750
-  }
+  },
+  ...GAME_THEME_INTERIORS,
 ] as const;
 
 export const THEMED_COSTUMES = {
@@ -299,7 +302,8 @@ export const THEMED_COSTUMES = {
       "value": "theme-l2-dark-elf-mage-noa",
       "label": "Lineage II · Dark Elf mage",
       "theme": "lineage-2"
-    }
+    },
+    ...GAME_THEME_COSTUMES.noa,
   ],
   "leo": [
     {
@@ -481,11 +485,13 @@ export const THEMED_COSTUMES = {
       "value": "theme-l2-dark-elf-mage-leo",
       "label": "Lineage II · Dark Elf mage",
       "theme": "lineage-2"
-    }
+    },
+    ...GAME_THEME_COSTUMES.leo,
   ]
 } as const;
 
 export const THEMED_INTERIOR_COSTUMES: Readonly<Record<string, { noa: readonly string[]; leo: readonly string[] }>> = {
+  ...GAME_THEME_RECOMMENDATIONS,
   "underwater": {
     "noa": [
       "reference-shark-noa"

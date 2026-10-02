@@ -1,9 +1,9 @@
 {
   "tool": "built-in image_gen",
-  "expectedBackgroundCount": 13,
-  "expectedCostumeCount": 72,
-  "backgroundCount": 13,
-  "costumeCount": 72,
+  "expectedBackgroundCount": 30,
+  "expectedCostumeCount": 106,
+  "backgroundCount": 30,
+  "costumeCount": 106,
   "assets": [
     {
       "key": "interior-underwater",
@@ -69,6 +69,91 @@
       "key": "interior-nfs-underground",
       "asset": "public/assets/bar/backgrounds/interior-nfs-underground.webp",
       "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-3ad68281-eaeb-4fd8-8b76-7708a3079f87.png"
+    },
+    {
+      "key": "interior-witcher-3",
+      "asset": "public/assets/bar/backgrounds/interior-witcher-3.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-6a35ed3c-c2d1-4f7a-b566-a4c3f71de0f2.png"
+    },
+    {
+      "key": "interior-heroes-3",
+      "asset": "public/assets/bar/backgrounds/interior-heroes-3.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-09110df0-ef00-43ce-997d-ab7de2144ffd.png"
+    },
+    {
+      "key": "interior-elden-ring",
+      "asset": "public/assets/bar/backgrounds/interior-elden-ring.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-8649fc6c-466d-464f-956c-df2db665a714.png"
+    },
+    {
+      "key": "interior-minecraft",
+      "asset": "public/assets/bar/backgrounds/interior-minecraft.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-f9549f51-08c0-484a-a2fa-e76b58c27135.png"
+    },
+    {
+      "key": "interior-skyrim",
+      "asset": "public/assets/bar/backgrounds/interior-skyrim.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-3e9fecc8-2be3-4a87-bcc7-908d3acd13cc.png"
+    },
+    {
+      "key": "interior-cyberpunk-2077",
+      "asset": "public/assets/bar/backgrounds/interior-cyberpunk-2077.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-ae1ff865-f96a-48af-8894-9609e0865706.png"
+    },
+    {
+      "key": "interior-cs-2",
+      "asset": "public/assets/bar/backgrounds/interior-cs-2.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-48caa638-b28c-4148-9d19-4619aa1adf60.png"
+    },
+    {
+      "key": "interior-assassins-creed",
+      "asset": "public/assets/bar/backgrounds/interior-assassins-creed.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-50a04fee-4a56-44cb-b609-a8bf4cc89517.png"
+    },
+    {
+      "key": "interior-watch-dogs",
+      "asset": "public/assets/bar/backgrounds/interior-watch-dogs.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-6961a919-28f4-4729-8f7c-f8da60b5424d.png"
+    },
+    {
+      "key": "interior-sleeping-dogs",
+      "asset": "public/assets/bar/backgrounds/interior-sleeping-dogs.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-e3f81049-a4e1-4db8-a821-0db8199550a0.png"
+    },
+    {
+      "key": "interior-detroit",
+      "asset": "public/assets/bar/backgrounds/interior-detroit.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-0eb8402d-4b69-4619-b58e-28b623c60ebf.png"
+    },
+    {
+      "key": "interior-neighbours-from-hell",
+      "asset": "public/assets/bar/backgrounds/interior-neighbours-from-hell.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-7c28e952-3df7-4f6b-bdcb-fff47d6be5f8.png"
+    },
+    {
+      "key": "interior-gta",
+      "asset": "public/assets/bar/backgrounds/interior-gta.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-d4aba1dd-d128-4551-843c-8bf38b9a8ee6.png"
+    },
+    {
+      "key": "interior-stellar-blade",
+      "asset": "public/assets/bar/backgrounds/interior-stellar-blade.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-92faf5cd-1f53-49fc-87da-1b4943202370.png"
+    },
+    {
+      "key": "interior-repo",
+      "asset": "public/assets/bar/backgrounds/interior-repo.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-00ce810b-1591-403d-8968-ff2d51f66e86.png"
+    },
+    {
+      "key": "interior-among-us",
+      "asset": "public/assets/bar/backgrounds/interior-among-us.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-d708f4bd-45e3-4472-92d2-72176ac80acc.png"
+    },
+    {
+      "key": "interior-borderlands",
+      "asset": "public/assets/bar/backgrounds/interior-borderlands.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-e9a12e35-8310-4225-92f4-0d082c0685d6.png"
     },
     {
       "key": "noa-themed-atlas-v1",
@@ -365,6 +450,147 @@
       ]
     },
     {
+      "key": "noa-themed-atlas-v7",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v7.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-witcher-3-noa",
+          "label": "Ciri",
+          "theme": "witcher-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-bb112ec1-9638-4f6a-b3e1-fea900f1ab34.png"
+        },
+        {
+          "value": "theme-heroes-3-noa",
+          "label": "Catherine Ironfist",
+          "theme": "heroes-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-952a7c4e-9db2-465c-a81d-b4414b9f0d9c.png"
+        },
+        {
+          "value": "theme-elden-ring-noa",
+          "label": "Ranni",
+          "theme": "elden-ring",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-be9598e4-eb1f-413f-9625-2322455796e6.png"
+        },
+        {
+          "value": "theme-minecraft-noa",
+          "label": "Alex",
+          "theme": "minecraft",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-860f6e2c-9a6d-4629-8ea7-9dc90ed7cf9e.png"
+        },
+        {
+          "value": "theme-skyrim-noa",
+          "label": "Dragonborn shieldmaiden",
+          "theme": "skyrim",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-80fad3e1-0d24-40dd-af5f-53b6f1c1112f.png"
+        },
+        {
+          "value": "theme-cyberpunk-2077-noa",
+          "label": "V • female",
+          "theme": "cyberpunk-2077",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-6fcf12e8-83f4-41a0-986a-5489cf3bc4a6.png"
+        }
+      ]
+    },
+    {
+      "key": "noa-themed-atlas-v8",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v8.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-cs-2-noa",
+          "label": "Agent Ava",
+          "theme": "cs-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-ae270644-6832-4e89-9716-50a5f7b2ca71.png"
+        },
+        {
+          "value": "theme-assassins-creed-noa",
+          "label": "Evie Frye",
+          "theme": "assassins-creed",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-d5b1b63e-3b30-44b0-873d-6dc9d2e0b27b.png"
+        },
+        {
+          "value": "theme-watch-dogs-noa",
+          "label": "Sitara",
+          "theme": "watch-dogs",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-1172b627-e180-44cf-9f4d-9711d84942cc.png"
+        },
+        {
+          "value": "theme-sleeping-dogs-noa",
+          "label": "Hong Kong detective",
+          "theme": "sleeping-dogs",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-86fa482b-1c33-435b-9ba5-75188c470144.png"
+        },
+        {
+          "value": "theme-detroit-noa",
+          "label": "Kara",
+          "theme": "detroit",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-1b4135fa-d466-45b4-a029-59216ccb2577.png"
+        },
+        {
+          "value": "theme-neighbours-from-hell-noa",
+          "label": "Prankster hostess",
+          "theme": "neighbours-from-hell",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-f09806c2-fb53-41dd-b77e-6d074b89fca7.png"
+        }
+      ]
+    },
+    {
+      "key": "noa-themed-atlas-v9",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v9.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-gta-noa",
+          "label": "Vice City hostess",
+          "theme": "gta",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-386198b8-f80a-4da6-b685-1dc6a9619db6.png"
+        },
+        {
+          "value": "theme-stellar-blade-noa",
+          "label": "EVE",
+          "theme": "stellar-blade",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-66e7ee7d-3fd5-4734-b64c-5854dcdb872b.png"
+        },
+        {
+          "value": "theme-repo-noa",
+          "label": "Salvage robot • female",
+          "theme": "repo",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-713fc9fc-f04d-4a44-82b8-885e9c673376.png"
+        },
+        {
+          "value": "theme-among-us-noa",
+          "label": "Crewmate • red",
+          "theme": "among-us",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-5f2cab35-41a7-4d45-ad5b-8654b90cd3dc.png"
+        },
+        {
+          "value": "theme-borderlands-noa",
+          "label": "Lilith",
+          "theme": "borderlands",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-8443fd10-7d91-401b-be8b-780ba095e86e.png"
+        }
+      ]
+    },
+    {
       "key": "leo-themed-atlas-v1",
       "asset": "public/assets/characters/bartender/leo-themed-atlas-v1.webp",
       "columns": 3,
@@ -655,6 +881,147 @@
           "label": "Lineage II · Dark Elf mage",
           "theme": "lineage-2",
           "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-8691bfc7-53ee-414e-8a6b-0f93c84324d3.png"
+        }
+      ]
+    },
+    {
+      "key": "leo-themed-atlas-v7",
+      "asset": "public/assets/characters/bartender/leo-themed-atlas-v7.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-witcher-3-leo",
+          "label": "Geralt",
+          "theme": "witcher-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-cfa21fcc-41ed-48dd-b23f-5c803d2904d7.png"
+        },
+        {
+          "value": "theme-heroes-3-leo",
+          "label": "Gelu",
+          "theme": "heroes-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-7fc9fd92-6521-4fa6-af0b-d9dfae779dfa.png"
+        },
+        {
+          "value": "theme-elden-ring-leo",
+          "label": "Blaidd",
+          "theme": "elden-ring",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-ea748ca9-2b41-4dbf-847a-b54f292095db.png"
+        },
+        {
+          "value": "theme-minecraft-leo",
+          "label": "Steve",
+          "theme": "minecraft",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-8e577a0b-4c57-491e-a797-c4e573a8dd50.png"
+        },
+        {
+          "value": "theme-skyrim-leo",
+          "label": "Dragonborn warrior",
+          "theme": "skyrim",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-713185ef-a9c7-4c17-8d72-b6cd0b36e2dc.png"
+        },
+        {
+          "value": "theme-cyberpunk-2077-leo",
+          "label": "V • male",
+          "theme": "cyberpunk-2077",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-8c18946e-386e-471f-9ade-c1728a4315b5.png"
+        }
+      ]
+    },
+    {
+      "key": "leo-themed-atlas-v8",
+      "asset": "public/assets/characters/bartender/leo-themed-atlas-v8.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-cs-2-leo",
+          "label": "Counter-terrorist operator",
+          "theme": "cs-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-bad9a5b9-e5c9-4d90-aa47-3e95f2c4208d.png"
+        },
+        {
+          "value": "theme-assassins-creed-leo",
+          "label": "Ezio Auditore",
+          "theme": "assassins-creed",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-388c80fa-a3a6-4412-b2e6-8868d6ee778d.png"
+        },
+        {
+          "value": "theme-watch-dogs-leo",
+          "label": "Aiden Pearce",
+          "theme": "watch-dogs",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-8bbccf35-7a19-498f-9b2c-77529208f462.png"
+        },
+        {
+          "value": "theme-sleeping-dogs-leo",
+          "label": "Wei Shen",
+          "theme": "sleeping-dogs",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-fe8ae6d0-fd46-4467-8618-9d393ca7c9c6.png"
+        },
+        {
+          "value": "theme-detroit-leo",
+          "label": "Connor",
+          "theme": "detroit",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-56225c4d-2884-4324-a19f-e65943a9c221.png"
+        },
+        {
+          "value": "theme-neighbours-from-hell-leo",
+          "label": "Woody",
+          "theme": "neighbours-from-hell",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-aeecc59f-168b-49a2-8cd4-fd7edfe8f74f.png"
+        }
+      ]
+    },
+    {
+      "key": "leo-themed-atlas-v9",
+      "asset": "public/assets/characters/bartender/leo-themed-atlas-v9.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-gta-leo",
+          "label": "Tommy Vercetti",
+          "theme": "gta",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-42618d58-3d05-42fe-bd2f-31a4491dfaa1.png"
+        },
+        {
+          "value": "theme-stellar-blade-leo",
+          "label": "Adam",
+          "theme": "stellar-blade",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-b5a21240-ee23-4758-9bd2-a744e44dfbea.png"
+        },
+        {
+          "value": "theme-repo-leo",
+          "label": "Salvage robot • male",
+          "theme": "repo",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-27d85e1e-df19-4aef-9c11-3810b84e3806.png"
+        },
+        {
+          "value": "theme-among-us-leo",
+          "label": "Crewmate • cyan",
+          "theme": "among-us",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-ee7d2dc3-ed0e-40b1-bcfb-a2a1c4d492b7.png"
+        },
+        {
+          "value": "theme-borderlands-leo",
+          "label": "Mordecai",
+          "theme": "borderlands",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-84fcfae8-f730-4f31-87bb-1c976c427ebc.png"
         }
       ]
     }

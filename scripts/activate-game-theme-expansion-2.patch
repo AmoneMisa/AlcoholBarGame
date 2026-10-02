@@ -1,0 +1,71 @@
+*** Begin Patch
+*** Update File: C:/Users/kubai/IdeaProjects/AlcoholBarGame/src/data/cosmetics/gameThemeExpansion.ts
+@@
+ // Appended collections preserve all existing atlas cells and saved costume IDs.
++import { NEXT_GAME_INTERIORS, NEXT_GAME_COSTUMES, NEXT_GAME_RECOMMENDATIONS, NEXT_GAME_PRIMARY_STYLES, NEXT_GAME_SHELVES } from './gameThemeExpansion2';
+@@
+-    "crystalCost": 3440
+-  }
++    "crystalCost": 3440
++  },
++  ...NEXT_GAME_INTERIORS,
+@@
+-      "value": "theme-borderlands-noa",
++      "value": "theme-borderlands-noa",
+@@
+-      "theme": "borderlands"
+-    }
+-  ],
++      "theme": "borderlands"
++    },
++    ...NEXT_GAME_COSTUMES.noa,
++  ],
+@@
+-      "value": "theme-borderlands-leo",
++      "value": "theme-borderlands-leo",
+@@
+-      "theme": "borderlands"
+-    }
+-  ]
++      "theme": "borderlands"
++    },
++    ...NEXT_GAME_COSTUMES.leo,
++  ]
+@@
+ export const GAME_THEME_RECOMMENDATIONS = {
++  ...NEXT_GAME_RECOMMENDATIONS,
+@@
+ export const GAME_THEME_PRIMARY_STYLES = {
++  ...NEXT_GAME_PRIMARY_STYLES,
+@@
+ export const GAME_THEME_SHELVES = {
++  ...NEXT_GAME_SHELVES,
+*** Update File: C:/Users/kubai/IdeaProjects/AlcoholBarGame/tests/avatar.test.mjs
+@@
+-    ...['noa', 'leo'].flatMap(character => Array.from({ length: 9 }, (_, i) => character + '-themed-atlas-v' + (i + 1) + '.webp')),
++    ...['noa', 'leo'].flatMap(character => Array.from({ length: 14 }, (_, i) => character + '-themed-atlas-v' + (i + 1) + '.webp')),
+@@
+-    assert.equal(costumes.length, character === 'noa' ? 104 : 98);
++    assert.equal(costumes.length, character === 'noa' ? 130 : 124);
+@@
+-  assert.equal(INTERIORS.length, 50);
++  assert.equal(INTERIORS.length, 74);
+*** Update File: C:/Users/kubai/IdeaProjects/AlcoholBarGame/tests/themed-bars.test.mjs
+@@
+-    assert.equal(THEMED_COSTUMES[character].length,53);
+-    assert.equal(GAME_THEME_INTERIORS.length,17);
++    assert.equal(THEMED_COSTUMES[character].length,79);
++    assert.equal(GAME_THEME_INTERIORS.length,41);
+@@
+-      assert.equal(THEMED_COSTUMES[character].filter(style=>style.theme===interior.id).length,1);
+-      assert.deepEqual(costumesForInterior(interior.id,character),[`theme-${interior.id}-${character}`]);
++      const matching = THEMED_COSTUMES[character].filter(style=>style.theme===interior.id);
++      assert.equal(matching.length,interior.id==='resident-evil'?3:1);
++      assert.deepEqual(costumesForInterior(interior.id,character),matching.map(style=>style.value));
+@@
+   const values=THEMED_COSTUMES.noa.concat(THEMED_COSTUMES.leo).map(style=>style.value);
++  for (const value of ['theme-resident-evil-noa','theme-resident-evil-leo','theme-resident-evil-claire-noa','theme-resident-evil-ada-noa','theme-resident-evil-chris-leo','theme-resident-evil-wesker-leo']) assert.ok(values.includes(value),value);
+@@
+-  assert.equal(THEMED_INTERIORS.length,30);
++  assert.equal(THEMED_INTERIORS.length,54);
+*** End Patch

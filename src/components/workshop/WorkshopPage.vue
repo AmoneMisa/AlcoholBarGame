@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import ItemArt from '../ui/ItemArt.vue';
+import WeeklyPodium from './WeeklyPodium.vue';
+import WeeklyRewards from './WeeklyRewards.vue';
+import InventoryPanel from './InventoryPanel.vue';
 import UiCheckbox from '../ui/UiCheckbox.vue';
 import UiInput from '../ui/UiInput.vue';
 import { computed, ref, watch } from 'vue';
 import { fetchLeaderboard, type LeaderboardResult } from '../../telegram/api';
-import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE, leaderboardReward, describeLeaderboardReward } from '../../domain/leaderboard';
+import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE } from '../../domain/leaderboard';
 import { RECIPES } from '../../domain/catalog';
 import { COSMETICS, DRAWABLE_COSMETICS } from '../../domain/cosmetics';
 import { shardStyles } from '../../sim/loot';
@@ -27,8 +30,8 @@ import OptionSelect from '../game/OptionSelect.vue';
 import { useGameStore } from '../../stores/game';
 
 const game = useGameStore();
-const tab = ref<'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'signature' | 'weekly'>('equipment');
-const tabs = [['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['signature', 'Signature'], ['weekly', 'Weekly']] as const;
+const tab = ref<'inventory' | 'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'signature' | 'weekly'>('inventory');
+const tabs = [['inventory', 'Inventory'], ['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['signature', 'Signature'], ['weekly', 'Weekly']] as const;
 const scrollRecipe = ref('');
 const names = { consumable: (id: string) => consumableDef(id)?.name ?? id, equipment: (id: string) => equipmentDef(id)?.name ?? id };
 // Equipment is kept per bar. The bar shown here can be picked without leaving the page.
@@ -131,7 +134,6 @@ watch(tab, (next) => { if (next === 'weekly') void loadBoard(); });
 watch(boardScope, () => { void loadBoard(); });
 watch(() => game.loot.leaderboardClaimed, () => { if (tab.value === 'weekly') void loadBoard(); });
 const daysLeft = computed(() => board.value ? Math.max(0, Math.ceil((board.value.endsAt - Date.now()) / 86_400_000)) : 0);
-const rewardTable = [1, 2, 4, 11, 30].map((rank) => ({ rank, reward: leaderboardReward(rank, MIN_WEEKLY_SCORE)! }));
 // ---- Seasonal banner ----
 const banner = ref<'standard' | 'seasonal'>('seasonal');
 const season = computed(() => seasonAt(Date.now()));
@@ -165,7 +167,8 @@ const boostLeft = (id: string) => {
     <aside v-if="gettingStarted && (tab === 'equipment' || tab === 'boxes')" class="getting-started"><b>Getting started</b><ol><li v-for="step in started" :key="step.label" :class="{ done: step.done }">{{ step.label }}</li></ol></aside>
     <p v-if="game.loot.log[0]" class="workshop-log">{{ game.loot.log[0] }}</p>
 
-    <div v-if="tab === 'equipment'" class="grid">
+    <InventoryPanel v-if="tab === 'inventory'" />
+    <div v-else-if="tab === 'equipment'" class="grid">
       <nav v-if="ownedBars.length > 1" class="bar-chips" aria-label="Bar to upgrade"><UiButton v-for="region in ownedBars" :key="region.id" size="sm" :variant="region.id === equipBar ? 'solid' : 'secondary'" @click="pickedBar = region.id">{{ region.name }}</UiButton></nav>
       <article v-for="item in EQUIPMENT" :key="item.id" class="card">
         <ItemArt kind="equipment" :id="item.id" :fallback="item.icon" :size="72" class="workshop-art" />
@@ -321,6 +324,7 @@ const boostLeft = (id: string) => {
           <div class="row"><UiButton :variant="boardScope === 'global' ? 'solid' : 'secondary'" @click="boardScope = 'global'">Everyone</UiButton><UiButton :variant="boardScope === 'friends' ? 'solid' : 'secondary'" @click="boardScope = 'friends'">Friends</UiButton></div>
           <p>Score = XP you earn this week (serving, English, lessons). A drink pays the same XP at every level, so newcomers can win. Resets in {{ daysLeft }} day{{ daysLeft === 1 ? '' : 's' }}.</p>
           <p v-if="boardLoading">Loading…</p><p v-if="boardError" class="sig-error">{{ boardError }}</p>
+          <WeeklyPodium v-if="board?.top.length" :rows="board.top" />
           <ol v-if="board" class="board">
             <li v-for="row in board.top" :key="row.rank" :class="{ me: row.me }"><b>{{ row.rank }}</b><span>{{ row.label }}<small v-if="row.level"> · level {{ row.level }}</small></span><em>{{ row.score }}</em></li>
             <li v-if="!board.top.length" class="empty">{{ boardScope === 'friends' ? 'Add friends in the Friends tab to compete with them.' : 'Nobody has scored yet this week. Serve a drink to take the lead.' }}</li>
@@ -338,8 +342,7 @@ const boostLeft = (id: string) => {
             <UiButton variant="primary" :disabled="!board.previous.claimable" @click="game.act({ type: 'claimLeaderboardReward' })">{{ board.previous.claimable ? 'Claim reward' : board.previous.reward ? 'Claimed' : 'No reward' }}</UiButton>
           </template>
           <p v-else>You did not play last week. Score at least {{ MIN_WEEKLY_SCORE }} XP this week to earn a reward next week.</p>
-          <h3>Reward tiers</h3>
-          <ul class="results"><li v-for="tier in rewardTable" :key="tier.rank">{{ tier.reward.tier }}: {{ describeLeaderboardReward(tier.reward) }}</li></ul>
+          <WeeklyRewards />
         </article>
       </template>
     </div>

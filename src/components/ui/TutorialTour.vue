@@ -18,6 +18,7 @@ interface Step {
   until?: () => boolean;
   /** A short sentence that says what the player should do now. */
   action?: string;
+  when?: () => boolean;
 }
 
 const props = defineProps<{ ready: boolean; seen: boolean }>();
@@ -26,36 +27,33 @@ const game = useGameStore();
 
 const shown = (css: string) => { const element = document.querySelector<HTMLElement>(css); return !!element && element.getBoundingClientRect().width > 1; };
 
+const bottleOrder = ref(false);
 const STEPS: Step[] = [
-  { id: 'welcome', title: 'Welcome to BarLingo!', text: 'You run a bar, and you learn real English while you serve. This tour takes about a minute. You can skip it at any time and replay it later from Settings.', view: 'service' },
-  { id: 'guests', title: 'Your guests', text: 'Guests arrive at the bar one by one. Each has a mood, a wish, and sometimes a problem.', view: 'service',
-    action: 'Tap a guest to open the conversation.', point: [{ target: selector('guest'), gesture: 'tap', label: '{Tap} a guest to talk' }], until: () => !!game.conversationCustomerId },
-  { id: 'talk', title: 'Talk to find the order', text: 'Ask in English what the guest likes: "Do you like sweet drinks?" The guest answers with clues. The checker corrects your English.',
-    action: 'Build a question from the words and press Check & send.',
-    point: [
-      { target: selector('talk-send') + ':not(:disabled)', gesture: 'tap', label: '{Tap} Check & send', when: () => document.querySelectorAll('.word-answer .placed').length >= 3 },
-      { target: `${selector('tile-bank')} .word-tile:not(:disabled)`, gesture: 'tap', label: '{Tap} the words one by one to build a question' },
-      { target: selector('phrase-idea'), gesture: 'tap', label: '{Tap} a ready question' },
-      { target: selector('talk-input'), gesture: 'type', label: 'Type a question here' }
-    ], until: () => !!document.querySelector('.talk-line.bartender') },
-  { id: 'mix', title: 'Make the drink', text: 'When you know the order, close the conversation and build the drink: pull a bottle down to the glass and hold to pour, then shake and serve.', view: 'service',
-    action: 'Drag a bottle onto the glass and hold to pour.',
-    point: [
-      { target: selector('talk-close'), gesture: 'tap', label: '{Tap} the close button to go back to the bar', when: () => shown('.talk-popup') },
-      { target: '.pshelf-bottles button:not(.empty)', to: selector('glass'), gesture: 'drag', label: 'Drag a bottle onto the glass and hold to pour' }
-    ], until: () => game.currentMix.length > 0 },
-  { id: 'care', title: 'Look after your guests', text: 'Guests are people. Bring water or an ashtray, call a taxi, offer a snack or another drink (you will see the chance of a yes), and solve problems: a card that does not work, a broken glass, a person who feels ill.', tips: ['Every answer in a situation is a real English sentence.', 'Be kind, but firm with drunk or rude guests.'] },
-  { id: 'english', title: 'The English tab', text: 'Here you find words, phrases for every job, and daily quests. Quests give XP, crystals and sometimes a new recipe.',
-    action: 'Open the English tab.', point: [{ target: selector('nav-english'), gesture: 'tap', label: '{Tap} English' }], until: () => shown('.learning-page') },
-  { id: 'market', title: 'Stock and deliveries', text: 'Buy ingredients, bottles and food in the Market. Deliveries can be late, damaged or wrong. Report a problem politely, in English, and the supplier will help.',
-    action: 'Open Manage, then the Market tab.', point: [{ target: selector('nav-market'), gesture: 'tap', label: '{Tap} Market' }, { target: selector('nav-manage'), gesture: 'tap', label: '{Tap} Manage' }], until: () => shown('.market-panel') },
-  { id: 'hud', title: 'Coins, crystals and servers', text: 'Coins buy stock and upgrades. Crystals unlock recipes and styles. From level 8 you can hire servers: they earn coins while you are away, but never as much as you.', view: 'service' },
-  { id: 'rules', title: 'House rules and events', text: 'Every city has its own rules, such as checking ID or paying by card only. Inspectors count every rule you break. Special nights, like ladies’ night or happy hour, change who comes and what they pay.', view: 'service',
-    action: 'Press Rules to read them.', point: [{ target: selector('rules-button'), gesture: 'tap', label: '{Tap} Rules' }], until: () => shown('.house-rules-panel') },
-  { id: 'done', title: 'You are ready!', text: 'The help button (?) in every conversation explains the screen again. Small mistakes are fine: every sentence you try makes your English better. Have a good shift!', view: 'service' }
+  { id:'welcome', title:'Welcome to BarLingo!', text:'Run your bar and practise real English with your guests. Follow the pointers, skip any step, or replay this tour from your avatar: Settings → How to play.', view:'service' },
+  { id:'guests', title:'Guests at the counter', text:'Tap the guest directly to talk. Your bar has up to five seats, each with its own arrival timer. Swipe or use the arrows to browse seats. A red dot on an arrow means a customer is waiting off screen. Tap an empty silhouette to invite its next guest early for crystals; the price depends on the remaining time.', view:'service',
+    action:'Tap a guest. A red dot shows which way to scroll to find one.', point:[{target:selector('guest'),gesture:'tap',label:'{Tap} the guest to talk'},{target:'.guest-nudge:has(.hidden-guest-dot)',gesture:'tap',label:'{Tap} the red-dot arrow to find a waiting guest'}], until:()=>!!game.conversationCustomerId },
+  { id:'talk', title:'Ask in English', text:'Build a question with the word tiles, use a suggested sentence, or type your own. Check & send checks your English and gets a reply. Read the clue board to learn what your guest wants.',
+    action:'Build a question, then press Check & send.', point:[{target:selector('talk-send')+':not(:disabled)',gesture:'tap',label:'{Tap} Check & send',when:()=>document.querySelectorAll('.word-answer .placed').length>=3},{target:selector('tile-bank')+' .word-tile:not(:disabled)',gesture:'tap',label:'{Tap} word tiles to build a question'},{target:selector('phrase-idea'),gesture:'tap',label:'{Tap} a suggested question'},{target:selector('talk-input'),gesture:'type',label:'Type your question here'}], until:()=>!!document.querySelector('.talk-line.bartender') },
+  { id:'confirm', title:'Confirm the order', text:'Use the clues to name the drink or bottle in English. A wrong guess is another clue. Preparation opens only after the guest confirms the order.',
+    action:'Name the drink or bottle until the order is confirmed.', point:[{target:selector('new-question'),gesture:'tap',label:'{Tap} New question to choose an order sentence'},{target:selector('talk-input'),gesture:'type',label:'Ask which drink or bottle the guest wants'}], until:()=>!!game.customer.orderRevealed },
+  { id:'workstation', title:'Open your workstation', text:'After a drink order is confirmed, Start mixing opens a separate close view of the counter. Sealed bottle orders are sold directly in the conversation with Sell full bottle.',
+    action:'Press Start mixing for a drink, or Sell full bottle for a sealed bottle.', point:[{target:selector('prepare'),gesture:'tap',label:'{Tap} Start mixing'},{target:selector('bottle-sale')+':not(:disabled)',gesture:'tap',label:'{Tap} Sell full bottle'},{target:selector('guest'),gesture:'tap',label:'{Tap} the guest to reopen the confirmed order'}], until:()=>!!game.preparationCustomerId || game.rewardReport?.title==='Bottle sold' },
+  { id:'mix', title:'Build the cocktail', text:'Search by a bottle name, brand or type. Choose a pour size, then drag a bottle from the shelf onto the glass. Take mixers, ice and garnish from the drawer below the counter. The ingredient quest on the right checks every amount. Food is in the Food drawer tab.',
+    action:'Choose a measure and drag a needed bottle to the glass, or add a needed ingredient below.', point:[{target:selector('prep-bottle')+'.needed:not(:disabled)',to:selector('glass'),gesture:'drag',label:'Drag this bottle from the shelf to the glass'},{target:selector('prep-ingredient')+'.needed:not(:disabled)',gesture:'tap',label:'{Tap} the needed ingredient under the counter'},{target:selector('prep-search'),gesture:'type',label:'Find a bottle by name, brand or type'}], when:()=>!bottleOrder.value, until:()=>game.currentMix.length>0 },
+  { id:'serve', title:'Finish and serve', text:'Follow the ingredient quest. Use Clear to empty the glass if you add too much. Press Mix when the recipe requires it. Once the drink is ready, Serve order replaces the quest on the right.',
+    action:'Complete the ingredient quest, Mix if needed, then Serve order.', point:[{target:selector('serve')+':not(:disabled)',gesture:'tap',label:'{Tap} Serve order'},{target:selector('shake')+':not(:disabled)',gesture:'tap',label:'{Tap} Mix',when:()=>game.recipe.needsShake&&!game.shaken},{target:selector('prep-bottle')+'.needed:not(:disabled)',to:selector('glass'),gesture:'drag',label:'Drag a needed bottle to the glass'},{target:selector('prep-ingredient')+'.needed:not(:disabled)',gesture:'tap',label:'{Tap} a needed ingredient'}], when:()=>!bottleOrder.value, until:()=>!game.preparationCustomerId },
+  { id:'care', title:'Look after your guests', text:'Tap a guest to reopen their conversation. Bring water or an ashtray, call a taxi, offer food or another drink, and resolve problems with clear, polite English. Collect earned tips by tapping the jar beside the bartender.', tips:['Tips stay in the jar until you collect them.','Food can also be served from the preparation screen’s Food tab.'] },
+  { id:'english', title:'Study', text:'Study contains English lessons, recipes and pairing advice. Complete daily lessons for XP, crystals and a chance at a recipe card.', action:'Close any open screen, then open Study.', point:[{target:selector('talk-close'),gesture:'tap',label:'{Tap} Back to bar'},{target:selector('prep-back'),gesture:'tap',label:'{Tap} Back to bar'},{target:selector('nav-english'),gesture:'tap',label:'{Tap} Study'}], until:()=>shown('.learning-page') },
+  { id:'market', title:'Storage and deliveries', text:'Storage contains Inventory, Market and Workshop. Buy bottles, ingredients and food in Market. Use Workshop for equipment, styles, fragments, boxes and weekly rankings. Report delivery problems politely in English.', action:'Open Storage, then Market.', point:[{target:selector('nav-market'),gesture:'tap',label:'{Tap} Market'},{target:selector('nav-manage'),gesture:'tap',label:'{Tap} Storage'}], until:()=>shown('.market-panel') },
+  { id:'hud', title:'Your header', text:'Your avatar opens character information and Settings, including promo codes. Bar level appears before your bar’s name. Tap coins to exchange crystals for coins; tap crystals to open the Telegram Stars shop. The star balance is prestige. Servers become available as your bar levels up.', view:'service', point:[{target:selector('nav-service'),gesture:'tap',label:'{Tap} Bar to see your header'}] },
+  { id:'rules', title:'Bar info', text:'Bar info is the text button in the second header row. It contains your level perks, city effects and house rules. Inspectors count rule violations, so explain the rules politely to guests.', action:'Open Bar, then Bar info.', point:[{target:selector('rules-button'),gesture:'tap',label:'{Tap} Bar info'},{target:selector('nav-service'),gesture:'tap',label:'{Tap} Bar'}], until:()=>shown('.rules-note') },
+  { id:'events', title:'Events and login rewards', text:'Events includes login rewards, free daily style roulette, seasonal style draws and ready quest or achievement rewards. Its badge counts ready rewards and free draws. Paid spins are listed separately with their crystal cost.', action:'Close Bar info, then open Events.', point:[{target:'.modal-sheet .ui-close',gesture:'tap',label:'{Tap} Close to return to the header'},{target:selector('events'),gesture:'tap',label:'{Tap} Events'},{target:selector('nav-service'),gesture:'tap',label:'{Tap} Bar'}], until:()=>shown('.events-hub') },
+  { id:'screenshot', title:'A clean bar screenshot', text:'The small [ ] button at the bar’s bottom-right opens the full-screen scene. Screenshot settings choose the bartender, customers, jar, silhouettes, guest cards and arrival timers. Hide controls makes a clean frame; tap anywhere to bring controls back, then close or press Escape. These options are also in your character Settings.', action:'Close Events, then press [ ] at the bottom-right of the bar.', point:[{target:'.modal-sheet .ui-close',gesture:'tap',label:'{Tap} Close Events'},{target:selector('screenshot'),gesture:'tap',label:'{Tap} [ ] for a full-screen bar'},{target:selector('nav-service'),gesture:'tap',label:'{Tap} Bar'}], until:()=>shown('.bar-photo-screen') },
+  { id:'done', title:'You are ready!', text:'Keep trying English sentences and follow your guests’ clues. The conversation help button explains the dialogue again. You can replay this tour from your avatar → Settings → How to play.', view:'service' }
 ];
 
 const open = ref(false);
+const suspended = ref(false);
 const index = ref(0);
 const rect = ref<{ top: number; left: number; width: number; height: number } | undefined>();
 const step = computed(() => STEPS[index.value]!);
@@ -116,6 +114,7 @@ function place() {
 }
 
 async function show() {
+  if (step.value.id === 'workstation') bottleOrder.value = game.customer.orderKind === 'bottle';
   expanded.value = false;
   // The tour never moves the player: it does not switch tabs and does not close a popup that is open. The card says
   // what to do and the pointer shows where, as soon as that part of the screen is there.
@@ -127,8 +126,8 @@ async function show() {
 function start() { index.value = 0; finishedAt = -1; open.value = true; void show(); }
 // The choice is saved on the account (see the game store), so it is not asked again on another device.
 function finish(how: 'done' | 'skipped') { open.value = false; setPointer('tour', undefined); emit('finish', how); }
-function next() { if (last.value) finish('done'); else { index.value++; void show(); } }
-function back() { if (index.value > 0) { index.value--; void show(); } }
+function next() { if (last.value) finish('done'); else { do { index.value++; } while (index.value < STEPS.length - 1 && step.value.when && !step.value.when()); void show(); } }
+function back() { if (index.value > 0) { do { index.value--; } while (index.value > 0 && step.value.when && !step.value.when()); void show(); } }
 const onKey = (event: KeyboardEvent) => { if (open.value && event.key === 'Escape') finish('skipped'); };
 
 watch(() => props.ready, (ready) => { if (ready && !props.seen) setTimeout(() => { if (!props.seen) start(); }, 900); }, { immediate: true });
@@ -139,9 +138,10 @@ onMounted(() => {
   window.addEventListener('barlingo:tour', start);
   // A step that waits for an action moves on a moment after the player has done it.
   poll = setInterval(() => {
+    suspended.value = !!document.querySelector('.bar-photo-screen, .modal-backdrop.celebration, .modal-backdrop.reveal');
     place();
     const current = step.value;
-    if (!open.value || !current.until || finishedAt === index.value) return;
+    if ((suspended.value && current.id !== 'screenshot') || !open.value || !current.until || finishedAt === index.value) return;
     let done = false;
     try { done = current.until(); } catch { done = false; }
     if (!done) return;
@@ -161,7 +161,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div v-if="open" class="tour" role="dialog" aria-modal="false" aria-label="Game tour">
+  <Teleport to="body"><div v-if="open && !suspended" class="tour" role="dialog" aria-modal="false" aria-label="Game tour">
     <div v-if="rect" class="tour-spot" :style="{ top: rect.top + 'px', left: rect.left + 'px', width: rect.width + 'px', height: rect.height + 'px' }" />
     <div v-else-if="!step.point" class="tour-dim" />
     <section ref="cardEl" class="tour-card" :class="{ compact: slim }" :style="cardTop !== undefined ? { top: cardTop + 'px', bottom: 'auto' } : undefined">
@@ -176,11 +176,11 @@ onBeforeUnmount(() => {
         <UiButton :size="slim ? 'sm' : 'md'" variant="solid" @click="next">{{ last ? 'Start playing' : waiting || step.point ? 'Skip step' : 'Next' }}</UiButton>
       </footer>
     </section>
-  </div>
+  </div></Teleport>
 </template>
 
 <style scoped>
-.tour { position: fixed; inset: 0; z-index: 400; pointer-events: none; }
+.tour { position: fixed; inset: 0; z-index: 1800; pointer-events: none; }
 .tour-dim { position: absolute; inset: 0; background: rgba(5, 8, 14, .55); }
 .tour-spot { position: absolute; border-radius: 14px; border: 2px solid #f0c35a; box-shadow: 0 0 0 9999px rgba(5, 8, 14, .6); transition: all .25s ease; }
 .tour-card { pointer-events: auto; position: absolute; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(94vw, 440px); padding: 14px 16px; border: 1px solid #b78649; border-radius: 16px; background: #141c2b; color: #f1ead9; box-shadow: 0 16px 40px #000c; display: grid; gap: 8px; }
@@ -202,3 +202,7 @@ onBeforeUnmount(() => {
 .tour-card footer { display: flex; justify-content: space-between; gap: 8px; }
 .tour-card footer .ui-btn:last-child { flex: 1; }
 </style>
+
+
+
+

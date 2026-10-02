@@ -5,12 +5,13 @@ import { TAXI_ACCEPTED, TAXI_ARRIVED, choose, leaveLine, type LeaveOutcome, type
 import { pickSituation, startSituation } from './situations';
 import type { PlayerState } from './state';
 import { MINUTE } from '../domain/time';
+import { MAX_CUSTOMER_SEATS } from '../domain/customerTiming';
 
 // The life of the guests at the bar, run by the shared rules (so on the server): who sits, who stays for another
 // drink, who is getting drunk or asking for something, and what happens when the bartender asks someone to leave.
 // Nothing here knows about drinks or prices; rules.ts passes in what it needs through `GuestContext`.
 
-export const MAX_SEATS = 6;
+export const MAX_SEATS = MAX_CUSTOMER_SEATS;
 const ASHTRAYS_AT_START = 4;
 
 export interface GuestContext {
@@ -42,10 +43,26 @@ export function removeGuest(state: PlayerState, guest: Customer, context: GuestC
   state.lastClockAt = context.now;
 }
 
-// New guests walk in only while nobody is waiting to order and a seat is free.
+// Every seat keeps its own clock. Legacy saves assign seats once, preserving the old earliest arrival.
 export function scheduleArrival(state: PlayerState, context: GuestContext) {
-  if (orderingGuests(state).length || state.customers.length >= MAX_SEATS) { if (orderingGuests(state).length) state.nextCustomerAt = 0; return; }
-  if (!state.nextCustomerAt) state.nextCustomerAt = context.nextArrivalAt();
+  const occupied = new Set<number>();
+  for (const guest of state.customers) {
+    if (!Number.isInteger(guest.seatId) || guest.seatId! < 0 || guest.seatId! >= MAX_SEATS || occupied.has(guest.seatId!)) guest.seatId = Array.from({length:MAX_SEATS}, (_,i)=>i).find(i=>!occupied.has(i));
+    if (guest.seatId !== undefined) occupied.add(guest.seatId);
+  }
+  const legacy = !state.seatNextCustomerAt && state.nextCustomerAt > 0 ? state.nextCustomerAt : 0;
+  const clocks = state.seatNextCustomerAt ??= Array(MAX_SEATS).fill(0);
+  clocks.length = MAX_SEATS;
+  let migrated = false;
+  for (let seat=0; seat<MAX_SEATS; seat++) {
+    if (occupied.has(seat)) clocks[seat] = 0;
+    else if (!Number.isFinite(clocks[seat]) || clocks[seat]! <= 0) {
+      clocks[seat] = legacy && !migrated ? legacy : context.nextArrivalAt();
+      migrated = true;
+    }
+  }
+  state.nextCustomerAt = Math.min(...clocks.filter(time=>time>0)) || 0;
+  if (!Number.isFinite(state.nextCustomerAt)) state.nextCustomerAt = 0;
 }
 
 // ---- Feelings ----
@@ -152,7 +169,7 @@ export function startNextRound(state: PlayerState, guest: Customer, context: Gue
   delete social.pitch;
   driftEmotion(guest, context.random);
   if (!state.activeCustomerId || !state.customers.some((item) => item.id === state.activeCustomerId && isOrdering(item))) state.activeCustomerId = guest.id;
-  state.nextCustomerAt = 0;
+  scheduleArrival(state, context);
   // The order clock starts now, not when the guest sat down.
   state.lastClockAt = context.now;
   state.message = `${guest.name} would like another drink.`;

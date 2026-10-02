@@ -40,7 +40,7 @@ export const createStarInvoice = (packId: string) => post<{ ok: boolean; url?: s
 
 export interface LeaderboardResult {
   ok: boolean; scope?: 'global' | 'friends'; week: number; endsAt: number; minScore: number;
-  top: { rank: number; label: string; level: number | null; score: number; me: boolean }[];
+  top: { rank: number; label: string; level: number | null; score: number; me: boolean; look?: Record<string, string> }[];
   me: { rank: number; size: number; score: number } | null;
   previous: { week: number; rank: number; size: number; score: number; tier: string | null; reward: string | null; claimable: boolean } | null;
 }
@@ -62,3 +62,5 @@ export function sendAction(action: GameAction): Promise<ServerResult> {
   queue = run.catch(() => undefined);
   return run;
 }
+
+export const redeemPromo = (code:string) => post<ServerResult>('/api/promocodes/redeem', {code});

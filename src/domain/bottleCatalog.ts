@@ -1,7 +1,7 @@
 import type { AlcoholProduct, AlcoholType, BottleOccasion, BottleRequest } from './types';
 
 export const ALCOHOL_TYPE_LABELS: Record<AlcoholType, string> = {
-  whiskey: 'Whiskey', bourbon: 'Bourbon', liqueur: 'Liqueur', 'herbal-liqueur': 'Herbal liqueur', 'specialty-liqueur': 'Specialty liqueur', sambuca: 'Sambuca', sangria: 'Sangria', infusion: 'Настойка / Infusion', 'fruit-wine': 'Fruit wine', champagne: 'Champagne',
+  whiskey: 'Whiskey', bourbon: 'Bourbon', liqueur: 'Liqueur', 'herbal-liqueur': 'Herbal liqueur', 'specialty-liqueur': 'Specialty liqueur', sambuca: 'Sambuca', sangria: 'Sangria', infusion: 'Infusion', 'fruit-wine': 'Fruit wine', champagne: 'Champagne',
   'sparkling-wine': 'Sparkling wine', 'port-wine': 'Port wine', cognac: 'Cognac', brandy: 'Brandy', beer: 'Beer', 'non-alcoholic-beer': 'Alcohol-free beer', soju: 'Soju', sake: 'Sake', cider: 'Cider', vodka: 'Vodka', gin: 'Gin', rum: 'Rum', tequila: 'Tequila',
   aperitif: 'Aperitif', vermouth: 'Vermouth'
 };

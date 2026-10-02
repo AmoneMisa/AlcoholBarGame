@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import GuidePointer from './components/ui/GuidePointer.vue';
 import TutorialTour from './components/ui/TutorialTour.vue';
-import PopularityBar from './components/game/PopularityBar.vue';
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import SectionTabs from './components/ui/SectionTabs.vue';
 import { lazyPage } from './ui/lazy';
 import BarChips from './components/game/BarChips.vue';
-import CocktailWorkspace from './components/cocktails/CocktailWorkspace.vue';
+import UiButton from './components/ui/UiButton.vue';
+import ModalDialog from './components/ui/ModalDialog.vue';
+const PreparationScreen = lazyPage(() => import('./components/cocktails/PreparationScreen.vue'));
+const BarScreenshot = lazyPage(() => import('./components/game/BarScreenshot.vue'));
 import BarScene from './components/game/BarScene.vue';
 import TopHud from './components/game/TopHud.vue';
 import GuideSheet from './components/knowledge/GuideSheet.vue';
@@ -33,18 +35,19 @@ const StartingBarPicker = lazyPage(() => import('./components/game/StartingBarPi
 const game = useGameStore();
 const notifications = useNotificationsStore();
 const view = ref('service');
+const screenshotOpen = ref(false);
+const characterInfoOpen = ref(false);
+const characterInfoTab = ref('profile');
 const managementView = ref('inventory');
 // The management screens stay mounted once opened, so edits and scroll positions survive switching tabs.
 const managementOpened = ref(false);
-// The bottom bar has six tabs. Screens that belong together are tabs inside one screen; the bar and the character
-// open from the header (tap the bar name, or the bar icon).
+// Main activities stay in the bottom navigation. The avatar opens character information and settings.
 const nav = [
-  { id: 'service', label: 'Service', mark: 'glass' },
-  { id: 'english', label: 'English', mark: 'chat' },
-  { id: 'manage', label: 'Manage', mark: 'stock' },
+  { id: 'service', label: 'Bar', mark: 'glass' },
+  { id: 'english', label: 'Study', mark: 'chat' },
+  { id: 'manage', label: 'Storage', mark: 'stock' },
   { id: 'circle', label: 'Circle', mark: 'heart' },
-  { id: 'friends', label: 'Friends', mark: 'friends' },
-  { id: 'settings', label: 'Settings', mark: 'settings' }
+  { id: 'friends', label: 'Friends', mark: 'friends' }
 ];
 const SECTIONS: Record<string, { id: string; label: string }[]> = {
   english: [{ id: 'learn', label: 'Learn' }, { id: 'recipes', label: 'Recipes' }, { id: 'advisor', label: 'Pairings' }],
@@ -52,7 +55,7 @@ const SECTIONS: Record<string, { id: string; label: string }[]> = {
   bar: [{ id: 'regions', label: 'Bars' }, { id: 'design', label: 'Design' }],
   character: [{ id: 'profile', label: 'Profile' }, { id: 'look', label: 'Look' }]
 };
-const sub = reactive<Record<string, string>>({ english: 'learn', manage: 'market', bar: 'regions', character: 'profile' });
+const sub = reactive<Record<string, string>>({ english: 'learn', manage: 'inventory', bar: 'regions', character: 'profile' });
 // Older names (the tour, the training lessons and the header use them) lead to the right tab.
 const LEGACY: Record<string, [string, string]> = {
   inventory: ['manage', 'inventory'], market: ['manage', 'market'], workshop: ['manage', 'workshop'],
@@ -95,7 +98,7 @@ watch(() => game.sessionReady, (ready) => {
   if (!game.dailyLessonsComplete) notifications.push('dailyLesson','Daily English quests','Complete today’s lessons for XP, crystals and a recipe chance.',`daily-lesson:${today}`);
 }, { immediate:true });
 watch(() => game.customers.map((customer) => customer.id).join(','),(next,previous) => {
-  if (previous && next && next !== previous) notifications.push('customer','A new customer arrived','Open Service to greet the new guest.',`customer:${next}`);
+  if (previous && next && next !== previous) notifications.push('customer','A new customer arrived','Open Bar and tap the guest to greet them.',`customer:${next}`);
 });
 watch(() => game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'incoming').map((friend) => friend.code).join(','),(next,previous) => {
   if (next && next !== previous) notifications.push('friendRequest','New friend request','Open Friends to accept or decline.',`friend-request:${next}`);
@@ -159,6 +162,8 @@ const badges = computed<Record<string, number>>(() => ({
 }));
 
 function selectView(id: string) {
+  if (id === 'settings') { characterInfoTab.value = 'settings'; characterInfoOpen.value = true; return; }
+  characterInfoOpen.value = false;
   const legacy = LEGACY[id];
   if (legacy) { view.value = legacy[0]; sub[legacy[0]] = legacy[1]; } else view.value = id;
 }
@@ -167,13 +172,11 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
 </script>
 
 <template>
-  <div class="velvet-app">
-    <TopHud @design="selectView('design')" @goto="selectView" />
+  <div class="velvet-app" :class="{ 'service-mode': view === 'service' }" :inert="screenshotOpen || undefined">
+    <TopHud @design="selectView('design')" @goto="selectView" @profile="characterInfoOpen = true" />
     <main>
       <section v-show="view === 'service'" class="service-layout">
-        <PopularityBar />
-        <BarScene :active="view === 'service'" />
-        <CocktailWorkspace />
+        <BarScene :active="view === 'service'" @screenshot="screenshotOpen = true" />
       </section>
       <SectionTabs v-if="sectionTabs.length" v-model="sub[view]" :tabs="sectionTabs" :label="view" />
       <BarChips v-if="view === 'bar'" />
@@ -186,6 +189,14 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
       <ManagementDeck v-if="managementOpened" v-show="!!deckView" :active-view="managementView" :design-section="designSection" />
     </main>
     <ConversationPopup v-if="game.conversationCustomerId" />
+    <PreparationScreen v-if="game.preparationCustomerId" />
+    <BarScreenshot v-if="screenshotOpen" @close="screenshotOpen = false" />
+    <ModalDialog v-if="characterInfoOpen" title="Your character" class="character-info-popup" @close="characterInfoOpen = false">
+      <SectionTabs v-model="characterInfoTab" :tabs="[{id:'profile',label:'Character'},{id:'settings',label:'Settings'}]" label="Character information" />
+      <ProfilePage v-if="characterInfoTab === 'profile'" />
+      <SettingsPage v-else @goto="selectView" />
+      <UiButton v-if="characterInfoTab === 'profile'" @click="selectView('character'); sub.character = 'look'">Change appearance</UiButton>
+    </ModalDialog>
     <GuideSheet />
     <NotificationToasts />
     <RewardPopup />

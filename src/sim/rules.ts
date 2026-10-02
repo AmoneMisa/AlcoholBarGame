@@ -30,7 +30,7 @@ import { accrueStaff, hireStaff, upgradeStaff } from './staff';
 import { CompanionError, assignCompanion, buyKeepsake, companionVisit, dismissCompanion, giveKeepsake, recruitCompanion, spotlightCompanion, levelUpCompanion } from './companions';
 import { COMPANIONS, companionName } from '../domain/companions';
 import { applyPromo, barEventFor, tickBarEvent } from './events';
-import { adjustPitch, askPitch, cancelPitch, pitchChance, startPitch } from './pitch';
+import { adjustPitch, askPitch, cancelPitch, pitchChance, startPitch, serveFoodAtCounter } from './pitch';
 import { pitchActsIn } from '../domain/social/pitchActs';
 import { foodById } from '../domain/foods';
 import { discardQuarantine, expireStock, fileClaim, goodAmount, receiveOrder, takeLowGrade } from './stockQuality';
@@ -43,6 +43,8 @@ import { DELIVERY_DAY_MS, createInitialState, levelFor, normalizePlayerState, wi
 // ask for an action — it can never set coins, stock, XP or timers itself. Every payload is treated as untrusted.
 
 export type GameAction =
+  | { type: 'collectTips' }
+  | { type: 'serveFood'; ingredientId: string }
   | { type: 'tick' }
   | { type: 'serve'; mix: InventoryItem[]; shaken: boolean; pourBrands: Record<string, string>; auto?: boolean }
   | { type: 'buy'; supplierId: string; cart: Record<string, number> }
@@ -56,7 +58,7 @@ export type GameAction =
   | { type: 'buyInterior'; interiorId: string }
   | { type: 'buyStyle'; cosmeticId: string }
   | { type: 'buyBottleStock'; productId: string; quantity?: number }
-  | { type: 'expediteCustomer' }
+  | { type: 'expediteCustomer'; seatId?: number }
   | { type: 'switchBar'; regionId: RegionId }
   | { type: 'chooseStartingBar'; regionId: RegionId }
   | { type: 'buyBar'; regionId: RegionId }
@@ -312,7 +314,10 @@ function guestContext(state: PlayerState, now: number, random: () => number): Gu
   };
 }
 
-function welcomeNextCustomer(state: PlayerState, now: number, random: () => number) {
+function welcomeNextCustomer(state: PlayerState, now: number, random: () => number, seatId?: number) {
+  scheduleArrival(state, guestContext(state, now, random));
+  const seat = seatId ?? state.seatNextCustomerAt!.findIndex(time => time > 0 && time === state.nextCustomerAt);
+  if (seat < 0 || state.customers.some(guest => guest.seatId === seat)) return;
   const arrival = makeArrivingCustomer(state, now, random);
   // The sound system keeps guests happy for longer; a guest may come for the bar's own signature cocktail.
   const patienceFactor = lootBonuses(state, now).patienceFactor;
@@ -324,12 +329,14 @@ function welcomeNextCustomer(state: PlayerState, now: number, random: () => numb
   // Dirty ashtrays make a bar smell of old smoke: new guests like it a little less.
   const dirty = ashtraysOf(state).dirty;
   if (dirty) arrival.social.rapport = Math.max(0, arrival.social.rapport - Math.min(12, dirty * 4));
+  arrival.seatId = seat;
   state.customers.push(arrival);
   const trouble = pickSituation(state, arrival, 'arrival', random);
   if (trouble) startSituation(state, arrival, trouble, now, random);
-  state.activeCustomerId = arrival.id;
-  state.nextCustomerAt = 0;
-  state.lastClockAt = now;
+  if (!state.customers.some(guest => guest.id === state.activeCustomerId && isOrdering(guest))) state.activeCustomerId = arrival.id;
+  state.seatNextCustomerAt![seat] = 0;
+  scheduleArrival(state, guestContext(state, now, random));
+  if (orderingGuests(state).length === 1) state.lastClockAt = now;
   state.message = arrival.specialRecipeRewardId ? `VIP guest ${arrival.name} arrived with a recipe challenge.`
     : `${arrival.mood === 'vip' ? 'VIP guest' : 'A new customer'} ${arrival.name} arrived${dirty ? ' — and wrinkled their nose at the dirty ashtrays' : ''}.`;
 }
@@ -400,10 +407,10 @@ export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now
     const resolution = resolveIgnored(state, waiting, now, random);
     if (resolution) applyResolution(state, waiting, resolution, guests);
   }
-  // A guest walks in only while nobody is waiting to order and a seat is free.
-  if (!orderingGuests(state).length) {
-    if (context.spawnCustomers !== false && state.nextCustomerAt && now >= state.nextCustomerAt && state.customers.length < MAX_SEATS) welcomeNextCustomer(state, now, random);
-    else if (!state.nextCustomerAt) scheduleArrival(state, guests);
+  scheduleArrival(state, guests);
+  if (context.spawnCustomers !== false) for (let seat=0; seat<MAX_SEATS; seat++) {
+    const due = state.seatNextCustomerAt![seat];
+    if (due && due <= now && state.customers.length < MAX_SEATS) welcomeNextCustomer(state, now, random, seat);
   }
   const waiting = orderingGuests(state);
   const guest = waiting.find((item) => item.id === state.activeCustomerId) ?? waiting[0];
@@ -450,6 +457,25 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
   const region = REGIONS.find((item) => item.id === state.regionId)!;
 
   switch (action.type) {
+    case 'collectTips': {
+      const amount = state.tipJar ?? 0;
+      if (amount <= 0) throw new RuleError('The tip jar is empty.');
+      state.money = coins(state.money + amount);
+      state.tipJar = 0;
+      state.message = `Collected ${amount.toLocaleString('en-US')} coins from the tip jar.`;
+      break;
+    }
+    case 'serveFood': {
+      if (!guest || !guest.orderRevealed || hasSituation(guest)) throw new RuleError('Confirm the guest’s order and resolve their situation first.');
+      const balance = state.money;
+      const result = serveFoodAtCounter(state, guest, action.ingredientId, now);
+      if (!result.accepted) throw new RuleError(result.text);
+      const paid = state.money - balance;
+      const tip = rollTip(state, guest, now, random) ? Math.max(1, Math.ceil(paid * .1)) : 0;
+      state.tipJar = coins((state.tipJar ?? 0) + tip);
+      if (tip) state.message += ` Tip +${tip} in the jar.`;
+      break;
+    }
     case 'tick': break;
 
     case 'selectCustomer':
@@ -505,7 +531,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       stock.quantity -= request.quantity;
       const tip = rollTip(state, guest, now, random) ? Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .08 : .03) * economyOf(state, now).tips) : 0;
       const paid = coins(revenue * lootBonuses(state, now).bottleSaleFactor);
-      state.money = coins(state.money + paid + tip);
+      state.money = coins(state.money + paid);
+      state.tipJar = coins((state.tipJar ?? 0) + tip);
       const crystalPayment = bottleSaleCrystalReward(product, request.quantity);
       state.crystals += crystalPayment;
       state.xp += xpGain(state, 110 + Math.min(state.streak * 2, 14), now);
@@ -592,7 +619,10 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const promo = applyPromo(state, guest, verdict.recipe, now);
         const complaint = !promo.free && lowGradeUsed.size && random() < (lowGradeUsed.has('expiring') ? .4 : .2) ? situationById('complaint-quality') : undefined;
         const payTrouble = promo.free ? undefined : complaint ?? pickSituation(state, guest, 'payment', random);
-        if (!payTrouble && !promo.free) state.money = coins(state.money + revenue + tip);
+        if (!payTrouble && !promo.free) {
+          state.money = coins(state.money + revenue);
+          state.tipJar = coins((state.tipJar ?? 0) + tip);
+        }
         // About 170 successful orders reach level 25 and about 700 reach the level 50 cap.
         state.xp += xpGain(state, 100 + Math.min(state.streak * 2, 14), now);
         state.streak += 1;
@@ -635,7 +665,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         if (payTrouble) {
           recordDrink(guest, drunkGain(abv), now);
           holdForPayment(guest, now);
-          addGuestLine(state, guest, startSituation(state, guest, payTrouble, now, random, { amount: coins(revenue + tip), afterServe: true, data: complaint ? { reason: lowGradeUsed.has('expiring') ? 'expiring' : 'damaged' } : undefined }));
+          addGuestLine(state, guest, startSituation(state, guest, payTrouble, now, random, { amount: coins(revenue), afterServe: true, data: complaint ? { reason: lowGradeUsed.has('expiring') ? 'expiring' : 'damaged' } : undefined }));
           state.message = `${note} But there is a problem with the payment.${found}`;
         } else {
           const outcome = afterServed(state, guest, drunkGain(abv), guestContext(state, now, random));
@@ -865,12 +895,16 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       break;
     }
     case 'expediteCustomer': {
-      if (state.customers.length || !state.nextCustomerAt) throw new RuleError('A customer is already at the bar.');
-      const cost = arrivalSkipCrystalCost(state.nextCustomerAt - now);
+      const seat = action.seatId ?? state.seatNextCustomerAt?.findIndex(time => time > 0 && time === state.nextCustomerAt);
+      if (seat === undefined || !Number.isInteger(seat) || seat < 0 || seat >= MAX_SEATS) throw new RuleError('Choose a valid customer seat.');
+      if (state.customers.some(customer => customer.seatId === seat)) throw new RuleError('This customer seat is already occupied.');
+      const arrivalAt = state.seatNextCustomerAt?.[seat];
+      if (!arrivalAt) throw new RuleError('This customer is already arriving.');
+      const cost = arrivalSkipCrystalCost(arrivalAt - now);
       if (cost <= 0) throw new RuleError('The next customer is already arriving.');
       if (state.crystals < cost) throw new RuleError(`You need ${cost} crystals to welcome the next customer now.`);
       state.crystals -= cost;
-      welcomeNextCustomer(state, now, random);
+      welcomeNextCustomer(state, now, random, seat);
       state.message = `The next customer arrived early for ${cost} crystals.`;
       break;
     }

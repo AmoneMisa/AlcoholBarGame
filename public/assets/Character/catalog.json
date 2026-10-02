@@ -1,0 +1,23 @@
+{
+  "models": [
+    {
+      "model": "woman",
+      "rig": "atelier-adult-01",
+      "directory": "Woman",
+      "manifest": "Woman/manifest.json",
+      "combinations": "Woman/combinations.svg",
+      "assetCount": 26,
+      "productionApproved": false
+    },
+    {
+      "model": "man",
+      "rig": "atelier-adult-man-01",
+      "directory": "Man",
+      "manifest": "Man/manifest.json",
+      "combinations": "Man/combinations.svg",
+      "assetCount": 26,
+      "productionApproved": false
+    }
+  ],
+  "legacyWomanLibrary": "manifest.json"
+}

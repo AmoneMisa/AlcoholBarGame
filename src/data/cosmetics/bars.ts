@@ -1,6 +1,7 @@
 import type { RegionId } from '../../domain/types';
 import { REFERENCE_COSTUME_IDS } from './bartenderCostumes';
 import { THEMED_INTERIORS } from './themedBars';
+import { GAME_THEME_SHELVES } from './gameThemeExpansion';
 
 export const INTERIORS = [
   { id:'velvet',name:'Velvet lounge',asset:'/assets/bar/backgrounds/velvet-hour-bar.webp',tint:'#2d0d1e55',position:'center',blend:'multiply',crystalCost:0 },
@@ -40,6 +41,7 @@ export const COUNTER_SIZES = ['slim','standard','grand'] as const;
 export const SHELF_STYLES = ['auto','walnut','brass','glass','neon','marble','bamboo','rustic'] as const;
 export type ShelfStyle = Exclude<typeof SHELF_STYLES[number], 'auto'>;
 const SHELF_FOR_INTERIOR: Partial<Record<string, ShelfStyle>> = {
+  ...GAME_THEME_SHELVES,
   underwater:'glass', underground:'rustic', fairy:'bamboo', fairytale:'walnut',
   'lineage-2':'brass', 'perfect-world':'marble', 'warcraft-3':'rustic', allods:'brass',
   'lost-ark':'marble', 'mass-effect':'glass', 'nfs-most-wanted':'rustic', 'nfs-carbon':'neon', 'nfs-underground':'neon',

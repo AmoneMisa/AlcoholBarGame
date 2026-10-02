@@ -1,0 +1,299 @@
+{
+  "id": "atelier-adult-01",
+  "revision": 1,
+  "status": "prototype-awaiting-art-approval",
+  "canvas": {
+    "width": 600,
+    "height": 1000
+  },
+  "camera": {
+    "projection": "orthographic",
+    "view": "front",
+    "scale": 1
+  },
+  "lighting": "upper-left, soft key, warm ambient",
+  "anchors": {
+    "head": [
+      300,
+      150
+    ],
+    "eyeLeft": [
+      274,
+      151
+    ],
+    "eyeRight": [
+      326,
+      151
+    ],
+    "browLeft": [
+      274,
+      135
+    ],
+    "browRight": [
+      326,
+      135
+    ],
+    "nose": [
+      300,
+      174
+    ],
+    "mouth": [
+      300,
+      192
+    ],
+    "neck": [
+      300,
+      233
+    ],
+    "shoulderLeft": [
+      240,
+      256
+    ],
+    "shoulderRight": [
+      360,
+      256
+    ],
+    "waist": [
+      300,
+      405
+    ],
+    "hip": [
+      300,
+      490
+    ],
+    "handLeft": [
+      190,
+      545
+    ],
+    "handRight": [
+      410,
+      545
+    ],
+    "earLeft": [
+      248,
+      169
+    ],
+    "earRight": [
+      352,
+      169
+    ],
+    "crown": [
+      300,
+      94
+    ],
+    "feet": [
+      300,
+      943
+    ]
+  },
+  "pivots": {
+    "torso": [
+      300,
+      405
+    ],
+    "hair": [
+      300,
+      115
+    ],
+    "fabric": [
+      300,
+      405
+    ],
+    "accessory": [
+      300,
+      233
+    ]
+  },
+  "layers": [
+    "rearAccessories",
+    "hairBack",
+    "rearClothing",
+    "body",
+    "face",
+    "eyes",
+    "brows",
+    "nose",
+    "mouth",
+    "makeup",
+    "clothing",
+    "clothingOverlay",
+    "hairFront",
+    "accessories",
+    "foreground"
+  ],
+  "sha256": "48a200b5b9a03ec3772e2afdc4f906d7528ccc977ad20bda502fd776a888f602",
+  "colorRegions": [
+    "skin",
+    "hairColor",
+    "iris",
+    "lips",
+    "primary",
+    "secondary",
+    "trim"
+  ],
+  "assets": [
+    {
+      "id": "Hair/Back/cascade",
+      "file": "Hair/Back/cascade.svg",
+      "layer": "hairBack",
+      "motion": "hair",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Base/Body",
+      "file": "Base/Body.svg",
+      "layer": "body",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Face/Eyes/almond",
+      "file": "Face/Eyes/almond.svg",
+      "layer": "eyes",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Face/Eyebrows/arched",
+      "file": "Face/Eyebrows/arched.svg",
+      "layer": "brows",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Face/Nose/soft",
+      "file": "Face/Nose/soft.svg",
+      "layer": "nose",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Face/Mouth/neutral",
+      "file": "Face/Mouth/neutral.svg",
+      "layer": "mouth",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Face/Makeup/blush",
+      "file": "Face/Makeup/blush.svg",
+      "layer": "makeup",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Clothing/Dresses/evening",
+      "file": "Clothing/Dresses/evening.svg",
+      "layer": "clothing",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Clothing/Overlays/evening",
+      "file": "Clothing/Overlays/evening.svg",
+      "layer": "clothingOverlay",
+      "motion": "fabric",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Hair/Front/cascade",
+      "file": "Hair/Front/cascade.svg",
+      "layer": "hairFront",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Accessories/moon",
+      "file": "Accessories/moon.svg",
+      "layer": "accessories",
+      "motion": "accessory",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Face/Eyes/round",
+      "file": "Face/Eyes/round.svg",
+      "layer": "eyes",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Face/Eyes/soft",
+      "file": "Face/Eyes/soft.svg",
+      "layer": "eyes",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Face/Eyebrows/straight",
+      "file": "Face/Eyebrows/straight.svg",
+      "layer": "brows",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Face/Eyebrows/gentle",
+      "file": "Face/Eyebrows/gentle.svg",
+      "layer": "brows",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Face/Mouth/smile",
+      "file": "Face/Mouth/smile.svg",
+      "layer": "mouth",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Face/Mouth/full",
+      "file": "Face/Mouth/full.svg",
+      "layer": "mouth",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Hair/Back/bob",
+      "file": "Hair/Back/bob.svg",
+      "layer": "hairBack",
+      "motion": "hair",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Hair/Front/bob",
+      "file": "Hair/Front/bob.svg",
+      "layer": "hairFront",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Hair/Back/updo",
+      "file": "Hair/Back/updo.svg",
+      "layer": "hairBack",
+      "motion": "hair",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Hair/Front/updo",
+      "file": "Hair/Front/updo.svg",
+      "layer": "hairFront",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Clothing/Tops/tailored",
+      "file": "Clothing/Tops/tailored.svg",
+      "layer": "clothing",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Clothing/Overlays/tailored",
+      "file": "Clothing/Overlays/tailored.svg",
+      "layer": "clothingOverlay",
+      "motion": "fabric",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Accessories/pearls",
+      "file": "Accessories/pearls.svg",
+      "layer": "accessories",
+      "motion": "accessory",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Face/Nose/defined",
+      "file": "Face/Nose/defined.svg",
+      "layer": "nose",
+      "rig": "atelier-adult-01"
+    },
+    {
+      "id": "Face/Makeup/freckles",
+      "file": "Face/Makeup/freckles.svg",
+      "layer": "makeup",
+      "rig": "atelier-adult-01"
+    }
+  ]
+}

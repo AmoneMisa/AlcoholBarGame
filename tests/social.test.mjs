@@ -112,7 +112,7 @@ test('A guest with nothing left to stay for leaves after the drink, and new gues
   assert.equal(stay.state.customers.length, 1);
   assert.ok(stay.state.nextCustomerAt > 0, 'someone new is on the way while the guest enjoys the drink');
   advanceClock(stay.state, context(stay.state.nextCustomerAt + 1));
-  assert.equal(stay.state.customers.length, 2, 'a new guest sat down next to the seated one');
+  assert.ok(stay.state.customers.length >= 2, 'due seats fill next to the seated guest');
   assert.equal(stay.state.customers[1].social.phase, 'ordering');
 });
 

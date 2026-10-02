@@ -1,3 +1,4 @@
+import {createHash, timingSafeEqual} from 'node:crypto';
 import express from 'express';
 import { authenticate } from './auth.mjs';
 
@@ -5,7 +6,7 @@ import { authenticate } from './auth.mjs';
 //   POST /api/session  → create/load the player's game and return it
 //   POST /api/action   → { requestId, action } → apply one action on the server, return the new state
 
-export function createApp({ service, botToken, allowDevLogin = false, extraRoutes, createInvoiceLink }) {
+export function createApp({ service, botToken, allowDevLogin = false, extraRoutes, createInvoiceLink, adminToken }) {
   const app = express();
   app.disable('x-powered-by');
   // Behind the host's nginx / Caddy: use the real client address for rate limits.
@@ -37,6 +38,12 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
   });
   const who = (request) => request.identity;
 
+  app.post('/api/admin/promocodes', async (request,response,next)=> {
+    const supplied = request.get('authorization')?.replace(/^Bearer /,'') ?? '';
+    if (!adminToken || !timingSafeEqual(createHash('sha256').update(supplied).digest(),createHash('sha256').update(adminToken).digest())) return response.status(403).json({ok:false,error:'Administrator access required.'});
+    try { const result = await service.createPromoCode(request.body); if (result.status) response.status(result.status).json(result.body); else response.json(result); } catch(error) { next(error); }
+  });
+  route('/api/promocodes/redeem', request => service.redeemPromoCode(who(request),request.body?.code));
   route('/api/session', (request) => service.session(who(request)));
   route('/api/action', (request) => service.act(who(request), request.body));
 

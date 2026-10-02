@@ -5,7 +5,7 @@ import UiIcon from './UiIcon.vue';
 // One row per thing received: an icon for what it is and the amount.
 defineProps<{ lines: RewardLine[] }>();
 const ICONS: Record<RewardKind, string> = {
-  coins: 'coin', tip: 'coin', crystals: 'crystal', xp: 'star', recipe: 'book', style: 'brush', background: 'pin', card: 'book', prestige: 'trophy', level: 'star', gift: 'gift'
+  coins: 'coin', tip: 'coin', crystals: 'crystal', xp: 'star', recipe: 'book', style: 'brush', background: 'pin', card: 'book', prestige: 'trophy', level: 'star', gift: 'gift', companion: 'friends', item: 'gift', box: 'gift', material: 'crystal'
 };
 </script>
 

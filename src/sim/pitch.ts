@@ -163,6 +163,15 @@ function acceptDrink(state: PlayerState, guest: Customer, pitch: Pitch, price: n
   return { accepted: true, kind: 'drink', itemId: recipe.id, violation, text: guest.request };
 }
 
+export function serveFoodAtCounter(state: PlayerState, guest: Customer, id: string, now: number): PitchResult {
+  const social = ensureSocial(guest, now);
+  const food = foodById(id);
+  if (!food || goodAmount(state, id) < 1) return { accepted: false, kind: 'food', itemId: id, text: 'This food is not available in your bar.' };
+  if (social.allergyKnown && social.allergy && allergenOf(id) === social.allergy) return { accepted: false, kind: 'food', itemId: id, text: `${guest.name} told you they are allergic to this.` };
+  const pitch: Pitch = { kind: 'food', itemId: id, bonus: 0, used: [], discount: 0 };
+  return acceptFood(state, guest, pitch, priceOf(state, guest, pitch), now);
+}
+
 function acceptFood(state: PlayerState, guest: Customer, pitch: Pitch, price: number, now: number): PitchResult {
   const social = ensureSocial(guest, now);
   const food = foodById(pitch.itemId)!;

@@ -19,7 +19,7 @@ const telegramBot = createTelegramBot({ token: botToken, payments });
 
 const service = createGameService({ repository: createPgRepository(pool), checkEnglish });
 Object.assign(payments, { approve: service.approveStarCheckout, fulfil: service.fulfilStarPayment });
-const app = createApp({
+const app = createApp({ adminToken: process.env.ADMIN_API_TOKEN,
   service, botToken, allowDevLogin,
   createInvoiceLink: botToken ? telegramBot.createInvoiceLink : undefined,
   extraRoutes(api) {

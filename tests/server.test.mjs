@@ -482,6 +482,8 @@ test('Weekly leaderboard: ranks by XP earned this week, shows bar names only, an
   assert.ok(board.top[0].score > board.top[1].score && board.top[1].score > board.top[2].score);
   assert.equal(board.me.rank, 1);
   assert.equal(board.top[0].label, repository.states.get(sa.player.id).state.bars['new-york'].name);
+  assert.equal(board.top[0].look.bartenderCharacter, repository.states.get(sa.player.id).state.bars['new-york'].bartenderCharacter);
+  assert.ok(board.top.every(row => Object.keys(row.look ?? {}).every(key => !['money', 'crystals', 'inventory', 'name'].includes(key))), 'podium exposes appearance only');
   assert.doesNotMatch(JSON.stringify(board), /Player 100/, 'account names are never exposed');
   assert.equal((await service.leaderboard(c)).me.rank, 3);
 

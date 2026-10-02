@@ -1,5 +1,17 @@
 import type { Customer, Mood } from './types';
 
+export const MAX_CUSTOMER_SEATS = 5;
+
+/** Only occupied seats outside the visible part of the guest track need a notification. */
+export function hiddenCustomerDirections(seats: number[], scroll: number, spacing: number, viewport: number) {
+  if (spacing <= 0 || viewport <= 0) return { left: false, right: false };
+  const occupied = seats.filter(seat => Number.isInteger(seat) && seat >= 0 && seat < MAX_CUSTOMER_SEATS);
+  return {
+    left: occupied.some(seat => seat * spacing < scroll - 2),
+    right: occupied.some(seat => (seat + 1) * spacing > scroll + viewport + 2)
+  };
+}
+
 export const CUSTOMER_ARRIVAL_MIN_MS = 5 * 60 * 1000;
 export const CUSTOMER_ARRIVAL_MAX_MS = 2 * 60 * 60 * 1000;
 export const VIP_CHANCE = .10;
