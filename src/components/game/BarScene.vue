@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { enjoyingOpening } from '../../domain/social/talk';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { CUSTOMER_ART_BY_SLOT } from '../../data/cosmetics/artCatalog';
 import { INGREDIENTS, RECIPES } from '../../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../../domain/bottleCatalog';
-import { buildProfile, shortWish } from '../../domain/conversation/customerTalk';
 import type { Customer } from '../../domain/types';
 import { DRUNK_LABEL, EMOTION_ICON, EMOTION_LABEL, drunkStage } from '../../domain/social/model';
 import type { CharacterExpression } from '../../domain/dialogue/types';
@@ -89,12 +87,14 @@ const people = computed(() => {
   // The bartender works on the side away from the bottle shelf, so they never hide the bottles.
   const shelfOnRight = (current.shelf.left + current.shelf.right) / 2 > width * .6;
   const side = phone ? .84 : .86;
-  const bartenderX = barLayout.positions[game.decor.interior] !== undefined ? width * barLayout.positions[game.decor.interior]! : current.bartenderX ?? Math.round(width * (shelfOnRight ? 1 - side : side));
-  if (phone) guest = Math.min(guest, Math.floor((Math.max(bartenderX, width - bartenderX) - bartender * .24 - 14) / 2 / .8));
+  const guestAnchorX = current.bartenderX ?? Math.round(width * (shelfOnRight ? 1 - side : side));
+  const bartenderX = barLayout.positions[game.decor.interior] !== undefined ? width * barLayout.positions[game.decor.interior]! : guestAnchorX;
+  if (phone) guest = Math.min(guest, Math.floor((Math.max(guestAnchorX, width - guestAnchorX) - bartender * .24 - 14) / 2 / .8));
   // The glass stands at the bartender's left hand; only at the scene's left edge does it move to the right.
   const glassOffset = bartender * (phone ? .20 : .22);
   const glassX = bartenderX - glassOffset < 60 ? bartenderX + glassOffset : bartenderX - glassOffset;
-  return { guest, bartender, bartenderX, glassX, shelfOnRight, bartenderHalfWidth: bartender * .24 };
+  const guestGlassX = guestAnchorX - glassOffset < 60 ? guestAnchorX + glassOffset : guestAnchorX - glassOffset;
+  return { guest, bartender, bartenderX, glassX, guestAnchorX, guestGlassX, shelfOnRight, bartenderHalfWidth: bartender * .24 };
 });
 const sceneVars = computed(() => {
   const current = layout.value;
@@ -114,7 +114,7 @@ const seatXs = computed(() => {
   const current = layout.value;
   const sizes = people.value;
   const blocked = (x: number) => sizes
-    ? Math.abs(x - sizes.bartenderX) < sizes.bartenderHalfWidth + 60 || Math.abs(x - sizes.glassX) < 90
+    ? Math.abs(x - sizes.guestAnchorX) < sizes.bartenderHalfWidth + 60 || Math.abs(x - sizes.guestGlassX) < 90
     : false;
   // Free spots at the counter for when every visible stool is taken (narrow phones show only one or two).
   const spots = [width * .28, width * .5, width * .18].filter((x) => !blocked(x));
@@ -132,9 +132,9 @@ const guestZone = computed(() => {
   const { width } = sceneBox.value;
   if (!sizes || !width) return undefined;
   const reserve = sizes.bartenderHalfWidth + 14;
-  const bartenderOnLeft = sizes.bartenderX < width / 2;
-  const start = bartenderOnLeft ? Math.min(width - 80, Math.round(sizes.bartenderX + reserve)) : 0;
-  const end = bartenderOnLeft ? width : Math.max(80, Math.round(sizes.bartenderX - reserve));
+  const bartenderOnLeft = sizes.guestAnchorX < width / 2;
+  const start = bartenderOnLeft ? Math.min(width - 80, Math.round(sizes.guestAnchorX + reserve)) : 0;
+  const end = bartenderOnLeft ? width : Math.max(80, Math.round(sizes.guestAnchorX - reserve));
   return { start, end };
 });
 const phoneTrack = computed(() => {
@@ -143,7 +143,7 @@ const phoneTrack = computed(() => {
   if (!sizes || !zone || (sceneBox.value.width >= 760 && zone.end - zone.start >= MAX_CUSTOMER_SEATS * sizes.guest * .8)) return undefined;
   const spacing = sceneBox.value.width < 760 ? Math.floor((zone.end - zone.start) / 2) : Math.round(sizes.guest * .8) + 4;
   const visible = Math.max(1, Math.floor((zone.end - zone.start) / spacing)) * spacing;
-  const start = people.value!.bartenderX < sceneBox.value.width / 2 ? zone.end - visible : zone.start;
+  const start = sizes.guestAnchorX < sceneBox.value.width / 2 ? zone.end - visible : zone.start;
   return { start, end:start + visible, zone:visible, spacing, content: MAX_CUSTOMER_SEATS * spacing };
 });
 // Wider screens seat everyone at once: on the painted stools while there are enough distinct ones,
@@ -345,16 +345,12 @@ function badges(customer: Customer) {
   return list;
 }
 function bubbleText(customer: Customer) {
-  if (customer.social?.need && customer.social.need.since <= game.nowMs) return enjoyingOpening(customer, game.nowMs);
-  if (customer.pendingPayment) return `Ready to pay ${customer.pendingPayment.coins.toFixed(0)} coins.`;
-  // Something the guest said on their own (about the drink, the room, their life) shows for a while.
-  const murmur = customer.social?.murmur;
-  if (murmur && murmur.until > game.nowMs) return murmur.text;
-  if (customer.orderRevealed) return customer.request;
-  if (customer.wish) return customer.wish;
-  if (customer.orderKind === 'bottle') return `I need bottles for a ${customer.bottleRequest?.occasion ?? 'special occasion'}.`;
-  const recipe = RECIPES.find((item) => item.id === customer.orderRecipeId);
-  return recipe ? shortWish(buildProfile(recipe)) : customer.request;
+  const greetings = ['Hello!', 'Hi!', 'Good evening!', 'Hey there!', 'Nice to see you!'];
+  const seed = [...customer.id].reduce((sum, letter) => sum + letter.charCodeAt(0), 0);
+  return greetings[seed % greetings.length];
+}
+function customerStatus(customer: Customer) {
+  return customer.pendingPayment ? 'Payment' : customer.social?.phase === 'enjoying' ? 'Served' : customer.orderRevealed ? 'Confirmed' : 'Pending';
 }
 function patience(value: number, total: number) { return Math.max(0, Math.min(100, value / total * 100)); }
 function setRequestedBrand(id: string) {
@@ -546,7 +542,7 @@ onBeforeUnmount(() => {
           <header><b>{{ customer.name }}</b><time v-if="!game.trainingActive && customer.id === game.activeCustomerId">{{ game.orderCountdown }}</time></header>
           <small class="guest-badges"><span v-for="badge in badges(customer)" :key="badge.label" :title="badge.label"><img v-if="badge.icon === 'ashtray'" class="ashtray-badge" :src="ashtrayArt" alt="" /><Glyph v-else :g="badge.icon" /></span><i v-if="!customer.social">{{ customer.mood }}</i><i v-else>{{ customer.pendingPayment ? 'payment' : customer.social.phase === 'enjoying' ? 'enjoying' : EMOTION_LABEL[customer.social.emotion].toLowerCase() }}</i></small>
           <p>{{ bubbleText(customer) }}</p>
-          <footer><span v-if="!game.trainingActive" class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customer.pendingPayment ? 'Awaiting payment' : customer.social?.phase === 'enjoying' ? 'Enjoying the drink' : customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
+          <footer><span v-if="!game.trainingActive" class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customerStatus(customer) }}</em></footer>
         </div>
       </button>
       <button v-else type="button" class="scene-customer empty-seat" :style="customerStyle(index)" :aria-label="`Invite guest to seat ${index + 1} · next guest in ${countdown}`" @click="inviteSeat = index">

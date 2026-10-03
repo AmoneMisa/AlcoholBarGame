@@ -138,7 +138,8 @@ export type GameAction =
   | { type: 'claimQuest'; questId: string }
   | { type: 'claimAchievement'; id: string }
 
-export class RuleError extends Error {}
+import { RuleError } from './rulesError';
+export { RuleError } from './rulesError';
 
 export interface RuleContext {
   beforeAction?: () => void;

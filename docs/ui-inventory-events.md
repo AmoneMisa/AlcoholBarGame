@@ -41,3 +41,11 @@ The game UI is English only.
 - Crafting, chest use and negotiation actions are loaded on first use; authoritative server actions stay synchronous. Gift eligibility loads only when the friends screen needs it.
 - Bar tools and fullscreen share button styling and equal 10px scene margins. Circle guests have a bright Circle tag and their own fragment counter above the portrait; joined guests retain their relationship grade.
 - Validation: 327 tests pass; client and server production builds pass.
+
+- Moving the bartender changes only the bartender and work area; guest seats, scale and scroll track use the background's original anchor. Verified unchanged guest bounds on desktop and at 390px width.
+- Scene cards show stable short greetings, with Pending / Confirmed / Served / Payment status. Detailed requests and guest chatter remain in the conversation popup.
+- Upgrades, Mix page and fullscreen use the former compact translucent fullscreen style, matching 28px height, borders and scene margins.
+- UiIcon references individual public WebP files instead of eagerly embedding all 148 icon images. Its emitted JS chunk dropped from 298.26 KB to 21.04 KB (raw); image requests now follow the icons actually displayed.
+- The browser imports simulation rules on the first clock tick or local action, after the bar can mount. Calls waiting for the same load share a request; offline time catches up from the previous timestamp. Shared state/catalog dependencies remain mandatory, so this does not remove all simulation-related code. Server rules and Node simulation tests remain synchronous.
+- Learning, Management, Knowledge and Conversation global styles load only when their async screen is mounted, before its content appears. Code warmup does not request these sheets. The four deferred files total about 71 KB raw. Their original cascade order is preserved before UI kit and polish.
+- Validation: 328 tests pass, including a mandatory-bootstrap dependency regression check; client/server builds pass. Bar, Study, Storage and Conversation checked in the browser.

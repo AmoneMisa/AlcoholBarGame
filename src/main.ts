@@ -9,9 +9,10 @@ import { initGraphics } from './ui/graphics';
   initGraphics();
   await Promise.all([
     import('./style.css'), import('./dashboard.css'), import('./game.css'),
-    import('./conversation.css'), import('./management.css'),
-    import('./learning.css'), import('./knowledge.css'),
   ]);
+  const pageStylesAnchor = document.createElement('meta');
+  pageStylesAnchor.name = 'page-styles-anchor';
+  document.head.append(pageStylesAnchor);
   await import('./ui-kit.css');
   await import('./polish.css'); // last, so its layout fixes win over the older rules
   await import('./performance.css');

@@ -10,12 +10,12 @@ import BarChips from './components/game/BarChips.vue';
 import UiButton from './components/ui/UiButton.vue';
 import ModalDialog from './components/ui/ModalDialog.vue';
 const MailboxPopup = lazyPage(() => import('./components/ui/MailboxPopup.vue'));
-const PreparationScreen = lazyPage(loadPreparation);
+const PreparationScreen = lazyPage(loadPreparation, ['conversation', 'management']);
 const BarScreenshot = lazyPage(() => import('./components/game/BarScreenshot.vue'));
 import BarScene from './components/game/BarScene.vue';
 import TopHud from './components/game/TopHud.vue';
 import { useGuide } from './composables/useGuide';
-const GuideSheet = lazyPage(loadGuide);
+const GuideSheet = lazyPage(loadGuide, ['knowledge']);
 const { current: currentGuide } = useGuide();
 import UiIcon from './components/ui/UiIcon.vue';
 const CompanionsPanel = lazyPage(() => import('./components/workshop/CompanionsPanel.vue'));
@@ -33,9 +33,9 @@ import { ACHIEVEMENTS, questsForWeek, weekOf } from './domain/quests';
 import { initMusic, musicOn, playSfx, refreshMusic, setMusicInterior } from './audio/index';
 
 // Only the bar scene is needed for the first paint; every other screen is fetched when the player opens it.
-const ConversationPopup = lazyPage(loadConversation);
-const ManagementDeck = lazyPage(loadStorage);
-const LearningPage = lazyPage(loadStudy);
+const ConversationPopup = lazyPage(loadConversation, ['conversation', 'learning']);
+const ManagementDeck = lazyPage(loadStorage, ['management']);
+const LearningPage = lazyPage(loadStudy, ['learning']);
 const FriendsPage = lazyPage(() => import('./components/friends/FriendsPage.vue'));
 const EventsPage = lazyPage(() => import('./components/game/EventsPage.vue'));
 const StartingBarPicker = lazyPage(() => import('./components/game/StartingBarPicker.vue'));

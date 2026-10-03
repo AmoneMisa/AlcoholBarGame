@@ -1,3 +1,5 @@
+import ts from 'typescript';
+import { dirname, resolve, extname, relative } from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { warmPages } from '../src/ui/pageWarmup.ts';
@@ -96,4 +98,44 @@ test('a failed speculative page does not block later pages', async () => {
   warmPages([{id:'study',load:async()=>{throw new Error('offline');}},{id:'conversation',load:async()=>{loaded.push('conversation');}}],{allowed:()=>true,busy:()=>false,schedule:run=>{queue.push(run);return()=>{};}});
   queue.shift()(); await new Promise(resolve=>setImmediate(resolve)); queue.shift()();
   await new Promise(resolve=>setImmediate(resolve)); assert.deepEqual(loaded,['conversation']);
+});
+
+
+test('the bar bootstrap does not require simulation actions, page components or embedded icon files', () => {
+  const root = resolve('src');
+  const visited = new Set();
+  function visit(file) {
+    if (visited.has(file)) return;
+    visited.add(file);
+    let text = readFileSync(file, 'utf8');
+    if (file.endsWith('.vue')) text = text.match(/<script[^>]*>([\s\S]*?)<\/script>/)?.[1] ?? '';
+    const ast = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    for (const node of ast.statements) {
+      if (!ts.isImportDeclaration(node) && !ts.isExportDeclaration(node)) continue;
+      if (!node.moduleSpecifier || !ts.isStringLiteral(node.moduleSpecifier)) continue;
+      if (ts.isImportDeclaration(node) && (node.importClause?.isTypeOnly ||
+          node.importClause?.namedBindings && ts.isNamedImports(node.importClause.namedBindings) &&
+          !node.importClause.name && node.importClause.namedBindings.elements.every(item => item.isTypeOnly))) continue;
+      if (ts.isExportDeclaration(node) && node.isTypeOnly) continue;
+      const specifier = node.moduleSpecifier.text;
+      if (!specifier.startsWith('.') || specifier.includes('?')) continue;
+      const target = resolve(dirname(file), specifier);
+      const found = [target, target + '.ts', target + '.vue'].find(candidate => existsSync(candidate));
+      if (found && ['.ts', '.vue'].includes(extname(found))) visit(found);
+    }
+  }
+  visit(resolve(root, 'main.ts'));
+  visit(resolve(root, 'App.vue')); // main mounts App after loading the base styles.
+  const names = new Set([...visited].map(file => relative(root, file).replaceAll('\\', '/')));
+  for (const deferred of ['sim/rulesCore.ts', 'sim/rareActions.ts', 'audio/soundPack.ts',
+    'components/learning/LearningPage.vue', 'components/game/ManagementDeck.vue',
+    'components/conversation/ConversationPopup.vue', 'components/knowledge/GuideSheet.vue']) {
+    assert.equal(names.has(deferred), false, deferred + ' must remain outside the mandatory bootstrap');
+  }
+  const icon = readFileSync(resolve(root, 'components/ui/UiIcon.vue'), 'utf8');
+  assert.ok(!icon.includes('import.meta.glob'), 'icon artwork must not be embedded as one eager JS collection');
+  const main = readFileSync(resolve(root, 'main.ts'), 'utf8');
+  for (const sheet of ['learning', 'management', 'knowledge', 'conversation']) {
+    assert.ok(!main.includes("import('./" + sheet + ".css')"), sheet + ' styles must wait for its screen');
+  }
 });

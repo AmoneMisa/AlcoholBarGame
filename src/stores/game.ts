@@ -32,7 +32,9 @@ import { formatCountdown } from '../domain/customerTiming';
 import { spinsLeft } from '../domain/roulette';
 import { passEndsOf, passIdOf, passLevel, passPointsFor, passThemeOf, readyPassRewards } from '../domain/pass';
 import { checkText } from '../domain/english/checker';
-import { advanceClock, applyAction, previewTopUp, RuleError, isRareAction, rareActionsReady, installRareActions, type GameAction } from '../sim/rulesCore';
+import type { GameAction } from '../sim/rulesCore';
+import { RuleError } from '../sim/rulesError';
+import { shallowRef } from 'vue';
 import { createInitialState, levelFor, normalizePlayerState, type PlayerState } from '../sim/state';
 import { playSfx } from '../audio/index';
 import { answerFriendRequest, claimFriendGifts, connectSession, createStarInvoice, fetchFriends, removeFriendLink, requestFriend, saveFriendLabel, sendAction, sendFriendGift, visitFriendBar, type FriendBar, type FriendSummary } from '../telegram/api';
@@ -47,9 +49,16 @@ import { currentStage, fill as fillSituationText, guestLine, visibleChoices } fr
 // kept on this device only; it is never uploaded to an account.
 
 const OFFLINE_KEY = 'barlingo-offline-v2';
+const loadedRules = shallowRef<typeof import('../sim/rulesCore')>();
+let rulesRequest: Promise<typeof import('../sim/rulesCore')> | undefined;
+function loadRules() {
+  return rulesRequest ??= import('../sim/rulesCore').then(module => { loadedRules.value = module; return module; }).catch(error => { rulesRequest = undefined; throw error; });
+}
+// Node simulation tests keep synchronous actions; browsers defer the rules until needed.
+if (typeof (globalThis as { process?: { versions?: { node?: string } } }).process?.versions?.node === 'string') await loadRules();
 let rareActionsRequest: Promise<void> | undefined;
 function loadRareActions() {
-  return rareActionsRequest ??= import('../sim/rareActions').then(module => installRareActions(module.applyRareAction)).catch(error => { rareActionsRequest = undefined; throw error; });
+  return rareActionsRequest ??= loadRules().then(() => import('../sim/rareActions')).then(module => loadedRules.value!.installRareActions(module.applyRareAction)).catch(error => { rareActionsRequest = undefined; throw error; });
 }
 const LEGACY_KEY = 'barlingo-economy-v1';
 const EMPTY_CUSTOMER: Customer = {
@@ -406,6 +415,8 @@ export const useGameStore = defineStore('game', () => {
 
   // Apply an action locally (instant feedback), then let the server decide. Returns false if the rules refuse it.
   let pendingRareAction = false;
+  const pendingRuleActions: GameAction[] = [];
+  let waitingForRules = false;
   function dispatch(action: GameAction): boolean {
     const before = stateSnapshot(state.value);
     if (mode.value === 'online' && SERVER_ONLY.has(action.type)) {
@@ -413,7 +424,22 @@ export const useGameStore = defineStore('game', () => {
       void send(action, before);
       return true;
     }
-    if (isRareAction(action) && !rareActionsReady()) {
+    if (!loadedRules.value) {
+      pendingRuleActions.push(action);
+      if (!waitingForRules) {
+        waitingForRules = true;
+        void loadRules().then(() => {
+          waitingForRules = false;
+          for (const pending of pendingRuleActions.splice(0)) dispatch(pending);
+        }).catch(() => {
+          waitingForRules = false;
+          pendingRuleActions.length = 0;
+          message.value = 'Could not load this action. Please try again.';
+        });
+      }
+      return true;
+    }
+    if (loadedRules.value.isRareAction(action) && !loadedRules.value.rareActionsReady()) {
       if (pendingRareAction) return false;
       pendingRareAction = true;
       void loadRareActions().then(() => { pendingRareAction = false; dispatch(action); }).catch(() => { pendingRareAction = false; message.value = 'Could not load this action. Please try again.'; });
@@ -425,7 +451,7 @@ export const useGameStore = defineStore('game', () => {
     const snapshot = JSON.parse(JSON.stringify(state.value)) as PlayerState;
     const levelBefore = levelFor(state.value.xp ?? 0);
     try {
-      applyAction(state.value, action, ruleContext());
+      loadedRules.value.applyAction(state.value, action, ruleContext());
     } catch (error) {
       state.value = snapshot;
       if (!(error instanceof RuleError)) throw error;
@@ -554,12 +580,23 @@ export const useGameStore = defineStore('game', () => {
 
   // ---- Clock ----
   let lastSyncTick = 0;
+  let waitingForClockRules = false;
   function tickGameClock(now = clientNow()) {
     nowMs.value = now;
     if (trainingActive.value) { state.value.lastClockAt = now; return; }
+    if (!loadedRules.value) {
+      if (!waitingForClockRules) {
+        waitingForClockRules = true;
+        void loadRules().then(() => { waitingForClockRules = false; tickGameClock(); }).catch(() => {
+          waitingForClockRules = false;
+          message.value = 'Could not load the game clock. Please try again.';
+        });
+      }
+      return;
+    }
     const before = state.value.customers.length;
     const draft = state.value;
-    advanceClock(draft, { now, spawnCustomers: !trainingActive.value && mode.value !== 'online' });
+    loadedRules.value.advanceClock(draft, { now, spawnCustomers: !trainingActive.value && mode.value !== 'online' });
     const arrivalDue = draft.nextCustomerAt > 0 && now >= draft.nextCustomerAt;
     if (draft.customers.length !== before || arrivalDue) {
       message.value = draft.message;
@@ -753,7 +790,10 @@ export const useGameStore = defineStore('game', () => {
   const tourSeen = computed(() => !!state.value.tour || state.value.xp >= 150);
   const setTour = (value: 'done' | 'skipped') => dispatch({ type: 'setTour', value });
   const topUp = () => dispatch({ type: 'topUp' });
-  const topUpPreview = () => previewTopUp(state.value, clientNow());
+  const topUpPreview = () => {
+    if (!loadedRules.value) { void loadRules().catch(() => undefined); return { orders: [], total: 0 } as import('../sim/rulesCore').TopUpPreview; }
+    return loadedRules.value.previewTopUp(state.value, clientNow());
+  };
   // The servers of the bar being managed: every bar has its own team.
   const staff = computed(() => state.value.staffByBar?.[state.value.regionId] ?? []);
   // The Circle: people who joined, shards, keepsakes and who works in this bar.

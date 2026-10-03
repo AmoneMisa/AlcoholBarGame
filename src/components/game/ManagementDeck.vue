@@ -5,7 +5,7 @@ import { liteGraphics } from '../../ui/graphics';
 const props = withDefaults(defineProps<{ activeView?: string; designSection?: 'bar' | 'character' }>(), { activeView: 'inventory' });
 const InventoryPage = lazyPage(loadInventory);
 const MarketPanel = lazyPage(() => import('./MarketPanel.vue'));
-const RecipesPage = lazyPage(loadRecipes);
+const RecipesPage = lazyPage(loadRecipes, ['management']);
 const DesignPage = lazyPage(() => import('./DesignPage.vue'));
 const RegionsPage = lazyPage(() => import('./RegionsPage.vue'));
 const PairingAdvisor = lazyPage(() => import('../PairingAdvisor.vue'));
