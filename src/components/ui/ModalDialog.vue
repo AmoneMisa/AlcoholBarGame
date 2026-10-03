@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { nextTick, onUnmounted, onMounted, ref } from 'vue';
 import CloseButton from './CloseButton.vue';
 
 // The one frame for small utility popups (daily reward, pick-an-option, first-bar choice): a blurred backdrop,
@@ -28,7 +28,9 @@ onMounted(async () => {
   const first = sheet.value?.querySelector<HTMLElement>('[autofocus], button:not([disabled]), input, select, [tabindex]');
   (first ?? sheet.value)?.focus({ preventScroll: true });
 });
-onBeforeUnmount(() => document.body.classList.remove('modal-open'));
+onUnmounted(() => {
+  if (!document.querySelector('.modal-backdrop')) document.body.classList.remove('modal-open');
+});
 </script>
 
 <template>

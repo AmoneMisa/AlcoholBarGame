@@ -13,6 +13,7 @@ import CrystalAmount from '../ui/CrystalAmount.vue';
 import RewardArt from '../ui/RewardArt.vue';
 import type { RewardLine } from '../../domain/rewards';
 import UiButton from '../ui/UiButton.vue';
+import ModalDialog from '../ui/ModalDialog.vue';
 
 // The season pass: a two-week track of twenty levels. Points come from normal play (the list below says what each thing
 // is worth) or can be bought with crystals. Each level shows both tracks in a vertical list.
@@ -69,6 +70,7 @@ const buyOptions = computed(() => [1, 5].map((count) => ({ count: Math.min(count
 const buyReason = (price: number) => game.crystals < price ? `Not enough crystals: you need ${price}, you have ${Math.floor(game.crystals)}.` : '';
 
 const previewOpen = ref(false);
+const rewardsOpen = ref(true);
 </script>
 
 <template>
@@ -86,23 +88,7 @@ const previewOpen = ref(false);
       </div>
     </header>
 
-    <section class="pass-reward-list" aria-label="Pass levels">
-      <div class="pass-track-head"><b>Free</b><span></span><div><b>Premium</b><UiButton v-if="!game.passPremium" size="sm" :disabled="game.crystals < PASS_PREMIUM_PRICE" :title="'Unlock for ' + PASS_PREMIUM_PRICE + ' crystals'" @click="game.buyPassPremium()">Activate</UiButton><small v-else>Activated</small></div></div>
-      <ol class="pass-track">
-        <li v-for="row in rows" :key="row.level" :data-level="row.level" :class="{ reached: level >= row.level, current: level === row.level }">
-          <div class="pass-node"><span>{{ row.level }}</span></div>
-          <button v-for="tier in (['free', 'premium'] as const)" :key="tier" type="button" class="pass-cell" :class="[tier, state(tier, row.level)]" :disabled="state(tier, row.level) !== 'ready'" :aria-label="tier + ' level ' + row.level + ': ' + row[tier].map(text).join(', ') + '. ' + stateText(tier, row.level)" @click="game.claimPass(tier, row.level)">
-
-            <div v-for="(reward, index) in row[tier]" :key="index" class="pass-reward" :title="text(reward)">
-              <div class="pass-cell-art"><RewardArt v-for="(picture, pictureIndex) in rewardPictures(reward)" :key="pictureIndex" :line="picture" /></div>
-              <b v-if="quantity(reward)">{{ quantity(reward) }}</b>
-            </div>
-            <span class="pass-lock" v-if="!['claimed', 'ready'].includes(state(tier, row.level))"><UiIcon name="lock" /></span><small v-else class="pass-status">{{ state(tier, row.level) === 'claimed' ? 'Claimed' : 'Claim' }}</small>
-          </button>
-        </li>
-      </ol>
-    </section>
-    <p class="pass-hint">Scroll through the levels. Tap an available reward to claim it.</p>
+    <UiButton variant="primary" @click="rewardsOpen = true">View rewards</UiButton>
 
     <section class="pass-buy" aria-label="Buy levels">
       <div><b>Short on time?</b><small>Buy levels with crystals. Each one fills the rest of the level you are on.</small></div>
@@ -140,6 +126,28 @@ const previewOpen = ref(false);
         <UiButton v-if="!game.passPremium" variant="primary" :reason="buyReason(PASS_PREMIUM_PRICE)" @click="game.buyPassPremium()">Unlock · <CrystalAmount :value="PASS_PREMIUM_PRICE" /></UiButton>
       </div>
     </section>
+    <ModalDialog v-if="rewardsOpen" title="Battle Pass rewards" :eyebrow="theme.name" width="460px" @close="rewardsOpen = false">
+      <div class="pass-popup-progress"><b>Level {{ level }} / {{ PASS_LEVELS }}</b><span>{{ formatCountdown(secondsLeft) }} left</span><progress :value="inLevel" :max="PASS_LEVEL_POINTS"></progress></div>
+    <section class="pass-reward-list" aria-label="Pass levels">
+      <div class="pass-track-head"><b>Free</b><span></span><div><b>Premium</b><UiButton v-if="!game.passPremium" size="sm" :disabled="game.crystals < PASS_PREMIUM_PRICE" :title="'Unlock for ' + PASS_PREMIUM_PRICE + ' crystals'" @click="game.buyPassPremium()">Activate</UiButton><small v-else>Activated</small></div></div>
+      <ol class="pass-track">
+        <li v-for="row in rows" :key="row.level" :data-level="row.level" :class="{ reached: level >= row.level, current: level === row.level }">
+          <div class="pass-node"><span>{{ row.level }}</span></div>
+          <button v-for="tier in (['free', 'premium'] as const)" :key="tier" type="button" class="pass-cell" :class="[tier, state(tier, row.level)]" :disabled="state(tier, row.level) !== 'ready'" :aria-label="tier + ' level ' + row.level + ': ' + row[tier].map(text).join(', ') + '. ' + stateText(tier, row.level)" @click="game.claimPass(tier, row.level)">
+
+            <div v-for="(reward, index) in row[tier]" :key="index" class="pass-reward" :title="text(reward)">
+              <div class="pass-cell-art" :style="{ width: `${rewardPictures(reward).length * 44}px` }"><RewardArt v-for="(picture, pictureIndex) in rewardPictures(reward)" :key="pictureIndex" :line="picture" /></div>
+              <b class="pass-quantity">{{ quantity(reward) || ' ' }}</b>
+            </div>
+            <span class="pass-lock" v-if="!['claimed', 'ready'].includes(state(tier, row.level))"><UiIcon name="lock" /></span><small v-else class="pass-status">{{ state(tier, row.level) === 'claimed' ? 'Claimed' : 'Claim' }}</small>
+          </button>
+        </li>
+      </ol>
+    </section>
+    <p class="pass-hint">Scroll through the levels. Tap an available reward to claim it.</p>
+
+
+    </ModalDialog>
     <SeasonPrizePreview v-if="previewOpen" @close="previewOpen = false" />
   </div>
 </template>
@@ -162,27 +170,30 @@ const previewOpen = ref(false);
 .pass-buy-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .pass-need { flex-basis: 100%; color: #f2b99a !important; }
 
-.pass-reward-list { min-width:0;border:1px solid #536078;border-radius:14px;background:#0c1725cc;overflow:hidden; }
+.pass-popup-progress {display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-bottom:12px;font-size:12px;color:#c6d4e5;}
+.pass-popup-progress progress {width:100%;height:7px;accent-color:#e7b556;}
+.pass-quantity {display:block;height:16px;line-height:16px;}
+.pass-reward-list { min-width:0;border:1px solid #536078;border-radius:14px;background:#0c1725 url('/assets/ui/pass-track-surface-v1.webp') center / cover;overflow:hidden; }
 .pass-track-head,.pass-track > li { display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);gap:10px;align-items:center; }
-.pass-track-head { padding:14px 12px;color:#e4b35c;font-size:16px;text-align:center;border-bottom:1px solid #947440;background:#142039 url('/assets/ui/pass-panel-painted-v1.webp') center / cover; }
+.pass-track-head { padding:10px 8px;color:#e4b35c;font-size:14px;text-align:center;border-bottom:1px solid #947440;background:#142039 url('/assets/ui/pass-panel-painted-v1.webp') center / cover; }
 .pass-track-head > div { display:grid;justify-items:center;gap:8px; }
 .pass-track-head small { font-size:11px; }
 .pass-track-head > b { color:#bbd5ee; }
-.pass-track { display:grid;margin:0;padding:0 12px;list-style:none;max-height:min(52vh,520px);overflow-y:auto;overscroll-behavior:contain; }
-.pass-track > li { position:relative;padding:18px 0;border-bottom:1px solid #94744066; }
+.pass-track { display:grid;margin:0;padding:0 12px;list-style:none;max-height:min(64vh,560px);overflow-y:auto;overscroll-behavior:contain; }
+.pass-track > li { position:relative;padding:9px 0;border-bottom:1px solid #94744066; }
 .pass-node { grid-column:2;grid-row:1;align-self:stretch;display:grid;place-items:center;position:relative; }
-.pass-node::before { content:'';position:absolute;top:-18px;bottom:-18px;width:3px;background:#977039; }
-.pass-node span { position:relative;display:grid;place-items:center;width:34px;height:38px;border:1px solid #b89858;border-radius:9px;background:#25384d;color:#fff0ce;font-weight:800; }
-.pass-track > li.reached .pass-node span { background:#805b28;border-color:#edc578; }
-.pass-cell { position:relative;grid-row:1;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:10px;min-width:0;min-height:125px;padding:12px 8px 28px;border:1px solid #607c9a;border-radius:12px;background:#142a40cc;color:#e9eef7;font:inherit;text-align:center; }
-.pass-cell.premium { grid-column:3;background:#4b351ccc;border-color:#cda050; }
+.pass-node::before { content:'';position:absolute;top:-9px;bottom:-9px;width:3px;background:#977039; }
+.pass-node span { position:relative;display:grid;place-items:center;width:34px;height:38px;border:1px solid #b89858;border-radius:9px;background:#25384d url('/assets/ui/pass-free-surface-v1.webp') center / cover;color:#fff0ce;font-weight:800; }
+.pass-track > li.reached .pass-node span { background:#805b28 url('/assets/ui/pass-premium-surface-v1.webp') center / cover;border-color:#edc578; }
+.pass-cell { position:relative;grid-row:1;align-self:stretch;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:6px;min-width:0;min-height:94px;padding:8px 4px 20px;border:1px solid #607c9a;border-radius:12px;background:#142a40 url('/assets/ui/pass-free-surface-v1.webp') center / 100% 100%;color:#e9eef7;font:inherit;text-align:center; }
+.pass-cell.premium { grid-column:3;background:#4b351c url('/assets/ui/pass-premium-surface-v1.webp') center / 100% 100%;border-color:#cda050; }
 .pass-cell.free { grid-column:1; }
 .pass-reward { display:grid;justify-items:center;gap:4px;min-width:0; }
 .pass-reward b { font-size:14px;line-height:1.2;color:#fff3d7; }
-.pass-cell-art { display:flex;align-items:center;justify-content:center;width:64px;height:64px;gap:2px; }
-.pass-cell-art > .reward-art { flex:1;min-width:0;height:64px; }
-.pass-cell-art .item-art { width:64px;height:64px; }
-.pass-lock { position:absolute;right:-5px;top:-8px;font-size:27px;filter:drop-shadow(0 2px 3px #000a); }
+.pass-cell-art { display:flex;align-items:center;justify-content:center;width:44px;height:44px;gap:2px; }
+.pass-cell-art > .reward-art { flex:none;width:44px;min-width:0;height:44px; }
+.pass-cell-art .item-art { width:44px;height:44px; }
+.pass-lock { position:absolute;right:2px;top:2px;font-size:20px;filter:drop-shadow(0 2px 3px #000a); }
 .pass-status { position:absolute;bottom:8px;left:0;right:0;color:#8fd1a0;font-size:11px;font-weight:800; }
 .pass-cell.ready { cursor:pointer;border-color:#edc578;box-shadow:0 0 12px #edc57835; }
 .pass-cell.ready .pass-status { color:#ffdc85; }
@@ -192,10 +203,10 @@ const previewOpen = ref(false);
  .pass-track-head,.pass-track > li{grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr);gap:8px;}
  .pass-track{padding:0 8px;}
  .pass-node span{width:28px;height:34px;font-size:13px;}
- .pass-cell{padding:10px 4px 25px;min-height:124px;gap:8px;}
- .pass-cell-art{width:54px;height:54px;}
- .pass-cell-art > .reward-art{height:54px;}
- .pass-cell-art .item-art{width:54px;height:54px;}
+ .pass-cell{padding:8px 3px 20px;min-height:94px;gap:6px;}
+ .pass-cell-art{width:44px;height:44px;}
+ .pass-cell-art > .reward-art{height:44px;}
+ .pass-cell-art .item-art{width:44px;height:44px;}
 }
 
 .pass-points { display: grid; gap: 8px; padding: 12px; border: 1px solid #354762; border-radius: 12px; background: #111c2d; }
