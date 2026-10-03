@@ -4,6 +4,7 @@ import vue from '@vitejs/plugin-vue';
 export default defineConfig(({ isSsrBuild }) => ({
   plugins: [vue()],
   worker: { format: 'es' },
+  build: { rollupOptions: { output: { chunkFileNames: chunk => chunk.name === 'AdminPage' ? 'assets/admin-[name]-[hash].js' : 'assets/[name]-[hash].js', assetFileNames: asset => asset.names?.some(name => name.startsWith('AdminPage')) ? 'assets/admin-[name]-[hash][extname]' : 'assets/[name]-[hash][extname]' } } },
   // Which build this is: the commit CI built (GIT_SHA) and when. Shown on the profile screen and by /api/health.
   define: {
     __APP_VERSION__: JSON.stringify((process.env.GIT_SHA ?? 'dev').slice(0, 7)),

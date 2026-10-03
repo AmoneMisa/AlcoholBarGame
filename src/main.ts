@@ -5,7 +5,15 @@ import { initTelegram } from './telegram/webapp';
 import { initGraphics } from './ui/graphics';
 
 // The opening bar needs recipe mechanics only; descriptions and database prose load with Study.
-{
+if (window.location.pathname === '/admin' || new URLSearchParams(window.Telegram?.WebApp?.initData ?? '').get('start_param') === 'admin') {
+  initTelegram();
+  try {
+    const {post}=await import('./telegram/api');
+    const access=await post<{role:'owner'|'admin'|'moderator'}>('/api/admin/access',{});
+    const {default:AdminPage}=await import('./components/admin/AdminPage.vue');
+    createApp(AdminPage,{role:access.role}).mount('#app');
+  } catch { document.getElementById('app')!.textContent='Access denied. Open this page through Telegram with an authorized account.'; }
+} else {
   initGraphics();
   await Promise.all([
     import('./style.css'), import('./dashboard.css'), import('./game.css'),

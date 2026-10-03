@@ -1,3 +1,4 @@
+import { createHmac } from 'node:crypto';
 import { completeAction } from './paid-action.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -46,15 +47,19 @@ test('Promo rewards are authoritative, once per player, case-insensitive, expire
   now+=1000;
   assert.equal((await service.redeemPromoCode(identity(3),'WELCOME')).status,409);
 });
-test('Admin promo endpoint rejects player login and missing/wrong admin token', async()=>{
-  const service=createGameService({repository:createMemoryRepository()});
-  const app=createApp({service,allowDevLogin:true,adminToken:'test-admin-only'});
+test('Admin promo endpoint requires signed allowlisted Telegram identity', async()=>{
+  const service=createGameService({repository:createMemoryRepository(),ownerTelegramIds:[42]});
+  const token='123:admin-test';
+  const app=createApp({service,allowDevLogin:true,botToken:token});
   const server=app.listen(0,'127.0.0.1'); await new Promise(resolve=>server.once('listening',resolve));
   try {
     const url=`http://127.0.0.1:${server.address().port}/api/admin/promocodes`;
     const body=JSON.stringify({code:'TEST',expiresAt:Date.now()+60_000,rewards:[{kind:'coins',amount:1}]});
-    for (const headers of [{'X-Dev-Player':'dev-admin'},{Authorization:'Bearer incorrect'}]) assert.equal((await fetch(url,{method:'POST',headers:{'Content-Type':'application/json',...headers},body})).status,403);
-    assert.equal((await fetch(url,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer test-admin-only'},body})).status,200);
+    for (const headers of [{'X-Dev-Player':'dev-admin'},{Authorization:'Bearer incorrect'}]) assert.equal((await fetch(url,{method:'POST',headers:{'Content-Type':'application/json',...headers},body})).status,headers.Authorization ? 401 : 403);
+    const params=new URLSearchParams({auth_date:String(Math.floor(Date.now()/1000)),user:JSON.stringify({id:42,first_name:'Admin'})});
+    const check=[...params].sort(([a],[b])=>a.localeCompare(b)).map(([k,v])=>k+'='+v).join('\n');
+    const secret=createHmac('sha256','WebAppData').update(token).digest(); params.set('hash',createHmac('sha256',secret).update(check).digest('hex'));
+    assert.equal((await fetch(url,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'tma '+params},body})).status,200);
   } finally { await new Promise(resolve=>server.close(resolve)); }
 });
 test('Each empty seat arrives independently and an occupied seat keeps its guest and clock',()=>{

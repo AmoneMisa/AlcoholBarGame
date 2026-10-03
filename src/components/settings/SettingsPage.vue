@@ -6,6 +6,7 @@ import UiButton from '../ui/UiButton.vue';
 import ConfirmDialog from '../ui/ConfirmDialog.vue';
 import { ref } from 'vue';
 import { useGameStore } from '../../stores/game';
+import SupportTickets from './SupportTickets.vue';
 import SoundControls from './SoundControls.vue';
 import ScreenshotOptions from './ScreenshotOptions.vue';
 import { NOTIFICATION_EVENTS, useNotificationsStore } from '../../stores/notifications';
@@ -60,6 +61,7 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
       <UiButton variant="primary" icon="help" @click="replayTour">How to play (replay the tour)</UiButton>
     </section>
 
+    <SupportTickets />
     <section class="settings-card"><h3>Screenshot mode</h3><ScreenshotOptions /></section>
 
     <section class="settings-card danger-zone">

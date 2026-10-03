@@ -25,7 +25,7 @@ function authHeaders(): Record<string, string> {
   return {};
 }
 
-async function post<T>(path: string, body: unknown): Promise<T> {
+export async function post<T>(path: string, body: unknown): Promise<T> {
   const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(body ?? {}) });
   const data = await response.json().catch(() => ({}));
   // 409 = the rules refused the action; the body still carries the authoritative state.

@@ -22,13 +22,29 @@ export function createPgRepository(pool) {
 
 function pgTx(client) {
   return {
+    async lockStaffRoles() { await client.query('SELECT pg_advisory_xact_lock(86416302)'); },
+    async staffRole(id) { const {rows:[row]}=await client.query('SELECT role FROM staff_roles WHERE telegram_id=$1',[id]); return row?.role ?? null; },
+    async listStaff() { const {rows}=await client.query('SELECT telegram_id AS "telegramId",role,assigned_by AS "assignedBy",updated_at AS "updatedAt" FROM staff_roles ORDER BY telegram_id'); return rows; },
+    async setStaffRole(id,role,actor) { if(role==='none') await client.query('DELETE FROM staff_roles WHERE telegram_id=$1',[id]); else await client.query('INSERT INTO staff_roles(telegram_id,role,assigned_by) VALUES($1,$2,$3) ON CONFLICT(telegram_id) DO UPDATE SET role=EXCLUDED.role,assigned_by=EXCLUDED.assigned_by,updated_at=now()',[id,role,actor]); },
+    async adminPlayer(telegramId) { const {rows:[row]}=await client.query('SELECT id, telegram_id AS "telegramId", display_name AS name, blocked, block_reason AS "blockReason" FROM players WHERE telegram_id=$1 FOR UPDATE',[telegramId]); return row ?? null; },
+    async setBlocked(id,blocked,reason) { await client.query('UPDATE players SET blocked=$2, block_reason=$3 WHERE id=$1',[id,blocked,reason]); },
+    async listPromos() { const {rows}=await client.query('SELECT code,rewards,starts_at AS "startsAt",expires_at AS "expiresAt",max_uses AS "maxUses",deleted_at AS "deletedAt",(SELECT count(*)::int FROM promo_redemptions r WHERE r.code=p.code) AS uses FROM promo_codes p ORDER BY created_at DESC LIMIT 200'); return rows; },
+    async deletePromo(code) { return (await client.query('UPDATE promo_codes SET deleted_at=now() WHERE code=$1 AND deleted_at IS NULL',[code])).rowCount > 0; },
+    async addEvent(identity,event,detail,at) { await client.query('INSERT INTO game_events(telegram_id,event,detail,created_at) VALUES($1,$2,$3::jsonb,to_timestamp($4/1000.0))',[identity.telegramId,event,JSON.stringify(detail),at]); },
+    async pruneEvents(before) { for(const table of ['game_events','coin_ledger','crystal_ledger','loot_ledger']) await client.query('DELETE FROM '+table+' WHERE created_at <= to_timestamp($1/1000.0)',[before]); },
+    async listEvents({telegramId,before,event},cutoff) { const {rows}=await client.query('SELECT id,telegram_id AS "telegramId",event,detail,created_at AS "createdAt" FROM game_events WHERE created_at > to_timestamp($1/1000.0) AND ($2::bigint IS NULL OR telegram_id=$2) AND ($3::bigint IS NULL OR id<$3) AND ($4::text IS NULL OR event=$4) ORDER BY id DESC LIMIT 100',[cutoff,telegramId || null,before || null,event || null]); return rows; },
+    async addTicket(playerId,ticket) { const {rows:[row]}=await client.query('INSERT INTO support_tickets(player_id,title,description,occurred_at,screenshots) VALUES($1,$2,$3,$4,$5::jsonb) RETURNING id',[playerId,ticket.title,ticket.description,ticket.occurredAt,JSON.stringify(ticket.screenshots)]); return row.id; },
+    async recentTickets(playerId,since) { return (await client.query('SELECT 1 FROM support_tickets WHERE player_id=$1 AND created_at>to_timestamp($2/1000.0)',[playerId,since])).rowCount; },
+    async listTickets(before) { const {rows}=await client.query('SELECT t.*,p.telegram_id AS "telegramId",p.display_name AS name FROM support_tickets t JOIN players p ON p.id=t.player_id WHERE ($1::bigint IS NULL OR t.id<$1) ORDER BY t.id DESC LIMIT 20',[before || null]); return rows; },
+    async closeTicket(id) { return (await client.query("UPDATE support_tickets SET status='closed' WHERE id=$1",[id])).rowCount > 0; },
     async createPromo(promo) {
-      const {rowCount} = await client.query('INSERT INTO promo_codes(code,rewards,expires_at) VALUES($1,$2::jsonb,to_timestamp($3/1000.0)) ON CONFLICT DO NOTHING',[promo.code, JSON.stringify(promo.rewards), promo.expiresAt]);
+      const {rowCount} = await client.query('INSERT INTO promo_codes(code,rewards,expires_at,starts_at,max_uses) VALUES($1,$2::jsonb,to_timestamp($3/1000.0),to_timestamp($4/1000.0),$5) ON CONFLICT DO NOTHING',[promo.code, JSON.stringify(promo.rewards), promo.expiresAt, promo.startsAt, promo.maxUses]);
       return rowCount === 1;
     },
     async findPromo(code) {
-      const {rows:[row]} = await client.query('SELECT rewards, expires_at FROM promo_codes WHERE code=$1',[code]);
-      return row ? {code, rewards:row.rewards, expiresAt:new Date(row.expires_at).getTime()} : null;
+      const {rows:[row]} = await client.query('SELECT rewards, expires_at, starts_at, max_uses, deleted_at FROM promo_codes WHERE code=$1 FOR UPDATE',[code]);
+      const {rows:[count]}=await client.query('SELECT count(*)::int AS uses FROM promo_redemptions WHERE code=$1',[code]);
+      return row ? {code, rewards:row.rewards, expiresAt:new Date(row.expires_at).getTime(), startsAt:new Date(row.starts_at).getTime(), maxUses:row.max_uses, uses:count.uses, deletedAt:row.deleted_at} : null;
     },
     async redeemPromo(code,playerId) {
       const {rowCount} = await client.query('INSERT INTO promo_redemptions(code,player_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[code,playerId]);
@@ -38,9 +54,10 @@ function pgTx(client) {
       const { rows: [player] } = await client.query(
         `INSERT INTO players (auth_key, telegram_id, display_name, username) VALUES ($1, $2, $3, $4)
          ON CONFLICT (auth_key) DO UPDATE SET display_name = EXCLUDED.display_name, username = EXCLUDED.username, last_seen_at = now()
-         RETURNING id, display_name AS name`,
+         RETURNING id, display_name AS name, blocked, block_reason`,
         [identity.key, identity.telegramId, identity.name, identity.username]
       );
+      if (player.blocked) { const error = new Error("Account blocked: " + player.block_reason); error.status = 403; throw error; }
       return player;
     },
     async lockState(playerId) {
@@ -156,6 +173,8 @@ function pgTx(client) {
 }
 
 export function createMemoryRepository() {
+  const events = [], tickets = [];
+  const staff=new Map();
   const promos = new Map();
   const redeemedPromos = new Set();
   const players = new Map();
@@ -174,12 +193,27 @@ export function createMemoryRepository() {
   let queue = Promise.resolve();
   let nextId = 1;
   const tx = {
+    async lockStaffRoles() {},
+    async staffRole(id) { return staff.get(String(id))?.role ?? null; },
+    async listStaff() { return structuredClone([...staff.values()]); },
+    async setStaffRole(id,role,actor) { if(role==='none') staff.delete(String(id)); else staff.set(String(id),{telegramId:String(id),role,assignedBy:String(actor)}); },
+    async adminPlayer(telegramId) { return [...players.values()].find(p=>String(p.telegramId)===String(telegramId)) ?? null; },
+    async setBlocked(id,blocked,reason) { const p=[...players.values()].find(p=>p.id===id); p.blocked=blocked; p.blockReason=reason; },
+    async listPromos() { return Promise.all([...promos.keys()].map(code=>tx.findPromo(code))); },
+    async deletePromo(code) { const p=promos.get(code); if (!p || p.deletedAt) return false; p.deletedAt=Date.now(); return true; },
+    async addEvent(identity,event,detail,at) { events.push({id:events.length ? events.at(-1).id+1 : 1,telegramId:identity.telegramId,event,detail:structuredClone(detail),createdAt:at}); },
+    async pruneEvents(before) { while(events.length && events[0].createdAt<=before) events.shift(); },
+    async listEvents(filter,cutoff) { return events.filter(e=>e.createdAt>cutoff && (!filter.telegramId || String(e.telegramId)===String(filter.telegramId)) && (!filter.before || e.id<filter.before) && (!filter.event || e.event===filter.event)).reverse().slice(0,100); },
+    async addTicket(playerId,ticket) { const id=tickets.length+1; tickets.push({id,player_id:playerId,...structuredClone(ticket),created_at:Date.now(),status:'open'}); return id; },
+    async recentTickets(playerId,since) { return tickets.filter(t=>t.player_id===playerId && t.created_at>since).length; },
+    async listTickets(before) { return tickets.filter(t=>!before || t.id<before).reverse().slice(0,20).map(t=>({...t,telegramId:[...players.values()].find(p=>p.id===t.player_id)?.telegramId})); },
+    async closeTicket(id) { const t=tickets.find(t=>String(t.id)===String(id)); if(!t) return false; t.status='closed'; return true; },
     async createPromo(promo) { if (promos.has(promo.code)) return false; promos.set(promo.code,structuredClone(promo)); return true; },
-    async findPromo(code) { return structuredClone(promos.get(code) ?? null); },
+    async findPromo(code) { const p=promos.get(code); return p ? {...structuredClone(p),uses:[...redeemedPromos].filter(k=>k.startsWith(code+":")).length} : null; },
     async redeemPromo(code,id) { const key = `${code}:${id}`; if (redeemedPromos.has(key)) return false; redeemedPromos.add(key); return true; },
     async findOrCreatePlayer(identity) {
-      if (!players.has(identity.key)) players.set(identity.key, { id: nextId++, name: identity.name });
-      return players.get(identity.key);
+      if (!players.has(identity.key)) players.set(identity.key, { id: nextId++, name: identity.name, telegramId:identity.telegramId, blocked:false });
+      const player=players.get(identity.key); if(player.blocked) { const error=new Error("Account blocked: "+player.blockReason); error.status=403; throw error; } return player;
     },
     async lockState(playerId) { const row = states.get(playerId); return row ? structuredClone(row) : null; },
     async saveState(playerId, state, version) { states.set(playerId, structuredClone({ state, version })); },

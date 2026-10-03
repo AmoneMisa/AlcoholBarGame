@@ -21,7 +21,11 @@ export function validatePromo(body, now) {
     if (!single && (!Number.isSafeInteger(reward.amount) || reward.amount < 1 || reward.amount > 1_000_000)) throw new Error('Reward amount must be a whole number from 1 to 1000000.');
     return {kind, ...(ids[kind] ? {id:reward.id}:{}), ...(!single ? {amount:reward.amount}:{})};
   });
-  return {code, expiresAt, rewards};
+  const startsAt = body.startsAt == null ? now : typeof body.startsAt === 'string' ? Date.parse(body.startsAt) : body.startsAt;
+  const maxUses = body.maxUses == null || body.maxUses === '' ? null : body.maxUses;
+  if (!Number.isSafeInteger(startsAt) || startsAt >= expiresAt) throw new Error('Start time must precede expiration.');
+  if (maxUses !== null && (!Number.isSafeInteger(maxUses) || maxUses < 1 || maxUses > 1000000000)) throw new Error('Usage limit must be a positive whole number.');
+  return {code, expiresAt, startsAt, maxUses, rewards};
 }
 export function applyPromoRewards(state, rewards) {
   for (const reward of rewards) {

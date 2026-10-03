@@ -28,6 +28,8 @@ services:
       NODE_ENV: production
       PORT: 3000
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?Set TELEGRAM_BOT_TOKEN in .env}
+      SUPPORT_EMAIL: ${SUPPORT_EMAIL:-Kubai.rita2@gmail.com}
+      SUPPORT_TELEGRAM: ${SUPPORT_TELEGRAM:-}
       DATABASE_URL: postgresql://${POSTGRES_USER:-barlingo}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB:-barlingo}
     depends_on:
       database:

@@ -1,3 +1,5 @@
+import { createStaffRoles } from './staffRoles.mjs';
+import { createAdministration } from './administration.mjs';
 import {resolveFragmentReward} from '../src/sim/loot';
 import {cleanCode, validatePromo, applyPromoRewards} from './promocodes.mjs';
 import { randomBytes } from 'node:crypto';
@@ -41,15 +43,16 @@ async function resolveFriend(tx, player, code) {
   return { targetId, target, isFriend: !!target && await areFriends(tx, player.id, targetId) };
 }
 
-export function createGameService({ repository, checkEnglish, now = () => Date.now() }) {
+export function createGameService({ repository, checkEnglish, ownerTelegramIds = [], now = () => Date.now() }) {
+  const staff=createStaffRoles({repository,now,ownerTelegramIds});
   // Loot rolls use the operating system's secure random source, never Math.random.
   const secureRandom = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
   const context = () => ({ now: now(), random: secureRandom, checkEnglish, spawnCustomers: true });
 
-  async function createPromoCode(body) {
+  async function createPromoCode(body, identity) {
     let promo;
     try { promo = validatePromo(body,now()); } catch (error) { return {status:400,body:{ok:false,error:error.message}}; }
-    const created = await repository.transaction(tx=>tx.createPromo(promo));
+    const created = await repository.transaction(async tx=>{ const created=await tx.createPromo(promo); if(created && identity) await tx.addEvent(identity,'admin.promo.create',{promo},now()); return created; });
     return created ? {ok:true,promo} : {status:409,body:{ok:false,error:'This code already exists. Use a new code.'}};
   }
   async function redeemPromoCode(identity, code) {
@@ -57,7 +60,7 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       const player = await tx.findOrCreatePlayer(identity);
       const record = await tx.lockState(player.id);
       const promo = await tx.findPromo(cleanCode(code));
-      if (!promo || promo.expiresAt <= now()) return {status:409,body:{ok:false,error:'This code is invalid or expired.'}};
+      if (!promo || promo.deletedAt || promo.startsAt > now() || promo.expiresAt <= now() || (promo.maxUses !== null && promo.maxUses !== undefined && promo.uses >= promo.maxUses)) return {status:409,body:{ok:false,error:'This code is invalid or expired.'}};
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
       const coinsBefore = state.money, crystalsBefore = state.crystals;
       // The unique redemption is inside the same transaction as all rewards and ledgers.
@@ -130,6 +133,7 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
         await tx.saveState(player.id, state, (record?.version ?? 0) + 1);
         const refused = { ok: false, error: error.message, state: publicState(state), serverTime: now() };
         await tx.saveRequest(player.id, requestId, refused);
+        await tx.addEvent(identity,'game.action.refused',{requestId,action,error:error.message},now());
         return { status: 409, body: refused };
       }
       await tx.saveState(player.id, next, (record?.version ?? 0) + 1);
@@ -140,6 +144,7 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       if (result.audit) await tx.addLootLedger(player.id, { requestId, ...result.audit });
       const response = { ok: true, message: next.message, state: publicState(next), serverTime: now() };
       await tx.saveRequest(player.id, requestId, response);
+      await tx.addEvent(identity,'game.action',{requestId,action,moneyDelta:next.money-state.money,crystalDelta:next.crystals-state.crystals,xpDelta:next.xp-state.xp},now());
       return { status: 200, body: response };
     });
   }
@@ -553,6 +558,7 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       state.message = `Thank you! +${order.pack.crystals} crystals were added to your bar.`;
       await tx.saveState(player.id, state, (record?.version ?? 0) + 1);
       await tx.addCrystalLedger(player.id, { requestId: `stars-${chargeId}`.slice(0, 120), action: 'buyCrystalPack', delta: order.pack.crystals, balance: state.crystals });
+      await tx.addEvent({telegramId:null},'payment.stars',{playerId:player.id,packId:order.pack.id,crystals:order.pack.crystals,stars:order.pack.stars,chargeId},now());
       return { credited: true, playerId: player.id, pack: order.pack };
     });
   }
@@ -560,5 +566,5 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
   // Request ids only need to survive long enough for a retry; older rows are pure bloat.
   const pruneRequests = (olderThanMs = 7 * 24 * 60 * 60 * 1000) => repository.transaction((tx) => tx.pruneRequests(now() - olderThanMs));
 
-  return { claimMailReward, expireGifts, mailbox, decideGift, createPromoCode, redeemPromoCode, pruneRequests, session, act, leaderboard, leaderboardBar, friends, addFriend, answerFriend, removeFriend, labelFriend, visitFriend, stealFriendTips, sendGift, claimGifts, startStarPurchase, approveStarCheckout, fulfilStarPayment };
+  return { ...staff, ...createAdministration({repository,now,staff}), claimMailReward, expireGifts, mailbox, decideGift, createPromoCode, redeemPromoCode, pruneRequests, session, act, leaderboard, leaderboardBar, friends, addFriend, answerFriend, removeFriend, labelFriend, visitFriend, stealFriendTips, sendGift, claimGifts, startStarPurchase, approveStarCheckout, fulfilStarPayment };
 }

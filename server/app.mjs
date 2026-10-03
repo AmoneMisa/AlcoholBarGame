@@ -1,4 +1,4 @@
-import {createHash, timingSafeEqual} from 'node:crypto';
+import { randomBytes } from 'node:crypto';
 import express from 'express';
 import { authenticate } from './auth.mjs';
 
@@ -6,7 +6,7 @@ import { authenticate } from './auth.mjs';
 //   POST /api/session  → create/load the player's game and return it
 //   POST /api/action   → { requestId, action } → apply one action on the server, return the new state
 
-export function createApp({ service, botToken, allowDevLogin = false, extraRoutes, createInvoiceLink, adminToken }) {
+export function createApp({ service, botToken, allowDevLogin = false, extraRoutes, createInvoiceLink, supportEmail = 'Kubai.rita2@gmail.com', supportTelegram = '' }) {
   const app = express();
   app.disable('x-powered-by');
   // Behind the host's nginx / Caddy: use the real client address for rate limits.
@@ -19,18 +19,41 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
     });
     next();
   });
+  app.use('/api/support/ticket', express.json({limit:'5mb'}));
   app.use('/api', express.json({ limit: '16kb' }));
+    const assetSessions = new Map();
+  // Only the authorized bootstrap obtains this HttpOnly cookie; admin chunks never enter the public cache.
+  app.use('/assets', async (request,response,next)=> {
+    let assetPath; try { assetPath=decodeURIComponent(request.path).replaceAll('\\','/'); } catch { return response.sendStatus(400); }
+    if(!assetPath.split('/').some(part=>part.toLowerCase().startsWith('admin-'))) return next();
+    response.set('Cache-Control','private, no-store');
+    const token = /(?:^|; )barlingo_admin=([a-f0-9]{64})(?:;|$)/.exec(request.get('cookie') ?? '')?.[1];
+    const session=assetSessions.get(token);
+    if(!session || session.until<=Date.now()) return response.sendStatus(404);
+    try { if(!await service.staffRole({kind:'telegram',telegramId:session.telegramId})) return response.sendStatus(404); } catch(error) { return next(error); }
+    next();
+  });
 
   extraRoutes?.(app);
 
   const auth = authenticate({ botToken, allowDevLogin });
+  const access = async (request,response,next)=>{try { await service.checkAccess(request.identity); next(); } catch(error) { next(error); }};
+  app.use('/api', (request,response,next)=> {
+    const apiPath=request.path;
+    response.on('finish',()=> {
+      if(['/health','/cocktails','/admin/events'].includes(apiPath) || (apiPath==='/action' && [200,409].includes(response.statusCode))) return;
+      const detail={path:apiPath,status:response.statusCode};
+      if(request.body && !apiPath.startsWith('/support') && !apiPath.startsWith('/admin')) detail.input=request.body;
+      service.audit(request.identity ?? {telegramId:null},response.statusCode>=400 ? 'api.refused' : 'api.request',detail).catch(error=>console.error('Event logging failed:',error.message));
+    }); next();
+  });
   const limiter = rateLimit({ windowMs: 10_000, max: 40 });
   // Per-address limit before sign-in, so unsigned floods cannot make the server compute signatures endlessly.
   const ipLimiter = rateLimit({ windowMs: 10_000, max: 120, key: (request) => `ip:${request.ip}` });
   app.use('/api', (request, response, next) => request.path === '/health' || request.path === '/cocktails' ? next() : ipLimiter(request, response, next));
 
   // One place for the shared plumbing: sign-in, rate limit, errors. A handler returns { status, body }, or a plain answer for 200.
-  const route = (path, handle) => app.post(path, auth, limiter, async (request, response, next) => {
+  const route = (path, handle) => app.post(path, auth, limiter, access, async (request, response, next) => {
     try {
       const result = await handle(request);
       if (result && 'status' in result && 'body' in result) response.status(result.status).json(result.body); else response.json(result);
@@ -38,18 +61,34 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
   });
   const who = (request) => request.identity;
 
-  app.post('/api/admin/promocodes', async (request,response,next)=> {
-    const supplied = request.get('authorization')?.replace(/^Bearer /,'') ?? '';
-    if (!adminToken || !timingSafeEqual(createHash('sha256').update(supplied).digest(),createHash('sha256').update(adminToken).digest())) return response.status(403).json({ok:false,error:'Administrator access required.'});
-    try { const result = await service.createPromoCode(request.body); if (result.status) response.status(result.status).json(result.body); else response.json(result); } catch(error) { next(error); }
-  });
+  app.use('/api/admin', auth, limiter, async (request,response,next)=> { try { request.staffRole=await service.staffRole(request.identity); if(!request.staffRole) return response.status(403).json({ok:false,error:'Staff access required.'}); next(); } catch(error){next(error);} });
+  const adminRoute=(path,handler,roles=['owner','admin'])=>app.post('/api/admin/'+path,async(request,response,next)=> { response.set('Cache-Control','private, no-store'); if(!roles.includes(request.staffRole)) return response.status(403).json({ok:false,error:'You do not have permission for this operation.'}); try { const result=await handler(request); if(result?.status) response.status(result.status).json(result.body); else response.json(result); } catch(error){next(error);} });
+  adminRoute('access',request=> {
+    for(const [key,value] of assetSessions) if(value.until<=Date.now()) assetSessions.delete(key);
+    const token=randomBytes(32).toString('hex'); assetSessions.set(token,{telegramId:String(request.identity.telegramId),until:Date.now()+15*60*1000});
+    request.res.cookie('barlingo_admin',token,{httpOnly:true,sameSite:allowDevLogin ? 'strict' : 'none',secure:!allowDevLogin,maxAge:15*60*1000,path:'/assets'});
+    return {ok:true,role:request.staffRole};
+  },['owner','admin','moderator']);
+  adminRoute('staff/list',request=>service.staffList(request.identity));
+  adminRoute('staff/role',request=>service.staffSetRole(request.identity,request.body));
+  adminRoute('catalog',()=>({ok:true,catalog:service.adminCatalog()}));
+  adminRoute('promocodes',request=>service.createPromoCode(request.body,request.identity));
+  adminRoute('promocodes/list',()=>service.adminPromos());
+  adminRoute('promocodes/delete',request=>service.adminDeletePromo(request.identity,request.body?.code));
+  adminRoute('player',request=>service.adminPlayer(request.body,request.identity),['owner','admin','moderator']);
+  adminRoute('player/change',request=>service.adminChange(request.identity,request.body),['owner','admin','moderator']);
+  adminRoute('events',request=>service.adminEvents(request.body));
+  adminRoute('tickets',request=>service.adminTickets(request.body));
+  adminRoute('tickets/close',request=>service.adminCloseTicket(request.identity,request.body?.id));
+  route('/api/support/config',()=>({ok:true,email:supportEmail,telegram:supportTelegram}));
+  route('/api/support/ticket',request=>service.createTicket(request.identity,request.body));
   route('/api/promocodes/redeem', request => service.redeemPromoCode(who(request),request.body?.code));
   route('/api/session', (request) => service.session(who(request)));
   route('/api/action', (request) => service.act(who(request), request.body));
 
   // Telegram Stars: returns an invoice link for the Mini App's WebApp.openInvoice(). Crystals are credited
   // only when Telegram confirms the payment to the bot — never because the client says it paid.
-  app.post('/api/stars/invoice', auth, limiter, async (request, response, next) => {
+  app.post('/api/stars/invoice', auth, limiter, access, async (request, response, next) => {
     try {
       if (!createInvoiceLink) return response.status(503).json({ ok: false, error: 'Star payments are not available right now.' });
       const result = await service.startStarPurchase(request.identity, request.body?.packId);
@@ -83,7 +122,7 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
 export function handleErrors(app) {
   app.use((error, _request, response, _next) => {
     // A body that is not valid JSON (or is too large) is the client's mistake, not a server failure.
-    if (error?.status >= 400 && error.status < 500) return response.status(error.status).json({ ok: false, error: 'Invalid request.' });
+    if (error?.status >= 400 && error.status < 500) return response.status(error.status).json({ ok: false, error: error?.status === 403 ? error.message : 'Invalid request.' });
     console.error(error);
     response.status(500).json({ ok: false, error: 'Internal server error' });
   });

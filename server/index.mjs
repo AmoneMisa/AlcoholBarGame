@@ -15,11 +15,10 @@ const botToken = process.env.TELEGRAM_BOT_TOKEN;
 const allowDevLogin = process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production';
 if (!botToken && !allowDevLogin) console.warn('TELEGRAM_BOT_TOKEN is not set: players cannot sign in.');
 const payments = {};
-const telegramBot = createTelegramBot({ token: botToken, payments });
-
 const service = createGameService({ repository: createPgRepository(pool), checkEnglish });
+const telegramBot = createTelegramBot({ token: botToken, payments, staffRole:identity=>service.staffRole(identity) });
 Object.assign(payments, { approve: service.approveStarCheckout, fulfil: service.fulfilStarPayment });
-const app = createApp({ adminToken: process.env.ADMIN_API_TOKEN,
+const app = createApp({ supportEmail: process.env.SUPPORT_EMAIL || undefined, supportTelegram: process.env.SUPPORT_TELEGRAM,
   service, botToken, allowDevLogin,
   createInvoiceLink: botToken ? telegramBot.createInvoiceLink : undefined,
   extraRoutes(api) {
@@ -51,7 +50,7 @@ const HASHED = /-[A-Za-z0-9_-]{8}\.(js|css|dic|aff)$/;
 app.use(express.static(dist, {
   index: false,
   setHeaders(response, file) {
-    response.setHeader('Cache-Control', /[\/]index\.html$/.test(file) ? 'no-cache, must-revalidate' : HASHED.test(file) ? 'public, max-age=31536000, immutable' : 'public, max-age=3600, must-revalidate');
+    response.setHeader('Cache-Control', /[\\/]admin-/.test(file) ? 'private, no-store' : /[\/]index\.html$/.test(file) ? 'no-cache, must-revalidate' : HASHED.test(file) ? 'public, max-age=31536000, immutable' : 'public, max-age=3600, must-revalidate');
   }
 }));
 // The page itself is never cached without asking the server first, so a new release is picked up on the next open
@@ -62,6 +61,9 @@ app.use('/api', (_request, response) => response.status(404).json({ ok: false, e
 handleErrors(app);
 
 await migrate();
+await service.pruneEvents();
+const eventCleanup=setInterval(()=>service.pruneEvents().catch(error=>console.error('Event cleanup failed:',error.message)),60*1000);
+eventCleanup.unref();
 const seeded = await seedMissingCocktails(RECIPES);
 if (seeded.inserted) console.log(`Added ${seeded.inserted} new cocktails to the catalog.`);
 

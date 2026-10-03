@@ -51,3 +51,7 @@ The app verifies every `Telegram.WebApp.initData` signature on the server. At st
 - Caddy in the compose file is optional (`docker compose --profile caddy up -d`) and only for a server whose ports 80 and 443 are free.
 - The deploy checks `/api/health` inside the container and on the host port, so a missing mapping fails the workflow.
 - `compose.yaml` in the repository root is for building and running locally; do not run it next to the CI stack on the server.
+
+## Administration and support
+
+See [administration setup and behavior](docs/administration.md) for staff roles and the owner Telegram ID, promo management, player moderation, tickets and 14-day event retention.

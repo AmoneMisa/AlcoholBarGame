@@ -7,7 +7,8 @@ export class TelegramBotError extends Error {}
  * TELEGRAM_BOT_TOKEN is the only runtime Telegram setting. The launch URL is the bot's
  * standard Main Mini App deep link, whose HTTPS application URL is managed once in BotFather.
  */
-export function createTelegramBot({ token, fetchImpl = globalThis.fetch, logger = console, payments } = {}) {
+export function createTelegramBot({ token, fetchImpl = globalThis.fetch, logger = console, payments, adminTelegramIds = [], staffRole } = {}) {
+  const admins=new Set((Array.isArray(adminTelegramIds) ? adminTelegramIds : String(adminTelegramIds).split(',')).map(id=>String(id).trim()));
   const state = {
     configured: Boolean(token), connected: false, mode: 'off', id: null, username: null,
     mainMiniApp: false, lastUpdateAt: null, error: token ? null : 'TELEGRAM_BOT_TOKEN is not set'
@@ -95,6 +96,9 @@ export function createTelegramBot({ token, fetchImpl = globalThis.fetch, logger 
     const message = update?.message;
     if (payments && message?.successful_payment) return handleSuccessfulPayment(message, signal);
     const command = message?.text?.trim().split(/\s+/, 1)[0]?.toLowerCase().split('@', 1)[0];
+    if(command === '/admin' && message?.chat?.type === 'private' && (staffRole ? await staffRole({kind:'telegram',telegramId:message.from?.id}) : admins.has(String(message.from?.id))) && state.username) {
+      return call('sendMessage',{chat_id:message.chat.id,text:'Open administration:',reply_markup:{inline_keyboard:[[{text:'Administration',url:'https://t.me/'+state.username+'?startapp=admin'}]]}},signal);
+    }
     if (command === '/start' || command === '/game') return sendWelcome(message, signal);
     if (command === '/help' && message?.chat?.id && message.chat.type === 'private') {
       return call('sendMessage', {
