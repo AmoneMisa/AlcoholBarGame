@@ -90,7 +90,7 @@ onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); emit('busy'
     <div class="wheel-stage">
       <div class="wheel-pointer" aria-hidden="true"></div>
       <div class="wheel-disc" :class="{ instant }" role="img" aria-label="Daily prize wheel" :style="{ transform: `rotate(${angle}deg)`, transitionDuration: instant ? '0ms' : `${SPIN_MS}ms` }">
-        <img class="wheel-background" src="/assets/ui/daily-wheel.webp" alt="" width="800" height="800" draggable="false" />
+        <img class="wheel-background" src="/assets/ui/daily-wheel-painted-v1.webp" alt="" width="800" height="800" draggable="false" />
         <div v-for="slice in slices" :key="slice.id" class="wheel-sector" :style="{transform: `rotate(${slice.turn}deg)`}" aria-hidden="true">
           <div class="wheel-sector-reward"><img v-if="slice.art" :src="slice.art" alt="" /><span v-else>{{ slice.icon }}</span><b>{{ slice.label }}</b></div>
         </div>
@@ -105,11 +105,11 @@ onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); emit('busy'
       </div>
       <details class="wheel-odds">
         <summary>What is on the wheel</summary>
-        <ul><li v-for="item in odds" :key="item.id"><span>{{ item.icon }} {{ item.label }}</span><b>{{ item.percent }}%</b></li></ul>
+        <ul><li v-for="item in odds" :key="item.id"><span><img :src="artUrl(item.id)" alt="" width="28" height="28" />{{ item.label }}</span><b>{{ item.percent }}%</b></li></ul>
       </details>
     </div>
   </div>
-  <ModalDialog v-if="rewardOpen" title="Your wheel reward" presentation="celebration" width="400px" @close="rewardOpen = false"><div class="wheel-prize-reveal"><img v-if="won?.art" :src="won.art" alt="" /><b>{{ shown }}</b><p>{{ game.mode === 'online' ? 'Your reward delivery is in Mail.' : 'Added to your collection.' }}</p><UiButton variant="solid" block @click="rewardOpen = false">Continue</UiButton></div></ModalDialog>
+  <ModalDialog v-if="rewardOpen" title="Your wheel reward" presentation="celebration" width="400px" @close="rewardOpen = false"><div class="wheel-prize-reveal"><img v-if="won?.art" :src="won.art" alt="" /><b>{{ shown }}</b><p>{{ game.mode === 'online' ? 'Your reward delivery is in Post Box.' : 'Added to your collection.' }}</p><UiButton variant="solid" block @click="rewardOpen = false">Continue</UiButton></div></ModalDialog>
 </template>
 
 <style>
@@ -119,9 +119,9 @@ onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); emit('busy'
 
 .wheel-page { display: grid; grid-template-columns: minmax(220px, 340px) 1fr; gap: 20px; align-items: center; padding: 8px 4px; }
 @media (max-width: 640px) { .wheel-page { grid-template-columns: 1fr; justify-items: center; } }
-.wheel-stage { position: relative; width: min(340px, 82vw); aspect-ratio: 1; }
+.wheel-stage { position: relative; width: min(340px, 100%); aspect-ratio: 1; }
 .wheel-disc { width: 100%; height: 100%; display: block; transition-property: transform; transition-timing-function: cubic-bezier(.1, .72, .12, 1); filter: drop-shadow(0 10px 22px #0008); }
-.wheel-disc {position:relative}
+.wheel-disc {position:relative;overflow:clip;border-radius:50%}
 .wheel-background {display:block;width:100%;height:100%;object-fit:contain}
 .wheel-sector {position:absolute;inset:0;pointer-events:none}
 .wheel-sector-reward {position:absolute;left:50%;top:10%;width:24%;transform:translateX(-50%);display:grid;justify-items:center;gap:3px;color:#fff;text-align:center}
@@ -138,5 +138,7 @@ onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); emit('busy'
 .wheel-odds summary { cursor: pointer; }
 .wheel-odds ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
 .wheel-odds li { display: flex; justify-content: space-between; gap: 12px; }
+.wheel-odds li > span {display:flex;align-items:center;gap:8px;}
+.wheel-odds li img {object-fit:contain;}
 @media (prefers-reduced-motion: reduce) { .wheel-disc { transition-duration: 0ms !important; } }
 </style>

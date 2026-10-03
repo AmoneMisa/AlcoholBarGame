@@ -21,7 +21,7 @@ function back() { if (!wheelBusy.value) page.value = undefined; }
       <div class="event-summary"><span><b>{{ game.availableEvents.rewards }}</b> rewards ready</span><span><b>{{ game.rouletteSpinsLeft }}</b> free wheel spins</span></div>
       <div class="event-menu">
         <UiButton @click="page = 'login'"><UiIcon class="event-menu-icon" name="gift" /><span><b>Daily login</b><small>{{ game.dailyGiftAvailable ? 'Your reward is ready' : 'Come back tomorrow' }}</small></span></UiButton>
-        <UiButton @click="page = 'wheel'"><img class="event-menu-icon" src="/assets/ui/daily-wheel.webp" alt="" /><span><b>Daily wheel</b><small>{{ game.rouletteSpinsLeft }} free spins available</small></span></UiButton>
+        <UiButton @click="page = 'wheel'"><img class="event-menu-icon" src="/assets/ui/daily-wheel-painted-v1.webp" alt="" /><span><b>Daily wheel</b><small>{{ game.rouletteSpinsLeft }} free spins available</small></span></UiButton>
         <UiButton @click="page = 'pass'"><UiIcon class="event-menu-icon" name="prestige" /><span><b>Battle Pass</b><small>Season outfits, background & rewards</small></span></UiButton>
         <UiButton @click="page = 'quests'"><UiIcon class="event-menu-icon" name="trophy" /><span><b>Quests & rewards</b><small>{{ game.availableEvents.quests.length + game.availableEvents.achievements.length }} ready to collect</small></span></UiButton>
       </div>
