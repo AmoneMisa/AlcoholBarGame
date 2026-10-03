@@ -1,0 +1,612 @@
+{
+  "navigation": {
+    "dom": 73,
+    "load": 85.89999999850988
+  },
+  "paint": [
+    {
+      "name": "first-paint",
+      "start": 120
+    },
+    {
+      "name": "first-contentful-paint",
+      "start": 120
+    }
+  ],
+  "lcp": [
+    {
+      "start": 120,
+      "size": 4067,
+      "url": ""
+    },
+    {
+      "start": 400,
+      "size": 715666,
+      "url": "http://127.0.0.1:5191/assets/bar/backgrounds/velvet-hour-bar.webp"
+    }
+  ],
+  "longTasks": [
+    {
+      "start": 116.69999999925494,
+      "duration": 177
+    }
+  ],
+  "resources": [
+    {
+      "url": "js/telegram-web-app.js?63",
+      "type": "script",
+      "bytes": 0,
+      "body": 0,
+      "duration": 0
+    },
+    {
+      "url": "assets/index-Dw5Dytxl.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 2460,
+      "duration": 7
+    },
+    {
+      "url": "assets/runtime-dom.esm-bundler-zm2ZW4er.js",
+      "type": "other",
+      "bytes": 300,
+      "body": 3905,
+      "duration": 9.899999998509884
+    },
+    {
+      "url": "assets/webapp-DytqpQtl.js",
+      "type": "other",
+      "bytes": 300,
+      "body": 170,
+      "duration": 9.899999998509884
+    },
+    {
+      "url": "assets/preload-helper-BZ1Pz5am.js",
+      "type": "other",
+      "bytes": 300,
+      "body": 688,
+      "duration": 10.600000001490116
+    },
+    {
+      "url": "assets/catalog-Dvd246fR.js",
+      "type": "other",
+      "bytes": 300,
+      "body": 39658,
+      "duration": 9.699999999254942
+    },
+    {
+      "url": "assets/style--WWmtwpM.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 2866,
+      "duration": 2.600000001490116
+    },
+    {
+      "url": "assets/game-B9BLI3CP.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 29419,
+      "duration": 3.899999998509884
+    },
+    {
+      "url": "assets/conversation-CKn9-gI8.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 4397,
+      "duration": 4
+    },
+    {
+      "url": "assets/dashboard-ms1bWSAy.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 879,
+      "duration": 3.300000000745058
+    },
+    {
+      "url": "assets/management-IhfHSTGZ.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 5014,
+      "duration": 8.5
+    },
+    {
+      "url": "assets/learning-43AZx-pL.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 5954,
+      "duration": 8.299999997019768
+    },
+    {
+      "url": "assets/knowledge-CoVcjVxo.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 2865,
+      "duration": 8.399999998509884
+    },
+    {
+      "url": "assets/bar/backgrounds/interior-speakeasy.webp",
+      "type": "css",
+      "bytes": 300,
+      "body": 0,
+      "duration": 7
+    },
+    {
+      "url": "assets/ui-kit-7RAzKvlt.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 1085,
+      "duration": 1.4000000022351742
+    },
+    {
+      "url": "assets/polish-D7QD_KV-.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 7882,
+      "duration": 1.199999999254942
+    },
+    {
+      "url": "api/cocktails",
+      "type": "fetch",
+      "bytes": 300,
+      "body": 0,
+      "duration": 2.199999999254942
+    },
+    {
+      "url": "assets/App-D-mBNN8F.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 20511,
+      "duration": 5.699999999254942
+    },
+    {
+      "url": "assets/game-_zOBuVBl.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 456,
+      "duration": 10.600000001490116
+    },
+    {
+      "url": "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 84,
+      "duration": 12.400000002235174
+    },
+    {
+      "url": "assets/pointer-B-5vShAm.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 846,
+      "duration": 12.300000000745058
+    },
+    {
+      "url": "assets/game-D_l1wYHa.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 357188,
+      "duration": 8.400000002235174
+    },
+    {
+      "url": "assets/SectionTabs-CkgsDSvz.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 715,
+      "duration": 11.899999998509884
+    },
+    {
+      "url": "assets/SectionTabs-Cm2-F2-n.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 745,
+      "duration": 12.699999999254942
+    },
+    {
+      "url": "assets/ModalDialog-BWnJUB8_.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 1089,
+      "duration": 12.699999999254942
+    },
+    {
+      "url": "assets/BarScene-qjrGQ0-T.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 11062,
+      "duration": 13.200000002980232
+    },
+    {
+      "url": "assets/BottleModel-B_v8APC2.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 724,
+      "duration": 13.5
+    },
+    {
+      "url": "assets/ModalDialog-CiAiwaJO.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 1023,
+      "duration": 14.400000002235174
+    },
+    {
+      "url": "assets/bottleArt-Cd58mJOf.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 759,
+      "duration": 14.900000002235174
+    },
+    {
+      "url": "assets/TipJar-B1cclRmx.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 544,
+      "duration": 14.199999999254942
+    },
+    {
+      "url": "assets/CharacterModel-CxXVpyWq.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 2090,
+      "duration": 15.300000000745058
+    },
+    {
+      "url": "assets/bartenderAvatars-DPDTOlOK.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 695,
+      "duration": 16.399999998509884
+    },
+    {
+      "url": "assets/TipJar-DDus1jBL.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 931,
+      "duration": 16.5
+    },
+    {
+      "url": "assets/ConfirmDialog-R-8b9oSm.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 449,
+      "duration": 14.199999999254942
+    },
+    {
+      "url": "assets/CrystalAmount-DfYjLwap.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 36,
+      "duration": 14.199999999254942
+    },
+    {
+      "url": "assets/ConfirmDialog-CAt99yIK.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 974,
+      "duration": 18.599999997764826
+    },
+    {
+      "url": "assets/CrystalAmount-DqbRLWst.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 316,
+      "duration": 19.299999997019768
+    },
+    {
+      "url": "assets/BarScene-DpID6ZWO.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 687,
+      "duration": 14.600000001490116
+    },
+    {
+      "url": "assets/CharacterPortrait-CIiZxQho.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 163,
+      "duration": 16.300000000745058
+    },
+    {
+      "url": "assets/CharacterPortrait-4YPNMCVE.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 622,
+      "duration": 19.400000002235174
+    },
+    {
+      "url": "assets/RewardArt-DB-tfT6L.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 1284,
+      "duration": 19.400000002235174
+    },
+    {
+      "url": "assets/RewardList-Bo7fhmkE.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 6386,
+      "duration": 19.400000002235174
+    },
+    {
+      "url": "assets/ItemArt-D0rLAFy8.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 356,
+      "duration": 16.300000000745058
+    },
+    {
+      "url": "assets/RewardArt-C241KUSn.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 537,
+      "duration": 17.199999999254942
+    },
+    {
+      "url": "assets/AchievementArt-B1_s01ST.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 90,
+      "duration": 17.699999999254942
+    },
+    {
+      "url": "assets/ItemArt-DGfa4FTP.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 802,
+      "duration": 19.699999999254942
+    },
+    {
+      "url": "assets/AchievementArt-BUkK_z1N.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 437,
+      "duration": 20.199999999254942
+    },
+    {
+      "url": "assets/RewardList-Bje5U4OR.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 3195,
+      "duration": 18
+    },
+    {
+      "url": "assets/guides-DinjxUnw.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 33431,
+      "duration": 21.5
+    },
+    {
+      "url": "assets/BrandBottle-BHEHFDbo.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 536,
+      "duration": 21.199999999254942
+    },
+    {
+      "url": "assets/speak-DaWtXHnT.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 1633,
+      "duration": 21.199999999254942
+    },
+    {
+      "url": "assets/ingredients-DyG4Vkdr.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 11349,
+      "duration": 21.199999999254942
+    },
+    {
+      "url": "assets/BrandBottle-QihnTNkZ.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 290,
+      "duration": 17.699999999254942
+    },
+    {
+      "url": "assets/App-DvIfpcO_.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 5236,
+      "duration": 18
+    },
+    {
+      "url": "assets/notifications-BkK6XGBF.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 801,
+      "duration": 21.399999998509884
+    },
+    {
+      "url": "assets/voice/manifest.json",
+      "type": "fetch",
+      "bytes": 300,
+      "body": 66270,
+      "duration": 3.599999997764826
+    },
+    {
+      "url": "api/session",
+      "type": "fetch",
+      "bytes": 300,
+      "body": 0,
+      "duration": 2.399999998509884
+    },
+    {
+      "url": "assets/ui/tip-jar/stage-0.webp",
+      "type": "img",
+      "bytes": 300,
+      "body": 0,
+      "duration": 2.5
+    },
+    {
+      "url": "assets/characters/bartender/noa-natural-atlas-v2.webp",
+      "type": "css",
+      "bytes": 300,
+      "body": 0,
+      "duration": 2.100000001490116
+    },
+    {
+      "url": "assets/workshop/resources/coins-painted-v1.webp",
+      "type": "css",
+      "bytes": 300,
+      "body": 0,
+      "duration": 2.399999998509884
+    },
+    {
+      "url": "assets/workshop/resources/crystals-painted-v1.webp",
+      "type": "css",
+      "bytes": 300,
+      "body": 0,
+      "duration": 2.7999999970197678
+    },
+    {
+      "url": "assets/workshop/resources/prestige.webp",
+      "type": "css",
+      "bytes": 300,
+      "body": 0,
+      "duration": 3.199999999254942
+    },
+    {
+      "url": "assets/workshop/boxes/choice-painted-v1.webp",
+      "type": "css",
+      "bytes": 300,
+      "body": 0,
+      "duration": 5.5
+    },
+    {
+      "url": "assets/bar/backgrounds/velvet-hour-bar.webp",
+      "type": "css",
+      "bytes": 300,
+      "body": 0,
+      "duration": 5.5
+    },
+    {
+      "url": "assets/StartingBarPicker-CCjnK3Mw.js",
+      "type": "script",
+      "bytes": 300,
+      "body": 915,
+      "duration": 3.099999997764826
+    },
+    {
+      "url": "assets/StartingBarPicker-IOUk2hc3.css",
+      "type": "link",
+      "bytes": 300,
+      "body": 798,
+      "duration": 2.900000002235174
+    },
+    {
+      "url": "assets/bar/backgrounds/interior-loft.webp",
+      "type": "img",
+      "bytes": 300,
+      "body": 0,
+      "duration": 3.2999999970197678
+    },
+    {
+      "url": "assets/bar/backgrounds/interior-riad.webp",
+      "type": "img",
+      "bytes": 300,
+      "body": 0,
+      "duration": 3.7999999970197678
+    },
+    {
+      "url": "assets/bar/backgrounds/interior-art-deco.webp",
+      "type": "img",
+      "bytes": 300,
+      "body": 0,
+      "duration": 4
+    },
+    {
+      "url": "assets/bar/backgrounds/interior-izakaya.webp",
+      "type": "img",
+      "bytes": 300,
+      "body": 0,
+      "duration": 4.5
+    },
+    {
+      "url": "assets/ui/lounge-panel-painted-v1.webp",
+      "type": "css",
+      "bytes": 300,
+      "body": 0,
+      "duration": 4.199999999254942
+    }
+  ],
+  "memory": {
+    "used": 16019162,
+    "total": 29505330
+  },
+  "dom": 183,
+  "images": [
+    {
+      "src": "assets/ui/tip-jar/stage-0.webp",
+      "w": 384,
+      "h": 384,
+      "displayW": 64,
+      "displayH": 64
+    },
+    {
+      "src": "assets/bar/backgrounds/velvet-hour-bar.webp",
+      "w": 1774,
+      "h": 887,
+      "displayW": 294,
+      "displayH": 120
+    },
+    {
+      "src": "assets/bar/backgrounds/interior-speakeasy.webp",
+      "w": 623,
+      "h": 623,
+      "displayW": 294,
+      "displayH": 120
+    },
+    {
+      "src": "assets/bar/backgrounds/interior-loft.webp",
+      "w": 764,
+      "h": 508,
+      "displayW": 294,
+      "displayH": 120
+    },
+    {
+      "src": "assets/bar/backgrounds/interior-riad.webp",
+      "w": 764,
+      "h": 508,
+      "displayW": 294,
+      "displayH": 120
+    },
+    {
+      "src": "assets/bar/backgrounds/interior-art-deco.webp",
+      "w": 623,
+      "h": 623,
+      "displayW": 294,
+      "displayH": 120
+    },
+    {
+      "src": "assets/bar/backgrounds/interior-izakaya.webp",
+      "w": 764,
+      "h": 508,
+      "displayW": 294,
+      "displayH": 120
+    }
+  ],
+  "backgrounds": [
+    "url(\"http://127.0.0.1:5191/assets/characters/bartender/noa-natural-atlas-v2.webp\")",
+    "url(\"http://127.0.0.1:5191/assets/workshop/resources/coins-painted-v1.webp\")",
+    "url(\"http://127.0.0.1:5191/assets/workshop/resources/crystals-painted-v1.webp\")",
+    "url(\"http://127.0.0.1:5191/assets/workshop/resources/prestige.webp\")",
+    "url(\"http://127.0.0.1:5191/assets/workshop/boxes/choice-painted-v1.webp\")",
+    "linear-gradient(rgba(45, 13, 30, 0.333), rgba(45, 13, 30, 0.333)), url(\"http://127.0.0.1:5191/assets/bar/backgrounds/velvet-hour-bar.webp\")",
+    "linear-gradient(rgba(11, 19, 32, 0.4), rgba(11, 19, 32, 0.4)), url(\"http://127.0.0.1:5191/assets/ui/lounge-panel-painted-v1.webp\")"
+  ],
+  "filters": [
+    {
+      "class": "top-hud",
+      "filter": "blur(18px)"
+    },
+    {
+      "class": "game-nav",
+      "filter": "blur(18px)"
+    },
+    {
+      "class": "modal-backdrop center",
+      "filter": "blur(5px)"
+    }
+  ]
+}

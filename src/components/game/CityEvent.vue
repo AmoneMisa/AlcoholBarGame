@@ -54,14 +54,14 @@ const perks = computed(() => {
 .city-event-head { display: flex; width: 100%; align-items: center; gap: 8px; padding: 7px 10px; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
 .city-event-icon { font-size: 18px; }
 .city-event-head b, .city-event-head small { display: block; }
-.city-event-head b { font-size: 11px; }
-.city-event-head small { color: #a9b3c1; font-size: 8px; letter-spacing: .04em; }
+.city-event-head b { font-size: 13px; }
+.city-event-head small { color: #a9b3c1; font-size: 13px; letter-spacing: .04em; }
 .buff .city-event-head b { color: #ffd98b; }
 .disaster .city-event-head b { color: #ff9ca5; }
-.city-event-body { padding: 0 10px 9px; font-size: 9px; line-height: 1.45; }
+.city-event-body { padding: 0 10px 9px; font-size: 13px; line-height: 1.45; }
 .city-event-body p { margin: 0 0 5px; }
 .city-event-body .shortage { color: #ffb3b9; }
 .city-event-body ul { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 5px; padding: 0; list-style: none; }
 .city-event-body li { padding: 2px 6px; border: 1px solid #3c4d64; border-radius: 8px; background: #16233a; color: #cfd8e4; }
-.city-event-body > small { color: #8f9bab; font-size: 8px; }
+.city-event-body > small { color: #8f9bab; font-size: 13px; }
 </style>

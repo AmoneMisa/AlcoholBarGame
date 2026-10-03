@@ -51,7 +51,7 @@ watch(open, async (value) => {
 </template>
 
 <style>
-.opt-select{display:grid;gap:6px;min-width:0;font-size:12px;color:#d6c5b0}
+.opt-select{display:grid;gap:6px;min-width:0;font-size:13px;color:#d6c5b0}
 .opt-trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-width:0;min-height:44px;padding:8px 12px;color:#f0e7dc;background:#182232;border:1px solid #465064;border-radius:10px;font-size:14px;text-align:left}
 .opt-trigger span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .opt-trigger i{color:#d8aa57;font-style:normal}
@@ -61,6 +61,6 @@ watch(open, async (value) => {
 .opt-list li button:hover:not(:disabled){background:#1b2b44}
 .opt-list li button.selected{background:#4a3219;border-color:#d8aa57;color:#ffe2a8}
 .opt-list li button:disabled{color:#7d8696;cursor:not-allowed}
-.opt-list li em{font-style:normal;font-size:12px;color:#d8aa57}
+.opt-list li em{font-style:normal;font-size:13px;color:#d8aa57}
 .opt-list li button:disabled em{color:#7d8696}
 </style>

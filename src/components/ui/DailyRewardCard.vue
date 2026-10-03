@@ -44,20 +44,20 @@ function claim() { game.claimDailyGift(); }
 
 <style>
 .daily-popup { display: grid; gap: 12px; }
-.daily-intro, .daily-wait { margin: 0; color: #aebccd; font-size: 12px; line-height: 1.5; }
+.daily-intro, .daily-wait { margin: 0; color: #aebccd; font-size: 13px; line-height: 1.5; }
 .daily-track { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
 .daily-track > span { display: grid; justify-items: center; gap: 3px; padding: 8px 2px; border: 1px solid #34465e; border-radius: 10px; background: #142034; text-align: center; }
-.daily-track small { color: #93a8be; font-size: 7px; font-weight: 800; letter-spacing: .06em; }
+.daily-track small { color: #93a8be; font-size: 13px; font-weight: 800; letter-spacing: .06em; }
 .daily-track .ui-icon { width: 18px; height: 18px; color: #7c8da3; }
 .daily-track b { color: #e7be68; font: 700 16px Georgia, serif; }
-.daily-track em { color: #859ab0; font-size: 8px; font-style: normal; line-height: 1.15; }
+.daily-track em { color: #859ab0; font-size: 13px; font-style: normal; line-height: 1.15; }
 .daily-track > span.claimed { border-color: #3f7a55; background: #14291f; }
 .daily-track > span.claimed .ui-icon { color: #7fd69b; }
 .daily-track > span.today { border-color: #e2b657; background: #48351f; box-shadow: 0 0 0 2px #e2b65755; }
 .daily-track > span.today .ui-icon { color: #f2bd58; }
 .daily-result { display: grid; gap: 6px; padding: 10px 12px; border: 1px solid #3f7a55; border-radius: 12px; background: #12271d; }
-.daily-result > b { color: #b9e5c6; font-size: 12px; }
+.daily-result > b { color: #b9e5c6; font-size: 13px; }
 .daily-claim { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; }
 .daily-claim .ui-icon { width: 20px; height: 20px; }
-@media (max-width: 420px) { .daily-track { gap: 3px; } .daily-track b { font-size: 13px; } .daily-track em { font-size: 7px; } }
+@media (max-width: 420px) { .daily-track { gap: 3px; } .daily-track b { font-size: 13px; } .daily-track em { font-size: 13px; } }
 </style>

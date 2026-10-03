@@ -39,8 +39,8 @@ const why = computed(() => active.value ? 'A boost is already running.' : enough
 .popularity-bar .ui-icon { width: 22px; height: 22px; color: #ffd35a; }
 .popularity-text { display: grid; gap: 3px; min-width: 0; }
 .popularity-text b { font-size: 14px; }
-.popularity-text em { margin-left: 6px; color: #9eafc1; font-style: normal; font-weight: 600; font-size: 12px; }
-.popularity-text small { color: #9eafc1; font-size: 11px; }
+.popularity-text em { margin-left: 6px; color: #9eafc1; font-style: normal; font-weight: 600; font-size: 13px; }
+.popularity-text small { color: #9eafc1; font-size: 13px; }
 .popularity-text small.running { color: #7cc686; font-weight: 700; }
 .popularity-text progress { width: 100%; height: 5px; accent-color: #e7b556; }
 .popularity-actions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }

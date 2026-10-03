@@ -1,0 +1,17 @@
+/* Preserve painted surfaces; reduce compositing and repaint work on budget devices. */
+html[data-graphics='lite'] .top-hud,
+html[data-graphics='lite'] .game-nav,
+html[data-graphics='lite'] .modal-backdrop,
+html[data-graphics='lite'] .talk-backdrop,
+html[data-graphics='lite'] .ui-popover { backdrop-filter: none !important; }
+html[data-graphics='lite'] .bar-scene:not(.capture) .scene-light { display: none; }
+html[data-graphics='lite'] .bar-scene:not(.capture) .art-character,
+html[data-graphics='lite'] .bar-scene:not(.capture) .customer-art,
+html[data-graphics='lite'] .bar-scene:not(.capture) .bartender-art,
+html[data-graphics='lite'] .bar-scene:not(.capture) .bottle-visual,
+html[data-graphics='lite'] .bar-scene:not(.capture) .tip-jar-art { filter: none !important; }
+html[data-graphics='lite'] .pass-cell.ready,
+html[data-graphics='lite'] .bubbles i,
+html[data-graphics='lite'] .reveal-halo,
+html[data-graphics='lite'] .reveal-stars i { animation: none !important; }
+.bar-scene.scene-inactive * { animation-play-state: paused !important; }

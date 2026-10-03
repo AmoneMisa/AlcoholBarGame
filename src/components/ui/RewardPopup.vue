@@ -72,8 +72,8 @@ onUnmounted(() => clearTimeout(timer));
 .reward-grid li.legendary, .reward-grid li.companion { --glow: #d097fa; }
 .reward-tile-art { position: relative; width: min(100%, 120px); height: 108px; isolation: isolate; }
 .reward-tile-art::before { content: ''; position: absolute; z-index: -1; inset: -8px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--glow) 65%, transparent), transparent 68%); }
-.reward-grid li > span { color: #fff0d3; font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; text-shadow: 0 2px 4px #000; }
-.reward-new { position: absolute; right: 0; top: 0; padding: 4px; border: 1px solid #f9d897; border-radius: 50%; background: #d15b71; color: #fff3ba; font: italic 10px Georgia, serif; box-shadow: 0 0 14px #f7ad78; }
+.reward-grid li > span { color: #fff0d3; font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; text-shadow: 0 2px 4px #000; }
+.reward-new { position: absolute; right: 0; top: 0; padding: 4px; border: 1px solid #f9d897; border-radius: 50%; background: #d15b71; color: #fff3ba; font: italic 13px Georgia, serif; box-shadow: 0 0 14px #f7ad78; }
 .reward-continue { display: block; margin: 28px auto 0; min-height: 44px; color: #f4dfb7; }
 .modal-backdrop.reveal { background: radial-gradient(ellipse at 50% 65%, #412658, #090810 72%); backdrop-filter: none; }
 .reveal .modal-sheet { width: min(720px, 100%) !important; }
@@ -84,15 +84,15 @@ onUnmounted(() => clearTimeout(timer));
 .reveal-halo { position: absolute; z-index: -1; top: 12%; width: 85%; aspect-ratio: 1; border-radius: 50%; background: repeating-conic-gradient(from 0deg, #b57ff720 0deg 2deg, transparent 2deg 12deg); mask-image: radial-gradient(circle, transparent 16%, #000 40%, transparent 70%); animation: reward-orbit 40s linear infinite; }
 .reveal-caption { z-index: 1; margin-top: 8px; }
 .reveal-new { display: block; width: 65px; margin: 0 auto 12px; padding: 8px 4px; border: 1px solid #e6bf76; border-radius: 50%; color: #ffde91; font: italic 14px Georgia, serif; box-shadow: 0 0 20px #dba65366; }
-.reveal-caption small { color: #d7bce7; font-size: 10px; text-transform: uppercase; letter-spacing: .2em; }
+.reveal-caption small { color: #d7bce7; font-size: 13px; text-transform: uppercase; letter-spacing: .2em; }
 .reveal-caption h2 { margin: 10px 0; color: #ffdf91; font: 700 clamp(26px, 7vw, 42px)/1.1 Georgia, serif; text-shadow: 0 0 20px #b88269; }
 .reveal-stars { position: absolute; inset: 0; pointer-events: none; z-index: -1; }
-.reveal-stars i { position: absolute; left: calc(mod(var(--n) * 37, 100) * 1%); top: calc(mod(var(--n) * 23, 100) * 1%); color: #d7acf3; font-size: 12px; font-style: normal; animation: reward-spark 3s ease-in-out infinite alternate; animation-delay: calc(var(--n) * -230ms); }
+.reveal-stars i { position: absolute; left: calc(mod(var(--n) * 37, 100) * 1%); top: calc(mod(var(--n) * 23, 100) * 1%); color: #d7acf3; font-size: 13px; font-style: normal; animation: reward-spark 3s ease-in-out infinite alternate; animation-delay: calc(var(--n) * -230ms); }
 @keyframes reward-bloom { from { opacity: 0; transform: translateY(18px) scale(.88); } to { opacity: 1; transform: none; } }
 @keyframes reward-orbit { to { transform: rotate(360deg); } }
 @keyframes reward-spark { from { opacity: .15; transform: translateY(6px) scale(.5); } to { opacity: .9; transform: translateY(-6px) scale(1.2); } }
 @media (prefers-reduced-motion: reduce) { .reward-grid li, .reveal-hero, .reveal-halo, .reveal-stars i { animation: none; } }
-@media (max-width: 360px) { .reward-tile-art { height: 88px; } .reward-grid li > span { font-size: 11px; } }
+@media (max-width: 360px) { .reward-tile-art { height: 88px; } .reward-grid li > span { font-size: 13px; } }
 .reward-popup { position: fixed; z-index: 140; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; width: min(340px, calc(100vw - 24px)); padding: 10px 12px 12px; border: 1px solid #d2a24e; border-radius: 14px; background: linear-gradient(150deg, #1b2740f7, #0b1320f7 72%); box-shadow: 0 18px 50px #000d; transform: translateX(-50%); animation: reward-in .24s ease-out; }
 .reward-popup > header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .reward-popup > header b { color: var(--gold, #e8b85a); font: 700 15px Georgia, serif; }

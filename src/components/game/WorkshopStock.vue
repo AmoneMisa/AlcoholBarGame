@@ -138,7 +138,7 @@ function throwAway() {
     </template>
 
     <template v-else-if="popup.type === 'parts'">
-      <p class="stock-text">You have <b>{{ game.loot.parts }}</b> workshop parts. They pay for equipment upgrades in Manage → Workshop. Serving guests and opening boxes find more.</p>
+      <p class="stock-text">You have <b>{{ game.loot.parts }}</b> workshop parts. Use Equipment on the Bar screen to upgrade your bar. Serving guests and opening boxes find more.</p>
     </template>
 
     <template v-else-if="popup.type === 'style' && style">
@@ -179,7 +179,7 @@ function throwAway() {
 .stock-tile.tappable:hover, .stock-tile.tappable:focus-visible { border-color: #d6a54d; }
 .stock-tile .item-art { width: 64px; height: 64px; border-radius: 50%; }
 .stock-tile b { font-size: 14px; }
-.stock-tile small { color: #9eafc1; font-size: 11px; line-height: 1.3; }
+.stock-tile small { color: #9eafc1; font-size: 13px; line-height: 1.3; }
 .stock-tile strong { position: absolute; top: 8px; left: 8px; min-width: 28px; padding: 2px 8px; border: 1px solid #806536; border-radius: 999px; background: #17120c; color: #ffd98a; font: 700 13px Georgia, serif; }
 .stock-empty { grid-column: 1 / -1; margin: 0; color: #9eafc1; }
 .stock-text { margin: 0 0 10px; color: #c9d5e6; font-size: 14px; line-height: 1.5; }
@@ -189,7 +189,7 @@ function throwAway() {
 .stock-craft-list { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .stock-craft-list li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; padding: 8px 10px; border: 1px solid #354762; border-radius: 10px; background: #111c2d; }
 .stock-craft-list li span { display: grid; min-width: 0; font-size: 14px; }
-.stock-craft-list li small { color: #9eafc1; font-size: 11px; }
+.stock-craft-list li small { color: #9eafc1; font-size: 13px; }
 .stock-craft-list li.rare { border-color: #3f86b8; }
 .stock-craft-list li.legendary { border-color: #d6a54d; background: #2a2113; }
 .stock-craft-list .ui-reason { flex-basis: 100%; margin: 0; }

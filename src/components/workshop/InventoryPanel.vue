@@ -66,7 +66,7 @@ function activate() { const entry = selected.value; if (entry?.action && game.ac
 <style scoped>
 .inventory-panel { display: grid; gap: 14px; padding: 16px; }
 .inventory-filters { display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;padding-bottom:6px; }
-.inventory-note { margin: 0 0 12px; color: #c2b3bf; font-size: 12px; line-height: 1.5; }
+.inventory-note { margin: 0 0 12px; color: #c2b3bf; font-size: 13px; line-height: 1.5; }
 .inventory-inspect-art.choice{height:110px;margin-bottom:12px}
 .inventory-inspect-art.chest {height:100px;margin-bottom:12px}
 .inventory-inspect-art { height: 240px; margin-bottom: 16px; }

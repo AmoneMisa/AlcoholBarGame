@@ -142,7 +142,6 @@ onMounted(() => { void game.loadFriends(); });
         </template>
       </ProfileCard>
       <BarShowcase :bar="visitBar" :name="visit.name"><TipJar visited /></BarShowcase>
-      <p v-if="visit.tips">Tip jar: {{ visit.tips.amount.toFixed(0) }} / {{ visit.tips.capacity }} coins · {{ visit.tips.attemptsLeft }} theft attempts left today.<br>Tap the jar to take up to 5%. At least 30% stays protected. One attempt per player per day, 10 attempts total. Empty or protected jars also use an attempt.</p>
       <ul class="visit-stats">
         <li><UiIcon name="star" />Level {{ visit.level }}</li>
         <li><UiIcon name="trophy" />{{ visit.prestige }} prestige</li>
@@ -172,35 +171,35 @@ onMounted(() => { void game.loadFriends(); });
 .friends-page > * { margin-inline: 12px; }
 .friends-page > .panel-heading { margin-inline: 0; }
 .card { padding: 14px; border: 1px solid #354762; border-radius: 14px; background: #111c2d; }
-.card small { display: block; color: #e4b35c; font-size: 9px; font-weight: 900; letter-spacing: .12em; }
+.card small { display: block; color: #e4b35c; font-size: 13px; font-weight: 900; letter-spacing: .12em; }
 .card h3 { margin: 3px 0 0; font: 700 20px Georgia, serif; }
-.card p { margin: 0; color: #9eafc1; font-size: 12px; line-height: 1.5; }
+.card p { margin: 0; color: #9eafc1; font-size: 13px; line-height: 1.5; }
 .card header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.friend-status { padding: 9px 12px; border: 1px solid #3e7756; border-radius: 10px; background: #173425; color: #b9e5c6; font-size: 12px; }
+.friend-status { padding: 9px 12px; border: 1px solid #3e7756; border-radius: 10px; background: #173425; color: #b9e5c6; font-size: 13px; }
 .friend-top { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 .friend-top > .card { display: grid; align-content: start; gap: 8px; }
 .friend-code b { color: #fff0c8; font: 800 26px ui-monospace, Consolas, "Courier New", monospace; letter-spacing: .12em; font-variant-numeric: lining-nums tabular-nums; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; }
 .row > * { flex: 1 1 120px; }
 input { min-width: 0; min-height: 42px; padding: 8px 10px; border: 1px solid #40536c; border-radius: 10px; background: #0c1625; color: #fff; font-size: 16px; }
-form.card label { color: #c7d2df; font-size: 12px; }
+form.card label { color: #c7d2df; font-size: 13px; }
 form.card { display: grid; align-content: start; gap: 8px; }
 .prestige b { display: flex; align-items: center; gap: 8px; color: #fff0c8; font-size: 22px; }
 .prestige b .ui-icon { width: 24px; height: 24px; color: #f2bd58; }
 .prestige em { color: #8294aa; font-size: 14px; font-style: normal; }
 .prestige progress { width: 100%; height: 10px; accent-color: #e7b556; }
-.boosts button { font-size: 11px; line-height: 1.25; }
+.boosts button { font-size: 13px; line-height: 1.25; }
 .requests { display: grid; gap: 8px; }
 .requests > article { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 8px; border-top: 1px solid #304159; }
 .requests > article > span { flex: 1 1 160px; display: grid; gap: 2px; }
-.requests > article > span small { color: #91a2b5; font-size: 11px; font-weight: 500; letter-spacing: 0; }
+.requests > article > span small { color: #91a2b5; font-size: 13px; font-weight: 500; letter-spacing: 0; }
 .friend-list { display: grid; gap: 8px; }
 .friend-list > article { display: grid; gap: 8px; padding: 12px; border: 1px solid #34465e; border-radius: 12px; background: #17253a; }
 .friend-list > article.visiting { border-color: #d2a24e; }
 .who { display: grid; gap: 2px; }
 .who b { font-size: 16px; }
-.who small { color: #b9c6d5; font-size: 12px; font-weight: 500; letter-spacing: 0; }
-.who em { display: flex; align-items: center; gap: 5px; color: #f2bd58; font-size: 12px; font-style: normal; }
+.who small { color: #b9c6d5; font-size: 13px; font-weight: 500; letter-spacing: 0; }
+.who em { display: flex; align-items: center; gap: 5px; color: #f2bd58; font-size: 13px; font-style: normal; }
 .who em .ui-icon { width: 15px; height: 15px; }
 .actions { display: flex; gap: 8px; }
 .actions .ui-btn-solid { flex: 1; }
@@ -219,7 +218,7 @@ form.card { display: grid; align-content: start; gap: 8px; }
 .gifts > header > .ui-icon { width: 26px; height: 26px; flex: none; color: #f2bd58; }
 .gifts > article { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border: 1px solid #34465e; border-radius: 10px; background: #17253a; }
 .gifts > article span { display: grid; gap: 2px; }
-.gifts > article small { color: #93a5b9; font-size: 11px; font-weight: 500; letter-spacing: 0; }
+.gifts > article small { color: #93a5b9; font-size: 13px; font-weight: 500; letter-spacing: 0; }
 .gifts > article button { flex: none; min-width: 72px; }
 @media (min-width: 900px) { .friend-list > article { grid-template-columns: 1fr auto; align-items: center; } .rename { grid-column: 1 / -1; } }
 </style>

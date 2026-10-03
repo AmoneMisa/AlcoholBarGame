@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { itemArtwork } from '../../domain/itemArtwork';
+import { thumbnailArtwork } from '../../domain/optimizedArtwork';
 
 // Navigation uses line icons; game resources and rewards use their full-color WebP art.
 // A line icon. The pictures are WebP files in src/assets/ui/icons (<name>.webp, and <name>-bold.webp for the heavier
@@ -12,7 +13,7 @@ const GAME_ART: Record<string,string> = {coin:'resources/coins',crystal:'resourc
 const props = defineProps<{ name: string }>();
 const artwork = computed(() => props.name === 'lock' ? `${import.meta.env.BASE_URL}assets/ui/lock-painted-v1.webp` : GAME_ART[props.name] ? itemArtwork(GAME_ART[props.name]!,import.meta.env.BASE_URL) : undefined);
 const normal = computed(() => urlOf(props.name));
-const style = computed(() => artwork.value ? {backgroundImage: `url("${artwork.value}")`} : normal.value ? { '--icon': `url("${normal.value}")`, '--icon-b': `url("${urlOf(`${props.name}-bold`) ?? normal.value}")` } : undefined);
+const style = computed(() => artwork.value ? {backgroundImage: `url("${thumbnailArtwork(artwork.value, 96, import.meta.env.BASE_URL)}")`} : normal.value ? { '--icon': `url("${normal.value}")`, '--icon-b': `url("${urlOf(`${props.name}-bold`) ?? normal.value}")` } : undefined);
 </script>
 <template><span class="ui-icon" :class="{ 'ui-icon-lock': name === 'lock', 'ui-icon-art': artwork, 'ui-icon-missing': !normal && !artwork }" :style="style" aria-hidden="true"></span></template>
 

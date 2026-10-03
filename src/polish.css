@@ -30,11 +30,11 @@
 .regions-deck .region-cards > article { display: flex; flex-direction: column; gap: 0; min-width: 0; min-height: 0; padding: 0; overflow: hidden; border-radius: 14px; }
 .regions-deck .region-cards > article > img { display: block; width: 100%; height: 130px; margin: 0; border-bottom: 1px solid #3a4b5f; object-fit: cover; }
 .regions-deck .region-cards > article > small, .regions-deck .region-cards > article > b, .regions-deck .region-cards > article > span { align-self: stretch; margin: 0; padding: 0 14px; }
-.regions-deck .region-cards > article > small:first-of-type { margin-top: 12px; font-size: 11px; letter-spacing: .08em; }
+.regions-deck .region-cards > article > small:first-of-type { margin-top: 12px; font-size: 13px; letter-spacing: .08em; }
 .regions-deck .region-cards > article > b { margin-top: 3px; font: 700 20px/1.15 Georgia, serif; }
-.regions-deck .region-cards > article > small:nth-of-type(2) { margin-top: 4px; color: #aab8c9; font-size: 12px; }
-.regions-deck .region-cards > article > span { margin-top: 8px; color: #b6c2d1; font-size: 12px; line-height: 1.4; }
-.regions-deck .region-cards > article > button { flex: none; align-self: stretch; width: auto; min-height: 44px; margin: auto 14px 14px; padding: 10px 12px; font-size: 12px; text-align: center; }
+.regions-deck .region-cards > article > small:nth-of-type(2) { margin-top: 4px; color: #aab8c9; font-size: 13px; }
+.regions-deck .region-cards > article > span { margin-top: 8px; color: #b6c2d1; font-size: 13px; line-height: 1.4; }
+.regions-deck .region-cards > article > button { flex: none; align-self: stretch; width: auto; min-height: 44px; margin: auto 14px 14px; padding: 10px 12px; font-size: 13px; text-align: center; }
 .regions-deck .region-cards > article > span + button { margin-top: 14px; }
 .regions-deck .region-cards > article > button:disabled { background: #1b283b; }
 @media (max-width: 430px) { .regions-deck .region-cards { grid-template-columns: 1fr; } .regions-deck .region-cards > article > img { height: 150px; } }
@@ -159,7 +159,7 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .market-product { grid-template-columns: 64px minmax(0, 1fr); min-height: 0; gap: 12px 16px; padding: 16px; align-items:start; }
 .market-product > .bottle-visual { grid-row:1 / 3; width:64px; height:96px; align-self:center; }
 .market-product-copy { line-height:1.5; }
-.market-product-copy small, .market-product-copy span, .market-product-copy .stock-conversion { font-size:12px; }
+.market-product-copy small, .market-product-copy span, .market-product-copy .stock-conversion { font-size:13px; }
 .market-product-copy h3 { display:flex; align-items:center; gap:6px; margin: 4px 0; font-size: 18px; }
 .market-product-copy h3 .speak-button { flex:none; }
 .market-product-copy b { font-size:14px; }
@@ -175,15 +175,15 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .recipe-cards .glass-model.glass-painted, .recipe-cards .glass-model { width: 72px; height: 84px; flex: none; transform: none; }
 .recipe-card-copy { display: grid; gap: 2px; text-align: left; }
 .recipe-card-copy b { font-size: 16px; }
-.recipe-card-copy p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0; font-size: 11px; }
-.recipe-card-copy small, .recipe-card-copy span { font-size: 10px; }
+.recipe-card-copy p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0; font-size: 13px; }
+.recipe-card-copy small, .recipe-card-copy span { font-size: 13px; }
 
 .unlock-guide { grid-template-columns: 1.4fr repeat(3, 1fr); gap: 0; margin: 10px 12px 0; padding: 4px; border: 1px solid #354962; border-radius: 12px; background: #142238; }
 .unlock-guide > div { min-height: 0; padding: 8px 12px; border: 0; border-left: 1px solid #2c3d57; border-radius: 0; background: transparent; }
 .unlock-guide > .unlock-intro { border-left: 0; }
 .unlock-guide h3 { margin: 2px 0; font-size: 16px; }
-.unlock-guide p, .unlock-guide span { margin: 0; font-size: 11px; line-height: 1.35; }
-.unlock-guide > div > b { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-right: 6px; border-radius: 50%; background: #d9a74c; color: #1b1405; font-size: 12px; }
+.unlock-guide p, .unlock-guide span { margin: 0; font-size: 13px; line-height: 1.35; }
+.unlock-guide > div > b { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-right: 6px; border-radius: 50%; background: #d9a74c; color: #1b1405; font-size: 13px; }
 .unlock-guide > div > strong { font-size: 13px; }
 @media (max-width: 760px) { .unlock-guide { grid-template-columns: 1fr; } .unlock-guide > div { border-left: 0; border-top: 1px solid #2c3d57; } .unlock-guide > .unlock-intro { border-top: 0; } }
 
@@ -203,9 +203,9 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .recipe-cards .glass-model, .recipe-cards .glass-model.glass-painted { align-self: center; }
 .recipe-card-copy { min-width: 0; align-content: start; justify-items: start; text-align: left; }
 .recipe-card-copy small { text-transform: uppercase; letter-spacing: .03em; line-height: 1.25; }
-.recipe-card-copy .specialty-badge { width: auto; max-width: 100%; box-sizing: border-box; font-size: 9px; margin: 2px 0; white-space: normal; line-height: 1.2; }
+.recipe-card-copy .specialty-badge { width: auto; max-width: 100%; box-sizing: border-box; font-size: 13px; margin: 2px 0; white-space: normal; line-height: 1.2; }
 .recipe-card-copy p, .recipe-card-copy span { max-width: 100%; overflow-wrap: anywhere; }
-.recipe-card-copy > em:last-child { margin-top: 2px; font-style: normal; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; font-size: 10px; color: #ffd98a; }
+.recipe-card-copy > em:last-child { margin-top: 2px; font-style: normal; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; font-size: 13px; color: #ffd98a; }
 .auto-supply > div:first-child { flex: 1 1 320px; }
 .auto-supply-actions { flex-wrap: nowrap; flex: 0 0 auto; }
 @media (max-width: 560px) { .auto-supply-actions { flex-wrap: wrap; width: 100%; margin-left: 0; } }
@@ -254,7 +254,7 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .bar-cast .clean-ashtrays { pointer-events: auto; }
 
 /* House rules: one steady size for the list, whatever the screen. */
-.house-rules-panel .rules-note { font-size: 12.5px; line-height: 1.4; }
+.house-rules-panel .rules-note { font-size: 13px; line-height: 1.4; }
 .house-rules-panel .rule-row { grid-template-columns: 30px minmax(0, 1fr); align-items: start; }
 .house-rules-panel .rule-row b { display: block; font-size: 15px; line-height: 1.25; }
 .house-rules-panel .rule-row small { margin-top: 2px; font-size: 13px; line-height: 1.4; }
@@ -262,10 +262,10 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 
 /* ==== Readability and touch size (checked at phone width) ==== */
 /* Labels were 6-8px on phones; nothing in the header or the bottom bar is smaller than 9-10px now. */
-.top-hud small, .top-hud em { font-size: 10px; }
-.hud-resources small { font-size: 9.5px; letter-spacing: .08em; }
-.game-nav b { font-size: 10px; }
-.sync-badge { font-size: 9.5px; }
+.top-hud small, .top-hud em { font-size: 13px; }
+.hud-resources small { font-size: 13px; letter-spacing: .08em; }
+.game-nav b { font-size: 13px; }
+.sync-badge { font-size: 13px; }
 /* The free-spin dot next to the bar name is a good-news marker, not an alarm. */
 .venue-dot { background: #f2bd58 !important; box-shadow: 0 0 0 2px #f2bd5844; }
 /* Buttons that sit on the bar scene or in lists reach a comfortable touch size. */
@@ -282,17 +282,17 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 
 /* Rows of tabs that can scroll fade out at the right edge, so it is clear there is more. */
 .workshop-tabs { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 34px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 34px), transparent); padding-right: 30px; }
-.supply-hint { margin: 6px 14px 10px; color: #9eafc1; font-size: 12.5px; }
+.supply-hint { margin: 6px 14px 10px; color: #9eafc1; font-size: 13px; }
 
 /* ==== One look for the same kind of control ==== */
 /* Second-level tabs (Workshop) are pills like the first-level ones, only a little smaller. */
 .workshop-tabs button { min-height: 34px; padding: 0 14px; border-radius: 999px; font-size: 13px; }
 .workshop-tabs button:focus-visible { outline: 2px solid #ffd35a; outline-offset: 2px; }
 /* Controls are 10px rounded, pills are fully round; no 7px or 9px in between. */
-.sealed-stock-grid .reserve-restock { min-height: 34px; border-radius: 10px; font-size: 11.5px; }
-.sound-rows .ui-btn { border-radius: 10px; font-size: 12px; }
+.sealed-stock-grid .reserve-restock { min-height: 34px; border-radius: 10px; font-size: 13px; }
+.sound-rows .ui-btn { border-radius: 10px; font-size: 13px; }
 .daily-lesson-card footer > button { min-height: 38px; padding: 0 14px; border-radius: 10px; font-size: 13px; }
-.daily-lesson-card small, .daily-learning-head small { font-size: 10px; }
+.daily-lesson-card small, .daily-learning-head small { font-size: 13px; }
 /* Checkout buttons are stacked with a clear gap between them (Negotiate, Place order, Clear). */
 .trade-checkout .ui-btn { margin-top: 12px; }
 .trade-checkout .ui-btn.negotiate-button { margin-top: 12px; }
@@ -311,15 +311,15 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 
 /* Reserve separate space for the row title, arrows, bottle art and full item names. */
 .bar-scene .pshelf-row { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 24px minmax(0, 1fr); align-items: stretch; padding: 0; }
-.bar-scene .pshelf-label { position: relative; inset: auto; align-self: center; width: auto; max-width: calc(100% - 74px); min-width: 0; margin-left: 6px; font-size: 9px; line-height: 11px; white-space: normal; overflow: visible; text-overflow: clip; }
+.bar-scene .pshelf-label { position: relative; inset: auto; align-self: center; width: auto; max-width: calc(100% - 74px); min-width: 0; margin-left: 6px; font-size: 13px; line-height: 11px; white-space: normal; overflow: visible; text-overflow: clip; }
 .bar-scene .pshelf-bottles { min-height: 0; padding: 0 6px; mask-image: none !important; -webkit-mask-image: none !important; }
 .bar-scene .pshelf-bottles > button { flex: 0 0 calc((100% - (var(--slots) - 1) * 2px) / var(--slots)); min-width: 0; scroll-snap-align: start; }
 .bar-scene .pshelf-bottles > button .bottle-visual { bottom: 23px; }
-.bar-scene .pshelf-bottles > button > span { bottom: 0; min-height: 22px; display: grid; align-items: center; font-size: 9px; line-height: 11px; white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
+.bar-scene .pshelf-bottles > button > span { bottom: 0; min-height: 22px; display: grid; align-items: center; font-size: 13px; line-height: 11px; white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
 .bar-scene .pshelf-row .shelf-nudge { top: 0; right: 4px; padding: 0; height: 24px; }
 .bar-scene .pshelf-row .shelf-nudge button { width: 30px; height: 24px; }
 .bar-scene .pshelf-row .shelf-nudge .ui-icon { width: 18px; height: 18px; }
-.bar-scene .pshelf-bottles .bottle-visual > b { top: 0; right: -3px; font-size: 8px; line-height: 12px; }
+.bar-scene .pshelf-bottles .bottle-visual > b { top: 0; right: -3px; font-size: 13px; line-height: 12px; }
 .guest-card header b { white-space: normal; overflow: visible; overflow-wrap: anywhere; }
 .guest-card > p { display: block; overflow: visible; -webkit-line-clamp: unset; }
 .guest-card footer { flex-wrap: wrap; }
@@ -331,7 +331,7 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .service-mode .service-layout { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 0; height: 100%; }
 .service-mode .bar-scene-shell { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
 .service-mode .bar-scene { height: 100% !important; min-height: 0 !important; border-radius: 14px; }
-.scene-toolbar .city-event-head b, .scene-toolbar .bar-event b { font-size: 10px; }
+.scene-toolbar .city-event-head b, .scene-toolbar .bar-event b { font-size: 13px; }
 .scene-toolbar .city-event.compact { flex-basis: 140px; }
 .scene-toolbar .house-rules-button { padding: 6px 8px; }
 .scene-toolbar .city-event-body { position: absolute; z-index: 30; top: calc(100% + 6px); width: min(300px, calc(100vw - 24px)); border: 1px solid #725942; border-radius: 10px; background: #101724f5; }
@@ -339,21 +339,21 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress { acc
 .panel-heading h2 + .guide-open { margin-top: 12px; }
 .bar-scene-shell:not(.is-preview) { position:relative; grid-template-rows:minmax(0,1fr); }
 .scene-info-dock { position:absolute; bottom:10px; left:10px; z-index:15; display:flex; gap:6px; }
-.scene-info-dock .house-rules-button,.scene-info-dock .clean-ashtrays { position:static!important; display:flex; align-items:center; gap:5px; padding:8px 10px; font-size:11px; }
+.scene-info-dock .house-rules-button,.scene-info-dock .clean-ashtrays { position:static!important; display:flex; align-items:center; gap:5px; padding:8px 10px; font-size:13px; }
 .game-nav { grid-template-columns:repeat(5,minmax(0,1fr)); }
 header.top-hud { display:flex; flex-wrap:wrap; align-items:center; min-height:52px; padding:max(5px,env(safe-area-inset-top)) 8px 5px; gap:6px; }
 header.top-hud .venue-card { display:flex; flex:1; align-items:center; min-width:125px; padding:0; border:0; background:none; box-shadow:none; gap:6px; }
 header.top-hud .venue-name { display:flex; gap:5px; min-width:0; }
-header.top-hud .venue-name b { font-size:12px; white-space:normal; overflow:visible; overflow-wrap:anywhere; }
-header.top-hud .venue-name em { font-size:10px; white-space:nowrap; }
+header.top-hud .venue-name b { font-size:13px; white-space:normal; overflow:visible; overflow-wrap:anywhere; }
+header.top-hud .venue-name em { font-size:13px; white-space:nowrap; }
 header.top-hud .hud-resources { display:flex!important; width:auto; flex:none; border:0; background:none; box-shadow:none; gap:7px; }
 header.top-hud .hud-resources > * { order:initial!important; grid-column:auto; border:0; padding:0; flex:none; }
 header.top-hud .hud-resources > div { display:flex; align-items:center; gap:3px; }
-header.top-hud .hud-resources b { font-size:11px; }
+header.top-hud .hud-resources b { font-size:13px; }
 header.top-hud .hud-resources .ui-icon { width:15px; height:15px; }
 header.top-hud .exchange-open { padding:0; gap:3px; }
 header.top-hud .hud-avatar .art-character { position:absolute; width:64px; height:112px; top:0; left:50%; translate:-50% 0; transform:none; animation:none; }
-header.top-hud .venue-name em { font-size:12px; }
+header.top-hud .venue-name em { font-size:13px; }
 header.top-hud .hud-avatar .character-leo { margin-left:-8px; }
 header.top-hud .hud-avatar .character-noa { margin-left:-4px; }
 header.top-hud .hud-avatar .bartender-art { width:100%; height:100%; object-fit:contain; }
@@ -361,7 +361,7 @@ header.top-hud .daily-hud-gift,header.top-hud .staff-open { width:26px; height:2
 header.top-hud .hud-events { width:26px; height:26px; }
 @media(max-width:600px) { header.top-hud .venue-card { flex:1 1 calc(100% - 32px); } header.top-hud .hud-events { order:1; } header.top-hud .hud-resources { order:2; width:100%; justify-content:flex-end; } }
 
-.seat-arrivals { display:flex; flex-wrap:wrap; justify-content:center; gap:4px 12px; font-size:10px; color:#c2b694; font-variant-numeric:tabular-nums; }
+.seat-arrivals { display:flex; flex-wrap:wrap; justify-content:center; gap:4px 12px; font-size:13px; color:#c2b694; font-variant-numeric:tabular-nums; }
 
 .modal-backdrop.celebration,.modal-backdrop.reveal { z-index:1700; }
 .preparation-screen .preparation-body { grid-auto-rows:max-content; }
@@ -386,17 +386,17 @@ header.top-hud .hud-events { width:26px; height:26px; }
 .seat-shadow > .guest-silhouette { width:100%; height:auto; max-height:100%; align-self:end; object-fit:contain; animation:seat-arrive .25s ease-out both; filter:drop-shadow(0 3px 8px #080a14aa); }
 .guest-nudge .hidden-guest-dot { position:absolute; top:2px; right:1px; width:8px; height:8px; border:1px solid #ffb2a2; border-radius:50%; background:#f04d4d; box-shadow:0 0 6px #eb393969; pointer-events:none; }
 .seat-countdown { position:absolute; bottom:12px; left:50%; translate:-50% 0; width:max-content; max-width:calc(100% - 16px); display:grid; place-items:center; padding:5px 10px; border:1px solid #ac936458; border-radius:8px; background:#11131fde; color:#e9d6af; text-align:center; }
-.seat-countdown time { font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.seat-countdown time { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
 
 /* Two clear header rows: identity and events, then bar information and balances. */
 header.top-hud { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:5px 10px; padding:7px 12px; }
 header.top-hud .venue-card { grid-column:1; grid-row:1; min-width:0; }
-header.top-hud .hud-events { grid-column:2; grid-row:1; justify-self:end; position:relative; display:flex; align-items:center; justify-content:center; gap:5px; width:auto; height:30px; padding:0 10px; border-radius:10px; font:700 10px system-ui; }
+header.top-hud .hud-events { grid-column:2; grid-row:1; justify-self:end; position:relative; display:flex; align-items:center; justify-content:center; gap:5px; width:auto; height:30px; padding:0 10px; border-radius:10px; font:700 13px system-ui; }
 header.top-hud .hud-events .ui-icon {width:16px;height:16px;}
-header.top-hud .events-badge {position:absolute;right:-5px;top:-5px;min-width:17px;height:17px;display:grid;place-items:center;padding:0 4px;border:1px solid #f8d596;border-radius:20px;background:#ac473b;color:#fff6da;font:700 9px system-ui;box-sizing:border-box;}
-header.top-hud .hud-bar-info {grid-column:1;grid-row:2;justify-self:start;display:flex;align-items:center;justify-content:center;width:auto;height:24px;padding:0 9px;border:1px solid #b59a5c40;border-radius:7px;background:#ffffff06;color:#e6c78c;font:600 12px system-ui;white-space:nowrap;}
+header.top-hud .events-badge {position:absolute;right:-5px;top:-5px;min-width:17px;height:17px;display:grid;place-items:center;padding:0 4px;border:1px solid #f8d596;border-radius:20px;background:#ac473b;color:#fff6da;font:700 13px system-ui;box-sizing:border-box;}
+header.top-hud .hud-bar-info {grid-column:1;grid-row:2;justify-self:start;display:flex;align-items:center;justify-content:center;width:auto;height:24px;padding:0 9px;border:1px solid #b59a5c40;border-radius:7px;background:#ffffff06;color:#e6c78c;font:600 13px system-ui;white-space:nowrap;}
 header.top-hud .hud-resources {grid-column:2;grid-row:2;width:auto;justify-content:flex-end;gap:10px;margin:0;}
-header.top-hud .venue-name em {font-size:12px;}
+header.top-hud .venue-name em {font-size:13px;}
 header.top-hud .exchange-open {display:flex;align-items:center;gap:4px;padding:3px 0;}
 @media(max-width:600px) {header.top-hud {padding:6px 8px;gap:4px 7px;}header.top-hud .hud-resources {gap:8px;}header.top-hud .venue-card {min-width:0;}}
 

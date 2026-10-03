@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { RewardLine } from '../../domain/rewards';
 import RewardArt from './RewardArt.vue';
+import LazyArtwork from './LazyArtwork.vue';
 import UiButton from './UiButton.vue';
 export interface ShelfEntry { key: string; line: RewardLine; count: number; fragments?: boolean }
 defineProps<{ title: string; entries: ShelfEntry[] }>();
@@ -11,7 +12,7 @@ defineEmits<{ select: [key: string] }>();
     <h3>{{ title }}</h3>
     <div v-if="entries.length" class="shelf-grid">
       <UiButton v-for="entry in entries" :key="entry.key" variant="ghost" class="shelf-tile" :class="[entry.line.rarity, { fragment: entry.fragments }]" :title="`${entry.line.text}${entry.fragments ? ' fragments' : ''}`" :aria-label="`${entry.line.text}, ${entry.count}${entry.fragments ? ' fragments' : ' owned'}`" @click="$emit('select', entry.key)">
-        <span class="shelf-picture"><RewardArt :line="entry.line" :fragments="entry.fragments" /><span class="shelf-count">{{ entry.count }}</span></span>
+        <span class="shelf-picture"><LazyArtwork><RewardArt :line="entry.line" :fragments="entry.fragments" compact /></LazyArtwork><span class="shelf-count">{{ entry.count }}</span></span>
         <span class="shelf-label">{{ entry.line.text }}</span>
       </UiButton>
     </div>
@@ -27,9 +28,9 @@ defineEmits<{ select: [key: string] }>();
 .inventory-shelf .shelf-tile .ui-btn-label { display:block;width:100%;height:100%; }
 .shelf-picture { position:absolute;inset:3px;display:block;width:auto;height:auto;overflow:hidden;border:0;border-radius:0; }
 .shelf-tile.rare { border-color:#77b8c9!important; }.shelf-tile.legendary { border-color:#e6bf70!important;background:linear-gradient(140deg,#51442a,#18212a)!important; }
-.shelf-count { position:absolute;left:1px;top:1px;z-index:2;min-width:14px;padding:1px 3px;border-radius:2px;background:#111723d9;color:#ffe8c2;font:700 11px/1.2 system-ui;text-shadow:0 1px #000; }
+.shelf-count { position:absolute;left:1px;top:1px;z-index:2;min-width:14px;padding:1px 3px;border-radius:2px;background:#111723d9;color:#ffe8c2;font:700 13px/1.2 system-ui;text-shadow:0 1px #000; }
 .fragment .shelf-count { color:#96dfe8; }
-.shelf-label { display:none;position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);width:max-content;max-width:180px;padding:7px 9px;border:1px solid #b99553;border-radius:4px;background:#101722;color:#fff0d0;font:600 12px/1.35 system-ui;white-space:normal;pointer-events:none; }
+.shelf-label { display:none;position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);width:max-content;max-width:180px;padding:7px 9px;border:1px solid #b99553;border-radius:4px;background:#101722;color:#fff0d0;font:600 13px/1.35 system-ui;white-space:normal;pointer-events:none; }
 .shelf-tile:hover .shelf-label,.shelf-tile:focus-visible .shelf-label { display:block; }
 .shelf-empty { margin:0;padding:22px 0;color:#aeb8c4;font-size:13px; }
 .shelf-picture .reward-art { position:absolute;inset:0; height:100%;max-height:100%;overflow:hidden; }

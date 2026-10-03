@@ -67,19 +67,19 @@ function send(id: string) {
 <style scoped>
 .delivery-problems { margin:12px 0;padding:12px;border:1px solid #6a4a2c;border-radius:12px;background:#1f1a14; }
 .delivery-problems > header { display:grid;gap:2px;margin-bottom:8px; }
-.delivery-problems > header small { color:#d9b86d;font-size:10px;letter-spacing:.08em; }.delivery-problems > header b { color:#f4ead0;font:700 15px Georgia,serif; }
+.delivery-problems > header small { color:#d9b86d;font-size:13px;letter-spacing:.08em; }.delivery-problems > header b { color:#f4ead0;font:700 15px Georgia,serif; }
 .problem { padding:8px 10px;margin-top:6px;border:1px solid #4a3d2a;border-radius:10px;background:#251f17; }
 .problem.refunded,.problem.replaced { opacity:.65; }
 .problem-head { display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:baseline; }
-.problem-head small { grid-column:1 / 3;color:#a99a78;font-size:11px; }
-.problem-kind { padding:1px 8px;border-radius:999px;background:#4a3d22;color:#ffe7b0;font-size:10px;font-weight:700; }
+.problem-head small { grid-column:1 / 3;color:#a99a78;font-size:13px; }
+.problem-kind { padding:1px 8px;border-radius:999px;background:#4a3d22;color:#ffe7b0;font-size:13px;font-weight:700; }
 .problem.counterfeit .problem-kind,.problem.expired .problem-kind { background:#5a2326;color:#ffd0d0; }.problem.lost .problem-kind { background:#2b3350;color:#c9d6ff; }
-.problem em { font-style:normal;font-size:11px;color:#c9b88a; }.problem em.refunded,.problem em.replaced { color:#8fe0a8; }.problem em.rejected,.problem em.closed { color:#e49a9a; }
+.problem em { font-style:normal;font-size:13px;color:#c9b88a; }.problem em.refunded,.problem em.replaced { color:#8fe0a8; }.problem em.rejected,.problem em.closed { color:#e49a9a; }
 .report { display:grid;gap:6px;margin-top:6px; }
 .ideas { display:grid;gap:4px; }
 .row { display:flex;gap:6px; }.row input { flex:1;min-width:0;padding:7px 9px;border:1px solid #4a3d2a;border-radius:8px;background:#14110d;color:#f4ead0;font-size:13px; }
 
-.report small { color:#a99a78;font-size:11px; }
-.quarantine { margin-top:10px;padding-top:8px;border-top:1px dashed #4a3d2a; }.quarantine small { color:#d9b86d;font-size:10px;letter-spacing:.08em; }
-.q-item { display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:5px;color:#e8dcc0;font-size:12px; }
+.report small { color:#a99a78;font-size:13px; }
+.quarantine { margin-top:10px;padding-top:8px;border-top:1px dashed #4a3d2a; }.quarantine small { color:#d9b86d;font-size:13px;letter-spacing:.08em; }
+.q-item { display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:5px;color:#e8dcc0;font-size:13px; }
 </style>

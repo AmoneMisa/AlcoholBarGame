@@ -14,8 +14,8 @@ import { MODIFIERS, RECIPES } from '../../domain/catalog';
 import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleTotal } from '../../domain/bottleCatalog';
 import { matchesFacts, questionTemplates, tilesFor, correctedTileSelection, TOPIC_LABEL, withArticle } from '../../domain/conversation/customerTalk';
 import { bottleFactChips, bottleQuestionTemplates, rankBottles } from '../../domain/conversation/bottleTalk';
-import { checkText, useSpeller, type CheckResult } from '../../domain/english/checker';
-import { loadSpeller } from '../../domain/english/dictionary';
+import type { CheckResult } from '../../domain/english/checker';
+import { checkTextAsync, releaseEnglishChecker, warmEnglishChecker } from '../../domain/english/asyncChecker';
 import { GLOSSARY } from '../../domain/english/lexicon';
 import { RULES, type GrammarRule } from '../../domain/english/rules';
 import { speak } from '../../domain/english/speak';
@@ -242,13 +242,19 @@ function highlighted(result: CheckResult, text: string) {
   return parts.filter((part) => part.text);
 }
 
+const checkingEnglish = ref(false);
+let disposed = false;
 async function send(text: string, force = false) {
   const current = customer.value;
-  if (!current || !talk.value || customerTyping.value) return;
+  if (!current || !talk.value || customerTyping.value || checkingEnglish.value) return;
   const sentence = text.replace(/\s+/g, ' ').trim();
   if (!sentence) return;
   // Instant feedback for learning; the rules re-check the sentence before it counts.
-  const result = checkText(sentence, phraseCandidates());
+  checkingEnglish.value = true;
+  let result: CheckResult;
+  try { result = await checkTextAsync(sentence, phraseCandidates()); }
+  finally { checkingEnglish.value = false; }
+  if (disposed || customer.value?.id !== current.id || !game.conversationCustomerId) return;
   if (!result.ok && !force) {
     if (feedbackFor.value !== sentence) learning.recordMistakes(sentence, result.corrected, result.issues);
     feedback.value = result;
@@ -349,9 +355,9 @@ const onKey = (event: KeyboardEvent) => {
 };
 onMounted(() => {
   window.addEventListener('keydown', onKey);
-  loadSpeller().then(useSpeller);
+  warmEnglishChecker();
 });
-onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
+onBeforeUnmount(() => { disposed = true; window.removeEventListener('keydown', onKey); releaseEnglishChecker(); });
 
 const patience = computed(() => customer.value ? Math.round(customer.value.patienceRemaining / customer.value.patience * 100) : 0);
 const accuracy = computed(() => game.languageStats.sentences ? Math.round(game.languageStats.correct / game.languageStats.sentences * 100) : 100);
@@ -532,8 +538,8 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
 
       <div v-if="!game.trainingActive && !situation && !customer.pendingPayment" class="service-decisions">
         <div><small>CAN’T SERVE THIS ORDER?</small><span>The guest can accept the closest stocked alternative, or you can decline the order and let them leave.</span></div>
-        <UiButton variant="secondary" @click="offerAlternative">Offer similar</UiButton>
-        <UiButton variant="danger" @click="rejectOrder">Reject order</UiButton>
+        <UiButton size="sm" variant="secondary" @click="offerAlternative">Offer similar</UiButton>
+        <UiButton size="sm" variant="danger" @click="rejectOrder">Reject order</UiButton>
       </div>
 
       </div>
@@ -581,15 +587,14 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <div class="compose-actions">
             <UiButton variant="secondary" class="new-question-button" data-guide="new-question" @click="nextTemplate">New question <UiIcon name="refresh" /></UiButton>
             <UiButton variant="secondary" :disabled="!picked.length" @click="picked = []">Clear</UiButton>
-            <UiButton variant="solid" data-guide="talk-send" :disabled="!picked.length || customerTyping" @click="send(builtSentence)">Check & send</UiButton>
+            <UiButton variant="solid" data-guide="talk-send" :disabled="!picked.length || customerTyping || checkingEnglish" @click="send(builtSentence)">{{ checkingEnglish ? 'Checking…' : 'Check & send' }}</UiButton>
           </div>
         </template>
 
         <template v-else>
-          <div class="phrase-ideas"><button v-for="idea in phraseIdeas" :key="idea" type="button" data-guide="phrase-idea" @click="suggest(idea)">{{ idea }}</button></div>
           <form class="type-row" @submit.prevent="send(draft)">
             <UiInput label="Your question or answer" ref="input" data-guide="talk-input" v-model="draft" type="text" autocomplete="off" autocapitalize="sentences" spellcheck="false" placeholder="Ask a question, e.g. Do you like sour drinks?" @input="feedback = undefined" />
-            <UiButton variant="solid" type="submit" :disabled="!draft.trim() || customerTyping">Check & send</UiButton>
+            <UiButton variant="solid" type="submit" :disabled="!draft.trim() || customerTyping || checkingEnglish">{{ checkingEnglish ? 'Checking…' : 'Check & send' }}</UiButton>
           </form>
         </template>
       </footer>

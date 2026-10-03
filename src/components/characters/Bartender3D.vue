@@ -382,6 +382,6 @@ function loadAvatar(url: string) {
   </div>
 </template>
 <style scoped>
-.bartender-3d{position:absolute;inset:0;min-height:1px}.bartender-3d :deep(canvas){display:block;width:100%;height:100%}.interactive{cursor:grab;touch-action:pan-y}.interactive:active{cursor:grabbing}.avatar-loading{position:absolute;left:10%;right:10%;top:48%;font-size:11px;text-align:center;color:#e4d5c1;background:#211a27bd;border-radius:8px;padding:8px}
+.bartender-3d{position:absolute;inset:0;min-height:1px}.bartender-3d :deep(canvas){display:block;width:100%;height:100%}.interactive{cursor:grab;touch-action:pan-y}.interactive:active{cursor:grabbing}.avatar-loading{position:absolute;left:10%;right:10%;top:48%;font-size:13px;text-align:center;color:#e4d5c1;background:#211a27bd;border-radius:8px;padding:8px}
 .avatar-camera{position:absolute;bottom:8px;left:8px;right:8px;display:flex;gap:6px;z-index:2}.avatar-camera button{min-height:36px}
 </style>

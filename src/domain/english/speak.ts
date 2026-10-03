@@ -1,7 +1,7 @@
 // Read a word or sentence aloud. Pre-rendered neural voice clips (public/assets/voice, see
 // scripts/generate_voice.py) are played first; anything without a clip falls back to the
 // device's built-in English voice.
-import { duckMusic, speechOn, speechVolume } from '../../audio/engine';
+import { duckMusic, speechOn, speechVolume } from '../../audio/index';
 import { forDeviceVoice } from './pronounce';
 let manifest: Promise<Record<string, string>> | undefined;
 let player: HTMLAudioElement | undefined;

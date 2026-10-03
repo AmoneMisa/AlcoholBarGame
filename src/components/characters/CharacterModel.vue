@@ -6,9 +6,12 @@ import { CHARACTER_ART, GUEST_FIGURE_BOTTOM, GUEST_SEAT_LINE } from '../../data/
 import { createCharacterLook } from '../../domain/customers/characterFactory';
 import type { CharacterExpression } from '../../domain/dialogue/types';
 import type { Mood } from '../../domain/types';
+import { characterFrame } from '../../domain/optimizedArtwork';
 
 const props = withDefaults(defineProps<{
   role: 'bartender' | 'customer';
+  artSize?: 128 | 512;
+  fullResolution?: boolean;
   interactive?: boolean;
   characterId?: string;
   mood?: Mood;
@@ -54,12 +57,15 @@ const FRAME_RATIO: Record<string, number> = {
   'extended-seated-cast-v2':(1568 / 5) / (1003 / 2),'extended-seated-cast-2-v2':(1568 / 5) / (1003 / 2),'velvet-hour-seated-cast-v2':(2122 / 5) / 741
 };
 const sheetName = (sheet?: string) => (sheet ?? '/velvet-hour-seated-cast-v2.webp').split('/').pop()!.replace(/\.(?:png|webp)$/, '');
-const spriteStyle = (sheet: string, columns: number, rows: number, index: number, frameRatio?: number) => ({
-  backgroundImage:`url('${sheet}')`,
-  backgroundSize:`${columns * 100}% ${rows * 100}%`,
-  backgroundPosition:`${columns > 1 ? (index % columns) / (columns - 1) * 100 : 50}% ${rows > 1 ? Math.floor(index / columns) / (rows - 1) * 100 : 50}%`,
-  '--frame-ratio':String(frameRatio ?? .6)
-});
+const spriteStyle = (sheet: string, columns: number, rows: number, index: number, frameRatio?: number) => {
+  const frame = props.fullResolution ? undefined : characterFrame(sheet, index, props.artSize ?? 512, import.meta.env.BASE_URL);
+  return {
+    backgroundImage:`url('${frame ?? sheet}')`,
+    backgroundSize: frame ? '100% 100%' : `${columns * 100}% ${rows * 100}%`,
+    backgroundPosition: frame ? 'center' : `${columns > 1 ? (index % columns) / (columns - 1) * 100 : 50}% ${rows > 1 ? Math.floor(index / columns) / (rows - 1) * 100 : 50}%`,
+    '--frame-ratio':String(frameRatio ?? .6)
+  };
+};
 const castStyle = computed(() => {
   const costume = props.role === 'bartender' ? bartenderCostumeFor(art.value.id, props.outfit) : undefined;
   if (costume) return spriteStyle(costume.sheet, costume.columns, costume.rows, costume.index, costume.frameRatio);

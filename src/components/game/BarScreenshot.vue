@@ -27,10 +27,10 @@ function hideControls(){settings.value=false;controls.value=false;root.value?.fo
 .bar-photo-screen .bar-scene-shell {display:block;height:100%;min-height:0;}
 .bar-photo-screen .bar-scene {height:100%!important;min-height:0!important;border:0;border-radius:0;}
 .photo-controls {position:absolute;right:max(12px,env(safe-area-inset-right));top:max(12px,env(safe-area-inset-top));display:flex;align-items:center;gap:6px;max-width:calc(100% - 24px);z-index:40;}
-.photo-controls .ui-btn {font-size:11px;background:#111a29e8;}
+.photo-controls .ui-btn {font-size:13px;background:#111a29e8;}
 .photo-settings {position:absolute;right:12px;top:58px;z-index:40;width:min(320px,calc(100% - 24px));box-sizing:border-box;max-height:calc(100% - 80px);overflow:auto;padding:18px;border:1px solid #ac8e56;border-radius:14px;background:#121c2ef5;box-shadow:0 12px 40px #000a;}
 .photo-settings h2 {margin:0 0 14px;font:700 20px Georgia;}
-.photo-hint {font-size:11px;color:#afbbcb;line-height:1.5;margin:16px 0 0;}
+.photo-hint {font-size:13px;color:#afbbcb;line-height:1.5;margin:16px 0 0;}
 .bar-scene.capture .scene-customer,.bar-scene.capture .tip-jar {pointer-events:none!important;}
 .bar-scene.capture .scene-status,.bar-scene.capture .guest-nudge .hidden-guest-dot {display:none!important;}
 .bar-scene.capture.hide-bartender .bartender-layer,.bar-scene.capture.hide-customers .scene-customer:not(.empty-seat),.bar-scene.capture.hide-tip-jar .tip-jar,.bar-scene.capture.hide-empty-seats .empty-seat,.bar-scene.capture.hide-guest-cards .guest-card,.bar-scene.capture.hide-arrival-timers .seat-countdown,.bar-scene.capture.hide-capture-controls .guest-nudge {visibility:hidden!important;}

@@ -147,14 +147,14 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
 header.clickable { cursor: pointer; }
 .first-steps ol { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; line-height: 1.4; }
 .links { display: grid; gap: 4px; margin: 4px 0 8px; padding: 0; list-style: none; }
-.links li { display: grid; gap: 1px; padding: 6px 8px; border: 1px dashed #4a5b75; border-radius: 9px; font-size: 12px; }
+.links li { display: grid; gap: 1px; padding: 6px 8px; border: 1px dashed #4a5b75; border-radius: 9px; font-size: 13px; }
 .links li.on { border-style: solid; border-color: #c98e3c; background: #2a2316; }
 .links small { opacity: .8; }
 .level-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 4px 0 8px; }
 .level-row small { opacity: .7; }
 .circle { display: grid; gap: 12px; padding: 14px; }
 .card { padding: 12px 14px; border: 1px solid #354762; border-radius: 14px; background: #111c2d; color: #e9eef7; }
-.hint { margin: 0; color: #93a5b9; font-size: 12px; line-height: 1.5; }
+.hint { margin: 0; color: #93a5b9; font-size: 13px; line-height: 1.5; }
 h3 { margin: 0 0 6px; font-size: 14px; }
 h3 b { margin-left: 8px; color: #e4b35c; }
 .crew ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
@@ -164,7 +164,7 @@ h3 b { margin-left: 8px; color: #e4b35c; }
 .keep-row { display: flex; flex-wrap: wrap; gap: 10px; }
 .keep { display: grid; justify-items: center; gap: 2px; padding: 6px 10px; border-radius: 10px; background: #17253a; }
 .keep-art { width: 52px; height: 52px; border-radius: 50%; }
-.keep small { color: #9eafc1; font-size: 11px; }
+.keep small { color: #9eafc1; font-size: 13px; }
 .people { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
 .person { display: grid; align-content: start; gap: 4px; }
 .person.joined { border-color: #b78649; }
@@ -174,10 +174,10 @@ h3 b { margin-left: 8px; color: #e4b35c; }
 .gift-art { display: block; width: 24px; height: 24px; border-radius: 50%; }
 .who { display: grid; gap: 1px; }
 .who b { font: 700 17px Georgia, serif; }
-.who small { color: #9eafc1; font-size: 11px; }
+.who small { color: #9eafc1; font-size: 13px; }
 .who .bond { color: #ffd35a; }
 .bonus { margin: 8px 0 4px; font-size: 13px; }
-.meta { margin: 2px 0 6px; color: #9eafc1; font-size: 12px; }
+.meta { margin: 2px 0 6px; color: #9eafc1; font-size: 13px; }
 progress { width: 100%; height: 8px; }
 .gifts { display: flex; gap: 6px; margin: 6px 0; }
 .story { margin-top: 10px; padding-top: 8px; border-top: 1px solid #2d4059; font-size: 13px; line-height: 1.45; }

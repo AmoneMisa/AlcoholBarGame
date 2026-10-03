@@ -96,10 +96,10 @@ function apply() {
 .preview-pick { display: flex; gap: 8px; margin: 6px 0; }
 .preview-label { display: block; margin: 10px 0 6px; letter-spacing: .08em; }
 .preview-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x proximity; }
-.preview-strip button { flex: 0 0 112px; height: 64px; border: 2px solid transparent; border-radius: 10px; color: #fff; text-align: left; padding: 6px; font-size: 11px; font-weight: 700; scroll-snap-align: start; cursor: pointer; text-shadow: 0 1px 4px #000; }
+.preview-strip button { flex: 0 0 112px; height: 64px; border: 2px solid transparent; border-radius: 10px; color: #fff; text-align: left; padding: 6px; font-size: 13px; font-weight: 700; scroll-snap-align: start; cursor: pointer; text-shadow: 0 1px 4px #000; }
 .preview-strip button.active, .preview-chips button.active { border-color: #e4b35c; }
 .preview-strip button.locked { filter: saturate(.6); }
 .preview-chips { display: flex; flex-wrap: wrap; gap: 6px; max-height: 150px; overflow-y: auto; }
-.preview-chips button { min-height: 34px; padding: 0 12px; border: 1px solid #43536b; border-radius: 999px; background: #0c1421; color: #e8e2d8; font-size: 12.5px; cursor: pointer; }
+.preview-chips button { min-height: 34px; padding: 0 12px; border: 1px solid #43536b; border-radius: 999px; background: #0c1421; color: #e8e2d8; font-size: 13px; cursor: pointer; }
 .preview-chips button.locked { opacity: .75; }
 </style>

@@ -39,9 +39,9 @@ async function start() {
 
 <style scoped>
 .speak-trainer { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.mic-button { border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: inherit; border-radius: 999px; padding: 2px 10px; cursor: pointer; font-size: .85em; }
+.mic-button { border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: inherit; border-radius: 999px; padding: 2px 10px; cursor: pointer; font-size: 13px; }
 .mic-button.live { background: #b5523b; border-color: #e07a6a; animation: pulse 1s infinite; }
-.speak-result { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: baseline; font-size: .85em; }
+.speak-result { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: baseline; font-size: 13px; }
 .speak-result b { color: #e0a14a; }
 .speak-result.passed b { color: #7cc686; }
 .spoken i { font-style: normal; }

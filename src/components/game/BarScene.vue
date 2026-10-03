@@ -23,6 +23,8 @@ import CrystalAmount from '../ui/CrystalAmount.vue';
 import UiIcon from '../ui/UiIcon.vue';
 import Glyph from '../ui/Glyph.vue';
 import { INTERIORS, shelfStyleFor } from '../../data/cosmetics/bars';
+import { liteGraphics } from '../../ui/graphics';
+import { mobileArtwork } from '../../domain/optimizedArtwork';
 import { sceneLayout } from '../../data/cosmetics/barLines';
 
 const game = useGameStore();
@@ -54,6 +56,11 @@ const glassTarget = ref<HTMLElement>();
 // The positions come from each background's measured geometry (data/cosmetics/barLines.ts).
 const sceneRef = ref<HTMLElement>();
 const sceneBox = ref({ width: 0, height: 0 });
+const sceneInteriorStyle = computed(() => {
+  const style = game.barInteriorStyle;
+  if (props.capture || props.preview || !liteGraphics.value) return style;
+  return { ...style, backgroundImage: style.backgroundImage.replace(game.barBackground, mobileArtwork(game.barBackground)) };
+});
 const sceneObserver = typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(() => measureScene());
 function measureScene() {
   const element = sceneRef.value;
@@ -509,7 +516,7 @@ onBeforeUnmount(() => {
     <div v-if="!preview && !capture && game.ashtrays.dirty" class="scene-info-dock">
       <button type="button" class="clean-ashtrays" @click="game.cleanAshtrays()"><UiIcon name="brush" /> Clean {{ game.ashtrays.dirty }}</button>
     </div>
-  <section ref="sceneRef" class="bar-scene" :class="[{ 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack && !preview, 'is-preview': preview },captureClasses]" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[game.barInteriorStyle, sceneVars]">
+  <section ref="sceneRef" class="bar-scene" :class="[{ 'scene-inactive': !active, 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack && !preview, 'is-preview': preview },captureClasses]" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[sceneInteriorStyle, sceneVars]">
     <div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div>
     <div v-if="preview" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
       <small v-if="shelfRows.length && !preview" class="pshelf-hint" :style="{ left: shelfRows[0]!.style.left, top: `calc(${shelfRows[0]!.style.top} - 18px)` }">Use the arrows to browse a shelf · pull a bottle down to the glass</small>
@@ -525,14 +532,14 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div class="bartender-layer" :class="{ moving: movingBartender }" :tabindex="capture || preview ? undefined : 0" :role="capture || preview ? undefined : 'slider'" aria-label="Bartender position. Drag left or right, or use arrow keys." :aria-valuemin="12" :aria-valuemax="88" :aria-valuenow="Math.round((people?.bartenderX ?? 0) / (sceneBox.width || 1) * 100)" @pointerdown="startMovingBartender" @pointermove="moveBartender" @pointerup="movingBartender = false" @pointercancel="movingBartender = false" @keydown="moveBartenderKey">
-      <CharacterModel role="bartender" :character-id="game.decor.bartenderCharacter ?? 'noa'" :outfit="game.decor.bartender" :face-style="game.decor.face" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :skin-detail="game.decor.skinDetail" :skin-tone="game.decor.skinTone" :tan-level="game.decor.tanLevel" :bust="game.decor.bust" :pose="game.decor.pose" :eye-shape="game.decor.eyeShape" :brow-shape="game.decor.browShape" :nose-shape="game.decor.noseShape" :lip-shape="game.decor.lipShape" :cheek-shape="game.decor.cheekShape" :eye-color="game.decor.eyeColor" :eyeliner="game.decor.eyeliner" :eyeshadow="game.decor.eyeshadow" :lip-color="game.decor.lipColor" :blush="game.decor.blush" :facial-hair="game.decor.facialHair" :outfit-color="game.decor.outfitColor" animation="idle" />
+      <CharacterModel :full-resolution="capture" role="bartender" :character-id="game.decor.bartenderCharacter ?? 'noa'" :outfit="game.decor.bartender" :face-style="game.decor.face" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :skin-detail="game.decor.skinDetail" :skin-tone="game.decor.skinTone" :tan-level="game.decor.tanLevel" :bust="game.decor.bust" :pose="game.decor.pose" :eye-shape="game.decor.eyeShape" :brow-shape="game.decor.browShape" :nose-shape="game.decor.noseShape" :lip-shape="game.decor.lipShape" :cheek-shape="game.decor.cheekShape" :eye-color="game.decor.eyeColor" :eyeliner="game.decor.eyeliner" :eyeshadow="game.decor.eyeshadow" :lip-color="game.decor.lipColor" :blush="game.decor.blush" :facial-hair="game.decor.facialHair" :outfit-color="game.decor.outfitColor" animation="idle" />
       <span class="name-ribbon">{{ (game.decor.bartenderNickname || (game.decor.bartenderCharacter === 'leo' ? 'Leo' : 'Noa')).toUpperCase() }} · BARTENDER</span>
     </div>
     <div v-if="!preview" ref="castRef" class="bar-cast" @scroll.passive="onGuestScroll">
       <!-- Only the figure and the card take taps; the rest of the guest's column lets presses reach the shelves. -->
       <template v-for="{ index, customer, countdown } in seats" :key="index">
       <button v-if="customer" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" :style="customerStyle(index)" :aria-label="`Talk to ${customer.name}`" @click="game.openConversation(customer.id)">
-        <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="faceOf(customer)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
+        <CharacterModel :full-resolution="capture" role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="faceOf(customer)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
         <img v-if="customer.social?.ashtray === 'given'" class="customer-ashtray" :src="ashtrayArt" alt="" draggable="false" />
         <div class="guest-card" data-guide="guest">
           <header><b>{{ customer.name }}</b><time v-if="!game.trainingActive && customer.id === game.activeCustomerId">{{ game.orderCountdown }}</time></header>
@@ -576,5 +583,5 @@ onBeforeUnmount(() => {
 .bar-scene .bartender-layer.moving { touch-action:none; }
 .bar-scene .bartender-layer:focus-visible { outline:2px solid #eac780; outline-offset:4px; }
 .bar-scene.capture .bartender-layer { pointer-events:none; }
-.bar-scene.phone-guests .guest-card { min-width:0; max-width:calc(var(--guest-h) * .8); font-size:10px; }
+.bar-scene.phone-guests .guest-card { min-width:0; max-width:calc(var(--guest-h) * .8); font-size:13px; }
 </style>

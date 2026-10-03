@@ -5,6 +5,7 @@ import SpeakButton from '../ui/SpeakButton.vue';
 import UiInput from '../ui/UiInput.vue';
 import CrystalAmount from '../ui/CrystalAmount.vue';
 import PanelHeading from '../ui/PanelHeading.vue';
+import { liteGraphics } from '../../ui/graphics';
 import { computed, ref, watch } from 'vue';
 import { INGREDIENTS, RECIPES, REGIONS, recipeAlcoholLabel } from '../../domain/catalog';
 import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleSaleCrystalReward } from '../../domain/bottleCatalog';
@@ -73,6 +74,20 @@ const ingredientById = (id: string) => INGREDIENTS.find((item) => item.id === id
 const bottleById = (id: string) => ALCOHOL_PRODUCTS.find((item) => item.id === id)!;
 const uiCategory = (ingredient: Ingredient) => ingredient.category === 'food' ? 'food' : ingredient.category === 'spirit' ? 'spirit' : ingredient.category === 'mixer' && !['sugar-syrup', 'coconut-cream', 'milk', 'coconut-milk'].includes(ingredient.id) ? 'mixer' : 'fresh';
 const visibleStock = computed(() => game.visibleInventory.filter((stock) => stockCategory.value === 'all' || uiCategory(ingredientById(stock.ingredientId)) === stockCategory.value));
+const bottleSearch = ref('');
+const bottlePage = ref(1);
+const BOTTLES_PER_PAGE = 12;
+const matchingBottles = computed(() => {
+  const query = bottleSearch.value.trim().toLowerCase();
+  return game.bottleInventory.filter(stock => {
+    const product = bottleById(stock.productId);
+    return !query || `${product.name} ${product.brand} ${ALCOHOL_TYPE_LABELS[product.type]}`.toLowerCase().includes(query);
+  });
+});
+const bottlePages = computed(() => Math.max(1, Math.ceil(matchingBottles.value.length / BOTTLES_PER_PAGE)));
+const currentBottlePage = computed(() => Math.min(bottlePage.value, bottlePages.value));
+const visibleBottles = computed(() => matchingBottles.value.slice((currentBottlePage.value - 1) * BOTTLES_PER_PAGE, currentBottlePage.value * BOTTLES_PER_PAGE));
+watch([bottleSearch, () => game.regionId, stockCategory], () => { bottlePage.value = 1; });
 const { openGuide } = useGuide();
 // What to do with each ingredient of the open recipe (pour, top up, garnish…), from the recipe card.
 const formulaActions = computed(() => selectedRecipe.value ? new Map(recipeCard(selectedRecipe.value).lines.filter((line) => line.ingredientId).map((line) => [line.ingredientId!, line.action])) : new Map<string, string>());
@@ -177,7 +192,7 @@ function selectBartender(id: 'noa' | 'leo') {
 
 <template>
   <section class="management-deck">
-    <article v-show="activeView === 'inventory'" class="game-panel inventory-deck">
+    <article v-if="!liteGraphics || activeView === 'inventory'" v-show="activeView === 'inventory'" class="game-panel inventory-deck">
       <PanelHeading :eyebrow="`STOCK ROOM · ${game.region.name}`" title="Bar inventories" :aside="`${game.inventory.length} ingredients · ${game.bottleInventory.length} sealed brands`" />
       <div class="bar-switcher" aria-label="Choose a bar inventory">
         <button v-for="region in REGIONS.filter(item => game.isBarOwned(item.id))" :key="region.id" :class="{ active: region.id === game.regionId }" type="button" @click="game.switchBar(region.id)"><b>{{ region.name }}</b><small>{{ barUnits(region.id).toLocaleString() }} ingredient units · {{ barBottles(region.id) }} bottles</small></button>
@@ -211,9 +226,18 @@ function selectBartender(id: 'noa' | 'leo') {
         <div><article v-for="item in recipeCardInventory" :key="item.recipe.id"><GlassModel :art-index="RECIPES.indexOf(item.recipe)" :recipe-id="item.recipe.id" type="coupe" /><span><small>RECIPE ITEM</small><b>{{ item.recipe.name }}</b><em>Owned ×{{ item.quantity }}</em></span><strong>×{{ item.quantity }}</strong></article></div>
       </section>
       <section v-if="stockCategory === 'all' || stockCategory === 'spirit'" class="sealed-stock-section">
-        <header><div><small>FULL-BOTTLE RETAIL</small><h3>Popular brands ready to sell</h3></div><span>{{ barBottles(game.regionId) }} sealed bottles</span></header>
+        <header><div><small>FULL-BOTTLE RETAIL</small><h3>Popular brands ready to sell</h3></div></header>
+        <div class="bottle-inventory-tools">
+          <UiInput v-model="bottleSearch" label="Find a bottle" placeholder="Search by name, brand or type" type="search" />
+          <nav aria-label="Bottle inventory pages" class="bottle-pagination">
+            <UiButton size="sm" variant="secondary" aria-label="Previous bottle page" :disabled="currentBottlePage === 1" @click="bottlePage = currentBottlePage - 1"><UiIcon name="arrow-left" /></UiButton>
+            <span role="status">{{ currentBottlePage }} / {{ bottlePages }} · {{ matchingBottles.length }} brands</span>
+            <UiButton size="sm" variant="secondary" aria-label="Next bottle page" :disabled="currentBottlePage === bottlePages" @click="bottlePage = currentBottlePage + 1"><UiIcon name="arrow-right" /></UiButton>
+          </nav>
+        </div>
+        <p v-if="!matchingBottles.length">No bottles match your search.</p>
         <div class="sealed-stock-grid">
-          <article v-for="stock in game.bottleInventory" :key="stock.productId">
+          <article v-for="stock in visibleBottles" :key="stock.productId">
             <div class="stock-brand-model"><BrandBottle :brand="bottleById(stock.productId).brand" :category="guideIdForProduct(bottleById(stock.productId))" :color="bottleById(stock.productId).color" /></div>
             <div><small>{{ ALCOHOL_TYPE_LABELS[bottleById(stock.productId).type] }} · {{ bottleById(stock.productId).abv }}% ABV</small><b>{{ bottleById(stock.productId).name }}</b><span>{{ bottleById(stock.productId).volumeMl }} ml · customer pays {{ (bottleById(stock.productId).price * game.economy.guestPriceFactor).toFixed(0) }} coins + <CrystalAmount :value="bottleSaleCrystalReward(bottleById(stock.productId))" /></span></div>
             <strong>{{ stock.quantity }}×</strong>
@@ -223,9 +247,9 @@ function selectBartender(id: 'noa' | 'leo') {
       </section>
     </article>
 
-    <MarketPanel v-show="activeView === 'market'" />
+    <MarketPanel v-if="!liteGraphics || activeView === 'market'" v-show="activeView === 'market'" />
 
-    <article v-show="activeView === 'recipes'" class="game-panel recipes-deck">
+    <article v-if="!liteGraphics || activeView === 'recipes'" v-show="activeView === 'recipes'" class="game-panel recipes-deck">
       <template v-if="!selectedRecipe">
         <PanelHeading eyebrow="RECIPE ACADEMY" title="Learn, collect & master" :aside="`${game.knownRecipes.length} / ${RECIPES.length} learned`" />
         <section class="unlock-guide">
@@ -263,7 +287,7 @@ function selectBartender(id: 'noa' | 'leo') {
       </template>
     </article>
 
-    <article v-show="activeView === 'design'" class="game-panel design-deck">
+    <article v-if="!liteGraphics || activeView === 'design'" v-show="activeView === 'design'" class="game-panel design-deck">
       <PanelHeading eyebrow="PERSONALIZE" title="Bar & bartender" aside="Live preview" />
       <div v-if="designTabsShown.length" class="design-tabs" role="tablist" aria-label="Design sections"><button v-for="tab in designTabsShown" :key="tab.id" role="tab" type="button" :aria-selected="designTab === tab.id" :class="{ active: designTab === tab.id }" @click="designTab = tab.id">{{ tab.label }}</button></div>
       <div class="design-grid-new">
@@ -312,14 +336,21 @@ function selectBartender(id: 'noa' | 'leo') {
       </div>
     </article>
 
-    <article v-show="activeView === 'regions'" class="game-panel regions-deck">
+    <article v-if="!liteGraphics || activeView === 'regions'" v-show="activeView === 'regions'" class="game-panel regions-deck">
       <PanelHeading eyebrow="WORLD TOUR" :title="`${game.startingBarChosen ? 'Build your bar network' : 'Choose your first city'}`" :aside="`${game.ownedBarIds.length} / ${REGIONS.length} bars open`" />
       <div class="bar-unlock-rules"><b>{{ game.startingBarChosen ? `Expansion unlocks at level ${game.barPurchaseLevel}` : 'Your first bar is free' }}</b><span>The second location costs coins. Every later location costs crystals. Each bar keeps its own name, look and inventory.</span></div>
       <WorldMap />
       <div class="region-cards"><article v-for="region in REGIONS" :key="region.id" :class="{ active: region.id === game.regionId && game.isBarOwned(region.id), locked: !game.isBarOwned(region.id) }"><img :src="INTERIORS.find(item => item.id === game.bars[region.id].interior)?.asset" alt="" /><small>{{ region.name }}</small><b>{{ game.bars[region.id].name }}</b><small>{{ region.tagline }}</small><span v-if="game.isBarOwned(region.id)">{{ region.marketFactor }}× prices · {{ barUnits(region.id).toLocaleString() }} stock</span><span v-else>{{ game.level < game.barPurchaseLevel && game.startingBarChosen ? `Level ${game.barPurchaseLevel} required` : 'Location not owned' }}</span><button type="button" :disabled="game.startingBarChosen && (game.isBarOwned(region.id) && region.id === game.regionId || !game.isBarOwned(region.id) && game.level < game.barPurchaseLevel)" @click="regionAction(region.id)">{{ barActionLabel(region.id) }}</button></article></div>
     </article>
 
-    <PairingAdvisor v-show="activeView === 'advisor'" />
+    <PairingAdvisor v-if="!liteGraphics || activeView === 'advisor'" v-show="activeView === 'advisor'" />
     <StylePreview v-if="previewOpen" :character="selectedBartender === 'leo' ? 'leo' : 'noa'" :interior="previewInterior" :outfit="previewOutfit" @close="previewOpen = false" />
   </section>
 </template>
+
+<style scoped>
+.bottle-inventory-tools { display:flex; flex-wrap:wrap; align-items:end; justify-content:space-between; gap:12px; margin:12px 0; }
+.bottle-inventory-tools > :first-child { flex:1 1 240px; max-width:480px; }
+.bottle-pagination { display:flex; align-items:center; gap:8px; }
+.bottle-pagination span { font-size:.85rem; color:var(--muted, #a8b6c9); white-space:nowrap; }
+</style>

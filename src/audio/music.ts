@@ -10,6 +10,7 @@
 import { audioContext, musicDestination, musicOn, musicReverbSend, noise, unlockAudio } from './engine';
 
 import { STYLES, styleForInterior, type Drum, type Style, type Voice } from './styles';
+import { liteGraphics } from '../ui/graphics';
 
 // Instruments that hold a note: they play sustained chords and long melody notes.
 const HELD: Voice[] = ['flute', 'strings', 'organ', 'horn', 'chip'];
@@ -75,6 +76,7 @@ class Track {
   }
   private schedule() {
     const ctx = audioContext()!;
+    if (ctx.state !== 'running') return;
     const stepLength = 60 / this.style.bpm / 4;
     while (this.next < ctx.currentTime + .35) {
       const swing = this.step % 2 === 1 ? this.style.swing * stepLength : 0;
@@ -100,15 +102,15 @@ class Track {
     this.melodyStep(step, t, len);
     for (const [drum, pattern] of Object.entries(s.drums)) {
       const hit = pattern?.[step];
-      if (hit === 'x' || hit === 'o') this.drum(drum as Drum, this.human(t, .004), (hit === 'x' ? 1 : .42) * rand(.8, 1.1));
+      if (hit === 'x' || (hit === 'o' && !liteGraphics.value)) this.drum(drum as Drum, this.human(t, .004), (hit === 'x' ? 1 : .42) * rand(.8, 1.1));
     }
   }
 
   // ---- harmony ----
   private chordBar(chordDegree: number, t: number, len: number) {
     const s = this.style;
-    const spread = [2, 4, 6, 8].map((offset) => degree(s.scale, s.root + 12, chordDegree + offset));
-    const triad = [0, 2, 4].map((offset) => degree(s.scale, s.root, chordDegree + offset));
+    const spread = (liteGraphics.value ? [2, 6] : [2, 4, 6, 8]).map((offset) => degree(s.scale, s.root + 12, chordDegree + offset));
+    const triad = (liteGraphics.value ? [0, 4] : [0, 2, 4]).map((offset) => degree(s.scale, s.root, chordDegree + offset));
     const at = (beat16: number) => t + beat16 * len;
     if (s.comp === 'sustain') {
       if (s.keys === 'epiano') spread.slice(0, 3).forEach((note, i) => this.epiano(midi(note), this.human(t + i * .012, .01), len * 12, .5));
@@ -123,7 +125,7 @@ class Track {
     } else if (s.comp === 'arp') {
       const order = [0, 1, 2, 3, 2, 1, 2, 3];
       for (let i = 0; i < 8; i++) {
-        const note = spread[order[i]! % 4]!;
+        const note = spread[order[i]! % spread.length]!;
         if (s.keys === 'synth') this.synth(midi(note), this.human(at(i * 2)), len * 2.4, .045);
         else if (HELD.includes(s.keys)) this.tone(s.keys, midi(note), this.human(at(i * 2), .01), len * 3, .4);
         else if (s.keys === 'pluck') this.pluck(midi(note), this.human(at(i * 2), .01), .5 + (i % 2 ? 0 : .15));

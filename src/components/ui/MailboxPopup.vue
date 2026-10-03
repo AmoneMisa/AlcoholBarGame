@@ -55,18 +55,18 @@ async function open(item:MailEntry){selectedId.value=item.id;if(!item.readAt && 
 .mail-row-copy{display:grid;gap:6px;min-width:0;overflow-wrap:anywhere;}
 .mail-row .mail-row-copy,.mail-row .mail-row-copy>span{text-align:left;justify-items:start;}
 .mail-row-copy b{font-size:16px;line-height:1.3;}
-.mail-type,.mail-row time,.mail-sender time,.mail-lifetimes{font-size:11px;color:#aab7ca;}
+.mail-type,.mail-row time,.mail-sender time,.mail-lifetimes{font-size:13px;color:#aab7ca;}
 .mail-row-end{display:grid;align-content:space-between;justify-items:end;gap:8px;flex:none;max-width:35%;}
 .mail-row-end>span{font-size:24px;color:#f3d291;}
 .mail-sender{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin:20px 0 12px;}
 .mail-body{line-height:1.6;overflow-wrap:anywhere;}
-.mail-status{color:#f3d291;font-size:12px;}
+.mail-status{color:#f3d291;font-size:13px;}
 .mail-attachments h3{font-size:14px;margin:20px 0 12px;}
 .mail-attachments ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;list-style:none;padding:0;}
 .mail-attachments li{display:grid;justify-items:center;align-content:start;gap:10px;padding:12px;border:1px solid #bc945266;border-radius:12px;background:radial-gradient(ellipse at top,#473a2e,#101a2a 75%);text-align:center;}
 .attachment-art{height:96px;width:100%;}
 .attachment-art :deep(.item-art){width:96px;height:96px;max-width:100%;object-fit:contain;}
 .mail-attachments li>span{font-size:13px;line-height:1.4;overflow-wrap:anywhere;}
-small{display:block;color:#aab7ca;font-size:11px;}
+small{display:block;color:#aab7ca;font-size:13px;}
 @media(max-width:420px){.mail-row{padding:12px;gap:10px;}.mail-row-end{max-width:32%;}.mail-attachments ul{grid-template-columns:repeat(2,minmax(0,1fr));}}
 </style>

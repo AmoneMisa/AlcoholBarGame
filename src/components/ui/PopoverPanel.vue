@@ -21,7 +21,7 @@ defineEmits<{ close: [] }>();
 <style>
 .ui-popover { z-index: 180; border: 1px solid #d2a24e; border-radius: 14px; background: #0b1320; background-image:linear-gradient(#0b132066,#0b132066),url('/assets/ui/lounge-panel-painted-v1.webp');background-position:center;background-size:cover;background-repeat:no-repeat; box-shadow: 0 20px 50px #000d; color: #fff; text-align: left; }
 .ui-popover-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px 9px; border-bottom: 1px solid #354762; }
-.ui-popover-head small { display: block; color: var(--gold, #e8b85a); font-size: 9px; font-weight: 900; letter-spacing: .13em; }
+.ui-popover-head small { display: block; color: var(--gold, #e8b85a); font-size: 13px; font-weight: 900; letter-spacing: .13em; }
 .ui-popover-body { padding: 12px 14px 14px; }
 .ui-popover-head b { display: block; margin-top: 2px; color: #fff3dc; font: 700 17px Georgia, serif; }
 .ui-popover {animation:popover-arrive .16s ease-out both;}

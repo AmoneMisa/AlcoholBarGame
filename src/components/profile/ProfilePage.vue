@@ -67,9 +67,9 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
 .version-card { padding: 12px 14px; border: 1px solid #354762; border-radius: 14px; background: #111c2d; color: #e9eef7; font-size: 13px; }
 .version-card h3 { margin: 0 0 6px; font-size: 14px; }
 .version-card dl { display: flex; flex-wrap: wrap; gap: 18px; margin: 0; }
-.version-card dt { color: #91a2b5; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.version-card dt { color: #91a2b5; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
 .version-card dd { margin: 2px 0 0; font: 700 15px ui-monospace, monospace; }
-.version-card dd small { display: block; font: 400 11px system-ui, sans-serif; color: #9eafc1; }
+.version-card dd small { display: block; font: 400 13px system-ui, sans-serif; color: #9eafc1; }
 .version-card p { margin: 8px 0 0; }
 .version-card .outdated { color: #ffd35a; }
 .version-card .current { color: #7cc686; }

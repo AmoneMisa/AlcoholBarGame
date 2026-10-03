@@ -30,9 +30,9 @@ export const setPointer = (layer: PointerLayer, candidates?: PointerSpec[]) => {
 /** The data-guide names and attributes the lessons point at. Every one must exist in a component (see the tests). */
 export const GUIDE_ATTRIBUTES = [
   'guest', 'give-water', 'give-ashtray', 'offer-open', 'offer-item', 'offer-ask', 'new-question', 'tile-bank', 'talk-send',
-  'phrase-idea', 'talk-input', 'situation-choice', 'talk-close', 'glass', 'prepare', 'rules-button', 'shake', 'serve', 'market-plus',
+  'talk-input', 'situation-choice', 'talk-close', 'glass', 'prepare', 'rules-button', 'shake', 'serve', 'market-plus',
   'market-order', 'top-up', 'nav-service', 'nav-english', 'nav-manage', 'nav-market', 'nav-recipes', 'nav-inventory', 'clue-board', 'talk-actions', 'data-guide-ingredient',
-  'prep-back', 'prep-search', 'prep-bottle', 'prep-ingredient', 'prep-clear', 'prep-food', 'bottle-sale', 'coins', 'crystals', 'events', 'tip-jar', 'screenshot'
+  'prep-back', 'prep-search', 'prep-bottle', 'prep-ingredient', 'prep-clear', 'prep-food', 'bottle-sale', 'coins', 'crystals', 'events', 'tip-jar', 'tip-collect', 'screenshot'
 ] as const;
 
 export const selector = (name: (typeof GUIDE_ATTRIBUTES)[number]) => `[data-guide="${name}"]`;

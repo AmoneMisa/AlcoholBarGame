@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { itemArtwork } from '../../domain/itemArtwork';
+import { thumbnailArtwork } from '../../domain/optimizedArtwork';
 
 // The picture of an item, a box, a piece of equipment, a keepsake, an achievement or a person of the Circle. The art lives in
 // public/assets/workshop/<folder>/<id>.webp (see the README there). If a picture is missing or fails to load, the emoji from
@@ -9,11 +10,14 @@ const FOLDER = { box: 'boxes', item: 'items', equipment: 'equipment', keepsake: 
 const props = withDefaults(defineProps<{ kind: keyof typeof FOLDER; id: string; fallback: string; size?: number }>(), { size: 40 });
 const failed = ref(false);
 watch(() => [props.kind, props.id], () => { failed.value = false; });
-const src = computed(() => itemArtwork(`${FOLDER[props.kind]}/${props.id}`, import.meta.env.BASE_URL));
+const src = computed(() => {
+  const original = itemArtwork(`${FOLDER[props.kind]}/${props.id}`, import.meta.env.BASE_URL);
+  return props.size > 96 ? original : thumbnailArtwork(original, props.size <= 48 ? 96 : 192, import.meta.env.BASE_URL);
+});
 </script>
 
 <template>
-  <img v-if="!failed" class="item-art" :src="src" alt="" :width="size" :height="size" decoding="async" @error="failed = true" />
+  <img v-if="!failed" class="item-art" :src="src" alt="" :width="size" :height="size" loading="lazy" decoding="async" @error="failed = true" />
   <span v-else class="item-art-emoji" aria-hidden="true" :style="{ fontSize: size * 0.7 + 'px' }">{{ fallback }}</span>
 </template>
 

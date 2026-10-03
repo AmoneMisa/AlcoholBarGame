@@ -149,7 +149,7 @@ onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); clearPointe
 .wheel-sector-reward {position:absolute;left:50%;top:10%;width:24%;transform:translateX(-50%);display:grid;justify-items:center;gap:3px;color:#fff;text-align:center}
 .wheel-sector-reward img {display:block;width:40%;aspect-ratio:1;object-fit:contain}
 .wheel-sector-reward span {font-size:20px;line-height:1}
-.wheel-sector-reward b {max-width:46px;font:700 8px/1.15 system-ui,sans-serif;white-space:normal;text-shadow:0 1px 3px #000}
+.wheel-sector-reward b {max-width:46px;font:700 13px/1.15 system-ui,sans-serif;white-space:normal;text-shadow:0 1px 3px #000}
 .wheel-pointer { position:absolute;z-index:2;left:50%;top:-24px;width:48px;height:60px;transform:translateX(-50%);filter:drop-shadow(0 2px 3px #000a);pointer-events:none; }
 .wheel-pointer img {position:absolute;inset:0;width:100%;height:100%;object-fit:contain;}
 .wheel-pointer.spinning .wheel-pointer-still {visibility:hidden;}

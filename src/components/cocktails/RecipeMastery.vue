@@ -55,22 +55,22 @@ const pct = (value: number) => `+${Math.round((value - 1) * 100)}%`;
 .recipe-mastery { display: grid; gap: 8px; padding: 14px; border: 1px solid #b78649; border-radius: 14px; background: radial-gradient(120% 100% at 0% 0%, #3a2a18, #141c2a 70%); }
 .recipe-mastery header { display: flex;align-items:flex-start;justify-content:space-between;gap:12px; }
 .recipe-mastery header > div { display:grid;gap:5px; }
-.recipe-mastery header small { color: var(--gold, #f1c26b); font-size: 8px; font-weight: 900; letter-spacing: .14em; }
-.recipe-owned { display:inline-flex;min-height:22px;align-items:center;justify-content:center;width:max-content;padding:3px 8px;border:1px solid #3d7454;border-radius:999px;background:#173526;color:#a7e3bc;font-size:8px;font-weight:900;letter-spacing:.06em; }
+.recipe-mastery header small { color: var(--gold, #f1c26b); font-size: 13px; font-weight: 900; letter-spacing: .14em; }
+.recipe-owned { display:inline-flex;min-height:22px;align-items:center;justify-content:center;width:max-content;padding:3px 8px;border:1px solid #3d7454;border-radius:999px;background:#173526;color:#a7e3bc;font-size:13px;font-weight:900;letter-spacing:.06em; }
 .mastery-levels { display:flex;align-items:center;gap:4px; }
-.mastery-levels i { display:grid;width:25px;height:25px;place-items:center;border:1px solid #3c4658;border-radius:50%;background:#182132;color:#778296;font-size:10px;font-style:normal;font-weight:900; }
+.mastery-levels i { display:grid;width:25px;height:25px;place-items:center;border:1px solid #3c4658;border-radius:50%;background:#182132;color:#778296;font-size:13px;font-style:normal;font-weight:900; }
 .mastery-levels i.on { border-color:#8d6c35;background:#4a361e;color:#f2c35f; }
 .mastery-levels i.current { box-shadow:0 0 0 2px #f2c35f44,0 0 10px #f2c35f44; }
-.recipe-mastery p { margin: 0; color: #d9e0ea; font-size: 11px; }
+.recipe-mastery p { margin: 0; color: #d9e0ea; font-size: 13px; }
 .recipe-mastery p b { color: #91dbad; }
-.recipe-mastery .ui-btn-solid em { display: block; font-size: 9px; font-style: normal; font-weight: 700; opacity: .8; }
+.recipe-mastery .ui-btn-solid em { display: block; font-size: 13px; font-style: normal; font-weight: 700; opacity: .8; }
 .recipe-card-balance { display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:8px;padding:8px 10px;border:1px solid #394a60;border-radius:9px;background:#101a2a; }
-.recipe-card-balance span { color:#aab7c8;font-size:8px;font-weight:900;letter-spacing:.1em; }
+.recipe-card-balance span { color:#aab7c8;font-size:13px;font-weight:900;letter-spacing:.1em; }
 .recipe-card-balance b { display:grid;width:27px;height:27px;place-items:center;border-radius:7px;background:#49351e;color:#ffd37e;font-size:13px; }
-.recipe-card-balance em { color:#91a2b6;font-size:9px;font-style:normal;line-height:1.35; }
+.recipe-card-balance em { color:#91a2b6;font-size:13px;font-style:normal;line-height:1.35; }
 .mastery-help { color:#e8c585!important; }
 .mastery-max { color: #91dbad !important; font-weight: 800; }
-.recipe-mastery footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-top: 8px; border-top: 1px solid #34435a; color: #a9b3c1; font-size: 10px; }
+.recipe-mastery footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-top: 8px; border-top: 1px solid #34435a; color: #a9b3c1; font-size: 13px; }
 .recipe-mastery footer b { color: #ffe3a3; }
 @media(max-width:560px){.recipe-mastery header{display:grid}.mastery-levels{width:100%;justify-content:space-between}.mastery-levels i{width:29px;height:29px}.recipe-card-balance{grid-template-columns:auto auto}.recipe-card-balance em{grid-column:1/-1}}
 </style>

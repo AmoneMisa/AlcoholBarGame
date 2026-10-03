@@ -5,6 +5,8 @@ import DailyRewardCard from '../ui/DailyRewardCard.vue';
 import DailyWheel from '../workshop/DailyWheel.vue';
 import SeasonPass from '../workshop/SeasonPass.vue';
 import QuestsPanel from '../workshop/QuestsPanel.vue';
+import { lazyPage } from '../../ui/lazy';
+const WeeklyLeaderboard = lazyPage(() => import('../workshop/WeeklyLeaderboard.vue'));
 
 // Everything that is going on, in one place: the login streak, the city and the bar tonight, the season pass, the daily
 // wheel and the weekly quests. The tabs above it (App.vue) pick the part to show.
@@ -26,6 +28,7 @@ const game = useGameStore();
     <div v-else-if="section === 'pass'" class="events-body"><SeasonPass /></div>
     <div v-else-if="section === 'wheel'" class="events-body"><article class="events-card"><header><small>FREE EVERY DAY</small><h3>Daily wheel</h3></header><DailyWheel /></article></div>
     <div v-else-if="section === 'quests'" class="events-body"><QuestsPanel /></div>
+    <div v-else-if="section === 'weekly'" class="events-body"><WeeklyLeaderboard /></div>
   </section>
 </template>
 
@@ -33,7 +36,7 @@ const game = useGameStore();
 .events-body { display: grid; gap: 12px; padding: 12px; }
 .events-card { display: grid; gap: 10px; padding: 14px; border: 1px solid #354762; border-radius: 13px; background: #111c2d; }
 .events-card > header { display: grid; gap: 2px; }
-.events-card > header small { color: #9eafc1; letter-spacing: .1em; font-size: 10px; font-weight: 800; }
+.events-card > header small { color: #9eafc1; letter-spacing: .1em; font-size: 13px; font-weight: 800; }
 .events-card > header h3 { margin: 0; font-size: 18px; color: #f8efe7; }
 .events-card .city-event { margin: 0; }
 .bar-night { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid #d9a441; border-radius: 12px; background: #1e160c; color: #ffe6a8; }

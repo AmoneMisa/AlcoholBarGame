@@ -42,10 +42,10 @@ const fill = computed(() => {
 .rel-node { width: 15px; height: 15px; border: 2px solid #4a5b75; border-radius: 50%; background: #121c2d; }
 .rel-line li.done .rel-node { border-color: #c98e3c; background: #c98e3c; }
 .rel-line li.now .rel-node { border-color: #ffd98a; background: #ffd98a; box-shadow: 0 0 0 3px #ffd98a33; }
-.rel-line li b { font-size: 10.5px; line-height: 1.15; overflow-wrap: anywhere; }
-.rel-line li small { font-size: 9px; opacity: .7; }
+.rel-line li b { font-size: 13px; line-height: 1.15; overflow-wrap: anywhere; }
+.rel-line li small { font-size: 13px; opacity: .7; }
 .rel-line li.done, .rel-line li.now { color: #f3e2bd; }
 .rel-line li.now b { color: #ffd98a; }
-.rel-next { margin: 2px 0 0; font-size: 12px; color: #aebbd0; }
+.rel-next { margin: 2px 0 0; font-size: 13px; color: #aebbd0; }
 .rel-next b { color: #ffe6a8; }
 </style>

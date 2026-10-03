@@ -136,7 +136,7 @@ const rewardsOpen = ref(true);
           <button v-for="tier in (['free', 'premium'] as const)" :key="tier" type="button" class="pass-cell" :class="[tier, state(tier, row.level)]" :disabled="state(tier, row.level) !== 'ready'" :aria-label="tier + ' level ' + row.level + ': ' + row[tier].map(text).join(', ') + '. ' + stateText(tier, row.level)" @click="game.claimPass(tier, row.level)">
 
             <div v-for="(reward, index) in row[tier]" :key="index" class="pass-reward" :title="text(reward)">
-              <div class="pass-cell-art" :style="{ width: `${rewardPictures(reward).length * 44}px` }"><RewardArt v-for="(picture, pictureIndex) in rewardPictures(reward)" :key="pictureIndex" :line="picture" /></div>
+              <div class="pass-cell-art" :style="{ width: `${rewardPictures(reward).length * 44}px` }"><RewardArt v-for="(picture, pictureIndex) in rewardPictures(reward)" :key="pictureIndex" :line="picture" compact /></div>
               <b class="pass-quantity">{{ quantity(reward) || ' ' }}</b>
             </div>
             <span class="pass-lock" v-if="!['claimed', 'ready'].includes(state(tier, row.level))"><UiIcon name="lock" /></span><small v-else class="pass-status">{{ state(tier, row.level) === 'claimed' ? 'Claimed' : 'Claim' }}</small>
@@ -166,18 +166,18 @@ const rewardsOpen = ref(true);
 .pass-level small { color: #9eafc1; }
 .pass-buy { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid #354762; border-radius: 12px; background: #111c2d; }
 .pass-buy > div:first-child { display: grid; gap: 2px; }
-.pass-buy small { color: #9eafc1; font-size: 12px; }
+.pass-buy small { color: #9eafc1; font-size: 13px; }
 .pass-buy-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .pass-need { flex-basis: 100%; color: #f2b99a !important; }
 
-.pass-popup-progress {display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-bottom:12px;font-size:12px;color:#c6d4e5;}
+.pass-popup-progress {display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-bottom:12px;font-size:13px;color:#c6d4e5;}
 .pass-popup-progress progress {width:100%;height:7px;accent-color:#e7b556;}
 .pass-quantity {display:block;height:16px;line-height:16px;}
 .pass-reward-list { min-width:0;border:1px solid #536078;border-radius:14px;background:#0c1725 url('/assets/ui/pass-track-surface-v1.webp') center / cover;overflow:hidden; }
 .pass-track-head,.pass-track > li { display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);gap:10px;align-items:center; }
 .pass-track-head { padding:10px 8px;color:#e4b35c;font-size:14px;text-align:center;border-bottom:1px solid #947440;background:#142039 url('/assets/ui/pass-panel-painted-v1.webp') center / cover; }
 .pass-track-head > div { display:grid;justify-items:center;gap:8px; }
-.pass-track-head small { font-size:11px; }
+.pass-track-head small { font-size:13px; }
 .pass-track-head > b { color:#bbd5ee; }
 .pass-track { display:grid;margin:0;padding:0 12px;list-style:none;max-height:min(64vh,560px);overflow-y:auto;overscroll-behavior:contain; }
 .pass-track > li { position:relative;padding:9px 0;border-bottom:1px solid #94744066; }
@@ -194,13 +194,13 @@ const rewardsOpen = ref(true);
 .pass-cell-art > .reward-art { flex:none;width:44px;min-width:0;height:44px; }
 .pass-cell-art .item-art { width:44px;height:44px; }
 .pass-lock { position:absolute;right:2px;top:2px;font-size:20px;filter:drop-shadow(0 2px 3px #000a); }
-.pass-status { position:absolute;bottom:8px;left:0;right:0;color:#8fd1a0;font-size:11px;font-weight:800; }
+.pass-status { position:absolute;bottom:8px;left:0;right:0;color:#8fd1a0;font-size:13px;font-weight:800; }
 .pass-cell.ready { cursor:pointer;border-color:#edc578;box-shadow:0 0 12px #edc57835; }
 .pass-cell.ready .pass-status { color:#ffdc85; }
 .pass-cell.ready {animation:pass-ready-glow 2.6s ease-in-out infinite;}
 @keyframes pass-ready-glow {50%{box-shadow:0 0 8px #edc57865;}}
 @media(prefers-reduced-motion:reduce){.pass-cell.ready{animation:none;}}
-.pass-hint { margin:0;color:#aebed2;font-size:12px;line-height:1.5; }
+.pass-hint { margin:0;color:#aebed2;font-size:13px;line-height:1.5; }
 @media(max-width:540px){
  .pass{padding:8px;gap:12px;}
  .pass-track-head,.pass-track > li{grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr);gap:8px;}
@@ -214,10 +214,10 @@ const rewardsOpen = ref(true);
 
 .pass-points { display: grid; gap: 8px; padding: 12px; border: 1px solid #354762; border-radius: 12px; background: #111c2d; }
 .pass-points > header { display: grid; gap: 2px; }
-.pass-points small { color: #9eafc1; letter-spacing: .1em; font-size: 10px; font-weight: 800; }
+.pass-points small { color: #9eafc1; letter-spacing: .1em; font-size: 13px; font-weight: 800; }
 .pass-points ul { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
 .pass-points li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2px 10px; padding: 7px 10px; border-radius: 8px; background: #17253a; font-size: 13px; }
-.pass-points li em { grid-column: 1; color: #8fd1a0; font-size: 11px; font-style: normal; }
+.pass-points li em { grid-column: 1; color: #8fd1a0; font-size: 13px; font-style: normal; }
 .pass-points li b { grid-row: 1; grid-column: 2; color: #f4d08e; font-size: 14px; }
 
 .pass-prize { display: grid; grid-template-columns: minmax(180px, 260px) minmax(220px,1fr); gap: 14px; align-items: stretch; padding: 12px; border: 1px solid #d8aa5766; border-radius: 14px; background: #0c1421aa; }

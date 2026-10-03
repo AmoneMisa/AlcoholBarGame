@@ -1,0 +1,3258 @@
+[
+  {
+    "file": "public/assets/characters/bartender/noa-natural-atlas-v2.webp",
+    "bytes": 1089294,
+    "w": 1896,
+    "h": 1656,
+    "pages": 1,
+    "rgbaMiB": 11.98
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-natural-atlas-v2.webp",
+    "bytes": 843734,
+    "w": 1896,
+    "h": 1656,
+    "pages": 1,
+    "rgbaMiB": 11.98
+  },
+  {
+    "file": "public/assets/bar/world-land.webp",
+    "bytes": 122190,
+    "w": 2400,
+    "h": 968,
+    "pages": 1,
+    "rgbaMiB": 8.86
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interiors-world-atlas.png",
+    "bytes": 3100178,
+    "w": 1254,
+    "h": 1254,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interiors-atmosphere-atlas.png",
+    "bytes": 3028506,
+    "w": 1536,
+    "h": 1024,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interiors-nightlife-atlas.png",
+    "bytes": 2869561,
+    "w": 1536,
+    "h": 1024,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interiors-classic-atlas.png",
+    "bytes": 2647416,
+    "w": 1254,
+    "h": 1254,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/botanical-room.png",
+    "bytes": 2578667,
+    "w": 1671,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/inferno-penthouse-club.png",
+    "bytes": 2527147,
+    "w": 1536,
+    "h": 1024,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/skyline-lounge.png",
+    "bytes": 2397394,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/velvet-hour-bar.png",
+    "bytes": 2386417,
+    "w": 1774,
+    "h": 887,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/drinks/cocktails/velvet-cocktails-v2.png",
+    "bytes": 1194320,
+    "w": 1983,
+    "h": 793,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-fairy.webp",
+    "bytes": 608494,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-perfect-world.webp",
+    "bytes": 606326,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-borderlands.webp",
+    "bytes": 602470,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-lost-ark.webp",
+    "bytes": 596174,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-elden-ring.webp",
+    "bytes": 587308,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-allods.webp",
+    "bytes": 586434,
+    "w": 1774,
+    "h": 887,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-underwater.webp",
+    "bytes": 586058,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-underground.webp",
+    "bytes": 554248,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-skyrim.webp",
+    "bytes": 552052,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-nfs-underground.webp",
+    "bytes": 549964,
+    "w": 1774,
+    "h": 887,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-cyberpunk-2077.webp",
+    "bytes": 545684,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-cs-2.webp",
+    "bytes": 543632,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-witcher-3.webp",
+    "bytes": 542102,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-assassins-creed.webp",
+    "bytes": 536942,
+    "w": 1672,
+    "h": 940,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-nfs-most-wanted.webp",
+    "bytes": 533212,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-stellar-blade.webp",
+    "bytes": 528696,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-lineage-2.webp",
+    "bytes": 525976,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-watch-dogs.webp",
+    "bytes": 525126,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-gta.webp",
+    "bytes": 524496,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-heroes-3.webp",
+    "bytes": 511966,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-warcraft-3.webp",
+    "bytes": 510100,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-sleeping-dogs.webp",
+    "bytes": 492148,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-fairytale.webp",
+    "bytes": 489126,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-nfs-carbon.webp",
+    "bytes": 479362,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/botanical-room.webp",
+    "bytes": 479050,
+    "w": 1671,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-repo.webp",
+    "bytes": 477678,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-neighbours-from-hell.webp",
+    "bytes": 472018,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/inferno-penthouse-club.webp",
+    "bytes": 458202,
+    "w": 1536,
+    "h": 1024,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-detroit.webp",
+    "bytes": 456608,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/customers/extended-seated-cast-2-v2.webp",
+    "bytes": 440368,
+    "w": 1568,
+    "h": 1003,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-mass-effect.webp",
+    "bytes": 436200,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/velvet-hour-bar.webp",
+    "bytes": 431916,
+    "w": 1774,
+    "h": 887,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/drinks/ingredients/velvet-ingredients-v2.webp",
+    "bytes": 422654,
+    "w": 1774,
+    "h": 887,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/skyline-lounge.webp",
+    "bytes": 413556,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/customers/extended-seated-cast-v2.webp",
+    "bytes": 374798,
+    "w": 1568,
+    "h": 1003,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/solen.webp",
+    "bytes": 364316,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/aveline.webp",
+    "bytes": 354640,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-minecraft.webp",
+    "bytes": 347680,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/drinks/cocktails/velvet-cocktails-v2.webp",
+    "bytes": 329336,
+    "w": 1983,
+    "h": 793,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-among-us.webp",
+    "bytes": 328410,
+    "w": 1672,
+    "h": 941,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/drinks/bottles/painted-bottles-v4.webp",
+    "bytes": 320072,
+    "w": 1536,
+    "h": 1024,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/drinks/bottles/painted-bottles-v3.webp",
+    "bytes": 315520,
+    "w": 1536,
+    "h": 1024,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/drinks/bottles/velvet-bottles-v2.webp",
+    "bytes": 301898,
+    "w": 1448,
+    "h": 1086,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/gideon.webp",
+    "bytes": 300380,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/customers/velvet-hour-seated-cast-v2.webp",
+    "bytes": 293818,
+    "w": 2122,
+    "h": 741,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/kellan.webp",
+    "bytes": 290094,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/tobin.webp",
+    "bytes": 285864,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/cassian.webp",
+    "bytes": 277562,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/lumi.webp",
+    "bytes": 273344,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/bram.webp",
+    "bytes": 264218,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/neri.webp",
+    "bytes": 257990,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/paloma.webp",
+    "bytes": 229978,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/soren.webp",
+    "bytes": 215876,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/yara.webp",
+    "bytes": 203246,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/celeste.webp",
+    "bytes": 200204,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/nadia.webp",
+    "bytes": 155788,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/companions/mirelle.webp",
+    "bytes": 145666,
+    "w": 1024,
+    "h": 1536,
+    "pages": 1,
+    "rgbaMiB": 6
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-themed-atlas-v2.webp",
+    "bytes": 524272,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-themed-atlas-v2.webp",
+    "bytes": 517484,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-themed-atlas-v5.webp",
+    "bytes": 511180,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-themed-atlas-v3.webp",
+    "bytes": 510154,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-themed-atlas-v3.webp",
+    "bytes": 499174,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-themed-atlas-v7.webp",
+    "bytes": 498170,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-themed-atlas-v5.webp",
+    "bytes": 489970,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-themed-atlas-v1.webp",
+    "bytes": 477390,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-themed-atlas-v4.webp",
+    "bytes": 450374,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-themed-atlas-v1.webp",
+    "bytes": 448100,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-themed-atlas-v7.webp",
+    "bytes": 445888,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-themed-atlas-v4.webp",
+    "bytes": 436966,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-themed-atlas-v6.webp",
+    "bytes": 372070,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-themed-atlas-v6.webp",
+    "bytes": 369152,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-themed-atlas-v9.webp",
+    "bytes": 355424,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-themed-atlas-v9.webp",
+    "bytes": 352070,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-themed-atlas-v8.webp",
+    "bytes": 348192,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-themed-atlas-v8.webp",
+    "bytes": 339964,
+    "w": 1260,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 5.31
+  },
+  {
+    "file": "public/assets/ui/lounge-panel-painted-v1.webp",
+    "bytes": 99320,
+    "w": 1400,
+    "h": 900,
+    "pages": 1,
+    "rgbaMiB": 4.81
+  },
+  {
+    "file": "public/assets/ui/pass-panel-painted-v1.webp",
+    "bytes": 41264,
+    "w": 1400,
+    "h": 900,
+    "pages": 1,
+    "rgbaMiB": 4.81
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-costumes-atlas-v3.webp",
+    "bytes": 491642,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-costumes-atlas-v8.webp",
+    "bytes": 477986,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-costumes-atlas-v5.webp",
+    "bytes": 451430,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-costumes-atlas-v6.webp",
+    "bytes": 426914,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-costumes-atlas-v7.webp",
+    "bytes": 420428,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-costumes-atlas-v2.webp",
+    "bytes": 414496,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-costumes-atlas-v1.webp",
+    "bytes": 406068,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-costumes-atlas-v7.webp",
+    "bytes": 381724,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-costumes-atlas-v2.webp",
+    "bytes": 375224,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-costumes-atlas-v3.webp",
+    "bytes": 372296,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-costumes-atlas-v1.webp",
+    "bytes": 343768,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-costumes-atlas-v6.webp",
+    "bytes": 343594,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-costumes-atlas-v4.webp",
+    "bytes": 328676,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-costumes-atlas-v4.webp",
+    "bytes": 282692,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-costumes-atlas-v5.webp",
+    "bytes": 276350,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-costumes-atlas-v9.webp",
+    "bytes": 194332,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-costumes-atlas-v8.webp",
+    "bytes": 151000,
+    "w": 948,
+    "h": 1104,
+    "pages": 1,
+    "rgbaMiB": 3.99
+  },
+  {
+    "file": "public/assets/ui/daily-wheel-painted-v1.webp",
+    "bytes": 246444,
+    "w": 800,
+    "h": 800,
+    "pages": 1,
+    "rgbaMiB": 2.44
+  },
+  {
+    "file": "public/assets/ui/daily-wheel.webp",
+    "bytes": 246444,
+    "w": 800,
+    "h": 800,
+    "pages": 1,
+    "rgbaMiB": 2.44
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-special-b-v1.webp",
+    "bytes": 235724,
+    "w": 316,
+    "h": 1656,
+    "pages": 1,
+    "rgbaMiB": 2
+  },
+  {
+    "file": "public/assets/characters/bartender/noa-special-a-v1.webp",
+    "bytes": 225526,
+    "w": 316,
+    "h": 1656,
+    "pages": 1,
+    "rgbaMiB": 2
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-special-a-v1.webp",
+    "bytes": 207946,
+    "w": 316,
+    "h": 1656,
+    "pages": 1,
+    "rgbaMiB": 2
+  },
+  {
+    "file": "public/assets/characters/bartender/leo-special-b-v1.webp",
+    "bytes": 197528,
+    "w": 316,
+    "h": 1656,
+    "pages": 1,
+    "rgbaMiB": 2
+  },
+  {
+    "file": "public/assets/ui/pass-track-surface-v1.webp",
+    "bytes": 34460,
+    "w": 640,
+    "h": 640,
+    "pages": 1,
+    "rgbaMiB": 1.56
+  },
+  {
+    "file": "public/assets/drinks/bottles/mystery-sealed-bottle.webp",
+    "bytes": 92080,
+    "w": 512,
+    "h": 768,
+    "pages": 1,
+    "rgbaMiB": 1.5
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-riad.webp",
+    "bytes": 198578,
+    "w": 764,
+    "h": 508,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-winter.webp",
+    "bytes": 184658,
+    "w": 623,
+    "h": 623,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-tropical.webp",
+    "bytes": 184348,
+    "w": 623,
+    "h": 623,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-beach.webp",
+    "bytes": 177554,
+    "w": 764,
+    "h": 508,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-palace.webp",
+    "bytes": 154510,
+    "w": 623,
+    "h": 623,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-loft.webp",
+    "bytes": 149302,
+    "w": 764,
+    "h": 508,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-library.webp",
+    "bytes": 148152,
+    "w": 623,
+    "h": 623,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-speakeasy.webp",
+    "bytes": 142162,
+    "w": 623,
+    "h": 623,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-parisian.webp",
+    "bytes": 142000,
+    "w": 764,
+    "h": 508,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-desert.webp",
+    "bytes": 141726,
+    "w": 623,
+    "h": 623,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-rooftop.webp",
+    "bytes": 139404,
+    "w": 764,
+    "h": 508,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-marina.webp",
+    "bytes": 134176,
+    "w": 764,
+    "h": 508,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-art-deco.webp",
+    "bytes": 131722,
+    "w": 623,
+    "h": 623,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-izakaya.webp",
+    "bytes": 129342,
+    "w": 764,
+    "h": 508,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-cyberpunk.webp",
+    "bytes": 127106,
+    "w": 764,
+    "h": 508,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/bar/backgrounds/interior-jazz-cellar.webp",
+    "bytes": 118036,
+    "w": 623,
+    "h": 623,
+    "pages": 1,
+    "rgbaMiB": 1.48
+  },
+  {
+    "file": "public/assets/drinks/ingredients/orange-garnish-v1.webp",
+    "bytes": 104862,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/whiskey-smash.webp",
+    "bytes": 74332,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/ingredients/bar-salt-v1.webp",
+    "bytes": 67056,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/fries.webp",
+    "bytes": 61938,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/rusty-nail.webp",
+    "bytes": 60380,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/edamame.webp",
+    "bytes": 58824,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/wings.webp",
+    "bytes": 58632,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/nachos.webp",
+    "bytes": 58214,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/batanga.webp",
+    "bytes": 57966,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/meat-plate.webp",
+    "bytes": 57152,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/ti-punch.webp",
+    "bytes": 54440,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/nuts.webp",
+    "bytes": 54188,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/tommys-margarita.webp",
+    "bytes": 53994,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/bruschetta.webp",
+    "bytes": 53138,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/garlic-bread.webp",
+    "bytes": 52980,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/pretzel.webp",
+    "bytes": 50350,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/cheese-plate.webp",
+    "bytes": 49174,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/fruit-plate.webp",
+    "bytes": 48470,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/olives.webp",
+    "bytes": 47750,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/popcorn.webp",
+    "bytes": 47344,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/spring-rolls.webp",
+    "bytes": 44034,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/mamie-taylor.webp",
+    "bytes": 42632,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/food/chocolate.webp",
+    "bytes": 41994,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/blue-lagoon.webp",
+    "bytes": 39740,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/queens-park-swizzle.webp",
+    "bytes": 37532,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/bijou.webp",
+    "bytes": 36178,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/bronx.webp",
+    "bytes": 34804,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/blue-hawaii.webp",
+    "bytes": 32284,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/singapore-sling.webp",
+    "bytes": 31804,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/last-word.webp",
+    "bytes": 30482,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/greyhound.webp",
+    "bytes": 29834,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/martinez.webp",
+    "bytes": 28952,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/cocktails/champagne-cocktail.webp",
+    "bytes": 24966,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/bar/props/ashtray.webp",
+    "bytes": 20782,
+    "w": 512,
+    "h": 512,
+    "pages": 1,
+    "rgbaMiB": 1
+  },
+  {
+    "file": "public/assets/drinks/glass/live-highball-v1.webp",
+    "bytes": 63776,
+    "w": 384,
+    "h": 576,
+    "pages": 1,
+    "rgbaMiB": 0.84
+  },
+  {
+    "file": "public/assets/workshop/items/golden-ice-painted-v1.webp",
+    "bytes": 77388,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/golden-ice.webp",
+    "bytes": 77388,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/vip-magnet-painted-v1.webp",
+    "bytes": 74152,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/vip-magnet.webp",
+    "bytes": 74152,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/equipment/ice-machine-painted-v1.webp",
+    "bytes": 67216,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/equipment/ice-machine.webp",
+    "bytes": 67216,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/equipment/cellar-painted-v1.webp",
+    "bytes": 66272,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/equipment/cellar.webp",
+    "bytes": 66272,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/equipment/register-painted-v1.webp",
+    "bytes": 64512,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/equipment/register.webp",
+    "bytes": 64512,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/background-choice-painted-v1.webp",
+    "bytes": 64108,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/background-choice.webp",
+    "bytes": 64108,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/style-choice-painted-v1.webp",
+    "bytes": 62754,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/style-choice.webp",
+    "bytes": 62754,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/boxes/gold-painted-v1.webp",
+    "bytes": 61958,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/boxes/gold.webp",
+    "bytes": 61958,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/calm-charm-painted-v1.webp",
+    "bytes": 61014,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/calm-charm.webp",
+    "bytes": 61014,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/keepsakes/flowers-painted-v1.webp",
+    "bytes": 60686,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/keepsakes/flowers.webp",
+    "bytes": 60686,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/boxes/choice-painted-v1.webp",
+    "bytes": 60488,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/boxes/choice.webp",
+    "bytes": 60488,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/equipment-choice-painted-v1.webp",
+    "bytes": 60356,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/equipment-choice.webp",
+    "bytes": 60356,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/boxes/silver-painted-v1.webp",
+    "bytes": 60208,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/boxes/silver.webp",
+    "bytes": 60208,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/vips-tier-4.webp",
+    "bytes": 59342,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/backgrounds-tier-4.webp",
+    "bytes": 59306,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/giftsSent-tier-4.webp",
+    "bytes": 59134,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/upgrades-tier-4.webp",
+    "bytes": 59132,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/boxes/bronze-painted-v1.webp",
+    "bytes": 59062,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/boxes/bronze.webp",
+    "bytes": 59062,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/barUpgrades-tier-4.webp",
+    "bytes": 59054,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bottles-tier-4.webp",
+    "bytes": 59016,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/draws-tier-4.webp",
+    "bytes": 58998,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/skins-tier-4.webp",
+    "bytes": 58998,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/boxes-tier-4.webp",
+    "bytes": 58824,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/signatures-tier-4.webp",
+    "bytes": 58758,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/giftsGot-tier-4.webp",
+    "bytes": 58640,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bonds-tier-4.webp",
+    "bytes": 58516,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/loginDays-tier-4.webp",
+    "bytes": 58294,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/companions-tier-4.webp",
+    "bytes": 58270,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/staffHired-tier-4.webp",
+    "bytes": 58270,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/visitedBy-tier-4.webp",
+    "bytes": 58270,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/visitedFriends-tier-4.webp",
+    "bytes": 58248,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/scroll-painted-v1.webp",
+    "bytes": 58112,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/scroll.webp",
+    "bytes": 58112,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/crystalsSpent-tier-4.webp",
+    "bytes": 58076,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/lessons-tier-4.webp",
+    "bytes": 58064,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/staffLevels-tier-4.webp",
+    "bytes": 58064,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/tasted-tier-4.webp",
+    "bytes": 57932,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/level-tier-4.webp",
+    "bytes": 57920,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/coinsSpent-tier-4.webp",
+    "bytes": 57684,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/perfectTalks-tier-4.webp",
+    "bytes": 57532,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bars-tier-4.webp",
+    "bytes": 57434,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/vips-tier-3.webp",
+    "bytes": 56500,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/serves-tier-4.webp",
+    "bytes": 56422,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bottles-tier-3.webp",
+    "bytes": 56288,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/backgrounds-tier-3.webp",
+    "bytes": 56154,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/barUpgrades-tier-3.webp",
+    "bytes": 56120,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/upgrades-tier-3.webp",
+    "bytes": 56108,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/vips-tier-2.webp",
+    "bytes": 56080,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/giftsSent-tier-3.webp",
+    "bytes": 56066,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/boxes-tier-3.webp",
+    "bytes": 55864,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/draws-tier-3.webp",
+    "bytes": 55846,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/skins-tier-3.webp",
+    "bytes": 55846,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/signatures-tier-3.webp",
+    "bytes": 55778,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/keepsakes/sweets-painted-v1.webp",
+    "bytes": 55692,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/keepsakes/sweets.webp",
+    "bytes": 55692,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/giftsGot-tier-3.webp",
+    "bytes": 55666,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bonds-tier-3.webp",
+    "bytes": 55490,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/backgrounds-tier-2.webp",
+    "bytes": 55450,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bottles-tier-2.webp",
+    "bytes": 55386,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/companions-tier-3.webp",
+    "bytes": 55376,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/staffHired-tier-3.webp",
+    "bytes": 55376,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/visitedBy-tier-3.webp",
+    "bytes": 55376,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/giftsSent-tier-2.webp",
+    "bytes": 55338,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/ui/achievement-diamond.webp",
+    "bytes": 55288,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/visitedFriends-tier-3.webp",
+    "bytes": 55184,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/upgrades-tier-2.webp",
+    "bytes": 55164,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/barUpgrades-tier-2.webp",
+    "bytes": 55136,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/draws-tier-2.webp",
+    "bytes": 55066,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/skins-tier-2.webp",
+    "bytes": 55066,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/signatures-tier-2.webp",
+    "bytes": 55010,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/crystalsSpent-tier-3.webp",
+    "bytes": 55006,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/loginDays-tier-3.webp",
+    "bytes": 54982,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/lessons-tier-3.webp",
+    "bytes": 54898,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/staffLevels-tier-3.webp",
+    "bytes": 54898,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bars-tier-3.webp",
+    "bytes": 54856,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/boxes-tier-2.webp",
+    "bytes": 54838,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/level-tier-3.webp",
+    "bytes": 54820,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/tasted-tier-3.webp",
+    "bytes": 54762,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bonds-tier-2.webp",
+    "bytes": 54646,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/giftsGot-tier-2.webp",
+    "bytes": 54628,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/coinsSpent-tier-3.webp",
+    "bytes": 54536,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/perfectTalks-tier-3.webp",
+    "bytes": 54366,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/companions-tier-2.webp",
+    "bytes": 54352,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/staffHired-tier-2.webp",
+    "bytes": 54352,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/visitedBy-tier-2.webp",
+    "bytes": 54352,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/visitedFriends-tier-2.webp",
+    "bytes": 54186,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/loginDays-tier-2.webp",
+    "bytes": 54110,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bars-tier-2.webp",
+    "bytes": 53904,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/lessons-tier-2.webp",
+    "bytes": 53902,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/staffLevels-tier-2.webp",
+    "bytes": 53902,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/crystalsSpent-tier-2.webp",
+    "bytes": 53824,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/tasted-tier-2.webp",
+    "bytes": 53772,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/level-tier-2.webp",
+    "bytes": 53696,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/serves-tier-3.webp",
+    "bytes": 53596,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/ui/tip-jar/stage-4.webp",
+    "bytes": 53544,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/coinsSpent-tier-2.webp",
+    "bytes": 53460,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/perfectTalks-tier-2.webp",
+    "bytes": 53302,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/shards/parts-painted-v1.webp",
+    "bytes": 52908,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/shards/parts.webp",
+    "bytes": 52908,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/second-chance-painted-v1.webp",
+    "bytes": 52388,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/second-chance.webp",
+    "bytes": 52388,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/happy-hour-painted-v1.webp",
+    "bytes": 52204,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/happy-hour.webp",
+    "bytes": 52204,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/serves-tier-2.webp",
+    "bytes": 52084,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/keepsakes/watch-painted-v1.webp",
+    "bytes": 51880,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/keepsakes/watch.webp",
+    "bytes": 51880,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/ui/achievement-gold.webp",
+    "bytes": 51642,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/equipment/speakers-painted-v1.webp",
+    "bytes": 51526,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/equipment/speakers.webp",
+    "bytes": 51526,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/coin-boost-painted-v1.webp",
+    "bytes": 50894,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/coin-boost.webp",
+    "bytes": 50894,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/courier-painted-v1.webp",
+    "bytes": 50878,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/courier.webp",
+    "bytes": 50878,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/ui/achievement-silver.webp",
+    "bytes": 50296,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/friend-choice-painted-v1.webp",
+    "bytes": 50080,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/friend-choice.webp",
+    "bytes": 50080,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/ui/tip-jar/stage-3.webp",
+    "bytes": 49968,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/xp-boost-painted-v1.webp",
+    "bytes": 48926,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/xp-boost.webp",
+    "bytes": 48926,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/vips-tier-1.webp",
+    "bytes": 48160,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/vips.webp",
+    "bytes": 48160,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bottles-tier-1.webp",
+    "bytes": 47594,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bottles.webp",
+    "bytes": 47594,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/giftsSent-tier-1.webp",
+    "bytes": 47006,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/giftsSent.webp",
+    "bytes": 47006,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/backgrounds-tier-1.webp",
+    "bytes": 47000,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/backgrounds.webp",
+    "bytes": 47000,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/upgrades-tier-1.webp",
+    "bytes": 46990,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/upgrades.webp",
+    "bytes": 46990,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/signatures-tier-1.webp",
+    "bytes": 46898,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/signatures.webp",
+    "bytes": 46898,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/draws-tier-1.webp",
+    "bytes": 46776,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/draws.webp",
+    "bytes": 46776,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/skins-tier-1.webp",
+    "bytes": 46776,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/skins.webp",
+    "bytes": 46776,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/barUpgrades-tier-1.webp",
+    "bytes": 46770,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/barUpgrades.webp",
+    "bytes": 46770,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/boxes-tier-1.webp",
+    "bytes": 46708,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/boxes.webp",
+    "bytes": 46708,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bonds-tier-1.webp",
+    "bytes": 46578,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bonds.webp",
+    "bytes": 46578,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/giftsGot-tier-1.webp",
+    "bytes": 46544,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/giftsGot.webp",
+    "bytes": 46544,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/keepsakes/vinyl-painted-v1.webp",
+    "bytes": 46170,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/keepsakes/vinyl.webp",
+    "bytes": 46170,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/visitedFriends-tier-1.webp",
+    "bytes": 46146,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/visitedFriends.webp",
+    "bytes": 46146,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/loginDays-tier-1.webp",
+    "bytes": 46074,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/loginDays.webp",
+    "bytes": 46074,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/companions-tier-1.webp",
+    "bytes": 46010,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/companions.webp",
+    "bytes": 46010,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/staffHired-tier-1.webp",
+    "bytes": 46010,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/staffHired.webp",
+    "bytes": 46010,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/visitedBy-tier-1.webp",
+    "bytes": 46010,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/visitedBy.webp",
+    "bytes": 46010,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/lessons-tier-1.webp",
+    "bytes": 45954,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/lessons.webp",
+    "bytes": 45954,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/staffLevels-tier-1.webp",
+    "bytes": 45954,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/staffLevels.webp",
+    "bytes": 45954,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/crystalsSpent-tier-1.webp",
+    "bytes": 45866,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/crystalsSpent.webp",
+    "bytes": 45866,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bars-tier-1.webp",
+    "bytes": 45738,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/bars.webp",
+    "bytes": 45738,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/level-tier-1.webp",
+    "bytes": 45726,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/level.webp",
+    "bytes": 45726,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/steady-hand-painted-v1.webp",
+    "bytes": 45690,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/steady-hand.webp",
+    "bytes": 45690,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/tasted-tier-1.webp",
+    "bytes": 45524,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/tasted.webp",
+    "bytes": 45524,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/coinsSpent-tier-1.webp",
+    "bytes": 45282,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/coinsSpent.webp",
+    "bytes": 45282,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/perfectTalks-tier-1.webp",
+    "bytes": 45162,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/perfectTalks.webp",
+    "bytes": 45162,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/resources/crystals-painted-v1.webp",
+    "bytes": 45006,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/resources/crystals.webp",
+    "bytes": 45006,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/equipment/fridge-painted-v1.webp",
+    "bytes": 44220,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/equipment/fridge.webp",
+    "bytes": 44220,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/serves-tier-1.webp",
+    "bytes": 43792,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/achievements/serves.webp",
+    "bytes": 43792,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/ui/tip-jar/stage-2.webp",
+    "bytes": 43504,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/voucher-painted-v1.webp",
+    "bytes": 42964,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/voucher.webp",
+    "bytes": 42964,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/ui/achievement-bronze.webp",
+    "bytes": 42560,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/tip-boost-painted-v1.webp",
+    "bytes": 42112,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/tip-boost.webp",
+    "bytes": 42112,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/ui/fragment-puzzle-painted-v1.webp",
+    "bytes": 41616,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/ui/fragment-puzzle.webp",
+    "bytes": 41616,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/shards/circle.webp",
+    "bytes": 41616,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/shards/skin.webp",
+    "bytes": 41616,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/shards/style.webp",
+    "bytes": 41616,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/whisper-painted-v1.webp",
+    "bytes": 39384,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/items/whisper.webp",
+    "bytes": 39384,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/resources/xp-painted-v1.webp",
+    "bytes": 39108,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/resources/xp.webp",
+    "bytes": 39108,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/ui/tip-jar/stage-1.webp",
+    "bytes": 38804,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/resources/coins-painted-v1.webp",
+    "bytes": 38054,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/resources/coins.webp",
+    "bytes": 38054,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/ui/tip-jar/stage-0.webp",
+    "bytes": 36822,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/keepsakes/book-painted-v1.webp",
+    "bytes": 29580,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/keepsakes/book.webp",
+    "bytes": 29580,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/equipment/shaker-painted-v1.webp",
+    "bytes": 26722,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/workshop/equipment/shaker.webp",
+    "bytes": 26722,
+    "w": 384,
+    "h": 384,
+    "pages": 1,
+    "rgbaMiB": 0.56
+  },
+  {
+    "file": "public/assets/ui/guest-silhouette.webp",
+    "bytes": 2472,
+    "w": 320,
+    "h": 360,
+    "pages": 1,
+    "rgbaMiB": 0.44
+  },
+  {
+    "file": "public/assets/workshop/resources/supplies.webp",
+    "bytes": 26736,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/achievements/prestiges.webp",
+    "bytes": 26448,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/resources/prestige.webp",
+    "bytes": 26448,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/solen.webp",
+    "bytes": 21382,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/aveline.webp",
+    "bytes": 20552,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/tobin.webp",
+    "bytes": 19722,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/cassian.webp",
+    "bytes": 19664,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/lumi.webp",
+    "bytes": 19466,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/ui/lock-painted-v1.webp",
+    "bytes": 18580,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/kellan.webp",
+    "bytes": 18572,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/bram.webp",
+    "bytes": 18480,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/neri.webp",
+    "bytes": 18346,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/gideon.webp",
+    "bytes": 18240,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/paloma.webp",
+    "bytes": 17480,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/celeste.webp",
+    "bytes": 17340,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/nadia.webp",
+    "bytes": 17340,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/mirelle.webp",
+    "bytes": 16664,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/soren.webp",
+    "bytes": 15980,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/workshop/companions/yara.webp",
+    "bytes": 15560,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/ui/pass-free-surface-v1.webp",
+    "bytes": 6312,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/ui/pass-premium-surface-v1.webp",
+    "bytes": 5852,
+    "w": 256,
+    "h": 256,
+    "pages": 1,
+    "rgbaMiB": 0.25
+  },
+  {
+    "file": "public/assets/ui/wheel-pointer-fast-v1.webp",
+    "bytes": 24050,
+    "w": 128,
+    "h": 160,
+    "pages": 6,
+    "rgbaMiB": 0.08
+  },
+  {
+    "file": "public/assets/ui/wheel-pointer-medium-v1.webp",
+    "bytes": 24050,
+    "w": 128,
+    "h": 160,
+    "pages": 6,
+    "rgbaMiB": 0.08
+  },
+  {
+    "file": "public/assets/ui/wheel-pointer-slow-v1.webp",
+    "bytes": 24050,
+    "w": 128,
+    "h": 160,
+    "pages": 6,
+    "rgbaMiB": 0.08
+  },
+  {
+    "file": "public/assets/ui/wheel-pointer-still-v1.webp",
+    "bytes": 4750,
+    "w": 128,
+    "h": 160,
+    "pages": 1,
+    "rgbaMiB": 0.08
+  }
+]

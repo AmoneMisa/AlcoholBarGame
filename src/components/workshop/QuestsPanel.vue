@@ -56,17 +56,17 @@ const achievementRows = computed(() => [...new Set(ACHIEVEMENTS.map((item) => it
 </template>
 
 <style>
-.quest-rewards {display:flex;align-items:center;gap:14px}.quest-rewards > span {display:flex;align-items:center;gap:5px;color:#f4d08e;font-size:12px}
+.quest-rewards {display:flex;align-items:center;gap:14px}.quest-rewards > span {display:flex;align-items:center;gap:5px;color:#f4d08e;font-size:13px}
 .quest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
 .quest-card { display: grid; align-content: start; gap: 8px; padding: 14px; border: 1px solid #354762; border-radius: 13px; background: #111c2d; background-image:linear-gradient(#111c2daa,#111c2daa),url('/assets/ui/lounge-panel-painted-v1.webp');background-position:center;background-size:cover; }
 .quest-card h3 { margin: 0; font: 700 17px Georgia, serif; }
-.quest-card p { margin: 0; color: #aebdce; font-size: 12px; line-height: 1.45; }
-.quest-card > small:first-child { color: #9eafc1; font-size: 10px; font-weight: 800; letter-spacing: .1em; }
-.quest-card > b { color: #f4d08e; font-size: 12px; }
+.quest-card p { margin: 0; color: #aebdce; font-size: 13px; line-height: 1.45; }
+.quest-card > small:first-child { color: #9eafc1; font-size: 13px; font-weight: 800; letter-spacing: .1em; }
+.quest-card > b { color: #f4d08e; font-size: 13px; }
 .quest-card progress { width: 100%; accent-color: #e7b556; }
 .quest-art { display: block; width: 72px; height: 72px; object-fit: contain; border-radius: 50%; }
 .quest-tiers { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0; }
-.quest-tier { display:inline-flex;align-items:center;gap:3px; padding: 1px 8px; border-radius: 999px; border: 1px solid #4a5a72; font-size: 11px; opacity: .5; }
+.quest-tier { display:inline-flex;align-items:center;gap:3px; padding: 1px 8px; border-radius: 999px; border: 1px solid #4a5a72; font-size: 13px; opacity: .5; }
 .quest-tier.done { opacity: 1; font-weight: 700; }
 .quest-tier-1.done { border-color: #a8672f; color: #e9b27d; }
 .quest-tier-2.done { border-color: #b9c3d0; color: #e4ebf3; }

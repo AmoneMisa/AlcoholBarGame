@@ -12,10 +12,13 @@ const PreparationScreen = lazyPage(() => import('./components/cocktails/Preparat
 const BarScreenshot = lazyPage(() => import('./components/game/BarScreenshot.vue'));
 import BarScene from './components/game/BarScene.vue';
 import TopHud from './components/game/TopHud.vue';
-import GuideSheet from './components/knowledge/GuideSheet.vue';
+import { useGuide } from './composables/useGuide';
+const GuideSheet = lazyPage(() => import('./components/knowledge/GuideSheet.vue'));
+const { current: currentGuide } = useGuide();
 import UiIcon from './components/ui/UiIcon.vue';
 const CompanionsPanel = lazyPage(() => import('./components/workshop/CompanionsPanel.vue'));
 const WorkshopPage = lazyPage(() => import('./components/workshop/WorkshopPage.vue'));
+const EquipmentPanel = lazyPage(() => import('./components/workshop/EquipmentPanel.vue'));
 const ProfilePage = lazyPage(() => import('./components/profile/ProfilePage.vue'));
 const SettingsPage = lazyPage(() => import('./components/settings/SettingsPage.vue'));
 import NotificationToasts from './components/ui/NotificationToasts.vue';
@@ -39,6 +42,13 @@ const game = useGameStore();
 const notifications = useNotificationsStore();
 const view = ref('service');
 const screenshotOpen = ref(false);
+const equipmentOpen = ref(false);
+const mixingOpen = ref(false);
+function openMixingCounter() {
+  const order = game.customers.find(guest => guest.orderRevealed && guest.orderKind !== 'bottle' && guest.social?.phase !== 'enjoying' && !guest.pendingPayment);
+  if (order) game.openPreparation(order.id);
+  else mixingOpen.value = true;
+}
 const characterInfoOpen = ref(false);
 const characterInfoTab = ref('profile');
 const managementView = ref('inventory');
@@ -55,7 +65,7 @@ const nav = [
 const SECTIONS: Record<string, { id: string; label: string }[]> = {
   english: [{ id: 'learn', label: 'Learn' }, { id: 'recipes', label: 'Recipes' }, { id: 'advisor', label: 'Pairings' }],
   manage: [{ id: 'market', label: 'Market' }, { id: 'inventory', label: 'Inventory' }, { id: 'workshop', label: 'Workshop' }],
-  events: [{ id: 'today', label: 'Today' }, { id: 'pass', label: 'Season pass' }, { id: 'wheel', label: 'Daily wheel' }, { id: 'quests', label: 'Quests' }],
+  events: [{ id: 'today', label: 'Today' }, { id: 'pass', label: 'Season pass' }, { id: 'wheel', label: 'Daily wheel' }, { id: 'quests', label: 'Quests' }, { id: 'weekly', label: 'Weekly Leaderboard' }],
   bar: [{ id: 'regions', label: 'Bars' }, { id: 'design', label: 'Design' }],
   character: [{ id: 'profile', label: 'Profile' }, { id: 'look', label: 'Look' }]
 };
@@ -200,6 +210,10 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
     <main>
       <section v-show="view === 'service'" class="service-layout">
         <BarScene :active="view === 'service'" @screenshot="screenshotOpen = true" />
+        <nav class="bar-utilities" aria-label="Bar tools">
+          <UiButton size="sm" icon="stock" @click="equipmentOpen = true">Equipment</UiButton>
+          <UiButton size="sm" icon="glass" @click="openMixingCounter">Mix cocktails</UiButton>
+        </nav>
       </section>
       <SectionTabs v-if="sectionTabs.length" v-model="sub[view]" :tabs="sectionTabs" :label="view" />
       <BarChips v-if="view === 'bar'" />
@@ -213,7 +227,8 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
       <ManagementDeck v-if="managementOpened" v-show="!!deckView" :active-view="managementView" :design-section="designSection" />
     </main>
     <ConversationPopup v-if="game.conversationCustomerId" />
-    <PreparationScreen v-if="game.preparationCustomerId" />
+    <PreparationScreen v-if="game.preparationCustomerId || mixingOpen" :workbench="!game.preparationCustomerId" @close="mixingOpen = false" />
+    <ModalDialog v-if="equipmentOpen" title="Equipment" eyebrow="YOUR BAR" width="760px" @close="equipmentOpen = false"><EquipmentPanel /></ModalDialog>
     <BarScreenshot v-if="screenshotOpen" @close="screenshotOpen = false" />
     <ModalDialog v-if="characterInfoOpen" title="Your character" class="character-info-popup" @close="characterInfoOpen = false">
       <SectionTabs v-model="characterInfoTab" :tabs="[{id:'profile',label:'Character'},{id:'settings',label:'Settings'}]" label="Character information" />
@@ -221,7 +236,7 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
       <SettingsPage v-else @goto="selectView" />
       <UiButton class="change-appearance-button" v-if="characterInfoTab === 'profile'" @click="selectView('character'); sub.character = 'look'">Change appearance</UiButton>
     </ModalDialog>
-    <GuideSheet />
+    <GuideSheet v-if="currentGuide" />
     <NotificationToasts />
     <RewardPopup />
     <MailboxPopup v-if="game.mailboxOpen" />
@@ -240,3 +255,9 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
     </nav>
   </div>
 </template>
+
+<style>
+.bar-utilities { position:fixed;z-index:110;left:12px;bottom:calc(88px + var(--safe-bottom, 0px));display:flex;gap:6px; }
+.bar-utilities .ui-btn { min-height:34px;padding:6px 10px;background:#101b2deb; }
+@media(max-width:600px) { .bar-utilities { left:8px;bottom:calc(80px + var(--safe-bottom, 0px)); } }
+</style>

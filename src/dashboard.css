@@ -1,12 +1,12 @@
 /* What is left of the first dashboard layout: the profile card, the panel frame and the filter tabs of the pairing advisor. */
 .profile-card{background:linear-gradient(#1a2639,#121c2a);border:1px solid #3b4b65;border-radius:11px;display:flex;align-items:center;gap:9px;padding:6px 10px}
 .profile-card strong,.profile-card span{display:block}
-.profile-card span{font-size:11px;color:#ffd16b}
+.profile-card span{font-size:13px;color:#ffd16b}
 .panel{padding:0;border-radius:12px;background:linear-gradient(#142033,#101927);border-color:#34455e}
 .panel-title-row{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:9px 10px;border-bottom:1px solid #2b3b52}
 .panel-title-row h2{margin:0;font-size:14px}
-.panel-title-row span{font-size:10px;color:#abb7c8}
+.panel-title-row span{font-size:13px;color:#abb7c8}
 .filter-tabs{display:flex;gap:4px;padding:6px}
-.filter-tabs button{border:1px solid #384a63;background:#192638;color:#cbd4df;border-radius:6px;padding:5px 8px;font-size:9px}
+.filter-tabs button{border:1px solid #384a63;background:#192638;color:#cbd4df;border-radius:6px;padding:5px 8px;font-size:13px}
 .filter-tabs button.active{background:#e5b750;color:#23190a;border-color:#e5b750}
 .filter-tabs.wide button{flex:1}

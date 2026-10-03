@@ -28,14 +28,14 @@ const open = ref<string>();
 
 <style scoped>
 .pairing-principles { grid-column: 1 / -1; padding-top: 8px; border-top: 1px dashed #31435a; }
-.pairing-principles > small { display: block; color: #e4b75b; font-size: 7px; font-weight: 900; letter-spacing: .12em; }
+.pairing-principles > small { display: block; color: #e4b75b; font-size: 13px; font-weight: 900; letter-spacing: .12em; }
 .principle-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
-.principle-chips button { padding: 4px 9px; border: 1px solid #3c5a7a; border-radius: 999px; background: #132238; color: #a9d3ff; font-size: 10px; font-weight: 800; cursor: pointer; }
+.principle-chips button { padding: 4px 9px; border: 1px solid #3c5a7a; border-radius: 999px; background: #132238; color: #a9d3ff; font-size: 13px; font-weight: 800; cursor: pointer; }
 .principle-chips button[aria-expanded="true"] { border-color: #e4b75b; color: #ffd98a; }
-.principle-detail { margin-top: 7px; padding: 9px 10px; border-radius: 8px; background: #0f1a2b; color: #c8d1dc; font-size: 11px; line-height: 1.5; }
+.principle-detail { margin-top: 7px; padding: 9px 10px; border-radius: 8px; background: #0f1a2b; color: #c8d1dc; font-size: 13px; line-height: 1.5; }
 .principle-detail p { margin: 0 0 6px; }
 .principle-rule { color: #eef2f8; font-weight: 700; }
-.principle-example span, .principle-say span { display: block; color: #e4b75b; font-size: 8px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.principle-example span, .principle-say span { display: block; color: #e4b75b; font-size: 13px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
 .principle-say { color: #9fe6b2; font-style: italic; }
 .principle-say button { cursor: pointer; font-style: normal; }
 </style>

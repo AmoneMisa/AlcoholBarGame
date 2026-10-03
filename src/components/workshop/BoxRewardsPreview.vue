@@ -96,5 +96,5 @@ const rewards = computed(() => {
 .box-reward:focus-visible { outline:2px solid #ffe3a0;outline-offset:1px; }
 .box-reward :deep(.item-art) { width:85%;height:85%; }
 .box-reward :deep(.art-character) { height:94%; }
-.fragment-mark { position:absolute;left:3px;top:3px;padding:1px 3px;border-radius:3px;background:#111723de;color:#96dfe8;font:700 12px/1.2 system-ui; }
+.fragment-mark { position:absolute;left:3px;top:3px;padding:1px 3px;border-radius:3px;background:#111723de;color:#96dfe8;font:700 13px/1.2 system-ui; }
 </style>

@@ -1,0 +1,18 @@
+/* Utility surfaces have one frame; interior cards supply the remaining borders. */
+.character-info-popup .settings-page { border:0;background:transparent;box-shadow:none;padding:0; }
+.sealed-stock-section { border:0!important;background:transparent!important;box-shadow:none!important;padding:16px!important; }
+.sealed-stock-section > header { padding:0 0 12px!important;background:transparent!important;border:0!important; }
+.bottle-inventory-tools { padding:0;gap:12px; }
+.sealed-stock-grid { padding:0!important; }
+.type-row { display:grid;grid-template-columns:minmax(0,1fr);gap:12px; }
+.type-row .ui-btn { justify-self:end; }
+.service-decisions { display:flex;flex-wrap:wrap;justify-content:flex-start; }
+.service-decisions > div { flex:1 1 100%; }
+.service-decisions .ui-btn { width:auto!important;min-height:32px;padding:6px 12px; }
+.optional-sound-pack { display:grid;gap:12px;margin-bottom:16px; }
+.optional-sound-pack .ui-btn { justify-self:start; }
+.sound-pack-ready { margin:0 0 12px; }
+.counter-order-quest .ui-btn { margin-top:8px; }
+.reward-popup .reward-list-art { position:relative;align-self:center; }
+.reward-popup .reward-list-art .reward-art { width:100%;height:100%; }
+.reward-popup .reward-list-art .item-art { width:100%;height:100%; }

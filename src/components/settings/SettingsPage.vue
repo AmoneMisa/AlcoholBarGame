@@ -9,6 +9,9 @@ import { useGameStore } from '../../stores/game';
 import SoundControls from './SoundControls.vue';
 import ScreenshotOptions from './ScreenshotOptions.vue';
 import { NOTIFICATION_EVENTS, useNotificationsStore } from '../../stores/notifications';
+import { graphicsMode, liteGraphics, type GraphicsMode } from '../../ui/graphics';
+import OptionSelect from '../game/OptionSelect.vue';
+const graphicsOptions = [{ value: 'auto', label: 'Automatic' }, { value: 'lite', label: 'Lightweight' }, { value: 'full', label: 'Full effects' }];
 
 // Everything the player sets once and rarely touches again: sound, notifications, help and the version of the game.
 const notifications = useNotificationsStore();
@@ -25,7 +28,7 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
 </script>
 
 <template>
-  <div class="settings-page game-panel">
+  <div class="settings-page">
     <header class="settings-head"><small>SETTINGS</small><h2>Sound, notifications and help</h2></header>
 
     <form class="settings-card" @submit.prevent="redeem">
@@ -37,6 +40,12 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
       <div class="sound-rows">
         <SoundControls id-prefix="settings" />
       </div>
+    </section>
+
+    <section class="settings-card">
+      <h3>Graphics</h3>
+      <OptionSelect label="Visual effects" :model-value="graphicsMode" :options="graphicsOptions" @update:model-value="graphicsMode = $event as GraphicsMode" />
+      <p>{{ liteGraphics ? 'Lightweight effects are active.' : 'Full effects are active.' }} Lightweight mode reduces blur and decorative effects while keeping the painted artwork.</p>
     </section>
 
     <section class="settings-card notification-settings">
@@ -73,7 +82,7 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
 
 <style scoped>
 .settings-page { display: grid; gap: 14px; padding: 14px; }
-.settings-head small { color: #e4b35c; letter-spacing: .12em; font-weight: 800; font-size: 10px; }
+.settings-head small { color: #e4b35c; letter-spacing: .12em; font-weight: 800; font-size: 13px; }
 .settings-head h2 { margin: 2px 0 0; font: 700 24px Georgia, serif; color: #e9eef7; }
 .settings-card { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid #354762; border-radius: 14px; background: #111c2d; color: #e9eef7; }
 .settings-card h3 { margin: 0; font-size: 15px; }

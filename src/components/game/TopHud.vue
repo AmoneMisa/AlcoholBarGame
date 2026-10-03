@@ -87,7 +87,6 @@ onUnmounted(() => {
     <div class="hud-secondary"><button class="hud-bar-info" type="button" data-guide="rules-button" aria-label="Bar info" :aria-expanded="perksOpen" @click="perksOpen = true">Bar info</button><button class="hud-mail" type="button" :aria-label="`Post Box · ${game.unreadMail} unread or pending`" @click="game.openMailbox()"><UiIcon name="mail" />Post Box<span v-if="game.unreadMail" class="mail-badge">{{ game.unreadMail }}</span></button></div>
     <ModalDialog v-if="perksOpen" eyebrow="YOUR BAR" :title="`Bar info · ${game.region.name}`" @close="perksOpen = false">
       <CityEvent />
-      <p class="rules-note">Tip jar: {{ game.tipJar.toFixed(0) }} / {{ game.tipJarCapacity }} coins. Tap the jar to collect manually. Accumulation pauses after 12 hours or when full. Visitors can take up to 5%; at least 30% stays protected. One attempt per player per day, 10 attempts total.</p>
       <p class="rules-note">Explain these rules politely to guests. Inspectors count every rule you break{{ game.ruleViolations ? ` (so far: ${game.ruleViolations})` : '' }}.</p>
       <article v-for="rule in game.houseRules" :key="rule.id" class="rule-row"><span class="rule-icon"><Glyph :g="rule.icon" /></span><span><b>{{ rule.title }}</b><small>{{ rule.text }}</small></span></article>
     </ModalDialog>
@@ -102,23 +101,23 @@ onUnmounted(() => {
 .hud-avatar { position:relative; flex:none; width:36px; height:36px; border-radius:50%; border:1px solid #b58b47; overflow:hidden; background:#24344a; padding:0; cursor:pointer; }
 .hud-avatar :deep(.art-character) { position:absolute; width:64px; height:112px; top:0; left:50%; translate:-50% 0; transform:none; animation:none; }
 .venue-name { display:flex; align-items:center; gap:6px; min-width:0; color:#f3e6c7; padding:0; }
-.venue-name em { flex:none; font:700 12px system-ui; color:#dbb35e; }
+.venue-name em { flex:none; font:700 13px system-ui; color:#dbb35e; }
 .venue-name b { font-size:13px; overflow-wrap:anywhere; line-height:1.2; }
 .hud-resources { display:flex; align-items:center; gap:10px; flex:none; padding:0; }
 .hud-resources > div { padding:0; border:0; background:none; gap:3px; min-width:0; }
-.hud-resources b { font:700 12px system-ui; font-variant-numeric:tabular-nums; }
+.hud-resources b { font:700 13px system-ui; font-variant-numeric:tabular-nums; }
 .hud-resources :deep(.ui-icon) { width:16px; height:16px; }
 .exchange-open { gap:3px; padding:0; }
-.hud-bar-info { grid-column:1; grid-row:2; justify-self:start; display:flex; align-items:center; justify-content:center; height:24px; padding:0 9px; border:1px solid #b59a5c40; border-radius:7px; background:#ffffff06; color:#e6c78c; font:600 12px system-ui; white-space:nowrap; cursor:pointer; }
+.hud-bar-info { grid-column:1; grid-row:2; justify-self:start; display:flex; align-items:center; justify-content:center; height:24px; padding:0 9px; border:1px solid #b59a5c40; border-radius:7px; background:#ffffff06; color:#e6c78c; font:600 13px system-ui; white-space:nowrap; cursor:pointer; }
 .hud-bar-info:hover { background:#ffffff0d; }
 .hud-secondary{grid-column:1;grid-row:2;display:flex;align-items:center;gap:6px;min-width:0;}
-.hud-mail{height:24px;display:flex;align-items:center;gap:4px;padding:0 7px;border:1px solid #b59a5c40;border-radius:7px;background:#ffffff06;color:#e6c78c;font:600 12px system-ui;cursor:pointer;}
+.hud-mail{height:24px;display:flex;align-items:center;gap:4px;padding:0 7px;border:1px solid #b59a5c40;border-radius:7px;background:#ffffff06;color:#e6c78c;font:600 13px system-ui;cursor:pointer;}
 .hud-mail :deep(.ui-icon){width:14px;height:14px;}
-.hud-mail .mail-badge{min-width:14px;line-height:14px;padding:0 3px;border-radius:8px;background:#ad403b;color:white;font-size:10px;}
+.hud-mail .mail-badge{min-width:14px;line-height:14px;padding:0 3px;border-radius:8px;background:#ad403b;color:white;font-size:13px;}
 .hud-bar-info:focus-visible { outline:2px solid #f3d38b; outline-offset:2px; }
 .hud-events,.daily-hud-gift,.staff-open { display:grid; place-items:center; flex:none; width:30px; height:30px; padding:0; border:1px solid #594b39; border-radius:10px; background:#1c2634; color:#e9c577; }
 .daily-hud-gift.ready { border-color:#e8b457; }
-@media(max-width:600px) { .top-hud { flex-wrap:wrap; column-gap:6px; padding:5px 8px; } .venue-card { flex:1; min-width:130px; } .hud-resources { gap:7px; } .venue-name b { font-size:12px; } }
+@media(max-width:600px) { .top-hud { flex-wrap:wrap; column-gap:6px; padding:5px 8px; } .venue-card { flex:1; min-width:130px; } .hud-resources { gap:7px; } .venue-name b { font-size:13px; } }
 @media(max-width:380px) { .hud-resources { order:3; width:100%; justify-content:flex-end; } }
 </style>
 
