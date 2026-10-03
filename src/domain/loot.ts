@@ -1,6 +1,6 @@
 import { BOX_STYLE_CHANCE } from '../data/cosmetics/styleSources';
 
-// Pure tables for the loot layer: equipment, consumables, boxes, the style draw and prestige.
+// Pure tables for the loot layer: equipment, consumables, boxes, and the style draw.
 // Nothing here touches state; sim/loot.ts applies these rules on the server.
 
 // ---- Bar equipment ----
@@ -78,6 +78,10 @@ export type Reward =
   | { kind: 'skinShards'; amount: number }
   | { kind: 'stylePieces'; amount: number }   // style shards
   | { kind: 'xp'; amount: number }
+  | { kind: 'box'; box: Exclude<BoxKind, 'choice'> }
+  | { kind: 'companionShards'; amount: number }   // shards of one Circle person who has not joined yet
+  | { kind: 'prestige'; amount: number }   // bar prestige (popularity)
+  | { kind: 'supplies'; size: 'small' | 'medium' | 'large' }   // stock of every ingredient the player's recipes use
   | { kind: 'style' }   // a whole painted style that only boxes give, picked at random from those you do not own
   | { kind: 'itemShards'; id: EquipmentId; amount: number }
   | { kind: 'consumable'; id: ConsumableId; amount: number }
@@ -86,7 +90,7 @@ export type Reward =
   | { kind: 'eventInterior' };   // a special-event background, picked at random from those you do not own
 
 interface Entry { weight: number; make: (level: number, random: () => number) => Reward; }
-const between = (random: () => number, min: number, max: number) => min + Math.floor(random() * (max - min + 1));
+export const between = (random: () => number, min: number, max: number) => min + Math.floor(random() * (max - min + 1));
 const pick = <T,>(items: readonly T[], random: () => number) => items[Math.min(items.length - 1, Math.floor(random() * items.length))]!;
 const consumable = (ids: ConsumableId[], amount = 1): Entry['make'] => (_l, random) => ({ kind: 'consumable', id: pick(ids, random), amount });
 const shards = (min: number, max: number): Entry['make'] => (_l, random) => ({ kind: 'itemShards', id: pick(EQUIPMENT, random).id, amount: between(random, min, max) });
@@ -135,23 +139,28 @@ const LOW_CHANCE: Record<Exclude<BoxKind, 'choice'>, Chance[]> = {
   bronze: [
     [22, shardsOf(1)], [6, shardsOf(2)], [1.5, shardsOf(5)], [.4, shardsOf(10)], [.1, shardsOf(25)],
     [BOX_STYLE_CHANCE * 100, () => ({ kind: 'style' })],
+    [6, () => ({ kind: 'companionShards', amount: 1 })],
     [3, (_l, r) => ({ kind: 'xp', amount: between(r, 30, 60) })]
   ],
   silver: [
     [22, shardsOf(1)], [8, shardsOf(2)], [3, shardsOf(5)], [1, shardsOf(10)], [.3, shardsOf(25)],
     [BOX_STYLE_CHANCE * 100, () => ({ kind: 'style' })],
+    [8, (_l, r) => ({ kind: 'companionShards', amount: between(r, 1, 2) })],
     [4, (_l, r) => ({ kind: 'xp', amount: between(r, 100, 200) })],
     [1.5, (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 400, 700) * (1 + l / 25)) })],
     [3, anyBooster(2)],
     [3, shards(10, 18)],
+    [.3, () => ({ kind: 'prestige', amount: 1 })]
   ],
   gold: [
     [22, shardsOf(1)], [12, shardsOf(2)], [6, shardsOf(5)], [2.5, shardsOf(10)], [.8, shardsOf(25)],
     [BOX_STYLE_CHANCE * 100, () => ({ kind: 'style' })],
+    [10, (_l, r) => ({ kind: 'companionShards', amount: between(r, 2, 3) })],
     [5, (_l, r) => ({ kind: 'xp', amount: between(r, 300, 600) })],
     [3, (l, r) => ({ kind: 'coins', amount: Math.round(between(r, 800, 1500) * (1 + l / 25)) })],
     [5, anyBooster(3)],
     [5, shards(20, 30)],
+    [1.5, () => ({ kind: 'prestige', amount: 1 })]
   ]
 };
 for (const kind of Object.keys(LOW_CHANCE) as (keyof typeof LOW_CHANCE)[]) {
@@ -186,14 +195,18 @@ export function describeReward(reward: Reward, names: { consumable: (id: string)
     case 'crystals': return `${reward.amount} crystals`;
     case 'parts': return `${reward.amount} workshop parts`;
     case 'skinShards': return `${reward.amount} skin shards`;
-    case 'stylePieces': return `${reward.amount} style shard${reward.amount === 1 ? '' : 's'}`;
+    case 'stylePieces': return `${reward.amount} style shard${reward.amount === 1 ? '' : 's'} of a random style`;
     case 'xp': return `${reward.amount} XP`;
+    case 'box': return `a ${reward.box} box`;
+    case 'companionShards': return `${reward.amount} Circle shard${reward.amount === 1 ? '' : 's'}`;
+    case 'prestige': return `${reward.amount} bar prestige`;
+    case 'supplies': return `a ${reward.size} pack of supplies`;
     case 'style': return 'a full bartender style'; 
     case 'itemShards': return `${reward.amount} ${names.equipment(reward.id)} shards`;
     case 'consumable': return `${reward.amount} × ${names.consumable(reward.id)}`;
     case 'recipeCard': return 'a recipe card';
     case 'mysteryBottle': return 'a mystery bottle';
-    case 'eventInterior': return 'a special event background with its matching style';
+    case 'eventInterior': return 'a special background with its matching style';
   }
 }
 

@@ -24,13 +24,15 @@ import { negotiatedQuote } from '../sim/trade';
 import type { Customer, InventoryItem, RegionId, SupplierOffer } from '../domain/types';
 import { pourableBrand } from '../domain/brandServe';
 import { formatCountdown } from '../domain/customerTiming';
+import { spinsLeft } from '../domain/roulette';
+import { passEndsOf, passIdOf, passLevel, passPointsFor, passThemeOf, readyPassRewards } from '../domain/pass';
 import { checkText } from '../domain/english/checker';
 import { advanceClock, applyAction, previewTopUp, RuleError, type GameAction } from '../sim/rules';
 import { createInitialState, levelFor, normalizePlayerState, type PlayerState } from '../sim/state';
 import { playSfx } from '../audio/index';
 import { answerFriendRequest, claimFriendGifts, connectSession, createStarInvoice, fetchFriends, removeFriendLink, requestFriend, saveFriendLabel, sendAction, sendFriendGift, visitFriendBar, type FriendBar, type FriendSummary } from '../telegram/api';
 import { rewardLines, snapshot as stateSnapshot, type RewardLine, type RewardReport, type Snapshot } from '../domain/rewards';
-import type { GiftRequest } from '../sim/gifts';
+import { giftableInteriors, giftableStyles, type GiftRequest } from '../sim/gifts';
 import { currentStage, fill as fillSituationText, guestLine, visibleChoices } from '../sim/situations';
 
 // The client side of a server-authoritative game.
@@ -155,8 +157,26 @@ export const useGameStore = defineStore('game', () => {
   const vipCooldownUntil = computed(() => state.value.vipCooldownUntil);
   const ownedCosmeticIds = computed(() => state.value.ownedCosmeticIds ?? []);
   const cosmeticCopies = computed(() => state.value.cosmeticCopies ?? {});
-  const cosmeticRouletteAvailable = computed(() => state.value.cosmeticRouletteKey !== today.value);
-  const cosmeticRouletteResult = computed(() => state.value.cosmeticRouletteResult);
+  // What can be given away because it only comes from boxes: moves to the friend and leaves this player.
+  const giftableStyleItems = computed(() => giftableStyles(state.value));
+  const giftableBackgrounds = computed(() => giftableInteriors(state.value));
+  const rouletteSpinsLeft = computed(() => spinsLeft(state.value.roulette, today.value));
+  const rouletteLast = computed(() => state.value.roulette.last);
+  // The season pass: shown from the loot counters; a pass that has not been started by an action yet counts from zero.
+  // The pass clock is the player's own: it began when the game first saw them (until then it starts now).
+  const passEpoch = computed(() => state.value.pass.epoch || nowMs.value);
+  const passNow = computed(() => passIdOf(passEpoch.value, nowMs.value));
+  const passCurrent = computed(() => state.value.pass.id === passNow.value);
+  const passEarned = computed(() => passPointsFor(state.value.loot.stats, passCurrent.value ? state.value.pass.base : state.value.loot.stats));
+  const passPoints = computed(() => passEarned.value + (passCurrent.value ? state.value.pass.bonus ?? 0 : 0));
+  const passLevelNow = computed(() => passLevel(passPoints.value));
+  const passBase = computed(() => state.value.pass.base);
+  const passPremium = computed(() => passCurrent.value && state.value.pass.premium);
+  const passClaimed = computed(() => (passCurrent.value ? state.value.pass.claimed : []));
+  const passReady = computed(() => readyPassRewards(passLevelNow.value, passPremium.value, passClaimed.value));
+  const passTheme = computed(() => passThemeOf(passEpoch.value, nowMs.value));
+  const passEnds = computed(() => passEndsOf(passEpoch.value, nowMs.value));
+  const cosmeticRouletteAvailable = computed(() => rouletteSpinsLeft.value > 0);
   const loot = computed(() => state.value.loot);
   const availableEvents = computed(() => eventAvailability(state.value, nowMs.value));
   // Progress of an achievement counter (counted ones and ones read from what the player owns).
@@ -219,7 +239,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: mode.value !== 'online' });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['collectTips', 'serveFood', 'say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson', 'spinCosmeticRoulette', 'giveAshtray', 'cleanAshtrays', 'pitchStart', 'pitchAsk', 'pitchCancel', 'hireStaff', 'upgradeStaff', 'giveWater', 'callTaxi', 'askToLeave', 'situationChoice', 'reportIssue', 'discardStock', 'openBox', 'pickReward', 'drawStyle', 'claimLeaderboardReward']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['collectTips', 'serveFood', 'say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson', 'spinRoulette', 'claimPass', 'buyPassPremium', 'buyPassLevels', 'discardLoot', 'giveAshtray', 'cleanAshtrays', 'pitchStart', 'pitchAsk', 'pitchCancel', 'hireStaff', 'upgradeStaff', 'giveWater', 'callTaxi', 'askToLeave', 'situationChoice', 'reportIssue', 'discardStock', 'openBox', 'pickReward', 'drawStyle', 'claimLeaderboardReward']);
 
   function saveOffline() {
     if (mode.value === 'online') return;
@@ -236,9 +256,10 @@ export const useGameStore = defineStore('game', () => {
   // The popup that tells the player what an action paid. Only actions that can give something are reported.
   const REWARD_TITLES: Partial<Record<GameAction['type'], string>> = {
     serve: 'Drink served', autoServe: 'Drink served', sellBottle: 'Bottle sold', collectTips: 'Tips collected', serveFood: 'Food served', claimDaily: 'Daily reward', completeDailyLesson: 'Lesson complete',
-    spinCosmeticRoulette: 'Style draw', sell: 'Stock sold', exchangeCrystals: 'Crystals exchanged', situationChoice: 'Guest situation resolved',
+    spinRoulette: 'Daily wheel', sell: 'Stock sold', exchangeCrystals: 'Crystals exchanged', situationChoice: 'Guest situation resolved',
     openBox: 'Chest opened', pickReward: 'Chest reward', drawStyle: 'Style draw', claimSpark: 'Season reward', craftSkin: 'New style', craftStyle: 'New style',
-    claimQuest: 'Quest complete', claimAchievement: 'Achievement unlocked', claimLeaderboardReward: 'Weekly reward', recruitCompanion: 'Welcome to your Circle', buyInterior: 'New background', buyStyle: 'New style'
+    claimQuest: 'Quest complete', claimAchievement: 'Achievement unlocked', claimLeaderboardReward: 'Weekly reward', recruitCompanion: 'Welcome to your Circle', buyInterior: 'New background', buyStyle: 'New style',
+    claimPass: 'Season pass reward', buyPassLevels: 'Pass levels bought', discardLoot: 'Thrown away'
   };
   function showRewards(title: string, lines: RewardLine[]) {
     if (lines.length) rewardReport.value = { id: ++reportId, title, lines, celebration: !['Drink served', 'Bottle sold', 'Stock sold', 'Crystals exchanged', 'Guest situation resolved', 'Tips collected', 'Food served'].includes(title) };
@@ -684,7 +705,10 @@ export const useGameStore = defineStore('game', () => {
       buyingCrystals.value = false;
     }
   }
-  const spinCosmeticRoulette = () => dispatch({ type:'spinCosmeticRoulette' });
+  const spinRoulette = () => dispatch({ type:'spinRoulette' });
+  const claimPass = (track: 'free' | 'premium', level: number) => dispatch({ type:'claimPass', track, level });
+  const buyPassPremium = () => dispatch({ type:'buyPassPremium' });
+  const buyPassLevels = (count: number) => dispatch({ type:'buyPassLevels', count });
   const activatePopularityBoost = (boost:'no-cooldown'|'vip-run') => dispatch({ type:'activatePopularityBoost', boost });
   const popularity = computed(() => state.value.popularity ?? 0);
   const popularityBoost = computed(() => state.value.popularityBoost);
@@ -718,7 +742,7 @@ export const useGameStore = defineStore('game', () => {
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, sessionReady, ownedInteriorIds, barBackground, barInteriorStyle,
-    cosmetics:COSMETICS, ownedCosmeticIds, cosmeticCopies, cosmeticRouletteAvailable, cosmeticRouletteResult, cosmeticGiftLog, canUseCosmetic, spinCosmeticRoulette, popularity, popularityBoost, activatePopularityBoost,
+    cosmetics:COSMETICS, ownedCosmeticIds, cosmeticCopies, cosmeticRouletteAvailable, passReady, passEarned, passCurrent, passBase, buyPassLevels, giftableStyleItems, giftableBackgrounds, rouletteSpinsLeft, rouletteLast, passPoints, passLevelNow, passPremium, passClaimed, passTheme, passEnds, claimPass, buyPassPremium, cosmeticGiftLog, canUseCosmetic, spinRoulette, popularity, popularityBoost, activatePopularityBoost,
     inventories, inventory, bottleInventories, bottleInventory, currentMix, shaken, customers, activeCustomerId, customer, hasCustomer, recipe, mixJudge,
     knownRecipeIds, recipeUnlockSources, knownRecipes, lockedRecipes, dailyGiftAvailable, dailyGiftResult, loginStreak, upcomingLoginDay, dailyCoinReward, dailyCrystalReward,
     dailyLessons, dailyLessonCompletedIds, dailyLessonsComplete, dailyLessonResult, learningStreak, learningStreakForToday, learningBonusPercent, completeDailyLesson,

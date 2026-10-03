@@ -4,11 +4,11 @@ import UiInput from '../ui/UiInput.vue';
 import PanelHeading from '../ui/PanelHeading.vue';
 import { computed, nextTick, onMounted, ref } from 'vue';
 import { RECIPES } from '../../domain/catalog';
-import { INTERIORS } from '../../data/cosmetics/bars';
 import { CONSUMABLES } from '../../domain/loot';
-import { SHARD_GIFT_AMOUNTS } from '../../sim/gifts';
+import { COSMETICS } from '../../domain/cosmetics';
+import { SHARD_GIFT_AMOUNTS, STYLE_SHARD_GIFT_AMOUNTS } from '../../sim/gifts';
 import { useGameStore } from '../../stores/game';
-import CharacterModel from '../characters/CharacterModel.vue';
+import BarShowcase from '../profile/BarShowcase.vue';
 import ProfileCard from '../profile/ProfileCard.vue';
 import UiIcon from '../ui/UiIcon.vue';
 
@@ -27,9 +27,11 @@ const recipeCards = computed(() => RECIPES.map((recipe) => ({ recipe, quantity: 
 const styleItems = computed(() => game.cosmetics.map((cosmetic) => ({ cosmetic, quantity: game.cosmeticCopies[cosmetic.id] ?? 0 })).filter((item) => item.quantity > 0));
 const itemGifts = computed(() => CONSUMABLES.map((item) => ({ id: item.id, name: item.name, quantity: game.loot.consumables[item.id] ?? 0 })).filter((item) => item.quantity > 0));
 const shardGifts = SHARD_GIFT_AMOUNTS;
+const styleShardGifts = STYLE_SHARD_GIFT_AMOUNTS;
+// Style shards are kept per style: one entry for each pile the player has.
+const shardPiles = computed(() => Object.entries(game.loot.styleShards).map(([id, quantity]) => ({ id, quantity, label: COSMETICS.find((item) => item.id === id)?.label ?? id })).filter((item) => item.quantity > 0));
 const visit = computed(() => game.visitedFriend);
 const visitBar = computed(() => visit.value?.bar as Record<string, string> | undefined);
-const visitBackground = computed(() => INTERIORS.find((item) => item.id === visitBar.value?.interior)?.asset ?? INTERIORS[0]!.asset);
 const friendName = (friend: { nickname: string; customName: string }) => friend.customName || friend.nickname;
 
 const appLink = () => {
@@ -137,10 +139,7 @@ onMounted(() => { void game.loadFriends(); });
           <UiButton variant="danger" @click="remove(visit.code, visit.customName || visit.nickname)">Remove from friends</UiButton>
         </template>
       </ProfileCard>
-      <div class="visit-scene" :style="{ backgroundImage: `url('${visitBackground}')` }">
-        <CharacterModel role="bartender" :character-id="visitBar?.bartenderCharacter ?? 'noa'" :outfit="visitBar?.bartender" :hair-style="visitBar?.hairStyle" :hair-color="visitBar?.hairColor" :body-shape="visitBar?.bodyShape" :skin-detail="visitBar?.skinDetail" :skin-tone="visitBar?.skinTone" :pose="visitBar?.pose" :eye-shape="visitBar?.eyeShape" :brow-shape="visitBar?.browShape" :nose-shape="visitBar?.noseShape" :lip-shape="visitBar?.lipShape" :cheek-shape="visitBar?.cheekShape" :eye-color="visitBar?.eyeColor" :eyeliner="visitBar?.eyeliner" :eyeshadow="visitBar?.eyeshadow" :lip-color="visitBar?.lipColor" :blush="visitBar?.blush" :facial-hair="visitBar?.facialHair" :outfit-color="visitBar?.outfitColor" animation="idle" />
-        <span class="ribbon">{{ visitBar?.name || visit.name }}</span>
-      </div>
+      <BarShowcase :bar="visitBar" :name="visit.name" />
       <ul class="visit-stats">
         <li><UiIcon name="star" />Level {{ visit.level }}</li>
         <li><UiIcon name="trophy" />{{ visit.prestige }} prestige</li>
@@ -149,11 +148,14 @@ onMounted(() => { void game.loadFriends(); });
       </ul>
       <p v-if="visit.mastered.length" class="mastered">Mastered: {{ visit.mastered.map((item) => `${item.name} (lv ${item.level})`).join(' · ') }}</p>
       <div ref="giftsPanel" class="gifts">
-        <header><UiIcon name="gift" /><div><small>GIFT FROM YOUR INVENTORY</small><p>Only spare copies can be given away — you keep everything else. Workshop items: up to 5 gifts a day.</p></div></header>
+        <header><UiIcon name="gift" /><div><small>GIFT FROM YOUR INVENTORY</small><p>Spare copies can be given away, and so can things that only come from boxes (style shards, whole styles, event backgrounds): they leave you and go to your friend, and only if you have them and are not using them. Workshop gifts: up to 5 a day.</p></div></header>
         <article v-for="item in recipeCards" :key="item.recipe.id"><span><b>{{ item.recipe.name }}</b><small>Recipe card · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'recipe-copy', recipeId: item.recipe.id })">Give</UiButton></article>
         <article v-for="item in styleItems" :key="item.cosmetic.id"><span><b>{{ item.cosmetic.label }}</b><small>Style · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'cosmetic-copy', cosmeticId: item.cosmetic.id })">Give</UiButton></article>
         <article v-for="item in itemGifts" :key="item.id"><span><b>{{ item.name }}</b><small>Workshop item · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'consumable', id: item.id })">Give</UiButton></article>
         <article v-for="amount in shardGifts" :key="amount"><span><b>{{ amount }} skin shards</b><small>You have {{ game.loot.skinShards }}</small></span><UiButton variant="solid" size="sm" :disabled="game.loot.skinShards < amount" @click="gift({ kind: 'skin-shards', amount })">Give</UiButton></article>
+        <article v-for="pile in shardPiles" :key="`style-${pile.id}`"><span><b>{{ pile.label }} shards</b><small>You give them away and lose them · you have {{ pile.quantity }}</small></span><span class="gift-amounts"><UiButton v-for="amount in styleShardGifts" :key="amount" variant="solid" size="sm" :disabled="pile.quantity < amount" @click="gift({ kind: 'style-shards', cosmeticId: pile.id, amount })">Give {{ amount }}</UiButton></span></article>
+        <article v-for="item in game.giftableStyleItems" :key="item.id"><span><b>{{ item.label }}</b><small>Whole style · you lose it · not worn in any bar</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'style-transfer', cosmeticId: item.id })">Give</UiButton></article>
+        <article v-for="item in game.giftableBackgrounds" :key="item.id"><span><b>{{ item.name }}</b><small>Background with its style · you lose both · not used by any bar</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'interior-transfer', interiorId: item.id })">Give</UiButton></article>
         <p v-if="!recipeCards.length && !styleItems.length && !itemGifts.length" class="empty">You have no spare cards or styles yet. Duplicates from VIP guests, lessons and the daily style draw show up here.</p>
       </div>
     </section>
@@ -162,6 +164,7 @@ onMounted(() => { void game.loadFriends(); });
 </template>
 
 <style scoped>
+.gift-amounts { display: flex; flex-wrap: wrap; gap: 6px; }
 .friends-page { display: grid; gap: 12px; padding-bottom: 14px; overflow: hidden; }
 .friends-page > .panel-heading { margin: 0; }
 .friends-page > * { margin-inline: 12px; }
@@ -205,9 +208,6 @@ form.card { display: grid; align-content: start; gap: 8px; }
 .empty { display: flex; align-items: center; gap: 10px; padding: 10px 0; color: #9eafc1; font-size: 13px; }
 .empty .ui-icon { width: 28px; height: 28px; flex: none; color: #71849b; }
 .visit { display: grid; gap: 10px; border-color: #d2a24e; }
-.visit-scene { position: relative; height: clamp(220px, 46vw, 340px); overflow: hidden; border: 1px solid #4a5c75; border-radius: 12px; background-position: center; background-size: cover; }
-.visit-scene :deep(.art-character) { position: absolute; right: 6%; bottom: -4%; width: auto; height: 96%; aspect-ratio: .572; }
-.ribbon { position: absolute; left: 10px; bottom: 10px; max-width: calc(100% - 20px); padding: 5px 10px; border: 1px solid #d8a34e; border-radius: 6px; background: #1c1420e8; color: #ffe2a8; font: 700 13px Georgia, serif; }
 .visit-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
 .visit-stats li { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 9px; background: #0d1829; color: #f4d08e; font-size: 13px; font-weight: 700; }
 .visit-stats .ui-icon { width: 18px; height: 18px; color: #f2bd58; }

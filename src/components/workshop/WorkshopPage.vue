@@ -6,17 +6,17 @@ import InventoryPanel from './InventoryPanel.vue';
 import UiCheckbox from '../ui/UiCheckbox.vue';
 import UiInput from '../ui/UiInput.vue';
 import { computed, ref, watch } from 'vue';
-import { fetchLeaderboard, type LeaderboardResult } from '../../telegram/api';
-import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE } from '../../domain/leaderboard';
+import { fetchLeaderboard, viewBoardBar, type BoardBar, type LeaderboardResult } from '../../telegram/api';
+import BoardBarView from '../profile/BoardBarView.vue';
+import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE, leaderboardReward, describeLeaderboardReward } from '../../domain/leaderboard';
 import { RECIPES } from '../../domain/catalog';
 import { COSMETICS, DRAWABLE_COSMETICS } from '../../domain/cosmetics';
 import { shardStyles } from '../../sim/loot';
 import { ACHIEVEMENT_STYLES, BOX_STYLE_CHANCE, STYLE_PIECES_TO_CRAFT } from '../../data/cosmetics/styleSources';
 import {
-  BOXES, CONSUMABLES, DRAW_COST, DRAW_ODDS, DUPLICATE_SHARDS, EQUIPMENT, LEGENDARY_PITY, SHARD_CRAFT_COST, TIER_SHARD_COST,
+  BOXES, CONSUMABLES, DRAW_COST, DRAW_ODDS, DUPLICATE_SHARDS, EQUIPMENT, LEGENDARY_PITY, TIER_SHARD_COST,
   consumableDef, describeReward, equipmentDef, levelCap, upgradeCostFor
 } from '../../domain/loot';
-import { ACHIEVEMENTS, questsForWeek, weekOf, type StatId } from '../../domain/quests';
 import { INGREDIENTS } from '../../domain/catalog';
 import { FAME_PRICE_BONUS, FAME_STEPS, MAX_ITEMS, SIGNATURE_FEE, SIGNATURE_GUEST_CHANCE, SIGNATURE_LEVEL, fameLevel, nextFameStep, scoreSignature, validateSignature } from '../../domain/signature';
 import { usableIngredientIds } from '../../domain/usableStock';
@@ -58,30 +58,19 @@ function tierReason(id: string) {
 const boxCount = (id: string) => game.loot.boxes[id] ?? 0;
 const knownRecipes = computed(() => RECIPES.filter((recipe) => game.knownRecipeIds.includes(recipe.id)));
 const featured = computed(() => featuredLegendary(Date.now()));
-// The pair of styles an achievement gives (one per bartender), with the matching backgrounds that come along.
-const achievementStyles = (goalId: string) => {
-  const pair = ACHIEVEMENT_STYLES[goalId];
-  return pair ? Object.entries(pair).map(([character, value]) => COSMETICS.find((item) => item.id === `bartender:${value}:${character}`)?.label).filter(Boolean).join(' · ') : '';
-};
-// Style shards craft the box styles and the styles of ordinary backgrounds (the matching background comes with it).
-const pieceCharacter = ref<'noa' | 'leo'>(game.decor.bartenderCharacter === 'leo' ? 'leo' : 'noa');
-const craftableStyles = computed(() => shardStyles().filter((item) => item.character === pieceCharacter.value && !game.ownedCosmeticIds.includes(item.id)));
-const lockedSkins = computed(() => DRAWABLE_COSMETICS.filter((item) => !game.ownedCosmeticIds.includes(item.id)));
-const week = computed(() => weekOf(Date.now()));
-const quests = computed(() => questsForWeek(week.value).map((quest) => {
-  const current = game.loot.quests.week === week.value;
-  return { quest, progress: current ? game.loot.quests.progress[quest.stat] ?? 0 : 0, claimed: current && game.loot.quests.claimed.includes(quest.id) };
-}));
 // The words under a blocked button when the player cannot afford something.
 const needMore = (what: string, need: number, have: number) => have < need ? `Not enough ${what}: you need ${need}, you have ${Math.floor(have)}.` : '';
-const stat = (id: string) => game.achievementStat(id as StatId);
-// One card per achievement series: the next tier to claim, and the four tiers as pips.
-const achievementRows = computed(() => [...new Set(ACHIEVEMENTS.map((item) => item.series))].map((series) => {
-  const tiers = ACHIEVEMENTS.filter((item) => item.series === series).map((item) => ({ ...item, done: game.loot.achievements.includes(item.id) }));
-  const next = tiers.find((item) => !item.done);
-  return { series, seriesName: tiers[0]!.seriesName, tiers, goal: next ?? tiers[tiers.length - 1]!, finished: !next };
-}));
-const cosmeticKind = (key: string) => key.replace(/([A-Z])/g, ' $1').toLowerCase();
+// A look at the bar of someone on the board (read-only).
+const viewing = ref<BoardBar>();
+const viewError = ref('');
+async function viewRow(row: { rank: number; score: number }) {
+  if (!board.value) return;
+  viewError.value = '';
+  try {
+    const result = await viewBoardBar(boardScope.value, row.rank, board.value.week, row.score);
+    if (result.ok) viewing.value = result; else viewError.value = result.error ?? 'This bar is not available.';
+  } catch (error) { viewError.value = (error as Error).message; }
+}
 const started = computed(() => [
   { label: 'Open your welcome box in the Boxes tab', done: (game.loot.stats.boxes ?? 0) >= 1 },
   { label: 'Upgrade a piece of equipment', done: (game.loot.stats.upgrades ?? 0) >= 1 },
@@ -159,7 +148,7 @@ const boostLeft = (id: string) => {
       <dl>
         <div><dt>Parts</dt><dd>{{ game.loot.parts }}</dd></div>
         <div><dt>Skin shards</dt><dd>{{ game.loot.skinShards }}</dd></div>
-        <div><dt>Style shards</dt><dd>{{ game.loot.stylePieces }}</dd></div>
+        <div><dt>Style shards</dt><dd>{{ Object.values(game.loot.styleShards).reduce((sum, n) => sum + n, 0) }}</dd></div>
         <div><dt>Crystals</dt><dd>{{ game.crystals }}</dd></div>
       </dl>
     </header>
@@ -239,51 +228,9 @@ const boostLeft = (id: string) => {
         </div>
         <ul v-if="game.loot.lastDraw.length" class="results"><li v-for="(result, index) in game.loot.lastDraw" :key="index" :class="result.rarity">{{ result.label }}<small v-if="result.duplicate"> · duplicate +{{ result.shards }} shards</small></li></ul>
       </article>
-      <article class="card">
-        <h3>🧵 Craft a full style</h3>
-        <p>Boxes drop style shards (1 shard in 22% of boxes, bigger piles of 2, 5, 10 and 25 are rarer), and every box has a {{ BOX_STYLE_CHANCE * 100 }}% chance to hold a whole style. {{ STYLE_PIECES_TO_CRAFT }} pieces craft one style of your choice, including the style of an ordinary background (you get the background too). You have {{ game.loot.stylePieces }}.</p>
-        <div class="crafts">
-          <UiButton type="button" :class="{ active: pieceCharacter === 'noa' }" @click="pieceCharacter = 'noa'">Noa</UiButton>
-          <UiButton type="button" :class="{ active: pieceCharacter === 'leo' }" @click="pieceCharacter = 'leo'">Leo</UiButton>
-        </div>
-        <div class="crafts">
-          <UiButton v-for="item in craftableStyles" :key="item.id" type="button" :disabled="game.loot.stylePieces < STYLE_PIECES_TO_CRAFT" @click="game.act({ type: 'craftStyle', cosmeticId: item.id })">{{ item.label }} · {{ STYLE_PIECES_TO_CRAFT }} pieces</UiButton>
-          <p v-if="!craftableStyles.length">You own every box style for {{ pieceCharacter === 'noa' ? 'Noa' : 'Leo' }}.</p>
-        </div>
-      </article>
-      <article class="card">
-        <h3>🧩 Craft with shards</h3>
-        <p>Common {{ SHARD_CRAFT_COST.common }} · Rare {{ SHARD_CRAFT_COST.rare }} · Legendary {{ SHARD_CRAFT_COST.legendary }} skin shards.</p>
-        <div class="crafts">
-          <UiButton variant="primary" v-for="item in lockedSkins" :key="item.id" type="button" :class="item.rarity" :disabled="game.loot.skinShards < SHARD_CRAFT_COST[item.rarity]" @click="game.act({ type: 'craftSkin', cosmeticId: item.id })">{{ item.label }} ({{ cosmeticKind(item.key) }}{{ item.character ? `, ${item.character}` : '' }}) · {{ SHARD_CRAFT_COST[item.rarity] }}</UiButton>
-          <p v-if="!lockedSkins.length">You own every style.</p>
-        </div>
-      </article>
+      <article class="card"><h3>🧵 Shards</h3><p>Style shards and skin shards are crafted from the Inventory: open Manage → Inventory → Shards and tap a shard. You have {{ Object.values(game.loot.styleShards).reduce((sum, n) => sum + n, 0) }} style shards (each style has its own pile) and {{ game.loot.skinShards }} skin shards.</p></article>
     </div>
 
-    <div v-else-if="tab === 'quests'" class="grid">
-      <article v-for="item in quests" :key="item.quest.id" class="card">
-        <h3>📋 Weekly quest</h3>
-        <p>{{ item.quest.name }}</p>
-        <progress :value="Math.min(item.progress, item.quest.target)" :max="item.quest.target"></progress>
-        <b>{{ Math.min(item.progress, item.quest.target) }} / {{ item.quest.target }} · +{{ item.quest.crystals }} crystals + {{ item.quest.box }} box</b>
-        <UiButton variant="primary" :disabled="item.claimed || item.progress < item.quest.target" @click="game.act({ type: 'claimQuest', questId: item.quest.id })">{{ item.claimed ? 'Claimed' : 'Claim' }}</UiButton>
-      </article>
-      <article class="card">
-        <h3>🍷 Tasting log</h3>
-        <p>{{ stat('tasted') }} recipes and {{ game.loot.tasted.length - stat('tasted') }} brands tasted. Serving a recipe for the first time gives parts and skin shards; a new brand gives a shard.</p>
-      </article>
-      <article v-for="row in achievementRows" :key="row.series" class="card">
-        <ItemArt kind="achievement" :id="row.series" fallback="🏅" :size="72" class="workshop-art" />
-        <h3>{{ row.seriesName }}</h3>
-        <p>{{ row.goal.name }}</p>
-        <p class="tiers"><span v-for="tier in row.tiers" :key="tier.id" :class="['tier', `tier-${tier.tier}`, { done: tier.done }]" :title="`${tier.tierName}: ${tier.target}`">{{ tier.tierName }}</span></p>
-        <progress :value="Math.min(stat(row.goal.stat), row.goal.target)" :max="row.goal.target"></progress>
-        <b>{{ Math.min(stat(row.goal.stat), row.goal.target) }} / {{ row.goal.target }} · +{{ row.goal.crystals }} crystals + {{ row.goal.box }} box</b>
-        <small v-if="achievementStyles(row.goal.id)">Styles: {{ achievementStyles(row.goal.id) }}</small>
-        <UiButton variant="primary" :disabled="row.finished || stat(row.goal.stat) < row.goal.target" @click="game.act({ type: 'claimAchievement', id: row.goal.id })">{{ row.finished ? 'All tiers claimed' : `Claim ${row.goal.tierName}` }}</UiButton>
-      </article>
-    </div>
 
     <div v-else-if="tab === 'signature'" class="draw">
       <article v-if="game.level < SIGNATURE_LEVEL" class="card"><h3>🍹 Signature cocktail</h3><p>Invent your own cocktail for this bar. Unlocks at level {{ SIGNATURE_LEVEL }} (you are level {{ game.level }}).</p></article>
@@ -323,10 +270,10 @@ const boostLeft = (id: string) => {
           <h3>🏆 This week's {{ boardScope === 'friends' ? 'friends' : 'top bars' }}</h3>
           <div class="row"><UiButton :variant="boardScope === 'global' ? 'solid' : 'secondary'" @click="boardScope = 'global'">Everyone</UiButton><UiButton :variant="boardScope === 'friends' ? 'solid' : 'secondary'" @click="boardScope = 'friends'">Friends</UiButton></div>
           <p>Score = XP you earn this week (serving, English, lessons). A drink pays the same XP at every level, so newcomers can win. Resets in {{ daysLeft }} day{{ daysLeft === 1 ? '' : 's' }}.</p>
-          <p v-if="boardLoading">Loading…</p><p v-if="boardError" class="sig-error">{{ boardError }}</p>
+          <p v-if="boardLoading">Loading…</p><p v-if="boardError || viewError" class="sig-error">{{ boardError || viewError }}</p>
           <WeeklyPodium v-if="board?.top.length" :rows="board.top" />
           <ol v-if="board" class="board">
-            <li v-for="row in board.top" :key="row.rank" :class="{ me: row.me }"><b>{{ row.rank }}</b><span>{{ row.label }}<small v-if="row.level"> · level {{ row.level }}</small></span><em>{{ row.score }}</em></li>
+            <li v-for="row in board.top" :key="row.rank" :class="{ me: row.me }"><b>{{ row.rank }}</b><span>{{ row.label }}<small v-if="row.level"> · level {{ row.level }}</small></span><em>{{ row.score }}</em><UiButton size="sm" variant="secondary" @click="viewRow(row)">View bar</UiButton></li>
             <li v-if="!board.top.length" class="empty">{{ boardScope === 'friends' ? 'Add friends in the Friends tab to compete with them.' : 'Nobody has scored yet this week. Serve a drink to take the lead.' }}</li>
           </ol>
           <p v-if="board?.me">You are <b>#{{ board.me.rank }}</b> of {{ board.me.size }} with {{ board.me.score }} XP.<template v-if="board.me.rank > LEADERBOARD_SIZE"> The list shows the top {{ LEADERBOARD_SIZE }}.</template></p>
@@ -358,17 +305,11 @@ const boostLeft = (id: string) => {
       <p class="hint">{{ regulars.length - metRegulars.length }} guests have not been served yet.</p>
     </div>
 
+    <BoardBarView v-if="viewing" :view="viewing" @close="viewing = undefined" />
   </section>
 </template>
 
 <style scoped>
-.tiers { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0; }
-.tier { padding: 1px 8px; border-radius: 999px; border: 1px solid #4a5a72; font-size: 11px; opacity: .5; }
-.tier.done { opacity: 1; font-weight: 700; }
-.tier-1.done { border-color: #a8672f; color: #e9b27d; }
-.tier-2.done { border-color: #b9c3d0; color: #e4ebf3; }
-.tier-3.done { border-color: #f0c24b; color: #ffe08a; }
-.tier-4.done { border-color: #7fe0f0; color: #bff3fb; }
 .workshop{overflow:hidden}.workshop-hero{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding:22px;background:radial-gradient(circle at 10% 20%,#4f334b,#16243a 66%);border-bottom:1px solid #354762}
 .workshop-hero small{color:#e4b35c;font-size:9px;font-weight:900;letter-spacing:.12em}.workshop-hero h2{margin:5px 0;font:700 29px Georgia,serif}.workshop-hero p{margin:0;color:#bdc8d6;font-size:12px}
 .workshop-hero dl{display:flex;gap:14px;margin:0}.workshop-hero dt{color:#91a2b5;font-size:9px;letter-spacing:.1em;text-transform:uppercase}.workshop-hero dd{margin:2px 0 0;color:#fff0c8;font:700 20px Georgia,serif}
@@ -380,9 +321,9 @@ const boostLeft = (id: string) => {
 .workshop-art{display:block;width:72px;height:72px;object-fit:contain;border-radius:50%}
 .card em{margin-left:6px;padding:2px 6px;border-radius:6px;background:#26364d;color:#c7d3e0;font-size:9px;font-style:normal;text-transform:uppercase}.card em.rare{background:#1d4b6e}.card em.legendary{background:#7a4d12;color:#ffe0a0}
 .card progress{width:100%;accent-color:#e7b556}.row{display:flex;flex-wrap:wrap;gap:6px}
-.results{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:11px}.results li{padding:5px 8px;border-radius:7px;background:#17253a}.results li.rare,.crafts .rare{border-color:#3f86b8;color:#bfe2ff}.results li.legendary,.crafts .legendary{background:#4a3210;color:#ffe0a0}
-.crafts{display:flex;flex-wrap:wrap;gap:5px;max-height:260px;overflow:auto}input[type=text],.card>input{padding:8px;border:1px solid #40536c;border-radius:8px;background:#0c1625;color:#fff}.sig-row{align-items:center}.sig-row select{flex:1;min-width:120px}.sig-row b{min-width:58px;text-align:center;color:#fff0c8}.sig-error{color:#f2a0a0}.card label{color:#c7d3e0;font-size:11px}
-.board{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:12px}.board li{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;padding:6px 8px;border-radius:7px;background:#17253a}.board li.me{background:#4a3210;color:#ffe0a0}.board li b{color:#f4d08e}.board li em{font-style:normal;color:#fff0c8}.board .empty{display:block;color:#93a5b9}
+.results{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:11px}.results li{padding:5px 8px;border-radius:7px;background:#17253a}.results li.rare{border-color:#3f86b8;color:#bfe2ff}.results li.legendary{background:#4a3210;color:#ffe0a0}
+input[type=text],.card>input{padding:8px;border:1px solid #40536c;border-radius:8px;background:#0c1625;color:#fff}.sig-row{align-items:center}.sig-row select{flex:1;min-width:120px}.sig-row b{min-width:58px;text-align:center;color:#fff0c8}.sig-error{color:#f2a0a0}.card label{color:#c7d3e0;font-size:11px}
+.board{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:12px}.board li{display:grid;grid-template-columns:30px 1fr auto auto;gap:8px;align-items:center;padding:6px 8px;border-radius:7px;background:#17253a}.board li.me{background:#4a3210;color:#ffe0a0}.board li b{color:#f4d08e}.board li em{font-style:normal;color:#fff0c8}.board .empty{display:block;color:#93a5b9}
 .gotit{color:#8fd1a0;text-decoration:line-through}
 .bar-chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
 

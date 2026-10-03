@@ -1,5 +1,5 @@
-// Generative background music. Every bar interior gets a style (tempo, scale, chords, instruments and drums)
-// that matches its painting; the notes are composed live so the music never loops the same way twice.
+// Generative background music. Every bar interior gets a style (tempo, scale, chords, instruments and drums, see
+// styles.ts) that matches its painting, and for the game backgrounds the game's own world; the notes are composed live so the music never loops the same way twice.
 //
 // To sound like players and not like a sequencer:
 //  - instruments are modelled on real ones (Rhodes-style piano, plucked upright bass, vibraphone, marimba,
@@ -9,67 +9,10 @@
 //  - everything sits in a shared hall reverb.
 import { audioContext, musicDestination, musicOn, musicReverbSend, noise, unlockAudio } from './engine';
 
-type Drum = 'kick' | 'snare' | 'hat' | 'brush' | 'shaker' | 'hand';
-type Voice = 'epiano' | 'pad' | 'pluck' | 'vibes' | 'marimba' | 'bell' | 'synth';
-type Comp = 'sustain' | 'charleston' | 'offbeat' | 'arp' | 'none';
-interface Style {
-  bpm: number;
-  swing: number;                     // 0 = straight, .3 = jazzy
-  root: number;                      // MIDI note of the key
-  scale: number[];                   // scale used for chords and bass
-  lead: number[];                    // scale used for the melody
-  chords: number[];                  // chord root (scale degree) for each bar
-  keys: Voice;                       // instrument that plays the chords
-  comp: Comp;                        // how the chords are played
-  bass: 'walk' | 'root' | 'pulse' | 'none';
-  bassVoice: 'upright' | 'sub';
-  melody: { voice: Voice; density: number; octave: number; decay: number };
-  drone?: boolean;
-  drums: Partial<Record<Drum, string>>; // 16 steps per bar, 'x' = hit, 'o' = soft hit
-}
+import { STYLES, styleForInterior, type Drum, type Style, type Voice } from './styles';
 
-const MAJOR = [0, 2, 4, 5, 7, 9, 11];
-const DORIAN = [0, 2, 3, 5, 7, 9, 10];
-const MINOR = [0, 2, 3, 5, 7, 8, 10];
-const MIXOLYDIAN = [0, 2, 4, 5, 7, 9, 10];
-const PHRYGIAN_DOM = [0, 1, 4, 5, 7, 8, 10];
-const HIRAJOSHI = [0, 2, 3, 7, 8];
-const MAJOR_PENT = [0, 2, 4, 7, 9];
-const MINOR_PENT = [0, 3, 5, 7, 10];
-
-const STYLES: Record<string, Style> = {
-  lounge: { bpm: 76, swing: .1, root: 57, scale: DORIAN, lead: MINOR_PENT, chords: [0, 3, 1, 4], keys: 'epiano', comp: 'sustain', bass: 'root', bassVoice: 'upright',
-    melody: { voice: 'epiano', density: .5, octave: 1, decay: .9 }, drums: { kick: 'x.......x.o.....', brush: '..x...x...x...x.', hat: 'o.o.o.o.o.o.o.o.' } },
-  jazz: { bpm: 104, swing: .32, root: 55, scale: DORIAN, lead: MINOR_PENT, chords: [1, 4, 0, 0], keys: 'epiano', comp: 'charleston', bass: 'walk', bassVoice: 'upright',
-    melody: { voice: 'vibes', density: .6, octave: 1, decay: .9 }, drums: { brush: 'x.x.x.x.x.x.x.x.', hat: '..o...o...o...o.', kick: 'o.......o.......' } },
-  library: { bpm: 66, swing: .18, root: 53, scale: MAJOR, lead: MAJOR_PENT, chords: [0, 5, 3, 4], keys: 'epiano', comp: 'arp', bass: 'root', bassVoice: 'upright',
-    melody: { voice: 'epiano', density: .35, octave: 1, decay: 1.4 }, drums: {} },
-  tropical: { bpm: 102, swing: 0, root: 60, scale: MIXOLYDIAN, lead: MAJOR_PENT, chords: [0, 3, 4, 3], keys: 'pluck', comp: 'offbeat', bass: 'pulse', bassVoice: 'upright',
-    melody: { voice: 'marimba', density: .6, octave: 1, decay: .35 }, drums: { shaker: 'x.xxx.xxx.xxx.xx', hand: 'x..o..x...o.x...' } },
-  ocean: { bpm: 84, swing: .05, root: 62, scale: MAJOR, lead: MAJOR_PENT, chords: [0, 4, 5, 3], keys: 'pad', comp: 'sustain', bass: 'root', bassVoice: 'sub',
-    melody: { voice: 'vibes', density: .45, octave: 1, decay: 1.6 }, drums: { shaker: 'o.o.o.o.o.o.o.o.', kick: 'x.......x.......' } },
-  desert: { bpm: 92, swing: 0, root: 50, scale: PHRYGIAN_DOM, lead: PHRYGIAN_DOM, chords: [0, 0, 1, 0], keys: 'pad', comp: 'sustain', bass: 'pulse', bassVoice: 'sub', drone: true,
-    melody: { voice: 'pluck', density: .6, octave: 1, decay: .6 }, drums: { hand: 'x..x..o.x..x.o..', shaker: '..x...x...x...x.' } },
-  izakaya: { bpm: 78, swing: 0, root: 57, scale: MINOR, lead: HIRAJOSHI, chords: [0, 5, 3, 0], keys: 'pad', comp: 'sustain', bass: 'root', bassVoice: 'sub', drone: true,
-    melody: { voice: 'pluck', density: .4, octave: 1, decay: 1.1 }, drums: { hand: 'x.......o.......' } },
-  winter: { bpm: 70, swing: 0, root: 64, scale: MAJOR, lead: MAJOR_PENT, chords: [0, 4, 5, 2], keys: 'pad', comp: 'sustain', bass: 'root', bassVoice: 'sub',
-    melody: { voice: 'bell', density: .4, octave: 2, decay: 2 }, drums: {} },
-  palace: { bpm: 88, swing: .05, root: 60, scale: MAJOR, lead: MAJOR_PENT, chords: [0, 3, 4, 0], keys: 'pluck', comp: 'arp', bass: 'walk', bassVoice: 'upright',
-    melody: { voice: 'bell', density: .5, octave: 1, decay: 1.3 }, drums: { brush: '..x...x...x...x.', kick: 'x.......x.......' } },
-  cyber: { bpm: 112, swing: 0, root: 45, scale: MINOR, lead: MINOR_PENT, chords: [0, 0, 5, 4], keys: 'synth', comp: 'arp', bass: 'pulse', bassVoice: 'sub',
-    melody: { voice: 'synth', density: .45, octave: 2, decay: .3 }, drums: { kick: 'x...x...x...x...', snare: '....x.......x...', hat: 'xoxoxoxoxoxoxoxo' } },
-  loft: { bpm: 96, swing: .12, root: 52, scale: DORIAN, lead: MINOR_PENT, chords: [0, 3, 0, 4], keys: 'epiano', comp: 'charleston', bass: 'pulse', bassVoice: 'upright',
-    melody: { voice: 'epiano', density: .4, octave: 1, decay: .5 }, drums: { kick: 'x.....x...x.....', snare: '....x.......x...', hat: 'x.x.x.x.x.x.x.xo' } }
-};
-
-const STYLE_OF_INTERIOR: Record<string, keyof typeof STYLES> = {
-  velvet: 'lounge', skyline: 'lounge', 'inferno-penthouse': 'lounge',
-  speakeasy: 'jazz', 'jazz-cellar': 'jazz', 'art-deco': 'jazz', parisian: 'jazz', library: 'library',
-  garden: 'ocean', tropical: 'tropical', beach: 'tropical', marina: 'ocean',
-  desert: 'desert', riad: 'desert', izakaya: 'izakaya',
-  winter: 'winter', palace: 'palace', cyberpunk: 'cyber', rooftop: 'cyber', loft: 'loft'
-};
-
+// Instruments that hold a note: they play sustained chords and long melody notes.
+const HELD: Voice[] = ['flute', 'strings', 'organ', 'horn', 'chip'];
 const midi = (n: number) => 440 * 2 ** ((n - 69) / 12);
 const degree = (scale: number[], root: number, d: number) => root + 12 * Math.floor(d / scale.length) + scale[((d % scale.length) + scale.length) % scale.length];
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
@@ -170,6 +113,7 @@ class Track {
     if (s.comp === 'sustain') {
       if (s.keys === 'epiano') spread.slice(0, 3).forEach((note, i) => this.epiano(midi(note), this.human(t + i * .012, .01), len * 12, .5));
       else if (s.keys === 'pad') triad.forEach((note) => this.pad(midi(note + 12), t, len * 16, .05));
+      else if (HELD.includes(s.keys)) triad.forEach((note, i) => this.tone(s.keys, midi(note + 12), t + i * .02, len * 16, .5));
       else triad.forEach((note, i) => this.pluck(midi(note + 12), at(0) + i * .03, .7));
     } else if (s.comp === 'charleston') {
       spread.forEach((note, i) => this.epiano(midi(note), this.human(at(0) + i * .008), len * 4, .6));
@@ -181,6 +125,7 @@ class Track {
       for (let i = 0; i < 8; i++) {
         const note = spread[order[i]! % 4]!;
         if (s.keys === 'synth') this.synth(midi(note), this.human(at(i * 2)), len * 2.4, .045);
+        else if (HELD.includes(s.keys)) this.tone(s.keys, midi(note), this.human(at(i * 2), .01), len * 3, .4);
         else if (s.keys === 'pluck') this.pluck(midi(note), this.human(at(i * 2), .01), .5 + (i % 2 ? 0 : .15));
         else this.epiano(midi(note), this.human(at(i * 2), .01), len * 3, .3 + (i % 4 === 0 ? .15 : 0));
       }
@@ -233,6 +178,7 @@ class Track {
     else if (m.voice === 'pluck') this.pluck(freq, t, vel * .9);
     else if (m.voice === 'synth') this.synth(freq, t, dur, vel * .06);
     else if (m.voice === 'pad') this.pad(freq, t, dur, vel * .06);
+    else if (HELD.includes(m.voice)) this.tone(m.voice, freq, t, dur, vel * .7);
     else this.epiano(freq, t, dur, vel * .65);
   }
 
@@ -385,6 +331,112 @@ class Track {
     }
   }
 
+  // ---- more instruments, for the game worlds: a wooden flute, a string section, a pipe organ, a horn and a chip-tune ----
+  private tone(voice: Voice, freq: number, t: number, dur: number, vel: number) {
+    if (voice === 'flute') this.flute(freq, t, dur, vel);
+    else if (voice === 'strings') this.strings(freq, t, dur, vel);
+    else if (voice === 'organ') this.organ(freq, t, dur, vel);
+    else if (voice === 'horn') this.horn(freq, t, dur, vel);
+    else this.chip(freq, t, dur, vel);
+  }
+  // A gain that rises over `attack`, holds, and fades out: the shape of a bowed or blown note.
+  private swell(t: number, attack: number, hold: number, peak: number, release: number) {
+    const amp = audioContext()!.createGain();
+    amp.gain.setValueAtTime(.0001, t);
+    amp.gain.exponentialRampToValueAtTime(Math.max(.0002, peak), t + attack);
+    amp.gain.setValueAtTime(Math.max(.0002, peak), t + attack + hold);
+    amp.gain.exponentialRampToValueAtTime(.0001, t + attack + hold + release);
+    return amp;
+  }
+  // Flute: a soft sine with a little breath noise and a slow vibrato that arrives after the note starts.
+  private flute(freq: number, t: number, dur: number, vel: number) {
+    const ctx = audioContext()!;
+    const hold = Math.max(.25, Math.min(dur, 2.2));
+    const amp = this.swell(t, .07, hold, .11 * vel, .35);
+    this.to(amp, .55);
+    const osc = ctx.createOscillator();
+    const vibrato = ctx.createOscillator();
+    const depth = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    vibrato.frequency.value = 5.2 + Math.random() * .8;
+    depth.gain.setValueAtTime(0, t);
+    depth.gain.linearRampToValueAtTime(freq * .008, t + hold * .8);
+    vibrato.connect(depth).connect(osc.frequency);
+    osc.connect(amp);
+    const second = ctx.createOscillator();
+    const second_amp = ctx.createGain();
+    second.type = 'triangle'; second.frequency.value = freq * 2; second_amp.gain.value = .12;
+    second.connect(second_amp).connect(amp);
+    for (const node of [osc, vibrato, second]) { node.start(t); node.stop(t + hold + .5); }
+    this.hit(t, .12, 'bandpass', freq * 2.5, 1.5, .02 * vel, undefined, .03);
+  }
+  // Strings: two slightly detuned saw waves under a low-pass that opens as the bow swells.
+  private strings(freq: number, t: number, dur: number, vel: number) {
+    const ctx = audioContext()!;
+    const hold = Math.max(.3, dur - .6);
+    const amp = this.swell(t, .35, hold, .05 * vel, .7);
+    const tone = ctx.createBiquadFilter();
+    tone.type = 'lowpass';
+    tone.frequency.setValueAtTime(700, t);
+    tone.frequency.linearRampToValueAtTime(1700, t + .4 + hold * .4);
+    tone.connect(amp);
+    this.to(amp, .8);
+    for (const cents of [-9, 0, 9]) {
+      const osc = ctx.createOscillator();
+      osc.type = 'sawtooth'; osc.frequency.value = freq; osc.detune.value = cents;
+      osc.connect(tone);
+      osc.start(t); osc.stop(t + .35 + hold + .8);
+    }
+  }
+  // Pipe organ: a stack of sine partials, a steady tone with a quick start and a soft release.
+  private organ(freq: number, t: number, dur: number, vel: number) {
+    const ctx = audioContext()!;
+    const hold = Math.max(.3, dur - .3);
+    const amp = this.swell(t, .03, hold, .045 * vel, .35);
+    this.to(amp, .7);
+    [[1, 1], [2, .55], [3, .3], [4, .18], [6, .08]].forEach(([ratio, weight]) => {
+      const osc = ctx.createOscillator();
+      const level = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.value = freq * ratio!; level.gain.value = weight!;
+      osc.connect(level).connect(amp);
+      osc.start(t); osc.stop(t + hold + .5);
+    });
+  }
+  // Horn: a brassy saw wave whose filter swells open, so each note starts soft and blooms.
+  private horn(freq: number, t: number, dur: number, vel: number) {
+    const ctx = audioContext()!;
+    const hold = Math.max(.25, Math.min(dur, 2));
+    const amp = this.swell(t, .14, hold, .06 * vel, .4);
+    const tone = ctx.createBiquadFilter();
+    tone.type = 'lowpass';
+    tone.Q.value = 1.4;
+    tone.frequency.setValueAtTime(500, t);
+    tone.frequency.exponentialRampToValueAtTime(1800, t + .35);
+    tone.connect(amp);
+    this.to(amp, .6);
+    for (const cents of [-6, 6]) {
+      const osc = ctx.createOscillator();
+      osc.type = 'sawtooth'; osc.frequency.value = freq; osc.detune.value = cents;
+      osc.connect(tone);
+      osc.start(t); osc.stop(t + .14 + hold + .5);
+    }
+  }
+  // Chip-tune: a plain square wave with a short, snappy decay, like an old game console.
+  private chip(freq: number, t: number, dur: number, vel: number) {
+    const ctx = audioContext()!;
+    const amp = ctx.createGain();
+    const length = Math.max(.12, Math.min(dur, .5));
+    amp.gain.setValueAtTime(.0001, t);
+    amp.gain.exponentialRampToValueAtTime(.035 * vel, t + .005);
+    amp.gain.exponentialRampToValueAtTime(.0001, t + length);
+    this.to(amp, .25);
+    const osc = ctx.createOscillator();
+    osc.type = 'square'; osc.frequency.value = freq;
+    osc.connect(amp);
+    osc.start(t); osc.stop(t + length + .05);
+  }
+
   // ---- drums ----
   private hit(t: number, dur: number, filter: BiquadFilterType, freq: number, q: number, gain: number, freqTo?: number, attack = .004) {
     const ctx = audioContext()!;
@@ -424,6 +476,8 @@ class Track {
     // Brushes: a soft swish that swells in and fades, like a hand sweeping across a snare.
     else if (kind === 'brush') this.hit(t, .16, 'bandpass', 4800, .6, .09 * level, 3200, .05);
     else if (kind === 'shaker') { this.hit(t, .05, 'bandpass', 6200, 1.2, .07 * level, undefined, .012); this.hit(t + .03, .05, 'bandpass', 6800, 1.2, .045 * level, undefined, .01); }
+    // War drum: a deep, long boom with a little skin on top.
+    else if (kind === 'tom') { this.thump(t, 98, 54, .5, .6 * level); this.hit(t, .05, 'lowpass', 600, .7, .08 * level); }
     // Hand drum: a round tone and a slap.
     else { this.thump(t, rand(210, 240), 150, .17, .26 * level); this.hit(t, .025, 'bandpass', 1900, 1.5, .08 * level); }
   }
@@ -433,7 +487,7 @@ let current: { id: string; track: Track } | undefined;
 let wanted = 'velvet';
 let unlocked = false;
 
-export function styleForInterior(id: string) { return STYLE_OF_INTERIOR[id] ?? 'lounge'; }
+export { styleForInterior };
 
 // Start (or crossfade to) the music that fits this bar interior.
 export function setMusicInterior(interiorId: string) {

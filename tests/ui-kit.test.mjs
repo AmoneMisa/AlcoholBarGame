@@ -10,6 +10,7 @@ test('Text inputs and selects come from the UI kit, not from raw elements', () =
   const bad = [];
   for (const [path, source] of vue) {
     if (path.endsWith('/ui/UiInput.vue') || path.endsWith('/OptionSelect.vue')) continue;
+    if (path.endsWith('/characters/CharacterStudio.vue')) continue;   // the art tool (?studio), not a player screen
     if (/<select\b/.test(source)) bad.push(`${path}: <select>`);
     for (const tag of source.match(/<input\b[^>]*>/g) ?? []) if (!/type="(range|radio|number)"/.test(tag) && !(path.endsWith('/ui/UiCheckbox.vue') && /type="checkbox"/.test(tag))) bad.push(`${path}: ${tag.slice(0, 60)}`);
   }

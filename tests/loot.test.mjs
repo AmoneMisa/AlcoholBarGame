@@ -587,7 +587,7 @@ test('Week-end notice appears only for a claimable reward, once per week key', a
 });
 
 test('Event backgrounds cannot be bought or gifted, come from boxes, and duplicates become shards', async () => {
-  const { EVENT_INTERIOR_IDS, INTERIORS: all, DUPLICATE_INTERIOR_SHARDS, DEFAULT_BARS: bars } = await import('../src/data/cosmetics/bars.ts');
+  const { EVENT_INTERIOR_IDS, BOX_INTERIOR_IDS, INTERIORS: all, DUPLICATE_INTERIOR_SHARDS, DEFAULT_BARS: bars } = await import('../src/data/cosmetics/bars.ts');
   const { giftPrice } = await import('../src/sim/gifts.ts');
   const { BOX_TABLES, rollFromTable } = await import('../src/domain/loot.ts');
   const { grantReward } = await import('../src/sim/loot.ts');
@@ -607,11 +607,13 @@ test('Event backgrounds cannot be bought or gifted, come from boxes, and duplica
   assert.ok(BOX_TABLES.silver.some((entry) => entry.make(1, () => 0).kind === 'eventInterior'));
   // Granting picks a background the player does not own; once all are owned it pays skin shards.
   const owned = new Set();
-  for (let i = 0; i < EVENT_INTERIOR_IDS.length; i++) {
+  // The pool is the event backgrounds plus the themed ones (which can also be bought).
+  const before0 = BOX_INTERIOR_IDS.filter((id) => state.ownedInteriorIds.includes(id)).length;
+  for (let i = before0; i < BOX_INTERIOR_IDS.length; i++) {
     const text = grantReward(state, { kind: 'eventInterior' }, () => 0);
-    assert.match(text, /special event background/);
+    assert.match(text, /the background/);
   }
-  assert.ok(EVENT_INTERIOR_IDS.every((id) => state.ownedInteriorIds.includes(id)));
+  assert.ok(BOX_INTERIOR_IDS.every((id) => state.ownedInteriorIds.includes(id)));
   const before = state.loot.skinShards;
   assert.match(grantReward(state, { kind: 'eventInterior' }, () => 0), /skin shards/);
   assert.equal(state.loot.skinShards, before + DUPLICATE_INTERIOR_SHARDS);
@@ -871,4 +873,25 @@ test('A save keeps every earned achievement (there are more than a hundred) and 
   const loot = normalizeLoot({ achievements: [...ids, 'a-prestige-1', 'made-up'] }, 1);
   assert.equal(loot.achievements.length, ids.length);
   assert.ok(!loot.achievements.includes('a-prestige-1'));
+});
+
+test('Delete in the inventory throws away boxes, boosters, parts and shards, only what the player has', () => {
+  const state = fresh();
+  state.loot.boxes = { bronze: 2 };
+  state.loot.consumables = { 'xp-boost': 1 };
+  state.loot.styleShards = { 'some-style': 7 };
+  state.loot.skinShards = 5; state.loot.parts = 9;
+  run(state, { type: 'discardLoot', kind: 'box', id: 'bronze', amount: 1 });
+  assert.equal(state.loot.boxes.bronze, 1);
+  run(state, { type: 'discardLoot', kind: 'consumable', id: 'xp-boost', amount: 1 });
+  assert.equal(state.loot.consumables['xp-boost'], undefined, 'an empty pile disappears');
+  run(state, { type: 'discardLoot', kind: 'styleShards', id: 'some-style', amount: 99 });
+  assert.equal(state.loot.styleShards['some-style'], undefined, 'it never takes more than there is');
+  run(state, { type: 'discardLoot', kind: 'skinShards', id: '', amount: 5 });
+  run(state, { type: 'discardLoot', kind: 'parts', id: '', amount: 4 });
+  assert.equal(state.loot.skinShards, 0);
+  assert.equal(state.loot.parts, 5);
+  assert.throws(() => run(state, { type: 'discardLoot', kind: 'box', id: 'gold', amount: 1 }), /do not have/);
+  assert.throws(() => run(state, { type: 'discardLoot', kind: 'crystals', id: '', amount: 1 }), /Choose what/, 'only items can be thrown away');
+  assert.throws(() => run(state, { type: 'discardLoot', kind: 'parts', id: '', amount: -3 }), /Choose what/);
 });

@@ -1,3 +1,4 @@
+import { THEMED_INTERIORS } from '../src/data/cosmetics/themedBars.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPinia,setActivePinia } from 'pinia';
@@ -5,7 +6,7 @@ import { nextTick } from 'vue';
 import { checkText } from '../src/domain/english/checker.ts';
 import { questionTemplates,tilesFor,withArticle,buildProfile,matchesFacts,sentenceWords,correctedTileSelection } from '../src/domain/conversation/customerTalk.ts';
 import { INGREDIENTS,RECIPES,REGIONS,SUPPLIERS,estimateRecipeAbv,recipeAlcoholLabel } from '../src/domain/catalog.ts';
-import { ALCOHOL_PRODUCTS,bottleRestockCrystalCost,bottleSaleCrystalReward } from '../src/domain/bottleCatalog.ts';
+import { ALCOHOL_PRODUCTS,bottleRestockCrystalCost,bottleSaleCrystalReward,isPremiumBottle } from '../src/domain/bottleCatalog.ts';
 import { brandBottleArtIndex,ingredientBottleArtIndex,PAINTED_BOTTLE_COLUMNS,PAINTED_BOTTLE_ROWS } from '../src/domain/bottleArt.ts';
 import { bottleQuestionTemplates,rankBottles } from '../src/domain/conversation/bottleTalk.ts';
 import { createMarket,generateCustomer } from '../src/domain/engine.ts';
@@ -33,14 +34,9 @@ test('Daily style draw unlocks modular face parts and a duplicate becomes a spar
   const first = COSMETICS.find((item) => item.character === 'noa');
   assert.ok(first);
   assert.throws(() => applyAction(state,{type:'setDecor',key:first.key,value:first.value},context),RuleError);
-  applyAction(state,{type:'spinCosmeticRoulette'},context);
-  assert.equal(state.ownedCosmeticIds.length,1);
-  assert.throws(() => applyAction(state,{type:'spinCosmeticRoulette'},context),RuleError,'one draw per day');
-  state.ownedCosmeticIds = COSMETICS.map((item) => item.id);
-  state.cosmeticRouletteKey = '';
-  applyAction(state,{type:'spinCosmeticRoulette'},context);
-  const duplicate = COSMETICS[0];
-  assert.equal(state.cosmeticCopies[duplicate.id],1);
+  // The daily wheel replaced the old one-a-day style draw: three spins a day (see styles.test.mjs).
+  applyAction(state,{type:'spinRoulette'},context);
+  assert.equal(state.roulette.spins,1);
 });
 
 test('Customer smoking trait is stable and never injected as incompatible dialogue text',() => {
@@ -176,15 +172,18 @@ test('Every liquid and retail brand resolves to painted fantasy-label bottle art
 test('Crystal prices cover locked backgrounds, advanced recipes, waiting time and profitable brand reserves',() => {
   assert.equal(INTERIORS[0].crystalCost,0);
   assert.ok(INTERIORS.slice(1).every((item) => item.crystalCost >= 350 && item.crystalCost <= 3500));
-  assert.equal(new Set(INTERIORS.map((item) => item.crystalCost)).size,INTERIORS.length);
+  // The themed backgrounds share one price on purpose; the original ones each have their own.
+  const original = INTERIORS.filter((item) => !THEMED_INTERIORS.some((themed) => themed.id === item.id));
+  assert.equal(new Set(original.map((item) => item.crystalCost)).size,original.length);
   const advanced = RECIPES.slice(10).map((recipe) => recipePurchase(recipe,RECIPES.indexOf(recipe)));
   assert.ok(advanced.filter((price) => price.currency === 'crystals').length > advanced.length / 2);
   assert.ok(advanced.filter((price) => price.currency === 'crystals').every((price) => price.amount >= 120 && price.amount <= 550));
   assert.equal(Math.min(...advanced.filter((price) => price.currency === 'crystals').map((price) => price.amount)),120);
   assert.equal(Math.max(...advanced.filter((price) => price.currency === 'crystals').map((price) => price.amount)),550);
   assert.equal(arrivalSkipCrystalCost(1),1);assert.equal(arrivalSkipCrystalCost(30 * 60_000),6);assert.equal(arrivalSkipCrystalCost(2 * 60 * 60_000),24);
-  const premium = ALCOHOL_PRODUCTS.filter((product) => bottleRestockCrystalCost(product) > 0);
+  const premium = ALCOHOL_PRODUCTS.filter(isPremiumBottle);
   assert.ok(premium.length >= 10 && premium.length < ALCOHOL_PRODUCTS.length);
+  assert.ok(ALCOHOL_PRODUCTS.every((product) => bottleRestockCrystalCost(product) >= 2), 'every label can be topped up');
   for (const product of premium) assert.ok(bottleSaleCrystalReward(product) > bottleRestockCrystalCost(product),product.name);
 });
 
@@ -446,6 +445,8 @@ test('Brand calls: the guest names a brand, the bartender must pick that brand; 
   assert.equal(checkText('Sorry, we don’t have Jack Daniel’s. Would you like Jameson instead?').ok, true, 'brand names are valid English');
 
   const game = freshGame();
+  // A new bar starts with basics only; these two premium labels have to be topped up first.
+  for (const id of ['jack-daniels-old-7', 'jameson']) game.bottleInventory.find((item) => item.productId === id).quantity = 2;
   const guest = game.customers[0];
   Object.assign(guest, { orderKind: 'serve', serveRequest: request, orderRevealed: true, request: serveRequestText(request) });
   game.selectCustomer(guest.id);

@@ -1,6 +1,6 @@
 """Build compact WebP art for workshop rewards and regular guests.
 
-Run with Pillow: python scripts/build-workshop-art.py
+Run with Pillow: python scripts/build-workshop-art.py [group ...]  (no group: rebuild everything)
 Companion portraits are built separately from original full-figure art.
 """
 
@@ -31,6 +31,13 @@ ICONS = {
         ('courier', '🚚', '#a4c8c9'), ('scroll', '📜', '#dbbe91'),
         ('calm-charm', '🕊️', '#b8d7c2'), ('whisper', '💬', '#a7c6dc'),
         ('steady-hand', '🎯', '#ddb7a3'),
+    ],
+    'shards': [
+        ('skin', '👗', '#c9a6e0'), ('style', '🧵', '#e0a6c9'),
+        ('parts', '⚙️', '#aab8c8'), ('circle', '🤝', '#e0a9a9'),
+    ],
+    'resources': [
+        ('crystals', '💎', '#7fd0e8'), ('coins', '🪙', '#e8c16e'), ('xp', '⭐', '#e8d18b'),
     ],
     'keepsakes': [
         ('book', '📖', '#cdbca0'), ('flowers', '💐', '#e1abba'),
@@ -78,8 +85,10 @@ def icon(group, key, emoji, accent):
     dest.parent.mkdir(parents=True, exist_ok=True)
     canvas.convert('RGB').save(dest, 'WEBP', quality=88, method=6)
 
-for group, entries in ICONS.items():
+import sys
+wanted = {group: entries for group, entries in ICONS.items() if not sys.argv[1:] or group in sys.argv[1:]}
+for group, entries in wanted.items():
     for key, emoji, accent in entries:
         icon(group, key, emoji, accent)
 
-print('Built', sum(map(len, ICONS.values())), 'workshop icons')
+print('Built', sum(map(len, wanted.values())), 'workshop icons')

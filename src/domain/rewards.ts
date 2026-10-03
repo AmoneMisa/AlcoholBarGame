@@ -26,7 +26,7 @@ export function snapshot(state: PlayerState): Snapshot {
     recipes: [...state.knownRecipeIds], styles: [...(state.ownedCosmeticIds ?? [])], interiors: [...(state.ownedInteriorIds ?? [])],
     cards: sum(state.recipeCopies) + sum(state.cosmeticCopies),
     companions: Object.keys(state.companions?.owned ?? {}),
-    materials: { parts: state.loot.parts, skinShards: state.loot.skinShards, stylePieces: state.loot.stylePieces, ...Object.fromEntries(Object.entries(state.loot.itemShards).map(([id, count]) => [`shard:${id}`, count])) },
+    materials: { parts: state.loot.parts, skinShards: state.loot.skinShards, stylePieces: state.loot.stylePieces, ...Object.fromEntries(Object.entries(state.loot.styleShards).map(([id, count]) => [`style:${id}`, count])), ...Object.fromEntries(Object.entries(state.loot.itemShards).map(([id, count]) => [`shard:${id}`, count])) },
     items: { ...state.loot.consumables }, boxes: { ...state.loot.boxes }
   };
 }
@@ -68,7 +68,8 @@ export function rewardLines(before: Snapshot, after: Snapshot, message = ''): Re
   const materials: Record<string, string> = { parts: 'Workshop parts', skinShards: 'Skin shards', stylePieces: 'Style pieces' };
   for (const [id, count] of Object.entries(after.materials)) {
     const amount = count - (before.materials[id] ?? 0);
-    if (amount > 0) lines.push({ kind: 'material', id, text: `+${amount} ${materials[id] ?? `${equipmentDef(id.replace('shard:', ''))?.name ?? id} shards`}` });
+    if (amount > 0 && id.startsWith('style:')) { const cosmetic = COSMETICS.find(item => item.id === id.slice(6)); lines.push({kind:'material', id, text:`+${amount} ${cosmetic?.label ?? 'Style'} fragments`}); }
+    else if (amount > 0) lines.push({ kind: 'material', id, text: `+${amount} ${materials[id] ?? `${equipmentDef(id.replace('shard:', ''))?.name ?? id} shards`}` });
   }
   if (after.cards > before.cards) lines.push({ kind: 'card', text: `+${plural(after.cards - before.cards, 'spare card')}` });
   if (after.prestige > before.prestige) lines.push({ kind: 'prestige', text: `+${after.prestige - before.prestige} prestige` });

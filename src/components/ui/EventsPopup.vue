@@ -5,6 +5,8 @@ import ModalDialog from './ModalDialog.vue';
 import UiIcon from './UiIcon.vue';
 import UiButton from './UiButton.vue';
 import LoginRewardTrack from './LoginRewardTrack.vue';
+import DailyWheel from '../workshop/DailyWheel.vue';
+import SeasonPass from '../workshop/SeasonPass.vue';
 import CityEvent from '../game/CityEvent.vue';
 const emit = defineEmits<{close:[]}>();
 const game = useGameStore();
@@ -18,7 +20,8 @@ const game = useGameStore();
         <span><UiIcon name="star" /><b>{{ game.availableEvents.freeDraws }}</b><small>Free draws</small></span>
       </div>
       <section><h3>Daily login rewards <i v-if="game.dailyGiftAvailable">Ready</i></h3><LoginRewardTrack /></section>
-      <section class="event-draws"><h3>A new look, every day</h3><p>One free style roulette spin per day.</p><UiButton variant="solid" :disabled="!game.cosmeticRouletteAvailable" @click="game.spinCosmeticRoulette()"><UiIcon name="star" />{{ game.cosmeticRouletteAvailable ? 'Free spin' : 'Come back tomorrow' }}</UiButton></section>
+      <section><h3>Daily wheel</h3><DailyWheel /></section>
+      <section><h3>Season pass</h3><SeasonPass /></section>
       <section class="event-draws"><h3>Seasonal style draws</h3><p>Paid spins use crystals. Your seasonal progress and rewards are saved.</p><div class="event-draw-actions"><UiButton :disabled="game.crystals < DRAW_COST.single" @click="game.act({type:'drawStyle',count:1,banner:'seasonal'})">Spin · {{ DRAW_COST.single }} <UiIcon name="crystal" /></UiButton><UiButton :disabled="game.crystals < DRAW_COST.ten" @click="game.act({type:'drawStyle',count:10,banner:'seasonal'})">10 spins · {{ DRAW_COST.ten }} <UiIcon name="crystal" /></UiButton></div></section>
       <section v-if="game.availableEvents.quests.length || game.availableEvents.achievements.length"><h3>Ready to collect</h3><article v-for="goal in game.availableEvents.quests" :key="goal.id" class="event-claim"><span><b>{{ goal.name }}</b><small>{{ goal.box }} box · {{ goal.crystals }} crystals</small></span><UiButton size="sm" @click="game.act({type:'claimQuest',questId:goal.id})">Claim</UiButton></article><article v-for="goal in game.availableEvents.achievements" :key="goal.id" class="event-claim"><span><b>{{ goal.name }}</b><small>{{ goal.box }} box · {{ goal.crystals }} crystals</small></span><UiButton size="sm" @click="game.act({type:'claimAchievement',id:goal.id})">Claim</UiButton></article></section>
       <section><h3>Tonight at the bar</h3><CityEvent /><article v-if="game.barEvent"><h4>{{ game.barEvent.title }}</h4><p>{{ game.barEvent.description }}</p></article></section>

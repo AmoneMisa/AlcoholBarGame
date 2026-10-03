@@ -1,4 +1,4 @@
-.ui-icon { display:inline-block;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;flex-shrink:0; }
+.ui-icon { display:inline-block;width:24px;height:24px;vertical-align:middle;flex-shrink:0; }
 .venue-mark { display:grid;place-items:center;border-radius:11px;background:linear-gradient(145deg,#55213b,#251d2d);color:#ffd78a; }
 .venue-mark::before,.venue-mark::after { content:none; }
 .venue-mark .ui-icon { width:31px;height:31px; }

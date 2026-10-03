@@ -3,6 +3,12 @@ import { REFERENCE_COSTUME_IDS } from './bartenderCostumes';
 import { THEMED_INTERIORS } from './themedBars';
 import { GAME_THEME_SHELVES } from './gameThemeExpansion';
 
+// Themed backgrounds are priced from a cheap first tier up to the big ones, instead of one flat price.
+const THEMED_PRICES: Record<string, number> = {
+  underground: 400, fairy: 500, 'nfs-underground': 600, underwater: 750, fairytale: 900, 'nfs-carbon': 1000, 'nfs-most-wanted': 1100,
+  'lost-ark': 1200, 'mass-effect': 1450, allods: 1550, 'warcraft-3': 1700, 'perfect-world': 1850, 'lineage-2': 2000
+};
+
 export const INTERIORS = [
   { id:'velvet',name:'Velvet lounge',asset:'/assets/bar/backgrounds/velvet-hour-bar.webp',tint:'#2d0d1e55',position:'center',blend:'multiply',crystalCost:0 },
   { id:'garden',name:'Botanical room',asset:'/assets/bar/backgrounds/botanical-room.webp',tint:'#123d2b44',position:'center',blend:'multiply',crystalCost:350 },
@@ -24,13 +30,19 @@ export const INTERIORS = [
   { id:'parisian',name:'Parisian salon',asset:'/assets/bar/backgrounds/interior-parisian.webp',tint:'#713f5e11',position:'center 62%',blend:'soft-light',crystalCost:2500 },
   { id:'loft',name:'Industrial loft',asset:'/assets/bar/backgrounds/interior-loft.webp',tint:'#343a3e18',position:'center 62%',blend:'saturation',crystalCost:1300 },
   { id:'riad',name:'Moroccan riad',asset:'/assets/bar/backgrounds/interior-riad.webp',tint:'#5a1f0c11',position:'center 62%',blend:'soft-light',crystalCost:2100 },
-  ...THEMED_INTERIORS,
+  ...THEMED_INTERIORS.map((item) => ({ ...item, crystalCost: THEMED_PRICES[item.id] ?? item.crystalCost })),
 ] as const;
 
 export type InteriorId = typeof INTERIORS[number]['id'];
 // The most expensive backgrounds are special-event rewards: they cannot be bought or gifted, only found in boxes
 // (Gold and Choice boxes, season and leaderboard rewards). Players who already bought one keep it.
-export const EVENT_INTERIOR_IDS = ['inferno-penthouse', 'parisian', 'cyberpunk', 'marina', 'rooftop'] as const;
+// Game backgrounds that are not a season pass: they are kept for boxes only, like the event backgrounds.
+// (A game that becomes a pass season has to come off this list: see tests/pass.test.mjs.)
+export const BOX_ONLY_GAME_IDS = ['cs-2', 'watch-dogs', 'sleeping-dogs', 'neighbours-from-hell', 'gta', 'repo', 'among-us'] as const;
+export const EVENT_INTERIOR_IDS = ['inferno-penthouse', 'parisian', 'cyberpunk', 'marina', 'rooftop', ...BOX_ONLY_GAME_IDS] as const;
+// Silver and Gold boxes draw their background reward from this pool: the event backgrounds (box-only) and the
+// themed ones (which can also be bought). Each background comes with its one connected style.
+export const BOX_INTERIOR_IDS: readonly string[] = [...new Set<string>([...EVENT_INTERIOR_IDS, ...THEMED_INTERIORS.map((item) => item.id)])];
 export const isEventInterior = (id: string) => (EVENT_INTERIOR_IDS as readonly string[]).includes(id);
 export const DUPLICATE_INTERIOR_SHARDS = 30;
 export const WALLS = ['neon','burgundy','emerald','navy','plum','charcoal','ivory','terracotta'] as const;
@@ -80,7 +92,7 @@ export const BUST_OPTIONS = ['petite','balanced','full'] as const;
 export const POSES = ['neutral','confident','working'] as const;
 // Recolours the main garment of the current outfit ('natural' keeps the original look).
 export const OUTFIT_COLORS = ['natural','black','white','red','blue','green','plum','sand'] as const;
-export const BARTENDER_OUTFITS = ['vest','shirt','apron','biker','tee-skirt','suit-jeans','bunny','kimono','baggy-tee','streetwear','special-gala','special-cyberpunk','special-steampunk','special-post-apocalypse','special-historical','special-fantasy','special-masquerade',...REFERENCE_COSTUME_IDS] as const;
+export const BARTENDER_OUTFITS = ['vest','shirt','apron','biker','tee-skirt','suit-jeans','bunny','kimono','baggy-tee','streetwear','special-gala','special-cyberpunk','special-steampunk','special-post-apocalypse','special-historical','special-fantasy','special-masquerade', ...REFERENCE_COSTUME_IDS] as const;
 export const BAR_PROFILE_OPTIONS = {
   wall:WALLS,counter:COUNTER_MATERIALS,counterColor:COUNTER_COLORS,counterSize:COUNTER_SIZES,
   lighting:HIGHLIGHTS,highlightStrength:HIGHLIGHT_STRENGTHS,shelf:SHELF_STYLES,bartenderCharacter:['noa','leo'] as const,

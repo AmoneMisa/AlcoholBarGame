@@ -1,5 +1,6 @@
 import { INGREDIENTS, RECIPES, REGIONS, STARTING_INVENTORY } from '../domain/catalog';
-import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
+import { ALCOHOL_PRODUCTS, isStarterBottle } from '../domain/bottleCatalog';
+import { ROULETTE_SPINS_PER_DAY, WHEEL } from '../domain/roulette';
 import { cosmeticFor } from '../domain/cosmetics';
 import { REFERENCE_COSTUME_IDS } from '../data/cosmetics/bartenderCostumes';
 import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
@@ -14,6 +15,7 @@ import type { BottleConversationFacts } from '../domain/conversation/bottleTalk'
 import { ensureSocial, rollSocial } from '../domain/social/generate';
 import { MAX_CUSTOMER_SEATS } from '../domain/customerTiming';
 import { createLoot, normalizeLoot, type LootState } from '../domain/lootState';
+import { migrateStylePool } from './loot';
 
 // The complete, serializable game state of one player. The server owns it; the client only displays it
 // (and, in offline practice mode, simulates it locally with the same rules).
@@ -45,8 +47,10 @@ export interface PlayerState {
   ownedInteriorIds: string[];
   ownedCosmeticIds: string[];
   cosmeticCopies: Record<string, number>;
-  cosmeticRouletteKey: string;
-  cosmeticRouletteResult: string;
+  /** The daily wheel: spins used today and the last result (the screen animates to its segment). */
+  roulette: import('../domain/roulette').RouletteState;
+  /** The season pass (see domain/pass.ts): the counters when it began, the premium track and the claimed rewards. */
+  pass: import('../domain/pass').PassState;
   cosmeticGiftLog: { cosmeticId:string; recipient:string; at:number }[];
   knownRecipeIds: string[];
   recipeUnlockSources: Record<string, UnlockSource>;
@@ -211,8 +215,8 @@ export function createInitialState(now = Date.now()): PlayerState {
     ownedInteriorIds: ['velvet'],
     ownedCosmeticIds: [],
     cosmeticCopies: {},
-    cosmeticRouletteKey: '',
-    cosmeticRouletteResult: 'Your daily style draw is ready.',
+    roulette: { day: '', spins: 0 },
+    pass: { bonus: 0, id: '', epoch: 0, base: {}, premium: false, claimed: [] },
     cosmeticGiftLog: [],
     knownRecipeIds,
     recipeUnlockSources: Object.fromEntries(knownRecipeIds.map((id) => [id, 'starter'])),
@@ -228,7 +232,8 @@ export function createInitialState(now = Date.now()): PlayerState {
     dailyLessonResult: 'Complete today’s three lessons to grow your learning streak.',
     inventories: Object.fromEntries(REGIONS.map((region) => [region.id, makeBarInventory(starting)])) as Record<RegionId, InventoryItem[]>,
     bottleInventories: Object.fromEntries(REGIONS.map((region, barIndex) => [region.id, ALCOHOL_PRODUCTS.map((product, productIndex) => ({
-      productId: product.id, quantity: 1 + ((barIndex + productIndex * 2) % 4)
+      // Only the mainstream basics are on the shelf at the start; every other label has to be topped up first.
+      productId: product.id, quantity: isStarterBottle(product) ? 2 + ((barIndex + productIndex) % 2) : 0
     }))])) as Record<RegionId, BottleInventoryItem[]>,
     customers: starterGuests,
     activeCustomerId: firstGuest.id,
@@ -276,6 +281,7 @@ export function normalizePlayerState(state: PlayerState) {
     ? state.tradeLog.filter((entry) => entry !== 'Each city bar now keeps its own stock.').slice(0, 40)
     : [];
   state.loot = normalizeLoot(state.loot, levelFor(state.xp));
+  if (state.loot.stylePieces > 0) migrateStylePool(state);
   state.popularity = Number.isFinite(state.popularity) ? Math.max(0, Math.floor(state.popularity)) : 0;
   if (state.popularityBoost?.kind === 'no-cooldown') {
     if (!Number.isFinite(state.popularityBoost.until)) state.popularityBoost = undefined;
@@ -322,8 +328,18 @@ export function normalizePlayerState(state: PlayerState) {
     : ['velvet'];
   state.ownedCosmeticIds = Array.isArray(state.ownedCosmeticIds) ? [...new Set(state.ownedCosmeticIds.filter((id) => typeof id === 'string'))] : [];
   state.cosmeticCopies = state.cosmeticCopies && typeof state.cosmeticCopies === 'object' ? state.cosmeticCopies : {};
-  state.cosmeticRouletteKey = typeof state.cosmeticRouletteKey === 'string' ? state.cosmeticRouletteKey : '';
-  state.cosmeticRouletteResult = typeof state.cosmeticRouletteResult === 'string' ? state.cosmeticRouletteResult : 'Your daily style draw is ready.';
+  const season = (state.pass ?? {}) as Partial<import('../domain/pass').PassState>;
+  state.pass = {
+    bonus: Number.isFinite(season.bonus) ? Math.max(0, Math.min(100_000, Math.floor(Number(season.bonus)))) : 0,
+    id: typeof season.id === 'string' ? season.id.slice(0, 24) : '',
+    epoch: Number.isFinite(season.epoch) && Number(season.epoch) > 0 ? Math.floor(Number(season.epoch)) : 0,
+    base: Object.fromEntries(Object.entries(season.base && typeof season.base === 'object' ? season.base : {}).filter(([key, value]) => key.length < 32 && Number.isFinite(value) && Number(value) >= 0).map(([key, value]) => [key, Math.floor(Number(value))])),
+    premium: season.premium === true,
+    claimed: Array.isArray(season.claimed) ? [...new Set(season.claimed.filter((key): key is string => typeof key === 'string' && /^[fp]\d{1,2}$/.test(key)))].slice(0, 60) : []
+  };
+  const wheel = (state.roulette ?? {}) as Partial<import('../domain/roulette').RouletteState>;
+  const last = wheel.last && Number.isInteger(wheel.last.index) && wheel.last.index >= 0 && wheel.last.index < WHEEL.length ? { index: wheel.last.index, text: String(wheel.last.text ?? '').slice(0, 200), n: Math.max(0, Math.floor(Number(wheel.last.n) || 0)) } : undefined;
+  state.roulette = { day: typeof wheel.day === 'string' ? wheel.day : '', spins: Math.max(0, Math.min(ROULETTE_SPINS_PER_DAY, Math.floor(Number(wheel.spins) || 0))), ...(last ? { last } : {}) };
   state.cosmeticGiftLog = Array.isArray(state.cosmeticGiftLog) ? state.cosmeticGiftLog.slice(0, 30) : [];
   // The training academy was removed: old saves drop its progress and any practice guest still at the bar.
   delete (state as { training?: unknown }).training;

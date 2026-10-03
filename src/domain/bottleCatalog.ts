@@ -84,11 +84,17 @@ export const bottleTotal = (product: AlcoholProduct, quantity: number, marketFac
 
 // Popular premium labels use the rare-currency reserve market. Customer crystal payments always
 // exceed the refill price, preserving a positive seller margin.
-export const bottleRestockCrystalCost = (product: AlcoholProduct) => product.popularity >= 90 && product.price >= 20
-  ? Math.min(24, Math.max(5, Math.round(product.price / 4))) : 0;
+// A new bar starts with only a few mainstream basics for the classic cocktails (one rum, gin, vodka, tequila, whiskey,
+// vermouth and a few beers). Every other label, premium ones included, is topped up with crystals first.
+export const STARTER_BOTTLE_IDS: readonly string[] = ['bacardi-carta-blanca', 'beefeater', 'smirnoff-red', 'jose-cuervo-especial', 'jim-beam-white', 'martini-bianco', 'heineken-original', 'corona-extra', 'budweiser'];
+export const isStarterBottle = (product: AlcoholProduct) => STARTER_BOTTLE_IDS.includes(product.id);
+export const isPremiumBottle = (product: AlcoholProduct) => !isStarterBottle(product) && ((product.popularity >= 90 && product.price >= 20) || product.price >= 40);
+export const bottleRestockCrystalCost = (product: AlcoholProduct) => Math.min(24, Math.max(isPremiumBottle(product) ? 5 : 2, Math.round(product.price / 4)));
 export const bottleSaleCrystalReward = (product: AlcoholProduct, quantity = 1) => {
   const cost = bottleRestockCrystalCost(product);
-  return (cost ? cost + Math.max(2, Math.ceil(cost * .3)) : 3) * Math.max(1, quantity);
+  // Selling a topped-up bottle pays a small margin (about a fifth, at least 1 crystal): enough to be worth it, too
+  // little to be a crystal machine.
+  return (cost + Math.max(1, Math.round(cost * .2))) * Math.max(1, quantity);
 };
 export const brandedServeCrystalReward = (product: AlcoholProduct) => Math.max(3, Math.min(15, Math.ceil(product.popularity / 12)));
 
