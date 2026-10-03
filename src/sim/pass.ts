@@ -4,7 +4,7 @@ import { COSMETICS } from '../domain/cosmetics';
 import {
   PASS_LEVELS, PASS_LEVEL_POINTS, PASS_LEVEL_PRICE, PASS_PREMIUM_PRICE, passClaimKey, passIdOf, passLevel, passPointsFor, passRewards, passThemeOf, sharedPassId, sharedPassStart
 } from '../domain/pass';
-import { grantCosmetic, grantReward } from './loot';
+import { grantCosmetic, grantReward } from './lootCore';
 import type { PlayerState } from './state';
 
 // The season pass: points are counted from the loot counters since the pass began (see domain/pass.ts), so the

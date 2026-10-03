@@ -2,11 +2,9 @@ import { createApp } from 'vue';
 import { installDragScroll } from './ui/dragScroll';
 import { createPinia } from 'pinia';
 import { initTelegram } from './telegram/webapp';
-import { hydrateCocktailCatalog } from './domain/recipeApi';
 import { initGraphics } from './ui/graphics';
 
-// The bundled catalogue is identical to the database seed, so a slow or failing API must not delay the game:
-// wait briefly for the fresh list, then start with what we have.
+// The opening bar needs recipe mechanics only; descriptions and database prose load with Study.
 {
   initGraphics();
   await Promise.all([
@@ -18,10 +16,6 @@ import { initGraphics } from './ui/graphics';
   await import('./polish.css'); // last, so its layout fixes win over the older rules
   await import('./performance.css');
   await import('./readability.css');
-  const catalogRequest = new AbortController();
-  const abortTimer = setTimeout(() => catalogRequest.abort(), 800);
-  await hydrateCocktailCatalog((input, init) => fetch(input, { ...init, signal: catalogRequest.signal }));
-  clearTimeout(abortTimer);
   initTelegram();
   const { default: App } = await import('./App.vue');
   installDragScroll();

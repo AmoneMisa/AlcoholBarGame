@@ -1313,7 +1313,7 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:clip}
 .bar-event span { font-size:13px;opacity:.85; }
 
 .game-nav button { position: relative; }
-.nav-badge { position: absolute; top: 2px; right: 8px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: #d9534f; color: #fff; font: 700 13px/16px system-ui, sans-serif; font-style: normal; text-align: center; }
+.nav-badge { position: absolute; top: 2px; right: 8px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; min-width: 24px; height: 24px; padding: 0 5px; border-radius: 12px; background: #d9534f; color: #fff; font: 700 13px/1 system-ui, sans-serif; font-style: normal; letter-spacing: 0; text-align: center; }
 
 .staff-resource { position: relative; }
 .staff-open { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid #43536b; border-radius: 12px; background: #131f31; color: inherit; cursor: pointer; }

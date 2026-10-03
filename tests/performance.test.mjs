@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { warmPages } from '../src/ui/pageWarmup.ts';
 import { existsSync, readFileSync } from 'node:fs';
 import { weakDevice } from '../src/ui/graphics.ts';
 import { thumbnailArtwork, characterFrame, mobileArtwork } from '../src/domain/optimizedArtwork.ts';
@@ -62,4 +63,37 @@ test('game audio is optional and English voice does not depend on the sound runt
   assert.ok(!/^import\s+(?!type\b).*from ['"]\.\/(?:engine|music|sfx|runtime)['"]/m.test(facade));
   const voice = readFileSync(new URL('../src/domain/english/speak.ts', import.meta.url), 'utf8');
   assert.ok(voice.includes("from '../../audio/index'"));
+});
+
+test('page warmup respects priority and never overlaps requests', async () => {
+  const scheduled = []; const started = []; let finish;
+  const stop = warmPages([
+    { id: 'study', load: () => { started.push('study'); return new Promise(resolve => { finish = resolve; }); } },
+    { id: 'conversation', load: async () => { started.push('conversation'); } }
+  ], { allowed: () => true, busy: () => false, schedule: run => { scheduled.push(run); return () => {}; } });
+  scheduled.shift()();
+  assert.deepEqual(started, ['study']); assert.equal(scheduled.length, 0);
+  finish(); await new Promise(resolve => setImmediate(resolve));
+  scheduled.shift()(); await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(started, ['study', 'conversation']); stop();
+});
+
+test('saving data prevents speculative pages from being scheduled', () => {
+  let scheduled = 0;
+  warmPages([{id:'study',load:async()=>{throw new Error('must not load');}}], {allowed:()=>false,busy:()=>false,schedule:()=>{scheduled++;return()=>{};}});
+  assert.equal(scheduled,0);
+});
+
+test('busy gameplay delays warming and cancellation prevents a queued import', () => {
+  const queue=[]; let busy=true; let imports=0;
+  const stop=warmPages([{id:'study',load:async()=>{imports++;}}],{allowed:()=>true,busy:()=>busy,schedule:run=>{queue.push(run);return()=>{};}});
+  queue.shift()(); assert.equal(imports,0); assert.equal(queue.length,1);
+  busy=false; stop(); queue.shift()(); assert.equal(imports,0);
+});
+
+test('a failed speculative page does not block later pages', async () => {
+  const queue=[]; const loaded=[];
+  warmPages([{id:'study',load:async()=>{throw new Error('offline');}},{id:'conversation',load:async()=>{loaded.push('conversation');}}],{allowed:()=>true,busy:()=>false,schedule:run=>{queue.push(run);return()=>{};}});
+  queue.shift()(); await new Promise(resolve=>setImmediate(resolve)); queue.shift()();
+  await new Promise(resolve=>setImmediate(resolve)); assert.deepEqual(loaded,['conversation']);
 });

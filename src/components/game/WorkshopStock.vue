@@ -138,7 +138,7 @@ function throwAway() {
     </template>
 
     <template v-else-if="popup.type === 'parts'">
-      <p class="stock-text">You have <b>{{ game.loot.parts }}</b> workshop parts. Use Equipment on the Bar screen to upgrade your bar. Serving guests and opening boxes find more.</p>
+      <p class="stock-text">You have <b>{{ game.loot.parts }}</b> workshop parts. Use Upgrades on the Bar screen to upgrade your bar. Serving guests and opening boxes find more.</p>
     </template>
 
     <template v-else-if="popup.type === 'style' && style">

@@ -147,9 +147,10 @@ const relation = computed(() => {
   const person = customer.value?.characterId ? companionById(customer.value.characterId) : undefined;
   if (!person) return undefined;
   const points = game.circle.owned[person.id];
-  if (points === undefined) return { text: `Not in your circle · ${game.circle.shards[person.id] ?? 0} / ${person.shards} shards`, joined: false };
+  const fragments = `${game.circle.shards[person.id] ?? 0}/${person.shards}`;
+  if (points === undefined) return { text: '', fragments, joined: false };
   const here = standing(COMPANION_LADDER, points);
-  return { text: here.nextAt === undefined ? `${here.name} · highest grade` : `${here.name} · ${here.points} / ${here.nextAt}`, joined: true };
+  return { text: here.nextAt === undefined ? `${here.name} · highest grade` : `${here.name} · ${here.points} / ${here.nextAt}`, fragments, joined: true };
 });
 const needNow = computed(() => social.value?.need && social.value.need.since <= game.nowMs ? social.value.need.kind : undefined);
 const NEED_LABEL: Record<string, string> = { ashtray: 'Wants an ashtray', 'clean-ashtray':'Wants the ashtray cleaned', 'remove-ashtray':'Wants the ashtray removed', food:'Wants food with the drink', water: '💧 Wants water', taxi: '🚕 Wants a taxi', chat: '💬 Wants to talk' };
@@ -368,7 +369,10 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
   <div v-if="customer && talk" class="talk-backdrop" @click.self="game.closeConversation()">
     <section class="talk-popup" role="dialog" aria-modal="true" :aria-label="`Conversation with ${customer.name}`">
       <header class="talk-header">
-        <div class="talk-portrait"><CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[slot % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="talk.expression" animation="talk" /></div>
+        <div class="talk-person">
+          <template v-if="relation"><span class="talk-circle-tag">Circle</span><span class="talk-circle-fragments" aria-label="Circle fragments">{{ relation.fragments }}</span></template>
+          <div class="talk-portrait"><CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[slot % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="talk.expression" animation="talk" /></div>
+        </div>
         <div class="talk-title">
           <small>ENGLISH PRACTICE · {{ customer.mood }}</small>
           <h2>{{ customer.name }}</h2>
@@ -379,7 +383,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           </div>
           <div v-if="social" class="talk-state">
             <span class="state-chip" :class="social.emotion">{{ EMOTION_ICON[social.emotion] }} {{ EMOTION_LABEL[social.emotion] }}</span>
-            <span v-if="relation" class="state-chip relation" :class="{ joined: relation.joined }" title="Your relationship with this person"><UiIcon name="heart" /> {{ relation.text }}</span>
+            <span v-if="relation?.joined" class="state-chip relation joined" title="Your relationship with this person"><UiIcon name="heart" /> {{ relation.text }}</span>
             <span v-if="stage !== 'sober'" class="state-chip drunk">🥴 {{ DRUNK_LABEL[stage] }}</span>
             <span v-if="needNow" class="state-chip need"><img v-if="needNow === 'ashtray'" class="ashtray-inline" :src="ashtrayArt" alt="" />{{ NEED_LABEL[needNow] }}</span>
             <span v-if="social.taxiAt" class="state-chip need">🚕 Taxi on the way</span>

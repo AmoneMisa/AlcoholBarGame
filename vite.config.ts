@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue';
 
 export default defineConfig(({ isSsrBuild }) => ({
   plugins: [vue()],
+  worker: { format: 'es' },
   // Which build this is: the commit CI built (GIT_SHA) and when. Shown on the profile screen and by /api/health.
   define: {
     __APP_VERSION__: JSON.stringify((process.env.GIT_SHA ?? 'dev').slice(0, 7)),

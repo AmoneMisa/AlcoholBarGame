@@ -21,6 +21,7 @@ import TipJar from './TipJar.vue';
 import ConfirmDialog from '../ui/ConfirmDialog.vue';
 import CrystalAmount from '../ui/CrystalAmount.vue';
 import UiIcon from '../ui/UiIcon.vue';
+import UiButton from '../ui/UiButton.vue';
 import Glyph from '../ui/Glyph.vue';
 import { INTERIORS, shelfStyleFor } from '../../data/cosmetics/bars';
 import { liteGraphics } from '../../ui/graphics';
@@ -561,7 +562,10 @@ onBeforeUnmount(() => {
       <button class="guest-nudge next" type="button" :aria-label="hiddenGuests.right ? 'Show more guests · customer off screen' : 'Show more guests'" :disabled="guestScroll >= phoneTrack!.content - phoneTrack!.zone - 2" @click="nudgeGuests(1)"><UiIcon name="chevron-right" /><span v-if="hiddenGuests.right" class="hidden-guest-dot" aria-hidden="true"></span></button>
     </template>
     <TipJar v-if="!preview" />
-    <button v-if="!preview && !capture" class="bar-screenshot-open" data-guide="screenshot" type="button" aria-label="Open full-screen bar for screenshots" title="Full-screen bar" @click="$emit('screenshot')"><UiIcon name="fullscreen" /></button>
+    <div v-if="!preview && !capture" class="bar-scene-tools">
+      <nav aria-label="Bar tools"><slot name="tools" /></nav>
+      <UiButton size="sm" icon="fullscreen" class="bar-screenshot-open" data-guide="screenshot" aria-label="Open full-screen bar for screenshots" title="Full-screen bar" @click="$emit('screenshot')" />
+    </div>
     <!-- Over the glass the bottle settles above its rim and tips; the glass draws the single pour stream. -->
     <div v-if="draggingIngredientId && selectedIngredient" class="drag-bottle-ghost" :class="{ pouring: dragOverGlass }" :style="ghostStyle" aria-hidden="true">
       <span class="ghost-bottle"><BottleModel :ingredient="selectedIngredient" /></span>
@@ -569,7 +573,7 @@ onBeforeUnmount(() => {
     </div>
   </section>
   </div>
-  <ConfirmDialog v-if="inviteArrival && inviteSeat !== undefined" :title="`Invite guest · Seat ${inviteSeat + 1}`" confirm-label="Invite now" :disabled="game.crystals < inviteArrival.cost || inviteArrival.cost <= 0" :reason="game.crystals < inviteArrival.cost ? 'Not enough crystals' : undefined" @cancel="inviteSeat = undefined" @confirm="inviteCustomer">
+  <ConfirmDialog v-if="inviteArrival && inviteSeat !== undefined" :title="`Invite guest · Seat ${inviteSeat + 1}`" confirm-label="Invite now" :disabled="game.crystals < inviteArrival.cost || inviteArrival.cost <= 0" @cancel="inviteSeat = undefined" @confirm="inviteCustomer">
     <p>This guest arrives in <b>{{ inviteArrival.countdown }}</b>.</p>
     <p>Invite them to this seat now for <CrystalAmount :value="inviteArrival.cost" />.</p>
   </ConfirmDialog>

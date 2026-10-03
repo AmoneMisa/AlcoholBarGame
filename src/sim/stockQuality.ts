@@ -1,7 +1,7 @@
 import { INGREDIENTS, SUPPLIERS } from '../domain/catalog';
 import { coins } from '../domain/economy';
 import type { InventoryItem, RegionId } from '../domain/types';
-import { SELLERS } from './trade';
+import { SELLERS } from './tradeCore';
 import { DELIVERY_DAY_MS, type DeliveryOrder, type PlayerState } from './state';
 import { ingredientName as nameOf } from '../domain/catalog';
 

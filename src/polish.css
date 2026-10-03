@@ -400,10 +400,10 @@ header.top-hud .venue-name em {font-size:13px;}
 header.top-hud .exchange-open {display:flex;align-items:center;gap:4px;padding:3px 0;}
 @media(max-width:600px) {header.top-hud {padding:6px 8px;gap:4px 7px;}header.top-hud .hud-resources {gap:8px;}header.top-hud .venue-card {min-width:0;}}
 
-.bar-screenshot-open {position:absolute;right:10px;bottom:10px;z-index:35;display:grid;place-items:center;width:28px;height:28px;padding:5px;border:1px solid #b997574d;border-radius:7px;background:#0d1528a6;color:#ead1a3;cursor:pointer;}
-.bar-screenshot-open .ui-icon {width:17px;height:17px;}
-.bar-screenshot-open:hover {background:#253247;}
-.bar-screenshot-open:focus-visible {outline:2px solid #eac780;outline-offset:2px;}
+.bar-scene-tools {position:absolute;left:10px;right:10px;bottom:10px;z-index:35;display:flex;align-items:center;justify-content:space-between;gap:8px;pointer-events:none;}
+.bar-scene-tools nav {display:flex;gap:6px;}
+.bar-scene-tools .ui-btn {pointer-events:auto;min-height:34px;padding:6px 10px;background:#101b2deb;}
+.bar-scene-tools .bar-screenshot-open {width:34px;padding:6px;flex:none;}
 
 .change-appearance-button { margin-top:18px; }
 .chat-guide-list li { display:list-item; }

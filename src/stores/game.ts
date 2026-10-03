@@ -25,19 +25,19 @@ import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { dailyLessonsFor, learningStreakBonus } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic as ownsCosmetic } from '../domain/cosmetics';
 import { usableIngredientIds } from '../domain/usableStock';
-import { negotiatedQuote } from '../sim/trade';
+import { negotiatedQuote } from '../sim/tradeCore';
 import type { Customer, InventoryItem, RegionId, SupplierOffer } from '../domain/types';
 import { pourableBrand } from '../domain/brandServe';
 import { formatCountdown } from '../domain/customerTiming';
 import { spinsLeft } from '../domain/roulette';
 import { passEndsOf, passIdOf, passLevel, passPointsFor, passThemeOf, readyPassRewards } from '../domain/pass';
 import { checkText } from '../domain/english/checker';
-import { advanceClock, applyAction, previewTopUp, RuleError, type GameAction } from '../sim/rules';
+import { advanceClock, applyAction, previewTopUp, RuleError, isRareAction, rareActionsReady, installRareActions, type GameAction } from '../sim/rulesCore';
 import { createInitialState, levelFor, normalizePlayerState, type PlayerState } from '../sim/state';
 import { playSfx } from '../audio/index';
 import { answerFriendRequest, claimFriendGifts, connectSession, createStarInvoice, fetchFriends, removeFriendLink, requestFriend, saveFriendLabel, sendAction, sendFriendGift, visitFriendBar, type FriendBar, type FriendSummary } from '../telegram/api';
 import { rewardLines, snapshot as stateSnapshot, type RewardLine, type RewardReport, type Snapshot } from '../domain/rewards';
-import { giftableInteriors, giftableStyles, type GiftRequest } from '../sim/gifts';
+import type { GiftRequest } from '../sim/gifts';
 import { currentStage, fill as fillSituationText, guestLine, visibleChoices } from '../sim/situations';
 
 // The client side of a server-authoritative game.
@@ -47,6 +47,10 @@ import { currentStage, fill as fillSituationText, guestLine, visibleChoices } fr
 // kept on this device only; it is never uploaded to an account.
 
 const OFFLINE_KEY = 'barlingo-offline-v2';
+let rareActionsRequest: Promise<void> | undefined;
+function loadRareActions() {
+  return rareActionsRequest ??= import('../sim/rareActions').then(module => installRareActions(module.applyRareAction)).catch(error => { rareActionsRequest = undefined; throw error; });
+}
 const LEGACY_KEY = 'barlingo-economy-v1';
 const EMPTY_CUSTOMER: Customer = {
   id: 'waiting-for-customer', name: 'Next guest', mood: 'calm', patience: 1, patienceRemaining: 1,
@@ -239,8 +243,13 @@ export const useGameStore = defineStore('game', () => {
   const ownedCosmeticIds = computed(() => state.value.ownedCosmeticIds ?? []);
   const cosmeticCopies = computed(() => state.value.cosmeticCopies ?? {});
   // What can be given away because it only comes from boxes: moves to the friend and leaves this player.
-  const giftableStyleItems = computed(() => giftableStyles(state.value));
-  const giftableBackgrounds = computed(() => giftableInteriors(state.value));
+  const giftChoices = ref<typeof import('../sim/giftChoices')>();
+  let giftChoicesRequest: Promise<void> | undefined;
+  function loadGiftChoices() {
+    if (!giftChoicesRequest) giftChoicesRequest = import('../sim/giftChoices').then(module => { giftChoices.value = module; }).catch(() => { giftChoicesRequest = undefined; });
+  }
+  const giftableStyleItems = computed(() => { if (!giftChoices.value) loadGiftChoices(); return giftChoices.value?.giftableStyles(state.value) ?? []; });
+  const giftableBackgrounds = computed(() => { if (!giftChoices.value) loadGiftChoices(); return giftChoices.value?.giftableInteriors(state.value) ?? []; });
   const rouletteSpinsLeft = computed(() => spinsLeft(state.value.roulette, today.value));
   const rouletteLast = computed(() => state.value.roulette.last);
   // The season pass: shown from the loot counters; a pass that has not been started by an action yet counts from zero.
@@ -396,11 +405,18 @@ export const useGameStore = defineStore('game', () => {
   }
 
   // Apply an action locally (instant feedback), then let the server decide. Returns false if the rules refuse it.
+  let pendingRareAction = false;
   function dispatch(action: GameAction): boolean {
     const before = stateSnapshot(state.value);
     if (mode.value === 'online' && SERVER_ONLY.has(action.type)) {
       if (action.type === 'openConversation') state.value.conversationCustomerId = action.customerId;
       void send(action, before);
+      return true;
+    }
+    if (isRareAction(action) && !rareActionsReady()) {
+      if (pendingRareAction) return false;
+      pendingRareAction = true;
+      void loadRareActions().then(() => { pendingRareAction = false; dispatch(action); }).catch(() => { pendingRareAction = false; message.value = 'Could not load this action. Please try again.'; });
       return true;
     }
     // Applied in place (objects the screens hold stay valid); a refused action is rolled back.

@@ -4,16 +4,18 @@ import TutorialTour from './components/ui/TutorialTour.vue';
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import SectionTabs from './components/ui/SectionTabs.vue';
 import { lazyPage } from './ui/lazy';
+import { loadStudy, loadConversation, loadStorage, loadGuide, loadPreparation, nextPages } from './ui/pageLoaders';
+import { startPageWarmup } from './ui/pageWarmup';
 import BarChips from './components/game/BarChips.vue';
 import UiButton from './components/ui/UiButton.vue';
 import ModalDialog from './components/ui/ModalDialog.vue';
 const MailboxPopup = lazyPage(() => import('./components/ui/MailboxPopup.vue'));
-const PreparationScreen = lazyPage(() => import('./components/cocktails/PreparationScreen.vue'));
+const PreparationScreen = lazyPage(loadPreparation);
 const BarScreenshot = lazyPage(() => import('./components/game/BarScreenshot.vue'));
 import BarScene from './components/game/BarScene.vue';
 import TopHud from './components/game/TopHud.vue';
 import { useGuide } from './composables/useGuide';
-const GuideSheet = lazyPage(() => import('./components/knowledge/GuideSheet.vue'));
+const GuideSheet = lazyPage(loadGuide);
 const { current: currentGuide } = useGuide();
 import UiIcon from './components/ui/UiIcon.vue';
 const CompanionsPanel = lazyPage(() => import('./components/workshop/CompanionsPanel.vue'));
@@ -31,14 +33,17 @@ import { ACHIEVEMENTS, questsForWeek, weekOf } from './domain/quests';
 import { initMusic, musicOn, playSfx, refreshMusic, setMusicInterior } from './audio/index';
 
 // Only the bar scene is needed for the first paint; every other screen is fetched when the player opens it.
-const ConversationPopup = lazyPage(() => import('./components/conversation/ConversationPopup.vue'));
-const ManagementDeck = lazyPage(() => import('./components/game/ManagementDeck.vue'));
-const LearningPage = lazyPage(() => import('./components/learning/LearningPage.vue'));
+const ConversationPopup = lazyPage(loadConversation);
+const ManagementDeck = lazyPage(loadStorage);
+const LearningPage = lazyPage(loadStudy);
 const FriendsPage = lazyPage(() => import('./components/friends/FriendsPage.vue'));
 const EventsPage = lazyPage(() => import('./components/game/EventsPage.vue'));
 const StartingBarPicker = lazyPage(() => import('./components/game/StartingBarPicker.vue'));
 
 const game = useGameStore();
+let stopPageWarmup: (() => void) | undefined;
+onMounted(() => { stopPageWarmup = startPageWarmup(nextPages, () => !!game.conversationCustomerId || !!game.preparationCustomerId || game.trainingActive); });
+onUnmounted(() => stopPageWarmup?.());
 const notifications = useNotificationsStore();
 const view = ref('service');
 const screenshotOpen = ref(false);
@@ -209,11 +214,12 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
     <TopHud @design="selectView('design')" @goto="selectView" @profile="characterInfoOpen = true" />
     <main>
       <section v-show="view === 'service'" class="service-layout">
-        <BarScene :active="view === 'service'" @screenshot="screenshotOpen = true" />
-        <nav class="bar-utilities" aria-label="Bar tools">
-          <UiButton size="sm" icon="stock" @click="equipmentOpen = true">Equipment</UiButton>
-          <UiButton size="sm" icon="glass" @click="openMixingCounter">Mix cocktails</UiButton>
-        </nav>
+        <BarScene :active="view === 'service'" @screenshot="screenshotOpen = true">
+        <template #tools>
+          <UiButton size="sm" icon="stock" @click="equipmentOpen = true">Upgrades</UiButton>
+          <UiButton size="sm" icon="glass" @click="openMixingCounter">Mix page</UiButton>
+        </template>
+        </BarScene>
       </section>
       <SectionTabs v-if="sectionTabs.length" v-model="sub[view]" :tabs="sectionTabs" :label="view" />
       <BarChips v-if="view === 'bar'" />
@@ -228,7 +234,7 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
     </main>
     <ConversationPopup v-if="game.conversationCustomerId" />
     <PreparationScreen v-if="game.preparationCustomerId || mixingOpen" :workbench="!game.preparationCustomerId" @close="mixingOpen = false" />
-    <ModalDialog v-if="equipmentOpen" title="Equipment" eyebrow="YOUR BAR" width="760px" @close="equipmentOpen = false"><EquipmentPanel /></ModalDialog>
+    <ModalDialog v-if="equipmentOpen" title="Upgrades" eyebrow="YOUR BAR" width="760px" @close="equipmentOpen = false"><EquipmentPanel /></ModalDialog>
     <BarScreenshot v-if="screenshotOpen" @close="screenshotOpen = false" />
     <ModalDialog v-if="characterInfoOpen" title="Your character" class="character-info-popup" @close="characterInfoOpen = false">
       <SectionTabs v-model="characterInfoTab" :tabs="[{id:'profile',label:'Character'},{id:'settings',label:'Settings'}]" label="Character information" />
@@ -257,7 +263,4 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
 </template>
 
 <style>
-.bar-utilities { position:fixed;z-index:110;left:12px;bottom:calc(88px + var(--safe-bottom, 0px));display:flex;gap:6px; }
-.bar-utilities .ui-btn { min-height:34px;padding:6px 10px;background:#101b2deb; }
-@media(max-width:600px) { .bar-utilities { left:8px;bottom:calc(80px + var(--safe-bottom, 0px)); } }
 </style>

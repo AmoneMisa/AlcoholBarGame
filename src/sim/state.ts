@@ -15,7 +15,7 @@ import type { BottleConversationFacts } from '../domain/conversation/bottleTalk'
 import { ensureSocial, rollSocial } from '../domain/social/generate';
 import { MAX_CUSTOMER_SEATS } from '../domain/customerTiming';
 import { createLoot, normalizeLoot, type LootState } from '../domain/lootState';
-import { migrateStylePool } from './loot';
+import { migrateStylePool } from './lootCore';
 import { normalizeTips } from './tips';
 
 // The complete, serializable game state of one player. The server owns it; the client only displays it
