@@ -352,7 +352,6 @@ function bubbleText(customer: Customer) {
 function customerStatus(customer: Customer) {
   return customer.pendingPayment ? 'Payment' : customer.social?.phase === 'enjoying' ? 'Served' : customer.orderRevealed ? 'Confirmed' : 'Pending';
 }
-function patience(value: number, total: number) { return Math.max(0, Math.min(100, value / total * 100)); }
 function setRequestedBrand(id: string) {
   if (game.customer.orderKind !== 'serve') return;
   const product = ALCOHOL_PRODUCTS.find((item) => item.id === game.customer.serveRequest?.productId);
@@ -542,7 +541,7 @@ onBeforeUnmount(() => {
           <header><b>{{ customer.name }}</b><time v-if="!game.trainingActive && customer.id === game.activeCustomerId">{{ game.orderCountdown }}</time></header>
           <small class="guest-badges"><span v-for="badge in badges(customer)" :key="badge.label" :title="badge.label"><img v-if="badge.icon === 'ashtray'" class="ashtray-badge" :src="ashtrayArt" alt="" /><Glyph v-else :g="badge.icon" /></span><i v-if="!customer.social">{{ customer.mood }}</i><i v-else>{{ customer.pendingPayment ? 'payment' : customer.social.phase === 'enjoying' ? 'enjoying' : EMOTION_LABEL[customer.social.emotion].toLowerCase() }}</i></small>
           <p>{{ bubbleText(customer) }}</p>
-          <footer><span v-if="!game.trainingActive" class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customerStatus(customer) }}</em></footer>
+          <footer><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customerStatus(customer) }}</em></footer>
         </div>
       </button>
       <button v-else type="button" class="scene-customer empty-seat" :style="customerStyle(index)" :aria-label="`Invite guest to seat ${index + 1} · next guest in ${countdown}`" @click="inviteSeat = index">
