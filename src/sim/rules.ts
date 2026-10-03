@@ -2,6 +2,7 @@ import { INGREDIENTS, MODIFIERS, RECIPES, REGIONS, SUPPLIERS, estimateRecipeAbv 
 import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost, bottleSaleCrystalReward, bottleTotal, brandedServeCrystalReward } from '../domain/bottleCatalog';
 import { arrivalSkipCrystalCost, calendarDate, coins, specialtyFactor, supplierInCity, consecutiveDays, conversationCrystalReward, conversationDifficulty, crystalExchange, dailyCoinsFor, dailyCrystalsFor, quotePurchase, recipePurchase } from '../domain/economy';
 import { withArticle } from '../domain/english/articles';
+import { accrueTips, depositTips, resetTips } from './tips';
 import { PassError, buyPassLevels, buyPassPremium, claimPass, syncPass } from './pass';
 import { ROULETTE_SPINS_PER_DAY, spinWheel } from '../domain/roulette';
 import { STYLE_SHOP_PRICE, styleForInterior, styleSource } from '../data/cosmetics/styleSources';
@@ -18,7 +19,7 @@ import { AUTO_SERVE_LEVEL, AUTO_SUPPLY_LEVEL, economyAt, formatDeliveryTime, mar
 import { BAR_PURCHASE_LEVEL, barUnlockPrice } from '../domain/barUnlocks';
 import { DAILY_LESSON_COUNT, DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus, normalizeLessonAnswer } from '../domain/dailyLessons';
 import { COSMETICS, canUseCosmetic } from '../domain/cosmetics';
-import { LootError, orderDiscount, claimSpark, grantCosmetic, grantReward, craftStyle, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, promoteEquipment, upgradeEquipment, useConsumable, xpGain, discardLoot } from './loot';
+import { LootError, orderDiscount, claimSpark, grantCosmetic, grantReward, craftStyle, addWeeklyScore, claimLeaderboardReward, applySignatureGuest, designSignature, signatureFameFactor, signatureServed, applySpoilage, capacityOf, roomFor, earnLoyalty, regularPriceBonus, dailyLessonsBox, englishTalkReward, buyBox, claimAchievement, claimQuest, tasteFirst, track, buyConsumable, craftSkin, dailyStreakBox, dropAfterServe, drawStyle, grantLevelBoxes, lootBonuses, openBox, pickChoice, promoteEquipment, upgradeEquipment, useFragmentChoice, useConsumable, xpGain, discardLoot } from './loot';
 import { usableIngredientIds } from '../domain/usableStock';
 import { acceptDeal, haggle, makeOffer, startNegotiation, TradeError } from './trade';
 import { actsIn } from '../domain/social/acts';
@@ -35,9 +36,10 @@ import { applyPromo, barEventFor, tickBarEvent } from './events';
 import { adjustPitch, askPitch, cancelPitch, pitchChance, startPitch, serveFoodAtCounter } from './pitch';
 import { pitchActsIn } from '../domain/social/pitchActs';
 import { foodById } from '../domain/foods';
+import { foodRequestLine } from '../domain/foodRequests';
 import { discardQuarantine, expireStock, fileClaim, goodAmount, receiveOrder, takeLowGrade } from './stockQuality';
 import { situationById } from '../domain/situations/catalog';
-import { MAX_SEATS, afterServed, holdForPayment, recordDrink, settleGuest, applySocialReply, askToLeave, callTaxi, cleanAshtrays, drunkGain, giveAshtray, giveWater, isOrdering, orderingGuests, removeGuest, scheduleArrival, tickGuests, ashtraysOf, type GuestContext } from './guests';
+import { MAX_SEATS, afterServed, holdForPayment, recordDrink, settleGuest, applySocialReply, askToLeave, callTaxi, cleanAshtrays, drunkGain, giveAshtray, giveWater, isOrdering, orderingGuests, removeGuest, scheduleArrival, tickGuests, ashtraysOf, serviceAshtray, type GuestContext } from './guests';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
 import { DELIVERY_DAY_MS, createInitialState, levelFor, normalizePlayerState, wishFor, withUniqueLook, type PlayerState, type Transcript, type UnlockSource } from './state';
 
@@ -90,6 +92,8 @@ export type GameAction =
   | { type: 'autoServe' }
   // Looking after the people at the bar: each names the guest it is for.
   | { type: 'giveAshtray'; customerId: string }
+  | { type: 'cleanGuestAshtray'; customerId:string }
+  | { type: 'removeGuestAshtray'; customerId:string }
   | { type: 'cleanAshtrays' }
   | { type: 'setTour'; value: 'done' | 'skipped' }
   // One-tap restock.
@@ -121,6 +125,7 @@ export type GameAction =
   | { type: 'pickReward'; index: number }
   | { type: 'buyBox'; box: string; quantity?: number }
   | { type: 'buyConsumable'; id: string; quantity?: number }
+  | { type: 'useFragmentChoice'; id: string; targetId: string }
   | { type: 'useConsumable'; id: string; recipeId?: string }
   | { type: 'discardLoot'; kind: string; id: string; amount: number }
   | { type: 'drawStyle'; count: 1 | 10; banner?: 'standard' | 'seasonal' }
@@ -137,6 +142,8 @@ export type GameAction =
 export class RuleError extends Error {}
 
 export interface RuleContext {
+  beforeAction?: () => void;
+  deferLevelRewards?: boolean;
   now: number;
   training?: boolean;
   random?: () => number;
@@ -227,10 +234,10 @@ function autoRestock(state: PlayerState, now: number, manual = false): number {
     const supplier = supplierInCity(SUPPLIERS.find((item) => item.id === supplierId)!, region.marketFactor);
     const quote = quotePurchase(market, cart, supplier);
     if (!quote.lines.length) continue;
-    if (state.money < quote.total) { state.message = `${manual ? 'Top-up' : 'Auto-supply'} paused: ${quote.total.toFixed(2)} coins needed for ${supplier.name}.`; continue; }
+    if (state.money < quote.total) { state.message = `${manual ? 'Top-up' : 'Auto-supply'} paused: ${quote.total.toFixed(0)} coins needed for ${supplier.name}.`; continue; }
     ordered++;
     placeDeliveryOrder(state, supplier, quote, now);
-    log(state, `${manual ? 'Top-up' : 'Auto-supply'} ordered ${quote.lines.map((line) => INGREDIENTS.find((item) => item.id === line.ingredientId)?.name).join(', ')} from ${supplier.name} for ${quote.total.toFixed(2)} coins.`);
+    log(state, `${manual ? 'Top-up' : 'Auto-supply'} ordered ${quote.lines.map((line) => INGREDIENTS.find((item) => item.id === line.ingredientId)?.name).join(', ')} from ${supplier.name} for ${quote.total.toFixed(0)} coins.`);
   }
   return ordered;
 }
@@ -376,8 +383,10 @@ function processDeliveries(state: PlayerState, now: number, random: () => number
 
 // Time passes on the server clock only: deliveries arrive, guests sober up, ask for things and order again,
 // patience runs down, the next guest walks in.
-export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now' | 'random' | 'spawnCustomers'>) {
+export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now' | 'random' | 'spawnCustomers' | 'training'>) {
+  if (context.training) { state.lastClockAt = context.now; return; }
   normalizePlayerState(state);
+  accrueTips(state, context.now);
   syncPass(state, context.now);
   state.conversations ??= {};
   const now = context.now;
@@ -427,6 +436,7 @@ export function advanceClock(state: PlayerState, context: Pick<RuleContext, 'now
   state.lastClockAt = elapsed > 0 ? state.lastClockAt + elapsed * 1000 : Math.min(state.lastClockAt, now);
   // Reading and writing in the customer dialogue is learning time, so the order clock pauses.
   if (state.conversationCustomerId) return;
+  if (guest.pendingPayment) return;
   guest.patienceRemaining = Math.max(0, guest.patienceRemaining - elapsed);
   if (guest.patienceRemaining <= 0) {
     const name = guest.name;
@@ -452,12 +462,12 @@ function cleanCart(cart: unknown, max: number) {
   return result;
 }
 
-function queuePayment(state: PlayerState, guest: Customer, amount: number, tips: number, crystals: number, now: number, bottle = false) {
+function queuePayment(state: PlayerState, guest: Customer, amount: number, tips: number, crystals: number, now: number, bottle = false, foodOnly = false) {
   const previous = guest.pendingPayment;
-  guest.pendingPayment = { coins: coins((previous?.coins ?? 0) + amount), tips: coins((previous?.tips ?? 0) + tips), crystals: (previous?.crystals ?? 0) + crystals, bottle: previous?.bottle || bottle };
-  holdForPayment(guest, now);
+  guest.pendingPayment = { coins: coins((previous?.coins ?? 0) + amount), tips: coins((previous?.tips ?? 0) + tips), crystals: (previous?.crystals ?? 0) + crystals, bottle: previous?.bottle || bottle, foodOnly:foodOnly && (!previous || previous.foodOnly) };
+  if (!foodOnly) holdForPayment(guest, now);
   state.conversationCustomerId = guest.id;
-  addGuestLine(state, guest, `Thank you! I am ready to pay ${guest.pendingPayment.coins.toFixed(2)} coins. Ask me how I would like to pay.`);
+  addGuestLine(state, guest, foodOnly && guest.social?.phase === 'ordering' ? 'Thank you for the food. Please bring my drink too, and I will pay for both together.' : `Thank you! I am ready to pay ${guest.pendingPayment.coins.toFixed(0)} coins. Ask me how I would like to pay.`);
 }
 
 export function applyAction(state: PlayerState, action: GameAction, context: RuleContext) {
@@ -465,6 +475,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
   const random = context.random ?? Math.random;
   if (!action || typeof action !== 'object' || typeof action.type !== 'string') throw new RuleError('Unknown action.');
   advanceClock(state, context);
+  context.beforeAction?.();
   const moneyBefore = state.money;
   const xpBefore = state.xp;
   const crystalsBefore = state.crystals;
@@ -476,7 +487,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const amount = state.tipJar ?? 0;
       if (amount <= 0) throw new RuleError('The tip jar is empty.');
       state.money = coins(state.money + amount);
-      state.tipJar = 0;
+      resetTips(state, now);
       state.message = `Collected ${amount.toLocaleString('en-US')} coins from the tip jar.`;
       break;
     }
@@ -488,7 +499,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const paid = state.money - balance;
       const tip = rollTip(state, guest, now, random) ? Math.max(1, Math.ceil(paid * .1)) : 0;
       state.money = balance;
-      queuePayment(state, guest, paid, tip, 0, now);
+      queuePayment(state, guest, paid, tip, 0, now, false, true);
       state.message = `Food served. Accept payment in the conversation.`;
       break;
     }
@@ -536,7 +547,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     }
 
     case 'sellBottle': {
-      if (guest?.pendingPayment) throw new RuleError('Accept this guest’s payment in the conversation first.');
+      if (guest?.pendingPayment && !guest.pendingPayment.foodOnly) throw new RuleError('Accept this guest’s payment in the conversation first.');
       if (guest && hasSituation(guest)) throw new RuleError(`Deal with ${guest.name}’s situation first.`);
       const request = guest?.bottleRequest;
       const product = ALCOHOL_PRODUCTS.find((item) => item.id === guest?.selectedBottleId);
@@ -554,7 +565,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       state.streak += 1;
       track(state, 'bottles', request.quantity, now);
       countServed(state);
-      const note = `Sold ${request.quantity} × ${product.name} for ${paid.toFixed(2)} coins and ${crystalPayment} crystals.${tip ? ` Tip +${tip}.` : ' No tip this time.'}`;
+      const note = `Sold ${request.quantity} × ${product.name} for ${paid.toFixed(0)} coins and ${crystalPayment} crystals.${tip ? ` Tip +${tip}.` : ' No tip this time.'}`;
       state.message = 'Bottle handed over. Accept payment in the conversation.';
       break;
     }
@@ -583,7 +594,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const auto = action.auto === true;
       if (!guest) throw new RuleError('There is no order to serve.');
       if (hasSituation(guest)) throw new RuleError(`Deal with ${guest.name}’s situation first.`);
-      if (guest.pendingPayment) throw new RuleError('Accept this guest’s payment in the conversation first.');
+      if (guest.pendingPayment && !guest.pendingPayment.foodOnly) throw new RuleError('Accept this guest’s payment in the conversation first.');
       if (!isOrdering(guest)) throw new RuleError(`${guest.name} is still enjoying the last drink.`);
       if (guest.signature && !guest.orderRevealed) throw new RuleError('Talk to the guest first: ask about your house special.');
       if (guest.orderKind === 'bottle') throw new RuleError('This customer wants sealed bottles. Complete the sale in the conversation.');
@@ -639,6 +650,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         if (!payTrouble && !promo.free) {
           queuePayment(state, guest, revenue, tip, 0, now);
         }
+        if (promo.free && guest.pendingPayment) { guest.pendingPayment.foodOnly = false; holdForPayment(guest, now); }
         // About 170 successful orders reach level 25 and about 700 reach the level 50 cap.
         state.xp += xpGain(state, 100 + Math.min(state.streak * 2, 14), now);
         state.streak += 1;
@@ -673,16 +685,18 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const crystalNote = crystalPayment ? ` +${crystalPayment} crystals.` : '';
         const note = unlocked ? `Perfect service. ${verdict.recipe.name} was added to your recipe book!${crystalNote}`
           : duplicateRecipe ? `Perfect service. You earned one ${verdict.recipe.name} recipe card for mastery.${crystalNote}`
-          : auto ? `Auto-served ${verdict.recipe.name}. Paid ${revenue.toFixed(2)} coins (no tip for automated drinks).${crystalNote}`
-          : steady ? `Steady Hand: close enough counts as perfect! Paid ${revenue.toFixed(2)} coins${tip ? `, tip +${tip}` : ''}.${crystalNote}`
+          : auto ? `Auto-served ${verdict.recipe.name}. Paid ${revenue.toFixed(0)} coins (no tip for automated drinks).${crystalNote}`
+          : steady ? `Steady Hand: close enough counts as perfect! Paid ${revenue.toFixed(0)} coins${tip ? `, tip +${tip}` : ''}.${crystalNote}`
           : !tip ? `Perfect service. No tip this time.${crystalNote}`
           : bonus ? `Perfect service — classic touch with ${bonus}! Tip +${tip} coins.${crystalNote}` : `Perfect service. Tip +${tip} coins.${crystalNote}`;
         // Alcohol raises the guest's level; a guest who likes the bar may stay for another drink.
         const abv = serveProduct ? serveProduct.abv * .8 : estimateRecipeAbv(verdict.recipe);
         if (payTrouble) {
+          const foodBill = guest.pendingPayment;
+          if (foodBill) { state.crystals += foodBill.crystals; delete guest.pendingPayment; }
           recordDrink(guest, drunkGain(abv), now);
           holdForPayment(guest, now);
-          addGuestLine(state, guest, startSituation(state, guest, payTrouble, now, random, { amount: coins(revenue), afterServe: true, data: complaint ? { reason: lowGradeUsed.has('expiring') ? 'expiring' : 'damaged' } : undefined }));
+          addGuestLine(state, guest, startSituation(state, guest, payTrouble, now, random, { amount: coins(revenue + (foodBill?.coins ?? 0)), afterServe: true, data: {foodTips:foodBill?.tips ?? 0, ...(complaint ? { reason: lowGradeUsed.has('expiring') ? 'expiring' : 'damaged' } : {})} }));
           state.message = `${note} But there is a problem with the payment.${found}`;
         } else if (guest.pendingPayment) {
           recordDrink(guest, drunkGain(abv), now);
@@ -737,8 +751,18 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       }
       if (state.money < quote.total) throw new RuleError('You do not have enough money.');
       if (voucher) { delete state.loot.armed['voucher']; state.message = 'Supplier Voucher used: 20% off.'; }
+      if (context.training) {
+        state.money = coins(state.money - quote.total);
+        for (const line of quote.lines) {
+          const stock = state.inventories[state.regionId].find(item => item.ingredientId === line.ingredientId);
+          if (stock) stock.amount += line.amount;
+          else state.inventories[state.regionId].push({ ingredientId:line.ingredientId, amount:line.amount });
+        }
+        log(state, 'Practice supplies received. Regular deliveries take time; practice delivery is instant.');
+        break;
+      }
       const days = placeDeliveryOrder(state, supplier, quote, now);
-      log(state, `Ordered ${quote.packs} packs from ${supplier.name} for ${quote.total.toFixed(2)} coins. Delivery in ${formatDeliveryTime(days)}.`);
+      log(state, `Ordered ${quote.packs} packs from ${supplier.name} for ${quote.total.toFixed(0)} coins. Delivery in ${formatDeliveryTime(days)}.`);
       break;
     }
     case 'sell': {
@@ -754,7 +778,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const revenue = coins(lines.reduce((sum, line) => sum + line.revenue, 0));
       for (const line of lines) inventoryOf(state).find((stock) => stock.ingredientId === line.ingredientId)!.amount -= line.quantity;
       state.money = coins(state.money + revenue);
-      log(state, `Sold ${lines.length} products for ${revenue.toFixed(2)} coins.`);
+      log(state, `Sold ${lines.length} products for ${revenue.toFixed(0)} coins.`);
       break;
     }
     case 'transfer': {
@@ -1017,6 +1041,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       break;
     }
     case 'giveAshtray':
+    case 'cleanGuestAshtray':
+    case 'removeGuestAshtray':
     case 'giveWater':
     case 'callTaxi':
     case 'askToLeave': {
@@ -1028,6 +1054,11 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const result = giveAshtray(state, target, now);
         if (!result.ok) throw new RuleError(result.text);
         state.message = result.text;
+      } else if (action.type === 'cleanGuestAshtray' || action.type === 'removeGuestAshtray') {
+        const result = serviceAshtray(state, target, now, action.type === 'removeGuestAshtray');
+        if (!result.ok) throw new RuleError(result.text);
+        state.message = result.text;
+        addGuestLine(state, target, action.type === 'removeGuestAshtray' ? 'Thank you for taking it away.' : 'Thank you! That is much better.');
       } else if (action.type === 'giveWater') state.message = giveWater(target, now);
       else if (action.type === 'callTaxi') state.message = `${target.name}: “${callTaxi(target, guests)}”`;
       else {
@@ -1077,7 +1108,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       if (!pitchChance(state, target, now)) throw new RuleError('Choose what to offer first.');
       const balanceBeforeFood = state.money;
       const result = askPitch(state, target, now, random);
-      if (result.accepted && result.kind === 'food') { const amount = coins(state.money - balanceBeforeFood); state.money = balanceBeforeFood; queuePayment(state, target, amount, 0, 0, now); }
+      if (result.accepted && result.kind === 'food') { const amount = coins(state.money - balanceBeforeFood); state.money = balanceBeforeFood; queuePayment(state, target, amount, 0, 0, now, false, true); }
       const transcript = ensureTranscript(state, target);
       addLine(transcript, 'customer', voice(target, result.text, transcript.lines.length));
       break;
@@ -1165,6 +1196,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'pickReward':
     case 'buyBox':
     case 'buyConsumable':
+    case 'useFragmentChoice':
     case 'useConsumable':
     case 'discardLoot':
     case 'drawStyle':
@@ -1183,6 +1215,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           case 'pickReward': pickChoice(state, action.index, random); break;
           case 'buyBox': buyBox(state, action.box, action.quantity); break;
           case 'buyConsumable': buyConsumable(state, action.id, action.quantity); break;
+          case 'useFragmentChoice': useFragmentChoice(state, action.id, action.targetId); break;
           case 'useConsumable': useConsumable(state, action.id, action.recipeId, now); break;
           case 'discardLoot': discardLoot(state, action.kind, action.id, action.amount); break;
           case 'drawStyle': drawStyle(state, action.count, action.banner, now, random); break;
@@ -1207,7 +1240,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
   // Achievements count what the player spent in all.
   addStat(state, 'coinsSpent', Math.floor(moneyBefore - state.money));
   addStat(state, 'crystalsSpent', crystalsBefore - state.crystals);
-  grantLevelBoxes(state);
+  if (!context.deferLevelRewards) grantLevelBoxes(state);
   syncDerivedStats(state);
   // Auto-serve XP does not count for the leaderboard: the ranking rewards hands-on service.
   addWeeklyScore(state, (action.type === 'serve' && action.auto) ? 0 : state.xp - xpBefore, now);
@@ -1218,7 +1251,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
 }
 
 // Loot actions leave a trail (what was rolled, pity) for the server's loot ledger.
-const AUDITED = new Set<GameAction['type']>(['discardLoot', 'openBox', 'pickReward', 'buyBox', 'buyConsumable', 'drawStyle', 'claimSpark', 'craftSkin', 'craftStyle', 'claimLeaderboardReward', 'claimQuest', 'claimAchievement']);
+const AUDITED = new Set<GameAction['type']>(['useFragmentChoice', 'discardLoot', 'openBox', 'pickReward', 'buyBox', 'buyConsumable', 'drawStyle', 'claimSpark', 'craftSkin', 'craftStyle', 'claimLeaderboardReward', 'claimQuest', 'claimAchievement']);
 export interface LootAudit { action: string; message: string; detail: Record<string, unknown>; }
 function auditEntry(state: PlayerState, action: GameAction): LootAudit | undefined {
   if (!AUDITED.has(action.type)) return undefined;
@@ -1326,7 +1359,7 @@ function ensureTranscript(state: PlayerState, guest: Customer, now = state.lastC
   const existing = state.conversations[guest.id];
   if (existing) return existing;
   const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
-  const opening = guestLine(state, guest) ?? (guest.social?.phase === 'enjoying' ? enjoyingOpening(guest, now)
+  const opening = guestLine(state, guest) ?? (guest.social?.phase === 'enjoying' || (guest.social?.need && guest.social.need.since <= now) ? enjoyingOpening(guest, now)
     : guest.orderKind === 'bottle' ? `${feelingFirst(guest)}${bottleOpeningLine(guest)}`
     : guest.orderKind === 'serve' || !recipe ? `${guest.social ? feelingFirst(guest) : `${guest.greeting} `}${guest.request}`
       : openingLine(guest, buildProfile(recipe)));
@@ -1334,6 +1367,8 @@ function ensureTranscript(state: PlayerState, guest: Customer, now = state.lastC
   const bottleFacts: Transcript['bottleFacts'] = guest.orderKind === 'bottle' ? { occasion: guest.bottleRequest?.occasion ?? 'party' } : {};
   const transcript: Transcript = { lines: [], facts: [], bottleFacts, expression: 'thinking', attempts: 0, correct: 0 };
   addLine(transcript, 'customer', opening);
+  if (guest.social?.need && guest.social.need.since <= now) guest.social.need.announced = true;
+  if (guest.social?.foodRequest && guest.social.need?.kind !== 'food' && !hasSituation(guest)) addLine(transcript, 'customer', foodRequestLine(guest));
   state.conversations[guest.id] = transcript;
   return transcript;
 }
@@ -1367,19 +1402,24 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
   }
   addLine(transcript, 'bartender', text, { ok: english.ok, note: english.ok ? english.note : `Better: “${english.corrected}”` });
 
+  if (guest.social?.ashtray === 'given' && /\bashtray\b/i.test(english.corrected) && /\b(clean|empty|remove|take.*away)\b/i.test(english.corrected) && !/\b(not|don't|cannot)\b/i.test(english.corrected)) {
+    const result = serviceAshtray(state, guest, context.now, /\b(remove|take.*away)\b/i.test(english.corrected));
+    state.message = result.text; addLine(transcript, 'customer', result.ok ? 'Thank you! That is much better.' : result.text); return;
+  }
+
   if (guest.pendingPayment && !hasSituation(guest)) {
     const bill = guest.pendingPayment;
     if (/\b(pay|payment|cash|card|bill|receipt|change)\b/i.test(english.corrected) && !/\b(cannot|can't|not|no|don't|do not)\b/i.test(english.corrected)) {
       delete guest.pendingPayment;
       state.money = coins(state.money + bill.coins);
-      state.tipJar = coins((state.tipJar ?? 0) + bill.tips);
+      const receivedTips = depositTips(state, bill.tips, context.now);
       state.crystals += bill.crystals;
       addLine(transcript, 'customer', `I will pay ${guest.paymentMethod === 'cash' ? 'in cash' : 'by card'}. Payment received, thank you!${bill.tips ? ` Here is a ${bill.tips} coin tip for your jar.` : ''}`);
-      state.message = `Payment received: ${bill.coins.toFixed(2)} coins.${bill.tips ? ` Tip +${bill.tips} in the jar.` : ''}`;
+      state.message = `Payment received: ${bill.coins.toFixed(0)} coins.${receivedTips ? ` Tip +${receivedTips} in the jar.` : bill.tips ? ' Collect your tip jar to resume accumulation.' : ''}`;
       if (bill.bottle) removeGuest(state, guest, guestContext(state, context.now, context.random ?? Math.random));
-      else settleGuest(state, guest, guestContext(state, context.now, context.random ?? Math.random));
+      else if (!bill.foodOnly) settleGuest(state, guest, guestContext(state, context.now, context.random ?? Math.random));
     } else {
-      addLine(transcript, 'customer', `I am ready to pay ${bill.coins.toFixed(2)} coins. Please ask whether I would like to pay by card or in cash.`);
+      addLine(transcript, 'customer', `I am ready to pay ${bill.coins.toFixed(0)} coins. Please ask whether I would like to pay by card or in cash.`);
     }
     return;
   }

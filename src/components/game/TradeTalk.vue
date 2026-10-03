@@ -99,7 +99,7 @@ function accept() {
           <small>THE DEAL</small>
           <ul>
             <li v-for="line in quote.base.lines" :key="line.ingredientId" :class="{ swapped: swapped.has(line.ingredientId) }">
-              <span>{{ line.packs }} × {{ nameOf(line.ingredientId) }}<em v-if="swapped.has(line.ingredientId)">instead of {{ nameOf(swapped.get(line.ingredientId)!) }}</em></span><b>{{ line.subtotal.toFixed(2) }}</b>
+              <span>{{ line.packs }} × {{ nameOf(line.ingredientId) }}<em v-if="swapped.has(line.ingredientId)">instead of {{ nameOf(swapped.get(line.ingredientId)!) }}</em></span><b>{{ line.subtotal.toFixed(0) }}</b>
             </li>
           </ul>
           <!-- The offer: price controls, success chance and its bonuses. -->
@@ -116,25 +116,25 @@ function accept() {
             <div class="haggle-price">
               <UiButton variant="secondary" size="sm" @click="offer = clampOffer(quote.minOffer)">Min</UiButton>
               <UiButton variant="secondary" size="sm" :aria-label="`Lower the offer by ${step} coins`" @click="offer = clampOffer(offer - step)">−{{ step }}</UiButton>
-              <output>{{ offer.toFixed(2) }}</output>
+              <output>{{ offer.toFixed(0) }}</output>
               <UiButton variant="secondary" size="sm" :aria-label="`Raise the offer by ${step} coins`" @click="offer = clampOffer(offer + step)">+{{ step }}</UiButton>
               <UiButton variant="secondary" size="sm" @click="offer = clampOffer(quote.goods)">Max</UiButton>
             </div>
             <input v-model.number="offer" class="haggle-slider" type="range" :min="quote.minOffer" :max="quote.goods" step="0.5" aria-label="Your offer for the goods" :style="{ '--fill': `${(offer - quote.minOffer) / Math.max(.01, quote.goods - quote.minOffer) * 100}%` }" />
-            <div class="haggle-range"><span>{{ quote.minOffer.toFixed(2) }}</span><span>list {{ quote.goods.toFixed(2) }}</span></div>
+            <div class="haggle-range"><span>{{ quote.minOffer.toFixed(0) }}</span><span>list {{ quote.goods.toFixed(0) }}</span></div>
             <UiButton variant="solid" :disabled="waiting" @click="placeOffer()">Offer <em>{{ offersLeft }}/{{ MAX_OFFERS }}</em></UiButton>
           </section>
-          <p v-else-if="agreed" class="haggle-agreed"><UiIcon class="inline-icon" name="check" /> Agreed: {{ talk.agreedGoods!.toFixed(2) }} coins for the goods <em>(−{{ Math.round(quote.discountRate * 100) }}%)</em></p>
+          <p v-else-if="agreed" class="haggle-agreed"><UiIcon class="inline-icon" name="check" /> Agreed: {{ talk.agreedGoods!.toFixed(0) }} coins for the goods <em>(−{{ Math.round(quote.discountRate * 100) }}%)</em></p>
           <p v-else class="haggle-agreed failed">No offers left — the list price stays.</p>
           <ol v-if="talk.offers.length" class="haggle-history">
-            <li v-for="(item, index) in talk.offers" :key="index" :class="item.success ? 'yes' : 'no'"><UiIcon class="inline-icon" :name="item.success ? 'check' : 'close'" /> {{ item.price.toFixed(2) }} <small>{{ (item.rate * 100).toFixed(0) }}%</small></li>
+            <li v-for="(item, index) in talk.offers" :key="index" :class="item.success ? 'yes' : 'no'"><UiIcon class="inline-icon" :name="item.success ? 'check' : 'close'" /> {{ item.price.toFixed(0) }} <small>{{ (item.rate * 100).toFixed(0) }}%</small></li>
           </ol>
           <dl>
-            <div><dt>Goods (list)</dt><dd>{{ quote.goods.toFixed(2) }}</dd></div>
-            <div v-if="quote.discount" class="good"><dt>Negotiated −{{ Math.round(quote.discountRate * 100) }}%</dt><dd>−{{ quote.discount.toFixed(2) }}</dd></div>
-            <div v-if="quote.surcharge" class="bad"><dt>Misunderstood +{{ Math.round(quote.surcharge * 100) }}%</dt><dd>+{{ quote.extra.toFixed(2) }}</dd></div>
-            <div :class="{ good: talk.freeDelivery && quote.base.delivery }"><dt>Delivery</dt><dd>{{ quote.delivery ? quote.delivery.toFixed(2) : 'free' }}</dd></div>
-            <div class="total"><dt>Total</dt><dd>{{ quote.total.toFixed(2) }}</dd></div>
+            <div><dt>Goods (list)</dt><dd>{{ quote.goods.toFixed(0) }}</dd></div>
+            <div v-if="quote.discount" class="good"><dt>Negotiated −{{ Math.round(quote.discountRate * 100) }}%</dt><dd>−{{ quote.discount.toFixed(0) }}</dd></div>
+            <div v-if="quote.surcharge" class="bad"><dt>Misunderstood +{{ Math.round(quote.surcharge * 100) }}%</dt><dd>+{{ quote.extra.toFixed(0) }}</dd></div>
+            <div :class="{ good: talk.freeDelivery && quote.base.delivery }"><dt>Delivery</dt><dd>{{ quote.delivery ? quote.delivery.toFixed(0) : 'free' }}</dd></div>
+            <div class="total"><dt>Total</dt><dd>{{ quote.total.toFixed(0) }}</dd></div>
           </dl>
           <p class="haggle-address" :class="{ bad: quote.barId !== talk.barId }">Delivery to <b>{{ barName(quote.barId) }}</b><template v-if="quote.barId !== talk.barId"> — not your {{ barName(talk.barId) }} bar!</template></p>
           <small class="haggle-hint">Talk first: every bargaining idea in correct, polite English raises your chance. Hard mistakes: {{ talk.mistakes }} · the next {{ untilSlip === 1 ? 'one' : 'two' }} will confuse {{ seller.name }}.</small>
@@ -151,7 +151,7 @@ function accept() {
         </form>
         <div class="haggle-actions">
           <UiButton variant="ghost" @click="game.leaveNegotiation()">Leave</UiButton>
-          <UiButton :variant="agreed ? 'solid' : 'secondary'" :class="{ 'quick-buy': !agreed }" :disabled="quote.total > game.money" @click="accept()">{{ agreed ? 'Accept deal' : 'Buy at list price' }} · {{ quote.total.toFixed(2) }} coins</UiButton>
+          <UiButton :variant="agreed ? 'solid' : 'secondary'" :class="{ 'quick-buy': !agreed }" :disabled="quote.total > game.money" @click="accept()">{{ agreed ? 'Accept deal' : 'Buy at list price' }} · {{ quote.total.toFixed(0) }} coins</UiButton>
         </div>
       </footer>
     </section>

@@ -14,7 +14,7 @@
     "build": "vue-tsc --noEmit && vite build && vite build --ssr server/index.mjs --outDir dist-server --emptyOutDir",
     "preview": "vite preview",
     "start": "node dist-server/index.js",
-    "test": "node --import ./tests/register.mjs --test tests/game.test.mjs tests/dialogue-payments.test.mjs tests/rewards.test.mjs tests/promocodes.test.mjs tests/economy.test.mjs tests/trade.test.mjs tests/server.test.mjs tests/loot.test.mjs tests/companions.test.mjs tests/ui-kit.test.mjs tests/avatar.test.mjs tests/social.test.mjs tests/situations.test.mjs tests/delivery.test.mjs tests/events.test.mjs tests/event-availability.test.mjs tests/styles.test.mjs tests/themed-bars.test.mjs tests/pass.test.mjs tests/gifts-transfer.test.mjs tests/visits.test.mjs tests/music.test.mjs",
+    "test": "node --import ./tests/register.mjs --test tests/game.test.mjs tests/dialogue-payments.test.mjs tests/rewards.test.mjs tests/promocodes.test.mjs tests/economy.test.mjs tests/trade.test.mjs tests/server.test.mjs tests/loot.test.mjs tests/companions.test.mjs tests/ui-kit.test.mjs tests/avatar.test.mjs tests/social.test.mjs tests/situations.test.mjs tests/delivery.test.mjs tests/events.test.mjs tests/event-availability.test.mjs tests/styles.test.mjs tests/themed-bars.test.mjs tests/pass.test.mjs tests/gifts-transfer.test.mjs tests/visits.test.mjs tests/tips.test.mjs tests/mailbox.test.mjs tests/music.test.mjs tests/fragment-choices.test.mjs",
     "db:export-cocktails": "node --import ./tests/register.mjs scripts/export-cocktails.mjs",
     "docker:clean": "powershell -ExecutionPolicy Bypass -File scripts/docker-clean.ps1"
   },
@@ -36,4 +36,3 @@
     "vue-tsc": "3.3.11"
   }
 }
-

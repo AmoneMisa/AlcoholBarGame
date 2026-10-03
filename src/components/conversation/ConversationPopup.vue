@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import UiInput from '../ui/UiInput.vue';
+import { trainingQuestions } from '../../domain/training';
 import { CHAT_GUIDE, type ChatGuideStep } from '../../domain/chatGuide';
 import { setPointer } from '../../guide/pointer';
 import SpeakTrainer from '../learning/SpeakTrainer.vue';
 import { FOODS } from '../../domain/foods';
+import { foodRequestLine } from '../../domain/foodRequests';
 const foodAssetBase = `${import.meta.env.BASE_URL}assets/drinks/food/`;
 const ashtrayArt = `${import.meta.env.BASE_URL}assets/bar/props/ashtray.webp`;
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
@@ -59,7 +61,7 @@ const pending = ref('');
 const confirmed = computed(() => !!customer.value?.orderRevealed);
 const bottleOrder = computed(() => customer.value?.orderKind === 'bottle');
 const conversationRecipes = computed(() => customer.value?.specialRecipeRewardId ? [...game.knownRecipes,...game.lockedRecipes.filter((item) => item.id === customer.value?.specialRecipeRewardId)] : game.knownRecipes);
-const candidates = computed(() => conversationRecipes.value.filter((item) => matchesFacts(item, talk.value?.facts ?? []) && !talk.value?.rejected?.includes(item.id)));
+const candidates = computed(() => game.trainingActive ? RECIPES.filter(item=>item.id==='gin-tonic') : conversationRecipes.value.filter((item) => matchesFacts(item, talk.value?.facts ?? []) && !talk.value?.rejected?.includes(item.id)));
 const bottleRecommendations = computed(() => {
   const quantity = talk.value?.bottleFacts.quantity ?? 1;
   return rankBottles(talk.value?.bottleFacts ?? {}, game.guestPriceFactor).filter(({ product }) =>
@@ -82,7 +84,8 @@ const tileTarget = ref('');
 // Brand-call guests (“Jack Daniel’s on the rocks”) know exactly what they want.
 const serveOrder = computed(() => customer.value?.orderKind === 'serve' ? customer.value.serveRequest : undefined);
 const templates = computed(() => {
-  if (customer.value?.pendingPayment) return [{ text: 'Would you like to pay by card or in cash?' }, { text: 'Here is your bill. How would you like to pay?' }];
+  if (game.trainingActive && customer.value) return trainingQuestions(customer.value,talk.value?.lines.filter(line=>line.speaker==='bartender').length ?? 0);
+  if (customer.value?.pendingPayment && !customer.value.pendingPayment.foodOnly) return [{ text: 'Would you like to pay by card or in cash?' }, { text: 'Here is your bill. How would you like to pay?' }];
   const base = serveOrder.value
     ? serveTemplates(serveOrder.value, game.brandOnShelf).map((text) => ({ text }))
     : bottleOrder.value
@@ -100,16 +103,29 @@ const templates = computed(() => {
 const social = computed(() => customer.value?.social);
 const offerOpen = ref(false);
 const guideOpen = ref(false);
+const guideFeedback = ref('');
+const guideFeedbackStep = ref('');
 // "Show me" circles the part of the screen a guide item explains, for a few seconds.
 let helpTimer: ReturnType<typeof setTimeout> | undefined;
-function showMe(step: ChatGuideStep) {
+async function showMe(step: ChatGuideStep) {
   const show = step.show;
   if (!show) return;
-  // The guide is a popup over the conversation, so it closes first and then the part it explains is circled.
+  guideFeedback.value = '';
+  guideFeedbackStep.value = step.title;
+  if (show.name === 'tile-bank') inputMode.value = 'words';
+  await nextTick();
+  const target = [...document.querySelectorAll<HTMLElement>(`[data-guide="${show.name}"]`)].find(node => node.getBoundingClientRect().width > 0 && node.getBoundingClientRect().height > 0);
+  if (!target) {
+    guideFeedback.value = ({ prepare:'Confirm a drink order first. Start mixing will appear in the conversation.', 'bottle-sale':'Sell full bottle appears after you confirm a sealed bottle order.', 'situation-choice':'These choices appear when a guest needs help with a situation.', 'talk-actions':'Guest care appears during normal play, after the tutorial.' } as Record<string,string>)[show.name] ?? 'This part appears when the guest reaches that stage of the conversation.';
+    return;
+  }
   guideOpen.value = false;
-  void nextTick(() => setPointer('help', [{ target: `[data-guide="${show.name}"]`, gesture: show.gesture, label: show.label }]));
+  await nextTick();
+  target.scrollIntoView({ block:'center', inline:'nearest', behavior:'instant' });
+  target.focus({preventScroll:true});
+  setPointer('help', [{ target: `[data-guide="${show.name}"]`, gesture:show.gesture, label:show.label }]);
   if (helpTimer) clearTimeout(helpTimer);
-  helpTimer = setTimeout(() => setPointer('help', undefined), 6000);
+  helpTimer = setTimeout(() => setPointer('help', undefined), 10000);
 }
 watch(guideOpen, (open) => { if (!open) setPointer('help', undefined); });
 onBeforeUnmount(() => { if (helpTimer) clearTimeout(helpTimer); setPointer('help', undefined); });
@@ -120,6 +136,10 @@ const offerName = computed(() => {
   return pitch ? (pitch.kind === 'food' ? FOODS.find((item) => item.id === pitch.itemId)?.name : game.knownRecipes.find((item) => item.id === pitch.itemId)?.name) : undefined;
 });
 const foodsInStock = computed(() => FOODS.filter((item) => (game.inventory.find((stock) => stock.ingredientId === item.id)?.amount ?? 0) >= 1));
+const foodChoices = computed(() => customer.value ? game.foodRecommendations(customer.value.id).filter(item => {
+  const request = customer.value!.social?.foodRequest;
+  return request?.kind === 'specific' ? item.food.id === request.itemId : item.score >= .5;
+}).slice(0,4) : []);
 const startOffer = (kind: 'drink' | 'food', itemId: string) => { if (customer.value) game.pitchStart(customer.value.id, kind, itemId); };
 const stage = computed(() => drunkStage(social.value?.drunk ?? 0));
 // A special person (the Circle) is shown with where the relationship stands; common guests have no such line.
@@ -132,7 +152,7 @@ const relation = computed(() => {
   return { text: here.nextAt === undefined ? `${here.name} · highest grade` : `${here.name} · ${here.points} / ${here.nextAt}`, joined: true };
 });
 const needNow = computed(() => social.value?.need && social.value.need.since <= game.nowMs ? social.value.need.kind : undefined);
-const NEED_LABEL: Record<string, string> = { ashtray: 'Wants an ashtray', water: '💧 Wants water', taxi: '🚕 Wants a taxi', chat: '💬 Wants to talk' };
+const NEED_LABEL: Record<string, string> = { ashtray: 'Wants an ashtray', 'clean-ashtray':'Wants the ashtray cleaned', 'remove-ashtray':'Wants the ashtray removed', food:'Wants food with the drink', water: '💧 Wants water', taxi: '🚕 Wants a taxi', chat: '💬 Wants to talk' };
 const leaveHint = (tone: 'gentle' | 'firm' | 'aggressive') => {
   if (!customer.value) return '';
   const chance = leaveChance(customer.value, tone);
@@ -150,7 +170,7 @@ const builtSentence = computed(() => pickedTiles.value.map((tile) => tile.text).
 
 function resetTiles() {
   const template = templates.value[templateIndex.value % Math.max(1, templates.value.length)];
-  tiles.value = template ? tilesFor(template.text, RECIPES) : [];
+  tiles.value = template ? tilesFor(template.text, RECIPES,game.trainingActive) : [];
   tileTarget.value = template?.text ?? '';
   picked.value = [];
 }
@@ -269,7 +289,7 @@ function useCorrection() {
   } else {
     // A suggested correction must be reachable in word mode, including newly inserted words.
     const corrected = feedback.value.corrected;
-    tiles.value = tilesFor(corrected, RECIPES);
+    tiles.value = tilesFor(corrected, RECIPES,game.trainingActive);
     tileTarget.value = corrected;
     picked.value = correctedTileSelection(corrected,tiles.value,RECIPES);
     feedback.value = undefined;
@@ -347,8 +367,8 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <small>ENGLISH PRACTICE · {{ customer.mood }}</small>
           <h2>{{ customer.name }}</h2>
           <div class="talk-meters">
-            <label>Patience <span><i :style="{ width: patience + '%' }"></i></span></label>
-            <label>Order time <b>{{ game.orderCountdown }} · paused</b></label>
+            <label v-if="!game.trainingActive">Patience <span><i :style="{ width: patience + '%' }"></i></span></label>
+            <label v-if="!game.trainingActive">Order time <b>{{ game.orderCountdown }} · paused</b></label>
             <label>Your English <b>{{ accuracy }}%</b></label>
           </div>
           <div v-if="social" class="talk-state">
@@ -364,7 +384,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         <CloseButton class="talk-close" data-guide="talk-close" label="Close conversation" @click="game.closeConversation()" />
       </header>
       <ModalDialog v-if="guideOpen" title="How conversations work" width="480px" close-label="Close the guide" @close="guideOpen = false">
-        <ol class="chat-guide-list"><li v-for="step in CHAT_GUIDE" :key="step.title"><b>{{ step.title }}.</b> {{ step.text }} <UiButton v-if="step.show" size="sm" class="show-me" @click="showMe(step)">Show me</UiButton></li></ol>
+        <ol class="chat-guide-list"><li v-for="step in CHAT_GUIDE" :key="step.title"><b>{{ step.title }}.</b> {{ step.text }} <UiButton v-if="step.show" size="sm" class="show-me" @click="showMe(step)">Show me</UiButton><p v-if="guideFeedback && guideFeedbackStep === step.title" class="chat-guide-feedback" role="status">{{ guideFeedback }}</p></li></ol>
         <template #footer><UiButton block variant="solid" @click="guideOpen = false">Got it</UiButton></template>
       </ModalDialog>
       <div class="talk-scroll">
@@ -398,15 +418,25 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           </div>
         </template>
         <template v-else-if="offer">
-          <p class="offer-title">Offering <b>{{ offerName }}</b> · {{ offer.price.toFixed(2) }} coins</p>
+          <p class="offer-title">Offering <b>{{ offerName }}</b> · {{ offer.price.toFixed(0) }} coins</p>
           <div class="chance-meter" role="meter" :aria-valuenow="Math.round(offer.chance * 100)" aria-valuemin="0" aria-valuemax="100"><i :style="{ width: Math.round(offer.chance * 100) + '%' }" /><span>{{ Math.round(offer.chance * 100) }}% chance</span></div>
           <ul class="chance-parts"><li v-for="part in offer.parts" :key="part.label" :class="part.value < 0 ? 'minus' : 'plus'"><span>{{ part.label }}</span><b>{{ part.value > 0 ? '+' : '' }}{{ Math.round(part.value * 100) }}%</b></li></ul>
           <small>Talk to raise it: tell its story, say how it pairs, offer a discount or a free taste. Do not push.</small>
           <div class="offer-buttons"><UiButton variant="solid" data-guide="offer-ask" @click="game.pitchAsk(customer.id)">Make the offer</UiButton><button type="button" @click="game.pitchCancel(customer.id)">Cancel</button></div>
         </template>
       </section>
-      <div v-if="social" class="talk-actions" data-guide="talk-actions" aria-label="Look after this guest">
+      <section v-if="social?.foodRequest && confirmed && !situation && (!customer.pendingPayment || customer.pendingPayment.foodOnly)" class="offer-panel" aria-label="Food with this drink">
+        <p>{{ foodRequestLine(customer) }}</p>
+        <div class="offer-items">
+          <button v-for="choice in foodChoices" :key="choice.food.id" class="food-offer-button" type="button" @click="game.act({type:'serveFood', ingredientId:choice.food.id})"><img :src="`${foodAssetBase}${choice.food.id}.webp`" alt="" />Serve {{ choice.food.name }} · {{ choice.score >= .5 ? 'Good pairing' : 'Requested' }}</button>
+          <small v-if="!foodChoices.length">No suitable food is in stock. Refill Market supplies or offer an alternative.</small>
+        </div>
+      </section>
+      <div v-if="social && !game.trainingActive" class="talk-actions" data-guide="talk-actions" aria-label="Look after this guest">
         <button v-if="needNow === 'ashtray'" type="button" data-guide="give-ashtray" class="wanted" :disabled="social.ashtray === 'given' || game.ashtrays.clean < 1" :title="social.ashtray === 'given' ? 'Already has one' : game.ashtrays.clean + ' clean ashtrays'" @click="game.giveAshtray(customer.id)"><img class="ashtray-inline" :src="ashtrayArt" alt="" /> Ashtray</button>
+        <button v-if="social.ashtray === 'given'" type="button" :class="{ wanted:needNow === 'clean-ashtray' }" @click="game.cleanGuestAshtray(customer.id)">Clean ashtray</button>
+        <button v-if="social.ashtray === 'given'" type="button" :class="{ wanted:needNow === 'remove-ashtray' }" @click="game.removeGuestAshtray(customer.id)">Remove ashtray</button>
+        <button v-if="game.ashtrays.dirty > 0" type="button" @click="game.cleanAshtrays()">Wash used ashtrays · {{ game.ashtrays.dirty }}</button>
         <button v-if="needNow === 'water'" type="button" data-guide="give-water" class="wanted" @click="game.giveWater(customer.id)">💧 Water</button>
         <button v-if="needNow === 'taxi'" type="button" class="wanted" :disabled="!!social.taxiAt" @click="game.callTaxi(customer.id)">🚕 Call a taxi</button>
         <button v-if="!customer.pendingPayment" type="button" data-guide="offer-open" :class="{ wanted: social.hungry }" @click="offerOpen = !offerOpen">🍽️ Offer</button>
@@ -488,7 +518,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         </aside>
       </div>
 
-      <div v-if="confirmed && !situation && !customer.pendingPayment" class="talk-confirmed">
+      <div v-if="confirmed && !situation && (!customer.pendingPayment || customer.pendingPayment.foodOnly)" class="talk-confirmed">
         <template v-if="bottleOrder && confirmedBottle && customer.bottleRequest">
           <div><small>SEALED-BOTTLE SALE CONFIRMED</small><b>{{ customer.bottleRequest.quantity }} × {{ confirmedBottle.name }}</b><span>{{ confirmedBottle.volumeMl }} ml · {{ confirmedBottle.abv }}% ABV · total {{ bottleTotal(confirmedBottle, customer.bottleRequest.quantity, game.guestPriceFactor) }} coins</span></div>
           <UiButton variant="solid" data-guide="bottle-sale" :disabled="game.serving || bottleStock(confirmedBottle.id) < customer.bottleRequest.quantity" @click="completeBottleSale">Sell full bottle{{ customer.bottleRequest.quantity === 1 ? '' : 's' }} <UiIcon class="inline-icon" name="arrow-right" /></UiButton>
@@ -500,7 +530,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         </template>
       </div>
 
-      <div v-if="!situation && !customer.pendingPayment" class="service-decisions">
+      <div v-if="!game.trainingActive && !situation && !customer.pendingPayment" class="service-decisions">
         <div><small>CAN’T SERVE THIS ORDER?</small><span>The guest can accept the closest stocked alternative, or you can decline the order and let them leave.</span></div>
         <UiButton variant="secondary" @click="offerAlternative">Offer similar</UiButton>
         <UiButton variant="danger" @click="rejectOrder">Reject order</UiButton>
@@ -549,7 +579,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
             <button v-for="tile in tiles" :key="tile.id" type="button" class="word-tile" :class="{ used: picked.includes(tile.id) }" :disabled="picked.includes(tile.id)" @click="pick(tile.id)">{{ tile.text }}</button>
           </div>
           <div class="compose-actions">
-            <UiButton variant="secondary" data-guide="new-question" @click="nextTemplate">New question <UiIcon class="inline-icon" name="refresh" /></UiButton>
+            <UiButton variant="secondary" class="new-question-button" data-guide="new-question" @click="nextTemplate">New question <UiIcon name="refresh" /></UiButton>
             <UiButton variant="secondary" :disabled="!picked.length" @click="picked = []">Clear</UiButton>
             <UiButton variant="solid" data-guide="talk-send" :disabled="!picked.length || customerTyping" @click="send(builtSentence)">Check & send</UiButton>
           </div>

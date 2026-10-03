@@ -137,12 +137,12 @@ test('City events are fixed by the clock, cover buffs and disasters, and change 
 
   const base = (now) => createMarket(region, new Date(now).getDate());
   const cheap = marketFor(region, discount, 0);
-  base(discount).forEach((offer, index) => assert.ok(Math.abs(cheap[index].price - offer.price * .8) < .02));
+  base(discount).forEach((offer, index) => assert.equal(cheap[index].price, Math.round(offer.price * .8)));
   const short = eventAt(region.id, shortage);
   const pricey = marketFor(region, shortage, 0);
   base(shortage).forEach((offer, index) => {
     const factor = short.shortageIds.includes(offer.ingredientId) ? 1.8 : 1;
-    assert.ok(Math.abs(pricey[index].price - offer.price * factor) < .02);
+    assert.equal(pricey[index].price, Math.round(offer.price * factor));
   });
 });
 
@@ -196,7 +196,7 @@ test('Tips are a chance, Auto-serve needs level 10 and a confirmed order, and ne
   };
   const serve = (state, random) => completeAction(state,{type:'serve',mix:requiredRecipe(state.customers[0]).ingredients.map((item) => ({...item})),shaken:true,pourBrands:{}},at(random));
   // Guests without a fixed price factor pay the city's rate (the rules' own fallback).
-  const price = (state) => Math.round(requiredRecipe(state.customers[0]).price * (state.customers[0].priceFactor ?? REGIONS.find((region) => region.id === state.regionId).marketFactor) * 100) / 100;
+  const price = (state) => Math.round(requiredRecipe(state.customers[0]).price * (state.customers[0].priceFactor ?? REGIONS.find((region) => region.id === state.regionId).marketFactor));
 
   const lucky = setup(0);const luckyPrice = price(lucky);const before = lucky.money;serve(lucky, .1);
   assert.equal(Math.round((lucky.money-before)*100)/100,luckyPrice);

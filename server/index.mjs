@@ -72,6 +72,8 @@ if (botToken) {
 }
 const prune = setInterval(() => service.pruneRequests().catch((error) => console.error('Request cleanup failed:', error.message)), 6 * 60 * 60 * 1000);
 prune.unref();
+const mailExpiry = setInterval(()=>service.expireGifts().catch(error=>console.error('Gift return failed:',error.message)),60*1000);
+mailExpiry.unref();
 const shutdown = async () => {
   await telegramBot.stop();
   server.close(async () => {

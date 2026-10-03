@@ -105,9 +105,9 @@ test('Level 14 gives both costumes and level 20 the background; costumes already
   act(owner, { type: 'tick' });
   play(owner, { serves: 1000 });
   owner.ownedCosmeticIds.push(themeStyleIds(theme)[0]);
-  const shards = owner.loot.skinShards;
+  const shards = Object.values(owner.loot.styleShards).reduce((a,b)=>a+b,0);
   for (let level = 1; level <= PASS_LEVELS; level++) act(owner, { type: 'claimPass', track: 'free', level });
-  assert.ok(owner.loot.skinShards >= shards + 10);
+  assert.ok(Object.values(owner.loot.styleShards).reduce((a,b)=>a+b,0) >= shards + 10);
 });
 
 test('A new two-week pass starts clean: counters from that moment, no claims, no premium', () => {

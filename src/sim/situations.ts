@@ -1,5 +1,6 @@
 import { REGIONS } from '../domain/catalog';
 import { coins } from '../domain/economy';
+import { depositTips } from './tips';
 import { ensureSocial } from '../domain/social/generate';
 import { clampPercent } from '../domain/social/model';
 import { SITUATIONS, situationById } from '../domain/situations/catalog';
@@ -41,7 +42,7 @@ export function fill(text: string, data: Record<string, string | number | boolea
   return text.replace(/\{(\w+)\}/g, (_match, key: string) => {
     const value = data[key];
     if (value === undefined) return '';
-    if (typeof value === 'number' && AMOUNT_KEYS.has(key)) return `${symbol}${value.toFixed(2).replace(/\.00$/, '')}`;
+    if (typeof value === 'number' && AMOUNT_KEYS.has(key)) return `${symbol}${value.toFixed(0).replace(/\.00$/, '')}`;
     return String(value);
   });
 }
@@ -131,19 +132,24 @@ function pickOutcome(outcomes: Outcome[], context: SituationContext) {
 const receive = (state: PlayerState, amount: number) => { state.money = coins(Math.max(0, state.money + amount)); };
 
 // Applies what an outcome does. Returns true when the guest leaves.
-function applyEffects(state: PlayerState, guest: Customer, effects: Effects, data: Record<string, string | number | boolean>) {
+function applyEffects(state: PlayerState, guest: Customer, effects: Effects, data: Record<string, string | number | boolean>, now: number) {
   const social = ensureSocial(guest, 0);
   const held = Number(data.amount ?? 0);
   const have = Number(data.have ?? 0);
   const paidShare = effects.paid === undefined ? 0 : effects.paid === 'have' ? Math.min(1, have / Math.max(.01, held)) : effects.paid;
   if (paidShare > 0 && held > 0) receive(state, coins(held * paidShare));
+  if (paidShare > 0 && Number(data.foodTips ?? 0) > 0) {
+    const share = Math.min(paidShare, Math.max(0, 1 - Number(data.foodTipPaidShare ?? 0)));
+    depositTips(state, Number(data.foodTips) * share, now);
+    data.foodTipPaidShare = Number(data.foodTipPaidShare ?? 0) + share;
+  }
   const owesShare = effects.owes === undefined ? 0 : effects.owes === 'rest' ? Math.max(0, 1 - paidShare) : effects.owes;
   if (owesShare > 0 && held > 0) (state.tabs ??= []).push({ guest: guest.name, amount: coins(held * owesShare), since: state.lastClockAt });
   if (effects.settleTab && state.tabs?.length) {
     const tab = state.tabs.shift()!;
     receive(state, tab.amount);
-    state.tipJar = coins((state.tipJar ?? 0) + coins(tab.amount * .1));
-    state.message = `${tab.guest} paid back ${tab.amount.toFixed(2)} coins and left a tip.`;
+    depositTips(state, coins(tab.amount * .1), now);
+    state.message = `${tab.guest} paid back ${tab.amount.toFixed(0)} coins and left a tip.`;
   }
   if (effects.violation) state.ruleViolations = (state.ruleViolations ?? 0) + effects.violation;
   if (effects.resetViolations) state.ruleViolations = 0;
@@ -177,7 +183,7 @@ function finish(state: PlayerState, guest: Customer, def: SituationDef, outcome:
     delete state.loot.armed['calm-charm'];
     effects = { ...bad, leave: false, violation: 0, breakage: 0, spawn: undefined, popularity: Math.max(0, bad.popularity ?? 0), money: Math.max(0, bad.money ?? 0), emotion: 'relaxed', result: 'neutral', note: 'Calm Charm: the guest settled down and nothing bad happened.' };
   }
-  const leave = applyEffects(state, guest, effects, data);
+  const leave = applyEffects(state, guest, effects, data, now);
   // Whisper lasts for one situation: it is used up when that situation ends.
   const spawned0 = effects.spawn;
   const spawned = spawned0 ? situationById(spawned0) : undefined;

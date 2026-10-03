@@ -9,8 +9,9 @@ import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 export interface DrawResult { id: string; label: string; rarity: 'common' | 'rare' | 'legendary'; duplicate: boolean; shards: number; }
 export interface LootState {
   parts: number;
+  // Deprecated save field, migrated into item-specific fragments on load. Never awarded or spent.
   skinShards: number;
-  // Style shards are kept per style: each style (and the background that comes with it) has its own pile, 50 craft it.
+  // Costume IDs and background:<interior ID> each identify an independent fragment pile.
   styleShards: Record<string, number>;
   // Old saves had one shared pool; it is split into per-style piles on load (see migrateStylePool) and then stays 0.
   stylePieces: number;
@@ -63,7 +64,7 @@ const count = (value: unknown, max = 1_000_000) => Number.isFinite(value) && (va
 function cleanPiles(value: unknown) {
   const result: Record<string, number> = {};
   if (!value || typeof value !== 'object') return result;
-  for (const [key, amount] of Object.entries(value as Record<string, unknown>).slice(0, 400)) {
+  for (const [key, amount] of Object.entries(value as Record<string, unknown>).slice(0, 2000)) {
     if (!/^[\w:.-]{1,80}$/.test(key)) continue;
     const clean = count(amount);
     if (clean) result[key] = clean;

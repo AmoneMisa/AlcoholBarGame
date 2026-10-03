@@ -1,3 +1,5 @@
+import { COSMETICS } from './cosmetics';
+import { INTERIORS, BOX_INTERIOR_IDS } from '../data/cosmetics/bars';
 import { BOX_STYLE_CHANCE } from '../data/cosmetics/styleSources';
 
 // Pure tables for the loot layer: equipment, consumables, boxes, and the style draw.
@@ -40,10 +42,13 @@ export function upgradeCostFor(level: number) {
 }
 
 // ---- Materials and consumables ----
-export type ConsumableId = 'happy-hour' | 'golden-ice' | 'voucher' | 'courier' | 'scroll' | 'second-chance' | 'calm-charm' | 'whisper' | 'steady-hand' | 'xp-boost' | 'coin-boost' | 'tip-boost' | 'vip-magnet';
-export interface ConsumableDef { id: ConsumableId; name: string; icon: string; description: string; crystalPrice: number; kind: 'boost' | 'charge' | 'instant'; durationMs?: number; }
+export type FragmentChoiceId = 'style-choice' | 'background-choice' | 'friend-choice' | 'equipment-choice';
+export const FRAGMENT_CHOICE_IDS: FragmentChoiceId[] = ['style-choice','background-choice','friend-choice','equipment-choice'];
+export type ConsumableId = FragmentChoiceId | 'happy-hour' | 'golden-ice' | 'voucher' | 'courier' | 'scroll' | 'second-chance' | 'calm-charm' | 'whisper' | 'steady-hand' | 'xp-boost' | 'coin-boost' | 'tip-boost' | 'vip-magnet';
+export interface ConsumableDef { id: ConsumableId; name: string; icon: string; description: string; crystalPrice: number; kind: 'boost' | 'charge' | 'instant' | 'choice'; durationMs?: number; }
 const MIN = 60_000;
 export const CONSUMABLES: ConsumableDef[] = [
+  ...FRAGMENT_CHOICE_IDS.map((id): ConsumableDef => ({id,name:{'style-choice':'Style fragment choice','background-choice':'Background fragment choice','friend-choice':'Circle fragment choice','equipment-choice':'Equipment fragment choice'}[id],icon:'🧩',kind:'choice',crystalPrice:0,description:'Choose one specific fragment. This item is consumed only after you confirm your selection.'})),
   { id: 'happy-hour', name: 'Happy Hour Token', icon: '🎉', kind: 'boost', durationMs: 30 * MIN, crystalPrice: 45, description: 'Guests arrive twice as fast for 30 minutes.' },
   { id: 'xp-boost', name: 'XP Booster', icon: '📈', kind: 'boost', durationMs: 60 * MIN, crystalPrice: 60, description: '+50% XP from serving and bottle sales for 1 hour.' },
   { id: 'coin-boost', name: 'Coin Booster', icon: '🪙', kind: 'boost', durationMs: 60 * MIN, crystalPrice: 60, description: 'Guests pay 25% more for 1 hour.' },
@@ -75,7 +80,8 @@ export type Reward =
   | { kind: 'coins'; amount: number }
   | { kind: 'crystals'; amount: number }
   | { kind: 'parts'; amount: number }
-  | { kind: 'skinShards'; amount: number }
+  | { kind: 'skinShards'; amount: number; id?: string }
+  | { kind: 'backgroundShards'; amount: number; id: string }
   | { kind: 'stylePieces'; amount: number }   // style shards
   | { kind: 'xp'; amount: number }
   | { kind: 'box'; box: Exclude<BoxKind, 'choice'> }
@@ -133,7 +139,7 @@ export const BOX_TABLES: Record<Exclude<BoxKind, 'choice'>, Entry[]> = {
 // of every box: 1 shard is 22%, and bigger piles of 2, 5, 10 and 25 are rarer. Every box also has a 0.5% chance of a
 // whole style, and a small chance of XP, a prestige star, a coin jackpot, a double booster or a pile of upgrade items.
 type Chance = [percent: number, make: Entry['make']];
-const shardsOf = (amount: number): Entry['make'] => () => ({ kind: 'stylePieces', amount });
+const shardsOf = (amount: number): Entry['make'] => (_level,random) => random() > .9 ? ({kind:'backgroundShards',id:pick(BOX_INTERIOR_IDS,random),amount}) : ({ kind: 'stylePieces', amount });
 const anyBooster = (amount: number): Entry['make'] => consumable(['xp-boost', 'coin-boost', 'tip-boost', 'happy-hour'], amount);
 const LOW_CHANCE: Record<Exclude<BoxKind, 'choice'>, Chance[]> = {
   bronze: [
@@ -165,7 +171,7 @@ const LOW_CHANCE: Record<Exclude<BoxKind, 'choice'>, Chance[]> = {
 };
 for (const kind of Object.keys(LOW_CHANCE) as (keyof typeof LOW_CHANCE)[]) {
   const table = BOX_TABLES[kind];
-  const extra = LOW_CHANCE[kind];
+  const extra = [...LOW_CHANCE[kind], ...FRAGMENT_CHOICE_IDS.map(id => [kind === 'bronze' ? .1 : kind === 'silver' ? .2 : .4, () => ({kind:'consumable',id,amount:1})] as Chance)];
   const share = extra.reduce((sum, [percent]) => sum + percent, 0) / 100;
   const total = table.reduce((sum, entry) => sum + entry.weight, 0) / (1 - share);
   for (const [percent, make] of extra) table.push({ weight: total * percent / 100, make });
@@ -194,7 +200,8 @@ export function describeReward(reward: Reward, names: { consumable: (id: string)
     case 'coins': return `${reward.amount} coins`;
     case 'crystals': return `${reward.amount} crystals`;
     case 'parts': return `${reward.amount} workshop parts`;
-    case 'skinShards': return `${reward.amount} skin shards`;
+    case 'backgroundShards': return `${reward.amount} ${INTERIORS.find(item=>item.id===reward.id)?.name ?? 'Background'} fragments`;
+    case 'skinShards': return `${reward.amount} ${COSMETICS.find(item=>item.id===reward.id)?.label ?? 'random costume'} fragments`;
     case 'stylePieces': return `${reward.amount} style shard${reward.amount === 1 ? '' : 's'} of a random style`;
     case 'xp': return `${reward.amount} XP`;
     case 'box': return `a ${reward.box} box`;

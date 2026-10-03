@@ -80,7 +80,7 @@ export const ALCOHOL_PRODUCTS: AlcoholProduct[] = [
 ];
 
 export const bottleTotal = (product: AlcoholProduct, quantity: number, marketFactor = 1) =>
-  Number((product.price * quantity * marketFactor).toFixed(2));
+  Number((product.price * quantity * marketFactor).toFixed(0));
 
 // Popular premium labels use the rare-currency reserve market. Customer crystal payments always
 // exceed the refill price, preserving a positive seller margin.

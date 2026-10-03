@@ -1,3 +1,4 @@
+const fragmentId='bartender:reference-kimono:noa';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
@@ -160,11 +161,14 @@ test('Replayed requests are applied once, and the daily gift is once per server 
   const replay = await act(service, { type: 'claimDaily' }, id);
   assert.equal(first.ok, true);
   assert.deepEqual(replay, first, 'the same request id returns the stored answer');
-  assert.equal(first.state.money, state.money + 100);
+  assert.equal(first.state.money, state.money,'daily reward waits in mail');
+  assert.equal(first.state.mailbox.filter(item=>item.kind==='reward').length,1);
   const again = await act(service, { type: 'claimDaily' });
   assert.equal(again.ok, false, 'a second claim the same day is refused');
   assert.equal(again.state.money, first.state.money);
-  assert.equal(repository.ledger.filter((entry) => entry.action === 'claimDaily').length, 1);
+  const claimed=await service.claimMailReward(identity(),first.state.mailbox.find(item=>item.kind==='reward').id);
+  assert.equal(claimed.body.state.money,state.money+100);
+  assert.equal(repository.ledger.filter((entry) => entry.action === 'claimMailReward').length, 1);
 });
 
 test('Crystal purchases and rewards are server-authoritative and fully ledgered', async () => {
@@ -442,7 +446,7 @@ test('Friends can gift consumables and skin shards; limits, ownership and friend
   const a = await service.session(aId); const b = await service.session(bId); await service.session(strangerId);
   const row = repository.states.get(a.player.id);
   row.state.loot.consumables = { 'golden-ice': 1 };
-  row.state.loot.skinShards = 12;
+  row.state.loot.styleShards[fragmentId] = 12;
   repository.states.set(a.player.id, row);
   const addFriendResult = await service.addFriend(aId, b.player.friendCode);
   assert.ok(addFriendResult.status < 400);
@@ -450,18 +454,20 @@ test('Friends can gift consumables and skin shards; limits, ownership and friend
   await service.visitFriend(aId, b.player.friendCode);
 
   assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'consumable', id: 'courier' })).body.ok, false, 'not owned');
-  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'skin-shards', amount: 7 })).body.ok, false, 'invalid amount');
-  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'skin-shards', amount: 20 })).body.ok, false, 'not enough shards');
+  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'style-shards', cosmeticId:fragmentId, amount: 7 })).body.ok, false, 'invalid amount');
+  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'style-shards', cosmeticId:fragmentId, amount: 20 })).body.ok, false, 'not enough shards');
   const sent = await service.sendGift(aId, b.player.friendCode, { kind: 'consumable', id: 'golden-ice' });
   assert.equal(sent.body.ok, true);
-  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'skin-shards', amount: 10 })).body.ok, true);
-  const received = await service.session(bId);
-  assert.equal(received.state.loot.consumables['golden-ice'], 1);
-  assert.equal(received.state.loot.skinShards, 10);
+  assert.equal((await service.sendGift(aId, b.player.friendCode, { kind: 'style-shards', cosmeticId:fragmentId, amount: 10 })).body.ok, true);
+  const pending = await service.session(bId);
+  assert.equal(pending.state.loot.consumables['golden-ice'], undefined,'login does not accept gifts');
+  const received = await service.claimGifts(bId);
+  assert.equal(received.body.state.loot.consumables['golden-ice'], 1);
+  assert.equal(received.body.state.loot.styleShards[fragmentId], 10);
   const after = repository.states.get(a.player.id).state.loot;
   assert.equal(after.consumables['golden-ice'], undefined);
-  assert.equal(after.skinShards, 2);
-  assert.equal((await service.sendGift(strangerId, b.player.friendCode, { kind: 'skin-shards', amount: 5 })).body.ok, false, 'strangers cannot gift');
+  assert.equal(after.styleShards[fragmentId], 2);
+  assert.equal((await service.sendGift(strangerId, b.player.friendCode, { kind: 'style-shards', cosmeticId:fragmentId, amount: 5 })).body.ok, false, 'strangers cannot gift');
 });
 
 test('Weekly leaderboard: ranks by XP earned this week, shows bar names only, and pays last week\'s reward once from the server rank', async () => {
@@ -503,6 +509,7 @@ test('Weekly leaderboard: ranks by XP earned this week, shows bar names only, an
   // A client cannot dictate its rank.
   const forged = await service.act(b, { requestId: requestId(), action: { type: 'claimLeaderboardReward', standing: { week: week, rank: 1, size: 1, score: 9999 } } });
   assert.equal(forged.body.ok, true);
+  await service.claimMailReward(b,forged.body.state.mailbox.find(item=>item.kind==='reward' && item.status==='pending').id);
   assert.equal(repository.states.get(sb.player.id).state.loot.boxes.gold ?? 0, 0, 'rank 2 gets podium rewards, not champion');
   assert.equal(repository.states.get(sb.player.id).state.loot.boxes.silver, 1);
   const crystalsB = repository.states.get(sb.player.id).state.crystals;
@@ -510,6 +517,7 @@ test('Weekly leaderboard: ranks by XP earned this week, shows bar names only, an
 
   const first = await act(service, { type: 'claimLeaderboardReward' }, requestId(), a);
   assert.equal(first.ok, true);
+  await service.claimMailReward(a,first.state.mailbox.find(item=>item.kind==='reward' && item.status==='pending').id);
   const stateA = repository.states.get(sa.player.id).state;
   assert.equal(stateA.loot.boxes.choice, 1);
   assert.equal(stateA.loot.boxes.gold, 1);

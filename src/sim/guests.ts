@@ -1,7 +1,7 @@
 import type { Customer } from '../domain/types';
 import { drunkStage, clampPercent, type Emotion, type GuestNeed, type NeedKind } from '../domain/social/model';
 import { ensureSocial } from '../domain/social/generate';
-import { TAXI_ACCEPTED, TAXI_ARRIVED, choose, leaveLine, type LeaveOutcome, type LeaveTone, type SocialReply } from '../domain/social/talk';
+import { TAXI_ACCEPTED, TAXI_ARRIVED, choose, leaveLine, enjoyingOpening, type LeaveOutcome, type LeaveTone, type SocialReply } from '../domain/social/talk';
 import { pickSituation, startSituation } from './situations';
 import type { PlayerState } from './state';
 import { MINUTE } from '../domain/time';
@@ -75,6 +75,7 @@ export function applySocialReply(guest: Customer, reply: SocialReply) {
   if (reply.heard) { const heard = (social.heard ??= []); if (!heard.some((item) => item.thing === reply.heard!.thing)) heard.push(reply.heard); if (heard.length > 5) heard.shift(); }
   social.asked = !!reply.asked;
   if (reply.chatted && !social.chatted.includes(reply.chatted)) social.chatted.push(reply.chatted);
+  if (social.need?.kind === 'chat' && reply.chatted && reply.rapport > 0) delete social.need;
   // Being rude to a guest makes them angry; being kind to an angry guest is how you calm them.
   if (social.rapport < 22 && social.emotion !== 'angry') social.emotion = 'angry';
   if (social.rapport >= 62 && (social.emotion === 'angry' || social.emotion === 'upset')) social.emotion = 'relaxed';
@@ -146,7 +147,8 @@ function rollEnjoyingNeed(guest: Customer, context: GuestContext) {
   const when = context.now + Math.round(span * (.25 + context.random() * .45));
   const stage = drunkStage(social.drunk);
   let kind: NeedKind | undefined;
-  if (guest.smoker && social.ashtray !== 'given' && context.random() < .55) kind = 'ashtray';
+  if (guest.smoker && !social.ashtrayCleared && social.ashtray !== 'given' && context.random() < .55) kind = 'ashtray';
+  else if (social.foodRequest && social.hungry) kind = 'food';
   else if (social.drunk >= 55 && context.random() < .5) kind = social.gender === 'f' && context.random() < .6 ? 'taxi' : 'water';
   else if (stage === 'tipsy' && context.random() < .3) kind = 'water';
   else if (social.chatty && context.random() < .6) kind = 'chat';
@@ -181,6 +183,16 @@ export function tickGuests(state: PlayerState, context: GuestContext, seconds: n
   for (const guest of [...state.customers]) {
     const social = ensureSocial(guest, context.now);
     social.drunk = clampPercent(social.drunk - minutes * .45);
+    if (social.ashtray === 'given') social.ashtrayUsedAt ??= context.now;
+    if (!social.need && social.ashtray === 'given' && context.now - (social.ashtrayUsedAt ?? context.now) >= 3 * MINUTE) social.need = { kind:context.random() < .65 ? 'clean-ashtray' : 'remove-ashtray', since:context.now };
+    if (!social.need && social.foodRequest && social.hungry) social.need = { kind:'food', since:context.now };
+    const request = activeNeed(guest, context.now);
+    if (request && !request.announced && state.conversations?.[guest.id]) {
+      const lines = state.conversations[guest.id]!.lines;
+      lines.push({id:(lines.at(-1)?.id ?? -1) + 1, speaker:'customer', text:enjoyingOpening(guest, context.now)});
+      if (lines.length > 80) lines.shift();
+      request.announced = true;
+    }
     if (guest.pendingPayment) continue;
     // A taxi that has arrived takes the guest home.
     if (social.taxiAt && context.now >= social.taxiAt) {
@@ -212,6 +224,8 @@ export function giveAshtray(state: PlayerState, guest: Customer, now: number) {
   if (stock.clean < 1) return { ok: false as const, text: 'You have no clean ashtrays left. Clean the dirty ones first.' };
   stock.clean--;
   social.ashtray = 'given';
+  social.ashtrayUsedAt = now;
+  social.ashtrayCleared = false;
   const wanted = social.need?.kind === 'ashtray';
   needDone(guest, 'ashtray');
   social.rapport = clampPercent(social.rapport + (wanted ? 9 : guest.smoker ? 4 : -3));
@@ -227,6 +241,17 @@ export function cleanAshtrays(state: PlayerState) {
   stock.dirty = 0;
   state.xp += cleaned;
   return cleaned;
+}
+
+export function serviceAshtray(state: PlayerState, guest: Customer, now:number, remove:boolean) {
+  const social = ensureSocial(guest, now);
+  if (social.ashtray !== 'given') return { ok:false, text:'There is no ashtray in front of this guest.' };
+  if (!remove && social.need?.kind !== 'clean-ashtray' && now - (social.ashtrayUsedAt ?? now) < 3 * MINUTE) return { ok:false, text:'This ashtray is still clean.' };
+  if (remove) { delete social.ashtray; delete social.ashtrayUsedAt; social.ashtrayCleared = true; ashtraysOf(state).dirty++; }
+  else social.ashtrayUsedAt = now;
+  if (social.need?.kind === 'clean-ashtray' || social.need?.kind === 'remove-ashtray') delete social.need;
+  social.rapport = clampPercent(social.rapport + 6);
+  return { ok:true, text:remove ? `You removed ${guest.name}’s used ashtray.` : `You emptied and cleaned ${guest.name}’s ashtray.` };
 }
 
 export function giveWater(guest: Customer, now: number) {

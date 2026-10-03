@@ -52,7 +52,7 @@ export function claimPass(state: PlayerState, trackInput: unknown, levelInput: u
       for (const id of reward.ids) {
         // The costumes come at their own level, without the background that normally goes with a connected style: that
         // arrives at level 20.
-        if (stylesBefore.includes(id)) { state.loot.skinShards += 10; parts.push('10 skin shards (you already had a costume)'); } else state.ownedCosmeticIds.push(id);
+        if (stylesBefore.includes(id)) { state.loot.styleShards[id] = (state.loot.styleShards[id] ?? 0) + 10; parts.push(`10 ${COSMETICS.find(item=>item.id===id)?.label ?? 'costume'} fragments`); } else state.ownedCosmeticIds.push(id);
       }
     } else parts.push(grantReward(state, reward, random));
   }

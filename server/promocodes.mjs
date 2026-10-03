@@ -14,7 +14,7 @@ export function validatePromo(body, now) {
   if (!Array.isArray(body?.rewards) || !body.rewards.length || body.rewards.length > 30) throw new Error('Choose 1–30 rewards.');
   const rewards = body.rewards.map((reward) => {
     const kind = reward?.kind;
-    const ids = { style:COSMETICS.map(x=>x.id), background:INTERIORS.map(x=>x.id), companion:COMPANIONS.map(x=>x.id), box:BOXES.map(x=>x.id), consumable:CONSUMABLES.map(x=>x.id), itemShards:EQUIPMENT.map(x=>x.id) };
+    const ids = { style:COSMETICS.map(x=>x.id), background:INTERIORS.map(x=>x.id), companion:COMPANIONS.map(x=>x.id), box:BOXES.map(x=>x.id), consumable:CONSUMABLES.map(x=>x.id), itemShards:EQUIPMENT.map(x=>x.id), skinShards:COSMETICS.map(x=>x.id), stylePieces:COSMETICS.map(x=>x.id), backgroundShards:INTERIORS.map(x=>x.id) };
     const single = ['style','background','companion'].includes(kind);
     if (!['coins','crystals','parts','skinShards','stylePieces', ...Object.keys(ids)].includes(kind)) throw new Error('Unknown reward kind.');
     if (ids[kind] && !ids[kind].includes(reward.id)) throw new Error(`Unknown ${kind} reward.`);
@@ -29,6 +29,6 @@ export function applyPromoRewards(state, rewards) {
     else if (reward.kind === 'background') { if (!state.ownedInteriorIds.includes(reward.id)) state.ownedInteriorIds.push(reward.id); }
     else if (reward.kind === 'companion') joinCompanion(state, reward.id);
     else if (reward.kind === 'box') grantBox(state, reward.id, reward.amount);
-    else grantReward(state, reward, () => .5);
+    else grantReward(state, reward.kind==='stylePieces' ? {...reward,kind:'skinShards'} : reward, () => .5);
   }
 }

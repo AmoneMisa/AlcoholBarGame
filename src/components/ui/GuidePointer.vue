@@ -64,7 +64,7 @@ onBeforeUnmount(() => { if (timer) clearInterval(timer); window.removeEventListe
 <template>
   <div v-if="drawn" :key="drawn.key" class="guide-pointer" :class="drawn.gesture" :style="style" aria-hidden="true">
     <i class="gp-ring" />
-    <svg v-if="drawn.gesture === 'drag'" class="gp-path" width="1" height="1" overflow="visible"><line x1="0" y1="0" :x2="drawn.dx" :y2="drawn.dy" /></svg>
+    <i v-if="drawn.gesture === 'drag'" class="gp-path" :style="{width: Math.hypot(drawn.dx, drawn.dy) + 'px', transform: 'rotate(' + Math.atan2(drawn.dy, drawn.dx) + 'rad)'}" />
     <span class="gp-hand"><UiIcon :name="hand" /></span>
     <b class="gp-label" :class="{ below: drawn.labelBelow }" :style="{ marginLeft: `${drawn.labelLeft - drawn.x}px` }">{{ drawn.label }}</b>
   </div>
@@ -79,7 +79,7 @@ onBeforeUnmount(() => { if (timer) clearInterval(timer); window.removeEventListe
 .guide-pointer.drag .gp-hand { animation: gp-drag 2.2s ease-in-out infinite; }
 .guide-pointer.swipe .gp-hand { animation: gp-drag 1.6s ease-in-out infinite; }
 .guide-pointer.type .gp-hand { animation: gp-blink 1s steps(2) infinite; }
-.gp-path line { stroke: #ffd35a; stroke-width: 3; stroke-dasharray: 6 7; opacity: .9; }
+.gp-path {position:absolute;left:0;top:-1.5px;height:3px;transform-origin:left center;background:repeating-linear-gradient(to right,#ffd35a 0 6px,transparent 6px 13px);opacity:.9;}
 .gp-label { position: absolute; top: calc(var(--size) / -2 - 44px); width: max-content; max-width: min(280px, 80vw); transform: translateX(-50%); padding: 6px 10px; border-radius: 10px; background: #ffd35a; color: #1b1405; font: 700 13px/1.25 system-ui, sans-serif; text-align: center; box-shadow: 0 6px 18px rgba(0, 0, 0, .5); }
 .gp-label.below { top: calc(var(--size) / 2 + 10px); }
 @keyframes gp-pulse { 0% { transform: scale(.85); opacity: 1; } 100% { transform: scale(1.25); opacity: .15; } }

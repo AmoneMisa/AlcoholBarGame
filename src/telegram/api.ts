@@ -5,9 +5,10 @@ import type { PlayerState } from '../sim/state';
 // (vite dev + server with ALLOW_DEV_LOGIN=true) a per-browser dev id is used instead.
 
 export interface ServerResult { ok: boolean; state?: PlayerState; serverTime?: number; message?: string; error?: string; }
-export interface SessionResult { ok: true; player: { id: number; name: string; friendCode: string }; state: PlayerState; starterPackAvailable?: boolean; received?: string[]; serverTime: number; }
+export interface SessionResult { theftNotifications?: import('../sim/mailbox').MailEntry[]; ok: true; player: { id: number; name: string; friendCode: string }; state: PlayerState; starterPackAvailable?: boolean; received?: string[]; serverTime: number; }
 export interface FriendSummary { id:number; code:string; nickname:string; customName:string; status:'pending'|'accepted'; direction:'incoming'|'outgoing'; level:number; prestige:number; barName:string; visitedToday:boolean }
-export interface FriendBar { profile?: import('../domain/profile').PlayerProfile; id:number; code:string; nickname:string; customName:string; name:string; level:number; prestige:number; regionId:string; bar:Record<string,any>; recipes:number; interiors:number; mastered:{name:string;level:number}[] }
+export interface TipVisitInfo {amount:number;capacity:number;attemptsLeft:number;attemptedToday:boolean}
+export interface FriendBar { tips?:TipVisitInfo; profile?: import('../domain/profile').PlayerProfile; id:number; code:string; nickname:string; customName:string; name:string; level:number; prestige:number; regionId:string; bar:Record<string,any>; recipes:number; interiors:number; mastered:{name:string;level:number}[] }
 export interface SocialResult { ok:boolean; error?:string; message?:string; state?:PlayerState; serverTime?:number; friendCode?:string; prestige?:number; pendingGifts?:number; received?:string[]; friends?:FriendSummary[]; friend?:FriendBar; rewarded?:boolean }
 
 function authHeaders(): Record<string, string> {
@@ -55,6 +56,10 @@ export const removeFriendLink = (code:string) => post<SocialResult>('/api/friend
 export const claimFriendGifts = () => post<SocialResult>('/api/friends/claim', {});
 export const saveFriendLabel = (code:string, label:string) => post<SocialResult>('/api/friends/label', { code, label });
 export const visitFriendBar = (code:string) => post<SocialResult>('/api/friends/visit', { code });
+export const stealFriendTips = (code:string) => post<ServerResult & {tips?:TipVisitInfo;stolen?:number}>('/api/friends/tips', {code});
+export const fetchMailbox = (readIds:string[] = []) => post<ServerResult>('/api/mailbox',{readIds});
+export const answerMailGift = (giftId:number,accept:boolean) => post<ServerResult>('/api/mailbox/gift',{giftId,accept});
+export const claimMailReward = (id:string) => post<ServerResult>('/api/mailbox/reward',{id});
 export const sendFriendGift = (code:string, gift:unknown) => post<SocialResult>('/api/friends/gift', { code, gift });
 
 // Actions go one at a time, in order, each with its own id (a retry of the same id is never applied twice).

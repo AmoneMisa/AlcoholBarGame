@@ -72,7 +72,7 @@ export interface Customer {
   greeting: string;
   request: string;
   paymentMethod: PaymentMethod;
-  pendingPayment?: { coins: number; tips: number; crystals: number; bottle?: boolean };
+  pendingPayment?: { coins: number; tips: number; crystals: number; bottle?: boolean; foodOnly?:boolean };
   specialRecipeRewardId?: string;
   orderRevealed?: boolean;
   // What the guest says before the order is known (“Something to feel fresh and cool…”); safe to show.

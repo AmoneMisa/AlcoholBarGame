@@ -1,13 +1,20 @@
+import {resolveFragmentReward} from '../src/sim/loot';
 import {cleanCode, validatePromo, applyPromoRewards} from './promocodes.mjs';
 import { randomBytes } from 'node:crypto';
 import { applyAction, advanceClock, RuleError } from '../src/sim/rules';
 import { createInitialState, levelFor, normalizePlayerState, publicState } from '../src/sim/state';
-import { payForGift, publicBar, receiveGift } from '../src/sim/gifts';
+import { giftLabel, giftPrice, payForGift, publicBar, receiveGift } from '../src/sim/gifts';
+import { giftAttachments, rewardAttachments } from '../src/domain/mailAttachments';
+import { addMail, pruneMail, MAIL_LIFETIME } from '../src/sim/mailbox';
 import { calendarDate, starCrystalPack } from '../src/domain/economy';
 import { friendCodeFor, playerIdFromCode } from './friendCode.mjs';
 import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE, describeLeaderboardReward, leaderboardReward } from '../src/domain/leaderboard';
 import { weekOf, WEEK_MS } from '../src/domain/quests';
 import { addStat } from '../src/domain/achievementStats';
+import { accrueTips, stealableTips, tipCapacity } from '../src/sim/tips';
+import { coins } from '../src/domain/economy';
+import { deferEventRewards, claimEventRewards } from './mailRewards.mjs';
+import { addWeeklyScore, grantLevelBoxes } from '../src/sim/loot';
 
 // Server-authoritative game: every request loads the player's state with a row lock, applies exactly one
 // validated action with the shared rules and the server clock, and stores the result together with a coin
@@ -18,14 +25,11 @@ const REQUEST_ID = /^[a-zA-Z0-9-]{8,64}$/;
 const friendCode = friendCodeFor;
 const friendIdFrom = playerIdFromCode;
 
-// Opens every unclaimed gift addressed to the player; returns the text of each (what was received, from whom).
-async function claimGiftsInto(tx, playerId, state) {
-  const received = [];
+// Old pending gifts also appear in the mailbox, but login never accepts them.
+async function syncGiftMail(tx, playerId, state) {
   for (const gift of await tx.listGifts(playerId)) {
-    const claimed = await tx.takeGift(gift.id, playerId);
-    if (claimed) received.push(receiveGift(state, claimed.payload, claimed.fromName));
+    addMail(state,{id:`gift-in:${gift.id}`,at:gift.createdAt,kind:'gift',direction:'incoming',actorId:gift.fromId,actorName:gift.fromName,giftId:gift.id,attachments:giftAttachments(gift.payload),status:'pending',text:`${gift.fromName} sent you ${giftLabel(gift.payload)}.`});
   }
-  return received;
 }
 
 const areFriends = async (tx, a, b) => await tx.friendship(a, b) === 'accepted' || await tx.friendship(b, a) === 'accepted';
@@ -58,8 +62,9 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       const coinsBefore = state.money, crystalsBefore = state.crystals;
       // The unique redemption is inside the same transaction as all rewards and ledgers.
       if (!await tx.redeemPromo(promo.code,player.id)) return {status:409,body:{ok:false,error:'You have already redeemed this code.'}};
-      applyPromoRewards(state,promo.rewards);
-      state.message = 'Promo code redeemed. Enjoy your rewards!';
+      const rewards=promo.rewards.map(reward=>resolveFragmentReward(state,reward,()=>.5));
+      addMail(state,{id:`promo:${promo.code}`,at:now(),kind:'reward',direction:'incoming',actorId:0,actorName:'BarLingo',status:'pending',text:`Promo code ${promo.code}: rewards are ready to claim.`,attachments:rewardAttachments({promo:rewards}),reward:{promo:rewards}});
+      state.message = 'Promo code redeemed. Claim your rewards in Mail (available for 180 days).';
       await tx.saveState(player.id,state,(record?.version ?? 0)+1);
       const requestId = `promo:${promo.code}`;
       if (state.money !== coinsBefore) await tx.addLedger(player.id,{requestId,action:'redeemPromoCode',delta:state.money-coinsBefore,balance:state.money});
@@ -70,15 +75,17 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
   }
 
   async function session(identity) {
+    await expireGifts();
     return repository.transaction(async (tx) => {
       const player = await tx.findOrCreatePlayer(identity);
       const record = await tx.lockState(player.id);
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
       advanceClock(state, context());
-      const received = await claimGiftsInto(tx, player.id, state);
-      if (received.length) state.message = received[received.length - 1];
+      await syncGiftMail(tx, player.id, state);
+      pruneMail(state,now());
+      const theftNotifications = state.mailbox.filter(item=>item.kind==='theft' && item.direction==='incoming' && !item.readAt);
       await tx.saveState(player.id, state, (record?.version ?? 0) + 1);
-      return { ok: true, player: { id: player.id, name: player.name, friendCode: friendCode(player.id) }, state: publicState(state), starterPackAvailable: !(await tx.hasStarPurchase(player.id, 'starter')), received, serverTime: now() };
+      return { ok: true, player: { id: player.id, name: player.name, friendCode: friendCode(player.id) }, state: publicState(state), starterPackAvailable: !(await tx.hasStarPurchase(player.id, 'starter')), received:[], theftNotifications, serverTime: now() };
     });
   }
 
@@ -97,12 +104,25 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       if (replay) return { status: 200, body: replay };
 
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
+      pruneMail(state,now());
       const next = structuredClone(state);
+      const eventMail = ['claimDaily','claimPass','spinRoulette','claimLeaderboardReward','claimQuest','claimAchievement'].includes(action.type);
+      let beforeReward;
       let result;
       try {
         // Last week's rank comes from the database, never from the client.
         const standing = action.type === 'claimLeaderboardReward' ? await tx.weeklyStanding(weekOf(now()) - 1, Number(player.id)) : undefined;
-        result = applyAction(next, action, { ...context(), leaderboard: standing ?? undefined });
+        result = applyAction(next, action, { ...context(), leaderboard: standing ?? undefined, deferLevelRewards:eventMail, beforeAction:eventMail ? ()=>{beforeReward=structuredClone(next);} : undefined });
+        if (eventMail) {
+          const changes=deferEventRewards(beforeReward,next);
+          if(changes.length) {
+            addMail(next,{id:`event:${requestId}`,at:now(),kind:'reward',direction:'incoming',actorId:0,actorName:'BarLingo',status:'pending',text:next.message,attachments:rewardAttachments({changes}),reward:{changes}});
+            next.message+=' Rewards are waiting in Mail (180 days).';
+          }
+          result.moneyDelta=next.money-beforeReward.money;
+          result.crystalDelta=next.crystals-beforeReward.crystals;
+          result.weekly={...result.weekly,...next.loot.weekly};
+        }
       } catch (error) {
         if (!(error instanceof RuleError)) throw error;
         // The action was refused; time still passes, but nothing the client asked for happens.
@@ -298,19 +318,63 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       const friendRecord = locked.get(targetId);
       const visitor = normalizePlayerState(visitorRecord?.state ?? createInitialState(now()));
       const owner = normalizePlayerState(friendRecord?.state ?? createInitialState(now()));
+      accrueTips(owner, now());
       const key = String(targetId);
       const today = calendarDate(new Date(now()));
       const rewarded = visitor.friendVisits[key] !== today;
+      const visitId = `visit:${randomBytes(12).toString('hex')}`;
+      addMail(owner,{id:visitId,at:now(),kind:'visit',direction:'incoming',actorId:Number(player.id),actorName:player.name,text:`${player.name} visited your bar.${rewarded ? ' +1 prestige.' : ''}`});
+      addMail(visitor,{id:visitId,at:now(),kind:'visit',direction:'outgoing',actorId:targetId,actorName:target.name,text:`You visited ${target.name}’s bar.`,readAt:now()});
       if (rewarded) {
         visitor.friendVisits[key] = today;
         addStat(visitor, 'visitedFriends', 1);
         addStat(owner, 'visitedBy', 1);
         owner.popularity += 1;
         owner.message = `${player.name} visited your bar. +1 prestige.`;
-        await tx.saveState(player.id, visitor, (visitorRecord?.version ?? 0) + 1);
-        await tx.saveState(targetId, owner, (friendRecord?.version ?? 0) + 1);
       }
-      return { status: 200, body: { ok: true, rewarded, state: publicState(visitor), friend: { id: targetId, code: friendCode(targetId), nickname: target.name, customName: visitor.friendLabels[key] ?? '', prestige: owner.popularity, ...publicBar(owner, target.name) } } };
+      await tx.saveState(player.id, visitor, (visitorRecord?.version ?? 0) + 1);
+      await tx.saveState(targetId, owner, (friendRecord?.version ?? 0) + 1);
+      return { status: 200, body: { ok: true, rewarded, state: publicState(visitor), friend: { id: targetId, code: friendCode(targetId), nickname: target.name, customName: visitor.friendLabels[key] ?? '', prestige: owner.popularity, tips: tipVisitInfo(visitor, owner, key, today), ...publicBar(owner, target.name) } } };
+    });
+  }
+
+  function tipVisitInfo(visitor, owner, targetId, today) {
+    const targets = visitor.tipTheft?.day === today ? visitor.tipTheft.targets : [];
+    return { amount: owner.tipJar, capacity: tipCapacity(owner), attemptsLeft: Math.max(0, 10 - targets.length), attemptedToday: targets.includes(targetId) };
+  }
+
+  async function stealFriendTips(identity, code) {
+    return repository.transaction(async tx => {
+      const player = await tx.findOrCreatePlayer(identity);
+      const { targetId, target, isFriend } = await resolveFriend(tx, player, code);
+      if (!isFriend || Number(player.id) === targetId) return {status:403,body:{ok:false,error:'Visit a friend’s bar to take a small share of tips.'}};
+      const locked = new Map();
+      for (const id of [Number(player.id), targetId].sort((a,b)=>a-b)) locked.set(id,await tx.lockState(id));
+      const mine = locked.get(Number(player.id)), theirs = locked.get(targetId);
+      const visitor = normalizePlayerState(mine?.state ?? createInitialState(now()));
+      const owner = normalizePlayerState(theirs?.state ?? createInitialState(now()));
+      const today = calendarDate(new Date(now())), key = String(targetId);
+      if (visitor.friendVisits[key] !== today) return {status:403,body:{ok:false,error:'Visit this bar first.'}};
+      if (visitor.tipTheft?.day !== today) visitor.tipTheft = {day:today,targets:[]};
+      if (visitor.tipTheft.targets.includes(key)) return {status:409,body:{ok:false,error:'You already tried this player’s jar today.'}};
+      if (visitor.tipTheft.targets.length >= 10) return {status:409,body:{ok:false,error:'All 10 theft attempts have been used today.'}};
+      accrueTips(owner,now());
+      visitor.tipTheft.targets.push(key);
+      const amount = stealableTips(owner);
+      owner.tipJar = coins(owner.tipJar - amount);
+      visitor.money = coins(visitor.money + amount);
+      visitor.message = amount > 0 ? `You took ${amount} coins from ${target.name}’s tip jar.` : 'No tips could be taken. This attempt has been used.';
+      if (amount > 0) owner.message = `At ${new Date(now()).toLocaleString('en-GB',{timeZone:'Europe/Moscow',dateStyle:'medium',timeStyle:'short'})} MSK, player ${player.name} stole ${amount} coins from your tip jar!`;
+      const requestId = `tip-theft:${today}:${player.id}:${targetId}`;
+      addMail(visitor,{id:requestId,at:now(),kind:'theft',direction:'outgoing',actorId:targetId,actorName:target.name,text:visitor.message,amount,readAt:now()});
+      if (amount > 0) {
+        addMail(owner,{id:requestId,at:now(),kind:'theft',direction:'incoming',actorId:Number(player.id),actorName:player.name,text:owner.message,amount});
+        await tx.addLedger(player.id,{requestId,action:'stealTips',delta:amount,balance:visitor.money});
+        await tx.addLootLedger(targetId,{requestId,action:'tipsStolen',message:owner.message,detail:{amount,visitorId:player.id}});
+      }
+      await tx.saveState(player.id,visitor,(mine?.version ?? 0)+1);
+      await tx.saveState(targetId,owner,(theirs?.version ?? 0)+1);
+      return {status:200,body:{ok:true,state:publicState(visitor),message:visitor.message,tips:tipVisitInfo(visitor,owner,key,today),stolen:amount}};
     });
   }
 
@@ -320,32 +384,123 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
       const player = await tx.findOrCreatePlayer(identity);
       const { targetId, target, isFriend } = await resolveFriend(tx, player, code);
       if (!isFriend) return { status: 403, body: { ok: false, error: 'You can only send gifts to friends.' } };
-      const record = await tx.lockState(player.id);
+      const locked = new Map();
+      for (const id of [Number(player.id),targetId].sort((a,b)=>a-b)) locked.set(id,await tx.lockState(id));
+      const record = locked.get(Number(player.id)), ownerRecord = locked.get(targetId);
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
+      const owner = normalizePlayerState(ownerRecord?.state ?? createInitialState(now()));
       if (state.friendVisits[String(targetId)] !== calendarDate(new Date(now()))) return { status: 403, body: { ok: false, error: 'Visit this friend’s bar first — gifts are handed over during a visit.' } };
       try {
         const paid = payForGift(state, gift, now());
         addStat(state, 'giftsSent', 1);
-        await tx.addGift({ fromId: Number(player.id), toId: targetId, payload: paid });
+        const giftId = await tx.addGift({ fromId: Number(player.id), toId: targetId, payload: paid, createdAt:now() });
+        addMail(state,{id:`gift-out:${giftId}`,at:now(),kind:'gift',direction:'outgoing',actorId:targetId,actorName:target.name,giftId,attachments:giftAttachments(paid),status:'pending',readAt:now(),text:`You sent ${giftLabel(paid)} to ${target.name}.`});
+        addMail(owner,{id:`gift-in:${giftId}`,at:now(),kind:'gift',direction:'incoming',actorId:Number(player.id),actorName:player.name,giftId,attachments:giftAttachments(paid),status:'pending',text:`${player.name} sent you ${giftLabel(paid)}.`});
         state.message = `Gift sent to ${target.name}.`;
       } catch (error) {
         return { status: 409, body: { ok: false, error: error.message } };
       }
       await tx.saveState(player.id, state, (record?.version ?? 0) + 1);
+      await tx.saveState(targetId,owner,(ownerRecord?.version ?? 0)+1);
       return { status: 200, body: { ok: true, state: publicState(state), message: state.message } };
     });
   }
 
-  // Opens gifts that arrived while the player was playing (the session does the same when the game starts).
+  // Explicit legacy "accept all" action. Never called automatically on login or refresh.
   async function claimGifts(identity) {
+    const gifts = await repository.transaction(async tx=>{const player=await tx.findOrCreatePlayer(identity); return tx.listGifts(player.id);});
+    const received = []; let state;
+    for (const gift of gifts) {
+      const result = await decideGift(identity,gift.id,true);
+      if (result.body.ok) {received.push(result.body.message); state=result.body.state;}
+    }
+    return {status:200,body:{ok:true,received,state,serverTime:now()}};
+  }
+
+  async function mailbox(identity, readIds = []) {
+    await expireGifts();
     return repository.transaction(async (tx) => {
       const player = await tx.findOrCreatePlayer(identity);
-      if (!(await tx.listGifts(player.id)).length) return { status: 200, body: { ok: true, received: [] } };
       const record = await tx.lockState(player.id);
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
-      const received = await claimGiftsInto(tx, player.id, state);
+      await syncGiftMail(tx,player.id,state);
+      pruneMail(state,now());
+      const read = new Set(Array.isArray(readIds) ? readIds.filter(id=>typeof id==='string') : []);
+      for (const item of state.mailbox) if (read.has(item.id)) item.readAt ??= now();
       await tx.saveState(player.id, state, (record?.version ?? 0) + 1);
-      return { status: 200, body: { ok: true, received, state: publicState(state), serverTime: now() } };
+      return {status:200,body:{ok:true,state:publicState(state),serverTime:now()}};
+    });
+  }
+
+  async function expireGifts() {
+    const expired=await repository.transaction(tx=>tx.expiredGifts(now()-MAIL_LIFETIME.gift));
+    for (const gift of expired) await decideGift(undefined,gift.id,false,gift.toId);
+  }
+
+  async function claimMailReward(identity,id) {
+    return repository.transaction(async tx=>{
+      const player=await tx.findOrCreatePlayer(identity),record=await tx.lockState(player.id);
+      const state=normalizePlayerState(record?.state ?? createInitialState(now()));
+      pruneMail(state,now());
+      const mail=state.mailbox.find(item=>item.id===id && item.kind==='reward' && item.status==='pending' && item.expiresAt>now());
+      if(!mail)return {status:409,body:{ok:false,error:'This reward was already claimed or has expired.'}};
+      const money=state.money,crystals=state.crystals,xp=state.xp;
+      if(mail.reward?.promo) applyPromoRewards(state,mail.reward.promo);
+      else claimEventRewards(state,mail.reward?.changes ?? []);
+      mail.status='accepted';mail.readAt=now();delete mail.reward;
+      state.message=`Claimed rewards: ${mail.text}`;
+      grantLevelBoxes(state);
+      if(state.xp>xp) {addWeeklyScore(state,state.xp-xp,now());const weekly=state.loot.weekly;await tx.setWeeklyScore(Number(player.id),weekly.week,{...weekly,label:state.bars[state.regionId].name,level:levelFor(state.xp)});}
+      await tx.saveState(player.id,state,(record?.version ?? 0)+1);
+      const requestId=`mail:${id}`;
+      if(state.money!==money)await tx.addLedger(player.id,{requestId,action:'claimMailReward',delta:state.money-money,balance:state.money});
+      if(state.crystals!==crystals)await tx.addCrystalLedger(player.id,{requestId,action:'claimMailReward',delta:state.crystals-crystals,balance:state.crystals});
+      await tx.addLootLedger(player.id,{requestId,action:'claimMailReward',message:state.message,detail:{id}});
+      return {status:200,body:{ok:true,state:publicState(state),message:state.message,serverTime:now()}};
+    });
+  }
+
+  async function decideGift(identity, giftId, accept, expiryPlayerId) {
+    if (!expiryPlayerId) await expireGifts();
+    if (!Number.isSafeInteger(giftId) || giftId<=0 || typeof accept!=='boolean') return {status:400,body:{ok:false,error:'Choose a gift and accept or decline.'}};
+    return repository.transaction(async tx=>{
+      const player = expiryPlayerId ? await tx.getPlayer(expiryPlayerId) : await tx.findOrCreatePlayer(identity);
+      const gift = (await tx.listGifts(player.id)).find(item=>item.id===giftId);
+      if (!gift) return {status:409,body:{ok:false,error:'This gift was already handled or is not addressed to you.'}};
+      const expired=gift.createdAt+MAIL_LIFETIME.gift<=now();
+      if (expired) accept=false;
+      const locked=new Map();
+      for (const id of [Number(player.id),gift.fromId].sort((a,b)=>a-b)) locked.set(id,await tx.lockState(id));
+      const record=locked.get(Number(player.id)), senderRecord=locked.get(gift.fromId);
+      const state=normalizePlayerState(record?.state ?? createInitialState(now()));
+      const sender=normalizePlayerState(senderRecord?.state ?? createInitialState(now()));
+      await syncGiftMail(tx,player.id,state);
+      if (!await tx.takeGift(giftId,player.id)) return {status:409,body:{ok:false,error:'This gift was already handled.'}};
+      const moneyBefore=sender.money, crystalsBefore=sender.crystals;
+      if (accept) state.message=receiveGift(state,gift.payload,gift.fromName);
+      else {
+        const price=giftPrice(gift.payload);
+        if (gift.payload.kind==='recipe' || gift.payload.kind==='interior') {
+          if (price?.currency==='coins') sender.money=coins(sender.money+price.amount);
+          if (price?.currency==='crystals') sender.crystals+=price.amount;
+        } else receiveGift(sender,gift.payload,player.name,false);
+        state.message=`Gift ${expired?'expired':'declined'}. ${giftLabel(gift.payload)} was returned to ${gift.fromName}.`;
+      }
+      const incoming=state.mailbox.find(item=>item.giftId===giftId && item.direction==='incoming');
+      incoming.status=accept?'accepted':expired?'returned':'declined'; incoming.readAt=now();
+      addMail(sender,{id:`gift-out:${giftId}`,at:gift.createdAt,kind:'gift',direction:'outgoing',actorId:Number(player.id),actorName:player.name,giftId,attachments:giftAttachments(gift.payload),status:'pending',text:`You sent ${giftLabel(gift.payload)} to ${player.name}.`});
+      const outgoing=sender.mailbox.find(item=>item.giftId===giftId && item.direction==='outgoing');
+      outgoing.status=accept?'accepted':expired?'returned':'declined'; delete outgoing.readAt;
+      outgoing.text=expired ? `Your gift to ${player.name} expired after 14 days: ${giftLabel(gift.payload)} was returned to you.` : `${player.name} ${accept?'accepted':'declined'} your gift: ${giftLabel(gift.payload)}.${accept?'':' The item or its purchase price was returned to you.'}`;
+      if (expired) addMail(sender,{id:`gift-return:${giftId}`,at:now(),kind:'gift',direction:'incoming',actorId:Number(player.id),actorName:player.name,status:'returned',attachments:giftAttachments(gift.payload),text:outgoing.text});
+      sender.message=outgoing.text;
+      await tx.saveState(player.id,state,(record?.version ?? 0)+1);
+      await tx.saveState(gift.fromId,sender,(senderRecord?.version ?? 0)+1);
+      const requestId=`gift-decision:${giftId}`;
+      if (sender.money!==moneyBefore) await tx.addLedger(gift.fromId,{requestId,action:'giftDeclined',delta:sender.money-moneyBefore,balance:sender.money});
+      if (sender.crystals!==crystalsBefore) await tx.addCrystalLedger(gift.fromId,{requestId,action:'giftDeclined',delta:sender.crystals-crystalsBefore,balance:sender.crystals});
+      await tx.addLootLedger(player.id,{requestId,action:accept?'giftAccepted':'giftDeclined',message:state.message,detail:{giftId}});
+      return {status:200,body:{ok:true,state:publicState(state),message:state.message,serverTime:now()}};
     });
   }
 
@@ -405,5 +560,5 @@ export function createGameService({ repository, checkEnglish, now = () => Date.n
   // Request ids only need to survive long enough for a retry; older rows are pure bloat.
   const pruneRequests = (olderThanMs = 7 * 24 * 60 * 60 * 1000) => repository.transaction((tx) => tx.pruneRequests(now() - olderThanMs));
 
-  return { createPromoCode, redeemPromoCode, pruneRequests, session, act, leaderboard, leaderboardBar, friends, addFriend, answerFriend, removeFriend, labelFriend, visitFriend, sendGift, claimGifts, startStarPurchase, approveStarCheckout, fulfilStarPayment };
+  return { claimMailReward, expireGifts, mailbox, decideGift, createPromoCode, redeemPromoCode, pruneRequests, session, act, leaderboard, leaderboardBar, friends, addFriend, answerFriend, removeFriend, labelFriend, visitFriend, stealFriendTips, sendGift, claimGifts, startStarPurchase, approveStarCheckout, fulfilStarPayment };
 }

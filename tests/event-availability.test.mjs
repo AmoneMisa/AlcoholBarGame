@@ -6,10 +6,12 @@ import { calendarDate } from '../src/domain/economy.ts';
 import { questsForWeek, weekOf } from '../src/domain/quests.ts';
 const NOW = Date.UTC(2026,9,2,12);
 test('events badge excludes paid spins and resets daily rewards on a new day',()=>{
- const state=createInitialState(NOW); state.crystals=150;
+ const state=createInitialState(NOW); state.crystals=0;
  const before=eventAvailability(state,NOW); assert.equal(before.spins,3); assert.equal(before.freeDraws,3); assert.equal(before.badge,before.rewards+3);
  state.dailyGiftClaimedKey=calendarDate(new Date(NOW)); state.roulette={day:state.dailyGiftClaimedKey,spins:3};
  assert.equal(eventAvailability(state,NOW).badge,before.badge-4);
+ assert.equal(eventAvailability(state,NOW).spins,0);
+ state.crystals=10000; assert.equal(eventAvailability(state,NOW).spins,0);
  assert.equal(eventAvailability(state,NOW+86400000).badge,before.badge);
 });
 test('events count only claimable achievement tiers and current-week quests',()=>{

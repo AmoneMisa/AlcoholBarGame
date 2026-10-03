@@ -1,4 +1,3 @@
-import { coins } from './economy';
 
 // Servers (waiters). Up to four can be hired, one at each of these bar levels. They work while the player is away
 // and serve guests for them, but not as well as the player: four servers at full level handle up to 85% of what the
@@ -30,5 +29,5 @@ export const upgradeCost = (index: number, level: number) => Math.round(hireCost
 
 /** One server's share of the player's own service: from 40% of a fair share at level 1 to a full share at level 5. */
 export const staffShare = (level: number) => (STAFF_TEAM_CAP / MAX_STAFF) * (.4 + .15 * (Math.max(1, Math.min(MAX_STAFF_LEVEL, level)) - 1));
-export const teamShare = (staff: StaffMember[]) => coins(staff.reduce((sum, member) => sum + staffShare(member.level), 0));
+export const teamShare = (staff: StaffMember[]) => Math.round(staff.reduce((sum, member) => sum + staffShare(member.level), 0) * 100) / 100;
 export const unlockedSlots = (playerLevel: number) => STAFF_UNLOCK_LEVELS.filter((level) => playerLevel >= level).length;

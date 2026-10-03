@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BoxRewardsPreview from './BoxRewardsPreview.vue';
+import ModalDialog from '../ui/ModalDialog.vue';
 import ItemArt from '../ui/ItemArt.vue';
 import WeeklyPodium from './WeeklyPodium.vue';
 import WeeklyRewards from './WeeklyRewards.vue';
@@ -10,29 +12,22 @@ import { fetchLeaderboard, viewBoardBar, type BoardBar, type LeaderboardResult }
 import BoardBarView from '../profile/BoardBarView.vue';
 import { LEADERBOARD_SIZE, MIN_WEEKLY_SCORE, leaderboardReward, describeLeaderboardReward } from '../../domain/leaderboard';
 import { RECIPES } from '../../domain/catalog';
-import { COSMETICS, DRAWABLE_COSMETICS } from '../../domain/cosmetics';
-import { shardStyles } from '../../sim/loot';
-import { ACHIEVEMENT_STYLES, BOX_STYLE_CHANCE, STYLE_PIECES_TO_CRAFT } from '../../data/cosmetics/styleSources';
 import {
-  BOXES, CONSUMABLES, DRAW_COST, DRAW_ODDS, DUPLICATE_SHARDS, EQUIPMENT, LEGENDARY_PITY, TIER_SHARD_COST,
+  BOXES, EQUIPMENT, TIER_SHARD_COST,
   consumableDef, describeReward, equipmentDef, levelCap, upgradeCostFor
 } from '../../domain/loot';
 import { INGREDIENTS } from '../../domain/catalog';
 import { FAME_PRICE_BONUS, FAME_STEPS, MAX_ITEMS, SIGNATURE_FEE, SIGNATURE_GUEST_CHANCE, SIGNATURE_LEVEL, fameLevel, nextFameStep, scoreSignature, validateSignature } from '../../domain/signature';
 import { usableIngredientIds } from '../../domain/usableStock';
-import { CHARACTER_ART } from '../../data/cosmetics/artCatalog';
-import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipeId, isRegularId, nextRegularStep, regularLevel } from '../../domain/regulars';
-import { SEASON_FEATURED_SHARE, SEASON_MILESTONES, SPARK_DRAWS, seasonAt } from '../../domain/seasons';
-import { featuredLegendary } from '../../sim/loot';
 import UiButton from '../ui/UiButton.vue';
 import { REGIONS } from '../../domain/catalog';
 import OptionSelect from '../game/OptionSelect.vue';
 import { useGameStore } from '../../stores/game';
 
 const game = useGameStore();
-const tab = ref<'inventory' | 'equipment' | 'boxes' | 'items' | 'draw' | 'quests' | 'regulars' | 'signature' | 'weekly'>('inventory');
-const tabs = [['inventory', 'Inventory'], ['equipment', 'Equipment'], ['boxes', 'Boxes'], ['items', 'Consumables'], ['draw', 'Style draw'], ['quests', 'Quests'], ['regulars', 'Regulars'], ['signature', 'Signature'], ['weekly', 'Weekly']] as const;
-const scrollRecipe = ref('');
+const previewBox = ref('');
+const tab = ref<'inventory' | 'equipment' | 'boxes' | 'signature' | 'weekly'>('inventory');
+const tabs = [['inventory', 'Inventory'], ['equipment', 'Equipment'], ['boxes', 'Chests'], ['signature', 'Signature'], ['weekly', 'Weekly']] as const;
 const names = { consumable: (id: string) => consumableDef(id)?.name ?? id, equipment: (id: string) => equipmentDef(id)?.name ?? id };
 // Equipment is kept per bar. The bar shown here can be picked without leaving the page.
 const pickedBar = ref('');
@@ -56,8 +51,6 @@ function tierReason(id: string) {
   return need && have < need ? `Not enough shards: you need ${need} ${equipmentDef(id)?.name.toLowerCase()} shards, you have ${have}. Silver and gold boxes bring item shards.` : '';
 }
 const boxCount = (id: string) => game.loot.boxes[id] ?? 0;
-const knownRecipes = computed(() => RECIPES.filter((recipe) => game.knownRecipeIds.includes(recipe.id)));
-const featured = computed(() => featuredLegendary(Date.now()));
 // The words under a blocked button when the player cannot afford something.
 const needMore = (what: string, need: number, have: number) => have < need ? `Not enough ${what}: you need ${need}, you have ${Math.floor(have)}.` : '';
 // A look at the bar of someone on the board (read-only).
@@ -72,16 +65,11 @@ async function viewRow(row: { rank: number; score: number }) {
   } catch (error) { viewError.value = (error as Error).message; }
 }
 const started = computed(() => [
-  { label: 'Open your welcome box in the Boxes tab', done: (game.loot.stats.boxes ?? 0) >= 1 },
+  { label: 'Open your welcome box from its Inventory popup', done: (game.loot.stats.boxes ?? 0) >= 1 },
   { label: 'Upgrade a piece of equipment', done: (game.loot.stats.upgrades ?? 0) >= 1 },
   { label: 'Serve a perfect drink to earn parts and boxes', done: (game.loot.stats.serves ?? 0) >= 1 }
 ]);
 const gettingStarted = computed(() => started.value.some((step) => !step.done));
-const regulars = computed(() => CHARACTER_ART.filter((art) => isRegularId(art.id)).map((art) => {
-  const points = game.loot.regulars[art.id] ?? 0;
-  return { art, points, level: regularLevel(points), next: nextRegularStep(points), favorite: RECIPES.find((recipe) => recipe.id === favoriteRecipeId(art.id))?.name ?? '' };
-}).sort((a, b) => b.points - a.points || a.art.name.localeCompare(b.art.name)));
-const metRegulars = computed(() => regulars.value.filter((item) => item.points > 0));
 // ---- Signature cocktail designer ----
 const saved = computed(() => game.loot.signatures[game.regionId]);
 const draftName = ref(saved.value?.name ?? '');
@@ -123,35 +111,16 @@ watch(tab, (next) => { if (next === 'weekly') void loadBoard(); });
 watch(boardScope, () => { void loadBoard(); });
 watch(() => game.loot.leaderboardClaimed, () => { if (tab.value === 'weekly') void loadBoard(); });
 const daysLeft = computed(() => board.value ? Math.max(0, Math.ceil((board.value.endsAt - Date.now()) / 86_400_000)) : 0);
-// ---- Seasonal banner ----
-const banner = ref<'standard' | 'seasonal'>('seasonal');
-const season = computed(() => seasonAt(Date.now()));
-const seasonFeatured = computed(() => season.value.featuredIds.map((id) => COSMETICS.find((item) => item.id === id)!).filter(Boolean));
-const seasonDraws = computed(() => game.loot.season.id === season.value.id ? game.loot.season.draws : 0);
-const seasonRewarded = computed(() => game.loot.season.id === season.value.id ? game.loot.season.rewarded : []);
-const sparkUsed = computed(() => game.loot.season.id === season.value.id && game.loot.season.spark);
-const seasonDaysLeft = computed(() => Math.max(0, Math.ceil((season.value.endsAt - Date.now()) / 86_400_000)));
 const effectText = (id: string) => {
   const item = equipmentDef(id)!;
   return `${Math.round(slot(id).level * item.perLevel * 1000) / 10}% ${item.unit}`;
 };
-const boostLeft = (id: string) => {
-  const until = game.loot.boosts[id];
-  return until && until > Date.now() ? `${Math.ceil((until - Date.now()) / 60000)} min left` : '';
-};
+
 </script>
 
 <template>
   <section class="workshop game-panel">
-    <header class="workshop-hero">
-      <div><small>WORKSHOP</small><h2>Upgrade your bar</h2><p>Improve equipment, open boxes, use boosters and draw new styles. Everything is checked by the server.</p></div>
-      <dl>
-        <div><dt>Parts</dt><dd>{{ game.loot.parts }}</dd></div>
-        <div><dt>Skin shards</dt><dd>{{ game.loot.skinShards }}</dd></div>
-        <div><dt>Style shards</dt><dd>{{ Object.values(game.loot.styleShards).reduce((sum, n) => sum + n, 0) }}</dd></div>
-        <div><dt>Crystals</dt><dd>{{ game.crystals }}</dd></div>
-      </dl>
-    </header>
+    <header class="workshop-hero"><div><small>YOUR COLLECTION</small><h2>{{ tab === 'inventory' ? 'Inventory' : tab === 'equipment' ? 'Equipment' : tab === 'boxes' ? 'Chests' : tab === 'signature' ? 'Signature cocktail' : 'Weekly ranking' }}</h2><p>Inspect your items, open chests and improve your bar.</p></div></header>
     <nav class="workshop-tabs"><UiButton v-for="[id, label] in tabs" :key="id" type="button" :class="{ active: tab === id }" @click="tab = id">{{ label }}</UiButton></nav>
     <aside v-if="gettingStarted && (tab === 'equipment' || tab === 'boxes')" class="getting-started"><b>Getting started</b><ol><li v-for="step in started" :key="step.label" :class="{ done: step.done }">{{ step.label }}</li></ol></aside>
     <p v-if="game.loot.log[0]" class="workshop-log">{{ game.loot.log[0] }}</p>
@@ -181,56 +150,12 @@ const boostLeft = (id: string) => {
       <article v-for="box in BOXES" :key="box.id" class="card">
         <ItemArt kind="box" :id="box.id" :fallback="box.icon" :size="72" class="workshop-art" />
         <h3>{{ box.name }} <b>×{{ boxCount(box.id) }}</b></h3>
-        <p>{{ box.description }}</p>
+        <UiButton size="sm" @click="previewBox = box.id">View rewards</UiButton>
         <div class="row">
-          <UiButton variant="primary" :reason="!boxCount(box.id) ? `You have no ${box.name.toLowerCase()}. Earn them from quests, achievements and drops, or buy one.` : game.loot.pendingChoice ? `Pick your reward first.` : ''" @click="game.act({ type: 'openBox', box: box.id })">Open</UiButton>
           <UiButton variant="primary" v-if="box.crystalPrice" type="button" :reason="needMore('crystals', box.crystalPrice, game.crystals)" @click="game.act({ type: 'buyBox', box: box.id })">Buy · {{ box.crystalPrice }} crystals</UiButton>
         </div>
       </article>
-      <article v-if="game.loot.pendingChoice" class="card choice">
-        <h3>🧭 Pick one reward</h3>
-        <div class="row"><UiButton variant="primary" v-for="(reward, index) in game.loot.pendingChoice" :key="index" type="button" @click="game.act({ type: 'pickReward', index })">{{ describeReward(reward, names) }}</UiButton></div>
-      </article>
     </div>
-
-    <div v-else-if="tab === 'items'" class="grid">
-      <article v-for="item in CONSUMABLES" :key="item.id" class="card">
-        <ItemArt kind="item" :id="item.id" :fallback="item.icon" :size="72" class="workshop-art" />
-        <h3>{{ item.name }} <b>×{{ game.loot.consumables[item.id] ?? 0 }}</b></h3>
-        <p>{{ item.description }}</p>
-        <small v-if="boostLeft(item.id)">Active · {{ boostLeft(item.id) }}</small>
-        <small v-else-if="game.loot.armed[item.id]">Armed for your next order</small>
-        <OptionSelect v-if="item.id === 'scroll'" label="Recipe" v-model="scrollRecipe" :options="[{ value: '', label: 'Choose a recipe' }, ...knownRecipes.map((recipe) => ({ value: recipe.id, label: recipe.name }))]" />
-        <div class="row">
-          <UiButton variant="primary" :disabled="!game.loot.consumables[item.id] || (item.id === 'scroll' && !scrollRecipe)" @click="game.act({ type: 'useConsumable', id: item.id, recipeId: scrollRecipe })">Use</UiButton>
-          <UiButton variant="primary" :reason="needMore('crystals', item.crystalPrice, game.crystals)" @click="game.act({ type: 'buyConsumable', id: item.id })">Buy · {{ item.crystalPrice }} crystals</UiButton>
-        </div>
-      </article>
-    </div>
-
-    <div v-else-if="tab === 'draw'" class="draw">
-      <article class="card">
-        <h3>✨ Style draw</h3>
-        <div class="row"><UiButton :variant="banner === 'seasonal' ? 'solid' : 'secondary'" @click="banner = 'seasonal'">{{ season.name }} banner</UiButton><UiButton :variant="banner === 'standard' ? 'solid' : 'secondary'" @click="banner = 'standard'">Standard banner</UiButton></div>
-        <template v-if="banner === 'seasonal'">
-          <p><b>{{ season.name }}</b> — {{ season.tagline }} Ends in {{ seasonDaysLeft }} day{{ seasonDaysLeft === 1 ? '' : 's' }}. Featured Legendary styles win {{ Math.round(SEASON_FEATURED_SHARE * 100) }}% of Legendary pulls: <b>{{ seasonFeatured.map((item) => item.label).join(' and ') }}</b>.</p>
-          <progress :value="Math.min(seasonDraws, SPARK_DRAWS)" :max="SPARK_DRAWS"></progress>
-          <p>{{ seasonDraws }} / {{ SPARK_DRAWS }} season draws. Milestones: <template v-for="step in SEASON_MILESTONES" :key="step.draws"><span :class="{ gotit: seasonRewarded.includes(step.draws) }">{{ step.draws }} → {{ step.label }}</span> · </template>{{ SPARK_DRAWS }} → pick a featured style (Spark).</p>
-          <div v-if="seasonDraws >= SPARK_DRAWS && !sparkUsed" class="row"><UiButton variant="primary" v-for="item in seasonFeatured" :key="item.id" type="button" :disabled="game.ownedCosmeticIds.includes(item.id)" @click="game.act({ type: 'claimSpark', cosmeticId: item.id })">Spark: {{ item.label }}{{ item.character ? ` (${item.character})` : '' }}</UiButton></div>
-          <p v-else-if="sparkUsed">You used this season’s Spark.</p>
-        </template>
-        <p>Odds: Common {{ DRAW_ODDS.common * 100 }}% · Rare {{ DRAW_ODDS.rare * 100 }}% · Legendary {{ DRAW_ODDS.legendary * 100 }}%. A Rare is guaranteed in every ten draws and a Legendary within {{ LEGENDARY_PITY }}.</p>
-        <p v-if="featured && banner === 'standard'">This week's featured Legendary: <b>{{ featured.label }}</b> (half of all Legendary wins).</p>
-        <p>Pity: {{ game.loot.pity.sinceLegendary }} / {{ LEGENDARY_PITY }} · duplicates give {{ DUPLICATE_SHARDS.common }} / {{ DUPLICATE_SHARDS.rare }} / {{ DUPLICATE_SHARDS.legendary }} skin shards.</p>
-        <div class="row">
-          <UiButton variant="primary" :reason="needMore('crystals', DRAW_COST.single, game.crystals)" @click="game.act({ type: 'drawStyle', count: 1, banner })">Draw ×1 · {{ DRAW_COST.single }}</UiButton>
-          <UiButton variant="primary" :reason="needMore('crystals', DRAW_COST.ten, game.crystals)" @click="game.act({ type: 'drawStyle', count: 10, banner })">Draw ×10 · {{ DRAW_COST.ten }}</UiButton>
-        </div>
-        <ul v-if="game.loot.lastDraw.length" class="results"><li v-for="(result, index) in game.loot.lastDraw" :key="index" :class="result.rarity">{{ result.label }}<small v-if="result.duplicate"> · duplicate +{{ result.shards }} shards</small></li></ul>
-      </article>
-      <article class="card"><h3>🧵 Shards</h3><p>Style shards and skin shards are crafted from the Inventory: open Manage → Inventory → Shards and tap a shard. You have {{ Object.values(game.loot.styleShards).reduce((sum, n) => sum + n, 0) }} style shards (each style has its own pile) and {{ game.loot.skinShards }} skin shards.</p></article>
-    </div>
-
 
     <div v-else-if="tab === 'signature'" class="draw">
       <article v-if="game.level < SIGNATURE_LEVEL" class="card"><h3>🍹 Signature cocktail</h3><p>Invent your own cocktail for this bar. Unlocks at level {{ SIGNATURE_LEVEL }} (you are level {{ game.level }}).</p></article>
@@ -245,7 +170,7 @@ const boostLeft = (id: string) => {
             <UiButton variant="secondary" size="sm" icon="close" aria-label="Remove this ingredient" :disabled="draftItems.length <= 2" @click="draftItems.splice(index, 1)" />
           </div>
           <div class="row"><UiButton variant="primary" :disabled="draftItems.length >= MAX_ITEMS" @click="addRow">Add ingredient</UiButton><UiCheckbox v-model="draftShake" label="Needs shaking" /></div>
-          <b>Guests would pay {{ preview.price.toFixed(2) }} coins</b>
+          <b>Guests would pay {{ preview.price.toFixed(0) }} coins</b>
           <small v-for="line in preview.notes" :key="line">{{ line }}</small>
           <small v-if="draftError" class="sig-error">{{ draftError }}</small>
           <UiButton variant="primary" :disabled="!!draftError || game.money < SIGNATURE_FEE" @click="game.act({ type: 'designSignature', name: draftName, items: draftItems, needsShake: draftShake })">{{ saved ? 'Replace signature' : 'Develop signature' }} · {{ SIGNATURE_FEE }} coins</UiButton>
@@ -253,7 +178,7 @@ const boostLeft = (id: string) => {
         <article class="card">
           <h3>⭐ {{ saved?.name ?? 'No signature yet' }}</h3>
           <template v-if="saved">
-            <p>Price {{ saved.price.toFixed(2) }} coins · served {{ saved.served }} times · fame level {{ fame }} (+{{ Math.round(FAME_PRICE_BONUS * fame * 100) }}% price).</p>
+            <p>Price {{ saved.price.toFixed(0) }} coins · served {{ saved.served }} times · fame level {{ fame }} (+{{ Math.round(FAME_PRICE_BONUS * fame * 100) }}% price).</p>
             <progress :value="saved.served" :max="nextFameStep(saved.served) ?? saved.served"></progress>
             <p>{{ nextFameStep(saved.served) ? `${nextFameStep(saved.served)! - saved.served} more serves to fame level ${fame + 1}.` : 'Top fame reached.' }} Fame levels at {{ FAME_STEPS.join(' / ') }} serves pay a bronze, silver and choice box.</p>
             <ul class="results"><li v-for="item in saved.items" :key="item.ingredientId">{{ ingredient(item.ingredientId).name }} · {{ item.amount }} {{ ingredient(item.ingredientId).unit === 'ml' ? 'ml' : '×' }}</li><li>{{ saved.needsShake ? 'Shake with ice' : 'Build over ice' }}</li></ul>
@@ -294,24 +219,14 @@ const boostLeft = (id: string) => {
       </template>
     </div>
 
-    <div v-else-if="tab === 'regulars'" class="grid">
-      <p class="hint">Guests remember you. Every drink you serve earns loyalty (+1, +1 for VIPs, +1 for their favourite drink). Loyalty levels at {{ REGULAR_LEVELS.join(' / ') }} points pay rewards, and a regular pays {{ Math.round((REGULAR_FAVORITE_BONUS - 1) * 100) }}% more for their favourite. Level rewards: {{ REGULAR_REWARDS.map((reward) => [reward.box && reward.box + ' box', reward.parts && reward.parts + ' parts', reward.skinShards && reward.skinShards + ' skin shards', reward.crystals && reward.crystals + ' crystals'].filter(Boolean).join(' + ')).join(' → ') }}.</p>
-      <article v-for="item in metRegulars" :key="item.art.id" class="card">
-        <h3>👤 {{ item.art.name }} <b>Lv {{ item.level }}</b></h3>
-        <progress :value="item.points" :max="item.next ?? item.points"></progress>
-        <p>{{ item.points }}{{ item.next ? ` / ${item.next}` : '' }} loyalty · favourite: <b>{{ item.favorite }}</b></p>
-      </article>
-      <article v-if="!metRegulars.length" class="card"><h3>No regulars yet</h3><p>Serve a few guests and they will start to remember you.</p></article>
-      <p class="hint">{{ regulars.length - metRegulars.length }} guests have not been served yet.</p>
-    </div>
-
+    <ModalDialog v-if="previewBox" :title="BOXES.find(box=>box.id===previewBox)?.name" width="640px" @close="previewBox = ''"><BoxRewardsPreview :box-id="previewBox" /></ModalDialog>
     <BoardBarView v-if="viewing" :view="viewing" @close="viewing = undefined" />
   </section>
 </template>
 
 <style scoped>
-.workshop{overflow:hidden}.workshop-hero{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding:22px;background:radial-gradient(circle at 10% 20%,#4f334b,#16243a 66%);border-bottom:1px solid #354762}
-.workshop-hero small{color:#e4b35c;font-size:9px;font-weight:900;letter-spacing:.12em}.workshop-hero h2{margin:5px 0;font:700 29px Georgia,serif}.workshop-hero p{margin:0;color:#bdc8d6;font-size:12px}
+.workshop{overflow:hidden}.workshop-hero{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;background:#0b1320; background-image:linear-gradient(#0b132088,#0b132088),url('/assets/ui/lounge-panel-painted-v1.webp');background-position:center;background-size:cover;border-bottom:1px solid #354762}
+.workshop-hero small{color:#e4b35c;font-size:9px;font-weight:900;letter-spacing:.12em}.workshop-hero h2{margin:5px 0;font:700 23px Georgia,serif}.workshop-hero p{margin:0;color:#bdc8d6;font-size:12px}
 .workshop-hero dl{display:flex;gap:14px;margin:0}.workshop-hero dt{color:#91a2b5;font-size:9px;letter-spacing:.1em;text-transform:uppercase}.workshop-hero dd{margin:2px 0 0;color:#fff0c8;font:700 20px Georgia,serif}
 .workshop-tabs{display:flex;gap:6px;padding:12px 14px 0;overflow-x:auto}.workshop-tabs button{padding:8px 12px;border:1px solid #40536c;border-radius:9px;background:#111c2d;color:#c7d3e0;font-weight:800;white-space:nowrap;cursor:pointer}.workshop-tabs button.active{border-color:#b78649;background:#3b2b1f;color:#fff0ce}
 .getting-started{margin:10px 14px 0;padding:10px 14px;border:1px solid #b78649;border-radius:10px;background:#2a2016;color:#ffe9bd;font-size:12px}.getting-started ol{margin:6px 0 0;padding-left:20px;display:grid;gap:3px}.getting-started li.done{color:#8fd1a0;text-decoration:line-through}

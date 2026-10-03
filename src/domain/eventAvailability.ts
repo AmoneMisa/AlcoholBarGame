@@ -3,7 +3,6 @@ import { statValue } from './achievementStats';
 import { ACHIEVEMENTS, questsForWeek, weekOf } from './quests';
 import { spinsLeft } from './roulette';
 import { passIdOf, passLevel, passPointsFor, readyPassRewards } from './pass';
-import { DRAW_COST } from './loot';
 import type { PlayerState } from '../sim/state';
 
 export function eventAvailability(state: PlayerState, now: number) {
@@ -14,5 +13,5 @@ export function eventAvailability(state: PlayerState, now: number) {
   const passRewards = readyPassRewards(passLevel(passPointsFor(state.loot.stats, currentPass ? state.pass.base : state.loot.stats) + (currentPass ? state.pass.bonus ?? 0 : 0)), currentPass && state.pass.premium, currentPass ? state.pass.claimed : []);
   const rewards = passRewards + Number(state.dailyGiftClaimedKey !== day) + quests.length + achievements.length;
   const freeDraws = spinsLeft(state.roulette, day);
-  return { quests, achievements, rewards, freeDraws, spins: Math.floor(state.crystals / DRAW_COST.single), badge: rewards + freeDraws };
+  return { quests, achievements, rewards, freeDraws, spins: freeDraws, badge: rewards + freeDraws };
 }

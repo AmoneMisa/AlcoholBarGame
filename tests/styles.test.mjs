@@ -140,11 +140,8 @@ test('50 style shards craft one full box style; fewer do not, and other styles c
   assert.throws(() => applyAction(state, { type: 'craftStyle', cosmeticId: target }, context()), /already own/);
   state.loot.styleShards[id('noa', 'reference-sakura')] = STYLE_PIECES_TO_CRAFT;
   applyAction(state, { type: 'craftStyle', cosmeticId: id('noa', 'reference-sakura') }, context());   // an ordinary background's style
-  assert.ok(state.ownedInteriorIds.includes('izakaya'), 'its background comes with it');
-  assert.ok(shardStyles().every((item) => item.id !== id('noa', 'reference-flame')), 'event styles stay box-only');
-  for (const cosmeticId of [id('noa', 'reference-flame'), id('noa', 'reference-biker'), id('noa', 'reference-gothic')]) {
-    assert.throws(() => applyAction(state, { type: 'craftStyle', cosmeticId }, context()), /cannot be crafted/, cosmeticId);
-  }
+  assert.ok(!state.ownedInteriorIds.includes('izakaya'), 'background requires its own fragments');
+
 });
 
 test('An old shared pool of style shards is split into piles for single styles when the save loads', () => {
@@ -266,4 +263,50 @@ test('Circle shards drop from boxes for one person who has not joined, and becom
   const capped = fresh();
   for (let i = 0; i < 60; i++) grantReward(capped, { kind: 'companionShards', amount: 3 }, () => 0);
   assert.ok(COMPANIONS.every((item) => (capped.companions.shards[item.id] ?? 0) <= item.shards));
+});
+
+
+test('Costume and background fragment piles cannot pay for any other item', () => {
+  const state=fresh(), a=boxStyles()[0], b=boxStyles()[1];
+  state.loot.styleShards[a.id]=50;
+  assert.throws(()=>applyAction(state,{type:'craftStyle',cosmeticId:b.id},context()),/shards/);
+  const background=INTERIORS.find(item=>!state.ownedInteriorIds.includes(item.id));
+  const other=INTERIORS.find(item=>item.id!==background.id && !state.ownedInteriorIds.includes(item.id));
+  const bgKey=`background:${background.id}`;
+  state.loot.styleShards[bgKey]=50;
+  assert.throws(()=>applyAction(state,{type:'craftStyle',cosmeticId:`background:${other.id}`},context()),/shards/);
+  applyAction(state,{type:'craftStyle',cosmeticId:a.id},context());
+  assert.equal(state.loot.styleShards[bgKey],50);
+  applyAction(state,{type:'craftStyle',cosmeticId:bgKey},context());
+  assert.ok(state.ownedInteriorIds.includes(background.id));
+  assert.equal(state.loot.styleShards[bgKey],undefined);
+  assert.equal(state.loot.skinShards,0);
+});
+
+test('Legacy shared fragments migrate once without losing fragments or creating a common pile',()=>{
+  const state=fresh(); state.loot.skinShards=17; state.loot.stylePieces=23;
+  const saved=normalizePlayerState(state,NOW);
+  assert.equal(saved.loot.skinShards,0); assert.equal(saved.loot.stylePieces,0);
+  assert.equal(Object.values(saved.loot.styleShards).reduce((a,b)=>a+b,0),40);
+  assert.deepEqual(normalizePlayerState(saved,NOW).loot.styleShards,saved.loot.styleShards);
+});
+
+test('Specific costume and background rewards keep their identity even after ownership',()=>{
+  const state=fresh(), outfit=boxStyles()[0], bg=INTERIORS[0];
+  state.ownedCosmeticIds.push(outfit.id);
+  grantReward(state,{kind:'skinShards',id:outfit.id,amount:7},()=>.9);
+  grantReward(state,{kind:'backgroundShards',id:bg.id,amount:9},()=>.1);
+  assert.equal(state.loot.styleShards[outfit.id],7);
+  assert.equal(state.loot.styleShards[`background:${bg.id}`],9);
+  assert.equal(state.loot.skinShards,0);
+});
+
+
+test('The last choice chest is consumed but its illustrated choices retain specific fragment IDs',()=>{
+ const state=fresh();state.loot.boxes.choice=1;
+ applyAction(state,{type:'openBox',box:'choice'},context(()=>.25));
+ assert.equal(state.loot.boxes.choice,undefined);assert.equal(state.loot.pendingChoice.length,3);
+ for(const reward of state.loot.pendingChoice) if(['skinShards','stylePieces'].includes(reward.kind)) assert.ok(reward.id);
+ applyAction(state,{type:'pickReward',index:0},context());
+ assert.equal(state.loot.pendingChoice,undefined);assert.equal(state.loot.skinShards,0);
 });

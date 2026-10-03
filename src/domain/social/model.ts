@@ -17,8 +17,8 @@ export type TalkTopic = 'work' | 'relationship' | 'money' | 'family' | 'sports' 
 export type Gender = 'f' | 'm' | 'x';
 
 // Something the guest is waiting for the bartender to do.
-export type NeedKind = 'ashtray' | 'taxi' | 'water' | 'chat';
-export interface GuestNeed { kind: NeedKind; since: number; ignored?: boolean }
+export type NeedKind = 'ashtray' | 'clean-ashtray' | 'remove-ashtray' | 'food' | 'taxi' | 'water' | 'chat';
+export interface GuestNeed { kind: NeedKind; since: number; ignored?: boolean; announced?:boolean }
 
 // A guest sits in one of two phases: waiting to be served, or enjoying the drink until they want another.
 export type GuestPhase = 'ordering' | 'enjoying';
@@ -44,6 +44,8 @@ export interface GuestSocial {
   need?: GuestNeed;
   /** 'given' while the guest has an ashtray on the bar; it turns dirty when they leave. */
   ashtray?: 'given';
+  ashtrayUsedAt?: number;
+  ashtrayCleared?: boolean;
   /** The bartender refused more alcohol; asking again makes the guest angrier. */
   refused?: boolean;
   /** Set when the bartender has called a taxi: when it arrives, the guest leaves. */
@@ -54,6 +56,7 @@ export interface GuestSocial {
   event?: GuestEvent;
   /** Hungry guests are glad to be offered food. */
   hungry?: boolean;
+  foodRequest?: { kind:'specific' | 'recommend' | 'choice'; itemId?:string };
   /** A hidden allergy: serving the food it hides in starts a medical emergency unless the guest said so first. */
   allergy?: 'nuts' | 'dairy';
   allergyKnown?: boolean;

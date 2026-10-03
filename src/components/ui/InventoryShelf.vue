@@ -10,8 +10,8 @@ defineEmits<{ select: [key: string] }>();
   <section class="inventory-shelf">
     <h3>{{ title }}</h3>
     <div v-if="entries.length" class="shelf-grid">
-      <UiButton v-for="entry in entries" :key="entry.key" variant="ghost" class="shelf-tile" :class="[entry.line.rarity, { fragment: entry.fragments }]" :aria-label="`${entry.line.text}, ${entry.count}${entry.fragments ? ' fragments' : ' owned'}`" @click="$emit('select', entry.key)">
-        <span class="shelf-picture"><RewardArt :line="entry.line" /><span class="shelf-count">{{ entry.fragments ? '◈ ' : '' }}{{ entry.count }}</span></span>
+      <UiButton v-for="entry in entries" :key="entry.key" variant="ghost" class="shelf-tile" :class="[entry.line.rarity, { fragment: entry.fragments }]" :title="`${entry.line.text}${entry.fragments ? ' fragments' : ''}`" :aria-label="`${entry.line.text}, ${entry.count}${entry.fragments ? ' fragments' : ' owned'}`" @click="$emit('select', entry.key)">
+        <span class="shelf-picture"><RewardArt :line="entry.line" :fragments="entry.fragments" /><span class="shelf-count">{{ entry.count }}</span></span>
         <span class="shelf-label">{{ entry.line.text }}</span>
       </UiButton>
     </div>
@@ -19,17 +19,21 @@ defineEmits<{ select: [key: string] }>();
   </section>
 </template>
 <style>
-.inventory-shelf { border: 1px solid #665441; border-radius: 12px; overflow: hidden; background: linear-gradient(145deg, #3b2b36, #211b2c); }
-.inventory-shelf > h3 { margin: 0; padding: 12px; color: #eac998; font: 700 17px Georgia, serif; border-bottom: 1px solid #82675055; }
-.shelf-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; }
-.shelf-tile.ui-btn { min-width: 0; height: auto; min-height: 136px; padding: 12px 5px 16px; border: 0; border-bottom: 7px solid #85695a; border-radius: 0; background: linear-gradient(transparent 78%, #bd947c33); box-shadow: 0 3px 0 #160e21, inset 0 -1px #e5c9a5; }
-.shelf-tile > .ui-btn-label { width: 100%; display: grid; gap: 6px; }
-.shelf-picture { position: relative; display: block; height: 78px; width: 100%; border: 1px solid #9c8297; border-radius: 4px; background: linear-gradient(140deg, #493c59, #241d30); }
-.shelf-tile.rare .shelf-picture { border-color: #8ccfdf; }
-.shelf-tile.legendary .shelf-picture { border-color: #efcc86; background: linear-gradient(140deg, #716044, #362435); }
-.shelf-count { position: absolute; right: -3px; bottom: -4px; min-width: 22px; padding: 2px 4px; border-radius: 4px; background: #352438ed; color: #ffe6c4; font: 700 14px Georgia, serif; text-shadow: 0 1px #000; }
-.fragment .shelf-count { color: #95e6f0; }
-.shelf-label { display: block; color: #eddfd3; font-size: 10px; line-height: 1.25; white-space: normal; overflow-wrap: anywhere; }
-.shelf-empty { margin: 0; padding: 20px 12px; color: #b9a7b8; font-size: 12px; }
-@media (max-width: 360px) { .shelf-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.inventory-shelf { min-width:0;padding:12px;border:1px solid #b9955359;border-radius:8px;background:#0b1320; background-image:linear-gradient(#0b132088,#0b132088),url('/assets/ui/lounge-panel-painted-v1.webp');background-position:center;background-size:cover;box-shadow:inset 0 0 0 3px #090d1455; }
+.inventory-shelf > h3 { margin:0 0 12px;color:#eac998;font:700 16px Georgia,serif; }
+.shelf-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,72px));gap:5px;justify-content:start; }
+.inventory-shelf .shelf-tile.ui-btn { position:relative;display:block;width:100%;height:auto;aspect-ratio:1;min-width:0;min-height:0;padding:3px;border:1px solid #827352;border-radius:2px;background:linear-gradient(145deg,#25332b,#0d1720);box-shadow:inset 0 0 6px #000b; }
+.inventory-shelf .shelf-tile.ui-btn:hover,.inventory-shelf .shelf-tile.ui-btn:focus-visible { z-index:3;border-color:#f3d48a;background:#2a352e;box-shadow:0 0 8px #cfa95355; }
+.inventory-shelf .shelf-tile .ui-btn-label { display:block;width:100%;height:100%; }
+.shelf-picture { position:absolute;inset:3px;display:block;width:auto;height:auto;overflow:hidden;border:0;border-radius:0; }
+.shelf-tile.rare { border-color:#77b8c9!important; }.shelf-tile.legendary { border-color:#e6bf70!important;background:linear-gradient(140deg,#51442a,#18212a)!important; }
+.shelf-count { position:absolute;left:1px;top:1px;z-index:2;min-width:14px;padding:1px 3px;border-radius:2px;background:#111723d9;color:#ffe8c2;font:700 11px/1.2 system-ui;text-shadow:0 1px #000; }
+.fragment .shelf-count { color:#96dfe8; }
+.shelf-label { display:none;position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);width:max-content;max-width:180px;padding:7px 9px;border:1px solid #b99553;border-radius:4px;background:#101722;color:#fff0d0;font:600 12px/1.35 system-ui;white-space:normal;pointer-events:none; }
+.shelf-tile:hover .shelf-label,.shelf-tile:focus-visible .shelf-label { display:block; }
+.shelf-empty { margin:0;padding:22px 0;color:#aeb8c4;font-size:13px; }
+.shelf-picture .reward-art { position:absolute;inset:0; height:100%;max-height:100%;overflow:hidden; }
+.shelf-picture .item-art { width:90%!important;height:90%!important; }
+.shelf-picture .art-character { position:relative!important;inset:auto!important;transform:none!important;height:92%!important;width:auto!important;aspect-ratio:.572!important; }
+@media(max-width:520px) { .shelf-grid { grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:4px; }.inventory-shelf { padding:8px; }.shelf-label { display:none!important; } }
 </style>

@@ -12,6 +12,9 @@ export function socialTemplates(customer: Customer, now: number): string[] {
   const list: string[] = [];
 
   if (need === 'ashtray') list.push('Would you like an ashtray?');
+  if (need === 'clean-ashtray') list.push('I will empty and clean your ashtray.');
+  if (need === 'remove-ashtray') list.push('I will take your ashtray away.');
+  if (need === 'food') list.push('May I recommend some food to go with your drink?', 'Do you have any food allergies?');
   if (need === 'water') list.push('Would you like some water?');
   if (need === 'taxi') list.push('Shall I call you a taxi?');
   if (need === 'chat') list.push('How was your day?', 'Do you want to talk about it?');
@@ -27,7 +30,7 @@ export function socialTemplates(customer: Customer, now: number): string[] {
   else if (social.emotion === 'nervous') list.push('Are you OK?', 'It will be fine.');
   else if (social.emotion === 'excited' || social.emotion === 'happy') list.push('You look happy tonight. What happened?', 'That sounds wonderful!');
 
-  if (customer.smoker && social.ashtray !== 'given') list.push('Would you like an ashtray?');
+  if (customer.smoker && !social.ashtrayCleared && social.ashtray !== 'given') list.push('Would you like an ashtray?');
   if (social.chatty) list.push('How are you tonight?', 'What do you do for work?');
   if (social.phase === 'enjoying') list.push('Is everything OK with your drink?', 'Would you like another drink?');
   return [...new Set(list)];

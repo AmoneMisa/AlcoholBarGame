@@ -13,6 +13,7 @@ const background = computed(() => interiorStyle(((INTERIORS.some((item) => item.
   <div class="bar-showcase" :style="background">
     <CharacterModel role="bartender" :character-id="bar?.bartenderCharacter ?? 'noa'" :outfit="bar?.bartender" :face-style="bar?.face" :hair-style="bar?.hairStyle" :hair-color="bar?.hairColor" :body-shape="bar?.bodyShape" :skin-detail="bar?.skinDetail" :skin-tone="bar?.skinTone" :pose="bar?.pose" :eye-shape="bar?.eyeShape" :brow-shape="bar?.browShape" :nose-shape="bar?.noseShape" :lip-shape="bar?.lipShape" :cheek-shape="bar?.cheekShape" :eye-color="bar?.eyeColor" :eyeliner="bar?.eyeliner" :eyeshadow="bar?.eyeshadow" :lip-color="bar?.lipColor" :blush="bar?.blush" :facial-hair="bar?.facialHair" :outfit-color="bar?.outfitColor" animation="idle" />
     <span class="ribbon">{{ bar?.name || name }}</span>
+    <slot />
   </div>
 </template>
 

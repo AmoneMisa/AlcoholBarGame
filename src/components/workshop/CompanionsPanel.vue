@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiIcon from '../ui/UiIcon.vue';
 import { computed, ref } from 'vue';
 import { SPOTLIGHT_MIN_BOND, SPOTLIGHT_MS, BOND_NAMES, BOND_STEPS, COMPANIONS, KEEPSAKES, KEEPSAKE_CRYSTAL_PRICE, KEEPSAKE_LIKED_POINTS, KEEPSAKE_POINTS, COMPANION_START_LEVEL, MAX_COMPANION_LEVEL, companionLevelCost, levelCapForGrade, companionPower, linksOf, linkStrength, bondLevel, companionName, companionSlots, describeBonus, keepsakeDef, nextBondStep } from '../../domain/companions';
 import { REGIONS } from '../../domain/catalog';
@@ -131,11 +132,11 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
           <p>{{ item.person.intro }}</p>
           <template v-for="(chapter, index) in item.person.chapters" :key="index">
             <p v-if="item.bond > index"><b>{{ BOND_NAMES[index + 1] }}.</b> {{ chapter }}</p>
-            <p v-else class="locked">🔒 Chapter {{ index + 1 }} opens at <b>{{ BOND_NAMES[index + 1] }}</b>{{ index ? ` (${BOND_STEPS[index]} bond points)` : '' }}.</p>
+            <p v-else class="locked"><UiIcon name="lock" /> Chapter {{ index + 1 }} opens at <b>{{ BOND_NAMES[index + 1] }}</b>{{ index ? ` (${BOND_STEPS[index]} bond points)` : '' }}.</p>
           </template>
         </section>
         <UiButton v-if="item.joined" size="sm" variant="ghost" @click="toggle(item.person.id)">{{ open === item.person.id ? 'Hide story' : `Read story · ${item.bond} of ${item.person.chapters.length} chapters open` }}</UiButton>
-        <p v-else class="meta locked-story">🔒 Their story opens when they join your circle, a chapter for each grade.</p>
+        <p v-else class="meta locked-story"><UiIcon name="lock" /> Their story opens when they join your circle, a chapter for each grade.</p>
       </article>
     </div>
   </div>

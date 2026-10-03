@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { itemArtwork } from '../../domain/itemArtwork';
 
 // The picture of an item, a box, a piece of equipment, a keepsake, an achievement or a person of the Circle. The art lives in
 // public/assets/workshop/<folder>/<id>.webp (see the README there). If a picture is missing or fails to load, the emoji from
@@ -8,7 +9,7 @@ const FOLDER = { box: 'boxes', item: 'items', equipment: 'equipment', keepsake: 
 const props = withDefaults(defineProps<{ kind: keyof typeof FOLDER; id: string; fallback: string; size?: number }>(), { size: 40 });
 const failed = ref(false);
 watch(() => [props.kind, props.id], () => { failed.value = false; });
-const src = computed(() => `${import.meta.env.BASE_URL}assets/workshop/${FOLDER[props.kind]}/${props.id}.webp`);
+const src = computed(() => itemArtwork(`${FOLDER[props.kind]}/${props.id}`, import.meta.env.BASE_URL));
 </script>
 
 <template>
@@ -17,6 +18,8 @@ const src = computed(() => `${import.meta.env.BASE_URL}assets/workshop/${FOLDER[
 </template>
 
 <style>
-.item-art { display: inline-block; flex: none; object-fit: contain; vertical-align: middle; }
+.item-art { animation:item-art-appear .22s ease-out both; display: inline-block; flex: none; object-fit: contain; vertical-align: middle; }
 .item-art-emoji { display: inline-grid; place-items: center; line-height: 1; }
+@keyframes item-art-appear {from {opacity:0;transform:scale(.96)} to {opacity:1;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce) {.item-art {animation:none}}
 </style>

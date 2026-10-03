@@ -47,7 +47,7 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
 
     <section class="settings-card">
       <h3>Help</h3>
-      <p>Practice a Gin & Tonic for Mia, accept payment in the dialogue and collect your first tip. Your account balance and stock stay safe. You can skip any step and replay the tour whenever you like.</p>
+      <p>Practice a Gin & Tonic for Mia, accept payment in the dialogue, collect your first tip and refill your tonic in Market. Your account balance and stock stay safe. You can skip any step and replay the tour whenever you like.</p>
       <UiButton variant="primary" icon="help" @click="replayTour">How to play (replay the tour)</UiButton>
     </section>
 

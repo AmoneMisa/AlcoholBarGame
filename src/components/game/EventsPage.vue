@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { useGameStore } from '../../stores/game';
-import Glyph from '../ui/Glyph.vue';
 import PanelHeading from '../ui/PanelHeading.vue';
 import DailyRewardCard from '../ui/DailyRewardCard.vue';
-import CityEvent from './CityEvent.vue';
 import DailyWheel from '../workshop/DailyWheel.vue';
 import SeasonPass from '../workshop/SeasonPass.vue';
 import QuestsPanel from '../workshop/QuestsPanel.vue';
@@ -24,19 +22,6 @@ const game = useGameStore();
       <DailyRewardCard />
     </article>
 
-    <article class="events-card">
-      <header><small>IN THE CITY</small><h3>{{ game.region.name }}</h3></header>
-      <CityEvent />
-    </article>
-
-    <article class="events-card">
-      <header><small>TONIGHT AT THE BAR</small><h3>{{ game.barEvent ? game.barEvent.title : 'A quiet night' }}</h3></header>
-      <div v-if="game.barEvent" class="bar-night" :class="game.barEvent.mood">
-        <span class="bar-night-icon" aria-hidden="true"><Glyph :g="game.barEvent.icon" /></span>
-        <p>{{ game.barEvent.description }}</p>
-      </div>
-      <p v-else class="bar-night-quiet">Nothing special is happening in your bar tonight. Special nights show up here when they start.</p>
-    </article>
     </div>
     <div v-else-if="section === 'pass'" class="events-body"><SeasonPass /></div>
     <div v-else-if="section === 'wheel'" class="events-body"><article class="events-card"><header><small>FREE EVERY DAY</small><h3>Daily wheel</h3></header><DailyWheel /></article></div>

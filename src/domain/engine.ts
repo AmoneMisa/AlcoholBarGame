@@ -124,7 +124,7 @@ export function createMarket(region: Region, day: number): SupplierOffer[] {
     return suppliers
       .filter((supplier) => supplier.accepts.includes(ingredient.category))
       .map((supplier) => {
-        const listPrice = Number((wholesale * supplier.multiplier * (0.96 + ((day + index) % 4) * 0.025)).toFixed(2));
+        const listPrice = Number((wholesale * supplier.multiplier * (0.96 + ((day + index) % 4) * 0.025)).toFixed(0));
         const discountPercent = (day + index * 3) % 7 === 0 ? 15 : 0;
         return {
           supplierId: supplier.id,
@@ -133,7 +133,7 @@ export function createMarket(region: Region, day: number): SupplierOffer[] {
           quantity: pack,
           listPrice,
           discountPercent,
-          price: Number((listPrice * (1 - discountPercent / 100)).toFixed(2)),
+          price: Number((listPrice * (1 - discountPercent / 100)).toFixed(0)),
           quality: supplier.quality
         };
       });

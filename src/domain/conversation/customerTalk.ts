@@ -236,8 +236,9 @@ export function correctedTileSelection(sentence:string, tiles:{id:string;text:st
     return tile?.id;
   }).filter((id):id is string => !!id);
 }
-export function tilesFor(sentence: string, recipes: Recipe[]) {
+export function tilesFor(sentence: string, recipes: Recipe[], ordered = false) {
   const tiles = sentenceWords(sentence, recipes);
+  if (ordered) return tiles.map((text,index)=>({id:`${index}-${text}`,text}));
   const lowered = tiles.map((tile) => tile.toLowerCase());
   const extras = DISTRACTORS.filter((word) => !lowered.includes(word)).sort(() => Math.random() - .5).slice(0, 3);
   const all = [...tiles, ...extras];

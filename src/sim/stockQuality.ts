@@ -173,7 +173,7 @@ export function fileClaim(state: PlayerState, issueId: string, text: string, eng
     state.money = coins(state.money + issue.value);
     issue.status = 'refunded';
     state.quarantine = state.quarantine?.filter((item) => !(item.ingredientId === issue.ingredientId && item.barId === issue.barId && item.kind === issue.kind && item.amount === issue.amount));
-    return { ok: true, line: `${seller === 'The seller' ? 'We are' : 'I am'} very sorry. We will refund ${issue.value.toFixed(2)} coins today.`, outcome: 'refunded', note: `Refund: ${issue.value.toFixed(2)} coins.` };
+    return { ok: true, line: `${seller === 'The seller' ? 'We are' : 'I am'} very sorry. We will refund ${issue.value.toFixed(0)} coins today.`, outcome: 'refunded', note: `Refund: ${issue.value.toFixed(0)} coins.` };
   }
   const supplier = SUPPLIERS.find((item) => item.id === issue.supplierId);
   state.deliveryOrders.push({ id: crypto.randomUUID(), supplier: issue.supplier, barId: issue.barId, dueAt: now + Math.round((supplier?.deliveryDays ?? 3) * DELIVERY_DAY_MS * .7), items: [{ ingredientId: issue.ingredientId, amount: issue.amount }], total: 0 });

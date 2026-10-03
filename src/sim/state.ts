@@ -16,6 +16,7 @@ import { ensureSocial, rollSocial } from '../domain/social/generate';
 import { MAX_CUSTOMER_SEATS } from '../domain/customerTiming';
 import { createLoot, normalizeLoot, type LootState } from '../domain/lootState';
 import { migrateStylePool } from './loot';
+import { normalizeTips } from './tips';
 
 // The complete, serializable game state of one player. The server owns it; the client only displays it
 // (and, in offline practice mode, simulates it locally with the same rules).
@@ -32,7 +33,12 @@ export type PopularityBoost = { kind: 'no-cooldown'; until: number } | { kind: '
 
 
 export interface PlayerState {
+  mailbox?: import('./mailbox').MailEntry[];
   tipJar?: number;
+  tipJarStartedAt?: number;
+  tipJarDeposited?: number;
+  tipJarPassiveAccrued?: number;
+  tipTheft?: { day: string; targets: string[] };
   version: 1;
   // XP curve of this save (see migrateXpCurve); missing = the original, shallower curve.
   xpCurve?: number;
@@ -205,7 +211,7 @@ export function createInitialState(now = Date.now()): PlayerState {
     version: 1,
     xpCurve: XP_CURVE_VERSION,
     regionId: 'new-york',
-    money: 600, tipJar: 0,
+    money: 600, tipJar: 0, tipJarStartedAt: now, tipJarDeposited: 0, tipJarPassiveAccrued: 0,
     crystals: 0,
     xp: 0,
     streak: 0,
@@ -269,7 +275,9 @@ export function migrateXpCurve(state: Pick<PlayerState, 'xp' | 'xpCurve'>) {
 }
 
 export function normalizePlayerState(state: PlayerState) {
-  state.tipJar = Number.isFinite(state.tipJar) ? Math.max(0, Math.round(state.tipJar! * 100) / 100) : 0;
+  state.money = Math.max(0, Math.round(Number.isFinite(state.money) ? state.money : 0));
+  state.mailbox ??= [];
+  normalizeTips(state);
   migrateXpCurve(state);
   state.crystals = Number.isFinite(state.crystals) && state.crystals >= 0 ? Math.floor(state.crystals) : 0;
   state.dailyLessonKey = typeof state.dailyLessonKey === 'string' ? state.dailyLessonKey : '';
@@ -281,7 +289,7 @@ export function normalizePlayerState(state: PlayerState) {
     ? state.tradeLog.filter((entry) => entry !== 'Each city bar now keeps its own stock.').slice(0, 40)
     : [];
   state.loot = normalizeLoot(state.loot, levelFor(state.xp));
-  if (state.loot.stylePieces > 0) migrateStylePool(state);
+  if (state.loot.stylePieces > 0 || state.loot.skinShards > 0) migrateStylePool(state);
   state.popularity = Number.isFinite(state.popularity) ? Math.max(0, Math.floor(state.popularity)) : 0;
   if (state.popularityBoost?.kind === 'no-cooldown') {
     if (!Number.isFinite(state.popularityBoost.until)) state.popularityBoost = undefined;

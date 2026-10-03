@@ -1,4 +1,9 @@
+import { trainingGuest } from '../domain/training';
 import { eventAvailability } from '../domain/eventAvailability';
+import { resetTips, tipCapacity } from '../sim/tips';
+import { stealFriendTips } from '../telegram/api';
+import { fetchMailbox, answerMailGift, claimMailReward } from '../telegram/api';
+import type { MailEntry } from '../sim/mailbox';
 import {redeemPromo} from '../telegram/api';
 import { computed, ref, toRaw } from 'vue';
 import { statValue } from '../domain/achievementStats';
@@ -8,7 +13,7 @@ import type { StatId } from '../domain/quests';
 import { buildPlayerProfile, earnedAchievements as earnedAchievementList } from '../domain/profile';
 import { rulesFor } from '../domain/situations/houseRules';
 import { barEventFor } from '../sim/events';
-import { pitchChance } from '../sim/pitch';
+import { pitchChance, recommendedFoods } from '../sim/pitch';
 import { defineStore } from 'pinia';
 import { INGREDIENTS, RECIPES, REGIONS, SUPPLIERS } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost } from '../domain/bottleCatalog';
@@ -89,9 +94,55 @@ export const useGameStore = defineStore('game', () => {
   const playerFriendCode = ref('');
   const friends = ref<FriendSummary[]>([]);
   const visitedFriend = ref<FriendBar>();
+  const mailboxOpen = ref(false);
+  const mailboxEntries = computed(()=>state.value.mailbox ?? []);
+  const unreadMail = computed(()=>mailboxEntries.value.filter(item=>!item.readAt || (item.direction==='incoming' && item.status==='pending')).length);
+  const theftNotices = ref<MailEntry[]>([]);
+  const mailBusy = ref(false);
+  const mailMessage = ref('');
+  async function loadMailbox(readIds:string[] = []) {
+    if (mode.value!=='online') return false;
+    try {
+      const result=await fetchMailbox(readIds);
+      if (!result.ok) throw new Error(result.error);
+      if (result.state) adoptServerState(result.state,result.serverTime);
+      mailMessage.value='';
+      return true;
+    } catch (error) { mailMessage.value=(error as Error)?.message || 'Could not load your mailbox.'; return friendError(error,'Could not load your mailbox.'); }
+  }
+  async function openMailbox() {mailboxOpen.value=true; await loadMailbox();}
+  async function dismissTheftNotices() {
+    if (await loadMailbox(theftNotices.value.map(item=>item.id))) theftNotices.value=[];
+  }
+  async function decideMailGift(giftId:number,accept:boolean) {
+    if (mailBusy.value) return;
+    mailBusy.value=true;
+    try {
+      const result=await answerMailGift(giftId,accept);
+      if (!result.ok) throw new Error(result.error);
+      if (result.state) adoptServerState(result.state,result.serverTime,result.message);
+      mailMessage.value=result.message ?? '';
+      if (accept && result.message) showRewards('Gift accepted',[{kind:'gift',text:result.message}]);
+    } catch (error) { mailMessage.value=(error as Error)?.message || 'Could not handle this gift.'; friendError(error,'Could not handle this gift.'); }
+    finally {mailBusy.value=false;}
+  }
+  async function collectMailReward(id:string) {
+    if(mailBusy.value)return;
+    mailBusy.value=true;
+    try {
+      const before=stateSnapshot(state.value);
+      const result=await claimMailReward(id);
+      if(!result.ok)throw new Error(result.error);
+      if(result.state)adoptServerState(result.state,result.serverTime,result.message);
+      mailMessage.value=result.message ?? '';
+      showRewards('Mail rewards',rewardLines(before,stateSnapshot(state.value),result.message));
+    } catch(error){mailMessage.value=(error as Error)?.message || 'Could not claim this reward.';friendError(error,'Could not claim this reward.');}
+    finally{mailBusy.value=false;}
+  }
   const rewardReport = ref<RewardReport>();
   const trainingActive = ref(false);
   const trainingPhase = ref<'order' | 'payment' | 'tips' | 'complete'>('order');
+  const trainingRestocked = ref(false);
   let savedTrainingState: PlayerState | undefined;
   let savedTrainingMode: 'connecting' | 'online' | 'offline' = 'offline';
   function beginTraining() {
@@ -99,29 +150,29 @@ export const useGameStore = defineStore('game', () => {
     savedTrainingState = JSON.parse(JSON.stringify(toRaw(state.value)));
     savedTrainingMode = mode.value;
     const practice = JSON.parse(JSON.stringify(toRaw(state.value))) as PlayerState;
-    const guest = createInitialState(clientNow()).customers[0]!;
-    Object.assign(guest, {id:'practice-guest', name:'Mia', characterId:'mia', seatId:0, mood:'calm', orderKind:'cocktail', orderRecipeId:'gin-tonic', modifierId:undefined, specialRecipeRewardId:undefined, orderRevealed:false, patience:86400, patienceRemaining:86400, request:'A Gin & Tonic, please.', wish:'A crisp, refreshing drink with gin and tonic.', greeting:'Hi! I am your practice guest. I would like a Gin & Tonic, please.', budget:100, paymentMethod:'cash'});
-    if (guest.social) { guest.social.staysFor = 0; guest.social.rapport = 80; guest.social.drunk = 0; guest.social.phase = 'ordering'; delete guest.social.event; }
+    const guest = trainingGuest();
     practice.customers = [guest]; practice.activeCustomerId = guest.id; practice.conversationCustomerId = undefined;
-    guest.characterId = 'marin';
     practice.conversations = { [guest.id]: { lines: [{ id:0, speaker:'customer', text:guest.greeting }], facts:[], bottleFacts:{}, expression:'smile', attempts:0, correct:0 } }; practice.rewardedSentences = {}; practice.tipJar = 0;
     practice.nextCustomerAt = clientNow() + 86400000; practice.seatNextCustomerAt = Array(5).fill(practice.nextCustomerAt);
-    practice.staffByBar = {}; practice.knownRecipeIds = [...new Set([...practice.knownRecipeIds, 'gin-tonic'])];
+    resetTips(practice, clientNow());
+    practice.staffByBar = {}; practice.deliveryOrders = []; practice.autoSupply = false; practice.money = Math.max(practice.money, 900); practice.knownRecipeIds = [...new Set([...practice.knownRecipeIds, 'gin-tonic'])];
     for (const item of practice.inventories[practice.regionId]) item.amount = Math.max(item.amount, 1000);
+    practice.inventories[practice.regionId].find(item => item.ingredientId === 'tonic')!.amount = 90;
     for (const item of practice.bottleInventories[practice.regionId]) item.quantity = Math.max(item.quantity, 1);
     practice.message = 'Practice order: Gin & Tonic. Your account balance and stock are safe.';
-    trainingActive.value = true; trainingPhase.value = 'order'; state.value = practice; mode.value = 'offline';
-    rewardReport.value = undefined; dailyOpen.value = false; clearBarWorkspace(); message.value = practice.message;
+    trainingActive.value = true; trainingPhase.value = 'order'; trainingRestocked.value = false; state.value = practice; mode.value = 'offline';
+    rewardReport.value = undefined; dailyOpen.value = false; selectedSupplier.value = 'global'; clearBarWorkspace(); message.value = practice.message;
   }
   function endTraining() {
     if (!trainingActive.value) return;
     trainingActive.value = false;
-    if (savedTrainingState) state.value = savedTrainingState;
+    if (savedTrainingState) { savedTrainingState.lastClockAt = clientNow(); state.value = savedTrainingState; }
     mode.value = savedTrainingMode; savedTrainingState = undefined;
     clearBarWorkspace(); rewardReport.value = undefined; message.value = state.value.message;
   }
   const preparationCustomerId = ref('');
   const tipJar = computed(() => state.value.tipJar ?? 0);
+  const tipJarCapacity = computed(() => tipCapacity(state.value));
   const collectTips = () => dispatch({ type: 'collectTips' });
   function openPreparation(id: string) {
     const customer = state.value.customers.find(customer => customer.id === id);
@@ -269,7 +320,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: !trainingActive.value && mode.value !== 'online', training: trainingActive.value });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['collectTips', 'serveFood', 'say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson', 'spinRoulette', 'claimPass', 'buyPassPremium', 'buyPassLevels', 'discardLoot', 'giveAshtray', 'cleanAshtrays', 'pitchStart', 'pitchAsk', 'pitchCancel', 'hireStaff', 'upgradeStaff', 'giveWater', 'callTaxi', 'askToLeave', 'situationChoice', 'reportIssue', 'discardStock', 'openBox', 'pickReward', 'drawStyle', 'claimLeaderboardReward']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['collectTips', 'serveFood', 'say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson', 'spinRoulette', 'claimPass', 'buyPassPremium', 'buyPassLevels', 'discardLoot', 'giveAshtray', 'cleanGuestAshtray', 'removeGuestAshtray', 'cleanAshtrays', 'pitchStart', 'pitchAsk', 'pitchCancel', 'hireStaff', 'upgradeStaff', 'giveWater', 'callTaxi', 'askToLeave', 'situationChoice', 'reportIssue', 'discardStock', 'openBox', 'pickReward', 'drawStyle', 'claimLeaderboardReward']);
 
   function saveOffline() {
     if (mode.value === 'online' || trainingActive.value) return;
@@ -301,7 +352,9 @@ export const useGameStore = defineStore('game', () => {
       if (action.type === 'serve' && state.value.customers.some(guest => guest.pendingPayment)) trainingPhase.value = 'payment';
       if (action.type === 'say' && state.value.money > before.money) trainingPhase.value = 'tips';
       if (action.type === 'collectTips') trainingPhase.value = 'complete';
+      if (action.type === 'buy' && (action.cart.tonic ?? 0) > 0) trainingRestocked.value = true;
     }
+    if (action.type === 'spinRoulette') return; // The wheel reveals its result after the animation.
     const title = REWARD_TITLES[action.type];
     if (title) showRewards(title, rewardLines(before, stateSnapshot(state.value), state.value.message));
   }
@@ -384,6 +437,7 @@ export const useGameStore = defineStore('game', () => {
       mode.value = 'online';
       starterPackAvailable.value = session.starterPackAvailable !== false;
       adoptServerState(session.state, session.serverTime, session.state.message);
+      theftNotices.value=session.theftNotifications ?? [];
       if (session.received?.length) showRewards('Gifts from friends', session.received.map((text) => ({ kind: 'gift', text })));
       connectEpoch.value += 1;
       resetMix();
@@ -398,11 +452,10 @@ export const useGameStore = defineStore('game', () => {
   const friendError = (error: unknown, fallback: string) => { message.value = (error as Error)?.message || fallback; return false; };
   async function redeemPromoCode(code:string) {
     if (mode.value !== 'online') throw new Error('Connect to your account to redeem a promo code.');
-    const before = stateSnapshot(state.value);
     const result = await redeemPromo(code);
     if (!result.ok) throw new Error(result.error || 'Could not redeem this code.');
     if (result.state) adoptServerState(result.state,result.serverTime,result.message);
-    showRewards('Promo code reward',rewardLines(before,stateSnapshot(state.value),result.message));
+    showRewards('Rewards sent to Mail',[{kind:'gift',text:result.message ?? 'Claim your promo code rewards in Mail within 180 days.'}]);
     return result.message || 'Rewards received.';
   }
   async function loadFriends() {
@@ -413,7 +466,6 @@ export const useGameStore = defineStore('game', () => {
       friends.value = result.friends ?? [];
       playerFriendCode.value = result.friendCode ?? playerFriendCode.value;
       friendPrestige.value = result.prestige ?? friendPrestige.value;
-      if (result.pendingGifts) await claimGifts();
       return true;
     } catch (error) { return friendError(error, 'Could not load friends.'); }
   }
@@ -458,6 +510,21 @@ export const useGameStore = defineStore('game', () => {
     } catch (error) { return friendError(error, 'Could not visit this bar.'); }
   }
   const leaveVisit = () => { visitedFriend.value = undefined; };
+  const stealingTips = ref(false);
+  async function stealVisitedTips() {
+    if (!visitedFriend.value || stealingTips.value) return;
+    const friend = visitedFriend.value;
+    stealingTips.value = true;
+    try {
+      const result = await stealFriendTips(friend.code);
+      if (!result.ok) throw new Error(result.error);
+      if (result.state) adoptServerState(result.state, clientNow(), result.message);
+      if (visitedFriend.value?.code === friend.code) visitedFriend.value.tips = result.tips;
+      if (result.stolen) playSfx('coin');
+      showRewards('Tip jar raid',[{kind:'tip',text:result.message ?? `You took ${Math.round(result.stolen ?? 0)} coins.`}]);
+    } catch (error) { friendError(error, 'Could not take tips.'); }
+    finally { stealingTips.value = false; }
+  }
   async function giftFriend(gift: GiftRequest) {
     if (!visitedFriend.value) return false;
     try {
@@ -473,6 +540,7 @@ export const useGameStore = defineStore('game', () => {
   let lastSyncTick = 0;
   function tickGameClock(now = clientNow()) {
     nowMs.value = now;
+    if (trainingActive.value) { state.value.lastClockAt = now; return; }
     const before = state.value.customers.length;
     const draft = state.value;
     advanceClock(draft, { now, spawnCustomers: !trainingActive.value && mode.value !== 'online' });
@@ -688,6 +756,9 @@ export const useGameStore = defineStore('game', () => {
   const callTaxi = (customerId: string) => dispatch({ type: 'callTaxi', customerId });
   const askToLeave = (customerId: string, tone: 'gentle' | 'firm' | 'aggressive') => dispatch({ type: 'askToLeave', customerId, tone });
   const cleanAshtrays = () => dispatch({ type: 'cleanAshtrays' });
+  const foodRecommendations = (id:string) => { const guest = state.value.customers.find(item => item.id === id); return guest ? recommendedFoods(state.value, guest) : []; };
+  const cleanGuestAshtray = (customerId:string) => dispatch({ type:'cleanGuestAshtray', customerId });
+  const removeGuestAshtray = (customerId:string) => dispatch({ type:'removeGuestAshtray', customerId });
   // A situation that is open for a guest (a payment problem, a broken glass, an emergency): its title and the replies on offer.
   const situationOf = (customerId: string) => {
     const guest = state.value.customers.find((item) => item.id === customerId);
@@ -775,7 +846,7 @@ export const useGameStore = defineStore('game', () => {
 
   const act = (action: GameAction) => dispatch(action);
   return {
-    trainingActive, trainingPhase, beginTraining, endTraining, preparationCustomerId, openPreparation, tipJar, collectTips,
+    mailMessage, collectMailReward, mailboxOpen, mailboxEntries, unreadMail, theftNotices, mailBusy, loadMailbox, openMailbox, dismissTheftNotices, decideMailGift, foodRecommendations, cleanGuestAshtray, removeGuestAshtray, trainingActive, trainingPhase, trainingRestocked, beginTraining, endTraining, preparationCustomerId, openPreparation, tipJar, tipJarCapacity, collectTips, stealVisitedTips, stealingTips,
     topUpPreview, circle, crewBonus, recruitCompanion, giveKeepsake, buyKeepsake, assignCompanion, dismissCompanion, spotlightCompanion, levelUpCompanion, achievementStat, profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, availableEvents, act, visibleInventory, connectEpoch,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,

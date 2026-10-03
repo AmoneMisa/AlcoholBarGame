@@ -1,3 +1,4 @@
+import { addStyleShards, addBackgroundShards } from './loot';
 import { addStat } from '../domain/achievementStats';
 import { buildPlayerProfile } from '../domain/profile';
 import { RECIPES } from '../domain/catalog';
@@ -12,6 +13,8 @@ import { consumableDef } from '../domain/loot';
 
 // Gifts between friends and visits to a friend's bar. The sender pays when a gift is sent; the receiver's game
 // changes only when they claim it. Both steps run on the server.
+
+const fragmentItem = (id: unknown) => shardStyles().find(entry=>entry.id===id) ?? (typeof id==='string' && id.startsWith('background:') ? (()=>{const item=INTERIORS.find(entry=>entry.id===id.slice(11));return item ? {id,label:item.name} : undefined;})() : undefined);
 
 export class GiftError extends Error {}
 
@@ -32,6 +35,14 @@ export const STYLE_SHARD_GIFT_AMOUNTS = [5, 10, 25] as const;
 // Anti-abuse: gifts of Workshop items are limited per day, and only move items that already exist.
 export const LOOT_GIFTS_PER_DAY = 5;
 export type Gift = GiftRequest;
+
+export function giftLabel(gift: Gift) {
+  if ('recipeId' in gift) return `${RECIPES.find(item=>item.id===gift.recipeId)?.name ?? gift.recipeId} recipe card`;
+  if ('interiorId' in gift) return INTERIORS.find(item=>item.id===gift.interiorId)?.name ?? gift.interiorId;
+  if ('cosmeticId' in gift) return `${fragmentItem(gift.cosmeticId)?.label ?? gift.cosmeticId}${'amount' in gift ? ` shards ×${gift.amount}` : ''}`;
+  if (gift.kind==='consumable') return consumableDef(gift.id)?.name ?? gift.id;
+  return `${gift.amount} skin shards`;
+}
 
 
 // What sending costs, for the gift screen and the rules.
@@ -68,11 +79,7 @@ export function payForGift(state: PlayerState, request: unknown, now = Date.now(
       if (state.loot.consumables[item.id]! <= 0) delete state.loot.consumables[item.id];
       clean = { kind: 'consumable', id: item.id };
     } else {
-      const amount = (SHARD_GIFT_AMOUNTS as readonly number[]).find((value) => value === (gift as { amount?: number }).amount);
-      if (!amount) throw new GiftError('Send 5, 10 or 20 skin shards.');
-      if (state.loot.skinShards < amount) throw new GiftError(`You need ${amount} skin shards.`);
-      state.loot.skinShards -= amount;
-      clean = { kind: 'skin-shards', amount };
+      throw new GiftError('Choose fragments of a specific costume instead.');
     }
     state.loot.giftsSent = { day: today, count: sent + 1 };
     return clean;
@@ -128,7 +135,7 @@ function payForTransfer(state: PlayerState, gift: { kind?: string; amount?: numb
   if (gift.kind === 'style-shards') {
     const amount = (STYLE_SHARD_GIFT_AMOUNTS as readonly number[]).find((value) => value === gift.amount);
     if (!amount) throw new GiftError('Send 5, 10 or 25 style shards.');
-    const style = shardStyles().find((entry) => entry.id === gift.cosmeticId);
+    const style = fragmentItem(gift.cosmeticId);
     if (!style) throw new GiftError('These shards cannot be given away.');
     const have = state.loot.styleShards[style.id] ?? 0;
     if (have < amount) throw new GiftError(`You need ${amount} ${style.label} shards.`);
@@ -167,8 +174,8 @@ function charge(state: PlayerState, currency: 'coins' | 'crystals', amount: numb
 }
 
 // Applies a claimed gift to the receiver. Something they already have becomes a spare card or a crystal refund.
-export function receiveGift(state: PlayerState, gift: Gift, from: string) {
-  addStat(state, 'giftsGot', 1);
+export function receiveGift(state: PlayerState, gift: Gift, from: string, count = true) {
+  if (count) addStat(state, 'giftsGot', 1);
   if (gift.kind === 'consumable') {
     const item = consumableDef(gift.id);
     if (!item) return `${from}'s gift could not be opened.`;
@@ -178,15 +185,14 @@ export function receiveGift(state: PlayerState, gift: Gift, from: string) {
   if (gift.kind === 'skin-shards') {
     const amount = (SHARD_GIFT_AMOUNTS as readonly number[]).includes(gift.amount) ? gift.amount : 0;
     if (!amount) return `${from}'s gift could not be opened.`;
-    state.loot.skinShards += amount;
+    addStyleShards(state, amount, () => 0);
     return `${from} gave you ${amount} skin shards!`;
   }
   if (gift.kind === 'style-shards') {
     const amount = (STYLE_SHARD_GIFT_AMOUNTS as readonly number[]).includes(gift.amount) ? gift.amount : 0;
-    const style = shardStyles().find((entry) => entry.id === gift.cosmeticId);
+    const style = fragmentItem(gift.cosmeticId);
     if (!amount || !style) return `${from}'s gift could not be opened.`;
     // Shards of a style the friend already owns would be useless: they become skin shards.
-    if (state.ownedCosmeticIds.includes(style.id)) { state.loot.skinShards += amount; return `${from} gave you ${amount} ${style.label} shards. You own that style, so they became skin shards.`; }
     state.loot.styleShards[style.id] = (state.loot.styleShards[style.id] ?? 0) + amount;
     return `${from} gave you ${amount} ${style.label} shards!`;
   }
@@ -204,8 +210,8 @@ export function receiveGift(state: PlayerState, gift: Gift, from: string) {
     const interior = INTERIORS.find((entry) => entry.id === gift.interiorId);
     if (!interior || !isEventInterior(interior.id)) return `${from}'s gift could not be opened.`;
     if (state.ownedInteriorIds.includes(interior.id)) {
-      state.loot.skinShards += DUPLICATE_INTERIOR_SHARDS;
-      return `You already have ${interior.name}, so ${from}'s gift became ${DUPLICATE_INTERIOR_SHARDS} skin shards.`;
+      addBackgroundShards(state, interior.id, DUPLICATE_INTERIOR_SHARDS);
+      return `You already have ${interior.name}, so ${from}'s gift became ${DUPLICATE_INTERIOR_SHARDS} background fragments.`;
     }
     state.ownedInteriorIds.push(interior.id);
     const styleId = connectedStyleId(interior.id);

@@ -1,4 +1,5 @@
 import type { Customer } from '../types';
+import { foodRequestLine } from '../foodRequests';
 import type { CustomerReply } from '../conversation/customerTalk';
 import { actsIn, isLeaveAct, type Act } from './acts';
 import { localize, originOf, spellFor } from './origin';
@@ -321,7 +322,7 @@ export function socialReply(customer: Customer, acts: Act[], turn: number, said 
     }
     return { text: choose(['No, I can eat everything, thanks.', 'Nope, nothing like that. Thanks for asking!', 'No allergies. Why, is something in it?', 'I am fine with everything, thank you.', 'No, nothing. That is thoughtful of you.'], seed), expression: 'smile', rapport: rapportBy(social, 4) };
   }
-  if (main === 'offerFood') return { text: social.hungry === false ? 'No, thanks. I am not hungry right now.' : choose(FOOD.slice(0, 2), customer.id + 'food'), expression: 'smile', rapport: 2 };
+  if (main === 'offerFood') return { text: social.hungry === false ? 'No, thanks. I am not hungry right now.' : social.foodRequest ? foodRequestLine(customer) : choose(FOOD.slice(0, 2), customer.id + 'food'), expression: 'smile', rapport: 2 };
   if (main === 'checkIn') return { text: embellish(choose(CHECK_IN[emotion], seed), social, seed), expression: 'smile', rapport: rapportBy(social, 3) };
   if (main === 'offerAnother' && social.phase === 'enjoying') return { text: choose(NOT_YET_ORDER, seed), expression: 'smile', rapport: 1 };
   if (main === 'thanks') {
@@ -346,6 +347,8 @@ export { actsIn };
 // What a seated guest says when the bartender walks over: the thing they need, or just how they feel.
 const NEED_LINES: Record<string, string[]> = {
   ashtray: ['Excuse me, could I have an ashtray, please?', 'Could you bring me an ashtray, please?'],
+  'clean-ashtray': ['Could you empty and clean my ashtray, please?'],
+  'remove-ashtray': ['I have finished smoking. Could you take this ashtray away, please?'],
   water: ['Could I have a glass of water, please?', 'Excuse me, some water, please. I need it.'],
   taxi: ['Excuse me… could you call me a taxi? I think it is time to go home.', 'Could you call me a taxi, please? I do not feel safe driving.'],
   chat: ['Do you have a minute? I would like to talk to someone.', 'Hey, are you busy? I just want to chat for a bit.']
@@ -364,5 +367,5 @@ export function enjoyingOpening(customer: Customer, now: number) {
   const social = customer.social;
   if (!social) return 'Everything is fine, thank you.';
   const need = social.need && social.need.since <= now ? social.need.kind : undefined;
-  return need ? choose(NEED_LINES[need]!, `${customer.id}:${need}`) : choose(ENJOYING[social.emotion], `${customer.id}:enjoy:${social.rounds}`);
+  return need === 'food' ? foodRequestLine(customer) : need ? choose(NEED_LINES[need]!, `${customer.id}:${need}`) : choose(ENJOYING[social.emotion], `${customer.id}:enjoy:${social.rounds}`);
 }

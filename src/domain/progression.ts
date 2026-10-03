@@ -151,6 +151,6 @@ export function marketFor(region: Region, now: number, xp: number) {
   const economy = economyAt(region.id, region.marketFactor, xp, now);
   return createMarket(region, new Date(now).getDate()).map((offer) => {
     const factor = economy.supplyFactor(offer.ingredientId);
-    return factor === 1 ? offer : { ...offer, listPrice: Number((offer.listPrice * factor).toFixed(2)), price: Number((offer.price * factor).toFixed(2)) };
+    return factor === 1 ? offer : { ...offer, listPrice: Number((offer.listPrice * factor).toFixed(0)), price: Number((offer.price * factor).toFixed(0)) };
   });
 }

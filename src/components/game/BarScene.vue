@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { enjoyingOpening } from '../../domain/social/talk';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { CUSTOMER_ART_BY_SLOT } from '../../data/cosmetics/artCatalog';
 import { INGREDIENTS, RECIPES } from '../../domain/catalog';
@@ -184,7 +185,7 @@ const customerStyle = (index: number) => phoneTrack.value
 const seats = computed(() => Array.from({length:MAX_CUSTOMER_SEATS}, (_, index) => ({
   index, customer:game.customers.find(customer => customer.seatId === index),
   countdown:game.seatArrivals.find(arrival => arrival.seat === index)?.countdown ?? 'Arriving…'
-})));
+})).filter(seat => game.trainingActive ? !!seat.customer : game.tourSeen));
 const inviteSeat = ref<number>();
 const inviteArrival = computed(() => game.seatArrivals.find(arrival => arrival.seat === inviteSeat.value));
 watch(inviteArrival, arrival => { if (!arrival) inviteSeat.value = undefined; });
@@ -336,7 +337,8 @@ function badges(customer: Customer) {
   return list;
 }
 function bubbleText(customer: Customer) {
-  if (customer.pendingPayment) return `Ready to pay ${customer.pendingPayment.coins.toFixed(2)} coins.`;
+  if (customer.social?.need && customer.social.need.since <= game.nowMs) return enjoyingOpening(customer, game.nowMs);
+  if (customer.pendingPayment) return `Ready to pay ${customer.pendingPayment.coins.toFixed(0)} coins.`;
   // Something the guest said on their own (about the drink, the room, their life) shows for a while.
   const murmur = customer.social?.murmur;
   if (murmur && murmur.until > game.nowMs) return murmur.text;
@@ -533,26 +535,26 @@ onBeforeUnmount(() => {
         <CharacterModel role="customer" :character-id="customer.characterId ?? CUSTOMER_ART_BY_SLOT[index % CUSTOMER_ART_BY_SLOT.length]" :seed="customer.id" :mood="customer.mood" :expression="faceOf(customer)" :animation="customer.id === game.activeCustomerId ? 'talk' : 'idle'" />
         <img v-if="customer.social?.ashtray === 'given'" class="customer-ashtray" :src="ashtrayArt" alt="" draggable="false" />
         <div class="guest-card" data-guide="guest">
-          <header><b>{{ customer.name }}</b><time v-if="customer.id === game.activeCustomerId">{{ game.orderCountdown }}</time></header>
+          <header><b>{{ customer.name }}</b><time v-if="!game.trainingActive && customer.id === game.activeCustomerId">{{ game.orderCountdown }}</time></header>
           <small class="guest-badges"><span v-for="badge in badges(customer)" :key="badge.label" :title="badge.label"><img v-if="badge.icon === 'ashtray'" class="ashtray-badge" :src="ashtrayArt" alt="" /><Glyph v-else :g="badge.icon" /></span><i v-if="!customer.social">{{ customer.mood }}</i><i v-else>{{ customer.pendingPayment ? 'payment' : customer.social.phase === 'enjoying' ? 'enjoying' : EMOTION_LABEL[customer.social.emotion].toLowerCase() }}</i></small>
           <p>{{ bubbleText(customer) }}</p>
-          <footer><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customer.pendingPayment ? 'Awaiting payment' : customer.social?.phase === 'enjoying' ? 'Enjoying the drink' : customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
+          <footer><span v-if="!game.trainingActive" class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customer.pendingPayment ? 'Awaiting payment' : customer.social?.phase === 'enjoying' ? 'Enjoying the drink' : customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
         </div>
       </button>
       <button v-else type="button" class="scene-customer empty-seat" :style="customerStyle(index)" :aria-label="`Invite guest to seat ${index + 1} · next guest in ${countdown}`" @click="inviteSeat = index">
         <div class="seat-shadow">
-          <svg viewBox="0 0 160 180" aria-hidden="true"><path d="M0 180 8 140Q10 131 23 126L54 114Q64 109 63 98L62 91C53 84 49 73 47 62C40 60 39 50 43 47L43 34C42 12 57 2 79 2C102 2 116 15 116 36L115 47C121 49 120 61 113 63C111 75 106 85 98 91L97 101Q96 109 106 114L138 126Q151 131 153 141L160 180Z" /></svg>
+          <img class="guest-silhouette" src="/assets/ui/guest-silhouette.webp" alt="" width="160" height="180" draggable="false" aria-hidden="true">
           <div class="seat-countdown"><time>{{ countdown }}</time></div>
         </div>
       </button>
       </template>
     </div>
-    <template v-if="guestsOverflow && !preview">
+    <template v-if="guestsOverflow && !preview && !game.trainingActive && game.tourSeen">
       <button class="guest-nudge prev" type="button" :aria-label="hiddenGuests.left ? 'Show earlier guests · customer off screen' : 'Show earlier guests'" :disabled="guestScroll <= 2" @click="nudgeGuests(-1)"><UiIcon name="chevron-left" /><span v-if="hiddenGuests.left" class="hidden-guest-dot" aria-hidden="true"></span></button>
       <button class="guest-nudge next" type="button" :aria-label="hiddenGuests.right ? 'Show more guests · customer off screen' : 'Show more guests'" :disabled="guestScroll >= phoneTrack!.content - phoneTrack!.zone - 2" @click="nudgeGuests(1)"><UiIcon name="chevron-right" /><span v-if="hiddenGuests.right" class="hidden-guest-dot" aria-hidden="true"></span></button>
     </template>
     <TipJar v-if="!preview" />
-    <button v-if="!preview && !capture" class="bar-screenshot-open" data-guide="screenshot" type="button" aria-label="Open full-screen bar for screenshots" title="Full-screen bar" @click="$emit('screenshot')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H4v16h4M16 4h4v16h-4" /></svg></button>
+    <button v-if="!preview && !capture" class="bar-screenshot-open" data-guide="screenshot" type="button" aria-label="Open full-screen bar for screenshots" title="Full-screen bar" @click="$emit('screenshot')"><UiIcon name="fullscreen" /></button>
     <!-- Over the glass the bottle settles above its rim and tips; the glass draws the single pour stream. -->
     <div v-if="draggingIngredientId && selectedIngredient" class="drag-bottle-ghost" :class="{ pouring: dragOverGlass }" :style="ghostStyle" aria-hidden="true">
       <span class="ghost-bottle"><BottleModel :ingredient="selectedIngredient" /></span>

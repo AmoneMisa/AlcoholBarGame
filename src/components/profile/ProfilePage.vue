@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AchievementArt from '../ui/AchievementArt.vue';
 import UiCheckbox from '../ui/UiCheckbox.vue';
 import UiButton from '../ui/UiButton.vue';
 import { computed, onMounted, ref } from 'vue';
@@ -31,7 +32,7 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
 </script>
 
 <template>
-  <div class="profile-page game-panel">
+  <div class="profile-page">
     <ProfileCard :name="game.decor.name || game.playerName" :level="game.level" :profile="game.profile" :look="game.decor as unknown as Record<string, string>">
       <template #achievements-action>
         <UiButton variant="secondary" size="sm" v-if="earned.length" @click="startPicking">Choose what to show</UiButton>
@@ -50,7 +51,7 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
 
     <section v-if="picking" class="picker" aria-label="Choose achievements to show">
       <header><b>Choose up to {{ FEATURED_MAX }} achievements to show on your profile</b></header>
-      <UiCheckbox v-for="item in earned" :key="item.id" :model-value="chosen.includes(item.id)" :label="`${item.seriesName} · ${item.tierName}`" :hint="item.name" :disabled="!chosen.includes(item.id) && chosen.length >= FEATURED_MAX" @update:model-value="toggle(item.id)" />
+      <div v-for="item in earned" :key="item.id" class="achievement-picker-option"><AchievementArt :series="item.series" :tier="item.tier" :size="40" /><UiCheckbox :model-value="chosen.includes(item.id)" :label="`${item.seriesName} · ${item.tierName}`" :hint="item.name" :disabled="!chosen.includes(item.id) && chosen.length >= FEATURED_MAX" @update:model-value="toggle(item.id)" /></div>
       <footer>
         <UiButton variant="primary" @click="save">Save ({{ chosen.length }} / {{ FEATURED_MAX }})</UiButton>
         <UiButton variant="secondary" @click="latest">Show the latest instead</UiButton>
@@ -61,7 +62,8 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
 </template>
 
 <style scoped>
-.profile-page { display: grid; gap: 14px; padding: 14px; }
+.achievement-picker-option{display:flex;align-items:center;gap:8px;}
+.profile-page { display: grid; gap: 14px; padding: 0; border:0;background:none;box-shadow:none; }
 .version-card { padding: 12px 14px; border: 1px solid #354762; border-radius: 14px; background: #111c2d; color: #e9eef7; font-size: 13px; }
 .version-card h3 { margin: 0 0 6px; font-size: 14px; }
 .version-card dl { display: flex; flex-wrap: wrap; gap: 18px; margin: 0; }

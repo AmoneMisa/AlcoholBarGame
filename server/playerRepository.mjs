@@ -134,13 +134,17 @@ function pgTx(client) {
       await client.query('DELETE FROM friendships WHERE (player_id = $1 AND friend_id = $2) OR (player_id = $2 AND friend_id = $1)', [a, b]);
     },
     async addGift(gift) {
-      const { rows: [row] } = await client.query('INSERT INTO gifts (from_id, to_id, kind, payload) VALUES ($1, $2, $3, $4::jsonb) RETURNING id', [gift.fromId, gift.toId, gift.payload.kind, JSON.stringify(gift.payload)]);
+      const { rows: [row] } = await client.query('INSERT INTO gifts (from_id, to_id, kind, payload, created_at) VALUES ($1, $2, $3, $4::jsonb, to_timestamp($5/1000.0)) RETURNING id', [gift.fromId, gift.toId, gift.payload.kind, JSON.stringify(gift.payload),gift.createdAt ?? Date.now()]);
       return Number(row.id);
     },
     async listGifts(toId) {
       const { rows } = await client.query(`SELECT g.id, g.from_id, g.payload, g.created_at, p.display_name AS from_name
           FROM gifts g JOIN players p ON p.id = g.from_id WHERE g.to_id = $1 AND g.claimed_at IS NULL ORDER BY g.id`, [toId]);
       return rows.map((row) => ({ id: Number(row.id), fromId: Number(row.from_id), fromName: row.from_name, payload: row.payload, createdAt: new Date(row.created_at).getTime() }));
+    },
+    async expiredGifts(before) {
+      const {rows}=await client.query('SELECT id,to_id FROM gifts WHERE claimed_at IS NULL AND created_at <= to_timestamp($1/1000.0) ORDER BY id',[before]);
+      return rows.map(row=>({id:Number(row.id),toId:Number(row.to_id)}));
     },
     async takeGift(giftId, toId) {
       const { rows: [row] } = await client.query(`UPDATE gifts g SET claimed_at = now() FROM players p
@@ -221,7 +225,8 @@ export function createMemoryRepository() {
     async friendship(a, b) { return friendships.get(`${a}:${b}`) ?? null; },
     async setFriendship(a, b, status) { friendships.set(`${a}:${b}`, status); },
     async deleteFriendship(a, b) { friendships.delete(`${a}:${b}`); friendships.delete(`${b}:${a}`); },
-    async addGift(gift) { const id = nextGiftId++; gifts.push({ id, fromId: gift.fromId, toId: gift.toId, payload: structuredClone(gift.payload), createdAt: Date.now(), claimed: false }); return id; },
+    async addGift(gift) { const id = nextGiftId++; gifts.push({ id, fromId: gift.fromId, toId: gift.toId, payload: structuredClone(gift.payload), createdAt: gift.createdAt ?? Date.now(), claimed: false }); return id; },
+    async expiredGifts(before) { return gifts.filter(gift=>!gift.claimed && gift.createdAt<=before).map(gift=>({id:gift.id,toId:gift.toId})); },
     async listGifts(toId) {
       return Promise.all(gifts.filter((gift) => gift.toId === toId && !gift.claimed)
         .map(async (gift) => ({ id: gift.id, fromId: gift.fromId, fromName: (await tx.getPlayer(gift.fromId))?.name ?? '', payload: structuredClone(gift.payload), createdAt: gift.createdAt })));

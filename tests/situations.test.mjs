@@ -132,7 +132,7 @@ test('Facts a situation hides never reach the client, and amounts are written in
   const view = publicState(state);
   assert.ok(!('_fake' in view.customers[0].social.event.data), 'the client does not');
   assert.equal(fill('The bill is {amount}.', { amount: 12 }, '$'), 'The bill is $12.');
-  assert.equal(fill('The bill is {amount}.', { amount: 12.5 }, '$'), 'The bill is $12.50.');
+  assert.equal(fill('The bill is {amount}.', { amount: 12.5 }, '$'), 'The bill is $13.');
   assert.match(guestLine(state, guest), /Keep the change/);
 });
 

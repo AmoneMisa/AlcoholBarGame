@@ -14,3 +14,7 @@ One WebP per thing, in a folder named after what it is. The game shows it instea
 | `achievements`  | the series name, for example `serves`, `bonds`, `companions`                                                |
 
 Square, transparent or flat background, 256 x 256 px, under about 40 KB. Full-figure portraits of the Circle live in `public/assets/characters/companions/`.
+
+Player reward art now uses transparent painted items instead of the old flat framed placeholders. Resources (coins, crystals, XP), parts, all four chests, and Battle Pass boosters use versioned `-painted-v1.webp` files selected by `src/domain/itemArtwork.ts`. Prestige and supplies have separate painted resource images. The painted fragment puzzle lives in `public/assets/ui/fragment-puzzle-painted-v1.webp`; the specific item's thumbnail is overlaid by RewardArt. Install selected generations with `node scripts/install-reward-art.mjs`, using `scripts/painted-reward-art.json` for source provenance.
+
+All six bar equipment images and all thirteen consumable illustrations now use versioned painted WebP assets. The four additional choice puzzles are independent consumable items; each exchanges for ONE item-specific fragment. Every achievement series has four baked WebP medal stages named <series>-tier-1..4.webp; profiles and Events use the same images. Popup backgrounds are painted raster textures with a dark readability overlay.

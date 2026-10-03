@@ -146,16 +146,16 @@ export function makeOffer(state: PlayerState, price: unknown, context: { random:
   if (negotiation.offers.length >= MAX_OFFERS) throw new TradeError('No offers left. Buy at the list price or leave.');
   const quote = negotiatedQuote(state, negotiation, context.now);
   const offered = typeof price === 'number' && Number.isFinite(price) ? coins(price) : NaN;
-  if (!(offered >= quote.minOffer && offered <= quote.goods)) throw new TradeError(`Offer between ${quote.minOffer.toFixed(2)} and ${quote.goods.toFixed(2)} coins.`);
+  if (!(offered >= quote.minOffer && offered <= quote.goods)) throw new TradeError(`Offer between ${quote.minOffer.toFixed(0)} and ${quote.goods.toFixed(0)} coins.`);
   const { rate } = offerChance(negotiation, quote.goods, offered);
   const success = context.random() < rate;
   negotiation.offers.push({ price: offered, rate, success });
   const seller = SELLERS[negotiation.supplierId]?.name ?? 'The seller';
-  addLine(negotiation, 'buyer', `I can offer ${offered.toFixed(2)} coins for the goods.`, { ok: true });
+  addLine(negotiation, 'buyer', `I can offer ${offered.toFixed(0)} coins for the goods.`, { ok: true });
   if (success) {
     negotiation.agreedGoods = offered;
     negotiation.mood = 'pleased';
-    addLine(negotiation, 'seller', offered >= quote.goods ? 'The full price — of course!' : `Deal! ${offered.toFixed(2)} coins it is.`);
+    addLine(negotiation, 'seller', offered >= quote.goods ? 'The full price — of course!' : `Deal! ${offered.toFixed(0)} coins it is.`);
   } else {
     negotiation.retryBonus = Number((negotiation.retryBonus + RETRY_BONUS).toFixed(3));
     const left = MAX_OFFERS - negotiation.offers.length;
@@ -291,7 +291,7 @@ export function acceptDeal(state: PlayerState, now: number, dayMs: number) {
   });
   state.lastNegotiatedAt = { ...(state.lastNegotiatedAt ?? {}), [negotiation.supplierId]: now };
   const bar = REGIONS.find((item) => item.id === quote.barId)!.name;
-  const note = `Negotiated ${quote.base.packs} packs from ${quote.supplier.name}: ${total.toFixed(2)} coins (${Math.round(quote.discountRate * 100)}% off${quote.surcharge ? `, +${Math.round(quote.surcharge * 100)}% surcharge` : ''}), delivery to ${bar}.`;
+  const note = `Negotiated ${quote.base.packs} packs from ${quote.supplier.name}: ${total.toFixed(0)} coins (${Math.round(quote.discountRate * 100)}% off${quote.surcharge ? `, +${Math.round(quote.surcharge * 100)}% surcharge` : ''}), delivery to ${bar}.`;
   state.tradeLog = [note, ...state.tradeLog].slice(0, 40);
   state.message = note;
   state.negotiation = undefined;

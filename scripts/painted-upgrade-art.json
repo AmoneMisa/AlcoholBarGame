@@ -1,0 +1,86 @@
+[
+  {
+    "key": "equipment/shaker",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-8971ec11-bed7-48d3-9375-6bd8671581c8.png"
+  },
+  {
+    "key": "equipment/speakers",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-b707e0e0-9141-4471-991e-9b449aa0fb6f.png"
+  },
+  {
+    "key": "equipment/ice-machine",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-02baea9b-ee4a-42e5-950f-91a6ef839f66.png"
+  },
+  {
+    "key": "equipment/register",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-cdda2f07-13e8-4e6a-a8b5-096357a2a886.png"
+  },
+  {
+    "key": "equipment/cellar",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-30fc7f0d-4811-437d-9fde-a41e2bd27277.png"
+  },
+  {
+    "key": "equipment/fridge",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-ff69de4d-6019-4417-b2a5-10435b156213.png"
+  },
+  {
+    "key": "items/vip-magnet",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-9f8e3560-6ed1-4ef7-978c-e432b64fa17f.png"
+  },
+  {
+    "key": "items/voucher",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-e9c3afba-b572-4709-a87e-fa32993eb859.png"
+  },
+  {
+    "key": "items/calm-charm",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-0effdf9d-b2bd-4d9d-b155-9587c48ae38c.png"
+  },
+  {
+    "key": "items/second-chance",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-a5a874e3-6b90-4ac5-ba16-a5f66e66e710.png"
+  },
+  {
+    "key": "items/golden-ice",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-4d3f2ff6-9696-4485-9a8a-6031c3058998.png"
+  },
+  {
+    "key": "items/whisper",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-92f88d97-2825-418f-83b1-c5cb94b68066.png"
+  },
+  {
+    "key": "items/courier",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-73090d6b-96f5-4514-9b50-d6e1843fb590.png"
+  },
+  {
+    "key": "items/steady-hand",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-37d6d48c-9f75-408b-9e72-99e6b9b1461f.png"
+  },
+  {
+    "key": "items/scroll",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-ece2430e-59a0-4d73-8372-e989619271d4.png"
+  },
+  {
+    "key": "items/friend-choice",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-ae582105-1195-4a10-b36f-84e2cdf41cd5.png"
+  },
+  {
+    "key": "items/background-choice",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-d4a0365f-b147-4f98-bb87-b564124332b5.png"
+  },
+  {
+    "key": "items/style-choice",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-e70fc375-1be7-4b12-803f-8d162c26fb06.png"
+  },
+  {
+    "key": "items/equipment-choice",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-964b3331-ea7e-4bbb-9987-9d7ff2320476.png"
+  },
+  {
+    "key": "ui/lounge-panel",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-347c64af-a3f0-497d-8846-aea918301019.png"
+  },
+  {
+    "key": "ui/pass-panel",
+    "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fdcf-7fff-7960-88e5-77ed5360a696\\exec-698289e9-7d3f-4adc-a160-11ce5addc9a5.png"
+  }
+]

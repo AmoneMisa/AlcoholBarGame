@@ -1,0 +1,54 @@
+[
+  {
+    "key": "resources/coins",
+    "source": "C:/Users/kubai/.codex/generated_images/01a0fdcf-7fff-7960-88e5-77ed5360a696/exec-8c95f976-9026-4b87-b1b2-101315687a39.png"
+  },
+  {
+    "key": "resources/crystals",
+    "source": "C:/Users/kubai/.codex/generated_images/01a0fdcf-7fff-7960-88e5-77ed5360a696/exec-b1b4f6b0-1e13-4e9f-ba64-420fba058109.png"
+  },
+  {
+    "key": "resources/xp",
+    "source": "C:/Users/kubai/.codex/generated_images/01a0fdcf-7fff-7960-88e5-77ed5360a696/exec-7eae121f-1211-4ec5-b9d1-e489cf4d1d4f.png"
+  },
+  {
+    "key": "shards/parts",
+    "source": "C:/Users/kubai/.codex/generated_images/01a0fdcf-7fff-7960-88e5-77ed5360a696/exec-a9e38aec-898e-48bd-8f66-72997b7ff365.png"
+  },
+  {
+    "key": "boxes/bronze",
+    "source": "C:/Users/kubai/.codex/generated_images/01a0fdcf-7fff-7960-88e5-77ed5360a696/exec-a1fe65a7-6c30-41e3-9c8c-c3b5a4ba3b3d.png"
+  },
+  {
+    "key": "boxes/silver",
+    "source": "C:/Users/kubai/.codex/generated_images/01a0fdcf-7fff-7960-88e5-77ed5360a696/exec-89835f52-20c2-4fd2-9d72-4a5ee2003c59.png"
+  },
+  {
+    "key": "fragment-puzzle",
+    "source": "C:/Users/kubai/.codex/generated_images/01a0fdcf-7fff-7960-88e5-77ed5360a696/exec-6d9825f0-01af-4f8b-85d9-e06d3c6147cb.png"
+  },
+  {
+    "key": "boxes/gold",
+    "source": "C:/Users/kubai/.codex/generated_images/01a0fdcf-7fff-7960-88e5-77ed5360a696/exec-f0ee987e-2ca9-4c9e-a16e-554d9edd679d.png"
+  },
+  {
+    "key": "boxes/choice",
+    "source": "C:/Users/kubai/.codex/generated_images/01a0fdcf-7fff-7960-88e5-77ed5360a696/exec-07d37a4e-ee0d-4f96-8c48-8584a7987ec2.png"
+  },
+  {
+    "key": "items/xp-boost",
+    "source": "C:/Users/kubai/.codex/generated_images/01a0fdcf-7fff-7960-88e5-77ed5360a696/exec-387f522d-f305-41b4-9d8c-f789114dd35b.png"
+  },
+  {
+    "key": "items/coin-boost",
+    "source": "C:/Users/kubai/.codex/generated_images/01a0fdcf-7fff-7960-88e5-77ed5360a696/exec-daf0fc97-1048-48b3-8d2a-402d0192b5cd.png"
+  },
+  {
+    "key": "items/tip-boost",
+    "source": "C:/Users/kubai/.codex/generated_images/01a0fdcf-7fff-7960-88e5-77ed5360a696/exec-e1ed81d2-9cd7-4e1b-b117-e7e4514f4036.png"
+  },
+  {
+    "key": "items/happy-hour",
+    "source": "C:/Users/kubai/.codex/generated_images/01a0fdcf-7fff-7960-88e5-77ed5360a696/exec-8fbf5f3b-dcb0-41d2-9c12-4aa37dec2c71.png"
+  }
+]

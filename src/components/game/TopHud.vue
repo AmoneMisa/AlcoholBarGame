@@ -69,7 +69,7 @@ onUnmounted(() => {
         </PopoverPanel>
       </div>
       <div class="crystal-resource"><button class="exchange-open" type="button" :aria-expanded="shopOpen" data-guide="crystals" aria-label="Buy crystals" @click="shopOpen = true"><UiIcon name="crystal" /><b>{{ game.crystals.toLocaleString('en-US') }}</b></button></div>
-      <div class="prestige-resource" :aria-label="`${game.popularity} prestige`" title="Prestige"><UiIcon name="star" /><b>{{ game.popularity }}</b></div>
+      <div class="prestige-resource" :aria-label="`${game.popularity} prestige`" title="Prestige"><UiIcon name="prestige" /><b>{{ game.popularity }}</b></div>
       <div v-if="game.level >= STAFF_UNLOCK_LEVELS[0]!" class="staff-resource">
         <button class="staff-open" type="button" :aria-expanded="staffOpen" :aria-label="`Servers: ${game.staff.length} of ${MAX_STAFF} hired`" @click="staffOpen = !staffOpen"><UiIcon name="server" /></button>
         <PopoverPanel v-if="staffOpen" class="staff-panel" padded eyebrow="SERVERS" :title="`Your team in ${game.region.name}`" close-label="Close servers" @close="staffOpen = false">
@@ -84,9 +84,10 @@ onUnmounted(() => {
       </div>
     </div>
     <button class="hud-events" data-guide="events" type="button" :aria-label="`Events · ${game.availableEvents.badge} available rewards and free draws`" title="Events" :aria-expanded="eventsOpen" @click="eventsOpen = true"><UiIcon name="gift" /><span>Events</span><b v-if="game.availableEvents.badge" class="events-badge">{{ game.availableEvents.badge }}</b></button>
-    <button class="hud-bar-info" type="button" data-guide="rules-button" aria-label="Bar info" :aria-expanded="perksOpen" @click="perksOpen = true">Bar info</button>
+    <div class="hud-secondary"><button class="hud-bar-info" type="button" data-guide="rules-button" aria-label="Bar info" :aria-expanded="perksOpen" @click="perksOpen = true">Bar info</button><button class="hud-mail" type="button" :aria-label="`Post Box · ${game.unreadMail} unread or pending`" @click="game.openMailbox()"><UiIcon name="mail" />Post Box<span v-if="game.unreadMail" class="mail-badge">{{ game.unreadMail }}</span></button></div>
     <ModalDialog v-if="perksOpen" eyebrow="YOUR BAR" :title="`Bar info · ${game.region.name}`" @close="perksOpen = false">
       <CityEvent />
+      <p class="rules-note">Tip jar: {{ game.tipJar.toFixed(0) }} / {{ game.tipJarCapacity }} coins. Tap the jar to collect manually. Accumulation pauses after 12 hours or when full. Visitors can take up to 5%; at least 30% stays protected. One attempt per player per day, 10 attempts total.</p>
       <p class="rules-note">Explain these rules politely to guests. Inspectors count every rule you break{{ game.ruleViolations ? ` (so far: ${game.ruleViolations})` : '' }}.</p>
       <article v-for="rule in game.houseRules" :key="rule.id" class="rule-row"><span class="rule-icon"><Glyph :g="rule.icon" /></span><span><b>{{ rule.title }}</b><small>{{ rule.text }}</small></span></article>
     </ModalDialog>
@@ -110,6 +111,10 @@ onUnmounted(() => {
 .exchange-open { gap:3px; padding:0; }
 .hud-bar-info { grid-column:1; grid-row:2; justify-self:start; display:flex; align-items:center; justify-content:center; height:24px; padding:0 9px; border:1px solid #b59a5c40; border-radius:7px; background:#ffffff06; color:#e6c78c; font:600 12px system-ui; white-space:nowrap; cursor:pointer; }
 .hud-bar-info:hover { background:#ffffff0d; }
+.hud-secondary{grid-column:1;grid-row:2;display:flex;align-items:center;gap:6px;min-width:0;}
+.hud-mail{height:24px;display:flex;align-items:center;gap:4px;padding:0 7px;border:1px solid #b59a5c40;border-radius:7px;background:#ffffff06;color:#e6c78c;font:600 12px system-ui;cursor:pointer;}
+.hud-mail :deep(.ui-icon){width:14px;height:14px;}
+.hud-mail .mail-badge{min-width:14px;line-height:14px;padding:0 3px;border-radius:8px;background:#ad403b;color:white;font-size:10px;}
 .hud-bar-info:focus-visible { outline:2px solid #f3d38b; outline-offset:2px; }
 .hud-events,.daily-hud-gift,.staff-open { display:grid; place-items:center; flex:none; width:30px; height:30px; padding:0; border:1px solid #594b39; border-radius:10px; background:#1c2634; color:#e9c577; }
 .daily-hud-gift.ready { border-color:#e8b457; }

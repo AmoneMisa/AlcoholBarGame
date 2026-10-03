@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import FragmentChoicePicker from '../workshop/FragmentChoicePicker.vue';
+import BoxRewardsPreview from '../workshop/BoxRewardsPreview.vue';
+import InventoryPanel from '../workshop/InventoryPanel.vue';
 import { computed, ref } from 'vue';
 import { BOXES, CONSUMABLES, EQUIPMENT, SHARD_CRAFT_COST, TIER_SHARD_COST, consumableDef, equipmentDef } from '../../domain/loot';
 import { COMPANIONS, KEEPSAKES, companionName } from '../../domain/companions';
@@ -37,7 +40,6 @@ const tiles = computed<Tile[]>(() => {
   return ([
     // One tile for every style or background that has shards: its own pile, with the style's own id.
     ...Object.entries(loot.styleShards).map(([id, count]): Tile => ({ key: `style-shard:${id}`, art: { kind: 'shard', id: 'style', fallback: '🧵' }, name: `${COSMETICS.find((item) => item.id === id)?.label ?? id} shards`, note: `${Math.min(count, STYLE_PIECES_TO_CRAFT)} of ${STYLE_PIECES_TO_CRAFT} to craft`, count, popup: { type: 'style', id } })),
-    { key: 'skin', art: { kind: 'shard', id: 'skin', fallback: '👗' }, name: 'Skin shards', note: 'Craft skins and hair', count: loot.skinShards, popup: { type: 'skin' } },
     ...EQUIPMENT.map((item): Tile => ({ key: `equipment-${item.id}`, art: { kind: 'equipment', id: item.id, fallback: item.icon }, name: `${item.name} shards`, note: 'Raise the tier of this equipment', count: loot.itemShards[item.id] ?? 0, popup: { type: 'equipment', id: item.id } })),
     ...COMPANIONS.map((person): Tile => ({ key: `circle-${person.id}`, art: { kind: 'companion', id: person.id, fallback: '🤝' }, name: `${companionName(person.id)} shards`, note: `${game.circle.shards[person.id] ?? 0} of ${person.shards} to invite them`, count: game.circle.shards[person.id] ?? 0, popup: { type: 'circle', id: person.id } }))
   ] as Tile[]).filter((tile) => tile.count > 0);
@@ -106,7 +108,8 @@ function throwAway() {
 </script>
 
 <template>
-  <section class="workshop-stock" :aria-label="kind === 'items' ? 'Workshop items' : 'Shards'">
+  <InventoryPanel v-if="kind === 'shards'" />
+  <section v-else class="workshop-stock" :aria-label="kind === 'items' ? 'Workshop items' : 'Shards'">
     <button v-for="tile in tiles" :key="tile.key" class="stock-tile tappable" type="button" :data-id="tile.key" @click="popup = tile.popup">
       <ItemArt :kind="tile.art.kind" :id="tile.art.id" :fallback="tile.art.fallback" :size="64" />
       <b>{{ tile.name }}</b><small>{{ tile.note }}</small><strong>×{{ tile.count }}</strong>
@@ -116,7 +119,7 @@ function throwAway() {
 
   <ModalDialog v-if="popup" :title="title" :eyebrow="kind === 'items' ? 'ITEM' : 'SHARDS'" width="560px" placement="bottom" @close="close">
     <template v-if="popup.type === 'box' && box">
-      <p class="stock-text">{{ box.description }}</p>
+      <BoxRewardsPreview :box-id="box.id" />
       <p class="stock-text">You have <b>{{ game.loot.boxes[box.id] ?? 0 }}</b>.</p>
       <div v-if="game.loot.pendingChoice" class="stock-craft"><b>Pick one reward</b><UiButton v-for="(_, index) in game.loot.pendingChoice" :key="index" variant="primary" @click="game.act({ type: 'pickReward', index })">Reward {{ index + 1 }}</UiButton></div>
       <UiButton variant="solid" block :reason="!(game.loot.boxes[box.id] ?? 0) ? 'You have no more of these.' : game.loot.pendingChoice ? 'Pick your reward first.' : ''" @click="game.act({ type: 'openBox', box: box.id })">Open one</UiButton>
@@ -126,7 +129,8 @@ function throwAway() {
       <p class="stock-text">{{ item.description }}</p>
       <p class="stock-text">You have <b>{{ game.loot.consumables[item.id] ?? 0 }}</b>.<template v-if="itemStatus"> {{ itemStatus }}.</template></p>
       <OptionSelect v-if="item.id === 'scroll'" label="Recipe" v-model="scrollRecipe" :options="[{ value: '', label: 'Choose a recipe' }, ...knownRecipes.map((recipe) => ({ value: recipe.id, label: recipe.name }))]" />
-      <UiButton variant="solid" block :reason="!(game.loot.consumables[item.id] ?? 0) ? 'You have no more of these.' : item.id === 'scroll' && !scrollRecipe ? 'Choose a recipe first.' : ''" @click="game.act({ type: 'useConsumable', id: item.id, recipeId: scrollRecipe })">Use</UiButton>
+      <FragmentChoicePicker v-if="item.kind==='choice'" :id="item.id" @used="close()" />
+      <UiButton v-else variant="solid" block :reason="!(game.loot.consumables[item.id] ?? 0) ? 'You have no more of these.' : item.id === 'scroll' && !scrollRecipe ? 'Choose a recipe first.' : ''" @click="game.act({ type: 'useConsumable', id: item.id, recipeId: scrollRecipe })">Use</UiButton>
     </template>
 
     <template v-else-if="popup.type === 'keepsake' && keepsake">
@@ -138,19 +142,12 @@ function throwAway() {
     </template>
 
     <template v-else-if="popup.type === 'style' && style">
-      <p class="stock-text">{{ style.label }}{{ style.character ? ` (${style.character === 'leo' ? 'Leo' : 'Noa'})` : '' }}. You have <b>{{ styleHave }}</b> of {{ STYLE_PIECES_TO_CRAFT }} shards. An ordinary background's style brings its background along.</p>
+      <p class="stock-text">{{ style.label }}{{ style.character ? ` (${style.character === 'leo' ? 'Leo' : 'Noa'})` : '' }}. You have <b>{{ styleHave }}</b> of {{ STYLE_PIECES_TO_CRAFT }} shards. These shards belong only to this style.</p>
       <progress class="stock-progress" :value="Math.min(styleHave, STYLE_PIECES_TO_CRAFT)" :max="STYLE_PIECES_TO_CRAFT"></progress>
       <p v-if="styleOwned" class="stock-text">You already own this style.</p>
       <UiButton v-else variant="solid" block :reason="need('shards', STYLE_PIECES_TO_CRAFT, styleHave)" @click="game.act({ type: 'craftStyle', cosmeticId: style.id })">Craft · {{ STYLE_PIECES_TO_CRAFT }} shards</UiButton>
     </template>
 
-    <template v-else-if="popup.type === 'skin'">
-      <p class="stock-text">You have <b>{{ game.loot.skinShards }}</b> skin shards. Common {{ SHARD_CRAFT_COST.common }} · Rare {{ SHARD_CRAFT_COST.rare }} · Legendary {{ SHARD_CRAFT_COST.legendary }}. Pick a skin or hair style to craft:</p>
-      <ul class="stock-craft-list">
-        <li v-for="skin in lockedSkins" :key="skin.id" :class="skin.rarity"><span>{{ skin.label }}<small>{{ cosmeticKind(skin.key) }}{{ skin.character ? `, ${skin.character}` : '' }}</small></span><UiButton size="sm" variant="primary" :reason="need('skin shards', SHARD_CRAFT_COST[skin.rarity], game.loot.skinShards)" @click="game.act({ type: 'craftSkin', cosmeticId: skin.id })">Craft · {{ SHARD_CRAFT_COST[skin.rarity] }}</UiButton></li>
-      </ul>
-      <p v-if="!lockedSkins.length" class="stock-text">You own every skin.</p>
-    </template>
 
     <template v-else-if="popup.type === 'equipment' && gear && gearSlot">
       <p class="stock-text">{{ gear.description }} In {{ game.region.name }} it is <b>{{ gearSlot.tier }}</b>, level {{ gearSlot.level }}.</p>
@@ -183,7 +180,7 @@ function throwAway() {
 .stock-tile .item-art { width: 64px; height: 64px; border-radius: 50%; }
 .stock-tile b { font-size: 14px; }
 .stock-tile small { color: #9eafc1; font-size: 11px; line-height: 1.3; }
-.stock-tile strong { position: absolute; top: 8px; right: 8px; min-width: 28px; padding: 2px 8px; border: 1px solid #806536; border-radius: 999px; background: #17120c; color: #ffd98a; font: 700 13px Georgia, serif; }
+.stock-tile strong { position: absolute; top: 8px; left: 8px; min-width: 28px; padding: 2px 8px; border: 1px solid #806536; border-radius: 999px; background: #17120c; color: #ffd98a; font: 700 13px Georgia, serif; }
 .stock-empty { grid-column: 1 / -1; margin: 0; color: #9eafc1; }
 .stock-text { margin: 0 0 10px; color: #c9d5e6; font-size: 14px; line-height: 1.5; }
 .stock-progress { width: 100%; margin: 0 0 12px; accent-color: #e7b556; }

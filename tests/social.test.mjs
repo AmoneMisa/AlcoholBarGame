@@ -10,10 +10,101 @@ import { openingFor, socialReply } from '../src/domain/social/talk.ts';
 import { advanceClock, applyAction, RuleError } from '../src/sim/rules.ts';
 import { leaveChance } from '../src/sim/guests.ts';
 import { createInitialState } from '../src/sim/state.ts';
+import { rollSocial, seededRandom } from '../src/domain/social/generate.ts';
+import { FOODS } from '../src/domain/foods.ts';
+import { foodRequestLine } from '../src/domain/foodRequests.ts';
+import { pairingScore, recommendedFoods } from '../src/sim/pitch.ts';
 
 const NOW = Date.UTC(2026, 9, 1, 20);
 const context = (now = NOW, random = () => .5) => ({ now, random, checkEnglish, spawnCustomers: true });
 const SOBER_GUEST = { emotion: 'upset', rapport: 50, drunk: 0, chatty: true, topic: 'work', gender: 'f', phase: 'ordering', nextOrderAt: 0, rounds: 0, staysFor: 0, chatted: [] };
+
+test('Ordinary smokers ask to receive, clean and remove an ashtray; the stock is conserved', () => {
+  const {state, guest} = barWith({need:{kind:'ashtray',since:NOW}}, {smoker:true});
+  talkTo(state, guest);
+  applyAction(state, {type:'giveAshtray', customerId:guest.id}, context());
+  advanceClock(state, context(NOW + 3 * 60_000, () => .5));
+  assert.equal(guest.social.need.kind, 'clean-ashtray');
+  assert.ok(state.conversations[guest.id].lines.some(line => /empty and clean my ashtray/i.test(line.text)));
+  applyAction(state, {type:'cleanGuestAshtray', customerId:guest.id}, context(NOW + 3 * 60_000));
+  assert.equal(guest.social.ashtray, 'given'); assert.equal(guest.social.need, undefined);
+  assert.deepEqual(state.ashtrays, {clean:3,dirty:0});
+  assert.throws(() => applyAction(state, {type:'cleanGuestAshtray',customerId:guest.id}, context(NOW + 3 * 60_000)), /still clean/);
+  advanceClock(state, context(NOW + 6 * 60_000, () => .9));
+  assert.equal(guest.social.need.kind, 'remove-ashtray');
+  applyAction(state, {type:'removeGuestAshtray', customerId:guest.id}, context(NOW + 6 * 60_000));
+  assert.equal(guest.social.ashtray, undefined); assert.deepEqual(state.ashtrays, {clean:3,dirty:1});
+  assert.throws(() => applyAction(state, {type:'removeGuestAshtray',customerId:guest.id}, context(NOW + 6 * 60_000)), /no ashtray/);
+  applyAction(state, {type:'cleanAshtrays'}, context(NOW + 6 * 60_000));
+  assert.deepEqual(state.ashtrays, {clean:4,dirty:0});
+});
+
+test('Ordinary guests generate specific, recommendation and bartender-choice food requests', () => {
+  const kinds = new Set();
+  for (let i=0; i<300; i++) {
+    const guest = {id:`food-request-${i}`,mood:'calm',characterId:'marin',smoker:false};
+    const social = rollSocial(guest, NOW, seededRandom(guest.id));
+    if (!social.foodRequest) continue;
+    kinds.add(social.foodRequest.kind);
+    assert.equal(social.need.kind, 'food');
+    assert.ok(foodRequestLine({...guest,social,orderRecipeId:'gin-tonic'}).includes('Gin & Tonic'));
+    if (social.foodRequest.kind === 'specific') assert.ok(FOODS.some(food => food.id === social.foodRequest.itemId));
+  }
+  assert.deepEqual([...kinds].sort(), ['choice','recommend','specific']);
+});
+
+for (const kind of ['specific','recommend','choice']) test(`Food ${kind} request can be served before alcohol and paid together in dialogue`, () => {
+  const {state, guest} = barWith({hungry:true, foodRequest:{kind,itemId:kind === 'specific' ? 'olives' : undefined}, need:{kind:'food',since:NOW}}, {orderRecipeId:'gin-tonic',modifierId:undefined,specialRecipeRewardId:undefined,signature:undefined});
+  for (const stock of state.inventories[state.regionId]) stock.amount = 1000;
+  talkTo(state, guest);
+  assert.match(state.conversations[guest.id].lines[0].text, /food|eat|olives/i);
+  const food = kind === 'specific' ? FOODS.find(item => item.id === 'olives') : recommendedFoods(state,guest).find(item => item.score >= .5).food;
+  const balance = state.money;
+  applyAction(state, {type:'serveFood', ingredientId:food.id}, context());
+  const foodPrice = guest.pendingPayment.coins;
+  assert.equal(state.money, balance); assert.equal(guest.social.phase, 'ordering'); assert.equal(guest.pendingPayment.foodOnly,true);
+  assert.equal(guest.social.foodRequest,undefined); assert.equal(guest.social.need,undefined);
+  applyAction(state, {type:'serve', mix:RECIPES.find(item => item.id === 'gin-tonic').ingredients, shaken:false}, context());
+  assert.ok(guest.pendingPayment.coins > foodPrice); assert.equal(guest.pendingPayment.foodOnly,false);
+  const total = guest.pendingPayment.coins;
+  assert.equal(state.money,balance);
+  applyAction(state, {type:'say',text:'Would you like to pay by card or in cash?'}, context());
+  assert.equal(state.money, Number((balance + total).toFixed(2))); assert.ok(!state.customers.includes(guest));
+});
+
+test('Food pairing uses a selected bottled spirit and excludes known allergies', () => {
+  const {state,guest} = barWith({hungry:true,allergy:'nuts',allergyKnown:true}, {orderKind:'serve',serveRequest:{productId:'jack-daniels-old-7'}});
+  for (const stock of state.inventories[state.regionId]) stock.amount = 10;
+  assert.ok(pairingScore(FOODS.find(food => food.id === 'meat-plate'), guest).score >= .5);
+  const choices = recommendedFoods(state,guest);
+  assert.ok(choices.length); assert.ok(!choices.some(choice => ['nuts','chocolate','cheese-plate'].includes(choice.food.id)));
+});
+
+test('Water and conversation requests are spoken and fulfilled for ordinary guests', () => {
+  const water = barWith({drunk:65,need:{kind:'water',since:NOW}});
+  talkTo(water.state,water.guest);
+  assert.match(water.state.conversations[water.guest.id].lines[0].text,/water/i);
+  applyAction(water.state,{type:'giveWater',customerId:water.guest.id},context());
+  assert.equal(water.guest.social.need,undefined); assert.ok(water.guest.social.drunk < 65);
+  const chat = barWith({need:{kind:'chat',since:NOW}});
+  talkTo(chat.state,chat.guest);
+  assert.match(chat.state.conversations[chat.guest.id].lines[0].text,/talk|chat/i);
+  say(chat.state,'How are you tonight?');
+  assert.equal(chat.guest.social.need,undefined);
+});
+
+test('A combined food and drink bill remains complete when a payment situation occurs', () => {
+  const {state,guest} = barWith({hungry:true,foodRequest:{kind:'specific',itemId:'olives'}},{orderRecipeId:'gin-tonic',modifierId:undefined,specialRecipeRewardId:undefined,signature:undefined});
+  for (const stock of state.inventories[state.regionId]) stock.amount = 1000;
+  talkTo(state,guest);
+  applyAction(state,{type:'serveFood',ingredientId:'olives'},context());
+  const foodBill = guest.pendingPayment.coins;
+  state.guestsSinceEvent = 5; state.eventGap = 12;
+  applyAction(state,{type:'serve',mix:RECIPES.find(item=>item.id==='gin-tonic').ingredients,shaken:false},context(NOW,()=>0));
+  assert.ok(guest.social.event,'ordinary payment events still occur with food');
+  assert.ok(guest.social.event.data.amount > foodBill,'held bill contains both food and alcohol');
+  assert.equal(guest.pendingPayment,undefined,'there is no second bill to collect twice');
+});
 
 // A bar with one guest whose feelings are set by the test.
 function barWith(social = {}, patch = {}) {
@@ -22,7 +113,7 @@ function barWith(social = {}, patch = {}) {
   const guest = state.customers[0];
   state.activeCustomerId = guest.id;
   Object.assign(guest, { mood: 'calm', orderKind: 'cocktail', orderRecipeId: RECIPES[0].id, orderRevealed: true, smoker: false, patience: 99_999, patienceRemaining: 99_999, ...patch });
-  guest.social = { ...SOBER_GUEST, ...social };
+  guest.social = { ...SOBER_GUEST, ...social, chatted:[...(social.chatted ?? [])] };
   state.nextCustomerAt = 0;
   return { state, guest };
 }

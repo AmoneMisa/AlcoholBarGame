@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UiIcon from '../ui/UiIcon.vue';
 import { computed, ref } from 'vue';
 import { INTERIORS, interiorStyle, type InteriorId } from '../../data/cosmetics/bars';
 import { bartenderCostumesFor } from '../../data/cosmetics/bartenderCostumes';
@@ -68,11 +69,11 @@ function apply() {
     </div>
     <small class="preview-label">BACKGROUND</small>
     <div class="preview-strip" role="listbox" aria-label="Backgrounds">
-      <button v-for="item in INTERIORS" :key="item.id" type="button" role="option" :aria-selected="interior === item.id" :class="{ active: interior === item.id, locked: !game.ownedInteriorIds.includes(item.id) }" :style="interiorStyle(item.id as InteriorId)" @click="interior = item.id"><span>{{ game.ownedInteriorIds.includes(item.id) ? '' : '🔒 ' }}{{ item.name }}</span></button>
+      <button v-for="item in INTERIORS" :key="item.id" type="button" role="option" :aria-selected="interior === item.id" :class="{ active: interior === item.id, locked: !game.ownedInteriorIds.includes(item.id) }" :style="interiorStyle(item.id as InteriorId)" @click="interior = item.id"><span><UiIcon v-if="!game.ownedInteriorIds.includes(item.id)" name="lock" /> {{ item.name }}</span></button>
     </div>
     <small class="preview-label">STYLE</small>
     <div class="preview-chips" role="listbox" aria-label="Styles">
-      <button v-for="item in outfits" :key="item.value" type="button" role="option" :aria-selected="outfit === item.value" :class="{ active: outfit === item.value, locked: !owns(item.value) }" @click="outfit = item.value">{{ owns(item.value) ? '' : '🔒 ' }}{{ item.label }}</button>
+      <button v-for="item in outfits" :key="item.value" type="button" role="option" :aria-selected="outfit === item.value" :class="{ active: outfit === item.value, locked: !owns(item.value) }" @click="outfit = item.value"><UiIcon v-if="!owns(item.value)" name="lock" /> {{ item.label }}</button>
     </div>
     <template #footer>
       <UiButton v-if="canBuyStyle" variant="primary" :disabled="game.crystals < outfitInfo.price" @click="game.buyStyle(outfitId)">Buy style · <CrystalAmount :value="outfitInfo.price" /></UiButton>
@@ -85,7 +86,7 @@ function apply() {
 
 <style>
 .preview-stage { position: relative; height: clamp(240px, 42vh, 380px); border-radius: 14px; overflow: hidden; border: 1px solid #d8aa5755; }
-.preview-stage .art-character { position: absolute !important; inset: auto auto 0 50% !important; transform: translateX(-50%); width: auto !important; height: 100% !important; aspect-ratio: auto !important; }
+.preview-stage .art-character { position: absolute !important; inset: auto auto 0 50% !important; transform: translateX(-50%); width: auto !important; height: 92% !important; aspect-ratio: auto !important; }
 .preview-stage .bartender-art { height: 100%; width: auto; object-fit: contain; }
 .preview-info { display: grid; gap: 6px; margin: 10px 0; font-size: 13px; }
 .preview-info p { margin: 0; }

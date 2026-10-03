@@ -215,7 +215,7 @@ function selectBartender(id: 'noa' | 'leo') {
         <div class="sealed-stock-grid">
           <article v-for="stock in game.bottleInventory" :key="stock.productId">
             <div class="stock-brand-model"><BrandBottle :brand="bottleById(stock.productId).brand" :category="guideIdForProduct(bottleById(stock.productId))" :color="bottleById(stock.productId).color" /></div>
-            <div><small>{{ ALCOHOL_TYPE_LABELS[bottleById(stock.productId).type] }} · {{ bottleById(stock.productId).abv }}% ABV</small><b>{{ bottleById(stock.productId).name }}</b><span>{{ bottleById(stock.productId).volumeMl }} ml · customer pays {{ (bottleById(stock.productId).price * game.economy.guestPriceFactor).toFixed(2) }} coins + <CrystalAmount :value="bottleSaleCrystalReward(bottleById(stock.productId))" /></span></div>
+            <div><small>{{ ALCOHOL_TYPE_LABELS[bottleById(stock.productId).type] }} · {{ bottleById(stock.productId).abv }}% ABV</small><b>{{ bottleById(stock.productId).name }}</b><span>{{ bottleById(stock.productId).volumeMl }} ml · customer pays {{ (bottleById(stock.productId).price * game.economy.guestPriceFactor).toFixed(0) }} coins + <CrystalAmount :value="bottleSaleCrystalReward(bottleById(stock.productId))" /></span></div>
             <strong>{{ stock.quantity }}×</strong>
             <button v-if="game.bottleCrystalCost(stock.productId)" class="reserve-restock" type="button" :disabled="game.crystals < game.bottleCrystalCost(stock.productId)" @click="game.buyBottleStock(stock.productId)">+1 reserve · <CrystalAmount :value="game.bottleCrystalCost(stock.productId)" /></button>
           </article>
@@ -252,7 +252,7 @@ function selectBartender(id: 'noa' | 'leo') {
         </div>
       </template>
       <template v-else>
-        <header class="panel-heading recipe-detail-heading"><button type="button" @click="selectedRecipeId = null"><UiIcon class="inline-icon" name="arrow-left" /> All recipes</button><div><small>{{ selectedRecipe.category }} · {{ selectedRecipe.origin }}</small><h2>{{ selectedRecipe.name }}</h2></div><span>{{ recipeAlcoholLabel(selectedRecipe) }} · {{ (selectedRecipe.price * game.economy.guestPriceFactor * specialtyFactor(game.regionId, selectedRecipe.id)).toFixed(2) }} coins<template v-if="isCitySpecialty(game.regionId, selectedRecipe.id)"> · {{ game.region.name }} specialty</template></span></header>
+        <header class="panel-heading recipe-detail-heading"><button type="button" @click="selectedRecipeId = null"><UiIcon class="inline-icon" name="arrow-left" /> All recipes</button><div><small>{{ selectedRecipe.category }} · {{ selectedRecipe.origin }}</small><h2>{{ selectedRecipe.name }}</h2></div><span>{{ recipeAlcoholLabel(selectedRecipe) }} · {{ (selectedRecipe.price * game.economy.guestPriceFactor * specialtyFactor(game.regionId, selectedRecipe.id)).toFixed(0) }} coins<template v-if="isCitySpecialty(game.regionId, selectedRecipe.id)"> · {{ game.region.name }} specialty</template></span></header>
         <div class="recipe-detail-page">
           <aside class="recipe-hero-art"><GlassModel :art-index="RECIPES.indexOf(selectedRecipe)" :recipe-id="selectedRecipe.id" type="coupe" /><div><small>TASTING PROFILE · {{ recipeAlcoholLabel(selectedRecipe) }}</small><div class="tasting-badges"><span v-for="note in selectedRecipe.tastingNotes" :key="note">{{ note }}</span></div></div></aside>
           <RecipeMastery :recipe="selectedRecipe" />
@@ -289,7 +289,7 @@ function selectBartender(id: 'noa' | 'leo') {
           <div class="bartender-selector" aria-label="Choose bartender">
             <button v-for="person in [{id:'noa',label:'Woman bartender'},{id:'leo',label:'Man bartender'}] as const" :key="person.id" :class="{ active: selectedBartender === person.id }" type="button" @click="selectBartender(person.id)">{{ person.label }}</button>
           </div>
-          <div class="outfit-selector" aria-label="Choose bartender outfit"><button v-for="outfit in visibleOutfits" :key="outfit" :class="{ active: game.decor.bartender === outfit, locked:cosmeticLocked('bartender',outfit) }" type="button" :aria-pressed="pendingStyle === outfit" @click="pickOutfit(outfit)">{{ cosmeticLocked('bartender',outfit) ? '🔒 ' : '' }}{{ outfitLabel(outfit) }}</button></div>
+          <div class="outfit-selector" aria-label="Choose bartender outfit"><button v-for="outfit in visibleOutfits" :key="outfit" :class="{ active: game.decor.bartender === outfit, locked:cosmeticLocked('bartender',outfit) }" type="button" :aria-pressed="pendingStyle === outfit" @click="pickOutfit(outfit)"><UiIcon v-if="cosmeticLocked('bartender',outfit)" name="lock" /> {{ outfitLabel(outfit) }}</button></div>
           <div v-if="styleInfo" class="style-info" role="status">
             <b>{{ styleInfo.item.label }}</b>
             <span>{{ styleInfo.how }}</span>

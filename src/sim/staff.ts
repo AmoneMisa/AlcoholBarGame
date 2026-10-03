@@ -55,5 +55,5 @@ export function accrueStaff(state: PlayerState, now: number, random: () => numbe
   state.staffEarned = coins((state.staffEarned ?? 0) + earned);
   const served = Math.max(1, Math.round(guests * teamShare(staff)));
   const place = regionId === state.regionId ? '' : ` in ${REGIONS.find((item) => item.id === regionId)?.name ?? regionId}`;
-  return `While you were away your team${place} served about ${served} guests: +${earned.toFixed(2)} coins.`;
+  return `While you were away your team${place} served about ${served} guests: +${earned.toFixed(0)} coins.`;
 }

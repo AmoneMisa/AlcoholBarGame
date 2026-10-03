@@ -7,6 +7,7 @@ import { lazyPage } from './ui/lazy';
 import BarChips from './components/game/BarChips.vue';
 import UiButton from './components/ui/UiButton.vue';
 import ModalDialog from './components/ui/ModalDialog.vue';
+const MailboxPopup = lazyPage(() => import('./components/ui/MailboxPopup.vue'));
 const PreparationScreen = lazyPage(() => import('./components/cocktails/PreparationScreen.vue'));
 const BarScreenshot = lazyPage(() => import('./components/game/BarScreenshot.vue'));
 import BarScene from './components/game/BarScene.vue';
@@ -119,6 +120,7 @@ watch(() => game.sessionReady, (ready) => {
   if (!game.dailyLessonsComplete) notifications.push('dailyLesson','Daily English quests','Complete today’s lessons for XP, crystals and a recipe chance.',`daily-lesson:${today}`);
 }, { immediate:true });
 watch(() => game.customers.map((customer) => customer.id).join(','),(next,previous) => {
+  if (game.trainingActive || !game.tourSeen) return;
   if (previous && next && next !== previous) notifications.push('customer','A new customer arrived','Open Bar and tap the guest to greet them.',`customer:${next}`);
 });
 watch(() => game.friends.filter((friend) => friend.status === 'pending' && friend.direction === 'incoming').map((friend) => friend.code).join(','),(next,previous) => {
@@ -217,15 +219,22 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
       <SectionTabs v-model="characterInfoTab" :tabs="[{id:'profile',label:'Character'},{id:'settings',label:'Settings'}]" label="Character information" />
       <ProfilePage v-if="characterInfoTab === 'profile'" />
       <SettingsPage v-else @goto="selectView" />
-      <UiButton v-if="characterInfoTab === 'profile'" @click="selectView('character'); sub.character = 'look'">Change appearance</UiButton>
+      <UiButton class="change-appearance-button" v-if="characterInfoTab === 'profile'" @click="selectView('character'); sub.character = 'look'">Change appearance</UiButton>
     </ModalDialog>
     <GuideSheet />
     <NotificationToasts />
     <RewardPopup />
-    <DailyRewardPopup v-if="game.dailyOpen" />
+    <MailboxPopup v-if="game.mailboxOpen" />
+    <ModalDialog v-if="game.theftNotices.length" title="Your tip jar was raided" eyebrow="WHILE YOU WERE AWAY" :closable="false">
+      <p v-for="item in game.theftNotices" :key="item.id">At {{ new Date(item.at).toLocaleString('en-GB',{timeZone:'Europe/Moscow',dateStyle:'medium',timeStyle:'short'}) }} MSK, player {{ item.actorName }} stole {{ Math.round(item.amount ?? 0) }} coins from your tip jar!</p>
+      <p>Your visit and theft history is saved in Mail.</p>
+      <p v-if="game.mailMessage" role="alert">{{ game.mailMessage }}</p>
+      <UiButton @click="game.dismissTheftNotices()">Got it</UiButton>
+    </ModalDialog>
+    <DailyRewardPopup v-if="game.dailyOpen && !game.theftNotices.length && !game.mailboxOpen" />
     <GuidePointer />
-    <TutorialTour :ready="game.sessionReady && game.startingBarChosen" :seen="game.tourSeen" @finish="game.setTour" />
-    <StartingBarPicker v-if="game.sessionReady && !game.startingBarChosen" />
+    <TutorialTour :ready="game.sessionReady && game.startingBarChosen && !game.theftNotices.length && !game.mailboxOpen" :seen="game.tourSeen" @finish="game.setTour" />
+    <StartingBarPicker v-if="game.sessionReady && !game.startingBarChosen && !game.theftNotices.length" />
     <nav class="game-nav" aria-label="Game views">
       <button v-for="item in nav" :key="item.id" :class="{ active: view === item.id }" :aria-current="view === item.id ? 'page' : undefined" :data-guide="'nav-' + item.id" type="button" @click="selectView(item.id)"><UiIcon :name="item.mark" /><b>{{ item.label }}</b><i v-if="badges[item.id]" class="nav-badge" :aria-label="`${badges[item.id]} waiting`">{{ badges[item.id] }}</i></button>
     </nav>

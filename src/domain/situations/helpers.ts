@@ -23,4 +23,4 @@ export const whenAccepted = (payment: Payment, yes: number, no = 0) => (context:
 // Calm, friendly guests behave; drunk and angry ones push their luck.
 export const behaves = (base: number) => (context: SituationContext) => Math.max(.05, Math.min(.95, base + (context.rapport - 50) / 200 - context.drunk / 250 - (context.emotion === 'angry' ? .15 : 0)));
 export const misbehaves = (base: number) => (context: SituationContext) => 1 - behaves(1 - base)(context);
-export const money = (amount: number) => amount.toFixed(2).replace(/\.00$/, '');
+export const money = (amount: number) => amount.toFixed(0).replace(/\.00$/, '');

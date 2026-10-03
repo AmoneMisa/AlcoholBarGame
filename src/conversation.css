@@ -78,6 +78,8 @@
 .word-tile.placed { border-color:#d9a44a;background:linear-gradient(#4a3620,#35271a);color:#ffe7b3; }
 .word-tile.used { opacity:.25;cursor:default; }
 .compose-actions, .feedback-actions { display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px; }
+.new-question-button .ui-btn-label { display:inline-flex;align-items:center;justify-content:center;gap:8px;line-height:1.2; }
+.new-question-button .ui-icon { flex:none;width:20px;height:20px; }
 .phrase-ideas { display:flex;flex-wrap:wrap;gap:6px; }
 .phrase-ideas button { padding:5px 10px;border:1px solid #3c4d66;border-radius:999px;background:#152033;color:#bccadf;font-size:11px;cursor:pointer; }
 .phrase-ideas button:hover { border-color:#e4b35c;color:#ffd98a; }

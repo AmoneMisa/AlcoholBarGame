@@ -1,6 +1,6 @@
 import type { Customer, Recipe, RegionId, Supplier, SupplierOffer } from './types';
 
-export const coins = (value: number) => Math.round(value * 100) / 100;
+export const coins = (value: number) => Math.round(value);
 export const bulkDiscount = (packs: number) => packs >= 10 ? .10 : packs >= 5 ? .05 : 0;
 export const DAILY_COINS = [100, 150, 200, 260, 320, 400, 500] as const;
 export const dailyCoinsFor = (streak: number) => DAILY_COINS[Math.min(6, Math.max(0, Math.floor(streak) - 1))]!;

@@ -68,7 +68,8 @@ export function rewardLines(before: Snapshot, after: Snapshot, message = ''): Re
   const materials: Record<string, string> = { parts: 'Workshop parts', skinShards: 'Skin shards', stylePieces: 'Style pieces' };
   for (const [id, count] of Object.entries(after.materials)) {
     const amount = count - (before.materials[id] ?? 0);
-    if (amount > 0 && id.startsWith('style:')) { const cosmetic = COSMETICS.find(item => item.id === id.slice(6)); lines.push({kind:'material', id, text:`+${amount} ${cosmetic?.label ?? 'Style'} fragments`}); }
+    if (amount > 0 && id.startsWith('style:background:')) { const background = INTERIORS.find(item => item.id === id.slice(17)); lines.push({kind:'material',id,text:`+${amount} ${background?.name ?? 'Background'} fragments`}); }
+    else if (amount > 0 && id.startsWith('style:')) { const cosmetic = COSMETICS.find(item => item.id === id.slice(6)); lines.push({kind:'material', id, text:`+${amount} ${cosmetic?.label ?? 'Style'} fragments`}); }
     else if (amount > 0) lines.push({ kind: 'material', id, text: `+${amount} ${materials[id] ?? `${equipmentDef(id.replace('shard:', ''))?.name ?? id} shards`}` });
   }
   if (after.cards > before.cards) lines.push({ kind: 'card', text: `+${plural(after.cards - before.cards, 'spare card')}` });

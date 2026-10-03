@@ -38,9 +38,10 @@ test('A served cocktail awaits dialogue payment; money and tips are credited onc
   assert.equal(state.money, balance);
   advanceClock(state, { now: now + 600000, spawnCustomers: false });
   assert.ok(state.customers.some(item => item.id === guest.id), 'unpaid guests do not disappear');
+  const accumulatedTips = state.tipJar;
   applyAction(state, { type: 'say', text: 'Would you like to pay by card or in cash?' }, { ...context, now: now + 600000 });
   assert.equal(state.money, Number((balance + bill.coins).toFixed(2)));
-  assert.equal(state.tipJar, bill.tips); assert.equal(guest.pendingPayment, undefined);
+  assert.equal(state.tipJar, Number((bill.tips + accumulatedTips).toFixed(2))); assert.equal(guest.pendingPayment, undefined);
   assert.throws(() => applyAction(state, { type: 'say', text: 'Here is your receipt.' }, context), /conversation/);
   applyAction(state, { type: 'collectTips' }, context);
   assert.equal(state.tipJar, 0);
@@ -61,6 +62,10 @@ test('Training always uses Gin & Tonic and guarantees a tip, without saving prac
   const original = { money: game.money, tips: game.tipJar, stock: JSON.stringify(game.inventory), guests: JSON.stringify(game.customers) };
   game.beginTraining();
   assert.equal(game.customer.orderRecipeId, 'gin-tonic'); assert.equal(game.customer.name, 'Mia');
+  const patience = game.customer.patienceRemaining;
+  game.tickGameClock(Date.now() + 48 * 60 * 60 * 1000);
+  assert.equal(game.customer.patienceRemaining, patience, 'training has no running deadline');
+  assert.equal(game.customers.length, 1, 'no regular customers join training');
   game.openConversation(game.customer.id);
   await game.say('Would you like a Gin & Tonic?');
   assert.equal(game.customer.orderRevealed, true);
@@ -70,8 +75,34 @@ test('Training always uses Gin & Tonic and guarantees a tip, without saving prac
   await game.say('Would you like to pay by card or in cash?');
   assert.equal(game.trainingPhase, 'tips'); assert.ok(game.tipJar > 0);
   game.collectTips(); assert.equal(game.trainingPhase, 'complete');
+  assert.equal(game.trainingActive, true, 'collecting tips does not end the rest of the tutorial');
+  assert.equal(game.inventory.find(item => item.ingredientId === 'tonic').amount, 0);
+  game.selectSupplier('global'); game.purchaseCart = { tonic:1 };
+  assert.equal(game.checkoutPurchase(), true);
+  assert.equal(game.trainingRestocked, true);
+  assert.ok(game.inventory.find(item => item.ingredientId === 'tonic').amount > 0, 'practice refill actually adds stock');
+  assert.equal(game.deliveryOrders.length, 0, 'practice delivery arrives immediately');
+  assert.equal(game.trainingActive, true);
   assert.equal(saved.size, 0, 'practice is never persisted');
   game.endTraining();
   assert.deepEqual({ money: game.money, tips: game.tipJar, stock: JSON.stringify(game.inventory), guests: JSON.stringify(game.customers) }, original);
   game.beginTraining(); game.endTraining(); assert.equal(game.money, original.money, 'skipping also restores account');
+});
+import { trainingGuest, trainingQuestions, TRAINING_HELP, TRAINING_CONFIRM, TRAINING_PAYMENT } from '../src/domain/training.ts';
+import { tilesFor } from '../src/domain/conversation/customerTalk.ts';
+
+test('Every training replay has the same clean guest and correctly ordered words, independent of random guests and account recipes',()=>{
+ for(let i=0;i<20;i++){
+  setActivePinia(createPinia());const game=useGameStore();game.mode='offline';
+  game.beginTraining();assert.deepEqual(JSON.parse(JSON.stringify(game.customer)),trainingGuest());assert.equal(game.customers.length,1);
+  const templates=trainingQuestions(game.customer,0);assert.deepEqual(templates.map(x=>x.text),[TRAINING_HELP,TRAINING_CONFIRM]);
+  for(const text of [TRAINING_HELP,TRAINING_CONFIRM,TRAINING_PAYMENT]){
+   const words=tilesFor(text,RECIPES,true).map(x=>x.text);
+   assert.equal(words.join(' ').replace(/\s+([?.!])/g,'$1'),text);
+   assert.deepEqual(tilesFor(text,RECIPES,true),tilesFor(text,RECIPES.slice(0,10),true));
+  }
+  assert.deepEqual(trainingQuestions(game.customer,1),[{text:TRAINING_CONFIRM}]);
+  game.customer.pendingPayment={coins:10,tips:2,crystals:0};assert.deepEqual(trainingQuestions(game.customer,2),[{text:TRAINING_PAYMENT}]);
+  game.endTraining();
+ }
 });

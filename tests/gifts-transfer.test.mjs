@@ -75,9 +75,9 @@ test('A box-only background moves together with its connected style; the sender 
   assert.ok(receiver.ownedInteriorIds.includes(id) && receiver.ownedCosmeticIds.includes(styleId(id)), 'the friend gets both');
   const owner = fresh();
   grantCosmetic(owner, styleId(id));
-  const shards = owner.loot.skinShards;
+  const shards = owner.loot.styleShards[`background:${id}`] ?? 0;
   receiveGift(owner, gift, 'Ana');
-  assert.ok(owner.loot.skinShards > shards, 'a background the friend already has becomes shards');
+  assert.ok(owner.loot.styleShards[`background:${id}`] > shards, 'a background the friend already has becomes shards');
 });
 
 test('A background or style that is in use cannot be given away', () => {

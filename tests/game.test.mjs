@@ -106,7 +106,7 @@ test('A confirmed full-bottle order consumes sealed stock and earns its retail p
   assert.equal(game.money, balance, 'bottle payment waits for dialogue');
   await game.say('Would you like to pay by card or in cash?');
   // A level-1 bar earns the guest's own rate (85% of the city price), fixed when they walked in.
-  assert.ok(game.money >= balance + product.price * customer.priceFactor - .01);
+  assert.ok(game.money >= balance + Math.round(product.price * customer.priceFactor));
   assert.equal(game.crystals,afterDialogue + bottleSaleCrystalReward(product));
 });
 
@@ -140,15 +140,15 @@ test('Correct common English is accepted, and corrections do not create more err
 test('Quotes calculate supplier deals, bulk tiers and free delivery after discounts',() => {
   const offers = createMarket(REGIONS[0],1);const supplier = SUPPLIERS[0];const offer = offers.find(item => item.supplierId === supplier.id);
   const small = quotePurchase(offers,{[offer.ingredientId]:1},supplier);
-  assert.equal(small.delivery,supplier.deliveryFee);assert.equal(small.total,Number((offer.price + supplier.deliveryFee).toFixed(2)));
+  assert.equal(small.delivery,supplier.deliveryFee);assert.equal(small.total,Number((offer.price + supplier.deliveryFee).toFixed(0)));
   const medium = quotePurchase(offers,{[offer.ingredientId]:5},supplier);assert.equal(medium.discountRate,.05);
   const large = quotePurchase(offers,{[offer.ingredientId]:30},supplier);assert.equal(large.discountRate,.10);assert.equal(large.delivery,0);
   assert.equal(quotePurchase(offers,{},supplier).total,0);
   assert.equal(quotePurchase(offers,{[offer.ingredientId]:Infinity},supplier).total,0);
   assert.equal(quotePurchase(offers,{[offer.ingredientId]:.5},supplier).total,0);
-  for (const item of offers) assert.equal(item.price,Number((item.listPrice * (1 - item.discountPercent / 100)).toFixed(2)));
+  for (const item of offers) assert.equal(item.price,Number((item.listPrice * (1 - item.discountPercent / 100)).toFixed(0)));
   assert.notEqual(createMarket(REGIONS[0],1)[0].price,createMarket(REGIONS[1],1)[0].price);
-  assert.notEqual(createMarket(REGIONS[0],1)[0].price,createMarket(REGIONS[0],2)[0].price);
+  assert.notDeepEqual(createMarket(REGIONS[0],1).map(x=>x.price),createMarket(REGIONS[0],2).map(x=>x.price));
 });
 
 test('Login rewards grow to 500, reset after missed days and cross month boundaries',() => {
@@ -211,7 +211,7 @@ test('Bulk purchase is atomic and delivery goes to its original bar',() => {
   const game = freshGame();const offer = game.market.find(item => item.supplierId === 'global');
   const original = game.inventory.find(item => item.ingredientId === offer.ingredientId).amount;
   game.purchaseCart[offer.ingredientId] = 5;const quote = game.purchaseQuote;const balance = game.money;
-  assert.equal(game.checkoutPurchase(),true);assert.equal(game.money,Number((balance - quote.total).toFixed(2)));assert.equal(game.deliveryOrders.length,1);
+  assert.equal(game.checkoutPurchase(),true);assert.equal(game.money,Number((balance - quote.total).toFixed(0)));assert.equal(game.deliveryOrders.length,1);
   assert.equal(game.inventory.find(item => item.ingredientId === offer.ingredientId).amount,original);
   const dueAt = game.deliveryOrders[0].dueAt;
   const london = game.inventories.london.find(item => item.ingredientId === offer.ingredientId).amount;
@@ -228,7 +228,7 @@ test('Sale cannot consume reserved mix or leave negative stock',() => {
   game.addIngredient(ingredient.id,5);game.saleCart[ingredient.id] = initial;
   assert.equal(game.checkoutSale(),false);assert.equal(game.inventory[0].amount,initial);
   game.saleCart[ingredient.id] = initial - 5;const balance = game.money;const revenue = game.saleRevenue;
-  assert.equal(game.checkoutSale(),true);assert.equal(game.inventory[0].amount,5);assert.equal(game.money,Number((balance + revenue).toFixed(2)));
+  assert.equal(game.checkoutSale(),true);assert.equal(game.inventory[0].amount,5);assert.equal(game.money,Number((balance + revenue).toFixed(0)));
 });
 
 test('Stock transfer respects the glass reservation, and invalid sale amounts do nothing',() => {

@@ -2,7 +2,8 @@
 import { computed } from 'vue';
 import { REGIONS } from '../../domain/catalog';
 import type { PlayerProfile } from '../../domain/profile';
-import CharacterModel from '../characters/CharacterModel.vue';
+import AchievementArt from '../ui/AchievementArt.vue';
+import CharacterPortrait from '../characters/CharacterPortrait.vue';
 
 // The player card: avatar, level, favourite bar, opened bars, guests served, share of correct English and
 // achievements. Used for the player's own screen and for a friend's bar (the actions go in the slot).
@@ -23,7 +24,7 @@ const english = computed(() => props.profile.englishPercent === undefined ? '—
   <section class="profile-card" aria-label="Player profile">
     <header class="profile-head">
       <div class="profile-avatar">
-        <CharacterModel role="bartender" :character-id="look?.bartenderCharacter ?? 'noa'" :outfit="look?.bartender" :hair-style="look?.hairStyle" :hair-color="look?.hairColor" :body-shape="look?.bodyShape" :skin-detail="look?.skinDetail" :skin-tone="look?.skinTone" :pose="look?.pose" animation="idle" />
+        <CharacterPortrait :character="look?.bartenderCharacter ?? 'noa'" :hair="look?.hairStyle" />
       </div>
       <div class="profile-title">
         <small>PLAYER</small>
@@ -47,7 +48,7 @@ const english = computed(() => props.profile.englishPercent === undefined ? '—
 
     <section class="profile-achievements">
       <h3>{{ profile.picked ? 'Chosen achievements' : 'Latest achievements' }}<slot name="achievements-action" /></h3>
-      <ul v-if="profile.shown.length"><li v-for="item in profile.shown" :key="item.id" :class="`tier-${item.tier}`" :title="item.name"><span class="medal">🏅</span><span><b>{{ item.seriesName }}</b><small>{{ item.tierName }}</small></span></li></ul>
+      <ul v-if="profile.shown.length"><li v-for="item in profile.shown" :key="item.id" :class="`tier-${item.tier}`" :title="item.name"><AchievementArt :series="item.series" :tier="item.tier" :size="40" /><span><b>{{ item.seriesName }}</b><small>{{ item.tierName }}</small></span></li></ul>
       <p v-else class="empty">No achievements yet.</p>
     </section>
   </section>
@@ -57,6 +58,7 @@ const english = computed(() => props.profile.englishPercent === undefined ? '—
 .profile-card { display: grid; gap: 14px; padding: 16px; border: 1px solid #354762; border-radius: 16px; background: #111c2d; color: #e9eef7; }
 .profile-head { display: grid; grid-template-columns: 88px 1fr auto; gap: 14px; align-items: center; }
 .profile-avatar { position: relative; width: 88px; height: 110px; overflow: hidden; border-radius: 14px; background: radial-gradient(circle at 50% 30%, #4f334b, #16243a 70%); }
+.profile-avatar :deep(.character-portrait) { left:50%!important;top:0;transform:translateX(-50%);width:110px;height:192px; }
 .profile-title small { color: #e4b35c; letter-spacing: .12em; font-weight: 800; font-size: 10px; }
 .profile-title h2 { margin: 2px 0; font: 700 24px Georgia, serif; }
 .profile-level { display: inline-block; padding: 2px 10px; border-radius: 999px; background: #3b2b1f; border: 1px solid #b78649; color: #ffe9bd; font-weight: 700; font-size: 12px; }

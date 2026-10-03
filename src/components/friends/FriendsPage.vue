@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { INTERIORS } from '../../data/cosmetics/bars';
 import UiButton from '../ui/UiButton.vue';
 import UiInput from '../ui/UiInput.vue';
 import PanelHeading from '../ui/PanelHeading.vue';
@@ -9,6 +10,7 @@ import { COSMETICS } from '../../domain/cosmetics';
 import { SHARD_GIFT_AMOUNTS, STYLE_SHARD_GIFT_AMOUNTS } from '../../sim/gifts';
 import { useGameStore } from '../../stores/game';
 import BarShowcase from '../profile/BarShowcase.vue';
+import TipJar from '../game/TipJar.vue';
 import ProfileCard from '../profile/ProfileCard.vue';
 import UiIcon from '../ui/UiIcon.vue';
 
@@ -29,7 +31,7 @@ const itemGifts = computed(() => CONSUMABLES.map((item) => ({ id: item.id, name:
 const shardGifts = SHARD_GIFT_AMOUNTS;
 const styleShardGifts = STYLE_SHARD_GIFT_AMOUNTS;
 // Style shards are kept per style: one entry for each pile the player has.
-const shardPiles = computed(() => Object.entries(game.loot.styleShards).map(([id, quantity]) => ({ id, quantity, label: COSMETICS.find((item) => item.id === id)?.label ?? id })).filter((item) => item.quantity > 0));
+const shardPiles = computed(() => Object.entries(game.loot.styleShards).map(([id, quantity]) => ({ id, quantity, label: COSMETICS.find((item) => item.id === id)?.label ?? INTERIORS.find(item=>`background:${item.id}`===id)?.name ?? id })).filter((item) => item.quantity > 0));
 const visit = computed(() => game.visitedFriend);
 const visitBar = computed(() => visit.value?.bar as Record<string, string> | undefined);
 const friendName = (friend: { nickname: string; customName: string }) => friend.customName || friend.nickname;
@@ -139,7 +141,8 @@ onMounted(() => { void game.loadFriends(); });
           <UiButton variant="danger" @click="remove(visit.code, visit.customName || visit.nickname)">Remove from friends</UiButton>
         </template>
       </ProfileCard>
-      <BarShowcase :bar="visitBar" :name="visit.name" />
+      <BarShowcase :bar="visitBar" :name="visit.name"><TipJar visited /></BarShowcase>
+      <p v-if="visit.tips">Tip jar: {{ visit.tips.amount.toFixed(0) }} / {{ visit.tips.capacity }} coins · {{ visit.tips.attemptsLeft }} theft attempts left today.<br>Tap the jar to take up to 5%. At least 30% stays protected. One attempt per player per day, 10 attempts total. Empty or protected jars also use an attempt.</p>
       <ul class="visit-stats">
         <li><UiIcon name="star" />Level {{ visit.level }}</li>
         <li><UiIcon name="trophy" />{{ visit.prestige }} prestige</li>
@@ -152,7 +155,6 @@ onMounted(() => { void game.loadFriends(); });
         <article v-for="item in recipeCards" :key="item.recipe.id"><span><b>{{ item.recipe.name }}</b><small>Recipe card · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'recipe-copy', recipeId: item.recipe.id })">Give</UiButton></article>
         <article v-for="item in styleItems" :key="item.cosmetic.id"><span><b>{{ item.cosmetic.label }}</b><small>Style · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'cosmetic-copy', cosmeticId: item.cosmetic.id })">Give</UiButton></article>
         <article v-for="item in itemGifts" :key="item.id"><span><b>{{ item.name }}</b><small>Workshop item · you have {{ item.quantity }}</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'consumable', id: item.id })">Give</UiButton></article>
-        <article v-for="amount in shardGifts" :key="amount"><span><b>{{ amount }} skin shards</b><small>You have {{ game.loot.skinShards }}</small></span><UiButton variant="solid" size="sm" :disabled="game.loot.skinShards < amount" @click="gift({ kind: 'skin-shards', amount })">Give</UiButton></article>
         <article v-for="pile in shardPiles" :key="`style-${pile.id}`"><span><b>{{ pile.label }} shards</b><small>You give them away and lose them · you have {{ pile.quantity }}</small></span><span class="gift-amounts"><UiButton v-for="amount in styleShardGifts" :key="amount" variant="solid" size="sm" :disabled="pile.quantity < amount" @click="gift({ kind: 'style-shards', cosmeticId: pile.id, amount })">Give {{ amount }}</UiButton></span></article>
         <article v-for="item in game.giftableStyleItems" :key="item.id"><span><b>{{ item.label }}</b><small>Whole style · you lose it · not worn in any bar</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'style-transfer', cosmeticId: item.id })">Give</UiButton></article>
         <article v-for="item in game.giftableBackgrounds" :key="item.id"><span><b>{{ item.name }}</b><small>Background with its style · you lose both · not used by any bar</small></span><UiButton variant="solid" size="sm" @click="gift({ kind: 'interior-transfer', interiorId: item.id })">Give</UiButton></article>

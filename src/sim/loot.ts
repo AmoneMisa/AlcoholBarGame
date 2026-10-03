@@ -1,3 +1,4 @@
+import { fragmentChoiceOptions } from '../domain/fragmentChoices';
 import { INGREDIENTS, RECIPES, REGIONS } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { coins } from '../domain/economy';
@@ -19,7 +20,7 @@ import { REGULAR_FAVORITE_BONUS, REGULAR_LEVELS, REGULAR_REWARDS, favoriteRecipe
 import { CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import type { Customer } from '../domain/types';
 import { statValue } from '../domain/achievementStats';
-import { companionBonus, joinCompanion, addKeepsakes, addCompanionShards } from './companions';
+import { emptyCompanions, companionBonus, joinCompanion, addKeepsakes, addCompanionShards } from './companions';
 import { companionJoiningWith, keepsakeFor } from '../domain/companions';
 import { ACHIEVEMENTS, TASTING_REWARD, achievementById, achievementSeries, questsForWeek, weekOf, type StatId } from '../domain/quests';
 import type { DrawResult } from '../domain/lootState';
@@ -76,6 +77,12 @@ export function lootBonuses(state: PlayerState, now: number) {
 export const xpGain = (state: PlayerState, base: number, now: number) => Math.round(base * lootBonuses(state, now).xpFactor);
 
 // ---- Rewards ----
+export function resolveFragmentReward(state: PlayerState, reward: Reward, random: () => number): Reward {
+  if (!['skinShards','stylePieces'].includes(reward.kind) || ('id' in reward && reward.id)) return reward;
+  const pool = ownedAside(state).length ? ownedAside(state) : shardStyles();
+  const item = pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))]!;
+  return {kind:'skinShards',id:item.id,amount:'amount' in reward ? reward.amount : 0};
+}
 function randomBottle(random: () => number) {
   const top = [...ALCOHOL_PRODUCTS].sort((a, b) => b.price - a.price).slice(0, Math.max(1, Math.ceil(ALCOHOL_PRODUCTS.length * .3)));
   return top[Math.min(top.length - 1, Math.floor(random() * top.length))]!;
@@ -87,7 +94,8 @@ export function grantReward(state: PlayerState, reward: Reward, random: () => nu
     case 'coins': state.money = coins(state.money + reward.amount); break;
     case 'crystals': state.crystals += reward.amount; break;
     case 'parts': loot.parts += reward.amount; break;
-    case 'skinShards': loot.skinShards += reward.amount; break;
+    case 'backgroundShards': return addBackgroundShards(state, reward.id, reward.amount);
+    case 'skinShards': if (reward.id) { if (!shardStyles().some(item=>item.id===reward.id)) throw new LootError('Unknown costume fragments.'); add(loot.styleShards,reward.id,reward.amount); return `${reward.amount} ${COSMETICS.find(item=>item.id===reward.id)!.label} fragments`; } return addStyleShards(state, reward.amount, random);
     case 'stylePieces': return addStyleShards(state, reward.amount, random);
     case 'xp': state.xp += reward.amount; break;
     case 'box': grantBox(state, reward.box); break;
@@ -110,7 +118,7 @@ export function grantReward(state: PlayerState, reward: Reward, random: () => nu
     case 'style': {
       const missing = boxStyles().filter((entry) => !state.ownedCosmeticIds.includes(entry.id));
       // Every box style owned: the drop turns into pieces instead of being wasted.
-      if (!missing.length) { loot.skinShards += STYLE_PIECES_TO_CRAFT; return `${STYLE_PIECES_TO_CRAFT} skin shards (you own every box style)`; }
+      if (!missing.length) { const pool=boxStyles(); const item=pool[Math.min(pool.length-1,Math.floor(random()*pool.length))]!; add(loot.styleShards,item.id,STYLE_PIECES_TO_CRAFT); return `${STYLE_PIECES_TO_CRAFT} ${item.label} fragments`; }
       const chosen = missing[Math.min(missing.length - 1, Math.floor(random() * missing.length))]!;
       grantCosmetic(state, chosen.id);
       return `the full style “${chosen.label}”`;
@@ -127,7 +135,7 @@ export function grantReward(state: PlayerState, reward: Reward, random: () => nu
     }
     case 'eventInterior': {
       const missing = BOX_INTERIOR_IDS.filter((id) => !state.ownedInteriorIds.includes(id));
-      if (!missing.length) { loot.skinShards += DUPLICATE_INTERIOR_SHARDS; return `${DUPLICATE_INTERIOR_SHARDS} skin shards (you own every box background)`; }
+      if (!missing.length) return addBackgroundShards(state, BOX_INTERIOR_IDS[Math.min(BOX_INTERIOR_IDS.length-1,Math.floor(random()*BOX_INTERIOR_IDS.length))]!, DUPLICATE_INTERIOR_SHARDS);
       const id = missing[Math.min(missing.length - 1, Math.floor(random() * missing.length))]!;
       state.ownedInteriorIds.push(id);
       // The background's own style comes with it.
@@ -156,7 +164,7 @@ export function openBox(state: PlayerState, kind: string, random: () => number, 
   take(state.loot.boxes, kind, 1);
   track(state, 'boxes', 1, now);
   if (kind === 'choice') {
-    state.loot.pendingChoice = choiceOptions(level, random);
+    state.loot.pendingChoice = choiceOptions(level, random).map(reward => resolveFragmentReward(state, reward, random));
     state.message = 'Choice box opened: pick one of three rewards.';
     return;
   }
@@ -190,7 +198,7 @@ export function buyBox(state: PlayerState, kind: string, quantity: unknown) {
 }
 export function buyConsumable(state: PlayerState, id: string, quantity: unknown) {
   const item = consumableDef(id);
-  if (!item) throw new LootError('Unknown item.');
+  if (!item || item.kind === 'choice') throw new LootError('This item is only found in chests.');
   const amount = quantityOf(quantity, 10);
   const cost = item.crystalPrice * amount;
   if (state.crystals < cost) throw new LootError(`You need ${cost} crystals for ${amount} × ${item.name}.`);
@@ -204,6 +212,7 @@ export function useConsumable(state: PlayerState, id: string, recipeId: unknown,
   const item = consumableDef(id);
   if (!item) throw new LootError('Unknown item.');
   if (!has(state.loot.consumables, id)) throw new LootError(`You have no ${item.name}.`);
+  if(item.kind === 'choice') throw new LootError('Choose a specific fragment first.');
   if ((BOOST_KINDS as readonly string[]).includes(id)) {
     if (boostActive(state, id, now)) throw new LootError(`${item.name} is already active.`);
     state.loot.boosts[id] = now + item.durationMs!;
@@ -302,7 +311,7 @@ export function drawStyle(state: PlayerState, count: unknown, banner: unknown, n
       : pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))]!;
     const duplicate = state.ownedCosmeticIds.includes(reward.id);
     const shards = duplicate ? DUPLICATE_SHARDS[rarity] : 0;
-    if (duplicate) loot.skinShards += shards; else grantCosmetic(state, reward.id);
+    if (duplicate) add(loot.styleShards, reward.id, shards); else grantCosmetic(state, reward.id);
     results.push({ id: reward.id, label: reward.label, rarity, duplicate, shards });
   }
   loot.lastDraw = results;
@@ -340,41 +349,55 @@ export function craftSkin(state: PlayerState, cosmeticId: unknown) {
   if (!item) throw new LootError('Unknown style.');
   if (state.ownedCosmeticIds.includes(item.id)) throw new LootError('You already own this style.');
   const cost = SHARD_CRAFT_COST[item.rarity];
-  if (state.loot.skinShards < cost) throw new LootError(`You need ${cost} skin shards for ${item.label}.`);
-  state.loot.skinShards -= cost;
-  const gained = grantCosmetic(state, item.id);
+  if ((state.loot.styleShards[item.id] ?? 0) < cost) throw new LootError(`You need ${cost} ${item.label} ${item.label} skin shards.`);
+  take(state.loot.styleShards, item.id, cost);
+  state.ownedCosmeticIds.push(item.id);
+  const gained = item.label;
   note(state, `${item.label} crafted from ${cost} skin shards.${gained.includes('background') ? ` You also got ${gained.split(' + ')[1]}.` : ''}`);
 }
 
 // Whole painted styles that only boxes give: a rare drop, or 50 style pieces crafted into the one the player picks.
 export const boxStyles = () => COSMETICS.filter((entry) => entry.source === 'box');
 // Style shards craft the box styles and the styles of ordinary backgrounds (the event backgrounds stay box-only).
-export const shardStyles = () => COSMETICS.filter((entry) => entry.source === 'box' || (entry.source === 'background' && !!entry.character && !isEventInterior(interiorForCosmetic(entry.id) ?? '')));
-// A drop of style shards is a pile for ONE style or background the player does not own yet, picked at random.
-// When every craftable style is owned, the shards turn into skin shards instead of being wasted.
-export const ownedAside = (state: PlayerState) => shardStyles().filter((item) => !state.ownedCosmeticIds.includes(item.id));
+export const shardStyles = () => COSMETICS.filter(entry => entry.key === 'bartender' || DRAWABLE_COSMETICS.some(item => item.id === entry.id));
+export const styleShardCost = (id: string) => {
+  const item = COSMETICS.find(entry => entry.id === id);
+  return item && !item.source ? SHARD_CRAFT_COST[item.rarity] : STYLE_PIECES_TO_CRAFT;
+};
+export const ownedAside = (state: PlayerState) => shardStyles().filter(item => !state.ownedCosmeticIds.includes(item.id));
 export function addStyleShards(state: PlayerState, amount: number, random: () => number): string {
-  const open = ownedAside(state);
-  if (!open.length) { state.loot.skinShards += amount; return `${amount} skin shards (you own every craftable style)`; }
-  const chosen = open[Math.min(open.length - 1, Math.floor(random() * open.length))]!;
-  state.loot.styleShards[chosen.id] = (state.loot.styleShards[chosen.id] ?? 0) + amount;
-  return `${amount} ${chosen.label} shard${amount === 1 ? '' : 's'}`;
+  const missing = ownedAside(state);
+  const pool = missing.length ? missing : shardStyles();
+  const chosen = pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))]!;
+  add(state.loot.styleShards, chosen.id, amount);
+  return `${amount} ${chosen.label} fragments`;
 }
-// Old saves: the one shared pool is split into random piles of up to 10 over the styles that are still missing.
-export function migrateStylePool(state: PlayerState, random: () => number = Math.random) {
-  let left = state.loot.stylePieces;
+export function addBackgroundShards(state: PlayerState, id: string, amount: number): string {
+  const item = INTERIORS.find(entry => entry.id === id);
+  if (!item) throw new LootError('Unknown background.');
+  add(state.loot.styleShards, `background:${id}`, amount);
+  return `${amount} ${item.name} background fragments`;
+}
+// Legacy pools are converted once into specific piles, retaining every fragment.
+export function migrateStylePool(state: PlayerState, random: () => number = () => 0) {
+  let left = state.loot.stylePieces + state.loot.skinShards;
   state.loot.stylePieces = 0;
+  state.loot.skinShards = 0;
   while (left > 0) { const part = Math.min(10, left); addStyleShards(state, part, random); left -= part; }
 }
 export function craftStyle(state: PlayerState, cosmeticId: unknown) {
-  const item = shardStyles().find((entry) => entry.id === cosmeticId);
-  if (!item) throw new LootError('This style cannot be crafted from style shards.');
-  if (state.ownedCosmeticIds.includes(item.id)) throw new LootError('You already own this style.');
-  const have = state.loot.styleShards[item.id] ?? 0;
-  if (have < STYLE_PIECES_TO_CRAFT) throw new LootError(`You need ${STYLE_PIECES_TO_CRAFT} ${item.label} shards (you have ${have}).`);
-  if (have === STYLE_PIECES_TO_CRAFT) delete state.loot.styleShards[item.id]; else state.loot.styleShards[item.id] = have - STYLE_PIECES_TO_CRAFT;
-  grantCosmetic(state, item.id);
-  note(state, `${item.label} crafted from ${STYLE_PIECES_TO_CRAFT} style shards.`);
+  const id = String(cosmeticId);
+  const background = id.startsWith('background:') ? INTERIORS.find(entry => entry.id === id.slice(11)) : undefined;
+  const item = shardStyles().find(entry => entry.id === id);
+  if (!item && !background) throw new LootError('Unknown fragment item.');
+  if (background ? state.ownedInteriorIds.includes(background.id) : state.ownedCosmeticIds.includes(id)) throw new LootError('You already own this item.');
+  const cost = background ? STYLE_PIECES_TO_CRAFT : styleShardCost(id);
+  const have = state.loot.styleShards[id] ?? 0;
+  const label = background?.name ?? item!.label;
+  if (have < cost) throw new LootError(`You need ${cost} ${label} shards (you have ${have}).`);
+  take(state.loot.styleShards, id, cost);
+  if (background) state.ownedInteriorIds.push(background.id); else state.ownedCosmeticIds.push(id);
+  note(state, `${label} crafted from ${cost} of its own fragments.`);
 }
 
 // ---- Drops from normal play ----
@@ -464,10 +487,10 @@ export function tasteFirst(state: PlayerState, key: string, kind: 'recipe' | 'br
     track(state, 'tasted', 1, now);
     const extra = Math.round(companionBonus(state, 'parts'));
     state.loot.parts += TASTING_REWARD.parts + extra;
-    state.loot.skinShards += TASTING_REWARD.skinShards;
+    addStyleShards(state, TASTING_REWARD.skinShards, () => 0);
     return ` First time serving this recipe: +${TASTING_REWARD.parts + extra} parts, +${TASTING_REWARD.skinShards} skin shards.`;
   }
-  state.loot.skinShards += TASTING_REWARD.brandShards;
+  addStyleShards(state, TASTING_REWARD.brandShards, () => 0);
   return ` New brand poured: +${TASTING_REWARD.brandShards} skin shard.`;
 }
 export { ACHIEVEMENTS, questsForWeek, weekOf };
@@ -513,7 +536,7 @@ export function earnLoyalty(state: PlayerState, characterId: string | undefined,
     const parts: string[] = [];
     if (reward.box) { grantBox(state, reward.box); parts.push(`a ${boxDef(reward.box)!.name}`); }
     if (reward.parts) { state.loot.parts += reward.parts; parts.push(`${reward.parts} parts`); }
-    if (reward.skinShards) { state.loot.skinShards += reward.skinShards; parts.push(`${reward.skinShards} skin shards`); }
+    if (reward.skinShards) { addStyleShards(state, reward.skinShards, () => 0); parts.push(`${reward.skinShards} skin shards`); }
     if (reward.crystals) { state.crystals += reward.crystals; parts.push(`${reward.crystals} crystals`); }
     gained.push(`${name} is now a level ${level + 1} regular (${parts.join(', ')})`);
   }
@@ -571,7 +594,7 @@ export function designSignature(state: PlayerState, input: unknown) {
   state.money = coins(state.money - SIGNATURE_FEE);
   // A new recipe starts unknown again: fame is earned per creation.
   state.loot.signatures[state.regionId] = { ...clean, served: 0 };
-  note(state, `${clean.name} is now the signature cocktail of ${state.bars[state.regionId].name}: guests will pay ${clean.price.toFixed(2)} coins.`);
+  note(state, `${clean.name} is now the signature cocktail of ${state.bars[state.regionId].name}: guests will pay ${clean.price.toFixed(0)} coins.`);
 }
 // Some arriving guests come for the house special, and it is announced up front (no detective work).
 export function applySignatureGuest(state: PlayerState, guest: Customer, random: () => number) {
@@ -649,4 +672,21 @@ export function discardLoot(state: PlayerState, kindInput: unknown, idInput: unk
   else if (kind === 'skinShards') loot.skinShards -= taken;
   else loot.parts -= taken;
   note(state, `You threw away ${taken}.`);
+}
+
+/** Validates the eligible target before spending exactly one choice puzzle. */
+export function useFragmentChoice(state: PlayerState, id: string, targetId: string) {
+  const item = consumableDef(id);
+  if(item?.kind!=='choice') throw new LootError('Unknown fragment choice.');
+  if(!has(state.loot.consumables,id)) throw new LootError('You do not own this choice puzzle.');
+  const target = fragmentChoiceOptions(id).find(option=>option.id===targetId);
+  if(!target) throw new LootError('This fragment is not available for selection.');
+  switch(id) {
+    case 'style-choice': add(state.loot.styleShards,targetId,1); break;
+    case 'background-choice': add(state.loot.styleShards,`background:${targetId}`,1); break;
+    case 'friend-choice': { const circle=state.companions ??= emptyCompanions(); if(targetId in circle.owned) throw new LootError('This friend has already joined your Circle.'); add(circle.shards,targetId,1); break; }
+    case 'equipment-choice': add(state.loot.itemShards,targetId,1); break;
+  }
+  take(state.loot.consumables,id,1);
+  note(state,`Selected 1 ${target.text} fragment.`);
 }

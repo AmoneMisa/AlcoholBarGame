@@ -1,4 +1,5 @@
 import { CHARACTER_ART } from '../../data/cosmetics/artCatalog';
+import { FOODS } from '../foods';
 import type { Customer, Mood } from '../types';
 import { clampPercent, type Emotion, type Gender, type GuestSocial, type TalkTopic } from './model';
 
@@ -100,11 +101,21 @@ export function rollSocial(customer: Pick<Customer, 'id' | 'mood' | 'characterId
   };
   // Smokers often ask for an ashtray as soon as they sit down.
   if (customer.smoker && random() < .45) social.need = { kind: 'ashtray', since: now };
+  if (social.hungry) {
+    const kind = (['specific', 'recommend', 'choice'] as const)[Math.min(2, Math.floor(random() * 3))]!;
+    social.foodRequest = { kind, itemId: kind === 'specific' ? FOODS[Math.min(FOODS.length - 1, Math.floor(random() * FOODS.length))]!.id : undefined };
+    social.need ??= { kind:'food', since:now };
+  }
   return social;
 }
 
 // Guests saved before feelings existed get a stable personality from their id.
 export function ensureSocial(customer: Customer, now: number): GuestSocial {
   customer.social ??= rollSocial(customer, now, seededRandom(customer.id), { arrivesDrunk: 0 });
+  if (customer.social.hungry && !customer.social.foodRequest) {
+    const random = seededRandom(`${customer.id}:food-request`);
+    const kind = (['specific','recommend','choice'] as const)[Math.floor(random() * 3)]!;
+    customer.social.foodRequest = {kind, itemId:kind === 'specific' ? FOODS[Math.floor(random() * FOODS.length)]!.id : undefined};
+  }
   return customer.social;
 }

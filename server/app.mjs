@@ -71,6 +71,10 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
   route('/api/friends/claim', (request) => service.claimGifts(who(request)));
   route('/api/friends/label', (request) => service.labelFriend(who(request), request.body?.code, request.body?.label));
   route('/api/friends/visit', (request) => service.visitFriend(who(request), request.body?.code));
+  route('/api/friends/tips', (request) => service.stealFriendTips(who(request), request.body?.code));
+  route('/api/mailbox',request=>service.mailbox(who(request),request.body?.readIds));
+  route('/api/mailbox/gift',request=>service.decideGift(who(request),request.body?.giftId,request.body?.accept));
+  route('/api/mailbox/reward',request=>service.claimMailReward(who(request),request.body?.id));
   route('/api/friends/gift', (request) => service.sendGift(who(request), request.body?.code, request.body?.gift));
 
   return app;

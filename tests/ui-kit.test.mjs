@@ -6,6 +6,11 @@ import { join, sep } from 'node:path';
 const files = (dir) => readdirSync(dir).flatMap((name) => { const path = join(dir, name); return statSync(path).isDirectory() ? files(path) : path.endsWith('.vue') ? [path] : []; });
 const vue = files('src').map((path) => [path.split(sep).join('/'), readFileSync(path, 'utf8')]);
 
+test('Game artwork does not render SVG outside button icons', () => {
+  const bad = vue.filter(([path, source]) => !path.endsWith('/ui/UiIcon.vue') && !path.endsWith('/characters/CharacterStudio.vue') && /<svg\b|data:image\/svg|["']\/?[^"'\s]+\.svg["']/.test(source)).map(([path]) => path);
+  assert.deepEqual(bad, [], 'Use WebP artwork for game screens and reward previews.');
+});
+
 test('Text inputs and selects come from the UI kit, not from raw elements', () => {
   const bad = [];
   for (const [path, source] of vue) {

@@ -21,7 +21,7 @@ function background(look?: Record<string, string>) { return INTERIORS.find(item 
           <span class="podium-ornament" aria-hidden="true">✦</span>
         </div>
         <h4>{{ titles[rank] }}</h4>
-        <div class="podium-details"><b>{{ row?.label ?? 'Place awaits' }}</b><small v-if="row?.level">Level {{ row.level }}<template v-if="row.me"> · You</template></small><strong v-if="row"><UiIcon name="star" />{{ row.score.toLocaleString('en-US') }}<small>XP</small></strong><small v-else>Earn XP to join</small></div>
+        <div class="podium-details"><b>{{ row?.label ?? 'Place awaits' }}</b><small v-if="row?.level">Level {{ row.level }}<template v-if="row.me"> · You</template></small><strong v-if="row"><UiIcon name="xp" />{{ row.score.toLocaleString('en-US') }}<small>XP</small></strong><small v-else>Earn XP to join</small></div>
       </article>
     </div>
   </section>

@@ -55,7 +55,7 @@ test('Offers: lower prices are riskier, refusals add a retry bonus, three tries 
 test('An accepted offer sets the price the player pays', () => {
   const state = openDeal(6);
   const { goods } = quoteOf(state);
-  const price = Math.round(goods * .8 * 100) / 100;
+  const price = Math.round(goods * .8);
   offer(state, price, () => 0);
   assert.equal(state.negotiation.agreedGoods, price);
   assert.throws(() => say(state, 'Could you give me a discount, please?'), /agreed/);

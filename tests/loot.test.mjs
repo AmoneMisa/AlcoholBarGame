@@ -136,7 +136,7 @@ test('Skin shards craft a chosen skin only when enough are held', () => {
   const state = fresh();
   const skin = COSMETICS.find((item) => item.rarity === 'common');
   assert.throws(() => run(state, { type: 'craftSkin', cosmeticId: skin.id }), /skin shards/);
-  state.loot.skinShards = 20;
+  state.loot.styleShards[skin.id] = 20;
   run(state, { type: 'craftSkin', cosmeticId: skin.id });
   assert.ok(state.ownedCosmeticIds.includes(skin.id));
   assert.equal(state.loot.skinShards, 0);
@@ -186,10 +186,10 @@ test('Serving tracks stats, pays the tasting reward only the first time, and que
   serve();
   assert.equal(state.loot.stats.serves, 1);
   assert.equal(state.loot.stats.tasted, 1);
-  assert.equal(state.loot.skinShards, 3);
+  assert.equal(Object.values(state.loot.styleShards).reduce((a,b)=>a+b,0), 3);
   serve();
   assert.equal(state.loot.stats.serves, 2);
-  assert.equal(state.loot.skinShards, 3, 'no second tasting reward');
+  assert.equal(Object.values(state.loot.styleShards).reduce((a,b)=>a+b,0), 3, 'no second tasting reward');
 
   assert.throws(() => run(state, { type: 'claimAchievement', id: 'a-serve-10' }), /not finished/);
   state.loot.stats.serves = 10;
@@ -372,11 +372,11 @@ test('Storeroom capacity: orders beyond it are refused, the fridge raises it, la
 test('Workshop gifts are limited to five per day and reset the next day', async () => {
   const { payForGift, LOOT_GIFTS_PER_DAY } = await import('../src/sim/gifts.ts');
   const state = fresh();
-  state.loot.skinShards = 1000;
-  for (let i = 0; i < LOOT_GIFTS_PER_DAY; i++) payForGift(state, { kind: 'skin-shards', amount: 5 }, NOW);
-  assert.throws(() => payForGift(state, { kind: 'skin-shards', amount: 5 }, NOW), /per day/);
-  assert.equal(state.loot.skinShards, 1000 - 5 * LOOT_GIFTS_PER_DAY);
-  payForGift(state, { kind: 'skin-shards', amount: 5 }, NOW + 86_400_000);
+  const fragmentId='bartender:reference-kimono:noa'; state.loot.styleShards[fragmentId] = 1000;
+  for (let i = 0; i < LOOT_GIFTS_PER_DAY; i++) payForGift(state, { kind: 'style-shards', cosmeticId:fragmentId, amount: 5 }, NOW);
+  assert.throws(() => payForGift(state, { kind: 'style-shards', cosmeticId:fragmentId, amount: 5 }, NOW), /per day/);
+  assert.equal(state.loot.styleShards[fragmentId], 1000 - 5 * LOOT_GIFTS_PER_DAY);
+  payForGift(state, { kind: 'style-shards', cosmeticId:fragmentId, amount: 5 }, NOW + 86_400_000);
 });
 
 test('Signature cocktails: validation, price scoring, fee, level gate', async () => {
@@ -616,9 +616,9 @@ test('Event backgrounds cannot be bought or gifted, come from boxes, and duplica
     assert.match(text, /the background/);
   }
   assert.ok(BOX_INTERIOR_IDS.every((id) => state.ownedInteriorIds.includes(id)));
-  const before = state.loot.skinShards;
-  assert.match(grantReward(state, { kind: 'eventInterior' }, () => 0), /skin shards/);
-  assert.equal(state.loot.skinShards, before + DUPLICATE_INTERIOR_SHARDS);
+  const fragmentId=`background:${BOX_INTERIOR_IDS[0]}`; const before = state.loot.styleShards[fragmentId] ?? 0;
+  assert.match(grantReward(state, { kind: 'eventInterior' }, () => 0), /background fragments/);
+  assert.equal(state.loot.styleShards[fragmentId], before + DUPLICATE_INTERIOR_SHARDS);
   void owned; void rollFromTable;
 });
 
@@ -882,14 +882,14 @@ test('Delete in the inventory throws away boxes, boosters, parts and shards, onl
   state.loot.boxes = { bronze: 2 };
   state.loot.consumables = { 'xp-boost': 1 };
   state.loot.styleShards = { 'some-style': 7 };
-  state.loot.skinShards = 5; state.loot.parts = 9;
+  const fragmentId='bartender:reference-kimono:noa'; state.loot.styleShards[fragmentId] = 5; state.loot.parts = 9;
   run(state, { type: 'discardLoot', kind: 'box', id: 'bronze', amount: 1 });
   assert.equal(state.loot.boxes.bronze, 1);
   run(state, { type: 'discardLoot', kind: 'consumable', id: 'xp-boost', amount: 1 });
   assert.equal(state.loot.consumables['xp-boost'], undefined, 'an empty pile disappears');
   run(state, { type: 'discardLoot', kind: 'styleShards', id: 'some-style', amount: 99 });
   assert.equal(state.loot.styleShards['some-style'], undefined, 'it never takes more than there is');
-  run(state, { type: 'discardLoot', kind: 'skinShards', id: '', amount: 5 });
+  run(state, { type: 'discardLoot', kind: 'styleShards', id: fragmentId, amount: 5 });
   run(state, { type: 'discardLoot', kind: 'parts', id: '', amount: 4 });
   assert.equal(state.loot.skinShards, 0);
   assert.equal(state.loot.parts, 5);

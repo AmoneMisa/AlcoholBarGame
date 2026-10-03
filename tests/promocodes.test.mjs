@@ -33,11 +33,15 @@ test('Promo rewards are authoritative, once per player, case-insensitive, expire
   const before=await service.session(identity(1));
   const attempts=await Promise.all([service.redeemPromoCode(identity(1),' Welcome '),service.redeemPromoCode(identity(1),'WELCOME')]);
   assert.equal(attempts.filter(x=>x.ok).length,1);
-  const granted=attempts.find(x=>x.ok).state;
+  const pending=attempts.find(x=>x.ok).state;
+  assert.equal(pending.money,before.state.money,'promo rewards await mailbox collection');
+  const claimed=await service.claimMailReward(identity(1),'promo:WELCOME');
+  assert.equal(claimed.body.ok,true);
+  const granted=claimed.body.state;
   assert.equal(granted.money,before.state.money+200); assert.equal(granted.crystals,before.state.crystals+5);
   assert.equal(granted.loot.boxes.gold,(before.state.loot.boxes.gold ?? 0)+2);
   assert.ok(granted.ownedCosmeticIds.includes('bartender:reference-streetwear:noa'));
-  assert.equal(repository.ledger.filter(x=>x.action==='redeemPromoCode').length,1);
+  assert.equal(repository.ledger.filter(x=>x.action==='claimMailReward').length,1);
   assert.equal((await service.redeemPromoCode(identity(2),'WELCOME')).ok,true);
   now+=1000;
   assert.equal((await service.redeemPromoCode(identity(3),'WELCOME')).status,409);
@@ -109,11 +113,25 @@ test('Food served at preparation consumes stock and applies the existing food ef
   const food=INGREDIENTS.find(item=>item.category==='food');
   const stock=state.inventories[state.regionId].find(item=>item.ingredientId===food.id);
   if(stock) stock.amount=2; else state.inventories[state.regionId].push({ingredientId:food.id,amount:2});
-  guest.orderRevealed=true;guest.social.hungry=true;guest.social.allergy=undefined;
+  guest.orderRevealed=true;guest.social.hungry=true;guest.social.foodRequest={kind:'specific',itemId:food.id};guest.social.allergy=undefined;
   assert.throws(()=>completeAction(state,{type:'serveFood',ingredientId:'vodka'},{now,random:()=>.9,spawnCustomers:false}),/food/i);
   const money=state.money;
   completeAction(state,{type:'serveFood',ingredientId:food.id},{now,random:()=>.9,spawnCustomers:false});
   assert.equal(state.inventories[state.regionId].find(item=>item.ingredientId===food.id).amount,1);
   assert.equal(guest.social.hungry,false);assert.ok(state.money>money);
 
+});
+
+
+test('Promo fragments require a specific costume or background and grant only that pile',async()=>{
+ const repository=createMemoryRepository(),now=1800000000000,service=createGameService({repository,now:()=>now});
+ const outfit='bartender:reference-kimono:noa', background='izakaya';
+ const base={code:'FRAGMENTS',expiresAt:now+10000};
+ assert.equal((await service.createPromoCode({...base,rewards:[{kind:'skinShards',amount:5}]})).status,400);
+ assert.equal((await service.createPromoCode({...base,rewards:[{kind:'skinShards',id:outfit,amount:5},{kind:'backgroundShards',id:background,amount:8}]})).ok,true);
+ await service.redeemPromoCode(identity(50),'FRAGMENTS');
+ const result=await service.claimMailReward(identity(50),'promo:FRAGMENTS');
+ assert.equal(result.body.state.loot.styleShards[outfit],5);
+ assert.equal(result.body.state.loot.styleShards[`background:${background}`],8);
+ assert.equal(result.body.state.loot.skinShards,0);
 });

@@ -1,4 +1,5 @@
 import { RECIPES, REGIONS } from '../domain/catalog';
+import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { buildProfile } from '../domain/conversation/customerTalk';
 import { coins } from '../domain/economy';
 import { FOODS, foodById, type FoodDef } from '../domain/foods';
@@ -25,13 +26,29 @@ const EMOTION_MOOD: Record<string, number> = { happy: .08, excited: .08, relaxed
 export interface ChancePart { label: string; value: number }
 export interface PitchChance { chance: number; parts: ChancePart[]; price: number }
 
-const ALLERGENS: Record<'nuts' | 'dairy', string[]> = { nuts: ['nuts', 'chocolate'], dairy: ['cheese-plate', 'nachos', 'garlic-bread', 'chocolate'] };
+const ALLERGENS: Record<'nuts' | 'dairy', string[]> = { nuts: ['nuts', 'chocolate', 'cheese-plate'], dairy: ['cheese-plate', 'nachos', 'garlic-bread', 'chocolate'] };
+export const containsAllergen = (foodId:string, kind:'nuts' | 'dairy') => ALLERGENS[kind].includes(foodId);
 export const allergenOf = (foodId: string) => (Object.keys(ALLERGENS) as ('nuts' | 'dairy')[]).find((kind) => ALLERGENS[kind].includes(foodId));
 
 const priceFactorOf = (state: PlayerState, guest: Customer) => guest.priceFactor ?? REGIONS.find((region) => region.id === state.regionId)?.marketFactor ?? 1;
 
 export function pairingScore(food: FoodDef, guest: Customer) {
-  const recipeId = guest.social?.lastDrink?.recipeId;
+  const ordering = guest.social?.phase !== 'enjoying';
+  const productId = ordering ? (guest.orderKind === 'serve' ? guest.serveRequest?.productId : guest.orderKind === 'bottle' ? guest.bottleRequest?.productId : undefined) : guest.social?.lastDrink?.productId;
+  const product = ALCOHOL_PRODUCTS.find(item => item.id === productId);
+  if (product) {
+    const traits = new Set<string>();
+    if (product.abv >= 20) traits.add('strong');
+    if (/beer|sparkling|champagne|prosecco/.test(product.type)) { traits.add('sparkling'); traits.add('fresh'); }
+    if (/wine|gin|vodka|vermouth|sake/.test(product.type)) traits.add('dry');
+    if (/beer|whiskey|bourbon|vermouth/.test(product.type)) traits.add('bitter');
+    if (/rum|liqueur|fruit/.test(product.type)) traits.add('sweet');
+    if (/gin|vodka/.test(product.type)) traits.add('fresh');
+    const shared = food.pairs.filter(trait => traits.has(trait));
+    const classic = food.classic.some(family => `${product.type} ${product.ingredientId ?? ''}`.includes(family));
+    return {score:Math.min(1, shared.length / 2 + (classic ? .35 : 0)), labels:[...shared, ...(classic ? ['a classic partner'] : [])]};
+  }
+  const recipeId = ordering && guest.orderKind === 'cocktail' && guest.orderRevealed ? guest.orderRecipeId : guest.social?.lastDrink?.recipeId;
   const recipe = recipeId ? RECIPES.find((item) => item.id === recipeId) : undefined;
   if (!recipe) return { score: 0, labels: [] as string[] };
   const traits = buildProfile(recipe).traits;
@@ -39,6 +56,11 @@ export function pairingScore(food: FoodDef, guest: Customer) {
   const spirit = recipe.ingredients.map((part) => part.ingredientId);
   const classic = food.classic.some((family) => spirit.some((id) => id.includes(family)) || recipe.name.toLowerCase().includes(family));
   return { score: Math.min(1, shared.length / 2 + (classic ? .35 : 0)), labels: [...shared, ...(classic ? ['a classic partner'] : [])] };
+}
+
+export function recommendedFoods(state: PlayerState, guest: Customer) {
+  return FOODS.filter(food => goodAmount(state, food.id) >= 1 && !(guest.social?.allergyKnown && guest.social.allergy && containsAllergen(food.id, guest.social.allergy)))
+    .map(food => ({food, ...pairingScore(food, guest)})).sort((a,b) => b.score - a.score || a.food.price - b.food.price);
 }
 
 export function priceOf(state: PlayerState, guest: Customer, pitch: Pitch) {
@@ -95,7 +117,7 @@ export function startPitch(state: PlayerState, guest: Customer, kind: 'drink' | 
     const food = foodById(itemId);
     if (!food) return 'This is not on the menu.';
     if (goodAmount(state, itemId) < 1) return `You have no ${food.name.toLowerCase()} in stock.`;
-    if (social.allergyKnown && social.allergy && allergenOf(itemId) === social.allergy) return `${guest.name} told you they are allergic to this.`;
+    if (social.allergyKnown && social.allergy && containsAllergen(itemId, social.allergy)) return `${guest.name} told you they are allergic to this.`;
   }
   if ((social.pitchTries ?? 0) >= MAX_TRIES) return `${guest.name} has said no twice. Try again after the next drink.`;
   if (social.pitchedAt && now - social.pitchedAt < PAUSE_AFTER_NO) return 'Give the guest a moment before you ask again.';
@@ -167,7 +189,9 @@ export function serveFoodAtCounter(state: PlayerState, guest: Customer, id: stri
   const social = ensureSocial(guest, now);
   const food = foodById(id);
   if (!food || goodAmount(state, id) < 1) return { accepted: false, kind: 'food', itemId: id, text: 'This food is not available in your bar.' };
-  if (social.allergyKnown && social.allergy && allergenOf(id) === social.allergy) return { accepted: false, kind: 'food', itemId: id, text: `${guest.name} told you they are allergic to this.` };
+  if (social.allergyKnown && social.allergy && containsAllergen(id, social.allergy)) return { accepted: false, kind: 'food', itemId: id, text: `${guest.name} told you they are allergic to this.` };
+  if (social.foodRequest?.kind === 'specific' && social.foodRequest.itemId !== id) return { accepted:false, kind:'food', itemId:id, text:`${guest.name} asked for ${foodById(social.foodRequest.itemId ?? '')?.name ?? 'a different dish'}. Offer an alternative in the conversation first.` };
+  if (social.foodRequest && social.foodRequest.kind !== 'specific' && pairingScore(food, guest).score < .5) return { accepted:false, kind:'food', itemId:id, text:'Choose food that pairs well with the guest’s selected drink.' };
   const pitch: Pitch = { kind: 'food', itemId: id, bonus: 0, used: [], discount: 0 };
   return acceptFood(state, guest, pitch, priceOf(state, guest, pitch), now);
 }
@@ -183,13 +207,14 @@ function acceptFood(state: PlayerState, guest: Customer, pitch: Pitch, price: nu
   state.money = coins(state.money + total);
   (social.ate ??= []).push(food.id);
   social.hungry = false;
+  delete social.foodRequest;
+  if (social.need?.kind === 'food') delete social.need;
   social.drunk = clampPercent(social.drunk - 8);
   social.rapport = clampPercent(social.rapport + 4 + (pairing.score >= .5 ? 6 : 0) + (pitch.discount >= 1 ? 6 : 0));
   state.xp += 3 + (pairing.score >= .5 ? 2 : 0);
-  state.message = `${guest.name} enjoys the ${food.name.toLowerCase()}${pairing.score >= .5 ? ' — a great pairing' : ''}. +${total.toFixed(2)} coins.`;
+  state.message = `${guest.name} enjoys the ${food.name.toLowerCase()}${pairing.score >= .5 ? ' — a great pairing' : ''}. +${total.toFixed(0)} coins.`;
   // A hidden allergy and the wrong food: a medical emergency, unless the guest had said so.
-  const allergen = allergenOf(food.id);
-  if (allergen && social.allergy === allergen) {
+  if (social.allergy && containsAllergen(food.id, social.allergy)) {
     const def = situationById('med-allergy');
     if (def) {
       startSituation(state, guest, def, now, () => .5);
