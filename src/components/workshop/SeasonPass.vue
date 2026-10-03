@@ -4,7 +4,7 @@ import { computed, ref } from 'vue';
 import { INTERIORS, interiorStyle, type InteriorId } from '../../data/cosmetics/bars';
 import { COSMETICS } from '../../domain/cosmetics';
 import { formatCountdown } from '../../domain/customerTiming';
-import { BOXES, CONSUMABLES, EQUIPMENT, describeReward } from '../../domain/loot';
+import { CONSUMABLES, EQUIPMENT, describeReward } from '../../domain/loot';
 import { PASS_LEVELS, PASS_LEVEL_POINTS, PASS_LEVEL_PRICE, PASS_POINTS, PASS_PREMIUM_PRICE, PASS_SOURCES, PASS_STYLES_LEVEL, passClaimKey, passRewards, themeStyleIds, type PassReward } from '../../domain/pass';
 import { useGameStore } from '../../stores/game';
 import CharacterModel from '../characters/CharacterModel.vue';
@@ -34,25 +34,9 @@ function text(reward: PassReward): string {
   if (reward.kind === 'cosmetics') return reward.ids.map((id) => `${id.endsWith(':noa') ? 'Noa' : 'Leo'}: ${label(id)}`).join(' + ');
   return describeReward(reward, names);
 }
-// The small picture and the short caption of a reward cell on the track.
-interface Look { kind?: 'box' | 'item' | 'shard' | 'resource'; id?: string; fallback: string; caption: string }
-function look(reward: PassReward): Look {
-  switch (reward.kind) {
-    case 'coins': return { kind: 'resource', id: 'coins', fallback: '🪙', caption: `${reward.amount}` };
-    case 'crystals': return { kind: 'resource', id: 'crystals', fallback: '💎', caption: `${reward.amount}` };
-    case 'xp': return { kind: 'resource', id: 'xp', fallback: '⭐', caption: `${reward.amount} XP` };
-    case 'parts': return { kind: 'shard', id: 'parts', fallback: '⚙️', caption: `${reward.amount} parts` };
-    case 'skinShards': return { kind: 'shard', id: 'skin', fallback: '👗', caption: `${reward.amount} random outfit fragments` };
-    case 'stylePieces': return { kind: 'shard', id: 'style', fallback: '🧵', caption: `${reward.amount} outfit fragments` };
-    case 'companionShards': return { kind: 'shard', id: 'circle', fallback: '🤝', caption: `${reward.amount} Circle` };
-    case 'box': return { kind: 'box', id: reward.box, fallback: BOXES.find((item) => item.id === reward.box)?.icon ?? '📦', caption: `${reward.box} box` };
-    case 'consumable': return { kind: 'item', id: reward.id, fallback: CONSUMABLES.find((item) => item.id === reward.id)?.icon ?? '🎁', caption: `${names.consumable(reward.id)}${reward.amount > 1 ? ` ×${reward.amount}` : ''}` };
-    case 'supplies': return { fallback: '🧺', caption: `${reward.size} supplies` };
-    case 'prestige': return { fallback: '🏅', caption: `+${reward.amount} prestige` };
-    case 'interior': return { fallback: '🖼️', caption: 'Background' };
-    case 'cosmetics': return { fallback: '👗', caption: 'Costumes' };
-    default: return { fallback: '🎁', caption: text(reward) };
-  }
+function quantity(reward: PassReward): string {
+  if ('amount' in reward) return String(reward.amount);
+  return '';
 }
 function rewardPictures(reward: PassReward): RewardLine[] {
   const caption = text(reward);
@@ -102,6 +86,24 @@ const previewOpen = ref(false);
       </div>
     </header>
 
+    <section class="pass-reward-list" aria-label="Pass levels">
+      <div class="pass-track-head"><b>Free</b><span></span><div><b>Premium</b><UiButton v-if="!game.passPremium" size="sm" :disabled="game.crystals < PASS_PREMIUM_PRICE" :title="'Unlock for ' + PASS_PREMIUM_PRICE + ' crystals'" @click="game.buyPassPremium()">Activate</UiButton><small v-else>Activated</small></div></div>
+      <ol class="pass-track">
+        <li v-for="row in rows" :key="row.level" :data-level="row.level" :class="{ reached: level >= row.level, current: level === row.level }">
+          <div class="pass-node"><span>{{ row.level }}</span></div>
+          <button v-for="tier in (['free', 'premium'] as const)" :key="tier" type="button" class="pass-cell" :class="[tier, state(tier, row.level)]" :disabled="state(tier, row.level) !== 'ready'" :aria-label="tier + ' level ' + row.level + ': ' + row[tier].map(text).join(', ') + '. ' + stateText(tier, row.level)" @click="game.claimPass(tier, row.level)">
+
+            <div v-for="(reward, index) in row[tier]" :key="index" class="pass-reward" :title="text(reward)">
+              <div class="pass-cell-art"><RewardArt v-for="(picture, pictureIndex) in rewardPictures(reward)" :key="pictureIndex" :line="picture" /></div>
+              <b v-if="quantity(reward)">{{ quantity(reward) }}</b>
+            </div>
+            <span class="pass-lock" v-if="!['claimed', 'ready'].includes(state(tier, row.level))"><UiIcon name="lock" /></span><small v-else class="pass-status">{{ state(tier, row.level) === 'claimed' ? 'Claimed' : 'Claim' }}</small>
+          </button>
+        </li>
+      </ol>
+    </section>
+    <p class="pass-hint">Scroll through the levels. Tap an available reward to claim it.</p>
+
     <section class="pass-buy" aria-label="Buy levels">
       <div><b>Short on time?</b><small>Buy levels with crystals. Each one fills the rest of the level you are on.</small></div>
       <div class="pass-buy-buttons">
@@ -110,24 +112,6 @@ const previewOpen = ref(false);
         <small v-else-if="game.crystals < PASS_LEVEL_PRICE" class="pass-need">A level costs {{ PASS_LEVEL_PRICE }} crystals, you have {{ Math.floor(game.crystals) }}.</small>
       </div>
     </section>
-
-    <section class="pass-reward-list" aria-label="Pass levels">
-      <div class="pass-track-head"><span>Level</span><b>Free rewards</b><b>Premium rewards</b></div>
-      <ol class="pass-track">
-        <li v-for="row in rows" :key="row.level" :data-level="row.level" :class="{ reached: level >= row.level, current: level === row.level }">
-          <div class="pass-node"><span>{{ row.level }}</span></div>
-          <button v-for="tier in (['free', 'premium'] as const)" :key="tier" type="button" class="pass-cell" :class="[tier, state(tier, row.level)]" :disabled="state(tier, row.level) !== 'ready'" :aria-label="tier + ' level ' + row.level + ': ' + row[tier].map(text).join(', ') + '. ' + stateText(tier, row.level)" @click="game.claimPass(tier, row.level)">
-            <span class="pass-track-label">{{ tier === 'free' ? 'Free' : 'Premium' }}</span>
-            <div v-for="(reward, index) in row[tier]" :key="index" class="pass-reward">
-              <div class="pass-cell-art"><RewardArt v-for="(picture, pictureIndex) in rewardPictures(reward)" :key="pictureIndex" :line="picture" /></div>
-              <b>{{ look(reward).caption }}</b>
-            </div>
-            <small class="pass-status"><UiIcon v-if="!['claimed', 'ready'].includes(state(tier, row.level))" name="lock" />{{ stateText(tier, row.level) }}</small>
-          </button>
-        </li>
-      </ol>
-    </section>
-    <p class="pass-hint">Scroll through the levels. Tap an available reward to claim it.</p>
 
     <section class="pass-points" aria-label="How to earn pass points">
       <header><small>HOW TO EARN POINTS</small><b>{{ PASS_LEVEL_POINTS }} points make a level</b></header>
@@ -178,32 +162,40 @@ const previewOpen = ref(false);
 .pass-buy-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .pass-need { flex-basis: 100%; color: #f2b99a !important; }
 
-.pass-reward-list { min-width:0; }
-.pass-track-head,.pass-track > li { display:grid;grid-template-columns:42px minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:stretch; }
-.pass-track-head { padding:0 0 12px;color:#e4b35c;font-size:13px;text-align:center; }
-.pass-track { display:grid;gap:12px;margin:0;padding:0;list-style:none; }
-.pass-node { display:flex;align-items:center;justify-content:center; }
-.pass-node span { display:grid;place-items:center;width:32px;height:32px;border:1px solid #4c5f7b;border-radius:50%;background:#131e30;color:#bbc9dc;font-weight:800; }
-.pass-track > li.reached .pass-node span { border-color:#edc578;background:#4a3720;color:#fff0ce; }
-.pass-cell { display:grid;align-content:start;gap:12px;min-width:0;padding:14px;border:1px solid #354762;border-radius:12px;background:#0c1725cc;color:#e9eef7;font:inherit;text-align:left; }
-.pass-cell.premium { background:#302719a6;border-color:#d8aa5760; }
-.pass-track-label { display:none;font-size:11px;color:#e4b35c;font-weight:800; }
-.pass-reward { display:flex;align-items:center;gap:12px;min-width:0; }
-.pass-reward b { font-size:13px;line-height:1.4;overflow-wrap:break-word; }
-.pass-cell-art { display:flex;align-items:center;justify-content:center;width:60px;height:60px;flex:none;gap:2px; }
-.pass-cell-art > .reward-art { flex:1;min-width:0;height:60px; }
-.pass-cell-art .item-art { width:60px;height:60px; }
-.pass-status { display:flex;align-items:center;gap:6px;color:#aebed2;font-size:11px; }
-.pass-cell.claimed .pass-status { color:#8fd1a0; }
-.pass-cell.ready { cursor:pointer;border-color:#edc578;background:#3b2b1f; }
+.pass-reward-list { min-width:0;border:1px solid #536078;border-radius:14px;background:#0c1725cc;overflow:hidden; }
+.pass-track-head,.pass-track > li { display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);gap:10px;align-items:center; }
+.pass-track-head { padding:14px 12px;color:#e4b35c;font-size:16px;text-align:center;border-bottom:1px solid #947440;background:#142039 url('/assets/ui/pass-panel-painted-v1.webp') center / cover; }
+.pass-track-head > div { display:grid;justify-items:center;gap:8px; }
+.pass-track-head small { font-size:11px; }
+.pass-track-head > b { color:#bbd5ee; }
+.pass-track { display:grid;margin:0;padding:0 12px;list-style:none;max-height:min(52vh,520px);overflow-y:auto;overscroll-behavior:contain; }
+.pass-track > li { position:relative;padding:18px 0;border-bottom:1px solid #94744066; }
+.pass-node { grid-column:2;grid-row:1;align-self:stretch;display:grid;place-items:center;position:relative; }
+.pass-node::before { content:'';position:absolute;top:-18px;bottom:-18px;width:3px;background:#977039; }
+.pass-node span { position:relative;display:grid;place-items:center;width:34px;height:38px;border:1px solid #b89858;border-radius:9px;background:#25384d;color:#fff0ce;font-weight:800; }
+.pass-track > li.reached .pass-node span { background:#805b28;border-color:#edc578; }
+.pass-cell { position:relative;grid-row:1;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:10px;min-width:0;min-height:125px;padding:12px 8px 28px;border:1px solid #607c9a;border-radius:12px;background:#142a40cc;color:#e9eef7;font:inherit;text-align:center; }
+.pass-cell.premium { grid-column:3;background:#4b351ccc;border-color:#cda050; }
+.pass-cell.free { grid-column:1; }
+.pass-reward { display:grid;justify-items:center;gap:4px;min-width:0; }
+.pass-reward b { font-size:14px;line-height:1.2;color:#fff3d7; }
+.pass-cell-art { display:flex;align-items:center;justify-content:center;width:64px;height:64px;gap:2px; }
+.pass-cell-art > .reward-art { flex:1;min-width:0;height:64px; }
+.pass-cell-art .item-art { width:64px;height:64px; }
+.pass-lock { position:absolute;right:-5px;top:-8px;font-size:27px;filter:drop-shadow(0 2px 3px #000a); }
+.pass-status { position:absolute;bottom:8px;left:0;right:0;color:#8fd1a0;font-size:11px;font-weight:800; }
+.pass-cell.ready { cursor:pointer;border-color:#edc578;box-shadow:0 0 12px #edc57835; }
 .pass-cell.ready .pass-status { color:#ffdc85; }
 .pass-hint { margin:0;color:#aebed2;font-size:12px;line-height:1.5; }
 @media(max-width:540px){
- .pass-track-head { display:none; }
- .pass-track > li { grid-template-columns:32px minmax(0,1fr);gap:10px; }
- .pass-node { grid-row:span 2; }
- .pass-cell { grid-column:2;padding:12px; }
- .pass-track-label { display:block; }
+ .pass{padding:8px;gap:12px;}
+ .pass-track-head,.pass-track > li{grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr);gap:8px;}
+ .pass-track{padding:0 8px;}
+ .pass-node span{width:28px;height:34px;font-size:13px;}
+ .pass-cell{padding:10px 4px 25px;min-height:124px;gap:8px;}
+ .pass-cell-art{width:54px;height:54px;}
+ .pass-cell-art > .reward-art{height:54px;}
+ .pass-cell-art .item-art{width:54px;height:54px;}
 }
 
 .pass-points { display: grid; gap: 8px; padding: 12px; border: 1px solid #354762; border-radius: 12px; background: #111c2d; }
