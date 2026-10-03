@@ -8,7 +8,7 @@ defineProps<{ lines: RewardLine[] }>();
 
 <template>
   <ul class="reward-list">
-    <li v-for="(line, index) in lines" :key="index" :class="line.kind"><span class="reward-list-art"><RewardArt :line="line" /></span><span>{{ line.text }}</span></li>
+    <li v-for="(line, index) in lines" :key="index" :class="line.kind" :style="{ animationDelay: `${Math.min(index, 6) * 35}ms` }"><span class="reward-list-art"><RewardArt :line="line" /></span><span>{{ line.text }}</span></li>
   </ul>
 </template>
 
@@ -20,4 +20,7 @@ defineProps<{ lines: RewardLine[] }>();
 .reward-list li.crystals .ui-icon { color: #6fd9ff; }
 .reward-list li.tip .ui-icon, .reward-list li.prestige .ui-icon { color: #f08ad0; }
 .reward-list li.xp .ui-icon, .reward-list li.level .ui-icon { color: #9be28a; }
+.reward-list li {animation:reward-row-arrive .22s ease-out both;}
+@keyframes reward-row-arrive {from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.reward-list li{animation:none;}}
 </style>

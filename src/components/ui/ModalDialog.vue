@@ -59,5 +59,8 @@ onUnmounted(() => {
 .modal-foot { padding: 12px 14px 14px; border-top: 1px solid #354762; }
 body.modal-open { overflow: hidden; }
 @keyframes modal-fade { from { opacity: 0; } }
+.modal-sheet {animation:modal-sheet-arrive .18s ease-out both;}
+@keyframes modal-sheet-arrive {from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.modal-sheet,.modal-backdrop{animation:none;}}
 @media (min-width: 760px) { .modal-backdrop.bottom { align-items: center; } }
 </style>

@@ -197,6 +197,9 @@ const rewardsOpen = ref(true);
 .pass-status { position:absolute;bottom:8px;left:0;right:0;color:#8fd1a0;font-size:11px;font-weight:800; }
 .pass-cell.ready { cursor:pointer;border-color:#edc578;box-shadow:0 0 12px #edc57835; }
 .pass-cell.ready .pass-status { color:#ffdc85; }
+.pass-cell.ready {animation:pass-ready-glow 2.6s ease-in-out infinite;}
+@keyframes pass-ready-glow {50%{box-shadow:0 0 8px #edc57865;}}
+@media(prefers-reduced-motion:reduce){.pass-cell.ready{animation:none;}}
 .pass-hint { margin:0;color:#aebed2;font-size:12px;line-height:1.5; }
 @media(max-width:540px){
  .pass{padding:8px;gap:12px;}

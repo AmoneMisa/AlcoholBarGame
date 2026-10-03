@@ -24,4 +24,7 @@ defineEmits<{ close: [] }>();
 .ui-popover-head small { display: block; color: var(--gold, #e8b85a); font-size: 9px; font-weight: 900; letter-spacing: .13em; }
 .ui-popover-body { padding: 12px 14px 14px; }
 .ui-popover-head b { display: block; margin-top: 2px; color: #fff3dc; font: 700 17px Georgia, serif; }
+.ui-popover {animation:popover-arrive .16s ease-out both;}
+@keyframes popover-arrive {from{opacity:0;translate:0 5px}to{opacity:1;translate:0 0}}
+@media(prefers-reduced-motion:reduce){.ui-popover{animation:none;}}
 </style>

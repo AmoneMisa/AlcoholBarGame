@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { itemArtwork } from '../../domain/itemArtwork';
 import { ROULETTE_SPINS_PER_DAY, WHEEL } from '../../domain/roulette';
 import { useGameStore } from '../../stores/game';
@@ -22,6 +22,17 @@ const shown = ref('');            // the prize text, only shown once the wheel h
 let finalAngle = 0;
 let timer: ReturnType<typeof setTimeout> | undefined;
 let watchdog: ReturnType<typeof setTimeout> | undefined;
+const pointerPhase = ref<'fast' | 'medium' | 'slow'>('fast');
+const pointerTimers: ReturnType<typeof setTimeout>[] = [];
+const pointerImage = computed(() => `${import.meta.env.BASE_URL}assets/ui/wheel-pointer-${pointerPhase.value}-v1.webp`);
+function clearPointerTimers() { pointerTimers.splice(0).forEach(clearTimeout); }
+onMounted(() => {
+  if (reduceMotion()) return;
+  for (const speed of ['fast', 'medium', 'slow']) {
+    const image = new Image();
+    image.src = `${import.meta.env.BASE_URL}assets/ui/wheel-pointer-${speed}-v1.webp`;
+  }
+});
 
 const left = computed(() => game.rouletteSpinsLeft);
 const busy = computed(() => waiting.value || spinning.value);
@@ -45,6 +56,7 @@ const slices = WHEEL.map((segment, index) => ({
 
 function finish() {
   clearTimeout(timer); clearTimeout(watchdog);
+  clearPointerTimers();
   spinning.value = false; waiting.value = false;
   angle.value = finalAngle;
   shown.value = game.rouletteLast?.text ?? '';
@@ -54,6 +66,7 @@ function finish() {
 
 function start(index: number) {
   clearTimeout(watchdog);
+  clearPointerTimers();
   const centre = index * SEGMENT + SEGMENT / 2;
   const wanted = (360 - centre) % 360;                          // the segment's centre ends up under the pointer
   const delta = (((wanted - (angle.value % 360)) % 360) + 360) % 360;
@@ -61,6 +74,9 @@ function start(index: number) {
   shown.value = '';
   if (reduceMotion()) { instant.value = true; angle.value = finalAngle; nextTick(finish); return; }
   spinning.value = true; waiting.value = false;
+  pointerPhase.value = 'fast';
+  pointerTimers.push(setTimeout(() => { pointerPhase.value = 'medium'; }, 2000));
+  pointerTimers.push(setTimeout(() => { pointerPhase.value = 'slow'; }, 3400));
   nextTick(() => requestAnimationFrame(() => { angle.value = finalAngle; }));
   timer = setTimeout(finish, SPIN_MS + 300);
 }
@@ -82,18 +98,23 @@ function skip() {
 watch(() => game.rouletteLast?.n, (next, previous) => {
   if (waiting.value && next !== undefined && next !== previous) start(game.rouletteLast!.index);
 });
-onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); emit('busy',false); });
+onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); clearPointerTimers(); emit('busy',false); });
 </script>
 
 <template>
   <div class="wheel-page">
     <div class="wheel-stage">
-      <div class="wheel-pointer" aria-hidden="true"></div>
+      <div class="wheel-pointer" :class="{ spinning }" aria-hidden="true">
+        <img class="wheel-pointer-still" src="/assets/ui/wheel-pointer-still-v1.webp" alt="" width="128" height="160" draggable="false" />
+        <img v-if="spinning" :key="pointerPhase" class="wheel-pointer-motion" :src="pointerImage" alt="" width="128" height="160" draggable="false" />
+      </div>
+      <div class="wheel-rotor-clip">
       <div class="wheel-disc" :class="{ instant }" role="img" aria-label="Daily prize wheel" :style="{ transform: `rotate(${angle}deg)`, transitionDuration: instant ? '0ms' : `${SPIN_MS}ms` }">
         <img class="wheel-background" src="/assets/ui/daily-wheel-painted-v1.webp" alt="" width="800" height="800" draggable="false" />
         <div v-for="slice in slices" :key="slice.id" class="wheel-sector" :style="{transform: `rotate(${slice.turn}deg)`}" aria-hidden="true">
           <div class="wheel-sector-reward"><img v-if="slice.art" :src="slice.art" alt="" /><span v-else>{{ slice.icon }}</span><b>{{ slice.label }}</b></div>
         </div>
+      </div>
       </div>
     </div>
     <div class="wheel-side">
@@ -120,15 +141,18 @@ onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); emit('busy'
 .wheel-page { display: grid; grid-template-columns: minmax(220px, 340px) 1fr; gap: 20px; align-items: center; padding: 8px 4px; }
 @media (max-width: 640px) { .wheel-page { grid-template-columns: 1fr; justify-items: center; } }
 .wheel-stage { position: relative; width: min(340px, 100%); aspect-ratio: 1; }
+.wheel-rotor-clip {width:100%;height:100%;border-radius:50%;overflow:clip;filter:drop-shadow(0 10px 22px #0008);}
 .wheel-disc { width: 100%; height: 100%; display: block; transition-property: transform; transition-timing-function: cubic-bezier(.1, .72, .12, 1); filter: drop-shadow(0 10px 22px #0008); }
-.wheel-disc {position:relative;overflow:clip;border-radius:50%}
+.wheel-disc {position:relative;overflow:clip;border-radius:50%;filter:none;}
 .wheel-background {display:block;width:100%;height:100%;object-fit:contain}
 .wheel-sector {position:absolute;inset:0;pointer-events:none}
 .wheel-sector-reward {position:absolute;left:50%;top:10%;width:24%;transform:translateX(-50%);display:grid;justify-items:center;gap:3px;color:#fff;text-align:center}
 .wheel-sector-reward img {display:block;width:40%;aspect-ratio:1;object-fit:contain}
 .wheel-sector-reward span {font-size:20px;line-height:1}
 .wheel-sector-reward b {max-width:46px;font:700 8px/1.15 system-ui,sans-serif;white-space:normal;text-shadow:0 1px 3px #000}
-.wheel-pointer { position: absolute; z-index: 2; left: 50%; top: -6px; width: 0; height: 0; transform: translateX(-50%); border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 22px solid #f2c96a; filter: drop-shadow(0 2px 3px #000a); }
+.wheel-pointer { position:absolute;z-index:2;left:50%;top:-24px;width:48px;height:60px;transform:translateX(-50%);filter:drop-shadow(0 2px 3px #000a);pointer-events:none; }
+.wheel-pointer img {position:absolute;inset:0;width:100%;height:100%;object-fit:contain;}
+.wheel-pointer.spinning .wheel-pointer-still {visibility:hidden;}
 .wheel-side { display: grid; gap: 12px; align-content: center; }
 .wheel-spins { margin: 0; color: #c9d5e6; }
 .wheel-spins b { color: #e4b35c; font-size: 22px; }
@@ -141,4 +165,5 @@ onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); emit('busy'
 .wheel-odds li > span {display:flex;align-items:center;gap:8px;}
 .wheel-odds li img {object-fit:contain;}
 @media (prefers-reduced-motion: reduce) { .wheel-disc { transition-duration: 0ms !important; } }
+@media (prefers-reduced-motion: reduce) { .wheel-pointer-motion {display:none;}.wheel-pointer.spinning .wheel-pointer-still {visibility:visible;} }
 </style>

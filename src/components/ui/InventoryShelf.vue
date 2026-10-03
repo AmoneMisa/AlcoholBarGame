@@ -36,4 +36,7 @@ defineEmits<{ select: [key: string] }>();
 .shelf-picture .item-art { width:90%!important;height:90%!important; }
 .shelf-picture .art-character { position:relative!important;inset:auto!important;transform:none!important;height:92%!important;width:auto!important;aspect-ratio:.572!important; }
 @media(max-width:520px) { .shelf-grid { grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:4px; }.inventory-shelf { padding:8px; }.shelf-label { display:none!important; } }
+.inventory-shelf .shelf-tile {transition:translate .16s ease,box-shadow .16s ease,border-color .16s ease;}
+@media(hover:hover){.inventory-shelf .shelf-tile:hover{translate:0 -2px;}}
+@media(prefers-reduced-motion:reduce){.inventory-shelf .shelf-tile{transition:none;translate:none!important;}}
 </style>

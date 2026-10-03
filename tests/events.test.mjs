@@ -624,3 +624,27 @@ test('Every bar has its own servers: hired and trained in one bar, they work in 
   assert.equal(migrated.staffAtByBar.london, NOW);
   assert.equal('staff' in migrated, false);
 });
+
+test('Wheel pointer WebP animations contain six frames and decelerate across speed variants', () => {
+  const durations = [];
+  for (const speed of ['fast', 'medium', 'slow']) {
+    const data = readFileSync(`public/assets/ui/wheel-pointer-${speed}-v1.webp`);
+    assert.equal(data.toString('ascii', 8, 12), 'WEBP');
+    const frames = [];
+    let animationHeader = false;
+    for (let at = 12; at + 8 <= data.length;) {
+      const kind = data.toString('ascii', at, at + 4);
+      const size = data.readUInt32LE(at + 4);
+      if (kind === 'ANIM') animationHeader = true;
+      if (kind === 'ANMF') frames.push(data.readUIntLE(at + 20, 3));
+      at += 8 + size + (size % 2);
+    }
+    assert.ok(animationHeader, 'must be an animated WebP, not just a static picture');
+    assert.equal(frames.length, 6);
+    assert.ok(frames.every(duration => duration >= 10));
+    durations.push(frames.reduce((sum, duration) => sum + duration, 0));
+  }
+  assert.ok(durations[0] < durations[1] && durations[1] < durations[2]);
+  const still = readFileSync('public/assets/ui/wheel-pointer-still-v1.webp');
+  assert.ok(!still.includes(Buffer.from('ANIM')), 'resting pointer must not keep animating');
+});
