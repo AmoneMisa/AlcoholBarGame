@@ -5,7 +5,7 @@ import { useGameStore } from '../../stores/game';
 import UiIcon from '../ui/UiIcon.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
 import UiButton from '../ui/UiButton.vue';
-import CharacterModel from '../characters/CharacterModel.vue';
+import CharacterPortrait from '../characters/CharacterPortrait.vue';
 import ModalDialog from '../ui/ModalDialog.vue';
 import CityEvent from './CityEvent.vue';
 import Glyph from '../ui/Glyph.vue';
@@ -57,7 +57,7 @@ onUnmounted(() => {
 <template>
   <header ref="hud" class="top-hud">
     <div class="venue-card">
-      <button type="button" class="hud-avatar" data-guide="profile" aria-label="Character information and settings" @click="$emit('profile')"><CharacterModel role="bartender" :character-id="game.decor.bartenderCharacter ?? 'noa'" :outfit="game.decor.bartender" :face-style="game.decor.face" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" /></button>
+      <button type="button" class="hud-avatar" data-guide="profile" aria-label="Character information and settings" @click="$emit('profile')"><CharacterPortrait :character="game.decor.bartenderCharacter ?? 'noa'" :hair="game.decor.hairStyle" /></button>
       <button type="button" class="venue-name" aria-label="Open your bar" @click="$emit('goto', 'bar')"><em>Lv. {{ game.level }}</em><b>{{ game.decor.name }}</b></button>
     </div>
     <div class="hud-resources">

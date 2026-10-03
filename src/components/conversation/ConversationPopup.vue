@@ -82,6 +82,7 @@ const tileTarget = ref('');
 // Brand-call guests (“Jack Daniel’s on the rocks”) know exactly what they want.
 const serveOrder = computed(() => customer.value?.orderKind === 'serve' ? customer.value.serveRequest : undefined);
 const templates = computed(() => {
+  if (customer.value?.pendingPayment) return [{ text: 'Would you like to pay by card or in cash?' }, { text: 'Here is your bill. How would you like to pay?' }];
   const base = serveOrder.value
     ? serveTemplates(serveOrder.value, game.brandOnShelf).map((text) => ({ text }))
     : bottleOrder.value
@@ -301,7 +302,6 @@ function startMixing() {
 function completeBottleSale() {
   if (!game.sellBottleToCustomer()) return;
   haptic('medium');
-  game.closeConversation();
 }
 
 function offerAlternative() {
@@ -409,8 +409,8 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         <button v-if="needNow === 'ashtray'" type="button" data-guide="give-ashtray" class="wanted" :disabled="social.ashtray === 'given' || game.ashtrays.clean < 1" :title="social.ashtray === 'given' ? 'Already has one' : game.ashtrays.clean + ' clean ashtrays'" @click="game.giveAshtray(customer.id)"><img class="ashtray-inline" :src="ashtrayArt" alt="" /> Ashtray</button>
         <button v-if="needNow === 'water'" type="button" data-guide="give-water" class="wanted" @click="game.giveWater(customer.id)">💧 Water</button>
         <button v-if="needNow === 'taxi'" type="button" class="wanted" :disabled="!!social.taxiAt" @click="game.callTaxi(customer.id)">🚕 Call a taxi</button>
-        <button type="button" data-guide="offer-open" :class="{ wanted: social.hungry }" @click="offerOpen = !offerOpen">🍽️ Offer</button>
-        <span class="leave-group">Ask to leave
+        <button v-if="!customer.pendingPayment" type="button" data-guide="offer-open" :class="{ wanted: social.hungry }" @click="offerOpen = !offerOpen">🍽️ Offer</button>
+        <span v-if="!customer.pendingPayment" class="leave-group">Ask to leave
           <button type="button" :title="leaveHint('gentle')" @click="game.askToLeave(customer.id, 'gentle')">Kindly</button>
           <button type="button" :title="leaveHint('firm')" @click="game.askToLeave(customer.id, 'firm')">Firmly</button>
           <button type="button" class="rude" :title="leaveHint('aggressive')" @click="game.askToLeave(customer.id, 'aggressive')">Rudely</button>
@@ -488,7 +488,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         </aside>
       </div>
 
-      <div v-if="confirmed && !situation" class="talk-confirmed">
+      <div v-if="confirmed && !situation && !customer.pendingPayment" class="talk-confirmed">
         <template v-if="bottleOrder && confirmedBottle && customer.bottleRequest">
           <div><small>SEALED-BOTTLE SALE CONFIRMED</small><b>{{ customer.bottleRequest.quantity }} × {{ confirmedBottle.name }}</b><span>{{ confirmedBottle.volumeMl }} ml · {{ confirmedBottle.abv }}% ABV · total {{ bottleTotal(confirmedBottle, customer.bottleRequest.quantity, game.guestPriceFactor) }} coins</span></div>
           <UiButton variant="solid" data-guide="bottle-sale" :disabled="game.serving || bottleStock(confirmedBottle.id) < customer.bottleRequest.quantity" @click="completeBottleSale">Sell full bottle{{ customer.bottleRequest.quantity === 1 ? '' : 's' }} <UiIcon class="inline-icon" name="arrow-right" /></UiButton>
@@ -500,7 +500,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
         </template>
       </div>
 
-      <div v-if="!situation" class="service-decisions">
+      <div v-if="!situation && !customer.pendingPayment" class="service-decisions">
         <div><small>CAN’T SERVE THIS ORDER?</small><span>The guest can accept the closest stocked alternative, or you can decline the order and let them leave.</span></div>
         <UiButton variant="secondary" @click="offerAlternative">Offer similar</UiButton>
         <UiButton variant="danger" @click="rejectOrder">Reject order</UiButton>

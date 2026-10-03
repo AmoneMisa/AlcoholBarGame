@@ -6,13 +6,13 @@ const pulse = ref(0);
 watch(() => game.tipJar, (next, old) => { if (next > old) pulse.value++; });
 </script>
 <template>
-  <button class="tip-jar" :class="{ ready: game.tipJar > 0 }" :disabled="game.tipJar <= 0" :aria-label="`Collect ${game.tipJar} coins in tips`" @click="game.collectTips()">
+  <button data-guide="tip-jar" class="tip-jar" :class="{ ready: game.tipJar > 0 }" :disabled="game.tipJar <= 0" :aria-label="`Collect ${game.tipJar} coins in tips`" @click="game.collectTips()">
     <span :key="pulse" class="tip-coin-drop" :class="{ falling: pulse > 0 }" aria-hidden="true">●</span>
     <span class="tip-jar-glass" aria-hidden="true"><span class="tip-jar-coins">● ●<br>● ● ●</span><span class="tip-jar-label">TIPS</span></span>
   </button>
 </template>
 <style scoped>
-.tip-jar { position: absolute; z-index: 8; left: clamp(32px, calc(var(--glass-x, 65%) + 18px), calc(100% - 32px)); top: calc(var(--glass-y, 58%) - 16px); width: 64px; min-height: 84px; transform: translate(-50%, -50%); display: grid; justify-items: center; align-content: end; gap: 8px; padding: 0; border: 0; background: transparent; color: #f2d8a0; cursor: pointer; }
+.tip-jar { position: absolute; z-index: 8; left: auto; right: 2px; top: calc(var(--glass-y, 58%) - 16px); width: 56px; min-height: 84px; transform: translateY(-50%); display: grid; justify-items: center; align-content: end; gap: 8px; padding: 0; border: 0; background: transparent; color: #f2d8a0; cursor: pointer; }
 .tip-jar:disabled { cursor: default; opacity: .85; }
 .tip-jar-glass { position: relative; width: 48px; height: 58px; border: 2px solid #eaf0e699; border-radius: 8px 8px 14px 14px; background: linear-gradient(95deg, #d1edf733, #ffffff08 45%, #e0e7e42b); box-shadow: inset 5px 0 8px #fff2, 0 6px 6px #0007; }
 .tip-jar-glass::before { content: ''; position: absolute; top: -6px; left: -3px; right: -3px; height: 9px; border: 2px solid #c7d7dc; border-radius: 50%; background: #40535a99; }

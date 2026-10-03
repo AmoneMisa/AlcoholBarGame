@@ -1,3 +1,4 @@
+import { completeAction } from './paid-action.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { checkEnglish } from '../server/english.mjs';
@@ -25,13 +26,13 @@ function barWith(social = {}, patch = {}) {
   state.nextCustomerAt = 0;
   return { state, guest };
 }
-const say = (state, text, now = NOW, random) => applyAction(state, { type: 'say', text }, context(now, random));
-const talkTo = (state, guest) => applyAction(state, { type: 'openConversation', customerId: guest.id }, context());
+const say = (state, text, now = NOW, random) => completeAction(state, { type: 'say', text }, context(now, random));
+const talkTo = (state, guest) => completeAction(state, { type: 'openConversation', customerId: guest.id }, context());
 const lastLine = (state, guest) => state.conversations[guest.id].lines.at(-1).text;
 function serve(state, now = NOW, random) {
   const guest = state.customers.find((item) => item.id === state.activeCustomerId);
   for (const item of requiredRecipe(guest).ingredients) state.inventories[state.regionId].find((stock) => stock.ingredientId === item.ingredientId).amount += 1000;
-  return applyAction(state, { type: 'serve', mix: requiredRecipe(guest).ingredients.map((item) => ({ ...item })), shaken: true, pourBrands: {} }, context(now, random));
+  return completeAction(state, { type: 'serve', mix: requiredRecipe(guest).ingredients.map((item) => ({ ...item })), shaken: true, pourBrands: {} }, context(now, random));
 }
 
 test('Guests open with their own feelings, and the same feeling is said in different ways', () => {
@@ -167,16 +168,16 @@ test('Ashtrays: a smoker asks, the bartender gives one, and it is dirty after th
   talkTo(state, guest);
   assert.match(state.conversations[guest.id].lines[0].text, /ashtray/i, 'the guest asks for one');
   assert.equal(state.ashtrays.clean, 4);
-  applyAction(state, { type: 'giveAshtray', customerId: guest.id }, context());
+  completeAction(state, { type: 'giveAshtray', customerId: guest.id }, context());
   assert.equal(state.ashtrays.clean, 3);
   assert.equal(guest.social.ashtray, 'given');
   assert.equal(guest.social.need, undefined);
-  assert.throws(() => applyAction(state, { type: 'giveAshtray', customerId: guest.id }, context()), /already has/);
+  assert.throws(() => completeAction(state, { type: 'giveAshtray', customerId: guest.id }, context()), /already has/);
   serve(state);
   assert.equal(state.ashtrays.dirty, 1, 'the ashtray is dirty when the guest leaves');
-  applyAction(state, { type: 'cleanAshtrays' }, context());
+  completeAction(state, { type: 'cleanAshtrays' }, context());
   assert.deepEqual(state.ashtrays, { clean: 4, dirty: 0 });
-  assert.throws(() => applyAction(state, { type: 'cleanAshtrays' }, context()), /nothing to clean/);
+  assert.throws(() => completeAction(state, { type: 'cleanAshtrays' }, context()), /nothing to clean/);
 });
 
 test('Dirty ashtrays make the next guest like the bar a little less', () => {
@@ -191,7 +192,7 @@ test('Dirty ashtrays make the next guest like the bar a little less', () => {
 
 test('A taxi takes a guest home safely after a few minutes', () => {
   const { state, guest } = barWith({ staysFor: 2, drunk: 70, gender: 'f' });
-  applyAction(state, { type: 'callTaxi', customerId: guest.id }, context());
+  completeAction(state, { type: 'callTaxi', customerId: guest.id }, context());
   assert.ok(guest.social.taxiAt > NOW);
   assert.equal(guest.social.staysFor, 0);
   const popularity = state.popularity;
@@ -206,7 +207,7 @@ test('Water helps a drunk guest, and an ignored request upsets them', () => {
   advanceClock(state, context(NOW + 7 * 60_000));
   assert.ok(guest.social.rapport < 60, 'waiting for a long time lowers rapport');
   const before = guest.social.drunk;
-  applyAction(state, { type: 'giveWater', customerId: guest.id }, context(NOW + 7 * 60_000));
+  completeAction(state, { type: 'giveWater', customerId: guest.id }, context(NOW + 7 * 60_000));
   assert.ok(guest.social.drunk < before);
   assert.equal(guest.social.need, undefined);
 });

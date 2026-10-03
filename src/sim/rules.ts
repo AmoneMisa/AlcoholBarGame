@@ -138,6 +138,7 @@ export class RuleError extends Error {}
 
 export interface RuleContext {
   now: number;
+  training?: boolean;
   random?: () => number;
   // Grammar check (the server runs its own copy): correctness decides XP; the corrected text is what the guest “hears”.
   checkEnglish: (text: string) => { ok: boolean; corrected: string; note?: string };
@@ -451,6 +452,14 @@ function cleanCart(cart: unknown, max: number) {
   return result;
 }
 
+function queuePayment(state: PlayerState, guest: Customer, amount: number, tips: number, crystals: number, now: number, bottle = false) {
+  const previous = guest.pendingPayment;
+  guest.pendingPayment = { coins: coins((previous?.coins ?? 0) + amount), tips: coins((previous?.tips ?? 0) + tips), crystals: (previous?.crystals ?? 0) + crystals, bottle: previous?.bottle || bottle };
+  holdForPayment(guest, now);
+  state.conversationCustomerId = guest.id;
+  addGuestLine(state, guest, `Thank you! I am ready to pay ${guest.pendingPayment.coins.toFixed(2)} coins. Ask me how I would like to pay.`);
+}
+
 export function applyAction(state: PlayerState, action: GameAction, context: RuleContext) {
   const now = context.now;
   const random = context.random ?? Math.random;
@@ -478,8 +487,9 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       if (!result.accepted) throw new RuleError(result.text);
       const paid = state.money - balance;
       const tip = rollTip(state, guest, now, random) ? Math.max(1, Math.ceil(paid * .1)) : 0;
-      state.tipJar = coins((state.tipJar ?? 0) + tip);
-      if (tip) state.message += ` Tip +${tip} in the jar.`;
+      state.money = balance;
+      queuePayment(state, guest, paid, tip, 0, now);
+      state.message = `Food served. Accept payment in the conversation.`;
       break;
     }
     case 'tick': break;
@@ -526,6 +536,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     }
 
     case 'sellBottle': {
+      if (guest?.pendingPayment) throw new RuleError('Accept this guest’s payment in the conversation first.');
       if (guest && hasSituation(guest)) throw new RuleError(`Deal with ${guest.name}’s situation first.`);
       const request = guest?.bottleRequest;
       const product = ALCOHOL_PRODUCTS.find((item) => item.id === guest?.selectedBottleId);
@@ -537,22 +548,20 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       stock.quantity -= request.quantity;
       const tip = rollTip(state, guest, now, random) ? Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .08 : .03) * economyOf(state, now).tips) : 0;
       const paid = coins(revenue * lootBonuses(state, now).bottleSaleFactor);
-      state.money = coins(state.money + paid);
-      state.tipJar = coins((state.tipJar ?? 0) + tip);
+      queuePayment(state, guest, paid, tip, bottleSaleCrystalReward(product, request.quantity), now, true);
       const crystalPayment = bottleSaleCrystalReward(product, request.quantity);
-      state.crystals += crystalPayment;
       state.xp += xpGain(state, 110 + Math.min(state.streak * 2, 14), now);
       state.streak += 1;
       track(state, 'bottles', request.quantity, now);
       countServed(state);
       const note = `Sold ${request.quantity} × ${product.name} for ${paid.toFixed(2)} coins and ${crystalPayment} crystals.${tip ? ` Tip +${tip}.` : ' No tip this time.'}`;
-      scheduleNextCustomer(state, now, random);
-      state.message = note;
+      state.message = 'Bottle handed over. Accept payment in the conversation.';
       break;
     }
     case 'offerSimilar': {
       const target = state.customers.find((item) => item.id === action.customerId);
       if (!target) throw new RuleError('This guest is no longer here.');
+      if (target.pendingPayment) throw new RuleError('Accept this guest’s payment in the conversation first.');
       offerSimilar(state, target, priceFactorOf(target, region.marketFactor));
       const transcript = ensureTranscript(state, target);
       addLine(transcript, 'bartender', 'I’m sorry, we cannot serve that order. May I offer you something similar?', { ok: true });
@@ -564,6 +573,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'rejectCustomer': {
       const target = state.customers.find((item) => item.id === action.customerId);
       if (!target) throw new RuleError('This guest is no longer here.');
+      if (target.pendingPayment) throw new RuleError('Accept this guest’s payment in the conversation first.');
       scheduleNextCustomer(state, now, random);
       state.message = `${target.name} left without ordering.`;
       break;
@@ -573,6 +583,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const auto = action.auto === true;
       if (!guest) throw new RuleError('There is no order to serve.');
       if (hasSituation(guest)) throw new RuleError(`Deal with ${guest.name}’s situation first.`);
+      if (guest.pendingPayment) throw new RuleError('Accept this guest’s payment in the conversation first.');
       if (!isOrdering(guest)) throw new RuleError(`${guest.name} is still enjoying the last drink.`);
       if (guest.signature && !guest.orderRevealed) throw new RuleError('Talk to the guest first: ask about your house special.');
       if (guest.orderKind === 'bottle') throw new RuleError('This customer wants sealed bottles. Complete the sale in the conversation.');
@@ -618,16 +629,15 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const revenue = coins(verdict.recipe.price * priceFactorOf(guest, region.marketFactor) * mastery.pay * specialty * lootBonuses(state, now).payFactor * (golden ? 1.5 : 1) * (guest.orderKind === 'serve' ? 1 : regularPriceBonus(state, guest.characterId, verdict.recipe.id)) * (guest.signature ? signatureFameFactor(state) : 1));
         const bonus = guest.orderKind === 'serve' ? undefined : signatureBonus(verdict.recipe.id, pourBrands);
         // Tips are a chance, never a given; drinks made with Auto-serve are paid but never tipped.
-        const tipped = !auto && (golden || rollTip(state, guest, now, random));
+        const tipped = !auto && (context.training || golden || rollTip(state, guest, now, random));
         const tip = tipped ? Math.ceil(revenue * (guest.mood === 'vip' || guest.mood === 'wealthy' ? .2 : .1) * economyOf(state, now).tips * mastery.tips) + (bonus ? 2 : 0) : 0;
         // Sometimes the guest has a problem with paying: then the bill is held until it is sorted out.
         // A drink made with damaged or old goods can bring a complaint instead.
         const promo = applyPromo(state, guest, verdict.recipe, now);
         const complaint = !promo.free && lowGradeUsed.size && random() < (lowGradeUsed.has('expiring') ? .4 : .2) ? situationById('complaint-quality') : undefined;
-        const payTrouble = promo.free ? undefined : complaint ?? pickSituation(state, guest, 'payment', random);
+        const payTrouble = promo.free || context.training ? undefined : complaint ?? pickSituation(state, guest, 'payment', random);
         if (!payTrouble && !promo.free) {
-          state.money = coins(state.money + revenue);
-          state.tipJar = coins((state.tipJar ?? 0) + tip);
+          queuePayment(state, guest, revenue, tip, 0, now);
         }
         // About 170 successful orders reach level 25 and about 700 reach the level 50 cap.
         state.xp += xpGain(state, 100 + Math.min(state.streak * 2, 14), now);
@@ -656,7 +666,8 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         const brandedPayment = serveProduct ? brandedServeCrystalReward(serveProduct) : 0;
         const specialPayment = guest.specialRecipeRewardId || guest.mood === 'vip' ? conversationCrystalReward(guest, verdict.recipe) : 0;
         const crystalPayment = brandedPayment + specialPayment;
-        state.crystals += crystalPayment;
+        if ((guest as Customer).pendingPayment) (guest as Customer).pendingPayment!.crystals += crystalPayment;
+        else state.crystals += crystalPayment;
         const duplicateRecipe = !!guest.specialRecipeRewardId && state.knownRecipeIds.includes(guest.specialRecipeRewardId);
         const unlocked = guest.specialRecipeRewardId ? unlockRecipe(state, guest.specialRecipeRewardId, 'special-client') : false;
         const crystalNote = crystalPayment ? ` +${crystalPayment} crystals.` : '';
@@ -673,6 +684,9 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
           holdForPayment(guest, now);
           addGuestLine(state, guest, startSituation(state, guest, payTrouble, now, random, { amount: coins(revenue), afterServe: true, data: complaint ? { reason: lowGradeUsed.has('expiring') ? 'expiring' : 'damaged' } : undefined }));
           state.message = `${note} But there is a problem with the payment.${found}`;
+        } else if (guest.pendingPayment) {
+          recordDrink(guest, drunkGain(abv), now);
+          state.message = `${verdict.recipe.name} served. Accept payment through the conversation.${found}`;
         } else {
           const outcome = afterServed(state, guest, drunkGain(abv), guestContext(state, now, random));
           state.message = `${outcome === 'stays' ? `${note} ${guest.name} stays to enjoy the drink.` : note}${promo.notes.length ? ` ${promo.notes.join(' ')}` : ''}${found}`;
@@ -1008,6 +1022,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'askToLeave': {
       const target = state.customers.find((item) => item.id === action.customerId);
       if (!target) throw new RuleError('This guest is no longer here.');
+      if (action.type === 'askToLeave' && target.pendingPayment) throw new RuleError('Accept this guest’s payment in the conversation first.');
       const guests = guestContext(state, now, random);
       if (action.type === 'giveAshtray') {
         const result = giveAshtray(state, target, now);
@@ -1050,6 +1065,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const target = state.customers.find((item) => item.id === action.customerId);
       if (!target) throw new RuleError('This guest is no longer here.');
       if (action.type === 'pitchCancel') { cancelPitch(target); break; }
+      if (target.pendingPayment) throw new RuleError('Accept this guest’s payment in the conversation first.');
       if (action.type === 'pitchStart') {
         const problem = startPitch(state, target, action.kind, String(action.itemId), now);
         if (problem) throw new RuleError(problem);
@@ -1059,7 +1075,9 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
         break;
       }
       if (!pitchChance(state, target, now)) throw new RuleError('Choose what to offer first.');
+      const balanceBeforeFood = state.money;
       const result = askPitch(state, target, now, random);
+      if (result.accepted && result.kind === 'food') { const amount = coins(state.money - balanceBeforeFood); state.money = balanceBeforeFood; queuePayment(state, target, amount, 0, 0, now); }
       const transcript = ensureTranscript(state, target);
       addLine(transcript, 'customer', voice(target, result.text, transcript.lines.length));
       break;
@@ -1349,6 +1367,22 @@ function say(state: PlayerState, guest: Customer, text: string, context: RuleCon
   }
   addLine(transcript, 'bartender', text, { ok: english.ok, note: english.ok ? english.note : `Better: “${english.corrected}”` });
 
+  if (guest.pendingPayment && !hasSituation(guest)) {
+    const bill = guest.pendingPayment;
+    if (/\b(pay|payment|cash|card|bill|receipt|change)\b/i.test(english.corrected) && !/\b(cannot|can't|not|no|don't|do not)\b/i.test(english.corrected)) {
+      delete guest.pendingPayment;
+      state.money = coins(state.money + bill.coins);
+      state.tipJar = coins((state.tipJar ?? 0) + bill.tips);
+      state.crystals += bill.crystals;
+      addLine(transcript, 'customer', `I will pay ${guest.paymentMethod === 'cash' ? 'in cash' : 'by card'}. Payment received, thank you!${bill.tips ? ` Here is a ${bill.tips} coin tip for your jar.` : ''}`);
+      state.message = `Payment received: ${bill.coins.toFixed(2)} coins.${bill.tips ? ` Tip +${bill.tips} in the jar.` : ''}`;
+      if (bill.bottle) removeGuest(state, guest, guestContext(state, context.now, context.random ?? Math.random));
+      else settleGuest(state, guest, guestContext(state, context.now, context.random ?? Math.random));
+    } else {
+      addLine(transcript, 'customer', `I am ready to pay ${bill.coins.toFixed(2)} coins. Please ask whether I would like to pay by card or in cash.`);
+    }
+    return;
+  }
   // While a situation is open, the guest answers the situation: a typed sentence that means one of the offered replies counts as it.
   if (hasSituation(guest)) {
     const choice = matchChoice(state, guest, english.corrected) ?? matchChoice(state, guest, text);

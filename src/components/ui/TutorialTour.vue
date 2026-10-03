@@ -29,12 +29,12 @@ const shown = (css: string) => { const element = document.querySelector<HTMLElem
 
 const bottleOrder = ref(false);
 const STEPS: Step[] = [
-  { id:'welcome', title:'Welcome to BarLingo!', text:'Run your bar and practise real English with your guests. Follow the pointers, skip any step, or replay this tour from your avatar: Settings → How to play.', view:'service' },
+  { id:'welcome', title:'Welcome to BarLingo!', text:'Run your bar and practise real English with your guests. Practise a Gin & Tonic with Mia, accept her payment in English and collect her tip. Practice never changes your account balance or stock. Follow the pointers, skip any step, or replay this tour from your avatar: Settings → How to play.', view:'service' },
   { id:'guests', title:'Guests at the counter', text:'Tap the guest directly to talk. Your bar has up to five seats, each with its own arrival timer. Swipe or use the arrows to browse seats. A red dot on an arrow means a customer is waiting off screen. Tap an empty silhouette to invite its next guest early for crystals; the price depends on the remaining time.', view:'service',
     action:'Tap a guest. A red dot shows which way to scroll to find one.', point:[{target:selector('guest'),gesture:'tap',label:'{Tap} the guest to talk'},{target:'.guest-nudge:has(.hidden-guest-dot)',gesture:'tap',label:'{Tap} the red-dot arrow to find a waiting guest'}], until:()=>!!game.conversationCustomerId },
   { id:'talk', title:'Ask in English', text:'Build a question with the word tiles, use a suggested sentence, or type your own. Check & send checks your English and gets a reply. Read the clue board to learn what your guest wants.',
     action:'Build a question, then press Check & send.', point:[{target:selector('talk-send')+':not(:disabled)',gesture:'tap',label:'{Tap} Check & send',when:()=>document.querySelectorAll('.word-answer .placed').length>=3},{target:selector('tile-bank')+' .word-tile:not(:disabled)',gesture:'tap',label:'{Tap} word tiles to build a question'},{target:selector('phrase-idea'),gesture:'tap',label:'{Tap} a suggested question'},{target:selector('talk-input'),gesture:'type',label:'Type your question here'}], until:()=>!!document.querySelector('.talk-line.bartender') },
-  { id:'confirm', title:'Confirm the order', text:'Use the clues to name the drink or bottle in English. A wrong guess is another clue. Preparation opens only after the guest confirms the order.',
+  { id:'confirm', title:'Confirm the order', text:'Mia is your practice guest and always wants a Gin & Tonic. Ask: Would you like a Gin & Tonic? Use the clues to name the drink or bottle in English. A wrong guess is another clue. Preparation opens only after the guest confirms the order.',
     action:'Name the drink or bottle until the order is confirmed.', point:[{target:selector('new-question'),gesture:'tap',label:'{Tap} New question to choose an order sentence'},{target:selector('talk-input'),gesture:'type',label:'Ask which drink or bottle the guest wants'}], until:()=>!!game.customer.orderRevealed },
   { id:'workstation', title:'Open your workstation', text:'After a drink order is confirmed, Start mixing opens a separate close view of the counter. Sealed bottle orders are sold directly in the conversation with Sell full bottle.',
     action:'Press Start mixing for a drink, or Sell full bottle for a sealed bottle.', point:[{target:selector('prepare'),gesture:'tap',label:'{Tap} Start mixing'},{target:selector('bottle-sale')+':not(:disabled)',gesture:'tap',label:'{Tap} Sell full bottle'},{target:selector('guest'),gesture:'tap',label:'{Tap} the guest to reopen the confirmed order'}], until:()=>!!game.preparationCustomerId || game.rewardReport?.title==='Bottle sold' },
@@ -42,6 +42,8 @@ const STEPS: Step[] = [
     action:'Choose a measure and drag a needed bottle to the glass, or add a needed ingredient below.', point:[{target:selector('prep-bottle')+'.needed:not(:disabled)',to:selector('glass'),gesture:'drag',label:'Drag this bottle from the shelf to the glass'},{target:selector('prep-ingredient')+'.needed:not(:disabled)',gesture:'tap',label:'{Tap} the needed ingredient under the counter'},{target:selector('prep-search'),gesture:'type',label:'Find a bottle by name, brand or type'}], when:()=>!bottleOrder.value, until:()=>game.currentMix.length>0 },
   { id:'serve', title:'Finish and serve', text:'Follow the ingredient quest. Use Clear to empty the glass if you add too much. Press Mix when the recipe requires it. Once the drink is ready, Serve order replaces the quest on the right.',
     action:'Complete the ingredient quest, Mix if needed, then Serve order.', point:[{target:selector('serve')+':not(:disabled)',gesture:'tap',label:'{Tap} Serve order'},{target:selector('shake')+':not(:disabled)',gesture:'tap',label:'{Tap} Mix',when:()=>game.recipe.needsShake&&!game.shaken},{target:selector('prep-bottle')+'.needed:not(:disabled)',to:selector('glass'),gesture:'drag',label:'Drag a needed bottle to the glass'},{target:selector('prep-ingredient')+'.needed:not(:disabled)',gesture:'tap',label:'{Tap} a needed ingredient'}], when:()=>!bottleOrder.value, until:()=>!game.preparationCustomerId },
+  { id:'payment', title:'Accept payment in English', text:'Handing over the drink does not collect money. In the conversation, ask: Would you like to pay by card or in cash? Mia pays only after you ask. This applies to every guest, including bottle and food orders.', action:'Build the payment sentence and press Check & send.', point:[{target:selector('talk-send')+':not(:disabled)',gesture:'tap',label:'{Tap} Check & send to accept payment'},{target:selector('tile-bank')+' .word-tile:not(:disabled)',gesture:'tap',label:'Build the payment sentence'},{target:selector('phrase-idea'),gesture:'tap',label:'Choose the payment question'}], until:()=>game.trainingPhase === 'tips' || game.trainingPhase === 'complete' },
+  { id:'tips', title:'Collect your practice tip', text:'Mia leaves a guaranteed practice tip after paying. Tips wait in the jar at the right edge. Tap the jar to collect them. Practice coins and tips are discarded when you return to your real bar.', action:'Close the conversation if needed, then tap the tip jar.', point:[{target:selector('talk-close'),gesture:'tap',label:'{Tap} Back to bar'},{target:'[data-guide="tip-jar"]',gesture:'tap',label:'{Tap} the jar to collect the tip'}], until:()=>game.trainingPhase === 'complete' },
   { id:'care', title:'Look after your guests', text:'Tap a guest to reopen their conversation. Bring water or an ashtray, call a taxi, offer food or another drink, and resolve problems with clear, polite English. Collect earned tips by tapping the jar beside the bartender.', tips:['Tips stay in the jar until you collect them.','Food can also be served from the preparation screen’s Food tab.'] },
   { id:'english', title:'Study', text:'Study contains English lessons, recipes and pairing advice. Complete daily lessons for XP, crystals and a chance at a recipe card.', action:'Close any open screen, then open Study.', point:[{target:selector('talk-close'),gesture:'tap',label:'{Tap} Back to bar'},{target:selector('prep-back'),gesture:'tap',label:'{Tap} Back to bar'},{target:selector('nav-english'),gesture:'tap',label:'{Tap} Study'}], until:()=>shown('.learning-page') },
   { id:'market', title:'Storage and deliveries', text:'Storage contains Inventory, Market and Workshop. Buy bottles, ingredients and food in Market. Use Workshop for equipment, styles, fragments, boxes and weekly rankings. Report delivery problems politely in English.', action:'Open Storage, then Market.', point:[{target:selector('nav-market'),gesture:'tap',label:'{Tap} Market'},{target:selector('nav-manage'),gesture:'tap',label:'{Tap} Storage'}], until:()=>shown('.market-panel') },
@@ -114,6 +116,7 @@ function place() {
 }
 
 async function show() {
+  if (step.value.id === 'care') game.endTraining();
   if (step.value.id === 'workstation') bottleOrder.value = game.customer.orderKind === 'bottle';
   expanded.value = false;
   // The tour never moves the player: it does not switch tabs and does not close a popup that is open. The card says
@@ -123,9 +126,9 @@ async function show() {
   setTimeout(() => { measure(); place(); }, 120);
 }
 
-function start() { index.value = 0; finishedAt = -1; open.value = true; void show(); }
+function start() { game.beginTraining(); index.value = 0; finishedAt = -1; open.value = true; void show(); }
 // The choice is saved on the account (see the game store), so it is not asked again on another device.
-function finish(how: 'done' | 'skipped') { open.value = false; setPointer('tour', undefined); emit('finish', how); }
+function finish(how: 'done' | 'skipped') { game.endTraining(); open.value = false; setPointer('tour', undefined); emit('finish', how); }
 function next() { if (last.value) finish('done'); else { do { index.value++; } while (index.value < STEPS.length - 1 && step.value.when && !step.value.when()); void show(); } }
 function back() { if (index.value > 0) { do { index.value--; } while (index.value > 0 && step.value.when && !step.value.when()); void show(); } }
 const onKey = (event: KeyboardEvent) => { if (open.value && event.key === 'Escape') finish('skipped'); };
@@ -151,6 +154,7 @@ onMounted(() => {
   }, 400);
 });
 onBeforeUnmount(() => {
+  game.endTraining();
   if (poll) clearInterval(poll);
   setPointer('tour', undefined);
   window.removeEventListener('resize', measure);

@@ -1,3 +1,4 @@
+import { completeAction } from './paid-action.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { RECIPES } from '../src/domain/catalog.ts';
@@ -5,13 +6,13 @@ import { COSMETICS } from '../src/domain/cosmetics.ts';
 import { DRAW_COST, LEGENDARY_PITY, TIER_LEVEL_CAP, rollRarity, upgradeCostFor } from '../src/domain/loot.ts';
 import { normalizeLoot } from '../src/domain/lootState.ts';
 import { xpForLevel } from '../src/domain/progression.ts';
-import { applyAction } from '../src/sim/rules.ts';
+
 import { lootBonuses } from '../src/sim/loot.ts';
 import { createInitialState, normalizePlayerState } from '../src/sim/state.ts';
 
 const NOW = new Date(2026, 8, 30, 12).getTime();
 const context = (random = () => .5, now = NOW) => ({ now, random, checkEnglish: (text) => ({ ok: true, corrected: text }) });
-const run = (state, action, random, now) => applyAction(state, action, context(random, now));
+const run = (state, action, random, now) => completeAction(state, action, context(random, now));
 const fresh = () => { const state = createInitialState(NOW); state.startingBarChosen = true; state.loot.boxes = {}; return state; };
 
 test('Old saves gain a valid loot state and tampered numbers are discarded', () => {
@@ -427,7 +428,7 @@ test('Signature guests order the house special, pay its price with fame, and can
   run(state, { type: 'designSignature', name: 'Sky Tonic', items, needsShake: false });
   // Force the next arrival to be a signature guest (random() = 0 is below the guest chance).
   state.customers = []; delete state.seatNextCustomerAt; state.nextCustomerAt = 1; state.vipCooldownUntil = NOW + 1e12;
-  applyAction(state, { type: 'tick' }, { now: NOW + 10_000, random: () => 0, checkEnglish: (t) => ({ ok: true, corrected: t }), spawnCustomers: true });
+  completeAction(state, { type: 'tick' }, { now: NOW + 10_000, random: () => 0, checkEnglish: (t) => ({ ok: true, corrected: t }), spawnCustomers: true });
   const guest = state.customers[0];
   assert.ok(guest?.signature, 'a signature guest arrived');
   // The house special is not announced: the client never sees it, and it must be brought up in English.
@@ -441,7 +442,7 @@ test('Signature guests order the house special, pay its price with fame, and can
   run(state, { type: 'openConversation', customerId: guest.id });
   assert.doesNotMatch(state.conversations[guest.id].lines[0].text, /Sky Tonic/, 'the opening line does not give the name away');
   const seen = [];
-  const talk = (text) => applyAction(state, { type: 'say', text }, { now: NOW + 20_000, random: () => .5, checkEnglish: (t) => { seen.push(t); return { ok: true, corrected: t }; } });
+  const talk = (text) => completeAction(state, { type: 'say', text }, { now: NOW + 20_000, random: () => .5, checkEnglish: (t) => { seen.push(t); return { ok: true, corrected: t }; } });
   talk('Good evening, how are you?');
   assert.equal(guest.orderRevealed, false, 'small talk does not confirm the order');
   talk('Would you like the Sky Tonic?');
@@ -468,6 +469,7 @@ test('Signature guests order the house special, pay its price with fame, and can
   assert.equal(fameLevel(state.loot.signatures['new-york'].served), 0);
   state.customers = [{ ...guest, id: 'again', signature: guest.signature, patienceRemaining: 500, orderRevealed: true }];
   state.activeCustomerId = 'again';
+  state.customers[0].social.phase = 'ordering';
   run(state, { type: 'serve', mix: items.map((item) => ({ ...item })), shaken: false, pourBrands: {} }, () => .99);
   assert.equal(fameLevel(state.loot.signatures['new-york'].served), 1);
   assert.ok((state.loot.boxes.bronze ?? 0) >= 1);
@@ -492,11 +494,11 @@ test('The house special can also be asked for as "the house special"; wrong dish
   state.xp = xpForLevel(15); state.money = 1000; state.vipCooldownUntil = NOW + 1e12;
   run(state, { type: 'designSignature', name: 'Amber Sour', items: [{ ingredientId: 'whiskey', amount: 45 }, { ingredientId: 'lemon-juice', amount: 25 }], needsShake: true });
   state.customers = []; delete state.seatNextCustomerAt; state.nextCustomerAt = 1;
-  applyAction(state, { type: 'tick' }, { now: NOW + 10_000, random: () => 0, checkEnglish: (t) => ({ ok: true, corrected: t }), spawnCustomers: true });
+  completeAction(state, { type: 'tick' }, { now: NOW + 10_000, random: () => 0, checkEnglish: (t) => ({ ok: true, corrected: t }), spawnCustomers: true });
   const guest = state.customers[0];
   run(state, { type: 'openConversation', customerId: guest.id });
   const seen = [];
-  const talk = (text) => applyAction(state, { type: 'say', text }, { now: NOW + 20_000, random: () => .5, checkEnglish: (t) => { seen.push(t); return { ok: true, corrected: t }; } });
+  const talk = (text) => completeAction(state, { type: 'say', text }, { now: NOW + 20_000, random: () => .5, checkEnglish: (t) => { seen.push(t); return { ok: true, corrected: t }; } });
   talk('Would you like a Mojito?');
   assert.equal(guest.orderRevealed, false, 'naming another drink does not confirm it');
   talk('Maybe our house special?');
@@ -658,7 +660,7 @@ test('Review fixes: XP curve migration, first-box bonus, auto-serve gating, whol
   assert.ok(auto.xp > xpBefore && auto.money > 600);
   assert.equal(auto.loot.stats.serves ?? 0, 0);
   assert.equal(auto.loot.parts, 0);
-  assert.equal(auto.loot.weekly.score, 0);
+  assert.equal(auto.loot.weekly.score, 3, 'only the manual payment sentence counts; auto-serving adds no score');
   assert.equal(auto.loot.tasted.length, 0);
 
   // 4) A signature name called "Gin" is not found inside "begin"; the mask never collides with words in the sentence.
@@ -666,11 +668,11 @@ test('Review fixes: XP curve migration, first-box bonus, auto-serve gating, whol
   sig.xp = xpForLevel(15); sig.money = 1000; sig.vipCooldownUntil = NOW + 1e12;
   run(sig, { type: 'designSignature', name: 'Gin Fizz', items: [{ ingredientId: 'gin', amount: 45 }, { ingredientId: 'soda', amount: 60 }], needsShake: false });
   sig.customers = []; delete sig.seatNextCustomerAt; sig.nextCustomerAt = 1;
-  applyAction(sig, { type: 'tick' }, { now: NOW + 10_000, random: () => 0, checkEnglish: (t) => ({ ok: true, corrected: t }), spawnCustomers: true });
+  completeAction(sig, { type: 'tick' }, { now: NOW + 10_000, random: () => 0, checkEnglish: (t) => ({ ok: true, corrected: t }), spawnCustomers: true });
   const sg = sig.customers[0];
   run(sig, { type: 'openConversation', customerId: sg.id });
   const seen = [];
-  const talk = (text) => applyAction(sig, { type: 'say', text }, { now: NOW + 20_000, random: () => .5, checkEnglish: (t) => { seen.push(t); return { ok: true, corrected: t }; } });
+  const talk = (text) => completeAction(sig, { type: 'say', text }, { now: NOW + 20_000, random: () => .5, checkEnglish: (t) => { seen.push(t); return { ok: true, corrected: t }; } });
   talk('Let us begin, would you like a Mojito?');
   assert.equal(sg.orderRevealed, false);
   talk('Would you like a Mojito or our Gin Fizz?');

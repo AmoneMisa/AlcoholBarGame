@@ -90,6 +90,36 @@ export const useGameStore = defineStore('game', () => {
   const friends = ref<FriendSummary[]>([]);
   const visitedFriend = ref<FriendBar>();
   const rewardReport = ref<RewardReport>();
+  const trainingActive = ref(false);
+  const trainingPhase = ref<'order' | 'payment' | 'tips' | 'complete'>('order');
+  let savedTrainingState: PlayerState | undefined;
+  let savedTrainingMode: 'connecting' | 'online' | 'offline' = 'offline';
+  function beginTraining() {
+    if (trainingActive.value) return;
+    savedTrainingState = JSON.parse(JSON.stringify(toRaw(state.value)));
+    savedTrainingMode = mode.value;
+    const practice = JSON.parse(JSON.stringify(toRaw(state.value))) as PlayerState;
+    const guest = createInitialState(clientNow()).customers[0]!;
+    Object.assign(guest, {id:'practice-guest', name:'Mia', characterId:'mia', seatId:0, mood:'calm', orderKind:'cocktail', orderRecipeId:'gin-tonic', modifierId:undefined, specialRecipeRewardId:undefined, orderRevealed:false, patience:86400, patienceRemaining:86400, request:'A Gin & Tonic, please.', wish:'A crisp, refreshing drink with gin and tonic.', greeting:'Hi! I am your practice guest. I would like a Gin & Tonic, please.', budget:100, paymentMethod:'cash'});
+    if (guest.social) { guest.social.staysFor = 0; guest.social.rapport = 80; guest.social.drunk = 0; guest.social.phase = 'ordering'; delete guest.social.event; }
+    practice.customers = [guest]; practice.activeCustomerId = guest.id; practice.conversationCustomerId = undefined;
+    guest.characterId = 'marin';
+    practice.conversations = { [guest.id]: { lines: [{ id:0, speaker:'customer', text:guest.greeting }], facts:[], bottleFacts:{}, expression:'smile', attempts:0, correct:0 } }; practice.rewardedSentences = {}; practice.tipJar = 0;
+    practice.nextCustomerAt = clientNow() + 86400000; practice.seatNextCustomerAt = Array(5).fill(practice.nextCustomerAt);
+    practice.staffByBar = {}; practice.knownRecipeIds = [...new Set([...practice.knownRecipeIds, 'gin-tonic'])];
+    for (const item of practice.inventories[practice.regionId]) item.amount = Math.max(item.amount, 1000);
+    for (const item of practice.bottleInventories[practice.regionId]) item.quantity = Math.max(item.quantity, 1);
+    practice.message = 'Practice order: Gin & Tonic. Your account balance and stock are safe.';
+    trainingActive.value = true; trainingPhase.value = 'order'; state.value = practice; mode.value = 'offline';
+    rewardReport.value = undefined; dailyOpen.value = false; clearBarWorkspace(); message.value = practice.message;
+  }
+  function endTraining() {
+    if (!trainingActive.value) return;
+    trainingActive.value = false;
+    if (savedTrainingState) state.value = savedTrainingState;
+    mode.value = savedTrainingMode; savedTrainingState = undefined;
+    clearBarWorkspace(); rewardReport.value = undefined; message.value = state.value.message;
+  }
   const preparationCustomerId = ref('');
   const tipJar = computed(() => state.value.tipJar ?? 0);
   const collectTips = () => dispatch({ type: 'collectTips' });
@@ -237,17 +267,18 @@ export const useGameStore = defineStore('game', () => {
   const filteredRecipes = computed(() => recipeCategory.value === 'all' ? knownRecipes.value : knownRecipes.value.filter((item) => item.category === recipeCategory.value));
 
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
-  const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: mode.value !== 'online' });
+  const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: !trainingActive.value && mode.value !== 'online', training: trainingActive.value });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
   const SERVER_ONLY = new Set<GameAction['type']>(['collectTips', 'serveFood', 'say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson', 'spinRoulette', 'claimPass', 'buyPassPremium', 'buyPassLevels', 'discardLoot', 'giveAshtray', 'cleanAshtrays', 'pitchStart', 'pitchAsk', 'pitchCancel', 'hireStaff', 'upgradeStaff', 'giveWater', 'callTaxi', 'askToLeave', 'situationChoice', 'reportIssue', 'discardStock', 'openBox', 'pickReward', 'drawStyle', 'claimLeaderboardReward']);
 
   function saveOffline() {
-    if (mode.value === 'online') return;
+    if (mode.value === 'online' || trainingActive.value) return;
     try { localStorage.setItem(OFFLINE_KEY, JSON.stringify(toRaw(state.value))); } catch { /* storage unavailable */ }
   }
 
   function adoptServerState(next: PlayerState, serverTime?: number, note?: string) {
     if (serverTime) serverOffset.value = serverTime - Date.now();
+    if (trainingActive.value) { savedTrainingState = normalizePlayerState(next); return; }
     state.value = normalizePlayerState(next);
     nowMs.value = clientNow();
     if (note) message.value = note;
@@ -255,16 +286,22 @@ export const useGameStore = defineStore('game', () => {
 
   // The popup that tells the player what an action paid. Only actions that can give something are reported.
   const REWARD_TITLES: Partial<Record<GameAction['type'], string>> = {
-    serve: 'Drink served', autoServe: 'Drink served', sellBottle: 'Bottle sold', collectTips: 'Tips collected', serveFood: 'Food served', claimDaily: 'Daily reward', completeDailyLesson: 'Lesson complete',
+    say: 'Payment received', serve: 'Drink served', autoServe: 'Drink served', sellBottle: 'Bottle sold', collectTips: 'Tips collected', serveFood: 'Food served', claimDaily: 'Daily reward', completeDailyLesson: 'Lesson complete',
     spinRoulette: 'Daily wheel', sell: 'Stock sold', exchangeCrystals: 'Crystals exchanged', situationChoice: 'Guest situation resolved',
     openBox: 'Chest opened', pickReward: 'Chest reward', drawStyle: 'Style draw', claimSpark: 'Season reward', craftSkin: 'New style', craftStyle: 'New style',
     claimQuest: 'Quest complete', claimAchievement: 'Achievement unlocked', claimLeaderboardReward: 'Weekly reward', recruitCompanion: 'Welcome to your Circle', buyInterior: 'New background', buyStyle: 'New style',
     claimPass: 'Season pass reward', buyPassLevels: 'Pass levels bought', discardLoot: 'Thrown away'
   };
   function showRewards(title: string, lines: RewardLine[]) {
-    if (lines.length) rewardReport.value = { id: ++reportId, title, lines, celebration: !['Drink served', 'Bottle sold', 'Stock sold', 'Crystals exchanged', 'Guest situation resolved', 'Tips collected', 'Food served'].includes(title) };
+    if (lines.length) rewardReport.value = { id: ++reportId, title, lines, celebration: !['Drink served', 'Bottle sold', 'Stock sold', 'Crystals exchanged', 'Guest situation resolved', 'Tips collected', 'Food served', 'Payment received'].includes(title) };
   }
   function reportAction(action: GameAction, before: Snapshot) {
+    if (action.type === 'say' && state.value.money <= before.money) return;
+    if (trainingActive.value) {
+      if (action.type === 'serve' && state.value.customers.some(guest => guest.pendingPayment)) trainingPhase.value = 'payment';
+      if (action.type === 'say' && state.value.money > before.money) trainingPhase.value = 'tips';
+      if (action.type === 'collectTips') trainingPhase.value = 'complete';
+    }
     const title = REWARD_TITLES[action.type];
     if (title) showRewards(title, rewardLines(before, stateSnapshot(state.value), state.value.message));
   }
@@ -274,6 +311,7 @@ export const useGameStore = defineStore('game', () => {
     const levelBefore = levelFor(state.value.xp ?? 0);
     return sendAction(action).then((result) => {
       if (result.state) adoptServerState(result.state, result.serverTime, result.ok ? result.message : result.error);
+      if (trainingActive.value) return result.ok;
       if (result.ok) reportAction(action, before);
       if (result.ok) playActionSound(action, levelBefore);
       else playSfx('error');
@@ -437,7 +475,7 @@ export const useGameStore = defineStore('game', () => {
     nowMs.value = now;
     const before = state.value.customers.length;
     const draft = state.value;
-    advanceClock(draft, { now, spawnCustomers: mode.value !== 'online' });
+    advanceClock(draft, { now, spawnCustomers: !trainingActive.value && mode.value !== 'online' });
     const arrivalDue = draft.nextCustomerAt > 0 && now >= draft.nextCustomerAt;
     if (draft.customers.length !== before || arrivalDue) {
       message.value = draft.message;
@@ -737,7 +775,7 @@ export const useGameStore = defineStore('game', () => {
 
   const act = (action: GameAction) => dispatch(action);
   return {
-    preparationCustomerId, openPreparation, tipJar, collectTips,
+    trainingActive, trainingPhase, beginTraining, endTraining, preparationCustomerId, openPreparation, tipJar, collectTips,
     topUpPreview, circle, crewBonus, recruitCompanion, giveKeepsake, buyKeepsake, assignCompanion, dismissCompanion, spotlightCompanion, levelUpCompanion, achievementStat, profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, availableEvents, act, visibleInventory, connectEpoch,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,

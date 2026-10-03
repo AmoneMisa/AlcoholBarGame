@@ -15,6 +15,7 @@ import CharacterModel from '../characters/CharacterModel.vue';
 import { MAX_CUSTOMER_SEATS, hiddenCustomerDirections } from '../../domain/customerTiming';
 import type { ScreenshotPreferences } from '../../stores/screenshot';
 import PopoverPanel from '../ui/PopoverPanel.vue';
+import { useBarLayoutStore } from '../../stores/barLayout';
 import TipJar from './TipJar.vue';
 import ConfirmDialog from '../ui/ConfirmDialog.vue';
 import CrystalAmount from '../ui/CrystalAmount.vue';
@@ -24,6 +25,23 @@ import { INTERIORS, shelfStyleFor } from '../../data/cosmetics/bars';
 import { sceneLayout } from '../../data/cosmetics/barLines';
 
 const game = useGameStore();
+const barLayout = useBarLayoutStore();
+const movingBartender = ref(false);
+function moveBartender(event: PointerEvent) {
+  if (!movingBartender.value || !sceneRef.value) return;
+  const box = sceneRef.value.getBoundingClientRect();
+  barLayout.move(game.decor.interior, (event.clientX - box.left) / box.width);
+}
+function startMovingBartender(event: PointerEvent) {
+  if (props.capture || event.button !== 0) return;
+  movingBartender.value = true;
+  (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+}
+function moveBartenderKey(event: KeyboardEvent) {
+  if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+  event.preventDefault();
+  barLayout.move(game.decor.interior, (barLayout.positions[game.decor.interior] ?? people.value!.bartenderX / sceneBox.value.width) + (event.key === 'ArrowRight' ? .025 : -.025));
+}
 const ashtrayArt = `${import.meta.env.BASE_URL}assets/bar/props/ashtray.webp`;
 // `preview` renders the bar exactly as decorated (shelves always on, no guests or glass) for the Design tab.
 const props = withDefaults(defineProps<{ active?: boolean; preview?: boolean; capture?:boolean; captureOptions?:ScreenshotPreferences; captureControls?:boolean }>(), { active: true, preview: false, capture:false, captureControls:true });
@@ -57,12 +75,13 @@ const people = computed(() => {
   const plankGap = planks.length > 1 ? (planks[planks.length - 1]! - planks[0]!) / (planks.length - 1) : current.drawnHeight * .1;
   // Phones show a compact scene, so people get smaller limits there.
   const phone = width < 760;
-  const guest = Math.round(phone ? Math.min(190, Math.max(110, plankGap * 2.3)) : Math.min(300, Math.max(150, plankGap * 2.3)));
+  let guest = Math.round(phone ? Math.min(190, Math.max(110, plankGap * 2.3)) : Math.min(300, Math.max(150, plankGap * 2.3)));
   const bartender = Math.round(phone ? Math.min(260, Math.max(150, plankGap * 3.4)) : Math.min(440, Math.max(240, plankGap * 3.4)));
   // The bartender works on the side away from the bottle shelf, so they never hide the bottles.
   const shelfOnRight = (current.shelf.left + current.shelf.right) / 2 > width * .6;
   const side = phone ? .84 : .86;
-  const bartenderX = current.bartenderX ?? Math.round(width * (shelfOnRight ? 1 - side : side));
+  const bartenderX = barLayout.positions[game.decor.interior] !== undefined ? width * barLayout.positions[game.decor.interior]! : current.bartenderX ?? Math.round(width * (shelfOnRight ? 1 - side : side));
+  if (phone) guest = Math.min(guest, Math.floor((Math.max(bartenderX, width - bartenderX) - bartender * .24 - 14) / 2 / .8));
   // The glass stands at the bartender's left hand; only at the scene's left edge does it move to the right.
   const glassOffset = bartender * (phone ? .20 : .22);
   const glassX = bartenderX - glassOffset < 60 ? bartenderX + glassOffset : bartenderX - glassOffset;
@@ -113,7 +132,7 @@ const phoneTrack = computed(() => {
   const sizes = people.value;
   const zone = guestZone.value;
   if (!sizes || !zone || (sceneBox.value.width >= 760 && zone.end - zone.start >= MAX_CUSTOMER_SEATS * sizes.guest * .8)) return undefined;
-  const spacing = Math.round(sizes.guest * .8) + 4;
+  const spacing = sceneBox.value.width < 760 ? Math.floor((zone.end - zone.start) / 2) : Math.round(sizes.guest * .8) + 4;
   const visible = Math.max(1, Math.floor((zone.end - zone.start) / spacing)) * spacing;
   const start = people.value!.bartenderX < sceneBox.value.width / 2 ? zone.end - visible : zone.start;
   return { start, end:start + visible, zone:visible, spacing, content: MAX_CUSTOMER_SEATS * spacing };
@@ -317,6 +336,7 @@ function badges(customer: Customer) {
   return list;
 }
 function bubbleText(customer: Customer) {
+  if (customer.pendingPayment) return `Ready to pay ${customer.pendingPayment.coins.toFixed(2)} coins.`;
   // Something the guest said on their own (about the drink, the room, their life) shows for a while.
   const murmur = customer.social?.murmur;
   if (murmur && murmur.until > game.nowMs) return murmur.text;
@@ -502,7 +522,7 @@ onBeforeUnmount(() => {
         <span class="shelf-nudge"><button type="button" :aria-label="`Scroll ${row.label} left`" @pointerdown.stop @click.stop="nudgeLine(row.id, -1)"><UiIcon name="chevron-left" /></button><button type="button" :aria-label="`Scroll ${row.label} right`" @pointerdown.stop @click.stop="nudgeLine(row.id, 1)"><UiIcon name="chevron-right" /></button></span>
       </div>
     </div>
-    <div class="bartender-layer">
+    <div class="bartender-layer" :class="{ moving: movingBartender }" :tabindex="capture || preview ? undefined : 0" :role="capture || preview ? undefined : 'slider'" aria-label="Bartender position. Drag left or right, or use arrow keys." :aria-valuemin="12" :aria-valuemax="88" :aria-valuenow="Math.round((people?.bartenderX ?? 0) / (sceneBox.width || 1) * 100)" @pointerdown="startMovingBartender" @pointermove="moveBartender" @pointerup="movingBartender = false" @pointercancel="movingBartender = false" @keydown="moveBartenderKey">
       <CharacterModel role="bartender" :character-id="game.decor.bartenderCharacter ?? 'noa'" :outfit="game.decor.bartender" :face-style="game.decor.face" :hair-style="game.decor.hairStyle" :hair-color="game.decor.hairColor" :body-shape="game.decor.bodyShape" :skin-detail="game.decor.skinDetail" :skin-tone="game.decor.skinTone" :tan-level="game.decor.tanLevel" :bust="game.decor.bust" :pose="game.decor.pose" :eye-shape="game.decor.eyeShape" :brow-shape="game.decor.browShape" :nose-shape="game.decor.noseShape" :lip-shape="game.decor.lipShape" :cheek-shape="game.decor.cheekShape" :eye-color="game.decor.eyeColor" :eyeliner="game.decor.eyeliner" :eyeshadow="game.decor.eyeshadow" :lip-color="game.decor.lipColor" :blush="game.decor.blush" :facial-hair="game.decor.facialHair" :outfit-color="game.decor.outfitColor" animation="idle" />
       <span class="name-ribbon">{{ (game.decor.bartenderNickname || (game.decor.bartenderCharacter === 'leo' ? 'Leo' : 'Noa')).toUpperCase() }} · BARTENDER</span>
     </div>
@@ -514,9 +534,9 @@ onBeforeUnmount(() => {
         <img v-if="customer.social?.ashtray === 'given'" class="customer-ashtray" :src="ashtrayArt" alt="" draggable="false" />
         <div class="guest-card" data-guide="guest">
           <header><b>{{ customer.name }}</b><time v-if="customer.id === game.activeCustomerId">{{ game.orderCountdown }}</time></header>
-          <small class="guest-badges"><span v-for="badge in badges(customer)" :key="badge.label" :title="badge.label"><img v-if="badge.icon === 'ashtray'" class="ashtray-badge" :src="ashtrayArt" alt="" /><Glyph v-else :g="badge.icon" /></span><i v-if="!customer.social">{{ customer.mood }}</i><i v-else>{{ customer.social.phase === 'enjoying' ? 'enjoying' : EMOTION_LABEL[customer.social.emotion].toLowerCase() }}</i></small>
+          <small class="guest-badges"><span v-for="badge in badges(customer)" :key="badge.label" :title="badge.label"><img v-if="badge.icon === 'ashtray'" class="ashtray-badge" :src="ashtrayArt" alt="" /><Glyph v-else :g="badge.icon" /></span><i v-if="!customer.social">{{ customer.mood }}</i><i v-else>{{ customer.pendingPayment ? 'payment' : customer.social.phase === 'enjoying' ? 'enjoying' : EMOTION_LABEL[customer.social.emotion].toLowerCase() }}</i></small>
           <p>{{ bubbleText(customer) }}</p>
-          <footer><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customer.social?.phase === 'enjoying' ? 'Enjoying the drink' : customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
+          <footer><span class="mini-patience"><i :style="{ width: patience(customer.patienceRemaining, customer.patience) + '%' }"></i></span><em :class="{ confirmed: customer.orderRevealed && customer.social?.phase !== 'enjoying' }">{{ customer.pendingPayment ? 'Awaiting payment' : customer.social?.phase === 'enjoying' ? 'Enjoying the drink' : customer.orderRevealed ? 'Order confirmed' : 'Tap to talk' }}</em></footer>
         </div>
       </button>
       <button v-else type="button" class="scene-customer empty-seat" :style="customerStyle(index)" :aria-label="`Invite guest to seat ${index + 1} · next guest in ${countdown}`" @click="inviteSeat = index">
@@ -546,3 +566,13 @@ onBeforeUnmount(() => {
   </ConfirmDialog>
 </template>
 
+
+<style scoped>
+.bar-scene { overflow:clip !important; }
+.bar-scene.phone-guests .bar-cast { min-width:0; }
+.bar-scene .bartender-layer { clip-path:inset(-12% -30% calc(42% - 4px) -30%); pointer-events:auto; touch-action:pan-y; cursor:ew-resize; }
+.bar-scene .bartender-layer.moving { touch-action:none; }
+.bar-scene .bartender-layer:focus-visible { outline:2px solid #eac780; outline-offset:4px; }
+.bar-scene.capture .bartender-layer { pointer-events:none; }
+.bar-scene.phone-guests .guest-card { min-width:0; max-width:calc(var(--guest-h) * .8); font-size:10px; }
+</style>

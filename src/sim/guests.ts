@@ -181,6 +181,7 @@ export function tickGuests(state: PlayerState, context: GuestContext, seconds: n
   for (const guest of [...state.customers]) {
     const social = ensureSocial(guest, context.now);
     social.drunk = clampPercent(social.drunk - minutes * .45);
+    if (guest.pendingPayment) continue;
     // A taxi that has arrived takes the guest home.
     if (social.taxiAt && context.now >= social.taxiAt) {
       state.message = `${guest.name}: “${choose(TAXI_ARRIVED, guest.id)}” The taxi took ${guest.name} home safely.`;

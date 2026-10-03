@@ -1,3 +1,4 @@
+import { completeAction } from './paid-action.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { RECIPES, REGIONS, SUPPLIERS } from '../src/domain/catalog.ts';
@@ -5,7 +6,7 @@ import { BAR_PURCHASE_LEVEL, SECOND_BAR_COIN_COST, barUnlockPrice } from '../src
 import { quotePurchase, supplierInCity } from '../src/domain/economy.ts';
 import { createMarket, requiredRecipe } from '../src/domain/engine.ts';
 import { EVENT_CATALOG, EVENT_WINDOW_MS, MAX_VIP_CHANCE, economyAt, eventAt, levelFor, levelPerks, levelProgress, marketFor, xpForLevel } from '../src/domain/progression.ts';
-import { applyAction, advanceClock } from '../src/sim/rules.ts';
+import { advanceClock } from '../src/sim/rules.ts';
 import { createInitialState, normalizePlayerState } from '../src/sim/state.ts';
 import { recipeCardsRequired } from '../src/sim/recipes.ts';
 import { DAILY_LESSON_RECIPE_CHANCE, dailyLessonsFor, learningStreakBonus } from '../src/domain/dailyLessons.ts';
@@ -39,17 +40,17 @@ test('Daily lessons award server-checked XP and crystals once, with a streak bon
   const state = createInitialState(now);
   const lessons = dailyLessonsFor('2026-09-29');
   assert.equal(lessons.length,3);
-  assert.throws(() => applyAction(state,{type:'completeDailyLesson',lessonId:lessons[0].id,answer:'wrong'},context(now)),/try again/i);
+  assert.throws(() => completeAction(state,{type:'completeDailyLesson',lessonId:lessons[0].id,answer:'wrong'},context(now)),/try again/i);
   const firstXp = state.xp;const firstCrystals = state.crystals;
-  applyAction(state,{type:'completeDailyLesson',lessonId:lessons[0].id,answer:lessons[0].answer},context(now));
+  completeAction(state,{type:'completeDailyLesson',lessonId:lessons[0].id,answer:lessons[0].answer},context(now));
   assert.equal(state.xp,firstXp + lessons[0].xp);assert.equal(state.crystals,firstCrystals + lessons[0].crystals);
-  assert.throws(() => applyAction(state,{type:'completeDailyLesson',lessonId:lessons[0].id,answer:lessons[0].answer},context(now)),/already/i);
-  for (const lesson of lessons.slice(1)) applyAction(state,{type:'completeDailyLesson',lessonId:lesson.id,answer:lesson.answer},context(now));
+  assert.throws(() => completeAction(state,{type:'completeDailyLesson',lessonId:lessons[0].id,answer:lessons[0].answer},context(now)),/already/i);
+  for (const lesson of lessons.slice(1)) completeAction(state,{type:'completeDailyLesson',lessonId:lesson.id,answer:lesson.answer},context(now));
   assert.equal(state.learningStreak,1);assert.equal(state.dailyLessonCompletedIds.length,3);
   state.learningStreak = 99;state.lastLearningDayKey = '2026-09-29';
   assert.equal(learningStreakBonus(100),.5);
   const tomorrow = new Date(2026,8,30,12).getTime();const next = dailyLessonsFor('2026-09-30')[0];
-  const xp = state.xp;applyAction(state,{type:'completeDailyLesson',lessonId:next.id,answer:next.answer},context(tomorrow));
+  const xp = state.xp;completeAction(state,{type:'completeDailyLesson',lessonId:next.id,answer:next.answer},context(tomorrow));
   assert.equal(state.xp - xp,Math.round(next.xp * 1.5));
 });
 
@@ -57,7 +58,7 @@ test('Completing the daily set can drop a random recipe at the configured low ch
   assert.ok(DAILY_LESSON_RECIPE_CHANCE > 0 && DAILY_LESSON_RECIPE_CHANCE < .1);
   const now = new Date(2026,8,29,12).getTime();const state = createInitialState(now);const before = state.knownRecipeIds.length;
   const lucky = { ...context(now), random:() => 0 };
-  for (const lesson of dailyLessonsFor('2026-09-29')) applyAction(state,{type:'completeDailyLesson',lessonId:lesson.id,answer:lesson.answer},lucky);
+  for (const lesson of dailyLessonsFor('2026-09-29')) completeAction(state,{type:'completeDailyLesson',lessonId:lesson.id,answer:lesson.answer},lucky);
   assert.equal(state.knownRecipeIds.length,before + 1);assert.match(state.dailyLessonResult,/Lucky drop/);
 });
 
@@ -65,18 +66,18 @@ test('The first bar is chosen freely; expansion starts at level 25, then costs c
   const now = Date.now();const state = createInitialState(now);
   assert.equal(state.startingBarChosen,false);assert.deepEqual(state.ownedBarIds,['new-york']);
   assert.equal(new Set(Object.values(state.bars).map((bar) => bar.interior)).size,6,'the welcome screen previews six different interiors');
-  applyAction(state,{type:'chooseStartingBar',regionId:'berlin'},context(now));
+  completeAction(state,{type:'chooseStartingBar',regionId:'berlin'},context(now));
   assert.deepEqual(state.ownedBarIds,['berlin']);assert.equal(state.regionId,'berlin');
   assert.equal(state.bars.berlin.interior,DEFAULT_BARS.berlin.interior);assert.ok(state.ownedInteriorIds.includes(DEFAULT_BARS.berlin.interior));
-  assert.throws(() => applyAction(state,{type:'switchBar',regionId:'london'},context(now)),/Purchase/);
-  assert.throws(() => applyAction(state,{type:'buyBar',regionId:'london'},context(now)),new RegExp(`level ${BAR_PURCHASE_LEVEL}`));
+  assert.throws(() => completeAction(state,{type:'switchBar',regionId:'london'},context(now)),/Purchase/);
+  assert.throws(() => completeAction(state,{type:'buyBar',regionId:'london'},context(now)),new RegExp(`level ${BAR_PURCHASE_LEVEL}`));
   state.xp = xpForLevel(BAR_PURCHASE_LEVEL);state.money = SECOND_BAR_COIN_COST;
-  applyAction(state,{type:'buyBar',regionId:'london'},context(now));
+  completeAction(state,{type:'buyBar',regionId:'london'},context(now));
   assert.ok(state.ownedBarIds.includes('london'));assert.equal(state.money,0);assert.equal(state.regionId,'london');
   assert.equal(state.bars.london.interior,DEFAULT_BARS.london.interior);assert.ok(state.ownedInteriorIds.includes(DEFAULT_BARS.london.interior));
   assert.equal(barUnlockPrice(state.ownedBarIds).currency,'crystals');
   state.crystals = barUnlockPrice(state.ownedBarIds).amount;
-  applyAction(state,{type:'buyBar',regionId:'tokyo'},context(now));
+  completeAction(state,{type:'buyBar',regionId:'tokyo'},context(now));
   assert.ok(state.ownedBarIds.includes('tokyo'));assert.equal(state.crystals,0);
 });
 
@@ -84,13 +85,13 @@ test('Recipe mastery: levels 2 and 3 cost coins only, the top two levels also ta
   const now = Date.now();const state = createInitialState(now);const recipe = RECIPES[0];
   state.money = 100000;state.recipeCopies = {};
   assert.deepEqual([1,2,3,4].map(recipeCardsRequired),[0,0,2,3]);
-  applyAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now));
-  applyAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now));
+  completeAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now));
+  completeAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now));
   assert.equal(state.recipeLevels[recipe.id],3,'coins alone reach level 3');
   state.recipeCopies[recipe.id] = 1;
-  assert.throws(() => applyAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now)),/need 2/i);
+  assert.throws(() => completeAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now)),/need 2/i);
   state.recipeCopies[recipe.id] = 2;
-  applyAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now));
+  completeAction(state,{type:'upgradeRecipe',recipeId:recipe.id},context(now));
   assert.equal(state.recipeLevels[recipe.id],4);assert.equal(state.recipeCopies[recipe.id],0);
 });
 
@@ -157,7 +158,7 @@ test('The rules charge event and level prices on the server side', () => {
   const offer = marketFor(region, now, state.xp).find((item) => item.supplierId === 'global');
   const cart = { [offer.ingredientId]: 3 };
   const money = state.money;
-  applyAction(state, { type: 'buy', supplierId: 'global', cart }, context(now));
+  completeAction(state, { type: 'buy', supplierId: 'global', cart }, context(now));
   const paid = Math.round((money - state.money) * 100) / 100;
   assert.equal(paid, quotePurchase(marketFor(region, now, 0), cart, supplier).total, 'the rules charge the event price');
   assert.ok(paid < quotePurchase(createMarket(region, new Date(now).getDate()), cart, supplier).total, 'the discount is applied');
@@ -193,25 +194,25 @@ test('Tips are a chance, Auto-serve needs level 10 and a confirmed order, and ne
     for (const item of requiredRecipe(guest).ingredients) state.inventories[state.regionId].find((stock) => stock.ingredientId === item.ingredientId).amount += 1000;
     return state;
   };
-  const serve = (state, random) => applyAction(state,{type:'serve',mix:requiredRecipe(state.customers[0]).ingredients.map((item) => ({...item})),shaken:true,pourBrands:{}},at(random));
+  const serve = (state, random) => completeAction(state,{type:'serve',mix:requiredRecipe(state.customers[0]).ingredients.map((item) => ({...item})),shaken:true,pourBrands:{}},at(random));
   // Guests without a fixed price factor pay the city's rate (the rules' own fallback).
   const price = (state) => Math.round(requiredRecipe(state.customers[0]).price * (state.customers[0].priceFactor ?? REGIONS.find((region) => region.id === state.regionId).marketFactor) * 100) / 100;
 
   const lucky = setup(0);const luckyPrice = price(lucky);const before = lucky.money;serve(lucky, .1);
   assert.equal(Math.round((lucky.money-before)*100)/100,luckyPrice);
   assert.ok(lucky.tipJar > 0, 'a tip waits in the jar');
-  const tip = lucky.tipJar; applyAction(lucky,{type:'collectTips'},at(.1));
+  const tip = lucky.tipJar; completeAction(lucky,{type:'collectTips'},at(.1));
   assert.equal(lucky.tipJar,0); assert.equal(Math.round((lucky.money-before)*100)/100, Math.round((luckyPrice+tip)*100)/100);
-  assert.throws(()=>applyAction(lucky,{type:'collectTips'},at(.1)),/empty/i);
+  assert.throws(()=>completeAction(lucky,{type:'collectTips'},at(.1)),/empty/i);
   const unlucky = setup(0);const unluckyPrice = price(unlucky);const start = unlucky.money;serve(unlucky, .9);
   assert.equal(Math.round((unlucky.money - start) * 100) / 100, unluckyPrice, 'no tip above the chance');
 
   const low = setup(0);
-  assert.throws(() => applyAction(low,{type:'autoServe'},at(.1)),/level 10/i);
+  assert.throws(() => completeAction(low,{type:'autoServe'},at(.1)),/level 10/i);
   const high = setup(xpForLevel(10));high.customers[0].orderRevealed = false;
-  assert.throws(() => applyAction(high,{type:'autoServe'},at(.1)),/talk to the guest/i);
+  assert.throws(() => completeAction(high,{type:'autoServe'},at(.1)),/talk to the guest/i);
   high.customers[0].orderRevealed = true;const autoPrice = price(high);const autoStart = high.money;const guestsBefore = high.customers.length;
-  applyAction(high,{type:'autoServe'},at(.1));
+  completeAction(high,{type:'autoServe'},at(.1));
   assert.equal(Math.round((high.money - autoStart) * 100) / 100, autoPrice, 'automated drinks are paid but not tipped');
   assert.equal(high.customers.length, guestsBefore - 1);
 });
@@ -219,17 +220,17 @@ test('Tips are a chance, Auto-serve needs level 10 and a confirmed order, and ne
 test('Auto-supply unlocks at level 5 and reorders low stock once, at market prices plus delivery', () => {
   const now = 1_800_000_000_000;
   const state = createInitialState(now);
-  assert.throws(() => applyAction(state,{type:'setAutoSupply',enabled:true},context(now)),/level 5/i);
+  assert.throws(() => completeAction(state,{type:'setAutoSupply',enabled:true},context(now)),/level 5/i);
   state.xp = xpForLevel(5);state.money = 5000;
   const lime = state.inventories[state.regionId].find((stock) => stock.ingredientId === 'lime-juice');lime.amount = 20;
-  applyAction(state,{type:'setAutoSupply',enabled:true},context(now));
+  completeAction(state,{type:'setAutoSupply',enabled:true},context(now));
   const orders = state.deliveryOrders.filter((order) => order.items.some((item) => item.ingredientId === 'lime-juice'));
   assert.equal(orders.length, 1, 'low stock is reordered');
   assert.ok(state.money < 5000);
   advanceClock(state,{ now: now + 1000 });
   assert.equal(state.deliveryOrders.filter((order) => order.items.some((item) => item.ingredientId === 'lime-juice')).length, 1, 'never ordered twice while on the way');
   const ordersBefore = state.deliveryOrders.length;
-  applyAction(state,{type:'setAutoSupply',enabled:false},context(now + 2000));
+  completeAction(state,{type:'setAutoSupply',enabled:false},context(now + 2000));
   for (const stock of state.inventories[state.regionId]) stock.amount = 0;
   advanceClock(state,{ now: now + 3000 });
   assert.equal(state.deliveryOrders.length, ordersBefore, 'switched off, nothing is ordered');

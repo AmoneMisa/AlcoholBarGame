@@ -1,3 +1,4 @@
+import { completeAction } from './paid-action.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { checkEnglish } from '../server/english.mjs';
@@ -5,7 +6,7 @@ import { RECIPES } from '../src/domain/catalog.ts';
 import { FOODS } from '../src/domain/foods.ts';
 import { BAR_EVENTS } from '../src/domain/barEvents.ts';
 import { pitchActsIn } from '../src/domain/social/pitchActs.ts';
-import { applyAction, advanceClock } from '../src/sim/rules.ts';
+import { advanceClock } from '../src/sim/rules.ts';
 import { pitchChance } from '../src/sim/pitch.ts';
 import { applyPromo, barEventFor, tickBarEvent } from '../src/sim/events.ts';
 import { createInitialState } from '../src/sim/state.ts';
@@ -55,14 +56,14 @@ test('Every seventh drink is a gift', () => {
 test('Offering food: chance is explained, talk changes it, a yes pays', () => {
   const { state, guest } = guestIn({ hungry: false, emotion: 'tired' });
   state.inventories[state.regionId].find((item) => item.ingredientId === 'fries').amount = 5;
-  applyAction(state, { type: 'pitchStart', customerId: guest.id, kind: 'food', itemId: 'fries' }, context());
+  completeAction(state, { type: 'pitchStart', customerId: guest.id, kind: 'food', itemId: 'fries' }, context());
   const before = pitchChance(state, guest, NOW);
   assert.ok(before.parts.length >= 3);
   assert.deepEqual(pitchActsIn('It is on the house'), ['free']);
   guest.social.pitch.bonus += .1;
   assert.ok(pitchChance(state, guest, NOW).chance > before.chance);
   const money = state.money;
-  applyAction(state, { type: 'pitchAsk', customerId: guest.id }, context(NOW, () => 0));
+  completeAction(state, { type: 'pitchAsk', customerId: guest.id }, context(NOW, () => 0));
   assert.ok(state.money > money);
   assert.equal(guest.social.hungry, false);
 });
@@ -70,7 +71,7 @@ test('Offering food: chance is explained, talk changes it, a yes pays', () => {
 test('Offering something not in stock is refused', () => {
   const { state, guest } = guestIn();
   state.inventories[state.regionId].find((item) => item.ingredientId === 'fries').amount = 0;
-  assert.throws(() => applyAction(state, { type: 'pitchStart', customerId: guest.id, kind: 'food', itemId: 'fries' }, context()), /no fries|stock/i);
+  assert.throws(() => completeAction(state, { type: 'pitchStart', customerId: guest.id, kind: 'food', itemId: 'fries' }, context()), /no fries|stock/i);
 });
 
 test('Clock keeps running with an event on', () => {
@@ -120,13 +121,13 @@ test('Servers: opened by level, trained one by one, paid only for time away and 
   const { state } = guestIn();
   state.money = 10000000;
   state.xp = 1e9;
-  for (let index = 0; index < 4; index++) applyAction(state, { type: 'hireStaff' }, context());
+  for (let index = 0; index < 4; index++) completeAction(state, { type: 'hireStaff' }, context());
   assert.equal(state.staffByBar[state.regionId].length, 4);
-  assert.throws(() => applyAction(state, { type: 'hireStaff' }, context()), /whole team/);
+  assert.throws(() => completeAction(state, { type: 'hireStaff' }, context()), /whole team/);
   assert.ok(staff.teamShare(state.staffByBar[state.regionId]) < .85, 'untrained servers are weaker');
-  for (let round = 0; round < 4; round++) for (let index = 0; index < 4; index++) applyAction(state, { type: 'upgradeStaff', index }, context());
+  for (let round = 0; round < 4; round++) for (let index = 0; index < 4; index++) completeAction(state, { type: 'upgradeStaff', index }, context());
   assert.equal(staff.teamShare(state.staffByBar[state.regionId]), .85);
-  assert.throws(() => applyAction(state, { type: 'upgradeStaff', index: 0 }, context()), /fully trained/);
+  assert.throws(() => completeAction(state, { type: 'upgradeStaff', index: 0 }, context()), /fully trained/);
 
   const market = { averagePrice: 10, arrival: 1 };
   state.staffAtByBar = { [state.regionId]: NOW };
@@ -146,7 +147,7 @@ test('A low-level bar cannot hire the next server', () => {
   const { state } = guestIn();
   state.money = 100000;
   state.xp = 0;
-  assert.throws(() => applyAction(state, { type: 'hireStaff' }, context()), /higher bar level/);
+  assert.throws(() => completeAction(state, { type: 'hireStaff' }, context()), /higher bar level/);
 });
 
 test('Asking about allergies is understood: a guest with one says so, and then the food is refused', async () => {
@@ -158,7 +159,7 @@ test('Asking about allergies is understood: a guest with one says so, and then t
   const reply = socialReply(guest, ['askAllergy'], 1);
   assert.match(reply.text, /nuts/i);
   assert.equal(guest.social.allergyKnown, true);
-  assert.throws(() => applyAction(state, { type: 'pitchStart', customerId: guest.id, kind: 'food', itemId: 'nuts' }, context()), /allergic/);
+  assert.throws(() => completeAction(state, { type: 'pitchStart', customerId: guest.id, kind: 'food', itemId: 'nuts' }, context()), /allergic/);
   const { state: other, guest: calm } = guestIn({ hungry: false });
   assert.match(socialReply(calm, ['offerFood'], 1).text, /not hungry/);
   assert.ok(other);
@@ -172,8 +173,8 @@ test('A guest who said no to a drink or a bottle is not offered it again, and he
   const { state, guest } = guestIn();
   Object.assign(guest, { orderKind: 'bottle', orderRevealed: false, greeting: 'Hello!', bottleRequest: { productId: wanted.id, quantity: 1, budget: 500, type: 'cognac', tastes: wanted.tastes.slice(0, 1), occasion: 'party' } });
   guest.social.phase = 'ordering';
-  applyAction(state, { type: 'openConversation', customerId: guest.id }, context());
-  applyAction(state, { type: 'say', text: `Would you like ${vodka.name}?` }, context());
+  completeAction(state, { type: 'openConversation', customerId: guest.id }, context());
+  completeAction(state, { type: 'say', text: `Would you like ${vodka.name}?` }, context());
   const talk = state.conversations[guest.id];
   assert.match(talk.lines.at(-1).text, /cognac/i, 'she says what she wants instead');
   assert.equal(talk.bottleFacts.type, 'cognac', 'the type is now known');
@@ -186,15 +187,15 @@ test('A guest who said no to a drink or a bottle is not offered it again, and he
 test('The tour choice is saved on the account state', () => {
   const { state } = guestIn();
   assert.equal(state.tour, undefined);
-  applyAction(state, { type: 'setTour', value: 'skipped' }, context());
+  completeAction(state, { type: 'setTour', value: 'skipped' }, context());
   assert.equal(state.tour, 'skipped');
-  applyAction(state, { type: 'setTour', value: 'done' }, context());
+  completeAction(state, { type: 'setTour', value: 'done' }, context());
   assert.equal(state.tour, 'done');
 });
 
 // ---- Training academy ----
 const academy = () => { const state = createInitialState(NOW); state.nextCustomerAt = 0; state.customers = []; return state; };
-const doAction = (state, action, now = NOW, random = () => .5) => applyAction(state, action, { now, random, checkEnglish, spawnCustomers: false });
+const doAction = (state, action, now = NOW, random = () => .5) => completeAction(state, action, { now, random, checkEnglish, spawnCustomers: false });
 
 // ---- Guide pointer ----
 import { readdirSync, readFileSync, statSync } from 'node:fs';
@@ -354,9 +355,9 @@ test('This is a bar, not a chat room: every small-talk answer of an ordering gue
   guest.orderRecipeId = 'mojito';
   guest.patience = guest.patienceRemaining = 99999;
   guest.social.chatted = [];
-  applyAction(state, { type: 'openConversation', customerId: guest.id }, context());
+  completeAction(state, { type: 'openConversation', customerId: guest.id }, context());
   for (const text of ['How are you?', 'What do you do in your free time?', 'I like football and pizza.', 'Why did that happen?']) {
-    applyAction(state, { type: 'say', text }, context());
+    completeAction(state, { type: 'say', text }, context());
     const line = state.conversations[guest.id].lines.at(-1).text;
     assert.match(line, /recommend|offer|suggest|drink|choose|my drink/i, `${text} -> ${line}`);
     assert.ok(line.trim().split(/(?<=[.!?])\s/).filter((part) => part.endsWith('?') && part.split(/\s+/).length > 2).length <= 1, `at most one real question (a one-word echo like "Football?" is fine): ${line}`);
@@ -513,9 +514,9 @@ test('"Who was it?" is answered as a repeat when the story already named the per
 test('A drink question after small talk is answered with a clue, not with a chat reaction', () => {
   const { state, guest } = guestIn({ phase: 'ordering', rapport: 60, emotion: 'relaxed' });
   Object.assign(guest, { orderRevealed: false, orderKind: 'cocktail', orderRecipeId: 'mojito', patience: 99999, patienceRemaining: 99999 });
-  applyAction(state, { type: 'openConversation', customerId: guest.id }, context());
-  applyAction(state, { type: 'say', text: 'I like football and pizza.' }, context());
-  applyAction(state, { type: 'say', text: 'Do you like sweet drinks?' }, context());
+  completeAction(state, { type: 'openConversation', customerId: guest.id }, context());
+  completeAction(state, { type: 'say', text: 'I like football and pizza.' }, context());
+  completeAction(state, { type: 'say', text: 'Do you like sweet drinks?' }, context());
   assert.match(state.conversations[guest.id].lines.at(-1).text, /sweet/i);
   assert.ok(state.conversations[guest.id].facts.some((fact) => fact.topic === 'sweet'), 'the clue was recorded');
 });
@@ -599,14 +600,14 @@ test('Every bar has its own servers: hired and trained in one bar, they work in 
   state.money = 10000000; state.xp = 1e9;
   state.ownedBarIds = ['new-york', 'london'];
   const home = state.regionId;
-  applyAction(state, { type: 'hireStaff' }, context());
-  applyAction(state, { type: 'hireStaff' }, context());
-  applyAction(state, { type: 'switchBar', regionId: 'london' }, context());
+  completeAction(state, { type: 'hireStaff' }, context());
+  completeAction(state, { type: 'hireStaff' }, context());
+  completeAction(state, { type: 'switchBar', regionId: 'london' }, context());
   assert.equal(teamOf(state).length, 0, 'the other bar starts without servers');
-  applyAction(state, { type: 'hireStaff' }, context());
+  completeAction(state, { type: 'hireStaff' }, context());
   assert.equal(teamOf(state, 'london').length, 1);
   assert.equal(teamOf(state, home).length, 2);
-  applyAction(state, { type: 'upgradeStaff', index: 0 }, context());
+  completeAction(state, { type: 'upgradeStaff', index: 0 }, context());
   assert.equal(teamOf(state, 'london')[0].level, 2);
   assert.equal(teamOf(state, home)[0].level, 1, 'training one bar leaves the other alone');
   // away time pays each bar by its own team

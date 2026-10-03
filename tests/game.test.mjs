@@ -103,6 +103,8 @@ test('A confirmed full-bottle order consumes sealed stock and earns its retail p
   const afterDialogue = game.crystals;
   assert.equal(game.sellBottleToCustomer(),true);
   assert.equal(stock.quantity,1);
+  assert.equal(game.money, balance, 'bottle payment waits for dialogue');
+  await game.say('Would you like to pay by card or in cash?');
   // A level-1 bar earns the guest's own rate (85% of the city price), fixed when they walked in.
   assert.ok(game.money >= balance + product.price * customer.priceFactor - .01);
   assert.equal(game.crystals,afterDialogue + bottleSaleCrystalReward(product));
@@ -461,6 +463,8 @@ test('Brand calls: the guest names a brand, the bartender must pick that brand; 
   assert.match(game.message, /asked for Jack Daniel’s/, 'wrong brand is refused');
   game.setPourBrand('whiskey', 'jack-daniels-old-7');
   game.serveMix();
+  assert.equal(game.money, before, 'drink payment waits for dialogue');
+  await game.say('Would you like to pay by card or in cash?');
   assert.ok(game.money > before, `sold: ${game.message}`);
   assert.ok(game.crystals > crystals,'a named-brand drink pays crystals as well as coins');
 
