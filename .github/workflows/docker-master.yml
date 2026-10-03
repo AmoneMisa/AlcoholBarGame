@@ -76,7 +76,7 @@ jobs:
 
   # Deploys the image just built to the server over SSH, then checks that the game answers.
   # Reads from the "production" environment (or the repository): DEPLOY_SSH_KEY must be a secret; DEPLOY_HOST,
-  # DEPLOY_USER and the optional DEPLOY_PORT (default 22) / DEPLOY_PATH (default /opt/barlingo) may be secrets
+  # DEPLOY_USER and the optional DEPLOY_PORT (default 22) / DEPLOY_PATH (default /opt/alcoholbot) may be secrets
   # or variables. Skipped while DEPLOY_HOST is not set.
   deploy:
     needs: test-build-publish
@@ -89,7 +89,7 @@ jobs:
       DEPLOY_HOST: ${{ secrets.DEPLOY_HOST || vars.DEPLOY_HOST }}
       DEPLOY_USER: ${{ secrets.DEPLOY_USER || vars.DEPLOY_USER }}
       DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || vars.DEPLOY_PORT || '22' }}
-      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || vars.DEPLOY_PATH || '~/opt/alcoholbot' }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || vars.DEPLOY_PATH || '/opt/alcoholbot' }}
     steps:
       - name: Check deploy configuration
         id: config
