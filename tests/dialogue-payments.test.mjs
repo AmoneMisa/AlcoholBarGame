@@ -19,6 +19,17 @@ function order() {
   return { state, guest, mix };
 }
 
+test('Sealed-bottle shoppers have one opening about the purchase, without a second drink order',()=>{
+  for(const emotion of ['relaxed','happy','angry','tired']) {
+    const state=createInitialState(now),guest=state.customers[0];
+    Object.assign(guest,{orderKind:'bottle',greeting:'Hello!',orderRevealed:false,bottleRequest:{productId:'jack-daniels-old-7',quantity:2,budget:40,type:'whisky',tastes:[],occasion:'gift'}});
+    Object.assign(guest.social,{emotion,phase:'ordering',rounds:0,need:undefined,foodRequest:undefined});
+    applyAction(state,{type:'openConversation',customerId:guest.id},context);
+    assert.equal(state.conversations[guest.id].lines[0].text,'Hello! I need some sealed bottles for a gift. Can you help me choose?');
+    assert.deepEqual(state.conversations[guest.id].bottleFacts,{occasion:'gift'});
+  }
+});
+
 test('A served cocktail awaits dialogue payment; money and tips are credited once, then the jar is collected', () => {
   const { state, guest, mix } = order();
   const balance = state.money;

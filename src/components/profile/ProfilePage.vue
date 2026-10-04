@@ -44,15 +44,15 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
       </template>
     </ProfileCard>
 
-    <section class="version-card" aria-label="Game version">
-      <h3>Version</h3>
+    <details class="version-card" aria-label="Game version">
+      <summary>Game version</summary>
       <dl>
         <div><dt>This device</dt><dd>{{ APP_VERSION }}<small v-if="APP_BUILT">built {{ formatBuilt(APP_BUILT) }}</small></dd></div>
         <div><dt>Server</dt><dd>{{ server ? server.version : 'not reachable' }}<small v-if="server?.built">built {{ formatBuilt(server.built) }}</small></dd></div>
       </dl>
       <p v-if="outdated" class="outdated">A newer version is running on the server. <UiButton variant="primary" size="sm" @click="reload">Reload to update</UiButton></p>
       <p v-else-if="server && APP_VERSION !== 'dev'" class="current">You have the latest version.</p>
-    </section>
+    </details>
 
     <section v-if="picking" class="picker" aria-label="Choose achievements to show">
       <header><b>Choose up to {{ FEATURED_MAX }} achievements to show on your profile</b></header>
@@ -72,6 +72,8 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
 .profile-page { display: grid; gap: 14px; padding: 0; border:0;background:none;box-shadow:none; }
 .version-card { padding: 12px 14px; border: 1px solid #354762; border-radius: 14px; background: #111c2d; color: #e9eef7; font-size: 13px; }
 .version-card h3 { margin: 0 0 6px; font-size: 14px; }
+.version-card summary {cursor:pointer;color:#b6c4d5;}
+.version-card[open] summary {margin-bottom:10px;}
 .version-card dl { display: flex; flex-wrap: wrap; gap: 18px; margin: 0; }
 .version-card dt { color: #91a2b5; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
 .version-card dd { margin: 2px 0 0; font: 700 15px ui-monospace, monospace; }

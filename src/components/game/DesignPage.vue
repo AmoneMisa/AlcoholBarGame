@@ -19,6 +19,7 @@ import { BAR_PROFILE_OPTIONS } from '../../data/cosmetics/bars';
 import { bartenderAvatarFor } from '../../data/cosmetics/bartenderAvatars';
 import { bartenderCostumeFor, bartenderCostumesFor } from '../../data/cosmetics/bartenderCostumes';
 import { COSMETICS } from '../../domain/cosmetics';
+import { ownedFirst } from '../../domain/appearanceRewards';
 import { STYLE_SHOP_PRICE } from '../../data/cosmetics/styleSources';
 import { styleOrigin } from '../../domain/styleInfo';
 import StylePreview from './StylePreview.vue';
@@ -31,7 +32,7 @@ watch(() => game.regionId, () => {
   bartenderNickname.value = game.decor.bartenderNickname ?? (game.decor.bartenderCharacter === 'leo' ? 'Leo' : 'Noa');
 });
 const selectedBartender = computed(() => game.decor.bartenderCharacter ?? 'noa');
-const visibleOutfits = computed(() => BARTENDER_OUTFITS.filter(value => ['vest', 'shirt', 'apron'].includes(value) || bartenderCostumesFor(selectedBartender.value).some(costume => costume.value === value) || COSMETICS.some(item => item.key === 'bartender' && item.character === selectedBartender.value && item.value === value)));
+const visibleOutfits = computed(() => ownedFirst(BARTENDER_OUTFITS.filter(value => ['vest', 'shirt', 'apron'].includes(value) || bartenderCostumesFor(selectedBartender.value).some(costume => costume.value === value) || COSMETICS.some(item => item.key === 'bartender' && item.character === selectedBartender.value && item.value === value)), value=>game.canUseCosmetic('bartender',value)));
 const fixedCostume = computed(() => game.decor.bartender.startsWith('special-') || !!bartenderCostumeFor(selectedBartender.value, game.decor.bartender));
 const outfitLabel = (outfit: string) => bartenderCostumeFor(selectedBartender.value, outfit)?.label ?? ({
   vest:'Burgundy vest',shirt:selectedBartender.value === 'leo' ? 'Shirt & suspenders' : 'Ivory jacket',apron:'Emerald apron',biker:'Leather set','tee-skirt':'Tee & skirt','suit-jeans':'Jacket & jeans',bunny:'Bunny suit',kimono:'Kimono','baggy-tee':'Baggy tee',streetwear:'Streetwear',

@@ -10,7 +10,7 @@ export function validatePromo(body, now) {
   const code = cleanCode(body?.code);
   const expiresAt = typeof body?.expiresAt === 'string' ? Date.parse(body.expiresAt) : body?.expiresAt;
   if (!/^[A-Z0-9_-]{3,40}$/.test(code)) throw new Error('Code must contain 3–40 letters, digits, underscores or hyphens.');
-  if (!Number.isSafeInteger(expiresAt) || expiresAt <= now) throw new Error('Choose a future expiration time.');
+  if (expiresAt !== null && (!Number.isSafeInteger(expiresAt) || expiresAt <= now)) throw new Error('Choose a future expiration time or no expiration.');
   if (!Array.isArray(body?.rewards) || !body.rewards.length || body.rewards.length > 30) throw new Error('Choose 1–30 rewards.');
   const rewards = body.rewards.map((reward) => {
     const kind = reward?.kind;
@@ -23,7 +23,7 @@ export function validatePromo(body, now) {
   });
   const startsAt = body.startsAt == null ? now : typeof body.startsAt === 'string' ? Date.parse(body.startsAt) : body.startsAt;
   const maxUses = body.maxUses == null || body.maxUses === '' ? null : body.maxUses;
-  if (!Number.isSafeInteger(startsAt) || startsAt >= expiresAt) throw new Error('Start time must precede expiration.');
+  if (!Number.isSafeInteger(startsAt) || (expiresAt !== null && startsAt >= expiresAt)) throw new Error('Start time must precede expiration.');
   if (maxUses !== null && (!Number.isSafeInteger(maxUses) || maxUses < 1 || maxUses > 1000000000)) throw new Error('Usage limit must be a positive whole number.');
   return {code, expiresAt, startsAt, maxUses, rewards};
 }

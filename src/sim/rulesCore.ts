@@ -1334,7 +1334,7 @@ function ensureTranscript(state: PlayerState, guest: Customer, now = state.lastC
   if (existing) return existing;
   const recipe = RECIPES.find((item) => item.id === guest.orderRecipeId);
   const opening = guestLine(state, guest) ?? (guest.social?.phase === 'enjoying' || (guest.social?.need && guest.social.need.since <= now) ? enjoyingOpening(guest, now)
-    : guest.orderKind === 'bottle' ? `${feelingFirst(guest)}${bottleOpeningLine(guest)}`
+    : guest.orderKind === 'bottle' ? bottleOpeningLine(guest)
     : guest.orderKind === 'serve' || !recipe ? `${guest.social ? feelingFirst(guest) : `${guest.greeting} `}${guest.request}`
       : openingLine(guest, buildProfile(recipe)));
   // A bottle customer names the occasion in the opening line, so it is already known and never asked again.

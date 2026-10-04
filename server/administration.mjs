@@ -1,4 +1,5 @@
-import { COSMETICS } from '../src/domain/cosmetics';
+import { COSMETICS, interiorForCosmetic } from '../src/domain/cosmetics';
+import { THEMED_INTERIOR_COSTUMES } from '../src/data/cosmetics/themedBars';
 import { INTERIORS } from '../src/data/cosmetics/bars';
 import { COMPANIONS } from '../src/domain/companions';
 import { CONSUMABLES, BOXES, EQUIPMENT } from '../src/domain/loot';
@@ -12,7 +13,25 @@ const groups = {style:COSMETICS,background:INTERIORS,companion:COMPANIONS,consum
 export function createAdministration({repository,now,staff}) {
   const audit = (identity,event,detail={}) => repository.transaction(tx=>tx.addEvent(identity,event,detail,now()));
   const pruneEvents = () => repository.transaction(tx=>tx.pruneEvents(now()-EVENT_LIFETIME));
-  const catalog = () => Object.fromEntries(Object.entries(groups).map(([kind,items])=>[kind,items.map(i=>({id:i.id,label:i.label ?? i.name ?? i.id}))]));
+  const styleGroup = item => {
+    const interior=interiorForCosmetic(item.id) ?? Object.entries(THEMED_INTERIOR_COSTUMES).find(([,pair])=>item.character && pair[item.character]?.includes(item.value))?.[0];
+    return INTERIORS.find(i=>i.id===interior)?.name ?? (item.key==='bartender' ? 'Other outfits' : 'Face, hair and makeup');
+  };
+  const catalog = () => Object.fromEntries(Object.entries(groups).map(([kind,items])=>[kind,items.map(i=>({id:i.id,label:i.label ?? i.name ?? i.id,...(['style','skinShards'].includes(kind) ? {group:styleGroup(i),character:i.character} : {})}))]));
+  async function adminUpdatePromoExpiry(identity,body) {
+    const code=cleanCode(body?.code);
+    const expiresAt=body?.expiresAt === null ? null : typeof body?.expiresAt==='string' ? Date.parse(body.expiresAt) : body?.expiresAt;
+    if(!/^[A-Z0-9_-]{3,40}$/.test(code) || (expiresAt !== null && (!Number.isSafeInteger(expiresAt) || expiresAt <= now()))) return fail('Choose a valid code and a future expiration time or no expiration.');
+    return repository.transaction(async tx=> {
+      if (!['owner','admin'].includes(await staff.roleIn(tx,identity))) return fail('Staff access required.',403);
+      const promo=await tx.findPromo(code);
+      if(!promo || promo.deletedAt) return fail('Code not found or already disabled.',404);
+      if(expiresAt !== null && expiresAt <= promo.startsAt) return fail('Expiration must follow the start time.');
+      if(!await tx.updatePromoExpiry(code,expiresAt)) return fail('Code not found or already disabled.',404);
+      await tx.addEvent(identity,'admin.promo.expiry',{code,previous:promo.expiresAt,expiresAt},now());
+      return {ok:true};
+    });
+  }
   async function adminPlayer(body, identity) {
     if (!/^\d{1,16}$/.test(String(body?.telegramId ?? ''))) return fail('Enter a Telegram ID.');
     return repository.transaction(async tx=> {
@@ -103,7 +122,7 @@ export function createAdministration({repository,now,staff}) {
       return {ok:true,id};
     });
   }
-  return {audit,pruneEvents,adminPlayer,adminChange,createTicket,adminCatalog:catalog,
+  return {audit,pruneEvents,adminPlayer,adminChange,createTicket,adminCatalog:catalog,adminUpdatePromoExpiry,
     checkAccess:identity=>repository.transaction(tx=>tx.findOrCreatePlayer(identity)),
     adminPromos:()=>repository.transaction(async tx=>({ok:true,promos:await tx.listPromos()})),
     adminDeletePromo:(identity,code)=>repository.transaction(async tx=>{const deleted=await tx.deletePromo(cleanCode(code)); if(!deleted) return fail('Code not found or already deleted.',404); await tx.addEvent(identity,'admin.promo.delete',{code:cleanCode(code)},now()); return {ok:true};}),

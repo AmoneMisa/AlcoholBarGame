@@ -75,6 +75,7 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
   adminRoute('promocodes',request=>service.createPromoCode(request.body,request.identity));
   adminRoute('promocodes/list',()=>service.adminPromos());
   adminRoute('promocodes/delete',request=>service.adminDeletePromo(request.identity,request.body?.code));
+  adminRoute('promocodes/expiry',request=>service.adminUpdatePromoExpiry(request.identity,request.body));
   adminRoute('player',request=>service.adminPlayer(request.body,request.identity),['owner','admin','moderator']);
   adminRoute('player/change',request=>service.adminChange(request.identity,request.body),['owner','admin','moderator']);
   adminRoute('events',request=>service.adminEvents(request.body));

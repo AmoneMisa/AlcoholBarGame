@@ -7,6 +7,7 @@ import { bartenderCostumesFor } from '../../data/cosmetics/bartenderCostumes';
 import { interiorForStyle } from '../../data/cosmetics/styleSources';
 import { interiorOrigin, styleLabel, styleOrigin } from '../../domain/styleInfo';
 import { canUseCosmetic } from '../../domain/cosmetics';
+import { ownedFirst } from '../../domain/appearanceRewards';
 import { useGameStore } from '../../stores/game';
 import CharacterModel from '../characters/CharacterModel.vue';
 import CrystalAmount from '../ui/CrystalAmount.vue';
@@ -23,10 +24,10 @@ const interior = ref<string>(props.interior ?? game.decor.interior);
 const outfit = ref<string>(props.outfit ?? game.decor.bartender);
 
 const everyday = ['vest', 'shirt', 'apron'];
-const outfits = computed(() => [
+const outfits = computed(() => ownedFirst([
   ...everyday.map((value) => ({ value, label: value === 'vest' ? 'Burgundy vest' : value === 'shirt' ? 'Shirt' : 'Apron' })),
   ...bartenderCostumesFor(character.value)
-]);
+],item=>owns(item.value)));
 const owns = (value: string) => canUseCosmetic(game.ownedCosmeticIds, 'bartender', value, character.value);
 function setCharacter(next: 'noa' | 'leo') { character.value = next; outfit.value = everyday[0]!; }
 

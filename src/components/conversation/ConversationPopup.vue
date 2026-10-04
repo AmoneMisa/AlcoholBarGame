@@ -85,7 +85,7 @@ const tileTarget = ref('');
 const serveOrder = computed(() => customer.value?.orderKind === 'serve' ? customer.value.serveRequest : undefined);
 const templates = computed(() => {
   if (game.trainingActive && customer.value) return trainingQuestions(customer.value,talk.value?.lines.filter(line=>line.speaker==='bartender').length ?? 0);
-  if (customer.value?.pendingPayment && !customer.value.pendingPayment.foodOnly) return [{ text: 'Would you like to pay by card or in cash?' }, { text: 'Here is your bill. How would you like to pay?' }];
+  if (customer.value?.pendingPayment) return [{ text: 'Would you like to pay by card or in cash?' }, { text: 'Here is your bill. How would you like to pay?' }];
   const base = serveOrder.value
     ? serveTemplates(serveOrder.value, game.brandOnShelf).map((text) => ({ text }))
     : bottleOrder.value
@@ -198,6 +198,14 @@ watch(() => customer.value?.id, () => {
   resetTiles();
   scrollLog();
 }, { immediate: true });
+
+watch(() => Boolean(customer.value?.pendingPayment), () => {
+  draft.value = '';
+  feedback.value = undefined;
+  templateIndex.value = 0;
+  offerOpen.value = false;
+  resetTiles();
+});
 
 function scrollLog() {
   nextTick(() => log.value?.scrollTo({ top: log.value.scrollHeight, behavior: 'smooth' }));
@@ -390,8 +398,10 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
             <label class="rapport" title="How much this guest likes you tonight">Likes you <span><i :style="{ width: social.rapport + '%' }"></i></span></label>
           </div>
         </div>
-        <button type="button" class="talk-help" :aria-expanded="guideOpen" aria-label="How does this screen work?" @click="guideOpen = !guideOpen">?</button>
-        <CloseButton class="talk-close" data-guide="talk-close" label="Close conversation" @click="game.closeConversation()" />
+        <div class="talk-header-actions">
+          <button type="button" class="talk-help" :aria-expanded="guideOpen" aria-label="How does this screen work?" @click="guideOpen = !guideOpen">?</button>
+          <CloseButton class="talk-close" data-guide="talk-close" label="Close conversation" @click="game.closeConversation()" />
+        </div>
       </header>
       <ModalDialog v-if="guideOpen" title="How conversations work" width="480px" close-label="Close the guide" @close="guideOpen = false">
         <ol class="chat-guide-list"><li v-for="step in CHAT_GUIDE" :key="step.title"><b>{{ step.title }}.</b> {{ step.text }} <UiButton v-if="step.show" size="sm" class="show-me" @click="showMe(step)">Show me</UiButton><p v-if="guideFeedback && guideFeedbackStep === step.title" class="chat-guide-feedback" role="status">{{ guideFeedback }}</p></li></ol>
@@ -411,7 +421,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           </div>
         </div>
       </section>
-      <section v-if="social && offerOpen" class="offer-panel" aria-label="Offer something">
+      <section v-if="social && offerOpen && !customer.pendingPayment" class="offer-panel" aria-label="Offer something">
         <header>
           <b>Offer</b>
           <span class="tabs"><button type="button" :class="{ on: offerKind === 'food' }" @click="offerKind = 'food'">Food</button><button type="button" :class="{ on: offerKind === 'drink' }" @click="offerKind = 'drink'">Another drink</button></span>
@@ -435,7 +445,7 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <div class="offer-buttons"><UiButton variant="solid" data-guide="offer-ask" @click="game.pitchAsk(customer.id)">Make the offer</UiButton><button type="button" @click="game.pitchCancel(customer.id)">Cancel</button></div>
         </template>
       </section>
-      <section v-if="social?.foodRequest && confirmed && !situation && (!customer.pendingPayment || customer.pendingPayment.foodOnly)" class="offer-panel" aria-label="Food with this drink">
+      <section v-if="social?.foodRequest && confirmed && !situation && !customer.pendingPayment" class="offer-panel" aria-label="Food with this drink">
         <p>{{ foodRequestLine(customer) }}</p>
         <div class="offer-items">
           <button v-for="choice in foodChoices" :key="choice.food.id" class="food-offer-button" type="button" @click="game.act({type:'serveFood', ingredientId:choice.food.id})"><img :src="`${foodAssetBase}${choice.food.id}.webp`" alt="" />Serve {{ choice.food.name }} · {{ choice.score >= .5 ? 'Good pairing' : 'Requested' }}</button>
@@ -494,24 +504,25 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
           <UiButton variant="secondary" @click="learning.toggleSaved(activeWord.word)"><UiIcon class="inline-icon" :name="learning.savedWords.includes(activeWord.word) ? 'star-fill' : 'star'" /> {{ learning.savedWords.includes(activeWord.word) ? 'Saved to my words' : 'Save to my words' }}</UiButton>
         </div>
 
-        <aside v-if="!situation" class="talk-clues" data-guide="clue-board">
+        <aside v-if="!situation && !confirmed && !customer.pendingPayment && social?.phase !== 'enjoying'" class="talk-clues" data-guide="clue-board">
           <template v-if="bottleOrder">
             <small>CUSTOMER REQUEST</small>
             <div class="clue-chips">
               <span v-for="fact in bottleFactChips(talk.bottleFacts)" :key="fact" class="yes"><UiIcon class="inline-icon" name="check" /> {{ fact }}</span>
               <em v-if="!bottleFactChips(talk.bottleFacts).length">Ask how many, total budget, type, flavour, occasion and brand.</em>
             </div>
-            <small>BEST STOCKED MATCHES</small>
+            <details :key="customer.id" class="order-suggestions">
+            <summary>Show bottle suggestions</summary>
             <div class="bottle-recommendations">
-              <article v-for="match in bottleRecommendations.slice(0, 6)" :key="match.product.id" :class="{ over: match.overBudget }">
+              <article v-for="match in bottleRecommendations.slice(0, 3)" :key="match.product.id" :class="{ over: match.overBudget }">
                 <div class="shop-brand-bottle"><BrandBottle :brand="match.product.brand" :category="guideIdForProduct(match.product)" :color="match.product.color" /></div>
                 <div><b>{{ match.product.name }}</b><span>{{ ALCOHOL_TYPE_LABELS[match.product.type] }} · {{ match.product.abv }}% ABV</span><small>{{ match.reasons.slice(0, 2).join(' · ') || 'popular choice' }}</small><em>{{ bottleTotal(match.product, talk.bottleFacts.quantity ?? 1, game.guestPriceFactor) }} coins · {{ bottleStock(match.product.id) }} in stock</em></div>
-                <strong>{{ match.score }}%</strong>
-                <UiButton variant="primary" size="sm" block @click="suggest(`Would you like ${match.product.name}?`)">Recommend</UiButton>
-                <UiButton variant="secondary" size="sm" block class="bottle-info" :aria-label="`About ${match.product.brand}`" @click="openGuide('ingredient', guideIdForProduct(match.product))">About the brand</UiButton>
+                <div class="bottle-suggestion-actions"><UiButton variant="secondary" size="sm" @click="suggest(`Would you like ${match.product.name}?`)">Use suggestion</UiButton>
+                <UiButton variant="ghost" size="sm" class="bottle-info" :aria-label="`About ${match.product.brand}`" @click="openGuide('ingredient', guideIdForProduct(match.product))">About the brand</UiButton></div>
               </article>
               <em v-if="!bottleRecommendations.length">No stocked bottle covers the known request.</em>
             </div>
+            </details>
           </template>
           <template v-else>
             <small>WHAT YOU KNOW</small>
@@ -519,16 +530,18 @@ const phraseIdeas = computed(() => templates.value.slice(0, 4).map((item) => ite
               <span v-for="fact in talk.facts" :key="fact.topic" :class="fact.likes ? 'yes' : 'no'"><UiIcon class="inline-icon" :name="fact.likes ? 'check' : 'close'" /> {{ TOPIC_LABEL[fact.topic] }}</span>
               <em v-if="!talk.facts.length">Ask about taste, fruit, strength or bubbles.</em>
             </div>
-            <small>POSSIBLE DRINKS</small>
+            <details :key="customer.id" class="order-suggestions">
+            <summary>Show drink suggestions</summary>
             <div class="clue-drinks">
               <span v-for="item in candidates.slice(0, 6)" :key="item.id" class="drink-option"><button type="button" @click="suggest(`Would you like ${withArticle(item.name)}?`)">{{ item.name }}</button><button type="button" class="drink-info" :aria-label="`About ${item.name}`" @click="openGuide('cocktail', item.id)">i</button></span>
               <em v-if="!candidates.length">No match in your recipe book.</em>
             </div>
+            </details>
           </template>
         </aside>
       </div>
 
-      <div v-if="confirmed && !situation && (!customer.pendingPayment || customer.pendingPayment.foodOnly)" class="talk-confirmed">
+      <div v-if="confirmed && !situation && !customer.pendingPayment" class="talk-confirmed">
         <template v-if="bottleOrder && confirmedBottle && customer.bottleRequest">
           <div><small>SEALED-BOTTLE SALE CONFIRMED</small><b>{{ customer.bottleRequest.quantity }} × {{ confirmedBottle.name }}</b><span>{{ confirmedBottle.volumeMl }} ml · {{ confirmedBottle.abv }}% ABV · total {{ bottleTotal(confirmedBottle, customer.bottleRequest.quantity, game.guestPriceFactor) }} coins</span></div>
           <UiButton variant="solid" data-guide="bottle-sale" :disabled="game.serving || bottleStock(confirmedBottle.id) < customer.bottleRequest.quantity" @click="completeBottleSale">Sell full bottle{{ customer.bottleRequest.quantity === 1 ? '' : 's' }} <UiIcon class="inline-icon" name="arrow-right" /></UiButton>

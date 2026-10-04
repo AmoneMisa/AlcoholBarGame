@@ -61,7 +61,7 @@ export function createGameService({ repository, checkEnglish, ownerTelegramIds =
       const player = await tx.findOrCreatePlayer(identity);
       const record = await tx.lockState(player.id);
       const promo = await tx.findPromo(cleanCode(code));
-      if (!promo || promo.deletedAt || promo.startsAt > now() || promo.expiresAt <= now() || (promo.maxUses !== null && promo.maxUses !== undefined && promo.uses >= promo.maxUses)) return {status:409,body:{ok:false,error:'This code is invalid or expired.'}};
+      if (!promo || promo.deletedAt || promo.startsAt > now() || (promo.expiresAt !== null && promo.expiresAt <= now()) || (promo.maxUses !== null && promo.maxUses !== undefined && promo.uses >= promo.maxUses)) return {status:409,body:{ok:false,error:'This code is invalid or expired.'}};
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
       const coinsBefore = state.money, crystalsBefore = state.crystals;
       // The unique redemption is inside the same transaction as all rewards and ledgers.

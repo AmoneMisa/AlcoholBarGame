@@ -9,6 +9,37 @@ import {EVENT_LIFETIME} from '../server/administration.mjs';
 const identity=id=>({kind:'telegram',key:`tg:${id}`,telegramId:id,name:`Player ${id}`,username:null});
 function setup() {let time=Date.now(); const repository=createMemoryRepository(),service=createGameService({repository,ownerTelegramIds:[42],now:()=>time}); return {repository,service,advance:n=>time+=n};}
 const change=(id,kind,delta,extra={})=>({telegramId:String(id),kind,delta,reason:'Support correction',requestId:crypto.randomUUID(),...extra});
+
+test('Promos can be created or made permanent, keep redemption limits, and expiration edits require staff permission',async()=>{
+ const {service,advance}=setup(),owner=identity(42),user=identity(8);
+ const permanent={code:'FOREVER',expiresAt:null,maxUses:2,rewards:[{kind:'coins',amount:10}]};
+ assert.equal((await service.createPromoCode(permanent,owner)).ok,true);
+ advance(365*86400_000);
+ assert.equal((await service.redeemPromoCode(user,'FOREVER')).ok,true);
+ assert.equal((await service.redeemPromoCode(user,'FOREVER')).status,409);
+ assert.equal((await service.redeemPromoCode(identity(9),'FOREVER')).ok,true);
+ assert.equal((await service.redeemPromoCode(identity(10),'FOREVER')).status,409);
+ assert.equal((await service.createPromoCode({...permanent,code:'CHANGE',expiresAt:Date.now()+2*365*86400_000})).ok,true);
+ assert.equal((await service.adminUpdatePromoExpiry(user,{code:'CHANGE',expiresAt:null})).status,403);
+ assert.equal((await service.adminUpdatePromoExpiry(owner,{code:'CHANGE',expiresAt:null})).ok,true);
+ assert.equal((await service.adminPromos()).promos.find(p=>p.code==='CHANGE').expiresAt,null);
+ assert.equal((await service.adminUpdatePromoExpiry(owner,{code:'CHANGE',expiresAt:'invalid'})).status,400);
+ assert.equal((await service.adminUpdatePromoExpiry(owner,{code:'CHANGE',expiresAt:Date.now()})).status,400);
+ const end=Date.now()+3*365*86400_000;
+ assert.equal((await service.adminUpdatePromoExpiry(owner,{code:'CHANGE',expiresAt:end})).ok,true);
+ assert.equal((await service.adminPromos()).promos.find(p=>p.code==='CHANGE').expiresAt,end);
+ await service.adminDeletePromo(owner,'CHANGE');
+ assert.equal((await service.adminUpdatePromoExpiry(owner,{code:'CHANGE',expiresAt:null})).status,404);
+ assert.equal((await service.adminEvents({event:'admin.promo.expiry'})).events.length,2);
+});
+test('Admin style catalog assigns both bartender genders to their background or game group',()=>{
+ const {service}=setup();const catalog=service.adminCatalog();
+ const group=catalog.style.find(item=>item.id==='bartender:theme-worms-noa:noa').group;
+ assert.ok(group && group.includes('Worms'));
+ assert.equal(catalog.style.find(item=>item.id==='bartender:theme-worms-leo:leo').group,group);
+ assert.equal(catalog.style.find(item=>item.id==='bartender:theme-worms-noa:noa').character,'noa');
+ assert.equal(catalog.skinShards.find(item=>item.id==='bartender:theme-worms-noa:noa').group,group);
+});
 test('Administration: signed deltas, idempotency, inventory, blocking every session/action and unblocking',async()=>{
  const {service,repository}=setup(),admin=identity(42),user=identity(8);
  const session=await service.session(user); const before=session.state.money;

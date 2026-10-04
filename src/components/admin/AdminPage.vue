@@ -3,15 +3,18 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import UiInput from '../ui/UiInput.vue';
 import OptionSelect from '../game/OptionSelect.vue';
 import { post } from '../../telegram/api';
+import CatalogPicker from './CatalogPicker.vue';
+import UiCheckbox from '../ui/UiCheckbox.vue';
 const props=defineProps<{role:'owner'|'admin'|'moderator'}>();
 const elevated=computed(()=>props.role!=='moderator');
 const tabs=computed(()=>elevated.value ? [['users','Players'],['staff','Staff roles'],['promos','Promo codes'],['tickets','Tickets'],['logs','Event log']] : [['users','Players']]);
 const changeOptions=computed(()=> (elevated.value ? ['coins','crystals','xp','parts',...Object.keys(catalog.value),'block','unblock'] : ['block','unblock']).map(value=>({value,label:value})));
 const staff=ref<any[]>([]),assignment=reactive({telegramId:'',role:'moderator',reason:''});
 const tab=ref('users'), busy=ref(false), feedback=ref('');
-const catalog=ref<Record<string,{id:string;label:string}[]>>({}), promos=ref<any[]>([]), events=ref<any[]>([]), tickets=ref<any[]>([]), player=ref<any>(null);
+const catalog=ref<Record<string,{id:string;label:string;group?:string;character?:string}[]>>({}), promos=ref<any[]>([]), events=ref<any[]>([]), tickets=ref<any[]>([]), player=ref<any>(null);
 const user=reactive({telegramId:'',kind:props.role==='moderator' ? 'block' : 'coins',id:'',delta:1,reason:''});
-const promo=reactive({code:'',startsAt:'',expiresAt:'',maxUses:'',rewards:[{kind:'coins',id:'',amount:100}]});
+const promo=reactive({code:'',startsAt:'',expiresAt:'',noExpiry:false,maxUses:'',rewards:[{kind:'coins',id:'',amount:100}]});
+const expiryEdits=reactive<Record<string,{noExpiry:boolean;expiresAt:string}>>({});
 const filter=reactive({telegramId:'',event:''});
 const singles=['style','background','companion'];
 async function run(task:()=>Promise<void>) { if(busy.value) return; busy.value=true; feedback.value=''; try { await task(); } catch(e) { feedback.value=(e as Error).message; } finally {busy.value=false;} }
@@ -19,8 +22,9 @@ async function api(path:string,body:unknown={}) {const result=await post<any>('/
 async function saveRole() { if(!confirm('Change staff role for Telegram ID '+assignment.telegramId+'?')) return; await api('staff/role',assignment); staff.value=(await api('staff/list')).staff; feedback.value='Role saved.'; }
 async function loadPlayer() { player.value=await api('player',{telegramId:user.telegramId}); }
 async function change() { if(!confirm(`Apply ${user.kind} ${user.delta} to Telegram ID ${user.telegramId}?\nReason: ${user.reason}`)) return; await api('player/change',{...user,requestId:crypto.randomUUID()}); await loadPlayer(); feedback.value='Change saved.'; }
-async function loadPromos() {promos.value=(await api('promocodes/list')).promos;}
-async function createPromo() { await api('promocodes',{...promo,startsAt:new Date(promo.startsAt).toISOString(),expiresAt:new Date(promo.expiresAt).toISOString(),maxUses:promo.maxUses==='' ? null : Number(promo.maxUses),rewards:promo.rewards.map(r=>({kind:r.kind,...(catalog.value[r.kind] ? {id:r.id}:{}),...(!singles.includes(r.kind) ? {amount:r.amount}:{})}))}); await loadPromos(); feedback.value='Promo code created.'; }
+async function loadPromos() {promos.value=(await api('promocodes/list')).promos;for(const p of promos.value){const date=p.expiresAt ? new Date(p.expiresAt) : undefined;expiryEdits[p.code]={noExpiry:p.expiresAt===null,expiresAt:date ? new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16) : ''};}}
+async function createPromo() { await api('promocodes',{...promo,startsAt:new Date(promo.startsAt).toISOString(),expiresAt:promo.noExpiry ? null : new Date(promo.expiresAt).toISOString(),maxUses:promo.maxUses==='' ? null : Number(promo.maxUses),rewards:promo.rewards.map(r=>({kind:r.kind,...(catalog.value[r.kind] ? {id:r.id}:{}),...(!singles.includes(r.kind) ? {amount:r.amount}:{})}))}); await loadPromos(); feedback.value='Promo code created.'; }
+async function saveExpiry(code:string) {const edit=expiryEdits[code]!;await api('promocodes/expiry',{code,expiresAt:edit.noExpiry ? null : new Date(edit.expiresAt).toISOString()});await loadPromos();feedback.value='Expiration saved.';}
 async function removePromo(code:string) {if(!confirm(`Disable promo code ${code}?`)) return; await api('promocodes/delete',{code}); await loadPromos();}
 async function loadEvents(more=false) { const batch=(await api('events',{...filter,...(more ? {before:events.value.at(-1)?.id}:{})})).events; events.value=more ? [...events.value,...batch] : batch; }
 async function loadTickets(more=false) {const batch=(await api('tickets',more ? {before:tickets.value.at(-1)?.id}:{})).tickets; tickets.value=more ? [...tickets.value,...batch]:batch;}
@@ -38,7 +42,7 @@ onMounted(()=>run(async()=> {if(elevated.value) catalog.value=(await api('catalo
       <template v-if="player"><h2>{{ player.player.name }} · {{ player.player.telegramId }}</h2><p>{{ player.player.blocked ? 'Blocked: '+player.player.blockReason : 'Active' }}</p><p v-if="elevated">Coins: {{ player.state?.money }} · Crystals: {{ player.state?.crystals }} · XP: {{ player.state?.xp }}</p>
         <form @submit.prevent="run(change)">
           <OptionSelect label="Change" v-model="user.kind" :options="changeOptions" @update:model-value="user.id=''" />
-          <OptionSelect v-if="catalog[user.kind]" label="Item" v-model="user.id" :options="catalog[user.kind]!.map(item=>({value:item.id,label:item.label+' · '+item.id}))" />
+          <CatalogPicker v-if="catalog[user.kind]" :key="user.kind" v-model="user.id" :items="catalog[user.kind]!" />
           <label v-if="!['block','unblock'].includes(user.kind)">Amount (+ add / − remove)<input v-model.number="user.delta" type="number" required step="1" min="-1000000" max="1000000" /></label>
           <small v-if="user.kind==='ingredient'">Ingredient stock in the player's current bar.</small>
           <label>Reason<textarea v-model="user.reason" required minlength="3" maxlength="500" /></label><button :disabled="busy">Apply change…</button>
@@ -57,15 +61,17 @@ onMounted(()=>run(async()=> {if(elevated.value) catalog.value=(await api('catalo
       <h2>Create promo code</h2><form @submit.prevent="run(createPromo)">
         <label>Code<UiInput v-model="promo.code" required pattern="[A-Za-z0-9_-]{3,40}" maxlength="40" /></label>
         <label>Starts (your local time)<UiInput v-model="promo.startsAt" type="datetime-local" required /></label>
-        <label>Expires (your local time)<UiInput v-model="promo.expiresAt" type="datetime-local" required /></label>
+        <UiCheckbox v-model="promo.noExpiry" label="No expiration" /><label v-if="!promo.noExpiry">Expires (your local time)<UiInput v-model="promo.expiresAt" type="datetime-local" required /></label>
         <label>Maximum players (empty = unlimited)<input v-model="promo.maxUses" type="number" min="1" max="1000000000" step="1" /></label><p>Each player may redeem a code once. Rewards go to Mail.</p>
         <fieldset v-for="(reward,index) in promo.rewards" :key="index"><legend>Reward {{ Number(index)+1 }}</legend>
           <OptionSelect label="Type" v-model="reward.kind" :options="['coins','crystals','parts',...Object.keys(catalog).filter(k=>k!=='ingredient')].map(value=>({value,label:value}))" @update:model-value="reward.id=''" />
-          <OptionSelect v-if="catalog[reward.kind]" label="Item" v-model="reward.id" :options="catalog[reward.kind]!.map(item=>({value:item.id,label:item.label}))" />
+          <CatalogPicker v-if="catalog[reward.kind]" :key="reward.kind" v-model="reward.id" :items="catalog[reward.kind]!" />
           <label v-if="!singles.includes(reward.kind)">Quantity<input v-model.number="reward.amount" type="number" required min="1" max="1000000" step="1" /></label><button type="button" :disabled="promo.rewards.length===1" @click="promo.rewards.splice(index,1)">Remove reward</button>
         </fieldset><button type="button" :disabled="promo.rewards.length>=30" @click="promo.rewards.push({kind:'coins',id:'',amount:100})">Add reward</button><button :disabled="busy">Create code</button>
       </form>
-      <article v-for="p in promos" :key="p.code"><h3>{{ p.code }} {{ p.deletedAt ? '(disabled)' : '' }}</h3><p>{{ time(p.startsAt) }} → {{ time(p.expiresAt) }} · {{ p.uses }} / {{ p.maxUses ?? 'Unlimited' }} players</p><pre>{{ JSON.stringify(p.rewards,null,2) }}</pre><button :disabled="busy || !!p.deletedAt" @click="run(()=>removePromo(p.code))">Disable…</button></article>
+      <article v-for="p in promos" :key="p.code"><h3>{{ p.code }} {{ p.deletedAt ? '(disabled)' : '' }}</h3><p>{{ time(p.startsAt) }} → {{ p.expiresAt === null ? 'No expiration' : time(p.expiresAt) }} · {{ p.uses }} / {{ p.maxUses ?? 'Unlimited' }} players</p><pre>{{ JSON.stringify(p.rewards,null,2) }}</pre>
+        <form v-if="!p.deletedAt && expiryEdits[p.code]" @submit.prevent="run(()=>saveExpiry(p.code))"><UiCheckbox v-model="expiryEdits[p.code]!.noExpiry" label="No expiration" /><UiInput v-if="!expiryEdits[p.code]!.noExpiry" v-model="expiryEdits[p.code]!.expiresAt" label="Expires (your local time)" type="datetime-local" required /><button :disabled="busy">Save expiration</button></form>
+        <button :disabled="busy || !!p.deletedAt" @click="run(()=>removePromo(p.code))">Disable…</button></article>
     </section>
     <section v-if="tab==='logs' && elevated">
       <h2>Events · last 14 days</h2><form @submit.prevent="run(()=>loadEvents())"><label>Telegram ID<UiInput v-model="filter.telegramId" inputmode="numeric" pattern="[0-9]*" /></label><label>Event type<UiInput v-model="filter.event" placeholder="game.action.refused" /></label><button :disabled="busy">Filter / refresh</button></form>

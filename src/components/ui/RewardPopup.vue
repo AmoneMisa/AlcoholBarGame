@@ -6,6 +6,8 @@ import RewardList from './RewardList.vue';
 import RewardArt from './RewardArt.vue';
 import ModalDialog from './ModalDialog.vue';
 import UiButton from './UiButton.vue';
+import type { RewardLine } from '../../domain/rewards';
+import { appearanceRewardOption } from '../../domain/appearanceRewards';
 
 // Tells the player exactly what the last action gave: coins, tips, crystals, XP, recipes, gifts.
 // It stays until closed or tapped away, or for a few seconds when nothing else needs reading.
@@ -13,6 +15,9 @@ const game = useGameStore();
 const revealIndex = ref(-1);
 const specials = computed(() => game.rewardReport?.lines.filter(line => line.id && ['style', 'background', 'companion', 'item'].includes(line.kind)) ?? []);
 const current = computed(() => specials.value[revealIndex.value]);
+const appearanceOption = (line:RewardLine)=>appearanceRewardOption(line,game.decor.bartenderCharacter ?? 'noa',game.ownedCosmeticIds,game.ownedInteriorIds);
+const inUse = (line:RewardLine)=> {const option=appearanceOption(line);return !!option && (game.decor as unknown as Record<string,string>)[option.key]===option.value;};
+function useAppearance(line:RewardLine) {const option=appearanceOption(line);if(option) game.act({type:'setDecor',key:option.key,value:option.value});}
 let timer: ReturnType<typeof setTimeout> | undefined;
 watch(() => game.rewardReport?.id, () => {
   clearTimeout(timer);
@@ -35,6 +40,7 @@ onUnmounted(() => clearTimeout(timer));
         <div class="reveal-halo" aria-hidden="true"></div>
         <div class="reveal-hero"><RewardArt :line="current" /></div>
         <div class="reveal-caption"><span class="reveal-new">{{ current.kind === 'item' ? 'RECEIVED' : 'NEW' }}</span><small>{{ current.rarity ?? 'common' }} · {{ current.kind }}</small><h2>{{ current.text.replace(/^New (style|background): /, '') }}</h2><div class="reward-flourish" aria-hidden="true">✧ ━ ◆ ━ ✧</div></div>
+        <UiButton v-if="appearanceOption(current)" variant="solid" :disabled="inUse(current)" @click="useAppearance(current)">{{ inUse(current) ? 'In use' : appearanceOption(current)!.label }}</UiButton>
         <UiButton variant="ghost" class="reward-continue" @click="advance">{{ revealIndex + 1 < specials.length ? 'Next reward' : 'Continue' }} · {{ revealIndex + 1 }}/{{ specials.length }}</UiButton>
       </section>
       <section v-else class="reward-celebration">
@@ -44,6 +50,7 @@ onUnmounted(() => clearTimeout(timer));
         <ul class="reward-grid">
           <li v-for="(line, index) in game.rewardReport.lines" :key="index" :class="line.rarity ?? line.kind" :style="{ '--order': index }">
             <div class="reward-tile-art"><RewardArt :line="line" /><span v-if="['style', 'background', 'companion'].includes(line.kind)" class="reward-new">NEW</span></div><span>{{ line.text }}</span>
+            <UiButton v-if="appearanceOption(line)" size="sm" :disabled="inUse(line)" @click="useAppearance(line)">{{ inUse(line) ? 'In use' : appearanceOption(line)!.label }}</UiButton>
           </li>
         </ul>
         <UiButton variant="ghost" class="reward-continue" @click="advance">{{ specials.length ? 'Discover your rewards ✦' : 'Continue' }}</UiButton>

@@ -30,6 +30,7 @@ function pgTx(client) {
     async setBlocked(id,blocked,reason) { await client.query('UPDATE players SET blocked=$2, block_reason=$3 WHERE id=$1',[id,blocked,reason]); },
     async listPromos() { const {rows}=await client.query('SELECT code,rewards,starts_at AS "startsAt",expires_at AS "expiresAt",max_uses AS "maxUses",deleted_at AS "deletedAt",(SELECT count(*)::int FROM promo_redemptions r WHERE r.code=p.code) AS uses FROM promo_codes p ORDER BY created_at DESC LIMIT 200'); return rows; },
     async deletePromo(code) { return (await client.query('UPDATE promo_codes SET deleted_at=now() WHERE code=$1 AND deleted_at IS NULL',[code])).rowCount > 0; },
+    async updatePromoExpiry(code,expiresAt) { return (await client.query('UPDATE promo_codes SET expires_at=to_timestamp($2/1000.0) WHERE code=$1 AND deleted_at IS NULL',[code,expiresAt])).rowCount > 0; },
     async addEvent(identity,event,detail,at) { await client.query('INSERT INTO game_events(telegram_id,event,detail,created_at) VALUES($1,$2,$3::jsonb,to_timestamp($4/1000.0))',[identity.telegramId,event,JSON.stringify(detail),at]); },
     async pruneEvents(before) { for(const table of ['game_events','coin_ledger','crystal_ledger','loot_ledger']) await client.query('DELETE FROM '+table+' WHERE created_at <= to_timestamp($1/1000.0)',[before]); },
     async listEvents({telegramId,before,event},cutoff) { const {rows}=await client.query('SELECT id,telegram_id AS "telegramId",event,detail,created_at AS "createdAt" FROM game_events WHERE created_at > to_timestamp($1/1000.0) AND ($2::bigint IS NULL OR telegram_id=$2) AND ($3::bigint IS NULL OR id<$3) AND ($4::text IS NULL OR event=$4) ORDER BY id DESC LIMIT 100',[cutoff,telegramId || null,before || null,event || null]); return rows; },
@@ -44,7 +45,7 @@ function pgTx(client) {
     async findPromo(code) {
       const {rows:[row]} = await client.query('SELECT rewards, expires_at, starts_at, max_uses, deleted_at FROM promo_codes WHERE code=$1 FOR UPDATE',[code]);
       const {rows:[count]}=await client.query('SELECT count(*)::int AS uses FROM promo_redemptions WHERE code=$1',[code]);
-      return row ? {code, rewards:row.rewards, expiresAt:new Date(row.expires_at).getTime(), startsAt:new Date(row.starts_at).getTime(), maxUses:row.max_uses, uses:count.uses, deletedAt:row.deleted_at} : null;
+      return row ? {code, rewards:row.rewards, expiresAt:row.expires_at === null ? null : new Date(row.expires_at).getTime(), startsAt:new Date(row.starts_at).getTime(), maxUses:row.max_uses, uses:count.uses, deletedAt:row.deleted_at} : null;
     },
     async redeemPromo(code,playerId) {
       const {rowCount} = await client.query('INSERT INTO promo_redemptions(code,player_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[code,playerId]);
@@ -201,6 +202,7 @@ export function createMemoryRepository() {
     async setBlocked(id,blocked,reason) { const p=[...players.values()].find(p=>p.id===id); p.blocked=blocked; p.blockReason=reason; },
     async listPromos() { return Promise.all([...promos.keys()].map(code=>tx.findPromo(code))); },
     async deletePromo(code) { const p=promos.get(code); if (!p || p.deletedAt) return false; p.deletedAt=Date.now(); return true; },
+    async updatePromoExpiry(code,expiresAt) { const p=promos.get(code);if(!p || p.deletedAt)return false;p.expiresAt=expiresAt;return true; },
     async addEvent(identity,event,detail,at) { events.push({id:events.length ? events.at(-1).id+1 : 1,telegramId:identity.telegramId,event,detail:structuredClone(detail),createdAt:at}); },
     async pruneEvents(before) { while(events.length && events[0].createdAt<=before) events.shift(); },
     async listEvents(filter,cutoff) { return events.filter(e=>e.createdAt>cutoff && (!filter.telegramId || String(e.telegramId)===String(filter.telegramId)) && (!filter.before || e.id<filter.before) && (!filter.event || e.event===filter.event)).reverse().slice(0,100); },
