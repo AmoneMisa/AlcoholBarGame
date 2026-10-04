@@ -8,6 +8,7 @@ declare global {
         initData?: string;
         ready?: () => void;
         expand?: () => void;
+        requestWriteAccess?: (callback: (allowed: boolean) => void) => void;
         showAlert?: (message: string) => void;
         openTelegramLink?: (url: string) => void;
         openInvoice?: (url: string, callback?: (status: 'paid' | 'cancelled' | 'failed' | 'pending') => void) => void;

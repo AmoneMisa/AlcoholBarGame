@@ -1,5 +1,6 @@
 import { reactive, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
+import { post } from '../telegram/api';
 
 export type NotificationEvent = 'dailyLesson'|'dailyReward'|'friendVisit'|'reward'|'customer'|'friendRequest'|'loot'|'leaderboard';
 export const NOTIFICATION_EVENTS: { id:NotificationEvent; label:string; detail:string }[] = [
@@ -21,6 +22,40 @@ export const useNotificationsStore = defineStore('notifications', () => {
   const prefs = reactive({ ...defaults, ...(saved.prefs ?? {}) });
   const seen = reactive<Record<string,number>>(saved.seen ?? {});
   const items = ref<{ id:string; type:NotificationEvent; title:string; text:string }[]>([]);
+  const telegramEnabled = ref(false), telegramBusy = ref(false), telegramMessage = ref('');
+  const signed = () => !!window.Telegram?.WebApp?.initData;
+  async function syncTelegram(save = false, hydrate = true) {
+    if (!signed()) return;
+    try {
+      const result = await post<{ok:boolean;enabled:boolean;prefs?:Record<NotificationEvent,boolean>;error?:string}>('/api/notifications',save ? {prefs:{...prefs}} : {});
+      if (!result.ok) throw new Error(result.error || 'Could not save notifications.');
+      telegramEnabled.value=result.enabled;
+      if (!save && hydrate && result.prefs) Object.assign(prefs,result.prefs);
+    } catch(error) { telegramMessage.value=(error as Error).message; }
+  }
+  async function enableTelegram() {
+    if (telegramBusy.value) return;
+    const request=window.Telegram?.WebApp?.requestWriteAccess;
+    if (!signed() || !request) { telegramMessage.value='Open the game in an updated Telegram app to enable messages.';return; }
+    telegramBusy.value=true;telegramMessage.value='';
+    try {
+      const allowed=await new Promise<boolean>(resolve=>window.Telegram!.WebApp!.requestWriteAccess!(resolve));
+      if (!allowed) { telegramMessage.value='Telegram messages were not enabled.';return; }
+      const result=await post<{ok:boolean;enabled:boolean;error?:string}>('/api/notifications',{enabled:true,prefs:{...prefs}});
+      if (!result.ok) throw new Error(result.error || 'Could not enable notifications.');
+      telegramEnabled.value=result.enabled;
+    } catch(error) { telegramMessage.value=(error as Error).message; }
+    finally { telegramBusy.value=false; }
+  }
+  async function disableTelegram() {
+    telegramBusy.value=true;
+    try {
+      const result=await post<{ok:boolean;enabled:boolean;error?:string}>('/api/notifications',{enabled:false,prefs:{...prefs}});
+      if (!result.ok) throw new Error(result.error || 'Could not disable notifications.');
+      telegramEnabled.value=result.enabled;
+    } catch(error) { telegramMessage.value=(error as Error).message; }
+    finally {telegramBusy.value=false;}
+  }
   watch([prefs,seen],() => {
     try { localStorage.setItem(KEY,JSON.stringify({prefs:{...prefs},seen:{...seen}})); } catch { /* private mode */ }
   },{deep:true});
@@ -34,6 +69,10 @@ export const useNotificationsStore = defineStore('notifications', () => {
     return true;
   }
   function dismiss(id:string) { items.value = items.value.filter((item) => item.id !== id); }
-  function setEnabled(type:NotificationEvent,enabled:boolean) { prefs[type] = enabled; }
-  return { prefs, items, push, dismiss, setEnabled };
+  let preferenceQueue: Promise<void> = Promise.resolve();
+  function setEnabled(type:NotificationEvent,enabled:boolean) {
+    prefs[type] = enabled;
+    preferenceQueue=preferenceQueue.then(()=>syncTelegram(true));
+  }
+  return { prefs, items, push, dismiss, setEnabled, syncTelegram, enableTelegram, disableTelegram, telegramEnabled, telegramBusy, telegramMessage };
 });

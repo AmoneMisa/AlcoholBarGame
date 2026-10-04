@@ -15,43 +15,46 @@
 .event-menu .ui-btn,
 .version-card,
 .theme-draw-prizes article,
-.daily-track > span,
 .offer-source,
 .wishlist-selected,
 .achievement-card,
 .quest-card {
-  background-image: var(--ui-panel-art) !important;
+  background-image: linear-gradient(#111c2df5, #111c2df5), var(--ui-panel-art) !important;
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
 }
 
 /* State colours remain visible over the artwork. */
-.daily-track > span.claimed { background-blend-mode:soft-light; }
-.daily-track > span.today { background-image:var(--ui-gold-art) !important;background-blend-mode:soft-light; }
-.mail-letter,.mail-row.active { background-blend-mode:soft-light; }
+.daily-track > span { background-image:none !important; }
+.daily-track small,.daily-track em { color:#c5d1df; }
+.mail-letter,.mail-row.active { background-image:none !important; }
 .modal-head,.modal-foot { background-color:#08132299; }
 
-/* Shared button artwork stays cached alongside panels; colour still describes the action. */
+/* Actions use quiet fills: resizing must never crop or repeat a painted button frame. */
 .ui-btn {
-  background-image:var(--ui-panel-art) !important;
+  background-image:none !important;
   background-position:center;
   background-size:cover;
   background-repeat:no-repeat;
   background-blend-mode:soft-light;
 }
 .ui-btn-primary,.ui-btn-solid {
-  background-image:var(--ui-gold-art) !important;
+  background-image:linear-gradient(#63421d,#493019) !important;
 }
 .ui-btn-ghost { background-image:none !important; }
+.ui-btn:disabled,.ui-btn-blocked,.ui-btn:disabled:hover,.ui-btn-blocked:hover {
+  background:#1b2634 !important;border-color:#445164 !important;color:#aebdce !important;
+  opacity:1;filter:none;box-shadow:none;transform:none;
+}
 
 .section-tabs button,.design-tabs button,.game-nav button {
-  background-image:var(--ui-panel-art);
+  background-image:none;
   background-position:center;
   background-size:cover;
   background-repeat:no-repeat;
   background-blend-mode:soft-light;
 }
 .section-tabs button[aria-selected='true'],.design-tabs button[aria-selected='true'],.game-nav button.active {
-  background-image:var(--ui-gold-art);
+  background-image:linear-gradient(#63421d,#493019);
 }

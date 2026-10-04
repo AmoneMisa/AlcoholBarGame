@@ -28,7 +28,7 @@ async function open(item:MailEntry){selectedId.value=item.id;if(!item.readAt && 
 <template>
   <ModalDialog title="Mailbox" eyebrow="POST BOX" width="1000px" @close="game.mailboxOpen=false">
     <SectionTabs v-model="filter" class="mail-tabs" label="Mail categories" :tabs="tabs" />
-    <p v-if="game.mailMessage" role="status">{{ game.mailMessage }}</p>
+    <p v-if="game.mailMessage && !game.mailMessage.startsWith('Claimed rewards:')" role="status">{{ game.mailMessage }}</p>
     <div class="mail-workspace" :class="{reading:selected}">
       <aside class="mail-inbox" aria-label="Messages"><p v-if="!entries.length" class="mail-empty">No messages here yet.</p>
       <ul class="mail-list"><li v-for="item in entries" :key="item.id"><button class="mail-row" :class="{unread:!item.readAt,active:selected?.id===item.id}" :aria-pressed="selected?.id===item.id" @click="open(item)"><span class="mail-emblem"><UiIcon :name="icon(item)" /></span><span class="mail-row-copy"><b>{{ title(item) }}</b><span>{{ item.actorName }}</span><time>{{ date(item.at) }} MSK</time></span><i v-if="!item.readAt" class="mail-unread" aria-label="Unread" /></button></li></ul></aside>

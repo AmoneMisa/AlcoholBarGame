@@ -13,9 +13,13 @@ if (window.location.pathname === '/admin' || new URLSearchParams(window.Telegram
   try {
     const {post}=await import('./telegram/api');
     const access=await post<{role:'owner'|'admin'|'moderator'}>('/api/admin/access',{});
+    if (!access.role) throw new Error('Staff access required.');
+    await import('./ui-kit.css');
     const {default:AdminPage}=await import('./components/admin/AdminPage.vue');
-    createApp(AdminPage,{role:access.role}).mount('#app');
-  } catch { document.getElementById('app')!.textContent='Access denied. Open this page through Telegram with an authorized account.'; }
+    createApp(AdminPage,{role:access.role}).use(createPinia()).mount('#app');
+  } catch (error) {
+    document.getElementById('app')!.textContent=(error as Error).message || 'Could not open administration. Reopen through Telegram.';
+  } finally { document.getElementById('boot')?.remove(); }
 } else {
   initGraphics();
   initSceneMotion();

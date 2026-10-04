@@ -8,6 +8,7 @@ import { checkEnglish } from './english.mjs';
 import { createGameService } from './gameService.mjs';
 import { createPgRepository } from './playerRepository.mjs';
 import { createTelegramBot } from './telegramBot.mjs';
+import { createTelegramNotifications } from './notifications.mjs';
 
 const port = Number(process.env.PORT || 3000);
 const botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -16,10 +17,11 @@ const allowDevLogin = process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE
 if (!botToken && !allowDevLogin) console.warn('TELEGRAM_BOT_TOKEN is not set: players cannot sign in.');
 const payments = {};
 const service = createGameService({ repository: createPgRepository(pool), checkEnglish });
-const telegramBot = createTelegramBot({ token: botToken, payments, staffRole:identity=>service.staffRole(identity) });
+const telegramBot = createTelegramBot({ token: botToken, payments, staffRole:identity=>service.staffRole(identity), onWriteAccess:id=>notifications.allow(id) });
+const notifications = createTelegramNotifications({pool,bot:telegramBot});
 Object.assign(payments, { approve: service.approveStarCheckout, fulfil: service.fulfilStarPayment });
 const app = createApp({ supportEmail: process.env.SUPPORT_EMAIL || undefined, supportTelegram: process.env.SUPPORT_TELEGRAM,
-  service, botToken, allowDevLogin,
+  service, botToken, allowDevLogin, notifications,
   createInvoiceLink: botToken ? telegramBot.createInvoiceLink : undefined,
   extraRoutes(api) {
     api.get('/api/health', async (_request, response) => {
@@ -76,7 +78,10 @@ const prune = setInterval(() => service.pruneRequests().catch((error) => console
 prune.unref();
 const mailExpiry = setInterval(()=>service.expireGifts().catch(error=>console.error('Gift return failed:',error.message)),60*1000);
 mailExpiry.unref();
+const notificationTimer=setInterval(()=>notifications.tick().catch(error=>console.error('Notification worker failed:',error.message)),60_000);
+notificationTimer.unref();
 const shutdown = async () => {
+  clearInterval(notificationTimer);
   await telegramBot.stop();
   server.close(async () => {
     await pool.end();

@@ -149,7 +149,7 @@ export const useGameStore = defineStore('game', () => {
       const result=await claimMailReward(id);
       if(!result.ok)throw new Error(result.error);
       if(result.state)adoptServerState(result.state,result.serverTime,result.message);
-      mailMessage.value=result.message ?? '';
+      mailMessage.value='';
       if(reveal) showRewards('Mail rewards',rewardLines(before,stateSnapshot(state.value),result.message));
       return true;
     } catch(error){mailMessage.value=(error as Error)?.message || 'Could not claim this reward.';friendError(error,'Could not claim this reward.');}

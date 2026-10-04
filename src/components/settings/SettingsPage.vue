@@ -59,6 +59,9 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
     <section class="settings-card notification-settings">
       <h3>Notifications</h3>
       <p>Choose what the game tells you about.</p>
+      <p>Telegram messages reach you while the game is closed: daily reminders, mail, friend requests and expired boosters. New customer alerts appear while playing.</p>
+      <UiButton :disabled="notifications.telegramBusy || game.mode!=='online'" @click="notifications.telegramEnabled ? notifications.disableTelegram() : notifications.enableTelegram()">{{ notifications.telegramBusy ? 'Saving…' : notifications.telegramEnabled ? 'Turn off Telegram messages' : 'Enable Telegram messages' }}</UiButton>
+      <p v-if="notifications.telegramMessage" role="status">{{ notifications.telegramMessage }}</p>
       <UiCheckbox v-for="event in NOTIFICATION_EVENTS" :key="event.id" :model-value="notifications.prefs[event.id]" :label="event.label" :hint="event.detail" @update:model-value="(value: boolean) => notifications.setEnabled(event.id, value)" />
     </section>
 

@@ -6,7 +6,7 @@ import { authenticate } from './auth.mjs';
 //   POST /api/session  → create/load the player's game and return it
 //   POST /api/action   → { requestId, action } → apply one action on the server, return the new state
 
-export function createApp({ service, botToken, allowDevLogin = false, extraRoutes, createInvoiceLink, supportEmail = 'Kubai.rita2@gmail.com', supportTelegram = '' }) {
+export function createApp({ service, botToken, allowDevLogin = false, extraRoutes, createInvoiceLink, notifications, supportEmail = 'Kubai.rita2@gmail.com', supportTelegram = '' }) {
   const app = express();
   app.disable('x-powered-by');
   // Behind the host's nginx / Caddy: use the real client address for rate limits.
@@ -84,6 +84,7 @@ export function createApp({ service, botToken, allowDevLogin = false, extraRoute
   route('/api/support/ticket',request=>service.createTicket(request.identity,request.body));
   route('/api/promocodes/redeem', request => service.redeemPromoCode(who(request),request.body?.code));
   route('/api/session', (request) => service.session(who(request)));
+  route('/api/notifications', request=>notifications ? notifications.preferences(who(request),request.body) : {ok:true,enabled:false});
   route('/api/action', (request) => service.act(who(request), request.body));
 
   // Telegram Stars: returns an invoice link for the Mini App's WebApp.openInvoice(). Crystals are credited

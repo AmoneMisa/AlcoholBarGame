@@ -7,7 +7,7 @@ export class TelegramBotError extends Error {}
  * TELEGRAM_BOT_TOKEN is the only runtime Telegram setting. The launch URL is the bot's
  * standard Main Mini App deep link, whose HTTPS application URL is managed once in BotFather.
  */
-export function createTelegramBot({ token, fetchImpl = globalThis.fetch, logger = console, payments, adminTelegramIds = [], staffRole } = {}) {
+export function createTelegramBot({ token, fetchImpl = globalThis.fetch, logger = console, payments, adminTelegramIds = [], staffRole, onWriteAccess } = {}) {
   const admins=new Set((Array.isArray(adminTelegramIds) ? adminTelegramIds : String(adminTelegramIds).split(',')).map(id=>String(id).trim()));
   const state = {
     configured: Boolean(token), connected: false, mode: 'off', id: null, username: null,
@@ -35,7 +35,7 @@ export function createTelegramBot({ token, fetchImpl = globalThis.fetch, logger 
     }
     let body;
     try { body = await response.json(); } catch { throw new TelegramBotError(`Telegram ${method} returned invalid JSON.`); }
-    if (!response.ok || !body?.ok) throw new TelegramBotError(body?.description || `Telegram ${method} failed.`);
+    if (!response.ok || !body?.ok) { const error=new TelegramBotError(body?.description || `Telegram ${method} failed.`); error.status=body?.error_code ?? response.status; throw error; }
     return body.result;
   }
 
@@ -94,6 +94,7 @@ export function createTelegramBot({ token, fetchImpl = globalThis.fetch, logger 
   async function handleUpdate(update, signal) {
     if (payments && update?.pre_checkout_query) return handlePreCheckout(update.pre_checkout_query, signal);
     const message = update?.message;
+    if (message?.chat?.type === 'private' && message.write_access_allowed) await onWriteAccess?.(message.from?.id);
     if (payments && message?.successful_payment) return handleSuccessfulPayment(message, signal);
     const command = message?.text?.trim().split(/\s+/, 1)[0]?.toLowerCase().split('@', 1)[0];
     if(command === '/admin' && message?.chat?.type === 'private' && (staffRole ? await staffRole({kind:'telegram',telegramId:message.from?.id}) : admins.has(String(message.from?.id))) && state.username) {

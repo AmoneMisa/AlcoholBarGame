@@ -124,6 +124,7 @@ onUnmounted(() => clearInterval(socialTimer));
 const bootGuard = setTimeout(() => document.getElementById('boot')?.remove(), 20_000);
 watch(() => game.sessionReady, (ready) => {
   if (!ready) return;
+  void notifications.syncTelegram();
   clearTimeout(bootGuard);
   const boot = document.getElementById('boot');
   boot?.classList.add('done');
@@ -135,6 +136,11 @@ watch(() => game.sessionReady, (ready) => {
   if (game.dailyGiftAvailable) notifications.push('dailyReward','Daily reward is ready','Claim today’s login gift.',`daily-reward:${today}`);
   if (!game.dailyLessonsComplete) notifications.push('dailyLesson','Daily English quests','Complete today’s lessons for XP, crystals and a recipe chance.',`daily-lesson:${today}`);
 }, { immediate:true });
+let notificationHeartbeat: ReturnType<typeof setInterval>;
+onMounted(() => { notificationHeartbeat=setInterval(()=>{
+  if (game.mode==='online' && document.visibilityState==='visible') void notifications.syncTelegram(false,false);
+},60_000); });
+onUnmounted(()=>clearInterval(notificationHeartbeat));
 watch(() => game.customers.map((customer) => customer.id).join(','),(next,previous) => {
   if (game.trainingActive || !game.tourSeen) return;
   if (previous && next && next !== previous) notifications.push('customer','A new customer arrived','Open Bar and tap the guest to greet them.',`customer:${next}`);

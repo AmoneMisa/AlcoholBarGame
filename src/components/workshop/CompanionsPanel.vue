@@ -125,7 +125,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
         <template v-else>
           <progress :value="item.shards" :max="item.person.shards"></progress>
           <p class="meta">{{ item.shards }} / {{ item.person.shards }} shards<template v-if="item.person.joinsWith"> · joins at once with an achievement</template><template v-if="item.person.eventId"> · likes a special night</template></p>
-          <UiButton block variant="primary" @click="item.shards < item.person.shards ? acquisitionOffer={kind:'companion',id:item.person.id,label:companionName(item.person.id)} : game.recruitCompanion(item.person.id)">Invite to your circle</UiButton>
+          <UiButton block :variant="item.shards < item.person.shards ? 'secondary' : 'primary'" @click="item.shards < item.person.shards ? acquisitionOffer={kind:'companion',id:item.person.id,label:companionName(item.person.id)} : game.recruitCompanion(item.person.id)">{{ item.shards < item.person.shards ? 'Find shards' : 'Invite to your circle' }}</UiButton>
         </template>
 
         <section v-if="item.joined && open === item.person.id" class="story">
