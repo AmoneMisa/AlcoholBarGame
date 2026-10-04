@@ -85,6 +85,10 @@ test('Telegram login: a valid signature is accepted; forged, tampered or old dat
   assert.throws(() => verifyTelegramInitData(tampered, BOT_TOKEN), AuthError, 'changing the user id breaks the signature');
   assert.throws(() => verifyTelegramInitData(signInitData(user, { authDate: Math.floor(Date.now() / 1000) - 3 * 86400 }), BOT_TOKEN), AuthError, 'expired');
   assert.throws(() => verifyTelegramInitData('user=%7B%7D', BOT_TOKEN), AuthError, 'no hash');
+  for (const authDate of [0, -1, Math.floor(Date.now()/1000)+3600]) {
+    assert.throws(() => verifyTelegramInitData(signInitData(user,{authDate}),BOT_TOKEN),AuthError,'invalid or future auth date');
+  }
+  for (const id of [0,-1]) assert.throws(() => verifyTelegramInitData(signInitData({...user,id}),BOT_TOKEN),AuthError,'invalid user id');
 });
 
 test('Telegram bot connects from one token and sends a Main Mini App launch link', async () => {
@@ -300,6 +304,12 @@ test('HTTP API: login required, dev login only when enabled, rate limited, state
   try {
     const response = await fetch(`http://127.0.0.1:${lockedServer.address().port}/api/session`, { method: 'POST', headers: { 'X-Dev-Player': 'someone' } });
     assert.equal(response.status, 401, 'dev login is off unless explicitly enabled');
+    for (const path of ['/api/session','/api/action','/api/friends','/api/stars/invoice']) {
+      const refused = await fetch(`http://127.0.0.1:${lockedServer.address().port}${path}`, {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'
+      });
+      assert.equal(refused.status,401,`${path} requires signed Telegram identity`);
+    }
   } finally {
     lockedServer.close();
   }

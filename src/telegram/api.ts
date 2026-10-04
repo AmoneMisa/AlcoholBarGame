@@ -33,7 +33,17 @@ export async function post<T>(path: string, body: unknown): Promise<T> {
   return data as T;
 }
 
+let bootstrapSession: SessionResult | undefined;
+export async function prepareSession() {
+  bootstrapSession = await post<SessionResult>('/api/session', {});
+}
+
 export function connectSession() {
+  if (bootstrapSession) {
+    const session = bootstrapSession;
+    bootstrapSession = undefined;
+    return Promise.resolve(session);
+  }
   return post<SessionResult>('/api/session', {});
 }
 

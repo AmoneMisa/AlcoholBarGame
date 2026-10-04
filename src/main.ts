@@ -3,8 +3,10 @@ import { installDragScroll } from './ui/dragScroll';
 import { createPinia } from 'pinia';
 import { initTelegram } from './telegram/webapp';
 import { initGraphics } from './ui/graphics';
+import { requireTelegramSession } from './telegram/launchGate';
 
 // The opening bar needs recipe mechanics only; descriptions and database prose load with Study.
+if (await requireTelegramSession()) {
 if (window.location.pathname === '/admin' || new URLSearchParams(window.Telegram?.WebApp?.initData ?? '').get('start_param') === 'admin') {
   initTelegram();
   try {
@@ -30,4 +32,5 @@ if (window.location.pathname === '/admin' || new URLSearchParams(window.Telegram
   const { default: App } = await import('./App.vue');
   installDragScroll();
   createApp(App).use(createPinia()).mount('#app');
+}
 }

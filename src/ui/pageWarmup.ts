@@ -6,6 +6,9 @@ export interface WarmupHost {
   busy: () => boolean;
   schedule: (run: () => void) => () => void;
 }
+export function canWarmPages(lite: boolean, connection?: { saveData?: boolean; effectiveType?: string }) {
+  return !lite && !connection?.saveData && !['slow-2g', '2g', '3g'].includes(connection?.effectiveType ?? '');
+}
 // One request at a time, including on fast devices. Opening a page uses the same cached loader.
 export function warmPages(tasks: WarmupTask[], host: WarmupHost) {
   let stopped = false;
@@ -32,7 +35,7 @@ export function startPageWarmup(tasks: WarmupTask[], isBusy: () => boolean) {
   const input = () => { lastInput = Date.now(); };
   for (const event of ['pointerdown', 'keydown', 'wheel', 'touchstart']) window.addEventListener(event, input, { passive: true });
   const stop = warmPages(tasks, {
-    allowed: () => !connection?.saveData && !['slow-2g', '2g'].includes(connection?.effectiveType ?? ''),
+    allowed: () => canWarmPages(liteGraphics.value, connection),
     busy: () => document.hidden || Date.now() - lastInput < (liteGraphics.value ? 3000 : 1500) || isBusy()
       || !!document.activeElement?.matches('input, textarea, [contenteditable="true"]'),
     schedule: run => {

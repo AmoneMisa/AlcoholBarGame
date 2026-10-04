@@ -6,6 +6,7 @@ import type { RegionId } from '../../domain/types';
 import { useGameStore } from '../../stores/game';
 import ModalDialog from '../ui/ModalDialog.vue';
 import UiButton from '../ui/UiButton.vue';
+import { thumbnailArtwork } from '../../domain/optimizedArtwork';
 
 // The first thing a new player sees: pick the city of their first (free) bar. Shown until a bar is chosen.
 const game = useGameStore();
@@ -25,7 +26,7 @@ function start() { game.chooseStartingBar(picked.value); }
       </header>
       <div class="starting-bar-grid">
         <button v-for="region in REGIONS" :key="region.id" type="button" :class="{ picked: picked === region.id }" :aria-pressed="picked === region.id" @click="picked = region.id">
-          <img :src="INTERIORS.find((item) => item.id === game.bars[region.id].interior)?.asset" alt="" />
+          <img :src="thumbnailArtwork(INTERIORS.find((item) => item.id === game.bars[region.id].interior)?.asset ?? '', 192)" alt="" width="192" height="120" loading="lazy" decoding="async" />
           <span class="starting-bar-copy"><small>{{ region.name }}</small><b>{{ game.bars[region.id].name }}</b><em>{{ region.tagline }}</em><i>{{ pricing(region.marketFactor) }} · {{ region.marketFactor.toFixed(2) }}×</i></span>
         </button>
       </div>

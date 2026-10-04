@@ -45,7 +45,7 @@ const StartingBarPicker = lazyPage(() => import('./components/game/StartingBarPi
 
 const game = useGameStore();
 let stopPageWarmup: (() => void) | undefined;
-onMounted(() => { stopPageWarmup = startPageWarmup(nextPages, () => !!game.conversationCustomerId || !!game.preparationCustomerId || game.trainingActive); });
+onMounted(() => { stopPageWarmup = startPageWarmup(nextPages, () => !game.sessionReady || !game.startingBarChosen || !!game.conversationCustomerId || !!game.preparationCustomerId || game.trainingActive); });
 onUnmounted(() => stopPageWarmup?.());
 const notifications = useNotificationsStore();
 const view = ref('service');
@@ -224,7 +224,7 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
     <TopHud @design="selectView('design')" @goto="selectView" @profile="characterInfoOpen = true" />
     <main>
       <section v-show="view === 'service'" class="service-layout">
-        <BarScene :active="view === 'service'" @screenshot="screenshotOpen = true">
+        <BarScene v-if="game.sessionReady && game.startingBarChosen" :active="view === 'service'" @screenshot="screenshotOpen = true">
         <template #tools>
           <UiButton size="sm" icon="stock" @click="equipmentOpen = true">Upgrades</UiButton>
           <UiButton size="sm" icon="glass" @click="openMixingCounter">Mix page</UiButton>

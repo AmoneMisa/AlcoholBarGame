@@ -2,7 +2,7 @@ import ts from 'typescript';
 import { dirname, resolve, extname, relative } from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { warmPages } from '../src/ui/pageWarmup.ts';
+import { warmPages, canWarmPages } from '../src/ui/pageWarmup.ts';
 import { existsSync, readFileSync } from 'node:fs';
 import { weakDevice } from '../src/ui/graphics.ts';
 import { thumbnailArtwork, characterFrame, mobileArtwork } from '../src/domain/optimizedArtwork.ts';
@@ -84,6 +84,27 @@ test('saving data prevents speculative pages from being scheduled', () => {
   let scheduled = 0;
   warmPages([{id:'study',load:async()=>{throw new Error('must not load');}}], {allowed:()=>false,busy:()=>false,schedule:()=>{scheduled++;return()=>{};}});
   assert.equal(scheduled,0);
+});
+
+test('light graphics and slow connections keep optional pages out of speculative loading', () => {
+  assert.equal(canWarmPages(true, {effectiveType:'4g'}), false);
+  assert.equal(canWarmPages(false, {saveData:true}), false);
+  for (const effectiveType of ['slow-2g','2g','3g']) assert.equal(canWarmPages(false, {effectiveType}), false);
+  assert.equal(canWarmPages(false, {effectiveType:'4g'}), true);
+  assert.equal(canWarmPages(false), true);
+});
+
+test('starting city previews use existing small artwork with a substantial payload reduction', () => {
+  const names = ['speakeasy','loft','riad','art-deco','izakaya'];
+  let original = 0, previews = 0;
+  for (const name of names) {
+    const asset = `/assets/bar/backgrounds/interior-${name}.webp`;
+    const preview = thumbnailArtwork(asset,192);
+    assert.notEqual(preview,asset);
+    original += readFileSync(new URL('../public'+asset,import.meta.url)).length;
+    previews += readFileSync(new URL('../public'+preview,import.meta.url)).length;
+  }
+  assert.ok(previews < original*.15, `${previews} vs ${original}`);
 });
 
 test('busy gameplay delays warming and cancellation prevents a queued import', () => {

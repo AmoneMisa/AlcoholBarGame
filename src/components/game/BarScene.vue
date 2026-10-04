@@ -57,7 +57,10 @@ const sceneRef = ref<HTMLElement>();
 const sceneBox = ref({ width: 0, height: 0 });
 const sceneInteriorStyle = computed(() => {
   const style = game.barInteriorStyle;
-  if (props.capture || props.preview || !liteGraphics.value) return style;
+  // Pick the light background on narrow screens even when device hints select Full.
+  // Use viewport width until ResizeObserver has measured the scene, avoiding an initial full-size request.
+  const width = sceneBox.value.width || (typeof window === 'undefined' ? Infinity : window.innerWidth);
+  if (props.capture || props.preview || (!liteGraphics.value && width > 900)) return style;
   return { ...style, backgroundImage: style.backgroundImage.replace(game.barBackground, mobileArtwork(game.barBackground)) };
 });
 const sceneObserver = typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(() => measureScene());

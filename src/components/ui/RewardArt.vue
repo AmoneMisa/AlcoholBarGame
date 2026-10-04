@@ -10,7 +10,7 @@ import ItemArt from './ItemArt.vue';
 import { thumbnailArtwork } from '../../domain/optimizedArtwork';
 const props = withDefaults(defineProps<{ line: RewardLine; fragments?: boolean; compact?: boolean }>(), {fragments:undefined});
 const artSize = computed(() => props.compact ? 44 : 96);
-const puzzle = computed(() => props.compact ? thumbnailArtwork(`${import.meta.env.BASE_URL}assets/ui/fragment-puzzle-painted-v1.webp`, 96, import.meta.env.BASE_URL) : `${import.meta.env.BASE_URL}assets/ui/fragment-puzzle-painted-v1.webp`);
+const puzzle = computed(() => thumbnailArtwork(`${import.meta.env.BASE_URL}assets/ui/fragment-puzzle-painted-v1.webp`, props.compact ? 96 : 192, import.meta.env.BASE_URL));
 const isFragment = computed(()=> props.fragments ?? ((props.line.kind==='material' && /^(style:|shard:)/.test(props.line.id ?? '')) || /\b(fragments|shards)\b/i.test(props.line.text)));
 const style = computed(() => COSMETICS.find(item => item.id === props.line.id?.replace(/^style:/,'')));
 const background = computed(() => INTERIORS.find(item => item.id === props.line.id?.replace(/^style:/,'').replace(/^background:/,'')));
@@ -23,7 +23,7 @@ const hasFragmentTarget = computed(() => !!style.value || !!background.value || 
       <span v-if="hasFragmentTarget" class="fragment-preview"><RewardArt :line="line" :fragments="false" compact /></span>
     </div>
     <CharacterModel v-else-if="style" role="bartender" :art-size="compact ? 128 : 512" :character-id="style.character ?? 'noa'" v-bind="{ [style.key === 'bartender' ? 'outfit' : style.key === 'face' ? 'faceStyle' : style.key]: style.value }" animation="idle" />
-    <CharacterModel v-else-if="line.kind === 'companion' && line.id" role="customer" :character-id="line.id" animation="idle" />
+    <CharacterModel v-else-if="line.kind === 'companion' && line.id" role="customer" :art-size="compact ? 128 : 512" :character-id="line.id" animation="idle" />
     <img v-else-if="background" :src="compact ? thumbnailArtwork(background.asset,192) : background.asset" loading="lazy" decoding="async" alt="" />
     <ItemArt v-else-if="['coins','tip','crystals','xp'].includes(line.kind)" kind="resource" :id="line.kind==='tip' ? 'coins' : line.kind" :fallback="line.kind==='crystals' ? '💎' : line.kind==='xp' ? '⭐' : '🪙'" :size="artSize" />
     <ItemArt v-else-if="line.kind==='material' && ['parts','skinShards','stylePieces'].includes(line.id ?? '')" kind="shard" :id="line.id==='skinShards' ? 'skin' : line.id==='stylePieces' ? 'style' : 'parts'" fallback="🧩" :size="artSize" />

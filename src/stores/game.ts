@@ -502,6 +502,10 @@ export const useGameStore = defineStore('game', () => {
       resetMix();
       void loadFriends();
     } catch {
+      if (import.meta.env?.PROD) {
+        message.value = 'Could not connect to your account. Reopen the game in Telegram.';
+        return;
+      }
       mode.value = 'offline';
       message.value = 'Offline practice: progress is saved on this device only.';
     }

@@ -19,10 +19,10 @@ export function verifyTelegramInitData(initData, botToken, { maxAgeSeconds = 24 
   const received = Buffer.from(hash, 'hex');
   if (received.length !== expected.length || !timingSafeEqual(received, expected)) throw new AuthError('Invalid Telegram signature.');
   const authDate = Number(params.get('auth_date'));
-  if (!Number.isFinite(authDate) || now / 1000 - authDate > maxAgeSeconds) throw new AuthError('Telegram login expired. Reopen the app.');
+  if (!Number.isSafeInteger(authDate) || authDate <= 0 || authDate > now / 1000 + 60 || now / 1000 - authDate > maxAgeSeconds) throw new AuthError('Telegram login expired. Reopen the app.');
   let user;
   try { user = JSON.parse(params.get('user') ?? ''); } catch { throw new AuthError('Missing Telegram user.'); }
-  if (!user || !Number.isSafeInteger(user.id)) throw new AuthError('Missing Telegram user.');
+  if (!user || !Number.isSafeInteger(user.id) || user.id <= 0) throw new AuthError('Missing Telegram user.');
   return { kind: 'telegram', key: `tg:${user.id}`, telegramId: user.id, name: [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username || 'Player', username: user.username ?? null };
 }
 
