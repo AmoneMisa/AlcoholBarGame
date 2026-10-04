@@ -1,6 +1,6 @@
 import {
   BLUSH_OPTIONS, BROW_SHAPES, CHEEK_SHAPES, EYELINER_OPTIONS, EYESHADOW_OPTIONS, EYE_COLORS, EYE_SHAPES,
-  FACE_SHAPES, FACIAL_HAIR_OPTIONS, LEO_HAIR_STYLES, LIP_COLORS, LIP_SHAPES, NOA_HAIR_STYLES, NOSE_SHAPES
+  FACE_SHAPES, FACIAL_HAIR_OPTIONS, LIP_COLORS, LIP_SHAPES, NOSE_SHAPES
 } from '../data/cosmetics/bars';
 import { BARTENDER_COSTUMES, bartenderCostumeFor, REFERENCE_COSTUME_IDS } from '../data/cosmetics/bartenderCostumes';
 import { cosmeticTheme, DRAW_THEME_IDS } from '../data/cosmetics/themeDistribution';
@@ -14,8 +14,6 @@ const item = (key:CosmeticKey, value:string, rarity:CosmeticItem['rarity']='comm
 const except = (values:readonly string[], free:readonly string[]) => values.filter((value) => !free.includes(value));
 
 export const COSMETICS: CosmeticItem[] = [
-  ...except(NOA_HAIR_STYLES,['updo']).map((value) => item('hairStyle',value,'rare','noa')),
-  ...except(LEO_HAIR_STYLES,['slick','undercut']).map((value) => item('hairStyle',value,'rare','leo')),
   ...except(FACE_SHAPES,['soft','angular']).map((value) => item('face',value,'rare')),
   ...except(EYE_SHAPES,['almond','hooded']).map((value) => item('eyeShape',value)),
   ...except(BROW_SHAPES,['soft-arch','bold']).map((value) => item('browShape',value)),
@@ -51,6 +49,7 @@ export const interiorForCosmetic = (id:string) => {
 const matchesCharacter = (entry:CosmeticItem, character?:string) => !entry.character || entry.character === character || entry.key === 'facialHair';
 export const cosmeticFor = (key:string,value:string,character?:string) => COSMETICS.find((entry) => entry.key === key && entry.value === value && matchesCharacter(entry,character));
 export const canUseCosmetic = (owned:readonly string[], key:string,value:string,character?:string) => {
+  if (key === 'hairStyle') return value === (character === 'leo' ? 'slick' : 'updo');
   if (key === 'bartender' && REFERENCE_COSTUME_IDS.some(id => id === value) && !bartenderCostumeFor(character ?? '',value)) return false;
   const variants = COSMETICS.filter((entry) => entry.key === key && entry.value === value);
   if (variants.length && !variants.some((entry) => matchesCharacter(entry,character))) return false;

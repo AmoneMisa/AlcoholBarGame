@@ -522,7 +522,7 @@ test('A drink question after small talk is answered with a clue, not with a chat
 });
 
 // ---- Player profile ----
-test('The profile shows the favourite bar, English share, opened bars and four achievements (picked, or the latest)', async () => {
+test('The profile shows the favourite bar, English share and five achievements (picked, or the latest)', async () => {
   const { buildPlayerProfile, earnedAchievements, FEATURED_MAX } = await import('../src/domain/profile.ts');
   const base = { served: 12, servedByBar: { london: 3, 'new-york': 9 }, languageStats: { sentences: 40, correct: 30 }, ownedBarIds: ['new-york', 'london'], loot: { achievements: ['a-serve-10', 'a-vip-10', 'a-bottles-25', 'a-boxes-20', 'a-draws-30', 'a-fake'] } };
   const profile = buildPlayerProfile(base);
@@ -557,11 +557,11 @@ test('Serving counts guests for the profile (drinks per bar); picks are validate
 
   bar.loot.achievements = ['a-serve-10', 'a-vip-10', 'a-bottles-25', 'a-boxes-20', 'a-draws-30'];
   doAction(bar, { type: 'setFeaturedAchievements', ids: ['a-serve-10', 'a-vip-10', 'a-bottles-25', 'a-boxes-20', 'a-draws-30', 'nope'] });
-  assert.equal(bar.featuredAchievements.length, 4, 'at most four');
+  assert.equal(bar.featuredAchievements.length, 5, 'all five earned medals can be displayed');
   doAction(bar, { type: 'setFeaturedAchievements', ids: ['nope', 'a-draws-30'] });
   assert.deepEqual(bar.featuredAchievements, ['a-draws-30'], 'only earned achievements');
   doAction(bar, { type: 'setFeaturedAchievements', ids: [] });
-  assert.equal(bar.featuredAchievements, undefined, 'empty goes back to the latest four');
+  assert.equal(bar.featuredAchievements, undefined, 'empty goes back to the latest five');
 });
 
 test('A friend’s bar carries the profile, old saves get a served count, and the profile is built from the state only', async () => {

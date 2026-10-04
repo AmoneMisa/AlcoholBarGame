@@ -146,7 +146,7 @@ function selectBartender(id: 'noa' | 'leo') {
           </div>
           <div v-show="designTab === 'character'" class="design-tab-character">
       <form class="bartender-name-editor" @submit.prevent="game.renameBartender(bartenderNickname)"><label for="bartender-nickname">Bartender nickname<UiInput id="bartender-nickname" v-model="bartenderNickname" maxlength="18" required placeholder="Enter a nickname" /></label><UiButton type="submit" variant="solid">Save nickname</UiButton><span>This is the name guests see.</span></form>
-            <p class="avatar-help">{{ fixedCostume ? 'This costume includes its hairstyle, hair color and makeup. Choose an everyday outfit to change your hairstyle.' : 'Your hairstyle comes with your selected costume.' }} Changes are saved with this bar.</p>
+            <p class="avatar-help">Your hairstyle comes with your selected costume. Changes are saved with this bar.</p>
             <div class="avatar-options">
               <OptionSelect v-for="option in characterOptions" :key="option.key" :label="option.label" :model-value="game.decor[option.key]" :options="avatarChoices(option)" @update:model-value="setAvatarOption(option.key, $event)" />
             </div>

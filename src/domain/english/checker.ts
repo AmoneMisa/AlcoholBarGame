@@ -332,7 +332,7 @@ export function checkSentence(input: string): CheckResult {
   const last = tokens[tokens.length - 1]!;
   const questionLike = isQuestion;
   if (!/[?.!]/.test(last.text)) {
-    issues.push({ kind: 'punctuation', severity: 'error', message: questionLike ? 'A question ends with a question mark “?”.' : 'End the sentence with a full stop “.”.', original: last.text, suggestion: last.text + (questionLike ? '?' : '.'), start: last.start, end: last.end, rule: questionLike ? 'end-question' : 'end-full-stop' });
+    issues.push({ kind: 'punctuation', severity: questionLike ? 'error' : 'hint', message: questionLike ? 'A question ends with a question mark “?”.' : 'In formal writing, finish the sentence with a full stop “.”.', original: last.text, suggestion: last.text + (questionLike ? '?' : '.'), start: last.start, end: last.end, rule: questionLike ? 'end-question' : 'end-full-stop' });
     corrected += questionLike ? '?' : '.';
   } else if (last.text === '.' && questionLike && (auxFirst || WH_WORDS.has(first))) {
     issues.push({ kind: 'punctuation', severity: 'error', message: 'This is a question, so end it with “?”.', original: '.', suggestion: '?', start: last.start, end: last.end, rule: 'end-question' });

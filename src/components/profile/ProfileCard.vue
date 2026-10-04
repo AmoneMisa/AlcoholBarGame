@@ -1,94 +1,98 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { wishedGifts } from '../../domain/wishlist';
-import RewardArt from '../ui/RewardArt.vue';
+import { wishedGifts, WISHLIST_MAX } from '../../domain/wishlist';
+import { FEATURED_MAX, type PlayerProfile } from '../../domain/profile';
 import { REGIONS } from '../../domain/catalog';
-import type { PlayerProfile } from '../../domain/profile';
+import RewardArt from '../ui/RewardArt.vue';
 import AchievementArt from '../ui/AchievementArt.vue';
+import UiIcon from '../ui/UiIcon.vue';
 import CharacterPortrait from '../characters/CharacterPortrait.vue';
-
-// The player card: avatar, level, favourite bar, opened bars, guests served, share of correct English and
-// achievements. Used for the player's own screen and for a friend's bar (the actions go in the slot).
 const props = defineProps<{
-  name: string;
-  level: number;
-  profile: PlayerProfile;
-  /** The bar's look (bartender and decor), as saved in the bar profile. */
-  look?: Record<string, string>;
+  name: string; level: number; profile: PlayerProfile; look?: Record<string, string>;
+  editable?: boolean; subtitle?: string; progress?: { into: number; needed: number; percent: number };
 }>();
-
-const regionName = (id?: string) => REGIONS.find((region) => region.id === id)?.name ?? '—';
-const opened = computed(() => props.profile.ownedBarIds.map((id) => ({ id, name: regionName(id), served: props.profile.servedByBar[id] ?? 0 })));
-const english = computed(() => props.profile.englishPercent === undefined ? '—' : `${props.profile.englishPercent}%`);
+const emit = defineEmits<{ achievements: []; pickAchievements: []; wishlist: [] }>();
+const english = computed(() => props.profile.englishPercent === undefined ? '—' : props.profile.englishPercent + '%');
+const favourite = computed(() => REGIONS.find(region => region.id === props.profile.favoriteBarId)?.name ?? 'Not yet');
+const placeholders = ['loginDays', 'perfectTalks', 'serves', 'bars', 'giftsGot'];
+const medals = computed(() => Array.from({ length: FEATURED_MAX }, (_, index) => props.profile.shown[index]));
+const wishes = computed(() => wishedGifts(props.profile.wishedGifts));
 </script>
 
 <template>
-  <section class="player-profile-card" aria-label="Player profile">
+  <section class="player-profile-card" :class="{ 'own-profile': editable }" aria-label="Player profile">
     <header class="profile-head">
-      <div class="profile-avatar">
-        <CharacterPortrait :character="look?.bartenderCharacter ?? 'noa'" :hair="look?.hairStyle" />
-      </div>
+      <div class="profile-avatar"><CharacterPortrait :character="look?.bartenderCharacter ?? 'noa'" :hair="look?.hairStyle" /></div>
       <div class="profile-title">
-        <small>PLAYER</small>
         <h2>{{ name }}</h2>
-        <span class="profile-level">Level {{ level }}</span>
+        <p v-if="subtitle" class="profile-subtitle">{{ subtitle }}</p>
+        <p class="profile-level">Level {{ level }}<template v-if="progress"> · {{ progress.needed ? progress.into + ' / ' + progress.needed + ' XP' : 'Max level' }}</template></p>
+        <div v-if="progress" class="profile-xp" role="progressbar" aria-label="Level progress" :aria-valuenow="Math.round(progress.percent)" :aria-valuemin="0" :aria-valuemax="100"><span :style="{ width: progress.percent + '%' }" /></div>
       </div>
-      <div class="profile-actions"><slot name="actions" /></div>
+      <div v-if="$slots.actions" class="profile-actions"><slot name="actions" /></div>
     </header>
-
     <dl class="profile-stats">
-      <div><dt>Favourite bar</dt><dd>{{ profile.favoriteBarId ? regionName(profile.favoriteBarId) : 'Not yet' }}<small v-if="profile.favoriteBarId">{{ profile.servedByBar[profile.favoriteBarId] }} guests served there</small></dd></div>
-      <div><dt>Guests served</dt><dd>{{ profile.served.toLocaleString('en-US') }}</dd></div>
-      <div><dt>Correct English</dt><dd>{{ english }}<small v-if="profile.sentences">{{ profile.sentences }} sentences</small></dd></div>
-      <div><dt>Achievements</dt><dd>{{ profile.achievementCount }} / {{ profile.achievementTotal }}</dd></div>
+      <div><UiIcon name="friends" /><dt>Guests served</dt><dd>{{ profile.served.toLocaleString('en-US') }}</dd></div>
+      <div><UiIcon name="chat" /><dt>Correct English</dt><dd>{{ english }}</dd></div>
+      <div class="profile-favourite"><UiIcon name="glass" /><dt>Favourite bar</dt><dd>{{ favourite }}</dd></div>
     </dl>
-
-    <section class="profile-bars">
-      <h3>Opened bars <small>{{ opened.length }} of {{ REGIONS.length }}</small></h3>
-      <ul><li v-for="bar in opened" :key="bar.id" :class="{ favourite: bar.id === profile.favoriteBarId }"><b>{{ bar.name }}</b><small>{{ bar.served }} served</small></li></ul>
-    </section>
-
     <section class="profile-achievements">
-      <h3>{{ profile.picked ? 'Chosen achievements' : 'Latest achievements' }}<slot name="achievements-action" /></h3>
-      <ul v-if="profile.shown.length"><li v-for="item in profile.shown" :key="item.id" :class="`tier-${item.tier}`" :title="item.name"><AchievementArt :series="item.series" :tier="item.tier" :size="40" /><span><b>{{ item.seriesName }}</b><small>{{ item.tierName }}</small></span></li></ul>
-      <p v-else class="empty">No achievements yet.</p>
+      <h3><component :is="editable ? 'button' : 'span'" :type="editable ? 'button' : undefined" @click="editable && emit('achievements')">Achievements · {{ profile.achievementCount }} / {{ profile.achievementTotal }}</component></h3>
+      <ul class="profile-medals">
+        <li v-for="(item, index) in medals" :key="index">
+          <component :is="editable ? 'button' : 'span'" :type="editable ? 'button' : undefined" class="profile-medal" :class="{ 'medal-empty': !item }" :title="item ? item.seriesName + ' · ' + item.tierName + ': ' + item.name : 'Choose achievements to display'" :aria-label="item ? item.seriesName + ' · ' + item.tierName : 'Empty achievement slot ' + (index + 1)" @click="editable && emit('pickAchievements')">
+            <AchievementArt :series="item?.series ?? placeholders[index]!" :tier="item?.tier ?? 1" :size="48" />
+          </component>
+        </li>
+      </ul>
     </section>
-    <section class="profile-wishes"><h3>Desired gifts<slot name="wishlist-action" /></h3><ul v-if="profile.wishedGifts?.length"><li v-for="(line,i) in wishedGifts(profile.wishedGifts)" :key="i"><RewardArt :line="line" /><span>{{ line.text }}</span></li></ul><p v-else class="empty">No desired gifts selected.</p></section>
+    <section class="profile-wishes">
+      <h3>Desired gifts</h3>
+      <component :is="editable ? 'button' : 'div'" :type="editable ? 'button' : undefined" class="profile-wishlist" :aria-label="editable ? 'Choose desired gifts' : undefined" @click="editable && emit('wishlist')">
+        <ul v-if="wishes.length"><li v-for="(line, index) in wishes" :key="index" :title="line.text"><RewardArt :line="line" /><span>{{ line.text }}</span></li></ul>
+        <template v-else><UiIcon name="gift" /><span>{{ editable ? 'Choose up to ' + WISHLIST_MAX + ' gifts for your wishlist' : 'No desired gifts selected.' }}</span></template>
+      </component>
+    </section>
   </section>
 </template>
 
 <style scoped>
-.profile-wishes h3{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px}.profile-wishes ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;list-style:none;padding:0}.profile-wishes li{display:grid;grid-template-rows:80px auto;gap:8px;justify-items:center;text-align:center;padding:10px;border:1px solid #6b604a;border-radius:10px;background:#172334;font-size:12px;overflow-wrap:anywhere}.profile-wishes :deep(.reward-art){height:80px;width:80px}
-.player-profile-card { display: grid; gap: 16px; min-width:0;padding: 12px; border: 1px solid #354762; border-radius: 12px; background: #111c2d; color: #e9eef7; }
-.profile-head { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 10px; align-items: center; }
-.profile-actions {grid-column:1/-1;}
-.profile-title {min-width:0;overflow-wrap:anywhere;}
-.profile-avatar { position: relative; width: 88px; height: 88px; overflow: hidden; border-radius: 50%; background:#0b1320 var(--ui-panel-art) center / cover no-repeat; }
-.profile-avatar :deep(.character-portrait) { inset:0;transform:none;width:100%;height:100%;background-size:cover; }
-.profile-title small { color: #e4b35c; letter-spacing: .12em; font-weight: 800; font-size: 13px; }
-.profile-title h2 { margin: 2px 0; font: 700 24px Georgia, serif; }
-.profile-level { display: inline-block; padding: 2px 10px; border-radius: 999px; background: #3b2b1f; border: 1px solid #b78649; color: #ffe9bd; font-weight: 700; font-size: 13px; }
-.profile-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
-.profile-stats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin: 0; }
-.profile-stats > div {min-width:0;overflow-wrap:anywhere;}
-.profile-stats div { padding: 10px 12px; border-radius: 12px; background: #17253a; }
-.profile-stats dt { color: #b6c4d5; font-size: 12px; line-height:1.4; }
-.profile-stats dd { margin: 4px 0 0; font: 700 20px Georgia, serif; }
-.profile-stats dd small { display: block; font: 400 13px system-ui, sans-serif; color: #9eafc1; }
-h3 { margin: 0 0 8px; font-size: 14px; }
-.profile-achievements h3,.profile-wishes h3 {display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;line-height:1.4;}
-.profile-achievements li {min-width:0;max-width:100%;overflow-wrap:anywhere;}
-h3 small { margin-left: 8px; color: #91a2b5; font-weight: 400; }
-ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.profile-bars li { padding: 6px 12px; border-radius: 10px; background: #17253a; border: 1px solid #2d4059; }
-.profile-bars li.favourite { border-color: #e0a14a; }
-.profile-bars li small { margin-left: 8px; color: #9eafc1; }
-.profile-achievements li { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 10px; background: #2a2418; border: 1px solid #6b5a2e; }
-.profile-achievements li small { display: block; font-size: 13px; opacity: .85; }
-.profile-achievements li.tier-1 { border-color: #a8672f; }
-.profile-achievements li.tier-2 { border-color: #b9c3d0; }
-.profile-achievements li.tier-3 { border-color: #f0c24b; background: #3a2f16; }
-.profile-achievements li.tier-4 { border-color: #7fe0f0; background: #17323a; }
-.empty { margin: 0; color: #9eafc1; font-size: 13px; }
-@media (max-width: 560px) { .profile-head { grid-template-columns: 72px 1fr; } .profile-actions { grid-column: 1 / -1; justify-content: flex-start; } .profile-avatar { width: 72px; height: 72px; } }
+.player-profile-card{display:grid;gap:16px;min-width:0;padding:16px;border:1px solid #526078;border-radius:14px;background:#101d2df2;color:#f3eee4;text-align:center}
+.own-profile{background:linear-gradient(180deg,#05112045,#051120b3 40%,#051120f0),url('/assets/bar/backgrounds/interior-riad.webp') center top/cover no-repeat}
+.profile-head{display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;align-items:center;min-width:0}
+.profile-avatar{position:relative;width:64px;height:64px;overflow:hidden;border:2px solid #d5b675;border-radius:50%;background:#101d2d}
+.profile-title{min-width:0;overflow-wrap:anywhere;text-shadow:0 1px 3px #000}
+.profile-title h2{margin:0;font:700 22px Georgia,serif;color:#ffe7af}
+.profile-subtitle{margin:3px 0;color:#e0e6ee;font-size:13px;line-height:1.35}
+.profile-level{margin:5px 0;color:#e6d4ac;font-size:12px;line-height:1.4}
+.profile-xp{height:6px;border:1px solid #65738a;border-radius:99px;overflow:hidden;background:#081321}
+.profile-xp span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#ac7730,#f8d484)}
+.profile-actions{display:flex;justify-content:center;gap:8px;grid-column:1/-1}
+.own-profile .profile-actions{grid-column:3;grid-row:1;align-self:start}
+.own-profile .profile-head{grid-template-columns:64px minmax(0,1fr) auto}
+.profile-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:0;padding:12px 0;border:1px solid #586b83;border-radius:12px;background:#071729e8}
+.profile-stats>div{display:grid;justify-items:center;align-content:start;gap:5px;min-width:0;padding:0 5px;background:none}
+.profile-stats>div+div{border-left:1px solid #3c536c}
+.profile-stats .ui-icon{width:24px;height:24px;color:#efcb7a}
+.profile-stats dt{color:#c8d3e2;font-size:12px;line-height:1.3;min-height:31px;display:flex;align-items:center;justify-content:center}
+.profile-stats dd{margin:0;max-width:100%;overflow-wrap:anywhere;font:700 22px Georgia,serif}
+.profile-favourite dd{font-size:16px;line-height:1.5}
+h3{margin:0 0 9px;color:#f2d69c;font:700 17px Georgia,serif;line-height:1.4;text-align:center}
+h3 button{padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer}
+.profile-medals{list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;gap:4px;margin:0;padding:10px 5px;border:1px solid #586b83;border-radius:12px;background:#071729e8}
+.profile-medals li{min-width:0;display:flex;justify-content:center}
+.profile-medal{display:grid;place-items:center;width:100%;max-width:52px;min-height:44px;padding:0;border:0;border-radius:50%;background:none;color:inherit}
+button.profile-medal{cursor:pointer}
+.profile-medal :deep(.achievement-art){width:100%;height:auto;max-width:48px}
+.medal-empty :deep(.achievement-art){filter:grayscale(1);opacity:.35}
+.profile-wishlist{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:58px;padding:10px 12px;border:1px solid #586b83;border-radius:12px;background:#071729e8;color:#e4eaf3;font:inherit;font-size:13px;line-height:1.5;text-align:center}
+button.profile-wishlist{cursor:pointer}
+.profile-wishlist>.ui-icon{width:28px;height:28px;color:#efcb7a}
+.profile-wishlist>span{min-width:0;overflow-wrap:anywhere}
+.profile-wishlist ul{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;width:100%;margin:0;padding:0;list-style:none}
+.profile-wishlist li{display:grid;justify-items:center;align-content:start;gap:4px;min-width:0;font-size:10px;line-height:1.3;overflow-wrap:anywhere}
+.profile-wishlist :deep(.reward-art){width:36px;height:36px;max-width:100%}
+button:focus-visible{outline:2px solid #f5d287;outline-offset:3px}
+button.profile-medal:hover,button.profile-wishlist:hover{background-color:#23384ad9}
+@media(max-width:360px){.player-profile-card{padding:12px}.own-profile .profile-head{grid-template-columns:56px minmax(0,1fr)}.profile-avatar{width:56px;height:56px}.own-profile .profile-actions{grid-column:2;grid-row:2;justify-self:center}.profile-title h2{font-size:20px}}
 </style>

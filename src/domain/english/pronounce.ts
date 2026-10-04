@@ -9,10 +9,10 @@ const WORDS: Record<string, string> = {
   'rosé': 'roh-zay', 'champagne': 'sham-payn', 'prosecco': 'pro-seck-oh',
   'liqueur': 'lih-kyur', 'liqueurs': 'lih-kyurz', 'aperitif': 'ah-pair-uh-teef', 'aperitifs': 'ah-pair-uh-teefs', 'apéritif': 'ah-pair-uh-teef',
   'curaçao': 'kyoor-uh-sow', 'curacao': 'kyoor-uh-sow', 'vermouth': 'ver-mooth', 'cointreau': 'kwahn-troh', 'campari': 'kahm-pah-ree', 'aperol': 'ap-er-ol',
-  'chartreuse': 'shar-trooz', 'bourbon': 'bur-bun', 'jägermeister': 'yay-ger-my-ster', 'amaretto': 'am-uh-ret-oh', 'kahlúa': 'kah-loo-ah', 'baileys': 'bay-leez',
+  'chartreuse': 'shar-trooz', 'jägermeister': 'yay-ger-my-ster', 'amaretto': 'am-uh-ret-oh', 'kahlúa': 'kah-loo-ah', 'baileys': 'bay-leez',
   'mojito': 'moh-hee-toh', 'daiquiri': 'dak-uh-ree', 'margarita': 'mar-gah-ree-tah', 'piña colada': 'peen-yah koh-lah-dah', 'pina colada': 'peen-yah koh-lah-dah',
   'caipirinha': 'kai-pee-reen-yah', 'cachaça': 'kah-shah-sah', 'pisco': 'pees-koh', 'sake': 'sah-keh', 'soju': 'soh-joo', 'tequila': 'teh-kee-lah',
-  'espresso': 'es-press-oh', 'sommelier': 'som-el-yay', 'maître d’': 'may-truh dee', 'digestif': 'dy-jes-teef', 'bartender': 'bar-ten-der'
+  'sommelier': 'som-el-yay', 'maître d’': 'may-truh dee', 'digestif': 'dy-jes-teef'
 };
 const ORDER = Object.keys(WORDS).sort((a, b) => b.length - a.length);
 const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

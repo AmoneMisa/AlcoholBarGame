@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { explainPairing } from '../domain/pairingExplain';
 import { speak } from '../domain/english/speak';
 import UiIcon from './ui/UiIcon.vue';
+import SpeakButton from './ui/SpeakButton.vue';
 
 const props = defineProps<{ item: { why?: string; relationship?: string }; kind: 'food' | 'drink' | 'context' | 'cigar' }>();
 const principles = computed(() => explainPairing(props.item, props.kind));
@@ -17,9 +18,9 @@ const open = ref<string>();
     </div>
     <template v-for="principle in principles" :key="principle.id">
       <div v-if="open === principle.id" class="principle-detail">
-        <p class="principle-rule">{{ principle.rule }}</p>
-        <p>{{ principle.explain }}</p>
-        <p class="principle-example"><span>Example</span>{{ principle.example }}</p>
+        <p class="principle-rule">{{ principle.rule }} <SpeakButton :text="principle.rule" /></p>
+        <p>{{ principle.explain }} <SpeakButton :text="principle.explain" /></p>
+        <p class="principle-example"><span>Example</span>{{ principle.example }} <SpeakButton :text="principle.example" /></p>
         <p class="principle-say"><span>Say it to the guest</span>“{{ principle.sayIt }}” <button type="button" class="inline-speak-button" aria-label="Listen" @click="speak(principle.sayIt)"><UiIcon name="speaker" /></button></p>
       </div>
     </template>

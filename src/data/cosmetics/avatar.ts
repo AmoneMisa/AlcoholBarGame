@@ -1,6 +1,5 @@
 /** Every value any imported avatar can show; keep saved legacy cosmetics valid. Use avatarOptionsFor() for what one character offers. */
 import { OUTFIT_COLORS } from './bars';
-import { BARTENDER_AVATARS } from './bartenderAvatars';
 export const AVATAR_OPTIONS = [
   { key: 'bodyShape', label: 'Body shape', values: ['slim', 'athletic', 'curvy', 'muscular', 'broad'] },
   { key: 'hairStyle', label: 'Hair', values: ['updo', 'bun', 'bob', 'pixie', 'waves', 'slick', 'buzz'] },

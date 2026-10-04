@@ -90,14 +90,13 @@ const people = computed(() => {
   const plankGap = planks.length > 1 ? (planks[planks.length - 1]! - planks[0]!) / (planks.length - 1) : current.drawnHeight * .1;
   // Phones show a compact scene, so people get smaller limits there.
   const phone = width < 760;
-  let guest = Math.round(phone ? Math.min(190, Math.max(110, plankGap * 2.3)) : Math.min(300, Math.max(150, plankGap * 2.3)));
+  const guest = Math.round(phone ? Math.min(200, Math.max(150, plankGap * 2.3)) : Math.min(300, Math.max(150, plankGap * 2.3)));
   const bartender = Math.round(phone ? Math.min(260, Math.max(150, plankGap * 3.4)) : Math.min(440, Math.max(240, plankGap * 3.4)));
   // The bartender works on the side away from the bottle shelf, so they never hide the bottles.
   const shelfOnRight = (current.shelf.left + current.shelf.right) / 2 > width * .6;
   const side = phone ? .84 : .86;
   const guestAnchorX = current.bartenderX ?? Math.round(width * (shelfOnRight ? 1 - side : side));
   const bartenderX = barLayout.positions[game.decor.interior] !== undefined ? width * barLayout.positions[game.decor.interior]! : guestAnchorX;
-  if (phone) guest = Math.min(guest, Math.floor((Math.max(guestAnchorX, width - guestAnchorX) - bartender * .24 - 14) / 2 / .8));
   // The glass stands at the bartender's left hand; only at the scene's left edge does it move to the right.
   const glassOffset = bartender * (phone ? .20 : .22);
   const glassX = bartenderX - glassOffset < 60 ? bartenderX + glassOffset : bartenderX - glassOffset;
@@ -109,7 +108,7 @@ const sceneVars = computed(() => {
   const sizes = people.value;
   if (!current || !sizes) return {};
   return {
-    ...(phoneTrack.value ? { '--cast-left': `${phoneTrack.value.start}px`, '--cast-right': `${sceneBox.value.width - phoneTrack.value.end}px` } : {}),
+    ...(phoneTrack.value ? { '--cast-left': `${phoneTrack.value.start}px`, '--cast-right': `${sceneBox.value.width - phoneTrack.value.end}px`, '--guest-slot': `${phoneTrack.value.spacing - 8}px` } : {}),
     '--back': `${current.back}px`, '--seat-top': `${current.seat}px`, '--guest-h': `${sizes.guest}px`, '--bt-h': `${sizes.bartender}px`,
     '--bt-x': `${sizes.bartenderX}px`, '--glass-x': `${Math.round(sizes.glassX)}px`,
     '--glass-y': `${Math.round(current.back + current.drawnHeight * .03)}px`
@@ -172,10 +171,15 @@ const wideSeats = computed(() => {
 });
 const castRef = ref<HTMLElement>();
 const guestScroll = ref(0);
+const guestScrollMax = ref(0);
 const guestsOverflow = computed(() => !!phoneTrack.value && phoneTrack.value.content > phoneTrack.value.zone + 4);
 const hiddenGuests = computed(() => hiddenCustomerDirections(game.customers.map(customer => customer.seatId ?? -1), guestScroll.value, phoneTrack.value?.spacing ?? 0, phoneTrack.value?.zone ?? 0));
 const trackX = (index: number) => phoneTrack.value!.spacing * (index + .5);
-function onGuestScroll() { guestScroll.value = castRef.value?.scrollLeft ?? 0; }
+function onGuestScroll() {
+  guestScroll.value = castRef.value?.scrollLeft ?? 0;
+  guestScrollMax.value = castRef.value ? Math.max(0, castRef.value.scrollWidth - castRef.value.clientWidth) : 0;
+}
+watch(phoneTrack, () => { void nextTick(onGuestScroll); }, { immediate: true });
 // The track always stops on whole guests, so no one is left cut in half at the edge.
 const guestsPerView = () => Math.max(1, Math.floor((phoneTrack.value?.zone ?? 0) / (phoneTrack.value?.spacing ?? 1)));
 function scrollToFirstGuest(first: number, behavior: ScrollBehavior = 'smooth') {
@@ -562,8 +566,8 @@ onBeforeUnmount(() => {
       </template>
     </div>
     <template v-if="guestsOverflow && !preview && !game.trainingActive && game.tourSeen">
-      <button class="guest-nudge prev" type="button" :aria-label="hiddenGuests.left ? 'Show earlier guests · customer off screen' : 'Show earlier guests'" :disabled="guestScroll <= 2" @click="nudgeGuests(-1)"><UiIcon name="chevron-left" /><span v-if="hiddenGuests.left" class="hidden-guest-dot" aria-hidden="true"></span></button>
-      <button class="guest-nudge next" type="button" :aria-label="hiddenGuests.right ? 'Show more guests · customer off screen' : 'Show more guests'" :disabled="guestScroll >= phoneTrack!.content - phoneTrack!.zone - 2" @click="nudgeGuests(1)"><UiIcon name="chevron-right" /><span v-if="hiddenGuests.right" class="hidden-guest-dot" aria-hidden="true"></span></button>
+      <button v-if="guestScroll > 2" class="guest-nudge prev" type="button" :aria-label="hiddenGuests.left ? 'Show earlier guests · customer off screen' : 'Show earlier guests'" @click="nudgeGuests(-1)"><UiIcon name="chevron-left" /><span v-if="hiddenGuests.left" class="hidden-guest-dot" aria-hidden="true"></span></button>
+      <button v-if="guestScroll < guestScrollMax - 2" class="guest-nudge next" type="button" :aria-label="hiddenGuests.right ? 'Show more guests · customer off screen' : 'Show more guests'" @click="nudgeGuests(1)"><UiIcon name="chevron-right" /><span v-if="hiddenGuests.right" class="hidden-guest-dot" aria-hidden="true"></span></button>
     </template>
     <TipJar v-if="!preview" />
     <div v-if="!preview && !capture" class="bar-scene-tools">
@@ -595,5 +599,20 @@ onBeforeUnmount(() => {
 .bar-scene .bartender-layer.moving { touch-action:none; }
 .bar-scene .bartender-layer:focus-visible { outline:2px solid #eac780; outline-offset:4px; }
 .bar-scene.capture .bartender-layer { pointer-events:none; }
-.bar-scene.phone-guests .guest-card { min-width:0; max-width:calc(var(--guest-h) * .8); font-size:13px; }
+.bar-scene.phone-guests .scene-customer { width:var(--guest-slot)!important; }
+.bar-scene .scene-customer .guest-card { top:calc(var(--seat-top) + 8px); bottom:auto; left:0; right:0; min-width:0; max-width:none; height:88px; box-sizing:border-box; padding:7px 8px; gap:3px; background:#101b2df2; text-align:left; }
+.bar-scene .guest-card header { flex-wrap:nowrap; align-items:center; gap:4px; }
+.bar-scene .guest-card header b { font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bar-scene .guest-card header time { font-size:11px; }
+.bar-scene .guest-card .guest-badges { display:flex; flex-wrap:nowrap; gap:4px; overflow:hidden; letter-spacing:normal; font-size:10px; text-transform:none; }
+.bar-scene .guest-card .guest-badges i { flex:0 1 auto; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:10px; text-transform:capitalize; }
+.bar-scene .guest-card > p { display:block; margin:0; font-size:12px; line-height:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bar-scene .guest-card footer { flex-wrap:nowrap; }
+.bar-scene .guest-card footer em { font-size:10px; line-height:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:normal; text-transform:capitalize; }
+</style>
+
+<style>
+/* All scene guests share a seated upper-body frame; full-length companion art is cropped to it. */
+.bar-scene .scene-customer .art-character { transform:none!important; filter:none!important; overflow:hidden; }
+.bar-scene .scene-customer .art-character > .bartender-art { position:absolute; top:12%; left:50%; width:auto; max-width:none; height:165%; object-fit:contain; transform:translateX(-50%); }
 </style>

@@ -227,7 +227,7 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
 
 <template>
   <div class="velvet-app" :class="{ 'service-mode': view === 'service' }" :inert="screenshotOpen || undefined">
-    <TopHud @design="selectView('design')" @goto="selectView" @profile="characterInfoOpen = true" />
+    <TopHud @design="selectView('design')" @goto="selectView" @profile="characterInfoTab = 'profile'; characterInfoOpen = true" />
     <main>
       <section v-show="view === 'service'" class="service-layout">
         <BarScene v-if="game.sessionReady && game.startingBarChosen" :active="view === 'service'" @screenshot="screenshotOpen = true">
@@ -245,7 +245,7 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
       <section v-if="view === 'theme-draw'" class="game-panel"><ThemeDrawPanel /></section>
       <EventsPage v-if="view === 'events'" :section="sub.events ?? 'today'" />
       <WorkshopPage v-if="view === 'manage' && sub.manage === 'workshop'" />
-      <ProfilePage v-if="view === 'character' && sub.character === 'profile'" @achievements="characterInfoTab = 'achievements'; characterInfoOpen = true" />
+      <ProfilePage v-if="view === 'character' && sub.character === 'profile'" @achievements="selectView('achievements')" @settings="selectView('settings')" @appearance="selectView('character'); sub.character = 'look'" />
       <SettingsPage v-if="view === 'settings'" @goto="selectView" />
       <ManagementDeck v-if="managementOpened" v-show="!!deckView" :active-view="managementView" :design-section="designSection" />
     </main>
@@ -253,12 +253,11 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
     <PreparationScreen v-if="game.preparationCustomerId || mixingOpen" :workbench="!game.preparationCustomerId" @close="mixingOpen = false" />
     <ModalDialog v-if="equipmentOpen" title="Upgrades" eyebrow="YOUR BAR" width="760px" @close="equipmentOpen = false"><EquipmentPanel /></ModalDialog>
     <BarScreenshot v-if="screenshotOpen" @close="screenshotOpen = false" />
-    <ModalDialog v-if="characterInfoOpen" title="Your character" class="character-info-popup" @close="characterInfoOpen = false">
-      <SectionTabs v-model="characterInfoTab" :tabs="[{id:'profile',label:'Character'},{id:'achievements',label:'Achievements'},{id:'settings',label:'Settings'}]" label="Character information" />
-      <ProfilePage v-if="characterInfoTab === 'profile'" @achievements="characterInfoTab = 'achievements'" />
+    <ModalDialog v-if="characterInfoOpen" :title="characterInfoTab === 'profile' ? 'Your character' : characterInfoTab === 'achievements' ? 'Achievements' : 'Settings'" :presentation="characterInfoTab === 'profile' ? 'character-profile' : 'default'" @close="characterInfoOpen = false">
+      <UiButton v-if="characterInfoTab !== 'profile'" size="sm" variant="ghost" icon="arrow-left" @click="characterInfoTab = 'profile'">Your character</UiButton>
+      <ProfilePage v-if="characterInfoTab === 'profile'" @achievements="characterInfoTab = 'achievements'" @settings="characterInfoTab = 'settings'" @appearance="selectView('character'); sub.character = 'look'" />
       <AchievementsPanel v-else-if="characterInfoTab === 'achievements'" />
       <SettingsPage v-else @goto="selectView" />
-      <UiButton class="change-appearance-button" v-if="characterInfoTab === 'profile'" @click="selectView('character'); sub.character = 'look'">Change appearance</UiButton>
     </ModalDialog>
     <GuideSheet v-if="currentGuide" />
     <NotificationToasts />

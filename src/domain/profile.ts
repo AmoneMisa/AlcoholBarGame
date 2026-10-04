@@ -5,7 +5,7 @@ import type { RegionId } from './types';
 // The player profile: what a visitor (or the player) sees about a bar. Built only from the saved state, on the server
 // for friends and on the device for the player's own screen, so both always agree.
 
-export const FEATURED_MAX = 4;
+export const FEATURED_MAX = 5;
 
 export interface ProfileStats {
   served: number;
@@ -31,7 +31,7 @@ export interface PlayerProfile {
   sentences: number;
   achievementCount: number;
   achievementTotal: number;
-  /** Up to four achievements to show: the ones the player picked, otherwise the last earned. */
+  /** Up to five achievements to show: the ones the player picked, otherwise the last earned. */
   shown: ProfileAchievement[];
   picked: boolean;
   wishedGifts?: string[];

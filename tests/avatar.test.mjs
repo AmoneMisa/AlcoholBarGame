@@ -4,17 +4,21 @@ import { readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
 import { AVATAR_OPTIONS, avatarOptionsFor } from '../src/data/cosmetics/avatar.ts';
 import { BAR_PROFILE_OPTIONS } from '../src/data/cosmetics/bars.ts';
-import { canUseCosmetic } from '../src/domain/cosmetics.ts';
+import { canUseCosmetic, COSMETICS } from '../src/domain/cosmetics.ts';
 import { avatarIdleAt } from '../src/domain/avatarMotion.ts';
 import { BARTENDER_AVATARS, bartenderAvatarFor } from '../src/data/cosmetics/bartenderAvatars.ts';
 import { INTERIORS } from '../src/data/cosmetics/bars.ts';
 import { bartenderCostumesFor, bartenderCostumeFor } from '../src/data/cosmetics/bartenderCostumes.ts';
 
-test('Avatars share compact atlases with unique hairstyle cells and fixed natural hair colors', () => {
+test('Base outfits only show the main hairstyle; retired variants are absent from every cosmetic catalog', () => {
   const paths = new Set();
   for (const character of ['noa', 'leo']) {
-    assert.equal(BARTENDER_AVATARS[character].length, 6);
-    assert.deepEqual(avatarOptionsFor(character), [], 'base costume hairstyles are hidden; saved atlas appearances still load');
+    assert.equal(BARTENDER_AVATARS[character].length, 1);
+    assert.deepEqual(avatarOptionsFor(character), []);
+    for (const retired of ['waves','bob','pixie','braids','ponytail','buzz','curls','undercut','pompadour','shoulder-waves']) {
+      assert.equal(bartenderAvatarFor(character, retired), BARTENDER_AVATARS[character][0], 'old saves display the main hairstyle');
+      assert.equal(canUseCosmetic([], 'hairStyle', retired, character), false);
+    }
     for (const avatar of BARTENDER_AVATARS[character]) {
       assert.equal(bartenderAvatarFor(character, avatar.hairStyle), avatar);
       const bytes = readFileSync(new URL(`../public${avatar.sheet}`, import.meta.url));
@@ -32,6 +36,7 @@ test('Avatars share compact atlases with unique hairstyle cells and fixed natura
     assert.equal(bartenderAvatarFor(character, 'legacy-unknown'), BARTENDER_AVATARS[character][0]);
   }
   assert.equal(bartenderAvatarFor('marin', 'waves'), undefined);
+  assert.equal(COSMETICS.some(item => item.key === 'hairStyle'), false, 'shops, rewards, shards and admin share the same catalog');
   assert.deepEqual(readdirSync(new URL('../public/assets/characters/bartender/', import.meta.url)).sort(), [
     'leo-costumes-atlas-v1.webp',
     'leo-costumes-atlas-v2.webp',

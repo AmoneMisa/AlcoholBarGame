@@ -61,8 +61,8 @@ export const RULES: Record<RuleId, GrammarRule> = {
     tip: 'If the sentence starts with Do, Does, Would, Can, Is, Are, What, Which or How, it is usually a question.'
   },
   'end-full-stop': {
-    id: 'end-full-stop', title: 'Statements end with a full stop', group: 'Punctuation', level: 'A1',
-    explain: 'A normal sentence (not a question) ends with a full stop “.” or, for strong feelings, “!”.',
+    id: 'end-full-stop', title: 'Full stops in formal writing', group: 'Punctuation', level: 'A1',
+    explain: 'In formal writing, finish a statement with “.” or, for strong feelings, “!”. Leaving out a final full stop in a short chat is a writing habit, not a grammar mistake.',
     examples: [{ wrong: 'I recommend a Mojito', right: 'I recommend a Mojito.' }],
     tip: 'Use “!” for greetings and excitement: “Hello!”, “Enjoy!”.'
   },

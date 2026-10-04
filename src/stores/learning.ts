@@ -36,8 +36,9 @@ export const useLearningStore = defineStore('learning', () => {
   const savedWords = ref<string[]>(saved?.savedWords ?? []);
   const knownWords = ref<string[]>(saved?.knownWords ?? []);
   const seenWords = ref<Record<string, number>>(saved?.seenWords ?? {});
-  const mistakes = ref<MistakeRecord[]>(saved?.mistakes ?? []);
-  const ruleCounts = ref<Partial<Record<RuleId, number>>>(saved?.ruleCounts ?? {});
+  const mistakes = ref<MistakeRecord[]>((saved?.mistakes ?? []).filter(item => item.rule !== 'end-full-stop'));
+  const ruleCounts = ref<Partial<Record<RuleId, number>>>({ ...saved?.ruleCounts });
+  delete ruleCounts.value['end-full-stop'];
   const correctSentences = ref<string[]>(saved?.correctSentences ?? []);
   // Phrase lessons the player has used correctly with a real customer.
   const usedPhrases = ref<string[]>(saved?.usedPhrases ?? []);

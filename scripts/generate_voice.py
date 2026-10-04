@@ -15,9 +15,10 @@ texts = json.load(open(sys.argv[1]))
 voice = PiperVoice.load(sys.argv[2])
 out = Path(__file__).resolve().parent.parent / 'public/assets/voice'
 out.mkdir(parents=True, exist_ok=True)
-manifest = {}
+manifest_path = out / 'manifest.json'
+manifest = json.loads(manifest_path.read_text(encoding='utf-8')) if manifest_path.exists() else {}
 for text in texts:
-    name = hashlib.sha1(text.encode()).hexdigest()[:12] + '.mp3'
+    name = manifest.get(text) or hashlib.sha1(text.encode()).hexdigest()[:12] + '.mp3'
     manifest[text] = name
     if (out / name).exists():
         continue

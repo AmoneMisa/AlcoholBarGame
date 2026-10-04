@@ -313,7 +313,7 @@ test('Bar names, bartender nicknames and styles are per-city and persisted; all 
   game.switchBar('new-york');assert.equal(game.decor.name,'North Star');assert.equal(game.decor.interior,'skyline');
   await nextTick();setActivePinia(createPinia());const reloaded = useGameStore();
   assert.equal(reloaded.bars.london.name,'Juniper Club');assert.equal(reloaded.bars.london.bartenderNickname,'Night Fox');assert.equal(reloaded.bars.london.bartenderCharacter,'leo');assert.equal(reloaded.bars.london.bartender,'apron');
-  assert.equal(reloaded.bars.london.interior,'cyberpunk');assert.equal(reloaded.bars.london.counter,'glass');assert.equal(reloaded.bars.london.counterSize,'grand');assert.equal(reloaded.bars.london.hairStyle,'undercut');assert.equal(reloaded.bars.london.skinDetail,'scar-brow');assert.equal(reloaded.bars.london.pose,'working');
+  assert.equal(reloaded.bars.london.interior,'cyberpunk');assert.equal(reloaded.bars.london.counter,'glass');assert.equal(reloaded.bars.london.counterSize,'grand');assert.equal(reloaded.bars.london.hairStyle,'slick','retired hairstyle selection keeps the main look');assert.equal(reloaded.bars.london.skinDetail,'scar-brow');assert.equal(reloaded.bars.london.pose,'working');
   assert.ok(INTERIORS.length >= 19);assert.ok(COUNTER_MATERIALS.length >= 8);assert.ok(HAIR_STYLES.length >= 8);assert.ok(SKIN_DETAILS.includes('clean') && SKIN_DETAILS.some(item => item.startsWith('tattoo')) && SKIN_DETAILS.some(item => item.startsWith('scar')));
   assert.equal(CUSTOMER_ART_BY_SLOT.length,25);
   assert.equal(game.customers.length,5,'a new player opens to a full row of five guests');
@@ -599,4 +599,33 @@ test('The reward report lists what an action paid: payment, tip, crystals, XP, l
   assert.match(text, /\+400 XP/);
   assert.match(text, /New recipe: /);
   assert.deepEqual(rewardLines(snapshot(before), snapshot(before)), [], 'nothing gained, nothing to show');
+});
+
+test('Missing statement full stops are optional hints, not recorded learning mistakes', async () => {
+  const result = checkText('Of you drink');
+  const hint = result.issues.find(issue=>issue.rule==='end-full-stop');
+  assert.equal(hint?.severity,'hint');
+  assert.equal(checkText('I like coffee').ok,true);
+  const incorrect = checkText('Of you drinks');
+  assert.ok(incorrect.issues.some(issue=>issue.severity==='error' && issue.rule!=='end-full-stop'));
+  assert.equal(checkText('Do you like coffee').ok,false,'question punctuation still conveys intent');
+  const {useLearningStore} = await import('../src/stores/learning.ts');
+  setActivePinia(createPinia());
+  const learning=useLearningStore();
+  learning.recordMistakes('I like coffee','I like coffee.',checkText('I like coffee').issues);
+  assert.equal(learning.mistakes.length,0);
+  assert.equal(learning.ruleCounts['end-full-stop'],undefined);
+});
+
+test('Drink recommendations fill missing Chardonnay entries with labelled related alternatives', async () => {
+  const {topDrinkPairings} = await import('../src/domain/pairingEngine.ts');
+  const {findBeveragePairings} = await import('../src/data/pairings/barPairings.ts');
+  const results=topDrinkPairings('chardonnay_oaked',6);
+  assert.equal(results.length,6);
+  assert.equal(new Set(results.map(item=>item.partnerId)).size,results.length);
+  assert.ok(results.every(item=>item.partnerId!=='chardonnay_oaked'));
+  assert.ok(results.some(item=>item.relationship==='alternative to explore' && item.why.includes('separately')));
+  assert.deepEqual(topDrinkPairings('not-a-drink'),[]);
+  const direct=findBeveragePairings('bourbon');
+  if(direct.length) assert.equal(topDrinkPairings('bourbon')[0].score,direct[0].score);
 });

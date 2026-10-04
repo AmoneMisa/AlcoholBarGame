@@ -10,7 +10,7 @@ const props = withDefaults(defineProps<{
   closable?: boolean;            // false: the player must choose (no close button, Escape and outside taps do nothing)
   placement?: 'center' | 'bottom'; // bottom: a sheet that rises from the screen edge on phones
   width?: string;
-  presentation?: 'default' | 'celebration' | 'reveal';
+  presentation?: 'default' | 'celebration' | 'reveal' | 'character-profile';
 }>(), { closable: true, placement: 'center', width: '520px' });
 const emit = defineEmits<{ close: [] }>();
 const sheet = ref<HTMLElement>();
@@ -57,6 +57,12 @@ onUnmounted(() => {
 .modal-head b { display: block; color: #fff3dc; font: 700 19px Georgia, serif; }
 .modal-body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 14px; }
 .modal-foot { padding: 12px 14px 14px; border-top: 1px solid #354762; }
+.modal-backdrop.character-profile .modal-sheet{background:linear-gradient(180deg,#06101c40,#06101ca6 35%,#06101cf5),url('/assets/bar/backgrounds/interior-riad.webp') center top/cover no-repeat}
+.modal-backdrop.character-profile .modal-head{position:relative;justify-content:center;min-height:54px;padding:12px 52px;background:#05101b45;border-color:#b99c6055;text-align:center}
+.modal-backdrop.character-profile .modal-head b{font-size:22px;color:#ffe5b0}
+.modal-backdrop.character-profile .modal-head .ui-close{position:absolute;right:12px;top:10px}
+.modal-backdrop.character-profile .modal-body{padding:0}
+.modal-backdrop.character-profile .player-profile-card{border:0;border-radius:0;background:none}
 body.modal-open { overflow: hidden; }
 @keyframes modal-fade { from { opacity: 0; } }
 .modal-sheet {animation:modal-sheet-arrive .18s ease-out both;}

@@ -52,7 +52,7 @@ const HASHED = /-[A-Za-z0-9_-]{8}\.(js|css|dic|aff)$/;
 app.use(express.static(dist, {
   index: false,
   setHeaders(response, file) {
-    response.setHeader('Cache-Control', /[\\/]admin-/.test(file) ? 'private, no-store' : /[\/]index\.html$/.test(file) ? 'no-cache, must-revalidate' : HASHED.test(file) ? 'public, max-age=31536000, immutable' : 'public, max-age=3600, must-revalidate');
+    response.setHeader('Cache-Control', /[\\/]admin-/.test(file) ? 'private, no-store' : /[\/](?:index\.html|voice[\/]manifest\.json)$/.test(file) ? 'no-cache, must-revalidate' : HASHED.test(file) ? 'public, max-age=31536000, immutable' : 'public, max-age=3600, must-revalidate');
   }
 }));
 // The page itself is never cached without asking the server first, so a new release is picked up on the next open

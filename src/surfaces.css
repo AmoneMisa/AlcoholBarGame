@@ -9,7 +9,6 @@
 /* Text-heavy utility cards use a quieter surface than their outer window. */
 .collection-bonuses,
 .workshop-utility .card,
-.profile-stats > div,
 .circle .card,
 .settings-card,
 .event-menu .ui-btn,

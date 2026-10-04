@@ -132,15 +132,15 @@ const opts = (values: readonly string[], any = false) => [...(any ? [{ value: ''
     <div v-if="mode === 'food'" class="pairing-results">
       <div v-for="item in foodResults" :key="item.beverage + item.food" class="pairing-result" :data-band="item.band">
         <div><small>PAIR WITH</small><b>{{ item.food }} <SpeakButton :text="item.food" /></b><span>{{ item.relationship }}</span></div>
-        <strong>{{ item.score }}</strong><section><small>WHY IT WORKS <SpeakButton :text="item.why" /></small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests who enjoy {{ selectedProfile?.style.replaceAll('_', ' ') }} {{ selectedProfile?.family }} and {{ item.relationship }} food pairings.</p></section>
+        <strong>{{ item.score }}</strong><section><small>WHY IT WORKS <SpeakButton :text="item.why" /></small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests who enjoy {{ selectedProfile?.style.replaceAll('_', ' ') }} {{ selectedProfile?.family }} and {{ item.relationship }} food pairings. <SpeakButton :text="`Guests who enjoy ${selectedProfile?.style.replaceAll('_', ' ')} ${selectedProfile?.family} and ${item.relationship} food pairings.`" /></p></section>
         <PairingPrinciples :item="item" kind="food" />
       </div>
     </div>
 
     <div v-else-if="mode === 'drink'" class="pairing-results">
       <div v-for="item in drinkResults" :key="item.a + item.b" class="pairing-result" :data-band="item.band">
-        <div><small>EXPLORE NEXT</small><b>{{ partnerName(item.partnerId) }}</b><span>{{ item.relationship }}</span></div>
-        <strong>{{ item.score }}</strong><section><small>WHY IT WORKS</small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests who already enjoy {{ selectedProfile?.name }} and want a related flavor direction.</p></section>
+        <div><small>EXPLORE NEXT</small><b>{{ partnerName(item.partnerId) }} <SpeakButton :text="partnerName(item.partnerId)" /></b><span>{{ item.relationship }}</span></div>
+        <strong>{{ item.score }}</strong><section><small>WHY IT WORKS <SpeakButton :text="item.why" /></small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests who already enjoy {{ selectedProfile?.name }} and want a related flavor direction. <SpeakButton :text="`Guests who already enjoy ${selectedProfile?.name} and want a related flavor direction.`" /></p></section>
         <small v-if="item.examples.length">Example: {{ item.examples.join(', ') }}</small>
         <PairingPrinciples :item="item" kind="drink" />
       </div>
@@ -148,8 +148,8 @@ const opts = (values: readonly string[], any = false) => [...(any ? [{ value: ''
 
     <div v-else-if="mode === 'context'" class="pairing-results">
       <div v-for="item in contextResults" :key="JSON.stringify(item.context) + item.beverage" class="pairing-result" :data-band="item.band">
-        <div><small>RECOMMEND</small><b>{{ partnerName(item.beverage) }}</b><span>{{ item.isNonAlcoholic ? 'non-alcoholic' : 'alcoholic' }}</span></div>
-        <strong>{{ item.score }}</strong><section><small>WHY IT FITS</small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests whose stated setting, activity and time match this card.</p></section>
+        <div><small>RECOMMEND</small><b>{{ partnerName(item.beverage) }} <SpeakButton :text="partnerName(item.beverage)" /></b><span>{{ item.isNonAlcoholic ? 'non-alcoholic' : 'alcoholic' }}</span></div>
+        <strong>{{ item.score }}</strong><section><small>WHY IT FITS <SpeakButton :text="item.why" /></small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests whose stated setting, activity and time match this card. <SpeakButton text="Guests whose stated setting, activity and time match this card." /></p></section>
         <PairingPrinciples :item="item" kind="context" />
       </div>
     </div>
@@ -157,7 +157,7 @@ const opts = (values: readonly string[], any = false) => [...(any ? [{ value: ''
     <div v-else class="pairing-results">
       <div v-for="item in cigarResults" :key="item.cigar_body + item.cigar_note + item.beverage" class="pairing-result" :data-band="item.band">
         <div><small>PAIR WITH</small><b>{{ partnerName(item.beverage) }} <SpeakButton :text="partnerName(item.beverage)" /></b><span>{{ item.alcoholic ? 'alcoholic' : 'non-alcoholic' }}</span></div>
-        <strong>{{ item.score }}</strong><section><small>WHY IT WORKS</small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests smoking a {{ cigarBody }} cigar with {{ cigarNote }} notes.</p></section>
+        <strong>{{ item.score }}</strong><section><small>WHY IT WORKS <SpeakButton :text="item.why" /></small><p>{{ item.why }}</p></section><section><small>WHO WILL LIKE IT</small><p>Guests smoking a {{ cigarBody }} cigar with {{ cigarNote }} notes. <SpeakButton :text="`Guests smoking a ${cigarBody} cigar with ${cigarNote} notes.`" /></p></section>
         <PairingPrinciples :item="item" kind="cigar" />
       </div>
     </div>
@@ -168,7 +168,7 @@ const opts = (values: readonly string[], any = false) => [...(any ? [{ value: ''
 
     <div class="a0-prompts">
       <h3>A0 questions to learn</h3>
-      <div class="chips"><span v-for="item in prompts" :key="item.slot + item.prompt">{{ item.prompt }}</span></div>
+      <div class="chips"><span v-for="item in prompts" :key="item.slot + item.prompt">{{ item.prompt }} <SpeakButton :text="item.prompt" /></span></div>
     </div>
 
     <p class="pairing-note">{{ BAR_PAIRINGS.metadata.important_note }}</p>

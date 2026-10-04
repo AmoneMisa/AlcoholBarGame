@@ -6,10 +6,17 @@ import { forDeviceVoice } from './pronounce';
 import { speechRate, voiceRate } from '../../audio/preferences';
 let manifest: Promise<Record<string, string>> | undefined;
 let player: HTMLAudioElement | undefined;
+let requestId = 0;
+let normalizedClips: Record<string, string> = {};
+const voiceKey = (text: string) => text.trim().replace(/[’‘]/g, "'").replace(/\s+/g, ' ').toLowerCase();
 
 function loadManifest() {
   manifest ??= fetch(`${import.meta.env.BASE_URL}assets/voice/manifest.json`)
     .then((response) => (response.ok ? response.json() : {}))
+    .then((clips: Record<string, string>) => {
+      normalizedClips = Object.fromEntries(Object.entries(clips).map(([text, file]) => [voiceKey(text), file]));
+      return clips;
+    })
     .catch(() => ({}));
   return manifest;
 }
@@ -46,8 +53,12 @@ export function speak(text: string) {
   if (!speechOn.value || speechVolume.value <= 0) return false;
   if (!canSpeak()) { speakWithDevice(text); return false; }
   const key = text.trim();
+  const currentRequest = ++requestId;
+  player?.pause();
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   void loadManifest().then(async (clips) => {
-    const file = clips[key];
+    if (currentRequest !== requestId) return;
+    const file = clips[key] ?? normalizedClips[voiceKey(key)];
     if (!file) { speakWithDevice(key); return; }
     try {
       player?.pause();
@@ -57,12 +68,13 @@ export function speak(text: string) {
       clip.volume = speechVolume.value;
       clip.playbackRate = voiceRate(speechRate.value);
       clip.preservesPitch = true;
-      const restore = () => duckMusic(false);
+      const restore = () => { if (currentRequest === requestId) duckMusic(false); };
       clip.addEventListener('ended', restore);
       clip.addEventListener('pause', restore);
       duckMusic(true);
       await clip.play();
     } catch {
+      if (currentRequest !== requestId) return;
       duckMusic(false);
       speakWithDevice(key);
     }

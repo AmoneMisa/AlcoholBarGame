@@ -30,11 +30,26 @@ export function topFoodPairings(beverageId: string, limit = 8) {
 }
 
 export function topDrinkPairings(beverageId: string, limit = 8) {
-  return findBeveragePairings(beverageId).slice(0, limit).map((item) => ({
+  const direct = findBeveragePairings(beverageId).slice(0, limit).map((item) => ({
     ...item,
     partnerId: item.a === beverageId ? item.b : item.a,
     band: pairingBand(item.score)
   }));
+  const source = beverageProfile(beverageId);
+  if (!source || direct.length >= limit) return direct;
+  // Some wines have food matches but no cocktail-combination rows. Offer related drinks to explore,
+  // using shared food matches or the same style, without presenting them as ingredients to mix together.
+  const foods = new Set(findBeverageFoodPairings(beverageId).filter(item=>item.score>=80).map(item=>item.food));
+  const used = new Set([beverageId,...direct.map(item=>item.partnerId)]);
+  const related = BAR_PAIRINGS.beverage_profiles.filter(item=>!used.has(item.id)).map(item=>{
+    const shared = findBeverageFoodPairings(item.id).filter(pair=>pair.score>=80 && foods.has(pair.food));
+    const sameStyle = item.family===source.family && item.style===source.style;
+    const score = Math.min(79,55 + (sameStyle ? 12 : 0) + Math.min(12,shared.length*3));
+    return {a:beverageId,b:item.id,partnerId:item.id,score,band:pairingBand(score),relationship:'alternative to explore',
+      why:shared.length ? `Both work well with ${shared.slice(0,2).map(pair=>pair.food.toLowerCase()).join(' and ')}. Try them separately to compare their flavours.` : `Both are ${source.style.replaceAll('_',' ')} ${source.family} options. Try them separately to compare their flavours.`,
+      examples:[] as string[],tags:[] as string[],pairing_kind:'alternative',eligible:sameStyle||shared.length>0};
+  }).filter(item=>item.eligible).sort((a,b)=>b.score-a.score);
+  return [...direct,...related.slice(0,Math.max(0,limit-direct.length))];
 }
 
 export function topContextPairings(query: ContextQuery, limit = 8) {

@@ -15,11 +15,12 @@ const artwork = computed(() => props.name === 'lock' ? `${import.meta.env.BASE_U
 const normal = computed(() => urlOf(props.name));
 const style = computed(() => artwork.value ? {backgroundImage: `url("${thumbnailArtwork(artwork.value, 96, import.meta.env.BASE_URL)}")`} : normal.value ? { '--icon': `url("${normal.value}")`, '--icon-b': `url("${urlOf(`${props.name}-bold`) ?? normal.value}")` } : undefined);
 </script>
-<template><span class="ui-icon" :class="{ 'ui-icon-lock': name === 'lock', 'ui-icon-art': artwork, 'ui-icon-missing': !normal && !artwork }" :style="style" aria-hidden="true"></span></template>
+<template><svg v-if="name === 'hanger'" class="ui-icon ui-icon-vector" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5a2 2 0 1 1 3 1.7L12 8v2L3 16a1 1 0 0 0 .6 1.8h16.8A1 1 0 0 0 21 16l-9-6" /></svg><span v-else class="ui-icon" :class="{ 'ui-icon-lock': name === 'lock', 'ui-icon-art': artwork, 'ui-icon-missing': !normal && !artwork }" :style="style" aria-hidden="true"></span></template>
 
 <style>
 .ui-icon { width:24px;height:24px;display: inline-block; flex: none; background-color: currentColor; -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat; }
 .ui-icon.ui-icon-art {background-color:transparent;background-position:center;background-size:contain;background-repeat:no-repeat;-webkit-mask:none;mask:none;}
 .ui-icon-lock {width:1em;height:1em;vertical-align:middle;}
 .ui-icon-missing { background: none; }
+.ui-icon-vector {background:none;-webkit-mask:none;mask:none;}
 </style>

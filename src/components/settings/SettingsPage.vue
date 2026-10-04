@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import UiInput from '../ui/UiInput.vue';
 import UiCheckbox from '../ui/UiCheckbox.vue';
-import { APP_BUILT, APP_VERSION, formatBuilt } from '../../version';
+import GameVersion from './GameVersion.vue';
 import UiButton from '../ui/UiButton.vue';
 import ConfirmDialog from '../ui/ConfirmDialog.vue';
 import { ref } from 'vue';
@@ -85,10 +85,7 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
       <UiCheckbox v-model="agreed" tone="danger" label="I understand that my progress will be deleted and cannot be restored." />
     </ConfirmDialog>
 
-    <section class="settings-card">
-      <h3>About</h3>
-      <p>Version <b>{{ APP_VERSION }}</b><template v-if="APP_BUILT"> · built {{ formatBuilt(APP_BUILT) }}</template>. The profile page compares it with the version on the server.</p>
-    </section>
+    <GameVersion />
   </div>
 </template>
 

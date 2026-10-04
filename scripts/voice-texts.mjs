@@ -11,8 +11,10 @@ import { BRANDS_A } from '../src/data/knowledge/brandsA.ts';
 import { BRANDS_B } from '../src/data/knowledge/brandsB.ts';
 import { BRANDS_C } from '../src/data/knowledge/brandsC.ts';
 import { BRANDS_D } from '../src/data/knowledge/brandsD.ts';
+import { PAIRING_VOICE_TEXTS } from './pairing-voice-texts.mjs';
 
 const texts = new Set();
+for (const text of PAIRING_VOICE_TEXTS) texts.add(text);
 for (const entry of VOCABULARY) { texts.add(entry.word); texts.add(entry.example); }
 for (const group of PHRASE_GROUPS) for (const lesson of group.lessons) { texts.add(lesson.text); for (const answer of lesson.answers) texts.add(answer); }
 for (const recipe of RECIPES) { texts.add(recipe.name); if (recipe.story) texts.add(recipe.story); }
