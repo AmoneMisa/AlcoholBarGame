@@ -1,4 +1,5 @@
 import { ACHIEVEMENTS, achievementById, bestTiers } from './quests';
+import { validWishlist } from './wishlist';
 import type { RegionId } from './types';
 
 // The player profile: what a visitor (or the player) sees about a bar. Built only from the saved state, on the server
@@ -13,6 +14,7 @@ export interface ProfileStats {
   ownedBarIds: RegionId[];
   loot: { achievements: string[] };
   featuredAchievements?: string[];
+  wishedGifts?: string[];
 }
 
 export interface ProfileAchievement { id: string; name: string; series: string; seriesName: string; tier: number; tierName: string }
@@ -32,6 +34,7 @@ export interface PlayerProfile {
   /** Up to four achievements to show: the ones the player picked, otherwise the last earned. */
   shown: ProfileAchievement[];
   picked: boolean;
+  wishedGifts?: string[];
 }
 
 // Every series is shown once, at the highest tier the player has earned.
@@ -57,7 +60,8 @@ export function buildPlayerProfile(state: ProfileStats): PlayerProfile {
     achievementCount: earned.length,
     achievementTotal: ACHIEVEMENTS.length,
     shown,
-    picked: picked.length > 0
+    picked: picked.length > 0,
+    wishedGifts:validWishlist(state.wishedGifts)
   };
 }
 

@@ -100,7 +100,7 @@ const fame = computed(() => fameLevel(saved.value?.served ?? 0));
           <b>Guests would pay {{ preview.price.toFixed(0) }} coins</b>
           <small v-for="line in preview.notes" :key="line">{{ line }}</small>
           <small v-if="draftError" class="sig-error">{{ draftError }}</small>
-          <UiButton variant="primary" :disabled="!!draftError || game.money < SIGNATURE_FEE" @click="game.act({ type: 'designSignature', name: draftName, items: draftItems, needsShake: draftShake })">{{ saved ? 'Replace signature' : 'Develop signature' }} · {{ SIGNATURE_FEE }} coins</UiButton>
+          <UiButton variant="primary" :disabled="!!draftError" :coin-cost="SIGNATURE_FEE" @click="game.act({ type: 'designSignature', name: draftName, items: draftItems, needsShake: draftShake })">{{ saved ? 'Replace signature' : 'Develop signature' }} · {{ SIGNATURE_FEE }} coins</UiButton>
         </article>
         <article class="card">
           <h3>⭐ {{ saved?.name ?? 'No signature yet' }}</h3>

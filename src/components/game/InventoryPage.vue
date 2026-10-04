@@ -107,7 +107,7 @@ const recipeCardInventory = computed(() => RECIPES.map((recipe) => ({ recipe, qu
             <div class="stock-brand-model"><BrandBottle :brand="bottleById(stock.productId).brand" :category="guideIdForProduct(bottleById(stock.productId))" :color="bottleById(stock.productId).color" /></div>
             <div><small>{{ ALCOHOL_TYPE_LABELS[bottleById(stock.productId).type] }} · {{ bottleById(stock.productId).abv }}% ABV</small><b>{{ bottleById(stock.productId).name }}</b><span>{{ bottleById(stock.productId).volumeMl }} ml · customer pays {{ (bottleById(stock.productId).price * game.economy.guestPriceFactor).toFixed(0) }} coins + <CrystalAmount :value="bottleSaleCrystalReward(bottleById(stock.productId))" /></span></div>
             <strong>{{ stock.quantity }}×</strong>
-            <button v-if="game.bottleCrystalCost(stock.productId)" class="reserve-restock" type="button" :disabled="game.crystals < game.bottleCrystalCost(stock.productId)" @click="game.buyBottleStock(stock.productId)">+1 reserve · <CrystalAmount :value="game.bottleCrystalCost(stock.productId)" /></button>
+            <button v-if="game.bottleCrystalCost(stock.productId)" class="reserve-restock" type="button"  @click="game.buyBottleStock(stock.productId)">+1 reserve · <CrystalAmount :value="game.bottleCrystalCost(stock.productId)" /></button>
           </article>
         </div>
       </section>

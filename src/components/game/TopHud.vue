@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { CRYSTAL_EXCHANGE_BUNDLES } from '../../domain/economy';
+import { offerCurrency } from '../../domain/uiOffers';
 import { useGameStore } from '../../stores/game';
 import UiIcon from '../ui/UiIcon.vue';
 import PopoverPanel from '../ui/PopoverPanel.vue';
@@ -19,6 +20,7 @@ const exchangeOpen = ref(false);
 const shopOpen = ref(false);
 const staffOpen = ref(false);
 const eventsOpen = ref(false);
+watch(() => game.visitedFriend, friend => { if (friend) eventsOpen.value = false; });
 const perksOpen = ref(false);
 const slots = computed(() => Array.from({ length: MAX_STAFF }, (_, index) => ({ index, profile: STAFF_PROFILES[index]!, unlockAt: STAFF_UNLOCK_LEVELS[index]!, member: game.staff[index], open: game.level >= STAFF_UNLOCK_LEVELS[index]! })));
 // Why a hire or training button is off, said in words under the row.
@@ -32,9 +34,13 @@ const teamPercent = computed(() => Math.round(teamShare(game.staff) * 100));
 const panels = { shop: shopOpen, exchange: exchangeOpen, staff: staffOpen, perks: perksOpen, events: eventsOpen };
 for (const [name, flag] of Object.entries(panels)) watch(flag, (open) => { if (open) for (const [other, ref] of Object.entries(panels)) if (other !== name) ref.value = false; });
 function exchange(crystals: number) {
+  if(game.crystals<crystals) {exchangeOpen.value=false;offerCurrency('crystals');return;}
   if (game.exchangeCrystals(crystals)) exchangeOpen.value = false;
 }
 let calendarTimer: ReturnType<typeof setInterval>;
+const closeOffers=()=>{for(const panel of Object.values(panels)) panel.value=false;};
+onMounted(()=>window.addEventListener('barlingo:navigate',closeOffers));
+onUnmounted(()=>window.removeEventListener('barlingo:navigate',closeOffers));
 // Other screens pin content just below the HUD (the Design preview), so its height is published as --hud-h.
 const hud = ref<HTMLElement>();
 const hudObserver = typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(() => {
@@ -65,7 +71,7 @@ onUnmounted(() => {
         <PopoverPanel v-if="exchangeOpen" class="currency-exchange" eyebrow="COINS" title="Exchange crystals for coins" close-label="Close exchange" @close="exchangeOpen = false">
 
           <p>This exchange only works from crystals to coins and cannot be reversed.</p>
-          <button v-for="bundle in CRYSTAL_EXCHANGE_BUNDLES" :key="bundle.crystals" type="button" :disabled="game.crystals < bundle.crystals" @click="exchange(bundle.crystals)"><span><UiIcon name="crystal" /><b>{{ bundle.crystals }}</b></span><i><UiIcon name="arrow-right" /></i><span><UiIcon name="coin" /><b>{{ bundle.coins.toLocaleString('en-US') }}</b></span></button>
+          <button v-for="bundle in CRYSTAL_EXCHANGE_BUNDLES" :key="bundle.crystals" type="button"  @click="exchange(bundle.crystals)"><span><UiIcon name="crystal" /><b>{{ bundle.crystals }}</b></span><i><UiIcon name="arrow-right" /></i><span><UiIcon name="coin" /><b>{{ bundle.coins.toLocaleString('en-US') }}</b></span></button>
         </PopoverPanel>
       </div>
       <div class="crystal-resource"><button class="exchange-open" type="button" :aria-expanded="shopOpen" data-guide="crystals" aria-label="Buy crystals" @click="shopOpen = true"><UiIcon name="crystal" /><b>{{ game.crystals.toLocaleString('en-US') }}</b></button></div>
@@ -90,7 +96,7 @@ onUnmounted(() => {
       <p class="rules-note">Explain these rules politely to guests. Inspectors count every rule you break{{ game.ruleViolations ? ` (so far: ${game.ruleViolations})` : '' }}.</p>
       <article v-for="rule in game.houseRules" :key="rule.id" class="rule-row"><span class="rule-icon"><Glyph :g="rule.icon" /></span><span><b>{{ rule.title }}</b><small>{{ rule.text }}</small></span></article>
     </ModalDialog>
-    <EventsPopup v-if="eventsOpen" @close="eventsOpen = false" />
+    <EventsPopup v-if="eventsOpen" @close="eventsOpen = false" @achievements="eventsOpen = false; $emit('goto', 'achievements')" />
     <CrystalShopPopup v-if="shopOpen" @close="shopOpen = false" />
   </header>
 </template>
@@ -120,8 +126,4 @@ onUnmounted(() => {
 @media(max-width:600px) { .top-hud { flex-wrap:wrap; column-gap:6px; padding:5px 8px; } .venue-card { flex:1; min-width:130px; } .hud-resources { gap:7px; } .venue-name b { font-size:13px; } }
 @media(max-width:380px) { .hud-resources { order:3; width:100%; justify-content:flex-end; } }
 </style>
-
-
-
-
 

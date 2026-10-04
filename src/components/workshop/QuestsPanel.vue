@@ -1,32 +1,18 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { COSMETICS } from '../../domain/cosmetics';
-import { ACHIEVEMENT_STYLES } from '../../data/cosmetics/styleSources';
-import { ACHIEVEMENTS, questsForWeek, weekOf, type StatId } from '../../domain/quests';
+import { questsForWeek, weekOf, type StatId } from '../../domain/quests';
 import { useGameStore } from '../../stores/game';
-import AchievementArt from '../ui/AchievementArt.vue';
 import ItemArt from '../ui/ItemArt.vue';
 import UiButton from '../ui/UiButton.vue';
 
-// Weekly quests, the tasting log and the achievement series. Lives on the Events page next to the pass and the wheel.
+// Weekly quests and the tasting log. Achievement progress lives in the character window.
 const game = useGameStore();
-// The pair of styles an achievement gives (one per bartender), with the matching backgrounds that come along.
-const achievementStyles = (goalId: string) => {
-  const pair = ACHIEVEMENT_STYLES[goalId];
-  return pair ? Object.entries(pair).map(([character, value]) => COSMETICS.find((item) => item.id === `bartender:${value}:${character}`)?.label).filter(Boolean).join(' · ') : '';
-};
 const week = computed(() => weekOf(Date.now()));
 const quests = computed(() => questsForWeek(week.value).map((quest) => {
   const current = game.loot.quests.week === week.value;
   return { quest, progress: current ? game.loot.quests.progress[quest.stat] ?? 0 : 0, claimed: current && game.loot.quests.claimed.includes(quest.id) };
 }));
 const stat = (id: string) => game.achievementStat(id as StatId);
-// One card per achievement series: the next tier to claim, and the four tiers as pips.
-const achievementRows = computed(() => [...new Set(ACHIEVEMENTS.map((item) => item.series))].map((series) => {
-  const tiers = ACHIEVEMENTS.filter((item) => item.series === series).map((item) => ({ ...item, done: game.loot.achievements.includes(item.id) }));
-  const next = tiers.find((item) => !item.done);
-  return { series, seriesName: tiers[0]!.seriesName, tiers, goal: next ?? tiers[tiers.length - 1]!, finished: !next };
-}));
 </script>
 
 <template>
@@ -41,16 +27,6 @@ const achievementRows = computed(() => [...new Set(ACHIEVEMENTS.map((item) => it
     <article class="quest-card">
       <h3>Tasting log</h3>
       <p>{{ stat('tasted') }} recipes and {{ game.loot.tasted.length - stat('tasted') }} brands tasted. Serving a recipe for the first time gives parts and skin shards; a new brand gives a shard.</p>
-    </article>
-    <article v-for="row in achievementRows" :key="row.series" class="quest-card">
-      <AchievementArt :series="row.series" :tier="row.goal.tier" :size="72" class="quest-art" />
-      <h3>{{ row.seriesName }}</h3>
-      <p>{{ row.goal.name }}</p>
-      <p class="quest-tiers"><span v-for="tier in row.tiers" :key="tier.id" :class="['quest-tier', `quest-tier-${tier.tier}`, { done: tier.done }]" :title="`${tier.tierName}: ${tier.target}`"><AchievementArt :series="row.series" :tier="tier.tier" :size="28" />{{ tier.tierName }}</span></p>
-      <progress :value="Math.min(stat(row.goal.stat), row.goal.target)" :max="row.goal.target"></progress>
-      <b>{{ Math.min(stat(row.goal.stat), row.goal.target) }} / {{ row.goal.target }}</b><div class="quest-rewards"><span><ItemArt kind="resource" id="crystals" fallback="💎" :size="36" />{{ row.goal.crystals }}</span><span><ItemArt kind="box" :id="row.goal.box" fallback="🎁" :size="36" />×1</span></div>
-      <small v-if="achievementStyles(row.goal.id)">Styles: {{ achievementStyles(row.goal.id) }}</small>
-      <UiButton variant="primary" :disabled="row.finished || stat(row.goal.stat) < row.goal.target" @click="game.act({ type: 'claimAchievement', id: row.goal.id })">{{ row.finished ? 'All tiers claimed' : `Claim ${row.goal.tierName}` }}</UiButton>
     </article>
   </div>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import UiIcon from '../ui/UiIcon.vue';
+import { acquisitionOffer } from '../../domain/uiOffers';
 import { computed, ref } from 'vue';
 import { SPOTLIGHT_MIN_BOND, SPOTLIGHT_MS, BOND_NAMES, BOND_STEPS, COMPANIONS, KEEPSAKES, KEEPSAKE_CRYSTAL_PRICE, KEEPSAKE_LIKED_POINTS, KEEPSAKE_POINTS, COMPANION_START_LEVEL, MAX_COMPANION_LEVEL, companionLevelCost, levelCapForGrade, companionPower, linksOf, linkStrength, bondLevel, companionName, companionSlots, describeBonus, keepsakeDef, nextBondStep } from '../../domain/companions';
 import { REGIONS } from '../../domain/catalog';
@@ -83,7 +84,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
     <section v-if="met" class="keepsakes card">
       <h3>Keepsakes</h3>
       <div class="keep-row">
-        <span v-for="item in keepsakes" :key="item.id" class="keep"><ItemArt kind="keepsake" :id="item.id" :fallback="item.icon" :size="52" class="keep-art" /><b>{{ item.count }}</b><small>{{ item.name }}</small><UiButton size="sm" variant="primary" :disabled="game.crystals < KEEPSAKE_CRYSTAL_PRICE" :title="game.crystals < KEEPSAKE_CRYSTAL_PRICE ? `Not enough crystals: you need ${KEEPSAKE_CRYSTAL_PRICE}.` : `Buy for ${KEEPSAKE_CRYSTAL_PRICE} crystals`" @click="game.buyKeepsake(item.id)">{{ KEEPSAKE_CRYSTAL_PRICE }} 💎</UiButton></span>
+        <span v-for="item in keepsakes" :key="item.id" class="keep"><ItemArt kind="keepsake" :id="item.id" :fallback="item.icon" :size="52" class="keep-art" /><b>{{ item.count }}</b><small>{{ item.name }}</small><UiButton size="sm" variant="primary" :crystal-cost="KEEPSAKE_CRYSTAL_PRICE" @click="game.buyKeepsake(item.id)">{{ KEEPSAKE_CRYSTAL_PRICE }} 💎</UiButton></span>
       </div>
     </section>
 
@@ -124,7 +125,7 @@ const toggle = (id: string) => { open.value = open.value === id ? '' : id; };
         <template v-else>
           <progress :value="item.shards" :max="item.person.shards"></progress>
           <p class="meta">{{ item.shards }} / {{ item.person.shards }} shards<template v-if="item.person.joinsWith"> · joins at once with an achievement</template><template v-if="item.person.eventId"> · likes a special night</template></p>
-          <UiButton block variant="primary" :reason="item.shards < item.person.shards ? `Not enough shards: you need ${item.person.shards}, you have ${item.shards}. Serve ${companionName(item.person.id)} as a guest to collect more.` : ''" @click="game.recruitCompanion(item.person.id)">Invite to your circle</UiButton>
+          <UiButton block variant="primary" @click="item.shards < item.person.shards ? acquisitionOffer={kind:'companion',id:item.person.id,label:companionName(item.person.id)} : game.recruitCompanion(item.person.id)">Invite to your circle</UiButton>
         </template>
 
         <section v-if="item.joined && open === item.person.id" class="story">

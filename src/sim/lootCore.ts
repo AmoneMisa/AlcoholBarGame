@@ -3,6 +3,7 @@ import { INGREDIENTS, RECIPES } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { coins } from '../domain/economy';
 import { COSMETICS, DRAWABLE_COSMETICS, interiorForCosmetic } from '../domain/cosmetics';
+import { randomCosmeticAllowed } from '../data/cosmetics/themeDistribution';
 import { STYLE_PIECES_TO_CRAFT, styleForInterior } from '../data/cosmetics/styleSources';
 import { BOX_INTERIOR_IDS, DUPLICATE_INTERIOR_SHARDS, INTERIORS } from '../data/cosmetics/bars';
 import { levelFor } from '../domain/progression';
@@ -143,15 +144,15 @@ export function grantCosmetic(state: PlayerState, cosmeticId: string): string {
   return parts.join(' + ');
 }
 
-export const boxStyles = () => COSMETICS.filter((entry) => entry.source === 'box');
+export const boxStyles = () => COSMETICS.filter((entry) => entry.source === 'box' && randomCosmeticAllowed(entry.id));
 
 export const shardStyles = () => COSMETICS.filter(entry => entry.key === 'bartender' || DRAWABLE_COSMETICS.some(item => item.id === entry.id));
 
-export const ownedAside = (state: PlayerState) => shardStyles().filter(item => !state.ownedCosmeticIds.includes(item.id));
+export const ownedAside = (state: PlayerState) => shardStyles().filter(item => !state.ownedCosmeticIds.includes(item.id) && randomCosmeticAllowed(item.id));
 
 export function addStyleShards(state: PlayerState, amount: number, random: () => number): string {
   const missing = ownedAside(state);
-  const pool = missing.length ? missing : shardStyles();
+  const pool = missing.length ? missing : shardStyles().filter(item=>randomCosmeticAllowed(item.id));
   const chosen = pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))]!;
   add(state.loot.styleShards, chosen.id, amount);
   return `${amount} ${chosen.label} fragments`;

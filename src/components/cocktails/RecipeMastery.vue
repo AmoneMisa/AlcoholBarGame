@@ -39,14 +39,14 @@ const pct = (value: number) => `+${Math.round((value - 1) * 100)}%`;
     </header>
     <p>Level {{ level }} · guests pay <b>{{ pct(bonus.pay) }}</b> and tip <b>{{ pct(bonus.tips) }}</b> more for this drink.</p>
     <div class="recipe-card-balance"><span>{{ recipe.name.toUpperCase() }} CARDS</span><b>×{{ copies }}</b><em>{{ !next ? 'Mastery is complete; extra cards may be gifted.' : cardsRequired ? `Level ${level + 1} needs ${cardsRequired} cards.` : `Level ${level + 1} needs coins only.` }}</em></div>
-    <UiButton variant="solid" v-if="next && cost !== undefined" :disabled="!canUpgrade" @click="game.upgradeRecipe(recipe.id)">
+    <UiButton variant="solid" v-if="next && cost !== undefined" :disabled="copies < cardsRequired" :coin-cost="cost" @click="game.upgradeRecipe(recipe.id)">
       Upgrade to level {{ level + 1 }} · {{ cost.toLocaleString('en-US') }} coins<span v-if="cardsRequired"> + {{ cardsRequired }} cards</span><em>pay {{ pct(next.pay) }}, tips {{ pct(next.tips) }}</em>
     </UiButton>
     <p v-if="next && cardsRequired && copies < cardsRequired" class="mastery-help">You need {{ cardsRequired - copies }} more {{ recipe.name }} card{{ cardsRequired - copies === 1 ? '' : 's' }}. Earn duplicates from VIP recipe challenges, daily gifts, the recipe shop, or friends.</p>
     <p v-else-if="!next" class="mastery-max">Top level reached.</p>
     <footer>
       <span>Duplicate cards can upgrade this recipe or be gifted.</span>
-      <UiButton variant="secondary" :disabled="sparePrice.currency === 'coins' ? game.money < sparePrice.amount : game.crystals < sparePrice.amount" @click="game.buyRecipe(recipe.id)">Get another card · <UiIcon v-if="sparePrice.currency !== 'coins'" class="inline-icon" name="crystal" /> {{ sparePrice.amount }}{{ sparePrice.currency === 'coins' ? ' coins' : '' }}</UiButton>
+      <UiButton variant="secondary" :coin-cost="sparePrice.currency === 'coins' ? sparePrice.amount : undefined" :crystal-cost="sparePrice.currency === 'coins' ? undefined : sparePrice.amount" @click="game.buyRecipe(recipe.id)">Get another card · <UiIcon v-if="sparePrice.currency !== 'coins'" class="inline-icon" name="crystal" /> {{ sparePrice.amount }}{{ sparePrice.currency === 'coins' ? ' coins' : '' }}</UiButton>
     </footer>
   </section>
 </template>

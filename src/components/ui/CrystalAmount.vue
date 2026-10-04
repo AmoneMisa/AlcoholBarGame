@@ -8,5 +8,5 @@ defineProps<{ value: number | string }>();
 <template><span class="crystal-amount"><UiIcon class="inline-icon" name="crystal" /> {{ value }}</span></template>
 
 <style>
-.crystal-amount { white-space: nowrap; }
+.crystal-amount { display:inline-flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;vertical-align:middle; }
 </style>

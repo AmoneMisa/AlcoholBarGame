@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AchievementArt from '../ui/AchievementArt.vue';
+import WishlistEditor from './WishlistEditor.vue';
 import UiCheckbox from '../ui/UiCheckbox.vue';
 import UiButton from '../ui/UiButton.vue';
 import { computed, onMounted, ref } from 'vue';
@@ -10,7 +11,9 @@ import ProfileCard from './ProfileCard.vue';
 
 // The player's own screen. The player can pick up to four achievements to show; otherwise the latest four are shown.
 const game = useGameStore();
+const emit = defineEmits<{ achievements: [] }>();
 const picking = ref(false);
+const wishesOpen=ref(false);
 const chosen = ref<string[]>([]);
 const earned = computed(() => game.earnedAchievements);
 
@@ -33,7 +36,9 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
 
 <template>
   <div class="profile-page">
-    <ProfileCard :name="game.decor.name || game.playerName" :level="game.level" :profile="game.profile" :look="game.decor as unknown as Record<string, string>">
+    <ProfileCard :name="game.decor.bartenderNickname || game.playerName" :level="game.level" :profile="game.profile" :look="game.decor as unknown as Record<string, string>">
+      <template #wishlist-action><UiButton size="sm" @click="wishesOpen=true">Choose gifts</UiButton></template>
+      <template #actions><UiButton size="sm" icon="trophy" aria-label="Achievements" @click="emit('achievements')">Achievements</UiButton></template>
       <template #achievements-action>
         <UiButton variant="secondary" size="sm" v-if="earned.length" @click="startPicking">Choose what to show</UiButton>
       </template>
@@ -58,6 +63,7 @@ function latest() { game.setFeaturedAchievements([]); picking.value = false; }
         <UiButton variant="secondary" @click="picking = false">Cancel</UiButton>
       </footer>
     </section>
+    <WishlistEditor v-if="wishesOpen" @close="wishesOpen=false" />
   </div>
 </template>
 

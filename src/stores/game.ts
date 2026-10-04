@@ -1,3 +1,4 @@
+import { handleCurrencyError } from '../domain/uiOffers';
 import { trainingGuest } from '../domain/training';
 import { eventAvailability } from '../domain/eventAvailability';
 import { resetTips, tipCapacity } from '../sim/tips';
@@ -139,7 +140,7 @@ export const useGameStore = defineStore('game', () => {
     } catch (error) { mailMessage.value=(error as Error)?.message || 'Could not handle this gift.'; friendError(error,'Could not handle this gift.'); }
     finally {mailBusy.value=false;}
   }
-  async function collectMailReward(id:string) {
+  async function collectMailReward(id:string, reveal=true) {
     if(mailBusy.value)return;
     mailBusy.value=true;
     try {
@@ -148,9 +149,17 @@ export const useGameStore = defineStore('game', () => {
       if(!result.ok)throw new Error(result.error);
       if(result.state)adoptServerState(result.state,result.serverTime,result.message);
       mailMessage.value=result.message ?? '';
-      showRewards('Mail rewards',rewardLines(before,stateSnapshot(state.value),result.message));
+      if(reveal) showRewards('Mail rewards',rewardLines(before,stateSnapshot(state.value),result.message));
+      return true;
     } catch(error){mailMessage.value=(error as Error)?.message || 'Could not claim this reward.';friendError(error,'Could not claim this reward.');}
     finally{mailBusy.value=false;}
+  }
+  async function collectAllMailRewards() {
+    if(mailBusy.value || mode.value!=='online') return;
+    const before=stateSnapshot(state.value);
+    const ids=mailboxEntries.value.filter(item=>item.kind==='reward'&&item.status==='pending').map(item=>item.id);
+    for(const id of ids) if(!await collectMailReward(id,false)) break;
+    showRewards('Mail rewards',rewardLines(before,stateSnapshot(state.value)));
   }
   const rewardReport = ref<RewardReport>();
   const trainingActive = ref(false);
@@ -385,7 +394,7 @@ export const useGameStore = defineStore('game', () => {
       if (trainingActive.value) return result.ok;
       if (result.ok) reportAction(action, before);
       if (result.ok) playActionSound(action, levelBefore);
-      else playSfx('error');
+      else { if(handleCurrencyError(result.error ?? '')) {message.value='';state.value.message='';} playSfx('error'); }
       return result.ok;
     }).catch(() => {
       message.value = 'Connection lost. Reconnecting…';
@@ -455,7 +464,7 @@ export const useGameStore = defineStore('game', () => {
     } catch (error) {
       state.value = snapshot;
       if (!(error instanceof RuleError)) throw error;
-      message.value = error.message;
+      message.value = handleCurrencyError(error.message) ? '' : error.message;
       playSfx('error');
       return false;
     }
@@ -491,7 +500,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   const friendPrestige = ref(0);
-  const friendError = (error: unknown, fallback: string) => { message.value = (error as Error)?.message || fallback; return false; };
+  const friendError = (error: unknown, fallback: string) => { const text=(error as Error)?.message || fallback; message.value = handleCurrencyError(text)?'':text; return false; };
   async function redeemPromoCode(code:string) {
     if (mode.value !== 'online') throw new Error('Connect to your account to redeem a promo code.');
     const result = await redeemPromo(code);
@@ -773,7 +782,14 @@ export const useGameStore = defineStore('game', () => {
   const bottleCrystalCost = (productId: string) => bottleRestockCrystalCost(ALCOHOL_PRODUCTS.find((item) => item.id === productId)!);
   const buyBottleStock = (productId: string, quantity = 1) => dispatch({ type: 'buyBottleStock', productId, quantity });
   const expediteCustomer = (seatId?: number) => dispatch({ type: 'expediteCustomer', seatId });
-  const claimDailyGift = () => dispatch({ type: 'claimDaily' });
+  const dailyClaimPending = ref(false);
+  function claimDailyGift() {
+    if (dailyClaimPending.value || !dailyGiftAvailable.value) return false;
+    if (mode.value !== 'online') return dispatch({ type: 'claimDaily' });
+    dailyClaimPending.value = true;
+    void send({ type: 'claimDaily' }).finally(() => { dailyClaimPending.value = false; });
+    return true;
+  }
   const completeDailyLesson = (lessonId: string, answer: string) => dispatch({ type: 'completeDailyLesson', lessonId, answer });
   const exchangeCrystals = (crystals: number) => dispatch({ type: 'exchangeCrystals', crystals });
 
@@ -870,7 +886,13 @@ export const useGameStore = defineStore('game', () => {
       buyingCrystals.value = false;
     }
   }
-  const spinRoulette = () => dispatch({ type:'spinRoulette' });
+  const roulettePending = ref(false);
+  function spinRoulette() {
+    if (roulettePending.value || rouletteSpinsLeft.value <= 0) return false;
+    if (mode.value !== 'online') return dispatch({ type:'spinRoulette' });
+    roulettePending.value = true;
+    return send({ type:'spinRoulette' }).finally(() => { roulettePending.value = false; });
+  }
   const claimPass = (track: 'free' | 'premium', level: number) => dispatch({ type:'claimPass', track, level });
   const buyPassPremium = () => dispatch({ type:'buyPassPremium' });
   const buyPassLevels = (count: number) => dispatch({ type:'buyPassLevels', count });
@@ -902,14 +924,14 @@ export const useGameStore = defineStore('game', () => {
 
   const act = (action: GameAction) => dispatch(action);
   return {
-    mailMessage, collectMailReward, mailboxOpen, mailboxEntries, unreadMail, theftNotices, mailBusy, loadMailbox, openMailbox, dismissTheftNotices, decideMailGift, foodRecommendations, cleanGuestAshtray, removeGuestAshtray, trainingActive, trainingPhase, trainingRestocked, beginTraining, endTraining, preparationCustomerId, openPreparation, tipJar, tipJarCapacity, collectTips, stealVisitedTips, stealingTips,
+    mailMessage, collectMailReward, collectAllMailRewards, mailboxOpen, mailboxEntries, unreadMail, theftNotices, mailBusy, loadMailbox, openMailbox, dismissTheftNotices, decideMailGift, foodRecommendations, cleanGuestAshtray, removeGuestAshtray, trainingActive, trainingPhase, trainingRestocked, beginTraining, endTraining, preparationCustomerId, openPreparation, tipJar, tipJarCapacity, collectTips, stealVisitedTips, stealingTips,
     topUpPreview, circle, crewBonus, recruitCompanion, giveKeepsake, buyKeepsake, assignCompanion, dismissCompanion, spotlightCompanion, levelUpCompanion, achievementStat, profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, availableEvents, act, visibleInventory, connectEpoch,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,
     regionId, region, money, crystals, xp, streak, level, serving, decor, bars, ownedBarIds, startingBarChosen, sessionReady, ownedInteriorIds, barBackground, barInteriorStyle,
     cosmetics:COSMETICS, ownedCosmeticIds, cosmeticCopies, cosmeticRouletteAvailable, passReady, passEarned, passCurrent, passBase, buyPassLevels, giftableStyleItems, giftableBackgrounds, rouletteSpinsLeft, rouletteLast, passPoints, passLevelNow, passPremium, passClaimed, passTheme, passEnds, claimPass, buyPassPremium, cosmeticGiftLog, canUseCosmetic, spinRoulette, popularity, popularityBoost, activatePopularityBoost,
     inventories, inventory, bottleInventories, bottleInventory, currentMix, shaken, customers, activeCustomerId, customer, hasCustomer, recipe, mixJudge,
-    knownRecipeIds, recipeUnlockSources, knownRecipes, lockedRecipes, dailyGiftAvailable, dailyGiftResult, loginStreak, upcomingLoginDay, dailyCoinReward, dailyCrystalReward,
+    knownRecipeIds, recipeUnlockSources, knownRecipes, lockedRecipes, dailyGiftAvailable, dailyClaimPending, roulettePending, dailyGiftResult, loginStreak, upcomingLoginDay, dailyCoinReward, dailyCrystalReward,
     dailyLessons, dailyLessonCompletedIds, dailyLessonsComplete, dailyLessonResult, learningStreak, learningStreakForToday, learningBonusPercent, completeDailyLesson,
     redeemPromoCode, conversationCustomerId, languageStats, seatArrivals, nextCustomerAt, nextCustomerInSeconds, nextCustomerCountdown, nextCustomerCrystalCost, vipCooldownUntil, orderCountdown, orderTimerPaused,
     message, market, selectedSupplier, transferTargetId, tradeLog, recipeCategory, filteredRecipes,

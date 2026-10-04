@@ -22,7 +22,7 @@ export type AvatarOptionKey = typeof AVATAR_OPTIONS[number]['key'];
 export interface AvatarOption { key: AvatarOptionKey; label: string; values: readonly string[] }
 /** Painted appearances preserve the face; each hairstyle includes its painted hair color. */
 export function avatarOptionsFor(character: string): AvatarOption[] {
-  return [{ key: 'hairStyle', label: 'Hairstyle', values: (BARTENDER_AVATARS[character] ?? []).map(avatar => avatar.hairStyle) }];
+  return [];
 }
 export const avatarLabel = (value: string) => value.replaceAll('-', ' ').replace(/^./, c => c.toUpperCase());
 export const OUTFIT_PALETTE: Record<string, string> = { natural:'#ffffff', black:'#3a3a42', white:'#f3f0ea', red:'#c23b3b', blue:'#3b63c2', green:'#3a8a5a', plum:'#8a4a8f', sand:'#d9c39a' };

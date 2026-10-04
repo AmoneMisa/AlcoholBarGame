@@ -14,7 +14,7 @@ test('Avatars share compact atlases with unique hairstyle cells and fixed natura
   const paths = new Set();
   for (const character of ['noa', 'leo']) {
     assert.equal(BARTENDER_AVATARS[character].length, 6);
-    assert.deepEqual(avatarOptionsFor(character).map(option => option.key), ['hairStyle']);
+    assert.deepEqual(avatarOptionsFor(character), [], 'base costume hairstyles are hidden; saved atlas appearances still load');
     for (const avatar of BARTENDER_AVATARS[character]) {
       assert.equal(bartenderAvatarFor(character, avatar.hairStyle), avatar);
       const bytes = readFileSync(new URL(`../public${avatar.sheet}`, import.meta.url));

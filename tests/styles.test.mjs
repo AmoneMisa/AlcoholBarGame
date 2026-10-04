@@ -70,7 +70,7 @@ test('Only a short list of unconnected styles is sold; background, achievement, 
   assert.throws(() => applyAction(fresh(), { type: 'buyStyle', cosmeticId: id('leo', 'reference-duelist') }, context()), /crystals/);
 });
 
-test('Backgrounds, achievements and the shop never share a style, and the rest belongs to boxes', () => {
+test('Backgrounds, achievements and the shop never share a style, and the rest belongs to boxes', async () => {
   const sources = { basic: 0, background: 0, achievement: 0, shop: 0, box: 0 };
   for (const character of ['noa', 'leo']) for (const costume of bartenderCostumesFor(character)) sources[styleSource(character, costume.value)]++;
   assert.equal(sources.basic, 0);
@@ -78,7 +78,8 @@ test('Backgrounds, achievements and the shop never share a style, and the rest b
   assert.equal(sources.achievement, Object.keys(ACHIEVEMENT_STYLES).length * 2);
   assert.equal(sources.shop, Object.values(SHOP_STYLES).flat().length);
   assert.ok(sources.box > 20);
-  assert.equal(boxStyles().length, sources.box);
+  const {randomCosmeticAllowed}=await import('../src/data/cosmetics/themeDistribution.ts');
+  assert.equal(boxStyles().length, COSMETICS.filter(item=>item.source==='box'&&randomCosmeticAllowed(item.id)).length);
 });
 
 test('Buying a background gives its one style with it', () => {

@@ -29,7 +29,7 @@ watch(() => [targetGuest.value?.id,targetGuest.value?.social?.phase,targetGuest.
 });
 const inMix = (id: string) => game.currentMix.find(item => item.ingredientId === id)?.amount ?? 0;
 const stock = (id: string) => Math.max(0, (game.inventory.find(item => item.ingredientId === id)?.amount ?? 0) - inMix(id));
-const needed = (id:string) => !props.workbench && game.recipe.ingredients.some(item => item.ingredientId === id);
+const needed = (id:string) => !props.workbench && game.recipe.ingredients.some(item => item.ingredientId === id && inMix(id) < item.amount);
 const prioritize = (a:string,b:string) => Number(needed(b)) - Number(needed(a));
 const amount = computed(() => game.currentMix.filter(item => INGREDIENTS.find(ingredient => ingredient.id === item.ingredientId)?.unit === 'ml').reduce((sum, item) => sum + item.amount, 0));
 const ice = computed(() => inMix('ice'));
@@ -40,7 +40,7 @@ const quest = computed(() => game.mixJudge.details.map(item => ({...item, ingred
 const bottles = computed(() => ALCOHOL_PRODUCTS.filter(item => item.ingredientId && game.shelfBrandsFor(item.ingredientId).some(product => product.id === item.id) && stock(item.ingredientId) > 0 && preparationMatches(search.value,[item.name,item.brand,item.type,ALCOHOL_TYPE_LABELS[item.type]])).sort((a,b) => prioritize(a.ingredientId!,b.ingredientId!)));
 const unbranded = computed(() => INGREDIENTS.filter(item => item.category === 'spirit' && (stock(item.id) > 0 || needed(item.id)) && !game.shelfBrandsFor(item.id).length && preparationMatches(search.value,[item.name,item.id])).sort((a,b)=>prioritize(a.id,b.id)));
 const ingredients = computed(() => INGREDIENTS.filter(item => (foodOpen.value ? item.category === 'food' : item.category !== 'spirit' && item.category !== 'food') && (stock(item.id) > 0 || needed(item.id)) && preparationMatches(search.value,[item.name,item.id,item.category])).sort((a,b)=>prioritize(a.id,b.id)));
-const drag = ref<{id:string;brand?:string;x:number;y:number;pointerId:number;over:boolean}>();
+const drag = ref<{id:string;brand?:string;x:number;y:number;startX:number;startY:number;moved:boolean;pointerId:number;over:boolean}>();
 const draggedIngredient = computed(() => INGREDIENTS.find(item => item.id === drag.value?.id));
 const draggedBottle = computed(() => ALCOHOL_PRODUCTS.find(item => item.id === drag.value?.brand));
 const feedback = ref('');
@@ -66,17 +66,18 @@ function startDrag(event:PointerEvent,id:string,brand?:string) {
   if (!ingredient || stock(id) < (ingredient.unit === 'ml' ? portion.value : 1)) return;
   event.preventDefault();
   (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
-  drag.value = {id,brand,x:event.clientX,y:event.clientY,pointerId:event.pointerId,over:false};
+  drag.value = {id,brand,x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,moved:false,pointerId:event.pointerId,over:false};
 }
 function moveDrag(event:PointerEvent) {
   if (!drag.value || drag.value.pointerId !== event.pointerId) return;
   const box = glassTarget.value?.getBoundingClientRect();
+  if (Math.hypot(event.clientX - drag.value.startX, event.clientY - drag.value.startY) > 10) drag.value.moved = true;
   Object.assign(drag.value,{x:event.clientX,y:event.clientY,over:!!box && event.clientX >= box.left && event.clientX <= box.right && event.clientY >= box.top && event.clientY <= box.bottom});
 }
 function endDrag(event:PointerEvent) {
   if (!drag.value || drag.value.pointerId !== event.pointerId) return;
   moveDrag(event);
-  if (drag.value.over) add(drag.value.id,drag.value.brand);
+  if (drag.value.over || !drag.value.moved) add(drag.value.id,drag.value.brand);
   drag.value = undefined;
 }
 function cancelDrag() { drag.value = undefined; }
@@ -106,7 +107,7 @@ onBeforeUnmount(() => {
       </header>
       <div class="counter-prep-room">
         <section class="counter-bottle-rack" aria-label="Bottle shelf">
-          <div class="counter-rack-heading"><span>BACK BAR</span><small>Drag a bottle to the glass</small><span class="counter-shelf-nav"><button type="button" aria-label="Show previous bottles" @click="scrollBottles(-1)"><UiIcon name="chevron-left" /></button><button type="button" aria-label="Show more bottles" @click="scrollBottles(1)"><UiIcon name="chevron-right" /></button></span></div>
+          <div class="counter-rack-heading"><span>BACK BAR</span><small>Tap a bottle or drag it to the glass</small><span class="counter-shelf-nav"><button type="button" aria-label="Show previous bottles" @click="scrollBottles(-1)"><UiIcon name="chevron-left" /></button><button type="button" aria-label="Show more bottles" @click="scrollBottles(1)"><UiIcon name="chevron-right" /></button></span></div>
           <div ref="bottleRow" class="counter-bottle-row">
             <button v-for="product in bottles" :key="product.id" type="button" class="counter-bottle" data-guide="prep-bottle" :class="{ needed:needed(product.ingredientId!) }" :disabled="stock(product.ingredientId!) < portion" :aria-label="`Pour ${product.brand} into glass`" @pointerdown="startDrag($event,product.ingredientId!,product.id)" @keydown.enter.prevent="add(product.ingredientId!,product.id)" @keydown.space.prevent="add(product.ingredientId!,product.id)">
               <span class="counter-bottle-art"><BrandBottle :brand="product.brand" :category="guideIdForProduct(product)" :color="product.color" /></span><b>{{ product.brand }}</b><small>{{ stock(product.ingredientId!) }} ml</small>

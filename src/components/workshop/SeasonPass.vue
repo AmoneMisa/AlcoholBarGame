@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import UiIcon from '../ui/UiIcon.vue';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { INTERIORS, interiorStyle, type InteriorId } from '../../data/cosmetics/bars';
 import { COSMETICS } from '../../domain/cosmetics';
 import { formatCountdown } from '../../domain/customerTiming';
@@ -67,7 +67,12 @@ const bought = computed(() => Math.max(0, game.passPoints - game.passEarned));
 
 // Buying levels: one level is the rest of the one in progress.
 const buyOptions = computed(() => [1, 5].map((count) => ({ count: Math.min(count, PASS_LEVELS - level.value), price: Math.min(count, PASS_LEVELS - level.value) * PASS_LEVEL_PRICE })).filter((option, index, all) => option.count > 0 && (index === 0 || option.count !== all[0]!.count)));
-const buyReason = (price: number) => game.crystals < price ? `Not enough crystals: you need ${price}, you have ${Math.floor(game.crystals)}.` : '';
+const premiumOpen = ref(false);
+function selectReward(track: 'free' | 'premium', lvl: number) {
+  if (track === 'premium' && !game.passPremium) { premiumOpen.value = true; return; }
+  if (state(track, lvl) === 'ready') game.claimPass(track, lvl);
+}
+watch(() => game.passPremium, unlocked => { if (unlocked) premiumOpen.value = false; });
 
 const previewOpen = ref(false);
 const rewardsOpen = ref(true);
@@ -93,9 +98,8 @@ const rewardsOpen = ref(true);
     <section class="pass-buy" aria-label="Buy levels">
       <div><b>Short on time?</b><small>Buy levels with crystals. Each one fills the rest of the level you are on.</small></div>
       <div class="pass-buy-buttons">
-        <UiButton v-for="option in buyOptions" :key="option.count" variant="primary" size="sm" :disabled="game.crystals < option.price" @click="game.buyPassLevels(option.count)">+{{ option.count }} level{{ option.count === 1 ? '' : 's' }} · <CrystalAmount :value="option.price" /></UiButton>
+        <UiButton v-for="option in buyOptions" :key="option.count" variant="primary" size="sm" :crystal-cost="option.price" @click="game.buyPassLevels(option.count)">+{{ option.count }} level{{ option.count === 1 ? '' : 's' }} · <CrystalAmount :value="option.price" /></UiButton>
         <small v-if="level >= PASS_LEVELS">All levels reached.</small>
-        <small v-else-if="game.crystals < PASS_LEVEL_PRICE" class="pass-need">A level costs {{ PASS_LEVEL_PRICE }} crystals, you have {{ Math.floor(game.crystals) }}.</small>
       </div>
     </section>
 
@@ -120,24 +124,19 @@ const rewardsOpen = ref(true);
         <span>{{ interiorName }}</span>
         <UiButton size="sm" variant="secondary" @click="previewOpen = true">Preview the prizes</UiButton>
       </div>
-      <div class="pass-premium">
-        <b>{{ game.passPremium ? 'Premium track unlocked' : 'Premium track' }}</b>
-        <small>Supplies for your bar, coins, boosters and prestige on every level, with a big pack at the end.</small>
-        <UiButton v-if="!game.passPremium" variant="primary" :reason="buyReason(PASS_PREMIUM_PRICE)" @click="game.buyPassPremium()">Unlock · <CrystalAmount :value="PASS_PREMIUM_PRICE" /></UiButton>
-      </div>
     </section>
     <ModalDialog v-if="rewardsOpen" title="Battle Pass rewards" :eyebrow="theme.name" width="460px" @close="rewardsOpen = false">
       <div class="pass-popup-progress"><b>Level {{ level }} / {{ PASS_LEVELS }}</b><span>{{ formatCountdown(secondsLeft) }} left</span><progress :value="inLevel" :max="PASS_LEVEL_POINTS"></progress></div>
     <section class="pass-reward-list" aria-label="Pass levels">
-      <div class="pass-track-head"><b>Free</b><span></span><div><b>Premium</b><UiButton v-if="!game.passPremium" size="sm" :disabled="game.crystals < PASS_PREMIUM_PRICE" :title="'Unlock for ' + PASS_PREMIUM_PRICE + ' crystals'" @click="game.buyPassPremium()">Activate</UiButton><small v-else>Activated</small></div></div>
+      <div class="pass-track-head"><b>Free</b><span></span><div><b>Premium</b><small v-if="game.passPremium">Activated</small></div></div>
       <ol class="pass-track">
         <li v-for="row in rows" :key="row.level" :data-level="row.level" :class="{ reached: level >= row.level, current: level === row.level }">
           <div class="pass-node"><span>{{ row.level }}</span></div>
-          <button v-for="tier in (['free', 'premium'] as const)" :key="tier" type="button" class="pass-cell" :class="[tier, state(tier, row.level)]" :disabled="state(tier, row.level) !== 'ready'" :aria-label="tier + ' level ' + row.level + ': ' + row[tier].map(text).join(', ') + '. ' + stateText(tier, row.level)" @click="game.claimPass(tier, row.level)">
+          <button v-for="tier in (['free', 'premium'] as const)" :key="tier" type="button" class="pass-cell" :class="[tier, state(tier, row.level)]" :disabled="!(tier === 'premium' && !game.passPremium) && state(tier, row.level) !== 'ready'" :aria-label="tier + ' level ' + row.level + ': ' + row[tier].map(text).join(', ') + '. ' + stateText(tier, row.level)" @click="selectReward(tier, row.level)">
 
             <div v-for="(reward, index) in row[tier]" :key="index" class="pass-reward" :title="text(reward)">
               <div class="pass-cell-art" :style="{ width: `${rewardPictures(reward).length * 44}px` }"><RewardArt v-for="(picture, pictureIndex) in rewardPictures(reward)" :key="pictureIndex" :line="picture" compact /></div>
-              <b class="pass-quantity">{{ quantity(reward) || ' ' }}</b>
+              <b v-if="quantity(reward)" class="pass-quantity">{{ quantity(reward) }}</b>
             </div>
             <span class="pass-lock" v-if="!['claimed', 'ready'].includes(state(tier, row.level))"><UiIcon name="lock" /></span><small v-else class="pass-status">{{ state(tier, row.level) === 'claimed' ? 'Claimed' : 'Claim' }}</small>
           </button>
@@ -149,6 +148,11 @@ const rewardsOpen = ref(true);
 
     </ModalDialog>
     <SeasonPrizePreview v-if="previewOpen" @close="previewOpen = false" />
+    <ModalDialog v-if="premiumOpen" title="Unlock Premium Battle Pass" width="400px" @close="premiumOpen = false">
+      <div class="pass-premium-offer"><p>Unlock the premium rewards for this season. Rewards become available as you reach each level.</p>
+      <UiButton variant="solid" block :disabled="game.passPremium" :crystal-cost="PASS_PREMIUM_PRICE" @click="game.buyPassPremium()">Unlock Premium · <CrystalAmount :value="PASS_PREMIUM_PRICE" /></UiButton>
+      <UiButton variant="secondary" block @click="premiumOpen = false">Later</UiButton></div>
+    </ModalDialog>
   </div>
 </template>
 
@@ -185,10 +189,15 @@ const rewardsOpen = ref(true);
 .pass-node::before { content:'';position:absolute;top:-9px;bottom:-9px;width:3px;background:#977039; }
 .pass-node span { position:relative;display:grid;place-items:center;width:34px;height:38px;border:1px solid #b89858;border-radius:9px;background:#25384d url('/assets/ui/pass-free-surface-v1.webp') center / cover;color:#fff0ce;font-weight:800; }
 .pass-track > li.reached .pass-node span { background:#805b28 url('/assets/ui/pass-premium-surface-v1.webp') center / cover;border-color:#edc578; }
-.pass-cell { position:relative;grid-row:1;align-self:stretch;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:6px;min-width:0;min-height:94px;padding:8px 4px 20px;border:1px solid #607c9a;border-radius:12px;background:#142a40 url('/assets/ui/pass-free-surface-v1.webp') center / 100% 100%;color:#e9eef7;font:inherit;text-align:center; }
+.pass-cell { position:relative;grid-row:1;align-self:stretch;display:flex;flex-wrap:wrap;align-content:center;align-items:center;justify-content:center;gap:6px;min-width:0;min-height:94px;padding:18px 4px;border:1px solid #607c9a;border-radius:12px;background:#142a40 url('/assets/ui/pass-free-surface-v1.webp') center / 100% 100%;color:#e9eef7;font:inherit;text-align:center; }
 .pass-cell.premium { grid-column:3;background:#4b351c url('/assets/ui/pass-premium-surface-v1.webp') center / 100% 100%;border-color:#cda050; }
 .pass-cell.free { grid-column:1; }
-.pass-reward { display:grid;justify-items:center;gap:4px;min-width:0; }
+.pass-premium-offer {display:grid;gap:12px;}
+.pass-premium-offer p {margin:0 0 4px;line-height:1.5;}
+.pass-cell.locked,.pass-cell.premium:not(.ready):not(.claimed) {filter:brightness(.7);}
+.pass-cell.claimed {border-color:#9de1ad;box-shadow:inset 0 0 20px #9de1ad40,0 0 10px #9de1ad25;}
+.pass-cell.claimed .pass-status::before {content:'✓ ';}
+.pass-reward { display:grid;justify-items:center;align-content:center;gap:4px;min-width:0; }
 .pass-reward b { font-size:14px;line-height:1.2;color:#fff3d7; }
 .pass-cell-art { display:flex;align-items:center;justify-content:center;width:44px;height:44px;gap:2px; }
 .pass-cell-art > .reward-art { flex:none;width:44px;min-width:0;height:44px; }
@@ -206,7 +215,7 @@ const rewardsOpen = ref(true);
  .pass-track-head,.pass-track > li{grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr);gap:8px;}
  .pass-track{padding:0 8px;}
  .pass-node span{width:28px;height:34px;font-size:13px;}
- .pass-cell{padding:8px 3px 20px;min-height:94px;gap:6px;}
+ .pass-cell{padding:18px 3px;min-height:94px;gap:6px;}
  .pass-cell-art{width:44px;height:44px;}
  .pass-cell-art > .reward-art{height:44px;}
  .pass-cell-art .item-art{width:44px;height:44px;}

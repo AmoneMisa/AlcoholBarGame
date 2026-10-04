@@ -151,7 +151,7 @@ function accept() {
         </form>
         <div class="haggle-actions">
           <UiButton variant="ghost" @click="game.leaveNegotiation()">Leave</UiButton>
-          <UiButton :variant="agreed ? 'solid' : 'secondary'" :class="{ 'quick-buy': !agreed }" :disabled="quote.total > game.money" @click="accept()">{{ agreed ? 'Accept deal' : 'Buy at list price' }} · {{ quote.total.toFixed(0) }} coins</UiButton>
+          <UiButton :variant="agreed ? 'solid' : 'secondary'" :class="{ 'quick-buy': !agreed }" :coin-cost="quote.total" @click="accept()">{{ agreed ? 'Accept deal' : 'Buy at list price' }} · {{ quote.total.toFixed(0) }} coins</UiButton>
         </div>
       </footer>
     </section>

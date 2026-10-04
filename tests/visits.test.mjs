@@ -106,6 +106,10 @@ test('A look at a bar from the weekly board: read-only, the right bar, and a str
   const view = await service.leaderboardBar(c, { scope: 'global', rank: first.rank, week: board.week, score: first.score });
   assert.equal(view.status, 200);
   assert.equal(view.body.ok, true);
+  assert.equal(view.body.player.nickname, 'Noa');
+  assert.equal(view.body.player.code, sa.player.friendCode);
+  assert.equal(view.body.player.me, false);
+  assert.equal(view.body.player.relationship, 'none');
   assert.equal(view.body.bar.name, first.label, 'it is the bar of the row that was tapped');
   assert.equal(view.body.score, first.score);
   assert.equal(JSON.stringify(repository.states.get(sa.player.id).state), before, 'looking changes nothing: no prestige, no visit mark');
@@ -145,6 +149,8 @@ test('The friends board can be opened too, and only shows people who are on it',
   const friendRow = board.top.find((row) => !row.me);
   const view = await service.leaderboardBar(a, { scope: 'friends', rank: friendRow.rank, week: board.week, score: friendRow.score });
   assert.equal(view.status, 200);
+  assert.equal(view.body.player.relationship, 'accepted');
+  assert.equal(view.body.player.code, sb.player.friendCode);
   assert.ok(view.body.bar.level >= 1);
   assert.ok(COSMETICS.length > 0 && sb.player.id > 0);
 });

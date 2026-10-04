@@ -3,7 +3,7 @@ import ModalDialog from './ModalDialog.vue';
 import UiButton from './UiButton.vue';
 
 // "Are you sure?": says what will happen, then asks. Used for actions that spend a lot or cannot be undone.
-defineProps<{ title: string; confirmLabel?: string; cancelLabel?: string; danger?: boolean; disabled?: boolean; /** Why the action cannot be confirmed now. */ reason?: string }>();
+defineProps<{ title: string; confirmLabel?: string; cancelLabel?: string; danger?: boolean; disabled?: boolean; /** Why the action cannot be confirmed now. */ reason?: string; crystalCost?: number; coinCost?: number }>();
 const emit = defineEmits<{ confirm: []; cancel: [] }>();
 </script>
 
@@ -13,7 +13,7 @@ const emit = defineEmits<{ confirm: []; cancel: [] }>();
     <template #footer>
       <div class="confirm-foot">
         <UiButton variant="ghost" @click="emit('cancel')">{{ cancelLabel ?? 'Cancel' }}</UiButton>
-        <UiButton :variant="danger ? 'danger' : 'solid'" :disabled="disabled" :reason="reason" @click="emit('confirm')">{{ confirmLabel ?? 'Confirm' }}</UiButton>
+        <UiButton :variant="danger ? 'danger' : 'solid'" :disabled="disabled" :reason="reason" :crystal-cost="crystalCost" :coin-cost="coinCost" @click="emit('confirm')">{{ confirmLabel ?? 'Confirm' }}</UiButton>
       </div>
     </template>
   </ModalDialog>

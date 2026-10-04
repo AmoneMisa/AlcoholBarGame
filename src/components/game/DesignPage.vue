@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import UiButton from '../ui/UiButton.vue';
+import { acquisitionOffer } from '../../domain/uiOffers';
 import UiInput from '../ui/UiInput.vue';
 import CrystalAmount from '../ui/CrystalAmount.vue';
 import PanelHeading from '../ui/PanelHeading.vue';
@@ -48,9 +49,9 @@ const previewOpen = ref(false);
 const previewInterior = ref('');
 const previewOutfit = ref('');
 function openPreview(interior?: string, outfit?: string) { previewInterior.value = interior ?? game.decor.interior; previewOutfit.value = outfit ?? game.decor.bartender; previewOpen.value = true; }
-function pickInterior(id: string) { if (isInteriorOwned(id)) game.chooseInterior(id); else openPreview(id); }
+function pickInterior(id: string) { if (isInteriorOwned(id)) game.chooseInterior(id); else acquisitionOffer.value={kind:'background',id,label:INTERIORS.find(item=>item.id===id)?.name??id}; }
 function pickOutfit(outfit: typeof BARTENDER_OUTFITS[number]) {
-  if (cosmeticLocked('bartender',outfit)) { pendingStyle.value = outfit; return; }
+  if (cosmeticLocked('bartender',outfit)) { pendingStyle.value = outfit; acquisitionOffer.value={kind:'style',id:`bartender:${outfit}:${selectedBartender.value}`,label:outfitLabel(outfit)}; return; }
   pendingStyle.value = ''; game.decor.bartender = outfit;
 }
 const DESIGN_TABS = [{ id: 'bar', label: 'Bar' }, { id: 'clothes', label: 'Clothes' }, { id: 'character', label: 'Character' }] as const;
@@ -134,7 +135,7 @@ function selectBartender(id: 'noa' | 'leo') {
             <span>{{ styleInfo.how }}</span>
             <span v-if="styleInfo.background">Background: “{{ styleInfo.background }}”.</span>
             <UiButton size="sm" variant="secondary" @click="openPreview(undefined, pendingStyle)">Preview this style</UiButton>
-            <button v-if="styleInfo.source === 'shop'" class="ui-btn ui-btn-primary ui-btn-sm" type="button" :disabled="game.crystals < STYLE_SHOP_PRICE" @click="game.buyStyle(styleInfo.item.id); pendingStyle = ''">Buy · {{ STYLE_SHOP_PRICE }} 💎</button>
+            <button v-if="styleInfo.source === 'shop'" class="ui-btn ui-btn-primary ui-btn-sm" type="button"  @click="game.buyStyle(styleInfo.item.id); pendingStyle = ''">Buy · {{ STYLE_SHOP_PRICE }} 💎</button>
           </div>
             <div class="avatar-options">
               <OptionSelect v-for="option in clothesOptions" :key="option.key" :label="option.label" :model-value="game.decor[option.key]" :options="avatarChoices(option)" @update:model-value="setAvatarOption(option.key, $event)" />
@@ -142,7 +143,7 @@ function selectBartender(id: 'noa' | 'leo') {
           </div>
           <div v-show="designTab === 'character'" class="design-tab-character">
       <form class="bartender-name-editor" @submit.prevent="game.renameBartender(bartenderNickname)"><label for="bartender-nickname">Bartender nickname<UiInput id="bartender-nickname" v-model="bartenderNickname" maxlength="18" required placeholder="Enter a nickname" /></label><UiButton type="submit" variant="solid">Save nickname</UiButton><span>This is the name guests see.</span></form>
-            <p class="avatar-help">{{ fixedCostume ? 'This costume includes its hairstyle, hair color and makeup. Choose an everyday outfit to change your hairstyle.' : 'Choose a hairstyle while keeping the same face and natural hair color.' }} Changes are saved with this bar.</p>
+            <p class="avatar-help">{{ fixedCostume ? 'This costume includes its hairstyle, hair color and makeup. Choose an everyday outfit to change your hairstyle.' : 'Your hairstyle comes with your selected costume.' }} Changes are saved with this bar.</p>
             <div class="avatar-options">
               <OptionSelect v-for="option in characterOptions" :key="option.key" :label="option.label" :model-value="game.decor[option.key]" :options="avatarChoices(option)" @update:model-value="setAvatarOption(option.key, $event)" />
             </div>
@@ -158,4 +159,3 @@ function selectBartender(id: 'noa' | 'leo') {
 .bottle-pagination { display:flex; align-items:center; gap:8px; }
 .bottle-pagination span { font-size:.85rem; color:var(--muted, #a8b6c9); white-space:nowrap; }
 </style>
-

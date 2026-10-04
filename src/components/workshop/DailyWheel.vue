@@ -11,6 +11,8 @@ import ModalDialog from '../ui/ModalDialog.vue';
 const game = useGameStore();
 const emit = defineEmits<{busy:[value:boolean]}>();
 const rewardOpen = ref(false);
+const oddsOpen = ref(false);
+const sectorLabel = (id: string, label: string) => id.startsWith('crystals-') ? id.slice('crystals-'.length) : label;
 const won = computed(() => game.rouletteLast ? slices[game.rouletteLast.index] : undefined);
 const SEGMENT = 360 / WHEEL.length;
 const SPIN_MS = 4600;
@@ -59,7 +61,7 @@ function finish() {
   clearPointerTimers();
   spinning.value = false; waiting.value = false;
   angle.value = finalAngle;
-  shown.value = game.rouletteLast?.text ?? '';
+  shown.value = (game.rouletteLast?.text ?? '').replace(/^Wheel:\s*/, '');
   rewardOpen.value = !!shown.value;
   nextTick(() => { instant.value = false; });
 }
@@ -81,12 +83,12 @@ function start(index: number) {
   timer = setTimeout(finish, SPIN_MS + 300);
 }
 
-function spin() {
-  if (busy.value || left.value <= 0) return;
+async function spin() {
+  if (busy.value || game.roulettePending || left.value <= 0) return;
   waiting.value = true; shown.value = ''; rewardOpen.value = false;
-  const accepted = game.spinRoulette();
+  const accepted = await game.spinRoulette();
   if (!accepted) waiting.value = false;
-  else watchdog = setTimeout(() => { waiting.value = false; }, 8000);   // the server did not answer: let the player try again
+  else if (waiting.value) watchdog = setTimeout(() => { waiting.value = false; }, 8000);
 }
 
 function skip() {
@@ -103,6 +105,7 @@ onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); clearPointe
 
 <template>
   <div class="wheel-page">
+    <div class="wheel-help"><UiButton size="sm" aria-label="Wheel rewards and chances" @click="oddsOpen = true">?</UiButton></div>
     <div class="wheel-stage">
       <div class="wheel-pointer" :class="{ spinning }" aria-hidden="true">
         <img class="wheel-pointer-still" src="/assets/ui/wheel-pointer-still-v1.webp" alt="" width="128" height="160" draggable="false" />
@@ -112,24 +115,21 @@ onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); clearPointe
       <div class="wheel-disc" :class="{ instant }" role="img" aria-label="Daily prize wheel" :style="{ transform: `rotate(${angle}deg)`, transitionDuration: instant ? '0ms' : `${SPIN_MS}ms` }">
         <img class="wheel-background" src="/assets/ui/daily-wheel-painted-v1.webp" alt="" width="800" height="800" draggable="false" />
         <div v-for="slice in slices" :key="slice.id" class="wheel-sector" :style="{transform: `rotate(${slice.turn}deg)`}" aria-hidden="true">
-          <div class="wheel-sector-reward"><img v-if="slice.art" :src="slice.art" alt="" /><span v-else>{{ slice.icon }}</span><b>{{ slice.label }}</b></div>
+          <div class="wheel-sector-reward"><img v-if="slice.art" :src="slice.art" alt="" /><span v-else>{{ slice.icon }}</span><b>{{ sectorLabel(slice.id, slice.label) }}</b></div>
         </div>
       </div>
       </div>
     </div>
     <div class="wheel-side">
       <p class="wheel-spins" role="status"><b>{{ left }}</b> of {{ ROULETTE_SPINS_PER_DAY }} spins left today</p>
-      <p class="wheel-result" role="status" aria-live="polite">{{ shown || (spinning ? 'Spinning…' : waiting ? 'Waiting for the wheel…' : 'Spin the wheel for a small prize.') }}</p>
+      <p v-if="busy" class="wheel-result" role="status" aria-live="polite">{{ spinning ? 'Spinning…' : 'Waiting for the wheel…' }}</p>
       <div class="wheel-buttons">
-        <UiButton variant="primary" :disabled="busy || left <= 0" @click="spin">{{ left <= 0 ? 'Come back tomorrow' : 'Spin' }}</UiButton>
+        <UiButton variant="primary" block :disabled="busy || game.roulettePending || left <= 0" @click="spin">{{ left <= 0 ? 'Come back tomorrow' : 'Spin' }}</UiButton>
         <UiButton v-if="spinning" variant="secondary" @click="skip">Skip animation</UiButton>
       </div>
-      <details class="wheel-odds">
-        <summary>What is on the wheel</summary>
-        <ul><li v-for="item in odds" :key="item.id"><span><img :src="artUrl(item.id)" alt="" width="28" height="28" />{{ item.label }}</span><b>{{ item.percent }}%</b></li></ul>
-      </details>
     </div>
   </div>
+  <ModalDialog v-if="oddsOpen" title="Wheel rewards" width="400px" @close="oddsOpen = false"><div class="wheel-odds"><p>Three free spins per day. Resets at 00:00 UTC.</p><ul><li v-for="item in odds" :key="item.id"><span><img :src="artUrl(item.id)" :alt="item.id.startsWith('crystals-') ? 'Crystals' : ''" width="28" height="28" />{{ sectorLabel(item.id, item.label) }}</span><b>{{ item.percent }}%</b></li></ul></div></ModalDialog>
   <ModalDialog v-if="rewardOpen" title="Your wheel reward" presentation="celebration" width="400px" @close="rewardOpen = false"><div class="wheel-prize-reveal"><img v-if="won?.art" :src="won.art" alt="" /><b>{{ shown }}</b><p>{{ game.mode === 'online' ? 'Your reward delivery is in Post Box.' : 'Added to your collection.' }}</p><UiButton variant="solid" block @click="rewardOpen = false">Continue</UiButton></div></ModalDialog>
 </template>
 
@@ -139,6 +139,8 @@ onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); clearPointe
 @media(prefers-reduced-motion:reduce) { .wheel-prize-reveal { animation:none; } }
 
 .wheel-page { display: grid; grid-template-columns: minmax(220px, 340px) 1fr; gap: 20px; align-items: center; padding: 8px 4px; }
+.wheel-help {grid-column:1/-1;justify-self:end;}
+.wheel-help .ui-btn {width:36px;height:36px;border-radius:50%;padding:0;font-size:20px;}
 @media (max-width: 640px) { .wheel-page { grid-template-columns: 1fr; justify-items: center; } }
 .wheel-stage { position: relative; width: min(340px, 100%); aspect-ratio: 1; }
 .wheel-rotor-clip {width:100%;height:100%;border-radius:50%;overflow:clip;filter:drop-shadow(0 10px 22px #0008);}
@@ -149,11 +151,11 @@ onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); clearPointe
 .wheel-sector-reward {position:absolute;left:50%;top:10%;width:24%;transform:translateX(-50%);display:grid;justify-items:center;gap:3px;color:#fff;text-align:center}
 .wheel-sector-reward img {display:block;width:40%;aspect-ratio:1;object-fit:contain}
 .wheel-sector-reward span {font-size:20px;line-height:1}
-.wheel-sector-reward b {max-width:46px;font:700 13px/1.15 system-ui,sans-serif;white-space:normal;text-shadow:0 1px 3px #000}
+.wheel-sector-reward b {max-width:46px;font:700 clamp(8px,2.8vw,11px)/1.15 system-ui,sans-serif;white-space:normal;text-shadow:0 1px 3px #000}
 .wheel-pointer { position:absolute;z-index:2;left:50%;top:-24px;width:48px;height:60px;transform:translateX(-50%);filter:drop-shadow(0 2px 3px #000a);pointer-events:none; }
 .wheel-pointer img {position:absolute;inset:0;width:100%;height:100%;object-fit:contain;}
 .wheel-pointer.spinning .wheel-pointer-still {visibility:hidden;}
-.wheel-side { display: grid; gap: 12px; align-content: center; }
+.wheel-side { display: grid; width:100%;min-width:0;gap: 12px; align-content: center; }
 .wheel-spins { margin: 0; color: #c9d5e6; }
 .wheel-spins b { color: #e4b35c; font-size: 22px; }
 .wheel-result { margin: 0; min-height: 3em; font-size: 16px; font-weight: 700; color: #f8efe7; }

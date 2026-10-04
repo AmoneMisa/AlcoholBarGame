@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import GuidePointer from './components/ui/GuidePointer.vue';
+import AcquisitionOffers from './components/ui/AcquisitionOffers.vue';
+import ThemeDrawPanel from './components/workshop/ThemeDrawPanel.vue';
 import TutorialTour from './components/ui/TutorialTour.vue';
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import SectionTabs from './components/ui/SectionTabs.vue';
@@ -22,6 +24,7 @@ const CompanionsPanel = lazyPage(() => import('./components/workshop/CompanionsP
 const WorkshopPage = lazyPage(() => import('./components/workshop/WorkshopPage.vue'));
 const EquipmentPanel = lazyPage(() => import('./components/workshop/EquipmentPanel.vue'));
 const ProfilePage = lazyPage(() => import('./components/profile/ProfilePage.vue'));
+const AchievementsPanel = lazyPage(() => import('./components/profile/AchievementsPanel.vue'));
 const SettingsPage = lazyPage(() => import('./components/settings/SettingsPage.vue'));
 import NotificationToasts from './components/ui/NotificationToasts.vue';
 import RewardPopup from './components/ui/RewardPopup.vue';
@@ -29,7 +32,7 @@ import DailyRewardPopup from './components/ui/DailyRewardPopup.vue';
 import { useGameStore } from './stores/game';
 import { useNotificationsStore } from './stores/notifications';
 import { calendarDate } from './domain/economy';
-import { ACHIEVEMENTS, questsForWeek, weekOf } from './domain/quests';
+import { questsForWeek, weekOf } from './domain/quests';
 import { initMusic, musicOn, playSfx, refreshMusic, setMusicInterior } from './audio/index';
 
 // Only the bar scene is needed for the first paint; every other screen is fetched when the player opens it.
@@ -92,9 +95,7 @@ const questsReady = computed(() => {
   const week = weekOf(Date.now());
   const current = game.loot.quests.week === week;
   const quests = questsForWeek(week).filter((quest) => current && !game.loot.quests.claimed.includes(quest.id) && (game.loot.quests.progress[quest.stat] ?? 0) >= quest.target).length;
-  const goals = ACHIEVEMENTS.filter((item) => !game.loot.achievements.includes(item.id) && game.achievementStat(item.stat) >= item.target
-    && ACHIEVEMENTS.filter((other) => other.series === item.series && other.target < item.target).every((other) => game.loot.achievements.includes(other.id))).length;
-  return quests + goals;
+  return quests;
 });
 const eventBadge = (id: string) => view.value !== 'events' ? undefined : (id === 'pass' ? game.passReady : id === 'wheel' ? game.rouletteSpinsLeft : id === 'quests' ? questsReady.value : id === 'today' && game.dailyGiftAvailable ? 1 : 0) || undefined;
 const sectionTabs = computed(() => (SECTIONS[view.value] ?? []).map((tab) => ({ ...tab, badge: eventBadge(tab.id) })));
@@ -200,11 +201,20 @@ const badges = computed<Record<string, number>>(() => ({
 }));
 
 function selectView(id: string) {
+  if (id === 'achievements') { characterInfoTab.value = 'achievements'; characterInfoOpen.value = true; return; }
   if (id === 'settings') { characterInfoTab.value = 'settings'; characterInfoOpen.value = true; return; }
   characterInfoOpen.value = false;
   const legacy = LEGACY[id];
   if (legacy) { view.value = legacy[0]; sub[legacy[0]] = legacy[1]; } else view.value = id;
 }
+watch(() => game.visitedFriend, friend => { if (friend) selectView('friends'); });
+function navigateOffer(event:Event) {
+  const {view:destination,section}=(event as CustomEvent<{view:string;section?:string}>).detail;
+  game.mailboxOpen=false;selectView(destination);
+  if(section && destination!=='theme-draw') sub[destination]=section;
+}
+onMounted(()=>window.addEventListener('barlingo:navigate',navigateOffer));
+onUnmounted(()=>window.removeEventListener('barlingo:navigate',navigateOffer));
 // The management screen keeps the part it showed last, so switching tabs never blanks it.
 watch(deckView, (part) => { if (part) { managementView.value = part; managementOpened.value = true; } }, { immediate: true });
 </script>
@@ -226,9 +236,10 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
       <LearningPage v-if="view === 'english' && sub.english === 'learn'" />
       <section v-if="view === 'circle'" class="circle-page game-panel"><CompanionsPanel /></section>
       <FriendsPage v-if="view === 'friends'" />
+      <section v-if="view === 'theme-draw'" class="game-panel"><ThemeDrawPanel /></section>
       <EventsPage v-if="view === 'events'" :section="sub.events ?? 'today'" />
       <WorkshopPage v-if="view === 'manage' && sub.manage === 'workshop'" />
-      <ProfilePage v-if="view === 'character' && sub.character === 'profile'" />
+      <ProfilePage v-if="view === 'character' && sub.character === 'profile'" @achievements="characterInfoTab = 'achievements'; characterInfoOpen = true" />
       <SettingsPage v-if="view === 'settings'" @goto="selectView" />
       <ManagementDeck v-if="managementOpened" v-show="!!deckView" :active-view="managementView" :design-section="designSection" />
     </main>
@@ -237,8 +248,9 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
     <ModalDialog v-if="equipmentOpen" title="Upgrades" eyebrow="YOUR BAR" width="760px" @close="equipmentOpen = false"><EquipmentPanel /></ModalDialog>
     <BarScreenshot v-if="screenshotOpen" @close="screenshotOpen = false" />
     <ModalDialog v-if="characterInfoOpen" title="Your character" class="character-info-popup" @close="characterInfoOpen = false">
-      <SectionTabs v-model="characterInfoTab" :tabs="[{id:'profile',label:'Character'},{id:'settings',label:'Settings'}]" label="Character information" />
-      <ProfilePage v-if="characterInfoTab === 'profile'" />
+      <SectionTabs v-model="characterInfoTab" :tabs="[{id:'profile',label:'Character'},{id:'achievements',label:'Achievements'},{id:'settings',label:'Settings'}]" label="Character information" />
+      <ProfilePage v-if="characterInfoTab === 'profile'" @achievements="characterInfoTab = 'achievements'" />
+      <AchievementsPanel v-else-if="characterInfoTab === 'achievements'" />
       <SettingsPage v-else @goto="selectView" />
       <UiButton class="change-appearance-button" v-if="characterInfoTab === 'profile'" @click="selectView('character'); sub.character = 'look'">Change appearance</UiButton>
     </ModalDialog>
@@ -254,6 +266,7 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
     </ModalDialog>
     <DailyRewardPopup v-if="game.dailyOpen && !game.theftNotices.length && !game.mailboxOpen" />
     <GuidePointer />
+    <AcquisitionOffers />
     <TutorialTour :ready="game.sessionReady && game.startingBarChosen && !game.theftNotices.length && !game.mailboxOpen" :seen="game.tourSeen" @finish="game.setTour" />
     <StartingBarPicker v-if="game.sessionReady && !game.startingBarChosen && !game.theftNotices.length" />
     <nav class="game-nav" aria-label="Game views">

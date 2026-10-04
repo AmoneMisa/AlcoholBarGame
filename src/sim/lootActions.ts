@@ -1,5 +1,6 @@
 // Optional actions, loaded only when their screen or action is used.
 import { fragmentChoiceOptions } from '../domain/fragmentChoices';
+import { THEME_DRAW_POOLS, randomCosmeticAllowed } from '../data/cosmetics/themeDistribution';
 import { RECIPES, REGIONS } from '../domain/catalog';
 import { coins } from '../domain/economy';
 import { COSMETICS, DRAWABLE_COSMETICS } from '../domain/cosmetics';
@@ -36,7 +37,7 @@ export const barLabel = (regionId: string) => REGIONS.find((item) => item.id ===
 
 export function resolveFragmentReward(state: PlayerState, reward: Reward, random: () => number): Reward {
   if (!['skinShards','stylePieces'].includes(reward.kind) || ('id' in reward && reward.id)) return reward;
-  const pool = ownedAside(state).length ? ownedAside(state) : shardStyles();
+  const pool = (ownedAside(state).length ? ownedAside(state) : shardStyles()).filter(item=>randomCosmeticAllowed(item.id));
   const item = pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))]!;
   return {kind:'skinShards',id:item.id,amount:'amount' in reward ? reward.amount : 0};
 }
@@ -163,6 +164,26 @@ export function currentSeason(state: PlayerState, now: number) {
 
 export function drawStyle(state: PlayerState, count: unknown, banner: unknown, now: number, random: () => number) {
   if (count !== 1 && count !== 10) throw new LootError('Choose a single draw or a ten-draw.');
+  const collection=THEME_DRAW_POOLS.find(item=>item.id===banner);
+  if(collection) {
+    const cost=count===1?DRAW_COST.single:DRAW_COST.ten;
+    if(state.crystals<cost) throw new LootError(`You need ${cost} crystals for this draw.`);
+    const pool=collection.styleIds.map(id=>COSMETICS.find(item=>item.id===id)!);
+    if(pool.some(item=>!item)) throw new LootError('Collection is unavailable.');
+    state.crystals-=cost;
+    const results:DrawResult[]=[];
+    for(let i=0;i<count;i++) {
+      const item=pool[Math.min(pool.length-1,Math.floor(random()*pool.length))]!;
+      const duplicate=state.ownedCosmeticIds.includes(item.id);
+      const shards=duplicate?DUPLICATE_SHARDS.rare:0;
+      if(duplicate) add(state.loot.styleShards,item.id,shards);
+      grantCosmetic(state,item.id);
+      results.push({id:item.id,label:item.label,rarity:item.rarity,duplicate,shards});
+    }
+    state.loot.lastDraw=results;track(state,'draws',count,now);
+    note(state,`${collection.name}: ${results.map(item=>item.label).join(', ')}.`);
+    return;
+  }
   if (banner !== undefined && banner !== 'standard' && banner !== 'seasonal') throw new LootError('Unknown banner.');
   const seasonal = banner === 'seasonal';
   const cost = count === 1 ? DRAW_COST.single : DRAW_COST.ten;

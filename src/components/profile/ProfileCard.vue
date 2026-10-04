@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { wishedGifts } from '../../domain/wishlist';
+import RewardArt from '../ui/RewardArt.vue';
 import { REGIONS } from '../../domain/catalog';
 import type { PlayerProfile } from '../../domain/profile';
 import AchievementArt from '../ui/AchievementArt.vue';
@@ -51,10 +53,12 @@ const english = computed(() => props.profile.englishPercent === undefined ? '—
       <ul v-if="profile.shown.length"><li v-for="item in profile.shown" :key="item.id" :class="`tier-${item.tier}`" :title="item.name"><AchievementArt :series="item.series" :tier="item.tier" :size="40" /><span><b>{{ item.seriesName }}</b><small>{{ item.tierName }}</small></span></li></ul>
       <p v-else class="empty">No achievements yet.</p>
     </section>
+    <section class="profile-wishes"><h3>Desired gifts<slot name="wishlist-action" /></h3><ul v-if="profile.wishedGifts?.length"><li v-for="(line,i) in wishedGifts(profile.wishedGifts)" :key="i"><RewardArt :line="line" /><span>{{ line.text }}</span></li></ul><p v-else class="empty">No desired gifts selected.</p></section>
   </section>
 </template>
 
 <style scoped>
+.profile-wishes h3{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px}.profile-wishes ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;list-style:none;padding:0}.profile-wishes li{display:grid;grid-template-rows:80px auto;gap:8px;justify-items:center;text-align:center;padding:10px;border:1px solid #6b604a;border-radius:10px;background:#172334;font-size:12px;overflow-wrap:anywhere}.profile-wishes :deep(.reward-art){height:80px;width:80px}
 .profile-card { display: grid; gap: 14px; padding: 16px; border: 1px solid #354762; border-radius: 16px; background: #111c2d; color: #e9eef7; }
 .profile-head { display: grid; grid-template-columns: 88px 1fr auto; gap: 14px; align-items: center; }
 .profile-avatar { position: relative; width: 88px; height: 88px; overflow: hidden; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #4f334b, #16243a 70%); }

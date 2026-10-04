@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import UiIcon from '../ui/UiIcon.vue';
+import { acquisitionOffer } from '../../domain/uiOffers';
 import { computed, ref } from 'vue';
 import { INTERIORS, interiorStyle, type InteriorId } from '../../data/cosmetics/bars';
 import { bartenderCostumesFor } from '../../data/cosmetics/bartenderCostumes';
@@ -76,8 +77,10 @@ function apply() {
       <button v-for="item in outfits" :key="item.value" type="button" role="option" :aria-selected="outfit === item.value" :class="{ active: outfit === item.value, locked: !owns(item.value) }" @click="outfit = item.value"><UiIcon v-if="!owns(item.value)" name="lock" /> {{ item.label }}</button>
     </div>
     <template #footer>
-      <UiButton v-if="canBuyStyle" variant="primary" :disabled="game.crystals < outfitInfo.price" @click="game.buyStyle(outfitId)">Buy style · <CrystalAmount :value="outfitInfo.price" /></UiButton>
-      <UiButton v-if="canBuyInterior" variant="primary" :disabled="game.crystals < interiorInfo.price" @click="game.buyInterior(interior)">Buy background · <CrystalAmount :value="interiorInfo.price" /></UiButton>
+      <UiButton v-if="!styleOwned" @click="acquisitionOffer={kind:'style',id:outfitId,label:styleLabel(character,outfit)};emit('close')">How to get this style</UiButton>
+      <UiButton v-if="!interiorOwned" @click="acquisitionOffer={kind:'background',id:interior,label:interiorName};emit('close')">How to get this background</UiButton>
+      <UiButton v-if="canBuyStyle" variant="primary" :crystal-cost="outfitInfo.price" @click="game.buyStyle(outfitId)">Buy style · <CrystalAmount :value="outfitInfo.price" /></UiButton>
+      <UiButton v-if="canBuyInterior" variant="primary" :crystal-cost="interiorInfo.price" @click="game.buyInterior(interior)">Buy background · <CrystalAmount :value="interiorInfo.price" /></UiButton>
       <UiButton v-if="canApply" variant="solid" @click="apply">Use this look</UiButton>
       <UiButton variant="secondary" @click="emit('close')">Close</UiButton>
     </template>

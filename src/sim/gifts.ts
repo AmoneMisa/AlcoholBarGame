@@ -1,4 +1,5 @@
 import { addStyleShards, addBackgroundShards } from './loot';
+import { restrictedTheme } from '../data/cosmetics/themeDistribution';
 import { addStat } from '../domain/achievementStats';
 import { buildPlayerProfile } from '../domain/profile';
 import { RECIPES } from '../domain/catalog';
@@ -58,7 +59,7 @@ export function giftPrice(gift: GiftRequest) {
     return recipe ? recipePurchase(recipe, RECIPES.indexOf(recipe)) : undefined;
   }
   const interior = INTERIORS.find((item) => item.id === gift.interiorId);
-  return interior && interior.crystalCost > 0 && !isEventInterior(interior.id) ? { currency: 'crystals' as const, amount: interior.crystalCost } : undefined;
+  return interior && interior.crystalCost > 0 && !isEventInterior(interior.id) && !restrictedTheme(interior.id) ? { currency: 'crystals' as const, amount: interior.crystalCost } : undefined;
 }
 
 // Validates a gift request and takes its price from the sender. Returns the clean gift to store.

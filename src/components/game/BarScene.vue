@@ -568,7 +568,7 @@ onBeforeUnmount(() => {
     </div>
   </section>
   </div>
-  <ConfirmDialog v-if="inviteArrival && inviteSeat !== undefined" :title="`Invite guest · Seat ${inviteSeat + 1}`" confirm-label="Invite now" :disabled="game.crystals < inviteArrival.cost || inviteArrival.cost <= 0" @cancel="inviteSeat = undefined" @confirm="inviteCustomer">
+  <ConfirmDialog v-if="inviteArrival && inviteSeat !== undefined" :title="`Invite guest · Seat ${inviteSeat + 1}`" confirm-label="Invite now" :disabled="inviteArrival.cost <= 0" :crystal-cost="inviteArrival.cost" @cancel="inviteSeat = undefined" @confirm="inviteCustomer">
     <p>This guest arrives in <b>{{ inviteArrival.countdown }}</b>.</p>
     <p>Invite them to this seat now for <CrystalAmount :value="inviteArrival.cost" />.</p>
   </ConfirmDialog>

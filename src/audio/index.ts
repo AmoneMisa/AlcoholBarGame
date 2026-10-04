@@ -1,7 +1,7 @@
 import { ref, watch } from 'vue';
 import { musicOn, sfxOn } from './preferences';
 import type { SfxName } from './sfx';
-export { musicOn, sfxOn, speechOn, musicVolume, sfxVolume, speechVolume } from './preferences';
+export { musicOn, sfxOn, speechOn, musicVolume, sfxVolume, speechVolume, speechRate } from './preferences';
 export const soundPackLoaded = ref(false);
 export const soundPackLoading = ref(false);
 export const soundPackError = ref('');

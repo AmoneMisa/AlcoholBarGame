@@ -3,6 +3,7 @@ import {
   FACE_SHAPES, FACIAL_HAIR_OPTIONS, LEO_HAIR_STYLES, LIP_COLORS, LIP_SHAPES, NOA_HAIR_STYLES, NOSE_SHAPES
 } from '../data/cosmetics/bars';
 import { BARTENDER_COSTUMES, bartenderCostumeFor, REFERENCE_COSTUME_IDS } from '../data/cosmetics/bartenderCostumes';
+import { cosmeticTheme, DRAW_THEME_IDS } from '../data/cosmetics/themeDistribution';
 import { interiorForStyle, styleSource, STYLE_CHARACTERS, type StyleSource } from '../data/cosmetics/styleSources';
 
 export type CosmeticKey = 'bartender' | 'hairStyle' | 'face' | 'eyeShape' | 'browShape' | 'noseShape' | 'lipShape' | 'cheekShape' | 'eyeColor' | 'eyeliner' | 'eyeshadow' | 'lipColor' | 'blush' | 'facialHair';
@@ -36,10 +37,11 @@ export const COSMETICS: CosmeticItem[] = [
 ];
 
 // Draws, the daily roulette, Spark and skin shards only hand out these: the painted styles have their own ways in.
-export const DRAWABLE_COSMETICS = COSMETICS.filter((entry) => !entry.source);
+export const DRAWABLE_COSMETICS = COSMETICS.filter((entry) => !entry.source && entry.key!=='hairStyle');
 
 // The background connected to a style (each background has exactly one style). Owning the style gives the background.
 export const interiorForCosmetic = (id:string) => {
+  const theme=cosmeticTheme(id);if(theme && DRAW_THEME_IDS.some(item=>item===theme)) return theme;
   const entry = COSMETICS.find((candidate) => candidate.id === id);
   return entry?.key === 'bartender' && entry.character ? interiorForStyle(entry.character, entry.value) : undefined;
 };

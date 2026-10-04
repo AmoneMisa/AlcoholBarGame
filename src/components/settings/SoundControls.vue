@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { musicOn, musicVolume, sfxOn, sfxVolume, speechOn, speechVolume, soundPackLoaded, soundPackLoading, soundPackError, downloadSoundPack } from '../../audio/index';
 import UiButton from '../ui/UiButton.vue';
 import UiIcon from '../ui/UiIcon.vue';
+import { speechRate } from '../../audio/preferences';
 
 // The three volume sliders with their mute buttons: used by the quick panel in the header and by the Settings page.
 const props = defineProps<{ idPrefix: string }>();
@@ -30,5 +31,11 @@ const toggle = (id: 'music' | 'sfx' | 'speech') => { if (id === 'music') musicOn
     <input type="range" min="0" max="100" step="5" :aria-labelledby="`${props.idPrefix}-${channel.id}`" :value="Math.round(channel.volume * 100)" :style="{ '--fill': percent(channel.volume) }" :aria-valuetext="channel.on ? percent(channel.volume) : 'Muted'" @input="setVolume(channel.id, $event)" />
     <output>{{ channel.on ? percent(channel.volume) : 'Off' }}</output>
     <UiButton size="sm" :aria-pressed="!channel.on" :aria-label="channel.mute" @click="toggle(channel.id)">{{ channel.on ? 'Mute' : 'Unmute' }}</UiButton>
+  </div>
+  <div class="volume-row voice-rate">
+    <span :id="`${props.idPrefix}-voice-rate`"><UiIcon name="speaker" /> Pronunciation speed</span>
+    <input type="range" min="0.5" max="2" step="0.1" :aria-labelledby="`${props.idPrefix}-voice-rate`" v-model.number="speechRate" :aria-valuetext="`${speechRate.toFixed(1)}×`" />
+    <output>{{ speechRate.toFixed(1) }}×</output>
+    <UiButton size="sm" @click="speechRate = 1">Reset</UiButton>
   </div>
 </template>

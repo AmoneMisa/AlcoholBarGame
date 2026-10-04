@@ -221,7 +221,12 @@ export function createGameService({ repository, checkEnglish, ownerTelegramIds =
       if (!theirs) return { status: 404, body: { ok: false, error: 'This bar is not available.' } };
       const state = normalizePlayerState(theirs);
       const { knownRecipeIds, ownedInteriorIds, ...bar } = publicBar(state, row.label);
-      return { status: 200, body: { ok: true, rank: row.rank, score: row.score, bar: { ...bar, prestige: state.popularity } } };
+      const code = friendCode(row.playerId);
+      const me = Number(row.playerId) === Number(player.id);
+      const accepted = !me && await areFriends(tx, player.id, row.playerId);
+      const incoming = !me && await tx.friendship(row.playerId, player.id) === 'pending';
+      const outgoing = !me && await tx.friendship(player.id, row.playerId) === 'pending';
+      return { status: 200, body: { ok: true, rank: row.rank, score: row.score, player: { code, nickname: state.bars[state.regionId].bartenderNickname, me, relationship: accepted ? 'accepted' : incoming ? 'incoming' : outgoing ? 'outgoing' : 'none' }, bar: { ...bar, prestige: state.popularity } } };
     });
   }
 

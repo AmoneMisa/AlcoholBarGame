@@ -58,11 +58,13 @@ export function recipePurchase(recipe: Recipe, catalogIndex: number) {
 }
 
 export function calendarDate(date = new Date()) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  // A game day must be identical in the browser and on the server.
+  return date.toISOString().slice(0, 10);
 }
 
 export function consecutiveDays(lastDate: string, streak: number, date = new Date()) {
-  const yesterday = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1);
+  const yesterday = new Date(date);
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
   return lastDate === calendarDate(date) ? Math.max(1, streak) : lastDate === calendarDate(yesterday) ? streak + 1 : 1;
 }
 

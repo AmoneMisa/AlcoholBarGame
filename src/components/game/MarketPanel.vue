@@ -32,7 +32,13 @@ function doSupply() {
 const ingredient = (id:string) => INGREDIENTS.find((item) => item.id === id)!;
 const group = (id:string) => ingredient(id).category === 'spirit' ? 'spirit' : ingredient(id).category === 'mixer' && !['sugar-syrup','coconut-cream'].includes(id) ? 'mixer' : 'fresh';
 const search = ref('');
-watch(() => game.trainingActive, active => { if (active) { mode.value = 'buy'; category.value = 'all'; search.value = ''; } }, { immediate:true });
+watch(() => game.trainingActive, active => {
+  if (active) {
+    mode.value = 'buy'; category.value = 'all'; search.value = 'Tonic';
+    const offer = game.market.find(item => item.ingredientId === 'tonic');
+    if (offer) game.selectSupplier(offer.supplierId);
+  }
+}, { immediate:true });
 const byName = (id: string) => !search.value.trim() || ingredient(id).name.toLowerCase().includes(search.value.trim().toLowerCase());
 const offers = computed(() => game.market.filter((offer) => offer.supplierId === game.selectedSupplier && (category.value === 'all' || group(offer.ingredientId) === category.value) && byName(offer.ingredientId)));
 const stock = computed(() => game.visibleInventory.filter((item) => (category.value === 'all' || group(item.ingredientId) === category.value) && byName(item.ingredientId)));
@@ -105,7 +111,7 @@ function sellAll() { game.saleCart = Object.fromEntries(game.inventory.map((item
           <p v-if="game.trainingActive" class="discount-help">Practice delivery arrives immediately. Your real coins and stock remain unchanged.</p>
           <p v-else class="discount-help">5+ supplier units: 5% off · 10+: 10% off<br />Arrives in {{ game.supplier.deliveryDays }} {{ game.supplier.deliveryDays === 1 ? 'shift' : 'shifts' }}.</p>
           <UiButton variant="secondary" class="negotiate-button" :disabled="!game.purchaseQuote.lines.length" title="Talk to the sales rep in English to lower the price" @click="game.startNegotiation()">Negotiate</UiButton>
-          <UiButton variant="solid" data-guide="market-order" :disabled="!game.purchaseQuote.lines.length || game.purchaseQuote.total > game.money" @click="game.checkoutPurchase()">Place order</UiButton>
+          <UiButton variant="solid" data-guide="market-order" :disabled="!game.purchaseQuote.lines.length" :coin-cost="game.purchaseQuote.total" @click="game.checkoutPurchase()">Place order</UiButton>
           <UiButton variant="secondary" size="sm" @click="game.purchaseCart = {}">Clear</UiButton>
         </template>
         <template v-else>

@@ -1,4 +1,5 @@
 import { INGREDIENTS, RECIPES, REGIONS, STARTING_INVENTORY } from '../domain/catalog';
+import { validWishlist } from '../domain/wishlist';
 import { ALCOHOL_PRODUCTS, isStarterBottle } from '../domain/bottleCatalog';
 import { ROULETTE_SPINS_PER_DAY, WHEEL } from '../domain/roulette';
 import { cosmeticFor } from '../domain/cosmetics';
@@ -86,6 +87,7 @@ export interface PlayerState {
   served: number;
   servedByBar: Record<string, number>;
   featuredAchievements?: string[];
+  wishedGifts?: string[];
   // Correct sentences already rewarded per customer, so talking cannot be farmed for XP.
   rewardedSentences: Record<string, number>;
   // Haggling with a supplier's sales rep (see sim/trade.ts); one open negotiation at a time.
@@ -304,6 +306,7 @@ export function normalizePlayerState(state: PlayerState) {
   state.servedByBar = state.servedByBar && typeof state.servedByBar === 'object' ? Object.fromEntries(Object.entries(state.servedByBar).filter(([, count]) => Number.isFinite(count) && count > 0).map(([id, count]) => [id, Math.floor(count)])) : {};
   if (!Object.keys(state.servedByBar).length && state.served > 0) state.servedByBar = { [state.regionId]: state.served };
   state.featuredAchievements = Array.isArray(state.featuredAchievements) ? [...new Set(state.featuredAchievements.filter((id) => typeof id === 'string'))].slice(0, 4) : undefined;
+  state.wishedGifts = validWishlist(state.wishedGifts);
   state.customers = Array.isArray(state.customers) ? state.customers : [];
   for (const customer of state.customers) {
     customer.smoker ??= [...customer.id].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 7 === 0;

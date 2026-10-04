@@ -3,6 +3,7 @@
 // device's built-in English voice.
 import { duckMusic, speechOn, speechVolume } from '../../audio/index';
 import { forDeviceVoice } from './pronounce';
+import { speechRate, voiceRate } from '../../audio/preferences';
 let manifest: Promise<Record<string, string>> | undefined;
 let player: HTMLAudioElement | undefined;
 
@@ -29,7 +30,7 @@ function speakWithDevice(text: string) {
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(forDeviceVoice(text));
   utterance.lang = 'en-GB';
-  utterance.rate = .9;
+  utterance.rate = .9 * voiceRate(speechRate.value);
   utterance.volume = speechVolume.value;
   const voice = window.speechSynthesis.getVoices().find((item) => item.lang.startsWith('en-GB')) ?? window.speechSynthesis.getVoices().find((item) => item.lang.startsWith('en'));
   if (voice) utterance.voice = voice;
@@ -54,6 +55,8 @@ export function speak(text: string) {
       player = new Audio(`${import.meta.env.BASE_URL}assets/voice/${file}`);
       const clip = player;
       clip.volume = speechVolume.value;
+      clip.playbackRate = voiceRate(speechRate.value);
+      clip.preservesPitch = true;
       const restore = () => duckMusic(false);
       clip.addEventListener('ended', restore);
       clip.addEventListener('pause', restore);

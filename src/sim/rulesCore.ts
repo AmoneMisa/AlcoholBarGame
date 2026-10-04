@@ -26,6 +26,8 @@ import { backToOrder, withoutTrailingQuestion, enjoyingOpening, openingFor, soci
 import { ensureSocial, genderOf, rollSocial } from '../domain/social/generate';
 import { guestLine, hasSituation, matchChoice, overdue, pickSituation, resolveChoice, resolveIgnored, startSituation, visibleChoices, type Resolution } from './situations';
 import { FEATURED_MAX } from '../domain/profile';
+import { WISHLIST_MAX, validWishlist } from '../domain/wishlist';
+import { restrictedTheme } from '../data/cosmetics/themeDistribution';
 import { collectChatter, reactionToServed } from './chatter';
 import { addStat, raiseStat, syncDerivedStats } from '../domain/achievementStats';
 import { accrueStaff, hireStaff, upgradeStaff } from './staff';
@@ -127,7 +129,7 @@ export type GameAction =
   | { type: 'useFragmentChoice'; id: string; targetId: string }
   | { type: 'useConsumable'; id: string; recipeId?: string }
   | { type: 'discardLoot'; kind: string; id: string; amount: number }
-  | { type: 'drawStyle'; count: 1 | 10; banner?: 'standard' | 'seasonal' }
+  | { type: 'drawStyle'; count: 1 | 10; banner?: string }
   | { type: 'claimSpark'; cosmeticId: string }
   | { type: 'craftSkin'; cosmeticId: string }
   | { type: 'wipeAccount'; confirm: true }
@@ -135,6 +137,7 @@ export type GameAction =
   | { type: 'designSignature'; name: string; items: { ingredientId: string; amount: number }[]; needsShake: boolean }
   | { type: 'claimLeaderboardReward' }
   | { type: 'setFeaturedAchievements'; ids: string[] }
+  | { type: 'setWishedGifts'; ids: string[] }
   | { type: 'claimQuest'; questId: string }
   | { type: 'claimAchievement'; id: string }
 
@@ -883,6 +886,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'buyInterior': {
       const interior = INTERIORS.find((item) => item.id === action.interiorId);
       if (!interior || interior.crystalCost <= 0 || state.ownedInteriorIds.includes(interior.id)) throw new RuleError('This background is not for sale.');
+      if (restrictedTheme(interior.id)) throw new RuleError('This background comes from its collection or season rewards.');
       if (isEventInterior(interior.id)) throw new RuleError(`${interior.name} is a special event reward: find it in Gold and Choice boxes.`);
       if (state.crystals < interior.crystalCost) throw new RuleError(`You need ${interior.crystalCost} crystals for ${interior.name}.`);
       state.crystals -= interior.crystalCost;
@@ -1115,6 +1119,12 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const ids = Array.isArray(action.ids) ? [...new Set(action.ids.filter((id) => typeof id === 'string' && earned.has(id)))].slice(0, FEATURED_MAX) : [];
       state.featuredAchievements = ids.length ? ids : undefined;
       state.message = ids.length ? 'Your profile shows the achievements you picked.' : 'Your profile shows your latest achievements.';
+      break;
+    }
+    case 'setWishedGifts': {
+      if(!Array.isArray(action.ids)||action.ids.length>WISHLIST_MAX||validWishlist(action.ids).length!==action.ids.length) throw new RuleError('Choose up to five distinct gifts from the catalog.');
+      state.wishedGifts=validWishlist(action.ids);
+      state.message='Your desired gifts were saved to your profile.';
       break;
     }
     case 'setTour':

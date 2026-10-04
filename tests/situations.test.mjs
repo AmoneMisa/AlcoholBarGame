@@ -6,10 +6,27 @@ import { RECIPES } from '../src/domain/catalog.ts';
 import { requiredRecipe } from '../src/domain/engine.ts';
 import { SITUATIONS, situationById } from '../src/domain/situations/catalog.ts';
 import { fill, hasSituation, resolveChoice, startSituation, visibleChoices, matchChoice, guestLine, currentStage } from '../src/sim/situations.ts';
+import { situationDailyLessons, situationQuizDistractors } from '../src/domain/situations/learning.ts';
 import { advanceClock, applyAction } from '../src/sim/rules.ts';
 import { createInitialState, publicState } from '../src/sim/state.ts';
 
 const NOW = Date.UTC(2026, 9, 1, 21);
+test('Daily situation replies stay in the current dialogue and never borrow unrelated smoking answers', () => {
+  const lessons = situationDailyLessons();
+  assert.ok(lessons.length > 20);
+  for (const lesson of lessons) {
+    const def = SITUATIONS.find(item => lesson.id.startsWith(`sit-${item.id}-`));
+    assert.ok(def);
+    const first = def.stages[0];
+    const localReplies = [...first.choices.map(choice => choice.say), ...situationQuizDistractors(def)];
+    assert.equal(lesson.choices.length, 3);
+    assert.equal(new Set(lesson.choices).size, lesson.choices.length);
+    assert.ok(lesson.choices.every(reply => localReplies.includes(reply)), lesson.id);
+    if (def.id !== 'rule-smoking-inside') assert.ok(lesson.choices.every(reply => !/smok|terrace/i.test(reply)), lesson.id);
+  }
+  assert.ok(lessons.some(lesson => lesson.id.startsWith('sit-good-payback-')));
+  assert.ok(lessons.some(lesson => lesson.id.startsWith('sit-good-wallet-')));
+});
 const context = (now = NOW, random = () => .5) => ({ now, random, checkEnglish, spawnCustomers: false });
 const SOCIAL = { emotion: 'relaxed', rapport: 55, drunk: 0, chatty: false, topic: 'work', gender: 'x', phase: 'ordering', nextOrderAt: 0, rounds: 0, staysFor: 0, chatted: [] };
 

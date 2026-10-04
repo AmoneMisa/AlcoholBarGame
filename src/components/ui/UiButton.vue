@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import UiIcon from './UiIcon.vue';
+import { handleCurrencyError, offerCurrency } from '../../domain/uiOffers';
+import { useGameStore } from '../../stores/game';
 
 // The standard button. One height, content centred, the same look on every screen.
 //   variant: primary (brown, the main action), solid (gold, the one big call to action), secondary (dark), danger, ghost.
@@ -14,16 +16,27 @@ const props = withDefaults(defineProps<{
   icon?: string;
   block?: boolean;
   reason?: string;
+  crystalCost?: number;
+  coinCost?: number;
   type?: 'button' | 'submit';
 }>(), { variant: 'secondary', size: 'md', type: 'button' });
 const emit = defineEmits<{ click: [event: MouseEvent] }>();
-const blocked = computed(() => !!props.reason);
-function press(event: MouseEvent) { if (!blocked.value) emit('click', event); }
+const currencyReason = computed(() => !!props.reason && /(?:not enough|need|insufficient).*(?:crystals|coins|money)/i.test(props.reason));
+const blocked = computed(() => !!props.reason && !currencyReason.value);
+function press(event: MouseEvent) {
+  if (props.crystalCost !== undefined || props.coinCost !== undefined) {
+    const game=useGameStore();
+    if (props.crystalCost !== undefined && game.crystals < props.crystalCost) { offerCurrency('crystals'); return; }
+    if (props.coinCost !== undefined && game.money < props.coinCost) { offerCurrency('coins'); return; }
+  }
+  if (currencyReason.value && handleCurrencyError(props.reason!)) return;
+  if (!blocked.value) emit('click', event);
+}
 </script>
 
 <template>
   <button v-bind="$attrs" :type="type" class="ui-btn" :class="[`ui-btn-${variant}`, `ui-btn-${size}`, { 'ui-btn-block': block, 'ui-btn-blocked': blocked }]" :aria-disabled="blocked || undefined" @click="press">
     <UiIcon v-if="icon" :name="icon" /><span v-if="$slots.default" class="ui-btn-label"><slot /></span>
   </button>
-  <p v-if="reason" class="ui-reason" role="note">{{ reason }}</p>
+  <p v-if="reason && !currencyReason" class="ui-reason" role="note">{{ reason }}</p>
 </template>

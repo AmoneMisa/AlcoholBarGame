@@ -2,7 +2,7 @@
 import UiIcon from './UiIcon.vue';
 import UiButton from './UiButton.vue';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { setPointer, selector, type PointerSpec } from '../../guide/pointer';
+import { setPointer, selector, pickPointer, type PointerSpec } from '../../guide/pointer';
 import { useGameStore } from '../../stores/game';
 
 // A short guided tour for new players. Steps that ask for an action show the exact thing to press (a circle on the
@@ -83,7 +83,8 @@ function measure() {
 // The card must never sit on top of what it asks the player to press: it takes the band under the header or the band
 // above the navigation, whichever hides less of the targets of this step.
 function targetRects(): DOMRect[] {
-  const specs = step.value.point ?? (step.value.target ? [{ target: step.value.target }] : []);
+  const active = pickPointer(step.value.point);
+  const specs = active ? [active.spec] : (step.value.target ? [{ target: step.value.target }] : []);
   const rects: DOMRect[] = [];
   for (const spec of specs as { target: string; to?: string }[]) {
     for (const css of [spec.target, spec.to]) {
@@ -125,6 +126,12 @@ async function show() {
   await nextTick();
   setTimeout(() => { measure(); place(); }, 120);
 }
+function revealRestockControl() {
+  if (!open.value || step.value.id !== 'restock') return;
+  const css = game.purchaseCart.tonic > 0 ? selector('market-order') : '[aria-label="Add one Tonic bottle"]';
+  document.querySelector<HTMLElement>(css)?.scrollIntoView({block:'center'});
+}
+watch(() => [step.value.id, game.purchaseCart.tonic, shown('.market-panel')] as const, () => { void nextTick(revealRestockControl); });
 
 function start() { game.beginTraining(); index.value = 0; finishedAt = -1; open.value = true; void show(); }
 // The choice is saved on the account (see the game store), so it is not asked again on another device.

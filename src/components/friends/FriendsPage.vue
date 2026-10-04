@@ -76,7 +76,7 @@ async function gift(request: Parameters<typeof game.giftFriend>[0]) {
   await game.giftFriend(request);
   status.value = game.message;
 }
-onMounted(() => { void game.loadFriends(); });
+onMounted(() => { void game.loadFriends(); if (visit.value) void nextTick(() => visitPanel.value?.scrollIntoView({block:'start'})); });
 </script>
 
 <template>

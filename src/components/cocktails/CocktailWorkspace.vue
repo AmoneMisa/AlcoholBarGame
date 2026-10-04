@@ -35,7 +35,7 @@ function serve() {
 <template>
   <section v-if="!game.hasCustomer" class="cocktail-workspace waiting-station game-panel">
     <div class="waiting-station-clock"><small>NEXT CUSTOMER</small><b>{{ game.nextCustomerCountdown }}</b></div>
-    <div><small>BAR PREP TIME</small><h2>The station is ready</h2><p>A new guest will arrive between five minutes and two hours after the previous customer leaves. Inventory, learning, recipes, market, and bar design remain available while you wait.</p><UiButton variant="solid" :disabled="game.crystals < game.nextCustomerCrystalCost" @click="game.expediteCustomer()">Welcome next guest now · <CrystalAmount :value="game.nextCustomerCrystalCost" /></UiButton></div>
+    <div><small>BAR PREP TIME</small><h2>The station is ready</h2><p>A new guest will arrive between five minutes and two hours after the previous customer leaves. Inventory, learning, recipes, market, and bar design remain available while you wait.</p><UiButton variant="solid" :crystal-cost="game.nextCustomerCrystalCost" @click="game.expediteCustomer()">Welcome next guest now · <CrystalAmount :value="game.nextCustomerCrystalCost" /></UiButton></div>
   </section>
 
   <section v-else-if="game.customer.orderKind === 'bottle'" class="cocktail-workspace bottle-order-station game-panel">

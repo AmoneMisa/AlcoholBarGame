@@ -226,7 +226,8 @@ test('New players start the rotation from the first season, whatever the date on
   assert.equal(late.pass.id, 'pass-1');
   // The first order is the announced one.
   assert.deepEqual(PASS_THEMES.slice(0, 4).map((theme) => theme.id), ['lost-ark', 'lineage-2', 'warcraft-3', 'mass-effect']);
-  assert.equal(PASS_THEMES.at(-1).id, 'assassins-creed', 'new seasons are added at the end');
+  assert.equal(PASS_THEMES[18].id, 'assassins-creed', 'new seasons are added after the existing rotation');
+  assert.equal(PASS_THEMES.at(-1).id, 'diablo-4');
 });
 
 test('A player who was already in the shared pass keeps it as their own first pass, with their claims; a lapsed one starts fresh', () => {
@@ -253,7 +254,7 @@ test('Game backgrounds that are not a pass season are kept for boxes: not for sa
   const { giftPrice } = await import('../src/sim/gifts.ts');
   const { grantReward } = await import('../src/sim/loot.ts');
   const { styleSource, INTERIOR_STYLE } = await import('../src/data/cosmetics/styleSources.ts');
-  assert.equal(BOX_ONLY_GAME_IDS.length, 7);
+  assert.equal(BOX_ONLY_GAME_IDS.length, 6, 'GTA moved to Battle Pass');
   for (const id of BOX_ONLY_GAME_IDS) {
     assert.ok(INTERIORS.some((item) => item.id === id), id);
     assert.ok(!PASS_THEMES.some((theme) => theme.interior === id), `${id} is a pass season: take it off the box-only list`);

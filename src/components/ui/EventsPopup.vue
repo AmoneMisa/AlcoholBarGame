@@ -6,14 +6,15 @@ import UiButton from './UiButton.vue';
 import UiIcon from './UiIcon.vue';
 import LoginRewardTrack from './LoginRewardTrack.vue';
 import DailyWheel from '../workshop/DailyWheel.vue';
+import ThemeDrawPanel from '../workshop/ThemeDrawPanel.vue';
 import SeasonPass from '../workshop/SeasonPass.vue';
 import QuestsPanel from '../workshop/QuestsPanel.vue';
 import { lazyPage } from '../../ui/lazy';
 const WeeklyLeaderboard = lazyPage(() => import('../workshop/WeeklyLeaderboard.vue'));
-const emit = defineEmits<{close:[]}>();
+const emit = defineEmits<{close:[]; achievements:[]}>();
 const game = useGameStore();
-const page = ref<'login'|'wheel'|'pass'|'quests'|'weekly'>();
-const title = computed(() => page.value ? ({login:'Daily login rewards',wheel:'Daily wheel',pass:'Battle Pass',quests:'Quests & rewards',weekly:'Weekly Leaderboard'})[page.value] : 'Events & rewards');
+const page = ref<'login'|'wheel'|'pass'|'quests'|'weekly'|'draw'>();
+const title = computed(() => page.value ? ({login:'Daily login rewards',wheel:'Daily wheel',pass:'Battle Pass',quests:'Quests & rewards',weekly:'Weekly Leaderboard',draw:'Style collections'})[page.value] : 'Events & rewards');
 const wheelBusy = ref(false);
 function back() { if (!wheelBusy.value) page.value = undefined; }
 </script>
@@ -25,7 +26,9 @@ function back() { if (!wheelBusy.value) page.value = undefined; }
         <UiButton @click="page = 'login'"><UiIcon class="event-menu-icon" name="gift" /><span><b>Daily login</b><small>{{ game.dailyGiftAvailable ? 'Your reward is ready' : 'Come back tomorrow' }}</small></span></UiButton>
         <UiButton @click="page = 'wheel'"><img class="event-menu-icon" src="/assets/ui/daily-wheel-painted-v1.webp" alt="" /><span><b>Daily wheel</b><small>{{ game.rouletteSpinsLeft }} free spins available</small></span></UiButton>
         <UiButton @click="page = 'pass'"><UiIcon class="event-menu-icon" name="prestige" /><span><b>Battle Pass</b><small>Season outfits, background & rewards</small></span></UiButton>
-        <UiButton @click="page = 'quests'"><UiIcon class="event-menu-icon" name="trophy" /><span><b>Quests & rewards</b><small>{{ game.availableEvents.quests.length + game.availableEvents.achievements.length }} ready to collect</small></span></UiButton>
+        <UiButton @click="page = 'draw'"><UiIcon class="event-menu-icon" name="gift" /><span><b>Style collections</b><small>4–5 styles with matching backgrounds</small></span></UiButton>
+        <UiButton @click="page = 'quests'"><UiIcon class="event-menu-icon" name="book" /><span><b>Quests & rewards</b><small>{{ game.availableEvents.quests.length }} ready to collect</small></span></UiButton>
+        <UiButton @click="emit('achievements')"><UiIcon class="event-menu-icon" name="trophy" /><span><b>Achievements</b><small>{{ game.availableEvents.achievements.length }} ready to collect</small></span></UiButton>
         <UiButton @click="page = 'weekly'"><UiIcon class="event-menu-icon" name="trophy" /><span><b>Weekly Leaderboard</b><small>Compete with everyone or your friends</small></span></UiButton>
       </div>
     </template>
@@ -34,6 +37,7 @@ function back() { if (!wheelBusy.value) page.value = undefined; }
       <LoginRewardTrack v-if="page === 'login'" />
       <DailyWheel v-else-if="page === 'wheel'" @busy="wheelBusy = $event" />
       <SeasonPass v-else-if="page === 'pass'" />
+      <ThemeDrawPanel v-else-if="page === 'draw'" />
       <QuestsPanel v-else-if="page === 'quests'" />
       <WeeklyLeaderboard v-else-if="page === 'weekly'" />
     </template>

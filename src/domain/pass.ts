@@ -1,5 +1,6 @@
 import type { BoxKind, Reward } from './loot';
 import type { StatId } from './quests';
+import { NEW_PASS_THEME_IDS } from '../data/cosmetics/themeDistribution';
 
 // The season pass: one pass every two weeks, twenty levels. Points come from normal play (serving, lessons, VIPs,
 // bottles, boxes …), counted from the day the pass starts, so there is nothing extra to do. Every level has a free
@@ -62,7 +63,8 @@ export const PASS_THEMES: readonly PassTheme[] = [
   { id: 'borderlands', name: 'Borderlands', tagline: 'The Pandora saloon: loot, bullets and very cold beer.', interior: 'borderlands', noa: 'theme-borderlands-noa', leo: 'theme-borderlands-leo' },
   { id: 'elden-ring', name: 'Elden Ring', tagline: 'A tavern in the Lands Between for those who still hope.', interior: 'elden-ring', noa: 'theme-elden-ring-noa', leo: 'theme-elden-ring-leo' },
   { id: 'detroit', name: 'Detroit: Become Human', tagline: 'The android lounge, where nobody asks who is who.', interior: 'detroit', noa: 'theme-detroit-noa', leo: 'theme-detroit-leo' },
-  { id: 'assassins-creed', name: 'Assassin’s Creed', tagline: 'A hidden tavern in Venice, the best seat has a view of the door.', interior: 'assassins-creed', noa: 'theme-assassins-creed-noa', leo: 'theme-assassins-creed-leo' }
+  { id: 'assassins-creed', name: 'Assassin’s Creed', tagline: 'A hidden tavern in Venice, the best seat has a view of the door.', interior: 'assassins-creed', noa: 'theme-assassins-creed-noa', leo: 'theme-assassins-creed-leo' },
+  ...NEW_PASS_THEME_IDS.map(id=>({id,name:({'gta':'GTA: Vice City','gta-5':'GTA V','gta-sa':'GTA: San Andreas','gta-3':'GTA III','palworld':'Palworld','devil-may-cry':'Devil May Cry','darksiders-3':'Darksiders III','baldurs-gate-3':'Baldur’s Gate 3','diablo-4':'Diablo IV'} as Record<string,string>)[id]!,tagline:'A new world for your bar, with matching styles for both bartenders.',interior:id,noa:`theme-${id}-noa`,leo:`theme-${id}-leo`}))
 ];
 
 // Every player has their own pass clock: it starts the first time the game sees them, so a new player begins with the

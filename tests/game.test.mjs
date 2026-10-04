@@ -10,7 +10,10 @@ import { ALCOHOL_PRODUCTS,bottleRestockCrystalCost,bottleSaleCrystalReward,isPre
 import { brandBottleArtIndex,ingredientBottleArtIndex,PAINTED_BOTTLE_COLUMNS,PAINTED_BOTTLE_ROWS } from '../src/domain/bottleArt.ts';
 import { bottleQuestionTemplates,rankBottles } from '../src/domain/conversation/bottleTalk.ts';
 import { createMarket,generateCustomer } from '../src/domain/engine.ts';
-import { arrivalSkipCrystalCost,CRYSTAL_EXCHANGE_BUNDLES,crystalExchange,dailyCoinsFor,dailyCrystalsFor,consecutiveDays,quotePurchase,recipePurchase } from '../src/domain/economy.ts';
+import { arrivalSkipCrystalCost,calendarDate,CRYSTAL_EXCHANGE_BUNDLES,crystalExchange,dailyCoinsFor,dailyCrystalsFor,consecutiveDays,quotePurchase,recipePurchase } from '../src/domain/economy.ts';
+import { spinsLeft } from '../src/domain/roulette.ts';
+import { currentAchievements, ACHIEVEMENT_CATEGORIES } from '../src/domain/achievementTrack.ts';
+import { ACHIEVEMENTS } from '../src/domain/quests.ts';
 import { CHARACTER_ART,CUSTOMER_ART_BY_SLOT } from '../src/data/cosmetics/artCatalog.ts';
 import { INTERIORS,COUNTER_MATERIALS,HAIR_STYLES,SKIN_DETAILS } from '../src/data/cosmetics/bars.ts';
 import { useGameStore } from '../src/stores/game.ts';
@@ -23,10 +26,49 @@ import {
 } from '../src/domain/customerTiming.ts';
 
 const saves = new Map();
+test('Achievement cards show one current goal per series and categories cover every series once', () => {
+  const rows = currentAchievements([]);
+  assert.equal(rows.length, new Set(ACHIEVEMENTS.map(item => item.series)).size);
+  assert.ok(rows.every(row => row.goal.tier === 1 && !row.finished));
+  const first = rows[0].goal;
+  assert.equal(currentAchievements([first.id]).find(row => row.goal.series === first.series).goal.tier, 2);
+  const claimed = ACHIEVEMENTS.filter(item => item.series === first.series).map(item => item.id);
+  assert.equal(currentAchievements(claimed).find(row => row.goal.series === first.series).finished, true);
+  const stats = ACHIEVEMENT_CATEGORIES.flatMap(item => item.stats);
+  assert.equal(stats.length, new Set(stats).size);
+  assert.ok(rows.every(row => stats.includes(row.goal.stat)));
+});
 globalThis.localStorage = { getItem:key => saves.get(key) ?? null,setItem:(key,value) => saves.set(key,value) };
 globalThis.window = { setTimeout,clearTimeout };
 // The store plays with real randomness; tests that serve guests must not meet a random payment problem or drunk guest.
 function freshGame() { saves.clear();Math.random = () => .5;setActivePinia(createPinia());return useGameStore(); }
+test('Training cocktail can be completed and tonic restocked without changing the real account', () => {
+  const game = freshGame();
+  const originalMoney = game.money;
+  const originalStock = game.inventory.map(item => ({...item}));
+  game.beginTraining();
+  game.openConversation(game.customer.id);
+  game.say('Would you like a Gin & Tonic?');
+  assert.equal(game.customer.orderRevealed, true);
+  game.openPreparation(game.customer.id);
+  for (const ingredient of game.recipe.ingredients) game.addIngredient(ingredient.ingredientId, ingredient.amount);
+  assert.equal(game.mixJudge.success, true);
+  assert.equal(game.serveMix(), true);
+  game.say('Would you like to pay by card or in cash?');
+  assert.equal(game.trainingPhase, 'tips');
+  game.collectTips();
+  const tonic = game.market.find(item => item.ingredientId === 'tonic');
+  assert.ok(tonic);
+  game.selectSupplier(tonic.supplierId);
+  game.purchaseCart = {tonic:1};
+  assert.ok(game.purchaseQuote.lines.length);
+  assert.equal(game.checkoutPurchase(), true);
+  assert.equal(game.trainingRestocked, true);
+  assert.ok(game.inventory.find(item => item.ingredientId === 'tonic').amount > 0);
+  game.endTraining();
+  assert.equal(game.money, originalMoney);
+  assert.deepEqual(game.inventory.map(item => ({...item})), originalStock);
+});
 
 test('Daily style draw unlocks modular face parts and a duplicate becomes a spare copy',() => {
   const state = createInitialState(Date.UTC(2026,8,30));
@@ -153,10 +195,32 @@ test('Quotes calculate supplier deals, bulk tiers and free delivery after discou
 
 test('Login rewards grow to 500, reset after missed days and cross month boundaries',() => {
   assert.deepEqual([1,2,3,4,5,6,7,30].map(dailyCoinsFor),[100,150,200,260,320,400,500,500]);
-  assert.equal(consecutiveDays('2026-09-27',4,new Date(2026,8,28)),5);
-  assert.equal(consecutiveDays('2026-09-26',4,new Date(2026,8,28)),1);
-  assert.equal(consecutiveDays('2026-09-30',6,new Date(2026,9,1)),7);
+  assert.equal(consecutiveDays('2026-09-27',4,new Date(Date.UTC(2026,8,28))),5);
+  assert.equal(consecutiveDays('2026-09-26',4,new Date(Date.UTC(2026,8,28))),1);
+  assert.equal(consecutiveDays('2026-09-30',6,new Date(Date.UTC(2026,9,1))),7);
   assert.deepEqual([1,2,3,4,5,6,7,10,14].map(dailyCrystalsFor),[0,0,30,0,0,0,90,30,90]);
+});
+
+test('Daily rewards and wheel share a UTC day around local midnight; missed days reset the streak', () => {
+  const state = createInitialState(Date.parse('2026-10-03T21:15:00Z'));
+  const context = (iso) => ({ now: Date.parse(iso), random: () => .5, spawnCustomers: false });
+  const localMidnight = '2026-10-04T00:15:00+03:00';
+  assert.equal(calendarDate(new Date(localMidnight)), '2026-10-03');
+  assert.equal(calendarDate(new Date('2026-10-03T14:15:00-07:00')), '2026-10-03');
+  applyAction(state, { type: 'claimDaily' }, context(localMidnight));
+  assert.equal(state.loginStreak, 1);
+  assert.throws(() => applyAction(state, { type: 'claimDaily' }, context('2026-10-03T23:59:59Z')), /already been claimed/);
+  for (let i = 0; i < 3; i++) applyAction(state, { type: 'spinRoulette' }, context(localMidnight));
+  assert.equal(spinsLeft(state.roulette, calendarDate(new Date(localMidnight))), 0);
+  assert.throws(() => applyAction(state, { type: 'spinRoulette' }, context(localMidnight)), /all 3 spins/);
+  applyAction(state, { type: 'claimDaily' }, context('2026-10-04T00:00:00Z'));
+  assert.equal(state.loginStreak, 2);
+  assert.equal(spinsLeft(state.roulette, calendarDate(new Date('2026-10-04T00:00:00Z'))), 3);
+  applyAction(state, { type: 'claimDaily' }, context('2026-10-05T00:00:00Z'));
+  assert.equal(state.loginStreak, 3);
+  assert.equal(state.crystals, 30); // Random .5 lands on parts, not crystals.
+  applyAction(state, { type: 'claimDaily' }, context('2026-10-07T00:00:00Z'));
+  assert.equal(state.loginStreak, 1);
 });
 
 test('Every liquid and retail brand resolves to painted fantasy-label bottle art',() => {

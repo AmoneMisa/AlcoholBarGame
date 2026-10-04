@@ -3,9 +3,26 @@ import assert from 'node:assert/strict';
 import { INTERIORS } from '../src/data/cosmetics/bars.ts';
 import { THEMED_INTERIORS } from '../src/data/cosmetics/themedBars.ts';
 import { GAME_OF_INTERIOR, STYLES, STYLE_OF_INTERIOR, styleForInterior } from '../src/audio/styles.ts';
+import { speechRate, voiceRate } from '../src/audio/preferences.ts';
+import { nextTick } from 'vue';
 
 const DRUMS = ['kick', 'snare', 'hat', 'brush', 'shaker', 'hand', 'tom'];
 const VOICES = ['epiano', 'pad', 'pluck', 'vibes', 'marimba', 'bell', 'synth', 'flute', 'strings', 'organ', 'horn', 'chip'];
+test('Pronunciation speed stays between 0.5 and 2 and is saved for the next session', async () => {
+  assert.equal(voiceRate(.1), .5);
+  assert.equal(voiceRate(5), 2);
+  assert.equal(voiceRate(NaN), 1);
+  assert.equal(voiceRate(.7), .7);
+  const values = new Map();
+  const previous = globalThis.localStorage;
+  globalThis.localStorage = {getItem:key => values.get(key),setItem:(key,value) => values.set(key,value)};
+  try {
+    speechRate.value = .5; await nextTick();
+    assert.equal(JSON.parse(values.get('barlingo.audio')).speechRate, .5);
+    speechRate.value = 2; await nextTick();
+    assert.equal(JSON.parse(values.get('barlingo.audio')).speechRate, 2);
+  } finally { speechRate.value = 1; await nextTick(); globalThis.localStorage = previous; }
+});
 
 test('Every background has its own music style, not the fallback', () => {
   for (const interior of INTERIORS) {
