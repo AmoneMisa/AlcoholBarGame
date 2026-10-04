@@ -3,6 +3,7 @@ import { lazyPage } from '../../ui/lazy';
 import { loadInventory, loadRecipes } from '../../ui/pageLoaders';
 import { liteGraphics } from '../../ui/graphics';
 const props = withDefaults(defineProps<{ activeView?: string; designSection?: 'bar' | 'character' }>(), { activeView: 'inventory' });
+const emit=defineEmits<{closeCustomization:[]}>();
 const InventoryPage = lazyPage(loadInventory);
 const MarketPanel = lazyPage(() => import('./MarketPanel.vue'));
 const RecipesPage = lazyPage(loadRecipes, ['management']);
@@ -16,7 +17,7 @@ const PairingAdvisor = lazyPage(() => import('../PairingAdvisor.vue'));
     <InventoryPage v-if="props.activeView === 'inventory'" />
     <MarketPanel v-else-if="props.activeView === 'market'" />
     <RecipesPage v-else-if="props.activeView === 'recipes'" />
-    <DesignPage v-else-if="props.activeView === 'design'" :design-section="props.designSection" />
+    <DesignPage v-else-if="props.activeView === 'design'" :design-section="props.designSection" @close="emit('closeCustomization')" />
     <RegionsPage v-else-if="props.activeView === 'regions'" />
     <PairingAdvisor v-else-if="props.activeView === 'advisor'" />
   </KeepAlive>

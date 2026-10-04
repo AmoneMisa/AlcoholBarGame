@@ -247,7 +247,7 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
       <WorkshopPage v-if="view === 'manage' && sub.manage === 'workshop'" />
       <ProfilePage v-if="view === 'character' && sub.character === 'profile'" @achievements="selectView('achievements')" @settings="selectView('settings')" @appearance="selectView('character'); sub.character = 'look'" />
       <SettingsPage v-if="view === 'settings'" @goto="selectView" />
-      <ManagementDeck v-if="managementOpened" v-show="!!deckView" :active-view="managementView" :design-section="designSection" />
+      <ManagementDeck v-if="managementOpened" v-show="!!deckView" :active-view="managementView" :design-section="designSection" @close-customization="view === 'character' ? sub.character = 'profile' : selectView('service')" />
     </main>
     <ConversationPopup v-if="game.conversationCustomerId" />
     <PreparationScreen v-if="game.preparationCustomerId || mixingOpen" :workbench="!game.preparationCustomerId" @close="mixingOpen = false" />

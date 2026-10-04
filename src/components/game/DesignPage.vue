@@ -1,20 +1,21 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { REGIONS } from '../../domain/catalog';
-import { BARTENDER_OUTFITS, interiorStyle } from '../../data/cosmetics/bars';
+import { BARTENDER_OUTFITS, INTERIORS, interiorStyle } from '../../data/cosmetics/bars';
+import { styleLabel } from '../../domain/styleInfo';
 import { useGameStore } from '../../stores/game';
 import AppearancePicker from './AppearancePicker.vue';
 import StylePreview from './StylePreview.vue';
-import BarScene from './BarScene.vue';
 import CharacterModel from '../characters/CharacterModel.vue';
-import PanelHeading from '../ui/PanelHeading.vue';
 import UiButton from '../ui/UiButton.vue';
 import UiInput from '../ui/UiInput.vue';
 import CollectionBonuses from './CollectionBonuses.vue';
 const props=defineProps<{activeView?:string;designSection?:'bar'|'character'}>();
+const emit=defineEmits<{close:[]}>();
 const game=useGameStore();
 const section=ref<'background'|'style'|'character'>(props.designSection==='character'?'style':'background');
 const character=computed(()=>(game.decor.bartenderCharacter==='leo'?'leo':'noa') as 'noa'|'leo');
+const backgroundName=computed(()=>INTERIORS.find(item=>item.id===game.decor.interior)?.name??'');
 const barName=ref(game.decor.name);const nickname=ref(game.decor.bartenderNickname??(character.value==='leo'?'Leo':'Noa'));
 watch(()=>game.regionId,()=>{barName.value=game.decor.name;nickname.value=game.decor.bartenderNickname??(character.value==='leo'?'Leo':'Noa');});
 watch(()=>props.designSection,value=>{section.value=value==='character'?'style':'background';});
@@ -31,27 +32,24 @@ function chooseCharacter(next:'noa'|'leo'){
 </script>
 <template>
   <article class="game-panel customization-page">
-    <PanelHeading eyebrow="PERSONALIZE" title="Bar & bartender" />
+    <header class="customization-heading"><h1>Customize</h1><UiButton size="sm" variant="ghost" icon="close" aria-label="Close customization" @click="emit('close')" /></header>
     <div class="customization-content">
       <nav class="customization-tabs" aria-label="Customization sections"><UiButton size="sm" :variant="section==='background'?'solid':'ghost'" @click="section='background'">Backgrounds</UiButton><UiButton size="sm" :variant="section==='style'?'solid':'ghost'" @click="section='style'">Styles</UiButton><UiButton size="sm" :variant="section==='character'?'solid':'ghost'" @click="section='character'">Character</UiButton></nav>
-      <CollectionBonuses />
       <template v-if="section==='background'">
         <nav v-if="game.ownedBarIds.length>1" class="customization-tabs" aria-label="Choose a bar"><UiButton v-for="region in REGIONS.filter(item=>game.isBarOwned(item.id))" :key="region.id" size="sm" :variant="game.regionId===region.id?'solid':'ghost'" @click="game.switchBar(region.id)">{{region.name}}</UiButton></nav>
-        <form class="customization-name" @submit.prevent="game.renameBar(barName)"><UiInput v-model="barName" label="Bar name" maxlength="32" required/><UiButton size="sm" type="submit">Save name</UiButton></form>
-        <div class="customization-bar-preview" aria-label="Live preview of your bar"><BarScene preview :active="false" /></div>
-        <UiButton size="sm" variant="secondary" @click="openPreview()">Preview backgrounds &amp; styles</UiButton>
+        <button type="button" class="customization-bar-preview" :style="interiorStyle(game.decor.interior)" aria-label="Preview backgrounds and styles" @click="openPreview()"><span>{{backgroundName}} <b>· In use</b></span></button>
         <AppearancePicker kind="background" :character="character" :selected="game.decor.interior" @pick="pickBackground" />
       </template>
       <template v-else>
         <nav class="customization-tabs" aria-label="Choose bartender"><UiButton size="sm" :variant="character==='noa'?'solid':'ghost'" @click="chooseCharacter('noa')">Noa</UiButton><UiButton size="sm" :variant="character==='leo'?'solid':'ghost'" @click="chooseCharacter('leo')">Leo</UiButton></nav>
-        <div class="customization-character-preview" :style="interiorStyle(game.decor.interior)" aria-label="Current bartender style"><CharacterModel role="bartender" :character-id="character" :outfit="game.decor.bartender" :hair-style="game.decor.hairStyle" /></div>
+        <button type="button" class="customization-character-preview" aria-label="Preview current bartender style" @click="openPreview()"><CharacterModel role="bartender" :character-id="character" :outfit="game.decor.bartender" :hair-style="game.decor.hairStyle" /><span>{{styleLabel(character,game.decor.bartender)}} <b>· In use</b></span></button>
         <AppearancePicker v-if="section==='style'" kind="style" :character="character" :selected="game.decor.bartender" @pick="pickStyle" />
-        <form v-else class="customization-name" @submit.prevent="game.renameBartender(nickname)"><UiInput v-model="nickname" label="Bartender nickname" maxlength="18" required/><UiButton size="sm" type="submit">Save nickname</UiButton></form>
+        <template v-else><form class="customization-name" @submit.prevent="game.renameBartender(nickname)"><UiInput v-model="nickname" label="Bartender nickname" maxlength="18" required/><UiButton size="sm" type="submit">Save nickname</UiButton></form><form class="customization-name" @submit.prevent="game.renameBar(barName)"><UiInput v-model="barName" label="Bar name" maxlength="32" required/><UiButton size="sm" type="submit">Save name</UiButton></form><CollectionBonuses /></template>
       </template>
     </div>
   </article>
   <StylePreview v-if="preview" :character="character" :interior="preview.interior" :outfit="preview.outfit" @close="preview=undefined" />
 </template>
 <style scoped>
-.customization-content{display:grid;gap:12px;min-width:0;padding:12px}.customization-tabs{display:flex;flex-wrap:wrap;gap:6px;position:static}.customization-name{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px}.customization-bar-preview{position:static;height:220px;overflow:hidden;border:1px solid #354962;border-radius:12px}.customization-bar-preview :deep(.bar-scene-wrap){height:100%}.customization-bar-preview :deep(.bar-scene){height:100%!important;min-height:0!important;margin:0!important;border-radius:0!important}.customization-character-preview{position:relative;height:220px;border:1px solid #354962;border-radius:12px;overflow:hidden}.customization-character-preview :deep(.art-character){position:relative!important;inset:auto!important;height:220px!important;min-height:0!important;width:132px!important;margin:0 auto;transform:none!important;aspect-ratio:.6!important}
+.customization-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-bottom:1px solid #304158}.customization-heading h1{margin:0;color:#fff0d2;font:700 23px/1.2 Georgia,serif}.customization-content{display:grid;gap:8px;min-width:0;padding:10px 12px}.customization-tabs{display:flex;flex-wrap:wrap;gap:6px;position:static}.customization-tabs[aria-label="Customization sections"]{flex-wrap:nowrap;gap:0;border:1px solid #3b516c;border-radius:8px;overflow:hidden}.customization-tabs[aria-label="Customization sections"] :deep(.ui-btn){flex:1;min-width:0;border-radius:0;border:0;font-size:12px;min-height:34px;padding:6px}.customization-name{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px}.customization-bar-preview,.customization-character-preview{position:relative;display:block;width:100%;height:96px;padding:0;overflow:hidden;border:1px solid #354962;border-radius:9px;cursor:pointer;background-position:center;background-size:cover;color:#eaf0f8}.customization-bar-preview>span,.customization-character-preview>span{position:absolute;bottom:0;left:0;right:0;padding:7px;background:linear-gradient(transparent,#07121fea);font-size:11px;text-align:center}.customization-bar-preview b,.customization-character-preview b{color:#efc579;font-weight:600}.customization-character-preview{background:radial-gradient(ellipse at top,#304158,#0d1827)}.customization-character-preview :deep(.art-character){position:relative!important;inset:auto!important;height:192px!important;min-height:0!important;width:116px!important;margin:0 auto;transform:none!important;aspect-ratio:.6!important}
 </style>
