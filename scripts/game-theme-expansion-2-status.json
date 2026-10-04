@@ -1,11 +1,22 @@
 {
-  "status": "awaiting_image_generation_quota",
-  "generated": 0,
+  "status": "installed_partial",
+  "generated": 75,
   "expected": 76,
   "backgrounds": 24,
-  "costumes": 52,
-  "reason": "built-in image_gen returned HTTP 429 usage_limit_reached",
-  "resetAtUtc": "2026-10-03T08:17:13.000Z",
-  "resetAtMoscow": "2026-10-03 11:17:13",
-  "runtimeEnabled": false
+  "costumes": 51,
+  "expectedCostumes": 52,
+  "noaCostumes": 26,
+  "leoCostumes": 25,
+  "baseCommit": "a2053b9",
+  "integrationCommit": "37aff72",
+  "runtimeEnabled": true,
+  "updated": "2026-10-04",
+  "blocked": [{ "key": "theme-batman-leo", "attempts": 4, "reason": "Built-in image generation returned HTTP 400 moderation_blocked", "fallback": "theme-max-payne-leo" }],
+  "validation": {
+    "artMusicPerformanceTests": "24 passed",
+    "fullSuite": "336 passed, 1 failed: existing daily-lesson choices assertion in tests/economy.test.mjs",
+    "typeCheck": "passed",
+    "clientBuild": "passed",
+    "serverBuild": "passed"
+  }
 }

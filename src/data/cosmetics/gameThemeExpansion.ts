@@ -1,4 +1,5 @@
 // Appended collections preserve all existing atlas cells and saved costume IDs.
+import { NEXT_GAME_INTERIORS, NEXT_GAME_COSTUMES, NEXT_GAME_RECOMMENDATIONS, NEXT_GAME_PRIMARY_STYLES, NEXT_GAME_SHELVES } from './gameThemeExpansion2';
 export const GAME_THEME_INTERIORS = [
   {
     "id": "witcher-3",
@@ -152,7 +153,8 @@ export const GAME_THEME_INTERIORS = [
     "position": "center",
     "blend": "multiply",
     "crystalCost": 3440
-  }
+  },
+  ...NEXT_GAME_INTERIORS,
 ] as const;
 
 export const GAME_THEME_COSTUMES = {
@@ -241,7 +243,8 @@ export const GAME_THEME_COSTUMES = {
       "value": "theme-borderlands-noa",
       "label": "Borderlands · Lilith",
       "theme": "borderlands"
-    }
+    },
+    ...NEXT_GAME_COSTUMES.noa,
   ],
   "leo": [
     {
@@ -328,11 +331,13 @@ export const GAME_THEME_COSTUMES = {
       "value": "theme-borderlands-leo",
       "label": "Borderlands · Mordecai",
       "theme": "borderlands"
-    }
+    },
+    ...NEXT_GAME_COSTUMES.leo,
   ]
 } as const;
 
 export const GAME_THEME_RECOMMENDATIONS = {
+  ...NEXT_GAME_RECOMMENDATIONS,
   "witcher-3": {
     "noa": [
       "theme-witcher-3-noa"
@@ -472,6 +477,7 @@ export const GAME_THEME_RECOMMENDATIONS = {
 } as const;
 
 export const GAME_THEME_PRIMARY_STYLES = {
+  ...NEXT_GAME_PRIMARY_STYLES,
   "witcher-3": {
     "character": "noa",
     "value": "theme-witcher-3-noa"
@@ -543,6 +549,7 @@ export const GAME_THEME_PRIMARY_STYLES = {
 } as const;
 
 export const GAME_THEME_SHELVES = {
+  ...NEXT_GAME_SHELVES,
   "witcher-3": "walnut",
   "heroes-3": "brass",
   "elden-ring": "brass",
@@ -561,4 +568,3 @@ export const GAME_THEME_SHELVES = {
   "among-us": "glass",
   "borderlands": "rustic"
 } as const;
-

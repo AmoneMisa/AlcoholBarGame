@@ -22,11 +22,12 @@ test('Every bar recommends valid outfits for both bartender identities', () => {
 
 test('Race collections and requested characters are complete for both sexes', () => {
   for(const character of ['noa','leo']) {
-    assert.equal(THEMED_COSTUMES[character].length,53);
-    assert.equal(GAME_THEME_INTERIORS.length,17);
+    assert.equal(THEMED_COSTUMES[character].length,character==='noa'?79:78);
+    assert.equal(GAME_THEME_INTERIORS.length,41);
     for (const interior of GAME_THEME_INTERIORS) {
-      assert.equal(THEMED_COSTUMES[character].filter(style=>style.theme===interior.id).length,1);
-      assert.deepEqual(costumesForInterior(interior.id,character),[`theme-${interior.id}-${character}`]);
+      const matching = THEMED_COSTUMES[character].filter(style=>style.theme===interior.id);
+      assert.equal(matching.length,interior.id==='resident-evil'?3:interior.id==='batman'&&character==='leo'?0:1);
+      assert.deepEqual(costumesForInterior(interior.id,character),interior.id==='batman'&&character==='leo'?['theme-max-payne-leo']:matching.map(style=>style.value));
     }
     assert.equal(THEMED_COSTUMES[character].filter(style=>style.theme==='lineage-2').length,8);
     assert.equal(THEMED_COSTUMES[character].filter(style=>style.theme==='perfect-world').length,6);
@@ -43,11 +44,12 @@ test('Race collections and requested characters are complete for both sexes', ()
     }
   }
   const values=THEMED_COSTUMES.noa.concat(THEMED_COSTUMES.leo).map(style=>style.value);
+  for (const value of ['theme-resident-evil-noa','theme-resident-evil-leo','theme-resident-evil-claire-noa','theme-resident-evil-ada-noa','theme-resident-evil-chris-leo','theme-resident-evil-wesker-leo']) assert.ok(values.includes(value),value);
   for(const value of ['theme-wc3-sylvanas-noa','theme-wc3-maiev-noa','theme-wc3-jaina-noa','theme-wc3-tyrande-noa','theme-wc3-illidan-leo','theme-wc3-malfurion-leo','theme-wc3-arthas-leo','theme-wc3-thrall-leo','theme-lost-ark-bard-noa','theme-lost-ark-berserker-leo','theme-shepard-noa','theme-shepard-leo','theme-garrus-leo','theme-thane-leo','theme-miranda-noa','theme-liara-noa']) assert.ok(values.includes(value),value);
 });
 
 test('All original and new backgrounds are individually installed and unique', () => {
-  assert.equal(THEMED_INTERIORS.length,30);
+  assert.equal(THEMED_INTERIORS.length,54);
   const hashes=new Set();
   for(const interior of INTERIORS) {
     const bytes=readFileSync(new URL(`../public${interior.asset}`,import.meta.url));

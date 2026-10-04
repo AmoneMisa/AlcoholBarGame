@@ -16,6 +16,8 @@ for (const correction of corrections) {
 const manifest = JSON.parse(await readFile('scripts/themed-bar-generations.json', 'utf8'));
 const results = JSON.parse(await readFile('scripts/themed-bar-results.json', 'utf8'));
 for (const job of expansion.jobs) {
+  // A blocked generation stays in the expansion queue, outside the live atlas order.
+  if (!additions.some(result => result.key === job.key && result.path)) continue;
   const index = manifest.jobs.findIndex(item => item.key === job.key);
   if (index < 0) manifest.jobs.push(job);
   else manifest.jobs[index] = job;

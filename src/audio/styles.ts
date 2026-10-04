@@ -3,6 +3,8 @@
 // them (see music.ts), in the spirit of the setting. Nothing here comes from a game's soundtrack: no recordings and no
 // melodies, only the sound world (instruments, mood, tempo) that goes with each place.
 
+import { NEXT_GAME_MUSIC_STYLES, NEXT_GAME_MUSIC_GAMES } from './gameThemeExpansion2';
+
 export type Drum = 'kick' | 'snare' | 'hat' | 'brush' | 'shaker' | 'hand' | 'tom';
 export type Voice = 'epiano' | 'pad' | 'pluck' | 'vibes' | 'marimba' | 'bell' | 'synth' | 'flute' | 'strings' | 'organ' | 'horn' | 'chip';
 export type Comp = 'sustain' | 'charleston' | 'offbeat' | 'arp' | 'none';
@@ -35,6 +37,7 @@ const MAJOR_PENT = [0, 2, 4, 7, 9];
 const MINOR_PENT = [0, 3, 5, 7, 10];
 
 export const STYLES: Record<string, Style> = {
+  ...NEXT_GAME_MUSIC_STYLES,
   // ---- the first backgrounds ----
   lounge: { bpm: 76, swing: .1, root: 57, scale: DORIAN, lead: MINOR_PENT, chords: [0, 3, 1, 4], keys: 'epiano', comp: 'sustain', bass: 'root', bassVoice: 'upright',
     melody: { voice: 'epiano', density: .5, octave: 1, decay: .9 }, drums: { kick: 'x.......x.o.....', brush: '..x...x...x...x.', hat: 'o.o.o.o.o.o.o.o.' } },
@@ -152,6 +155,7 @@ export const STYLES: Record<string, Style> = {
 
 // Which style each background uses, and which game (if any) it belongs to. Every background has an entry.
 export const STYLE_OF_INTERIOR: Record<string, keyof typeof STYLES> = {
+  ...Object.fromEntries(Object.keys(NEXT_GAME_MUSIC_STYLES).map(id => [id, id])),
   velvet: 'lounge', skyline: 'lounge', 'inferno-penthouse': 'lounge',
   speakeasy: 'jazz', 'jazz-cellar': 'jazz', 'art-deco': 'jazz', parisian: 'jazz', library: 'library',
   garden: 'ocean', tropical: 'tropical', beach: 'tropical', marina: 'ocean',
@@ -170,6 +174,7 @@ export const styleForInterior = (id: string) => STYLE_OF_INTERIOR[id] ?? 'lounge
 // The game each background comes from (the sound of its style is matched to that game's world). The backgrounds that
 // are not a game (the reef, the cave, the fairy places) are not listed.
 export const GAME_OF_INTERIOR: Record<string, string> = {
+  ...NEXT_GAME_MUSIC_GAMES,
   'lineage-2': 'Lineage II', 'perfect-world': 'Perfect World', 'warcraft-3': 'Warcraft III', allods: 'Allods Online', 'lost-ark': 'Lost Ark',
   'mass-effect': 'Mass Effect', 'nfs-most-wanted': 'Need for Speed: Most Wanted', 'nfs-carbon': 'Need for Speed: Carbon', 'nfs-underground': 'Need for Speed: Underground',
   'witcher-3': 'The Witcher 3', 'heroes-3': 'Heroes of Might and Magic III', 'elden-ring': 'Elden Ring', minecraft: 'Minecraft', skyrim: 'Skyrim',

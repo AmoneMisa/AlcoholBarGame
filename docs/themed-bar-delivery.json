@@ -1,9 +1,9 @@
 {
   "tool": "built-in image_gen",
-  "expectedBackgroundCount": 30,
-  "expectedCostumeCount": 106,
-  "backgroundCount": 30,
-  "costumeCount": 106,
+  "expectedBackgroundCount": 54,
+  "expectedCostumeCount": 157,
+  "backgroundCount": 54,
+  "costumeCount": 157,
   "assets": [
     {
       "key": "interior-underwater",
@@ -154,6 +154,126 @@
       "key": "interior-borderlands",
       "asset": "public/assets/bar/backgrounds/interior-borderlands.webp",
       "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-e9a12e35-8310-4225-92f4-0d082c0685d6.png"
+    },
+    {
+      "key": "interior-harry-potter",
+      "asset": "public/assets/bar/backgrounds/interior-harry-potter.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-27401d21-342d-458b-bfda-7e08d53ef5fd.png"
+    },
+    {
+      "key": "interior-gta-5",
+      "asset": "public/assets/bar/backgrounds/interior-gta-5.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-e2406f27-3c36-43fa-9518-22d7e9ce8f06.png"
+    },
+    {
+      "key": "interior-gta-sa",
+      "asset": "public/assets/bar/backgrounds/interior-gta-sa.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-35ef8e6a-a2a6-4d7d-acbb-8cc288e6d702.png"
+    },
+    {
+      "key": "interior-gta-3",
+      "asset": "public/assets/bar/backgrounds/interior-gta-3.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-e7193e2f-7f2d-4a59-ad74-5b6886c618df.png"
+    },
+    {
+      "key": "interior-control",
+      "asset": "public/assets/bar/backgrounds/interior-control.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-8b0e248a-5951-4168-9761-61a64102ae51.png"
+    },
+    {
+      "key": "interior-alan-wake",
+      "asset": "public/assets/bar/backgrounds/interior-alan-wake.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-a9b2ade6-5b66-4115-8847-edca9ecb0f80.png"
+    },
+    {
+      "key": "interior-quantum-break",
+      "asset": "public/assets/bar/backgrounds/interior-quantum-break.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-9b3ebe26-c84f-4c47-bb54-59a12d3d9404.png"
+    },
+    {
+      "key": "interior-max-payne",
+      "asset": "public/assets/bar/backgrounds/interior-max-payne.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-9c856d23-3ede-40c9-a146-2709a4caedae.png"
+    },
+    {
+      "key": "interior-resident-evil",
+      "asset": "public/assets/bar/backgrounds/interior-resident-evil.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-6d408dc9-4909-48fb-8392-fe7df9a3f577.png"
+    },
+    {
+      "key": "interior-silent-hill",
+      "asset": "public/assets/bar/backgrounds/interior-silent-hill.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-5efbf032-c638-41d9-8d83-dedda76addd0.png"
+    },
+    {
+      "key": "interior-batman",
+      "asset": "public/assets/bar/backgrounds/interior-batman.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-c917e06e-b74a-4092-99cb-b28bcc54cc03.png"
+    },
+    {
+      "key": "interior-baldurs-gate-3",
+      "asset": "public/assets/bar/backgrounds/interior-baldurs-gate-3.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-08acf2ab-bd9c-4aa1-a468-99313f6baee3.png"
+    },
+    {
+      "key": "interior-divinity-original-sin-2",
+      "asset": "public/assets/bar/backgrounds/interior-divinity-original-sin-2.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-19f09544-12d7-494f-adbc-9ece6916cdf5.png"
+    },
+    {
+      "key": "interior-diablo-4",
+      "asset": "public/assets/bar/backgrounds/interior-diablo-4.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-7d41441a-56b2-4f09-a408-99be3a614a41.png"
+    },
+    {
+      "key": "interior-black-desert",
+      "asset": "public/assets/bar/backgrounds/interior-black-desert.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-cf3f88ff-0156-40a1-b7e6-21dac7dbbadf.png"
+    },
+    {
+      "key": "interior-darksiders-3",
+      "asset": "public/assets/bar/backgrounds/interior-darksiders-3.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-3f352a6a-6706-4d87-80ff-2c3e57897afa.png"
+    },
+    {
+      "key": "interior-death-stranding",
+      "asset": "public/assets/bar/backgrounds/interior-death-stranding.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-b57a5b52-1cc3-44b4-b45e-54268807f2b4.png"
+    },
+    {
+      "key": "interior-devil-may-cry",
+      "asset": "public/assets/bar/backgrounds/interior-devil-may-cry.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-b8a86536-ec27-4d51-91c8-12400f799815.png"
+    },
+    {
+      "key": "interior-palworld",
+      "asset": "public/assets/bar/backgrounds/interior-palworld.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-70de33ab-d42a-48bd-a4fb-fe403a316fd9.png"
+    },
+    {
+      "key": "interior-shadow-tomb-raider",
+      "asset": "public/assets/bar/backgrounds/interior-shadow-tomb-raider.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-5b91f65d-e971-4072-a84a-d0c73f4b486e.png"
+    },
+    {
+      "key": "interior-wolf-among-us",
+      "asset": "public/assets/bar/backgrounds/interior-wolf-among-us.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-4d5ddb8d-0ca1-408c-bfb7-c230a72dd9bd.png"
+    },
+    {
+      "key": "interior-walking-dead-s3",
+      "asset": "public/assets/bar/backgrounds/interior-walking-dead-s3.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-65208856-56a5-4a75-a231-aca48949f69b.png"
+    },
+    {
+      "key": "interior-tropico-6",
+      "asset": "public/assets/bar/backgrounds/interior-tropico-6.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-493695d6-83d9-4399-9880-7f389e31c040.png"
+    },
+    {
+      "key": "interior-worms",
+      "asset": "public/assets/bar/backgrounds/interior-worms.webp",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-80947ff8-32a8-48d1-850b-03fa716ddf30.png"
     },
     {
       "key": "noa-themed-atlas-v1",
@@ -587,6 +707,227 @@
           "label": "Lilith",
           "theme": "borderlands",
           "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-8443fd10-7d91-401b-be8b-780ba095e86e.png"
+        },
+        {
+          "value": "theme-harry-potter-noa",
+          "label": "Hermione • adult wizard",
+          "theme": "harry-potter",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-0922dade-6e41-4bf3-8bd8-245fe06fec4c.png"
+        }
+      ]
+    },
+    {
+      "key": "noa-themed-atlas-v10",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v10.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-gta-5-noa",
+          "label": "Amanda De Santa",
+          "theme": "gta-5",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-7387b1a0-6d1d-4160-9afa-14a1c92cd855.png"
+        },
+        {
+          "value": "theme-gta-sa-noa",
+          "label": "Catalina",
+          "theme": "gta-sa",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-f9859b41-5abb-406f-870e-9a403ac49705.png"
+        },
+        {
+          "value": "theme-gta-3-noa",
+          "label": "Asuka Kasen",
+          "theme": "gta-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-49ced02d-9964-4f44-816c-74f59dc2c2ef.png"
+        },
+        {
+          "value": "theme-control-noa",
+          "label": "Jesse Faden",
+          "theme": "control",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-832d7a63-14ec-4c4a-b958-f035ec2ba1f9.png"
+        },
+        {
+          "value": "theme-alan-wake-noa",
+          "label": "Saga Anderson",
+          "theme": "alan-wake",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-97ed4e70-1beb-4467-9237-b57eb2aee6e6.png"
+        },
+        {
+          "value": "theme-quantum-break-noa",
+          "label": "Beth Wilder",
+          "theme": "quantum-break",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-927add95-6485-4546-a678-6ae08c8ef00f.png"
+        }
+      ]
+    },
+    {
+      "key": "noa-themed-atlas-v11",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v11.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-max-payne-noa",
+          "label": "Mona Sax",
+          "theme": "max-payne",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-0991bca7-b627-4015-b02b-b227968343fc.png"
+        },
+        {
+          "value": "theme-resident-evil-noa",
+          "label": "Jill Valentine • classic",
+          "theme": "resident-evil",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-de5ec080-2c45-462f-ab12-80c46206e4f4.png"
+        },
+        {
+          "value": "theme-silent-hill-noa",
+          "label": "Heather Mason • adult cosplay",
+          "theme": "silent-hill",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-5a09a99e-983c-41a7-bdda-b8f070f9e70e.png"
+        },
+        {
+          "value": "theme-batman-noa",
+          "label": "Catwoman",
+          "theme": "batman",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-610a05b4-d97e-4314-a25d-10f5483da1ad.png"
+        },
+        {
+          "value": "theme-baldurs-gate-3-noa",
+          "label": "Shadowheart",
+          "theme": "baldurs-gate-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-53850438-0077-414e-86dc-5037f730aaf1.png"
+        },
+        {
+          "value": "theme-divinity-original-sin-2-noa",
+          "label": "Lohse",
+          "theme": "divinity-original-sin-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-012a7533-d595-4e0c-8ba4-f1f9bf51d8e1.png"
+        }
+      ]
+    },
+    {
+      "key": "noa-themed-atlas-v12",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v12.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-diablo-4-noa",
+          "label": "Sorceress",
+          "theme": "diablo-4",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-9b89bb9f-09d8-4601-a9ff-f6a613a5b606.png"
+        },
+        {
+          "value": "theme-black-desert-noa",
+          "label": "Dark Knight",
+          "theme": "black-desert",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-ac3c14f4-57ca-4d38-8bdc-cccbf4d44a5d.png"
+        },
+        {
+          "value": "theme-darksiders-3-noa",
+          "label": "Fury • Flame Hollow",
+          "theme": "darksiders-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-1c3b3cec-b6aa-4db7-ac95-d9a320e29840.png"
+        },
+        {
+          "value": "theme-death-stranding-noa",
+          "label": "Fragile",
+          "theme": "death-stranding",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-03d16e8b-83fe-42a0-8b86-413d9d5d60a3.png"
+        },
+        {
+          "value": "theme-devil-may-cry-noa",
+          "label": "Lady",
+          "theme": "devil-may-cry",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-ce251728-7884-4f8c-82e6-6b7b10b1e686.png"
+        },
+        {
+          "value": "theme-palworld-noa",
+          "label": "Pal trainer • female",
+          "theme": "palworld",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-d8620e1d-1a20-41a2-a24d-80108def3bdb.png"
+        }
+      ]
+    },
+    {
+      "key": "noa-themed-atlas-v13",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v13.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-shadow-tomb-raider-noa",
+          "label": "Lara Croft",
+          "theme": "shadow-tomb-raider",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-66f12610-7593-4857-9692-b5d2354c05db.png"
+        },
+        {
+          "value": "theme-wolf-among-us-noa",
+          "label": "Snow White",
+          "theme": "wolf-among-us",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-6ab64c85-2613-469f-b752-9c3eb9812207.png"
+        },
+        {
+          "value": "theme-walking-dead-s3-noa",
+          "label": "Kate Garcia",
+          "theme": "walking-dead-s3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-d579d01c-25c7-4d3a-a019-4124c8f705fc.png"
+        },
+        {
+          "value": "theme-tropico-6-noa",
+          "label": "El Presidente • female",
+          "theme": "tropico-6",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-76e305d9-cdde-43ce-a78d-79f323a81811.png"
+        },
+        {
+          "value": "theme-worms-noa",
+          "label": "Worm mascot • female",
+          "theme": "worms",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-208963e7-0c72-4d47-9240-e1c4dfdf1d39.png"
+        },
+        {
+          "value": "theme-resident-evil-claire-noa",
+          "label": "Claire Redfield",
+          "theme": "resident-evil",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-98091a96-38a1-44fd-b4da-fd9634b3aa15.png"
+        }
+      ]
+    },
+    {
+      "key": "noa-themed-atlas-v14",
+      "asset": "public/assets/characters/bartender/noa-themed-atlas-v14.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-resident-evil-ada-noa",
+          "label": "Ada Wong",
+          "theme": "resident-evil",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-60a10416-806c-4b5c-b9e4-3454313b585a.png"
         }
       ]
     },
@@ -1022,6 +1363,208 @@
           "label": "Mordecai",
           "theme": "borderlands",
           "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-84fcfae8-f730-4f31-87bb-1c976c427ebc.png"
+        },
+        {
+          "value": "theme-harry-potter-leo",
+          "label": "Harry • adult wizard",
+          "theme": "harry-potter",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-5c4b19b0-8531-48e1-9e3f-159e2dc7e30b.png"
+        }
+      ]
+    },
+    {
+      "key": "leo-themed-atlas-v10",
+      "asset": "public/assets/characters/bartender/leo-themed-atlas-v10.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-gta-5-leo",
+          "label": "Franklin Clinton",
+          "theme": "gta-5",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-cac71074-6a07-4d3f-a26a-1cea9f6e1e43.png"
+        },
+        {
+          "value": "theme-gta-sa-leo",
+          "label": "Carl Johnson • CJ",
+          "theme": "gta-sa",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-cbf91dff-be39-4db1-b50a-210685745275.png"
+        },
+        {
+          "value": "theme-gta-3-leo",
+          "label": "Claude",
+          "theme": "gta-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-206eeb91-cf59-43cf-8845-1d3f278d98e8.png"
+        },
+        {
+          "value": "theme-control-leo",
+          "label": "Zachariah Trench",
+          "theme": "control",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-b0ffdebe-8f9d-45aa-90f6-7ca9e319b1a4.png"
+        },
+        {
+          "value": "theme-alan-wake-leo",
+          "label": "Alan Wake",
+          "theme": "alan-wake",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-c26d79ea-b4a0-47c6-a8a3-f1b099289aaf.png"
+        },
+        {
+          "value": "theme-quantum-break-leo",
+          "label": "Jack Joyce",
+          "theme": "quantum-break",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-0548972a-f798-4f8b-b483-bcba357d557f.png"
+        }
+      ]
+    },
+    {
+      "key": "leo-themed-atlas-v11",
+      "asset": "public/assets/characters/bartender/leo-themed-atlas-v11.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-max-payne-leo",
+          "label": "Max Payne",
+          "theme": "max-payne",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-beb09386-bfcb-4074-971c-ef6a181caa4b.png"
+        },
+        {
+          "value": "theme-resident-evil-leo",
+          "label": "Leon Kennedy • RE4",
+          "theme": "resident-evil",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-c2d2ddae-07d0-4503-9535-7e9d9b219010.png"
+        },
+        {
+          "value": "theme-silent-hill-leo",
+          "label": "James Sunderland",
+          "theme": "silent-hill",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-e38853a4-3332-47a4-9ac0-801fb35a8e73.png"
+        },
+        {
+          "value": "theme-baldurs-gate-3-leo",
+          "label": "Astarion",
+          "theme": "baldurs-gate-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-3dca08b1-3a63-40c2-a9e3-ddb2361d8227.png"
+        },
+        {
+          "value": "theme-divinity-original-sin-2-leo",
+          "label": "Ifan ben-Mezd",
+          "theme": "divinity-original-sin-2",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-f1951800-fbf4-4c87-a2e0-68251435f361.png"
+        },
+        {
+          "value": "theme-diablo-4-leo",
+          "label": "Necromancer",
+          "theme": "diablo-4",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-fc9d1f1f-89a3-46e7-998f-590e1947a855.png"
+        }
+      ]
+    },
+    {
+      "key": "leo-themed-atlas-v12",
+      "asset": "public/assets/characters/bartender/leo-themed-atlas-v12.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-black-desert-leo",
+          "label": "Warrior",
+          "theme": "black-desert",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-811ba692-cac2-4d08-bd24-3252798d775d.png"
+        },
+        {
+          "value": "theme-darksiders-3-leo",
+          "label": "Vulgrim merchant",
+          "theme": "darksiders-3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-114e6ee4-fbf2-4f1f-9900-d1c624b01047.png"
+        },
+        {
+          "value": "theme-death-stranding-leo",
+          "label": "Sam Porter Bridges",
+          "theme": "death-stranding",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-3bd9c013-a1c6-48ed-9581-ff665caea5f3.png"
+        },
+        {
+          "value": "theme-devil-may-cry-leo",
+          "label": "Dante",
+          "theme": "devil-may-cry",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-ddb8b1e8-e7f4-447b-9930-3334a408b4f2.png"
+        },
+        {
+          "value": "theme-palworld-leo",
+          "label": "Pal trainer • male",
+          "theme": "palworld",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-8b068500-0443-4fdb-986f-29af98038a21.png"
+        },
+        {
+          "value": "theme-shadow-tomb-raider-leo",
+          "label": "Jonah Maiava",
+          "theme": "shadow-tomb-raider",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-a71faa2c-4666-4e4d-a99b-842daa714d30.png"
+        }
+      ]
+    },
+    {
+      "key": "leo-themed-atlas-v13",
+      "asset": "public/assets/characters/bartender/leo-themed-atlas-v13.webp",
+      "columns": 3,
+      "rows": 2,
+      "frame": [
+        420,
+        552
+      ],
+      "poses": 1,
+      "frames": [
+        {
+          "value": "theme-wolf-among-us-leo",
+          "label": "Bigby Wolf",
+          "theme": "wolf-among-us",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-eab253c4-6535-464c-985e-466943d4d7e3.png"
+        },
+        {
+          "value": "theme-walking-dead-s3-leo",
+          "label": "Javier Garcia",
+          "theme": "walking-dead-s3",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-fa95f496-21a6-46f8-bf5d-d6bfcc030fba.png"
+        },
+        {
+          "value": "theme-tropico-6-leo",
+          "label": "El Presidente • male",
+          "theme": "tropico-6",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-6ca6fcd0-969f-4d98-8b28-6d7dd0cd5466.png"
+        },
+        {
+          "value": "theme-worms-leo",
+          "label": "Worm mascot • male",
+          "theme": "worms",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-9db49cbf-4457-4d6f-96d8-51ad5724a0ac.png"
+        },
+        {
+          "value": "theme-resident-evil-chris-leo",
+          "label": "Chris Redfield",
+          "theme": "resident-evil",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-23d2f248-a74d-4797-934c-917f86f55224.png"
+        },
+        {
+          "value": "theme-resident-evil-wesker-leo",
+          "label": "Albert Wesker",
+          "theme": "resident-evil",
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-c38c353f-2fe3-4d89-abe2-b0526bbc8ce5.png"
         }
       ]
     }

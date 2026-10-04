@@ -403,11 +403,6 @@ export const NEXT_GAME_COSTUMES = {
       "theme": "silent-hill"
     },
     {
-      "value": "theme-batman-leo",
-      "label": "Batman",
-      "theme": "batman"
-    },
-    {
       "value": "theme-baldurs-gate-3-leo",
       "label": "Astarion",
       "theme": "baldurs-gate-3"
@@ -575,7 +570,7 @@ export const NEXT_GAME_RECOMMENDATIONS = {
       "theme-batman-noa"
     ],
     "leo": [
-      "theme-batman-leo"
+      "theme-max-payne-leo"
     ]
   },
   "baldurs-gate-3": {
@@ -809,4 +804,3 @@ export const NEXT_GAME_SHELVES = {
   "tropico-6": "brass",
   "worms": "rustic"
 } as const;
-

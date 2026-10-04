@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "key": "theme-wolf-among-us-noa",
+    "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-6ab64c85-2613-469f-b752-9c3eb9812207.png",
+    "prompt": "Edit this adult bartender costume to Snow White's PROFESSIONAL OFFICE outfit from The Wolf Among Us. Preserve the exact adult Noa face, body proportions, painted rendering and hands. Replace the fairytale clothing entirely with a plain fitted ivory buttoned office blouse, normal long sleeves and normal shoulders without puff sleeves, a narrow dark blue neck ribbon, and a straight dark navy pencil skirt. Black hair in a neat low office bun, no red hair bow. No royal bodice, corset, gold trim, princess sleeves or Disney clothing. Both hands naturally adjust the blouse cuff. Show complete head and hands to middle thighs. Keep this a single adult portrait cutout on genuinely transparent alpha background. No background or text.",
+    "reference": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-bd617e25-36ed-4700-a973-8b7fb75b7bcc.png",
+    "replacedGeneration": {
+      "key": "theme-wolf-among-us-noa",
+      "path": "C:\\Users\\kubai\\.codex\\generated_images\\01a0fbaa-ce72-7ae3-bb24-fe1e015e8a77\\exec-bd617e25-36ed-4700-a973-8b7fb75b7bcc.png",
+      "prompt": "Create exactly ONE painted 2D game bartender costume sprite with a genuinely transparent alpha background. Adult female Noa wears Snow White cosplay. Reference supplies adult FACE IDENTITY and polished painterly style ONLY. Preserve eyes, nose, lips and compact facial proportions; change HAIR and BEARD explicitly to the requested costume rather than copying reference curls and stubble. Costume and one distinct appropriate pose: natural black hair in neat low bun with side part, ivory blouse with narrow blue neck ribbon, dark navy fitted skirt, small gold earrings; adult Noa as Snow, composed professional stance, one hand lightly touching cuff and other resting at waist. All wearers are fully grown adults. Normal head, jaw, neck, shoulders and torso, no sideways face stretching or elongated neck. Frame entire head, costume accessories and BOTH complete hands through mid-thigh, with generous transparent margins. Hand anatomy is critical: each hand belongs to its correct left/right forearm; natural thumb opposition; five fingers only, clean coherent knuckles and wrists. Any book, glass, strap or tool must be visibly supported with a believable grip, never floating. Rich painted textile details and attractive cohesive semi-realistic illustrated art, no photorealistic 3D render. One pose, one adult figure, no montage, no text, no floor shadow or scenery. Transparent portrait cutout.",
+      "reference": "C:/Users/kubai/IdeaProjects/AlcoholBarGame/.tmp/noa-costume-face-reference.png"
+    }
+  }
+]
