@@ -25,6 +25,7 @@ if (window.location.pathname === '/admin' || new URLSearchParams(window.Telegram
   await import('./polish.css'); // last, so its layout fixes win over the older rules
   await import('./performance.css');
   await import('./readability.css');
+  await import('./surfaces.css');
   initTelegram();
   const { default: App } = await import('./App.vue');
   installDragScroll();

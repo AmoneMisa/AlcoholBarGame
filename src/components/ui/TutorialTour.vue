@@ -194,7 +194,7 @@ onBeforeUnmount(() => {
 .tour { position: fixed; inset: 0; z-index: 1800; pointer-events: none; }
 .tour-dim { position: absolute; inset: 0; background: rgba(5, 8, 14, .55); }
 .tour-spot { position: absolute; border-radius: 14px; border: 2px solid #f0c35a; box-shadow: 0 0 0 9999px rgba(5, 8, 14, .6); transition: all .25s ease; }
-.tour-card { pointer-events: auto; position: absolute; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(94vw, 440px); padding: 14px 16px; border: 1px solid #b78649; border-radius: 16px; background: #141c2b; color: #f1ead9; box-shadow: 0 16px 40px #000c; display: grid; gap: 8px; }
+.tour-card { pointer-events: auto; position: absolute; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(94vw, 440px); padding: 14px 16px; border: 1px solid #b78649; border-radius: 16px; background:#0b1320 var(--ui-dialog-art) center / cover no-repeat; color: #f1ead9; box-shadow: 0 16px 40px #000c; display: grid; gap: 8px; }
 .tour-card.compact { width: min(94vw, 400px); padding: 8px 12px; }
 .tour-card.compact p { font-size: 13px; line-height: 1.35; }
 .tour-card.compact footer { gap: 6px; }

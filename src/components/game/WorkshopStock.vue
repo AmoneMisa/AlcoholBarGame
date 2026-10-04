@@ -174,7 +174,7 @@ function throwAway() {
 
 <style>
 .workshop-stock { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; padding: 12px; }
-.stock-tile { position: relative; display: grid; justify-items: center; align-content: start; gap: 4px; padding: 14px 10px 12px; border: 1px solid #354762; border-radius: 14px; background: radial-gradient(circle at 50% 30%, #243750, #111c2d 72%); color: #e9eef7; text-align: center; font: inherit; }
+.stock-tile { position: relative; display: grid; justify-items: center; align-content: start; gap: 4px; padding: 14px 10px 12px; border: 1px solid #354762; border-radius: 14px; background:#0b1320 var(--ui-card-art) center / cover no-repeat; color: #e9eef7; text-align: center; font: inherit; }
 .stock-tile.tappable { cursor: pointer; }
 .stock-tile.tappable:hover, .stock-tile.tappable:focus-visible { border-color: #d6a54d; }
 .stock-tile .item-art { width: 64px; height: 64px; border-radius: 50%; }

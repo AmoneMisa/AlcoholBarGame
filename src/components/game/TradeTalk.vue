@@ -160,13 +160,13 @@ function accept() {
 
 <style scoped>
 .haggle-backdrop { position: fixed; z-index: 400; inset: 0; display: grid; place-items: center; padding: 16px; background: #04070dcc; backdrop-filter: blur(6px); }
-.haggle-popup { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; min-width: 0; width: min(920px, 100%); max-height: min(720px, calc(100vh - 32px)); overflow: hidden; border: 1px solid #b78649; border-radius: 18px; background: linear-gradient(160deg, #1a2336, #0c1320 70%); color: #eef1f5; box-shadow: 0 30px 80px #000c; }
+.haggle-popup { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; min-width: 0; width: min(920px, 100%); max-height: min(720px, calc(100vh - 32px)); overflow: hidden; border: 1px solid #b78649; border-radius: 18px; background:#0b1320 var(--ui-dialog-art) center / cover no-repeat; color: #eef1f5; box-shadow: 0 30px 80px #000c; }
 .haggle-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #34435a; background: #0e1726; }
 .haggle-header > div { display: grid; flex: 1; }
 .haggle-header small { color: var(--gold, #f1c26b); font-size: 13px; font-weight: 900; letter-spacing: .14em; }
 .haggle-header b { font: 700 18px Georgia, serif; }
 .haggle-header em { color: #9fb0c4; font-size: 13px; font-style: normal; }
-.haggle-avatar { display: grid; width: 44px; height: 44px; place-items: center; border: 2px solid #d6a54e; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #7a5230, #2b1b14); color: #ffe2a8; font: 700 20px Georgia, serif; transition: border-color .2s; }
+.haggle-avatar { display: grid; width: 44px; height: 44px; place-items: center; border: 2px solid #d6a54e; border-radius: 50%; background:#0b1320 var(--ui-gold-art) center / cover no-repeat; color: #ffe2a8; font: 700 20px Georgia, serif; transition: border-color .2s; }
 .haggle-avatar.pleased { border-color: #6ee0a2; }
 .haggle-avatar.confused { border-color: #ff9ca5; }
 .haggle-body { display: grid; grid-template-columns: minmax(0, 1fr) 300px; min-height: 0; min-width: 0; }
@@ -212,7 +212,7 @@ function accept() {
 .haggle-compose form { display: flex; align-items: flex-end; gap: 8px; }
 .haggle-compose input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid #4a5c75; border-radius: 10px; background: #0a111d; color: #eef1f5; font-size: 13px; }
 .haggle-actions { display: flex; justify-content: flex-end; gap: 10px; padding-top: 12px; border-top: 1px solid #263449; }
-.haggle-offer { display: grid; gap: 7px; padding: 10px; border: 1px solid #5d4a2e; border-radius: 12px; background: radial-gradient(120% 90% at 50% 0%, #2c2418, #121821 70%); }
+.haggle-offer { display: grid; gap: 7px; padding: 10px; border: 1px solid #5d4a2e; border-radius: 12px; background:#0b1320 var(--ui-gold-art) center / cover no-repeat; }
 .haggle-offer > header { display: flex; flex-direction: column; align-items: center; gap: 1px; }
 .haggle-offer > header small { padding: 1px 8px; border-radius: 8px; background: #3a2d1a; color: #f3d38c; font-size: 13px; font-weight: 900; letter-spacing: .12em; }
 .haggle-offer > header span { color: #dfe6ef; font-size: 13px; }

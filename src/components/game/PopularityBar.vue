@@ -35,7 +35,7 @@ const why = computed(() => active.value ? 'A boost is already running.' : enough
 
 <style scoped>
 .popularity-bar { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; gap: 10px; margin: 0 0 8px; padding: 8px 12px; border: 1px solid #3b4b65; border-radius: 12px; background: #101a2b; color: #e9eef7; }
-.popularity-bar.ready { border-color: #e0a14a; background: linear-gradient(90deg, #3a2a14, #101a2b); }
+.popularity-bar.ready { border-color: #e0a14a; background:#0b1320 var(--ui-gold-art) center / cover no-repeat; }
 .popularity-bar .ui-icon { width: 22px; height: 22px; color: #ffd35a; }
 .popularity-text { display: grid; gap: 3px; min-width: 0; }
 .popularity-text b { font-size: 14px; }

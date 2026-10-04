@@ -121,7 +121,7 @@ const fame = computed(() => fameLevel(saved.value?.served ?? 0));
 </template>
 
 <style scoped>
-.workshop{overflow:hidden}.workshop-hero{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;background:#0b1320; background-image:linear-gradient(#0b132088,#0b132088),url('/assets/ui/lounge-panel-painted-v1.webp');background-position:center;background-size:cover;border-bottom:1px solid #354762}
+.workshop{overflow:hidden}.workshop-hero{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;background:#0b1320; background-image:var(--ui-panel-art);background-position:center;background-size:cover;border-bottom:1px solid #354762}
 .workshop-hero small{color:#e4b35c;font-size:13px;font-weight:900;letter-spacing:.12em}.workshop-hero h2{margin:5px 0;font:700 23px Georgia,serif}.workshop-hero p{margin:0;color:#bdc8d6;font-size:13px}
 .workshop-hero dl{display:flex;gap:14px;margin:0}.workshop-hero dt{color:#91a2b5;font-size:13px;letter-spacing:.1em;text-transform:uppercase}.workshop-hero dd{margin:2px 0 0;color:#fff0c8;font:700 20px Georgia,serif}
 .workshop-tabs{display:flex;gap:6px;padding:12px 14px 0;overflow-x:auto}.workshop-tabs button{padding:8px 12px;border:1px solid #40536c;border-radius:9px;background:#111c2d;color:#c7d3e0;font-weight:800;white-space:nowrap;cursor:pointer}.workshop-tabs button.active{border-color:#b78649;background:#3b2b1f;color:#fff0ce}

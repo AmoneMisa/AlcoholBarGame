@@ -192,7 +192,7 @@ onBeforeUnmount(() => {
 .counter-drop-hint,.counter-pour-feedback { position:absolute; top:0; left:50%; translate:-50% 0; width:max-content; max-width:100%; padding:6px 10px; border-radius:8px; background:#191d29ed; font-size:13px; color:#f5d58e; text-align:center; }
 .counter-tools { display:flex; gap:10px; justify-content:center; width:100%; }
 .counter-tools .ui-btn { min-width:100px; }
-.counter-order-quest { align-self:center; min-width:0; min-height:0; max-height:100%; overflow-y:auto; padding:16px; background:linear-gradient(140deg,#171c29ef,#11131cee); border:1px solid #be9659; border-radius:14px; box-shadow:0 8px 28px #0006; }
+.counter-order-quest { align-self:center; min-width:0; min-height:0; max-height:100%; overflow-y:auto; padding:16px; background:#0b1320 var(--ui-panel-art) center / cover no-repeat; border:1px solid #be9659; border-radius:14px; box-shadow:0 8px 28px #0006; }
 .counter-order-quest > small { color:#caaa6b; font-size:13px; letter-spacing:.15em; }
 .counter-order-quest h2 { margin:6px 0 12px; font:700 22px Georgia,serif; overflow-wrap:anywhere; }
 .counter-quest-progress { margin:0 0 12px; font-size:13px; color:#b4a899; }
@@ -208,7 +208,7 @@ onBeforeUnmount(() => {
 .counter-order-ready p { margin:0; font-size:13px; }
 .counter-order-ready .ui-btn { width:100%; }
 .counter-order-ready .ui-btn-label { white-space:normal; }
-.counter-ingredient-drawer { min-width:0; padding:14px 16px max(16px,env(safe-area-inset-bottom)); border:1px solid #8e633e; border-top:5px solid #bc9058; background:linear-gradient(#3e2922f5,#1c1516); border-radius:8px 8px 0 0; box-shadow:0 -5px 18px #0006; }
+.counter-ingredient-drawer { min-width:0; padding:14px 16px max(16px,env(safe-area-inset-bottom)); border:1px solid #8e633e; border-top:5px solid #bc9058; background:#0b1320 var(--ui-panel-art) center / cover no-repeat; border-radius:8px 8px 0 0; box-shadow:0 -5px 18px #0006; }
 .counter-drawer-heading { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:12px; }
 .counter-drawer-tabs,.counter-pour-sizes { display:flex; align-items:center; gap:6px; }
 .counter-pour-sizes small { color:#b9aa94; font-size:13px; }

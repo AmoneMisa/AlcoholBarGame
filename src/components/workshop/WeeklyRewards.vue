@@ -18,16 +18,16 @@ const tiers = [{ rank: 1, label: '1st place' }, { rank: 2, label: '2nd–3rd pla
 <style scoped>
 .weekly-rewards { display: grid; gap: 20px; }
 .weekly-rewards > p { margin: 0; color: #ccbaca; font-size: 13px; line-height: 1.5; }
-.weekly-prize-tier { border: 1px solid #91715c; border-radius: 12px; background: linear-gradient(130deg, #49303d, #211b2c); }
+.weekly-prize-tier { border: 1px solid #91715c; border-radius: 12px; background:#0b1320 var(--ui-panel-art) center / cover no-repeat; }
 .weekly-prize-tier.champion { border-color: #e1bc79; }
-.weekly-prize-tier h3 { margin: -1px -1px 0; padding: 10px 4px; border: 1px solid #c99a73; border-radius: 12px 12px 0 0; background: linear-gradient(90deg, #765145, #ae7660, #765145); color: #ffdfaa; font: italic 700 20px Georgia, serif; text-align: center; }
+.weekly-prize-tier h3 { margin: -1px -1px 0; padding: 10px 4px; border: 1px solid #c99a73; border-radius: 12px 12px 0 0; background:#513d29 var(--ui-gold-art) center/cover no-repeat;background-blend-mode:soft-light; color: #ffdfaa; font: italic 700 20px Georgia, serif; text-align: center; }
 .weekly-prize-tier h3 span { color: #edbf8b; font-size: 13px; }
 .weekly-prize-body { padding: 14px; }
 .weekly-prize-title { display: flex; align-items: center; gap: 8px; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #b4947255; color: #edc58c; }
 .weekly-prize-title .ui-icon { width: 26px; height: 26px; }
 .weekly-prize-body ul { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
 .weekly-prize-body li { width: 82px; text-align: center; }
-.weekly-prize-body li > div { position: relative; height: 82px; display: grid; place-items: center; border: 1px solid #b2937b; border-radius: 6px; background: linear-gradient(145deg, #ae847744, #251c2f); }
+.weekly-prize-body li > div { position: relative; height: 82px; display: grid; place-items: center; border: 1px solid #b2937b; border-radius: 6px; background:#0b1320 var(--ui-card-art) center / cover no-repeat; }
 .weekly-prize-body li b { position: absolute; right: 4px; bottom: 3px; color: #ffdc98; font-size: 14px; text-shadow: 0 1px 3px #000; }
 .weekly-prize-body li .ui-icon { width: 48px; height: 48px; color: #8bddf3; filter: drop-shadow(0 0 12px #86ddf366); }
 .weekly-prize-body li span { display: block; margin-top: 6px; color: #ebd9cf; font-size: 13px; text-transform: capitalize; }

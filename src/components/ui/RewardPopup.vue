@@ -75,7 +75,7 @@ onUnmounted(() => clearTimeout(timer));
 .reward-grid li > span { color: #fff0d3; font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; text-shadow: 0 2px 4px #000; }
 .reward-new { position: absolute; right: 0; top: 0; padding: 4px; border: 1px solid #f9d897; border-radius: 50%; background: #d15b71; color: #fff3ba; font: italic 13px Georgia, serif; box-shadow: 0 0 14px #f7ad78; }
 .reward-continue { display: block; margin: 28px auto 0; min-height: 44px; color: #f4dfb7; }
-.modal-backdrop.reveal { background: radial-gradient(ellipse at 50% 65%, #412658, #090810 72%); backdrop-filter: none; }
+.modal-backdrop.reveal { background:#0b1320 var(--ui-panel-art) center / cover no-repeat; backdrop-filter: none; }
 .reveal .modal-sheet { width: min(720px, 100%) !important; }
 .reveal .modal-body { padding-top: 0; }
 .reward-reveal { position: relative; isolation: isolate; display: grid; justify-items: center; text-align: center; overflow: hidden; }
@@ -93,7 +93,7 @@ onUnmounted(() => clearTimeout(timer));
 @keyframes reward-spark { from { opacity: .15; transform: translateY(6px) scale(.5); } to { opacity: .9; transform: translateY(-6px) scale(1.2); } }
 @media (prefers-reduced-motion: reduce) { .reward-grid li, .reveal-hero, .reveal-halo, .reveal-stars i { animation: none; } }
 @media (max-width: 360px) { .reward-tile-art { height: 88px; } .reward-grid li > span { font-size: 13px; } }
-.reward-popup { position: fixed; z-index: 140; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; width: min(340px, calc(100vw - 24px)); padding: 10px 12px 12px; border: 1px solid #d2a24e; border-radius: 14px; background: linear-gradient(150deg, #1b2740f7, #0b1320f7 72%); box-shadow: 0 18px 50px #000d; transform: translateX(-50%); animation: reward-in .24s ease-out; }
+.reward-popup { position: fixed; z-index: 140; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; width: min(340px, calc(100vw - 24px)); padding: 10px 12px 12px; border: 1px solid #d2a24e; border-radius: 14px; background:#0b1320 var(--ui-dialog-art) center / cover no-repeat; box-shadow: 0 18px 50px #000d; transform: translateX(-50%); animation: reward-in .24s ease-out; }
 .reward-popup > header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .reward-popup > header b { color: var(--gold, #e8b85a); font: 700 15px Georgia, serif; }
 @keyframes reward-in { from { opacity: 0; transform: translate(-50%, 14px); } }

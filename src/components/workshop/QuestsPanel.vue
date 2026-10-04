@@ -34,7 +34,7 @@ const stat = (id: string) => game.achievementStat(id as StatId);
 <style>
 .quest-rewards {display:flex;align-items:center;gap:14px}.quest-rewards > span {display:flex;align-items:center;gap:5px;color:#f4d08e;font-size:13px}
 .quest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
-.quest-card { display: grid; align-content: start; gap: 8px; padding: 14px; border: 1px solid #354762; border-radius: 13px; background: #111c2d; background-image:linear-gradient(#111c2daa,#111c2daa),url('/assets/ui/lounge-panel-painted-v1.webp');background-position:center;background-size:cover; }
+.quest-card { display: grid; align-content: start; gap: 8px; padding: 14px; border: 1px solid #354762; border-radius: 13px; background: #111c2d; background-image:var(--ui-panel-art);background-position:center;background-size:cover; }
 .quest-card h3 { margin: 0; font: 700 17px Georgia, serif; }
 .quest-card p { margin: 0; color: #aebdce; font-size: 13px; line-height: 1.45; }
 .quest-card > small:first-child { color: #9eafc1; font-size: 13px; font-weight: 800; letter-spacing: .1em; }

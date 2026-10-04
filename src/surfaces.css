@@ -1,0 +1,57 @@
+/* Small shared WebP artwork: loaded only where a visible surface uses it. */
+:root {
+  --ui-dialog-art: url('/assets/ui/surface-dialog.webp');
+  --ui-panel-art: url('/assets/ui/surface-panel.webp');
+  --ui-card-art: url('/assets/ui/surface-card.webp');
+  --ui-gold-art: url('/assets/ui/surface-gold.webp');
+}
+
+/* Text-heavy utility cards use a quieter surface than their outer window. */
+.collection-bonuses,
+.workshop-utility .card,
+.profile-stats > div,
+.circle .card,
+.settings-card,
+.event-menu .ui-btn,
+.version-card,
+.theme-draw-prizes article,
+.daily-track > span,
+.offer-source,
+.wishlist-selected,
+.achievement-card,
+.quest-card {
+  background-image: var(--ui-panel-art) !important;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+/* State colours remain visible over the artwork. */
+.daily-track > span.claimed { background-blend-mode:soft-light; }
+.daily-track > span.today { background-image:var(--ui-gold-art) !important;background-blend-mode:soft-light; }
+.mail-letter,.mail-row.active { background-blend-mode:soft-light; }
+.modal-head,.modal-foot { background-color:#08132299; }
+
+/* Shared button artwork stays cached alongside panels; colour still describes the action. */
+.ui-btn {
+  background-image:var(--ui-panel-art) !important;
+  background-position:center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  background-blend-mode:soft-light;
+}
+.ui-btn-primary,.ui-btn-solid {
+  background-image:var(--ui-gold-art) !important;
+}
+.ui-btn-ghost { background-image:none !important; }
+
+.section-tabs button,.design-tabs button,.game-nav button {
+  background-image:var(--ui-panel-art);
+  background-position:center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  background-blend-mode:soft-light;
+}
+.section-tabs button[aria-selected='true'],.design-tabs button[aria-selected='true'],.game-nav button.active {
+  background-image:var(--ui-gold-art);
+}

@@ -170,7 +170,7 @@ h3 b { margin-left: 8px; color: #e4b35c; }
 .person { display: grid; align-content: start; gap: 4px; }
 .person.joined { border-color: #b78649; }
 .person header { display: grid; grid-template-columns: 72px 1fr; gap: 10px; align-items: center; cursor: pointer; }
-.face { position: relative; width: 72px; height: 72px; overflow: hidden; border: 2px solid #d4a44d; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #5b3a4a, #1b1522); }
+.face { position: relative; width: 72px; height: 72px; overflow: hidden; border: 2px solid #d4a44d; border-radius: 50%; background:#0b1320 var(--ui-panel-art) center/cover no-repeat; }
 .face img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .gift-art { display: block; width: 24px; height: 24px; border-radius: 50%; }
 .who { display: grid; gap: 1px; }

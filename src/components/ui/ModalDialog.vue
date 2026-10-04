@@ -51,7 +51,7 @@ onUnmounted(() => {
 <style>
 .modal-backdrop { position: fixed; z-index: 1500; inset: 0; display: flex; align-items: center; justify-content: center; padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); background: #04070dcc; backdrop-filter: blur(5px); animation: modal-fade .16s ease both; }
 .modal-backdrop.bottom { align-items: flex-end; }
-.modal-sheet { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; max-height: 100%; overflow: hidden; border: 1px solid #d2a24e; border-radius: 16px; background: #0b1320; background-image:linear-gradient(#0b132066,#0b132066),url('/assets/ui/lounge-panel-painted-v1.webp');background-position:center;background-size:cover;background-repeat:no-repeat; box-shadow: 0 24px 70px #000e; color: #fff; outline: 0; }
+.modal-sheet { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; max-height: 100%; overflow: hidden; border: 1px solid #d2a24e; border-radius: 16px; background: #0b1320; background-image:var(--ui-dialog-art);background-position:center;background-size:cover;background-repeat:no-repeat; box-shadow: 0 24px 70px #000e; color: #fff; outline: 0; }
 .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-bottom: 1px solid #354762; }
 .modal-head small { display: block; color: var(--gold, #e8b85a); font-size: 13px; font-weight: 900; letter-spacing: .14em; }
 .modal-head b { display: block; color: #fff3dc; font: 700 19px Georgia, serif; }

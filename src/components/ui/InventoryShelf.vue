@@ -20,14 +20,14 @@ defineEmits<{ select: [key: string] }>();
   </section>
 </template>
 <style>
-.inventory-shelf { min-width:0;padding:12px;border:1px solid #b9955359;border-radius:8px;background:#0b1320; background-image:linear-gradient(#0b132088,#0b132088),url('/assets/ui/lounge-panel-painted-v1.webp');background-position:center;background-size:cover;box-shadow:inset 0 0 0 3px #090d1455; }
+.inventory-shelf { min-width:0;padding:12px;border:1px solid #b9955359;border-radius:8px;background:#0b1320; background-image:var(--ui-dialog-art);background-position:center;background-size:cover;box-shadow:inset 0 0 0 3px #090d1455; }
 .inventory-shelf > h3 { margin:0 0 12px;color:#eac998;font:700 16px Georgia,serif; }
 .shelf-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,72px));gap:5px;justify-content:start; }
-.inventory-shelf .shelf-tile.ui-btn { position:relative;display:block;width:100%;height:auto;aspect-ratio:1;min-width:0;min-height:0;padding:3px;border:1px solid #827352;border-radius:2px;background:linear-gradient(145deg,#25332b,#0d1720);box-shadow:inset 0 0 6px #000b; }
+.inventory-shelf .shelf-tile.ui-btn { position:relative;display:block;width:100%;height:auto;aspect-ratio:1;min-width:0;min-height:0;padding:3px;border:1px solid #827352;border-radius:2px;background:#0b1320 var(--ui-card-art) center / cover no-repeat;box-shadow:inset 0 0 6px #000b; }
 .inventory-shelf .shelf-tile.ui-btn:hover,.inventory-shelf .shelf-tile.ui-btn:focus-visible { z-index:3;border-color:#f3d48a;background:#2a352e;box-shadow:0 0 8px #cfa95355; }
 .inventory-shelf .shelf-tile .ui-btn-label { display:block;width:100%;height:100%; }
 .shelf-picture { position:absolute;inset:3px;display:block;width:auto;height:auto;overflow:hidden;border:0;border-radius:0; }
-.shelf-tile.rare { border-color:#77b8c9!important; }.shelf-tile.legendary { border-color:#e6bf70!important;background:linear-gradient(140deg,#51442a,#18212a)!important; }
+.shelf-tile.rare { border-color:#77b8c9!important; }.shelf-tile.legendary { border-color:#e6bf70!important;background:#0b1320 var(--ui-gold-art) center / cover no-repeat; }
 .shelf-count { position:absolute;left:1px;top:1px;z-index:2;min-width:14px;padding:1px 3px;border-radius:2px;background:#111723d9;color:#ffe8c2;font:700 13px/1.2 system-ui;text-shadow:0 1px #000; }
 .fragment .shelf-count { color:#96dfe8; }
 .shelf-label { display:none;position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);width:max-content;max-width:180px;padding:7px 9px;border:1px solid #b99553;border-radius:4px;background:#101722;color:#fff0d0;font:600 13px/1.35 system-ui;white-space:normal;pointer-events:none; }

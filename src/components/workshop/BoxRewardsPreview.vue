@@ -91,7 +91,7 @@ const rewards = computed(() => {
 .box-rewards { margin:0 0 18px; }
 .box-rewards h3 { margin:0 0 10px;color:#e8cf9d;font:600 15px Georgia,serif; }
 .box-rewards-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:6px;max-height:260px;overflow-y:auto;padding:3px;overscroll-behavior:contain; }
-.box-reward { position:relative;display:grid;place-items:center;aspect-ratio:1;min-width:0;overflow:hidden;border:1px solid #746449;border-radius:5px;background:linear-gradient(140deg,#24303a,#0c1420); }
+.box-reward { position:relative;display:grid;place-items:center;aspect-ratio:1;min-width:0;overflow:hidden;border:1px solid #746449;border-radius:5px;background:#0b1320 var(--ui-card-art) center / cover no-repeat; }
 .box-reward.rare { border-color:#77b8c9; }.box-reward.legendary { border-color:#e6bf70; }
 .box-reward:focus-visible { outline:2px solid #ffe3a0;outline-offset:1px; }
 .box-reward :deep(.item-art) { width:85%;height:85%; }

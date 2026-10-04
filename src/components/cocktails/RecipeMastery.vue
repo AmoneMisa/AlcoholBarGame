@@ -52,7 +52,7 @@ const pct = (value: number) => `+${Math.round((value - 1) * 100)}%`;
 </template>
 
 <style scoped>
-.recipe-mastery { display: grid; gap: 8px; padding: 14px; border: 1px solid #b78649; border-radius: 14px; background: radial-gradient(120% 100% at 0% 0%, #3a2a18, #141c2a 70%); }
+.recipe-mastery { display: grid; gap: 8px; padding: 14px; border: 1px solid #b78649; border-radius: 14px; background:#0b1320 var(--ui-panel-art) center/cover no-repeat; }
 .recipe-mastery header { display: flex;align-items:flex-start;justify-content:space-between;gap:12px; }
 .recipe-mastery header > div { display:grid;gap:5px; }
 .recipe-mastery header small { color: var(--gold, #f1c26b); font-size: 13px; font-weight: 900; letter-spacing: .14em; }

@@ -10,6 +10,6 @@ const notifications = useNotificationsStore();
 </style>
 
 <style scoped>
-.notification-stack article { grid-template-columns:32px minmax(0,1fr) 28px;padding:14px;background:#111c2df5 url('/assets/ui/lounge-panel-painted-v1.webp') center/cover; }
+.notification-stack article { grid-template-columns:32px minmax(0,1fr) 28px;padding:14px;background:#111c2d var(--ui-dialog-art) center/cover; }
 .notification-stack small {font-size:13px;line-height:1.4;}.notification-stack b{font-size:15px;}.notification-stack button .ui-icon{width:18px;height:18px;}
 </style>

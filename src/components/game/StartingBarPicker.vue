@@ -50,7 +50,7 @@ function start() { game.chooseStartingBar(picked.value); }
 .starting-bar-copy b { color: #fff3dc; font: 700 18px Georgia, serif; }
 .starting-bar-copy em { color: #c9d3df; font-size: 13px; font-style: normal; }
 .starting-bar-copy i { color: #8fa0b5; font-size: 13px; font-style: normal; }
-.starting-bar-footer { position: sticky; bottom: -14px; display: flex; justify-content: center; margin: 0 -14px -14px; padding: 12px 20px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #354762; background: linear-gradient(180deg, #0f1a2c, #0b1320); }
+.starting-bar-footer { position: sticky; bottom: -14px; display: flex; justify-content: center; margin: 0 -14px -14px; padding: 12px 20px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #354762; background:#0b1320 var(--ui-panel-art) center / cover no-repeat; }
 .starting-bar-footer .ui-btn { max-width: 360px; }
 @media (max-width: 560px) {
   .starting-bar-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 4px 12px 10px; }
