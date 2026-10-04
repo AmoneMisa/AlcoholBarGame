@@ -66,3 +66,70 @@ test('Insufficient currency errors open the matching offer; other refusals retai
   assert.equal(handleCurrencyError('Not enough money.'),true);assert.equal(currencyOffer.value,'coins');
   currencyOffer.value=undefined;assert.equal(handleCurrencyError('You need 4 workshop parts.'),false);assert.equal(currencyOffer.value,undefined);
 });
+
+
+// Collection benefits are derived from actual ownership on both client and server.
+import {collectionBonuses} from '../src/domain/collectionBonuses.ts';
+import {dailySpinLimit,spinsLeft} from '../src/domain/roulette.ts';
+import {dailyCoinsFor,dailyCrystalsFor,arrivalSkipCrystalCost,calendarDate} from '../src/domain/economy.ts';
+import {accrueTips,tipCapacity,tipAccumulationMs,TIP_ACCUMULATION_MS} from '../src/sim/tips.ts';
+import {deliveryFactorFor} from '../src/sim/lootCore.ts';
+import {createGameService} from '../server/gameService.mjs';
+import {createMemoryRepository} from '../server/playerRepository.mjs';
+const collectionState=(count)=>{
+  const state=createInitialState(now);
+  state.ownedCosmeticIds=COSMETICS.filter(item=>item.key==='bartender').slice(0,count).map(item=>item.id);
+  return state;
+};
+test('Collection counts only unique costumes and earned backgrounds; percent and milestone bonuses are capped',()=>{
+  const state=createInitialState(now);
+  state.ownedCosmeticIds=[COSMETICS[0].id,'fake'];
+  state.ownedInteriorIds=['velvet','fake'];
+  assert.equal(collectionBonuses(state).count,0);
+  const id=COSMETICS.find(item=>item.key==='bartender').id;
+  state.ownedCosmeticIds=[id,id];state.ownedInteriorIds=['velvet','lost-ark','lost-ark'];
+  assert.equal(collectionBonuses(state).count,2);
+  for(const [count,spins,prestige] of [[15,3,0],[16,4,0],[20,4,1],[32,5,1],[48,6,2],[64,7,3],[80,7,4],[120,7,4]]){
+    const state=collectionState(count),bonus=collectionBonuses(state);
+    assert.equal(bonus.count,count);assert.equal(dailySpinLimit(state),spins);assert.equal(bonus.visitPrestige,prestige);
+    assert.ok(bonus.rate<=.1&&bonus.offlineRate<=.2);
+  }
+});
+test('Collection rewards apply to daily claims, early invitation prices and seven-spin server limits without reopening used spins',()=>{
+  const state=collectionState(100);state.crystals=1000;
+  assert.equal(arrivalSkipCrystalCost(7200000,state),22);
+  assert.equal(dailyCoinsFor(7,state),550);assert.equal(dailyCrystalsFor(7,state),99);
+  state.loginStreak=6;state.dailyGiftClaimedKey=calendarDate(new Date(now-86400000));
+  const money=state.money,crystals=state.crystals;
+  applyAction(state,{type:'claimDaily'},{...ctx,random:()=>.9});
+  assert.equal(state.money-money,550);assert.equal(state.crystals-crystals,99);
+  assert.throws(()=>applyAction(state,{type:'claimDaily'},ctx),/already/);
+  for(let i=0;i<7;i++)applyAction(state,{type:'spinRoulette'},ctx);
+  assert.equal(spinsLeft(state.roulette,calendarDate(new Date(now)),state),0);
+  assert.equal(normalizePlayerState(state,now).roulette.spins,7);
+  assert.throws(()=>applyAction(state,{type:'spinRoulette'},ctx),/all 7/);
+});
+test('Collection extends the offline jar earning window and capacity, then stops; trade delivery discount stays small',()=>{
+  const state=collectionState(100),base=createInitialState(now);
+  assert.equal(tipAccumulationMs(state),TIP_ACCUMULATION_MS*1.2);
+  assert.equal(tipCapacity(state),Math.round(tipCapacity(base)*1.1*1.2));
+  accrueTips(state,now+TIP_ACCUMULATION_MS);
+  const first=state.tipJar;accrueTips(state,now+tipAccumulationMs(state));
+  assert.ok(state.tipJar>first);assert.equal(state.tipJar,tipCapacity(state));
+  accrueTips(state,now+3*TIP_ACCUMULATION_MS);assert.equal(state.tipJar,tipCapacity(state));
+  assert.equal(deliveryFactorFor(state,state.regionId),deliveryFactorFor(base,base.regionId)*.9);
+});
+test('Friend visits award the owner collection prestige bonus once per friend per day',async()=>{
+  const repository=createMemoryRepository();
+  const service=createGameService({repository,checkEnglish:()=>({ok:true}),now:()=>now});
+  const a={kind:'dev',key:'collection-visitor',name:'Visitor'},b={kind:'dev',key:'collection-owner',name:'Owner'};
+  const sa=await service.session(a),sb=await service.session(b);
+  await service.addFriend(a,sb.player.friendCode);await service.answerFriend(b,sa.player.friendCode,true);
+  const row=repository.states.get(Number(sb.player.id));
+  row.state.ownedCosmeticIds=collectionState(80).ownedCosmeticIds;
+  const before=row.state.popularity;
+  const visit=await service.visitFriend(a,sb.player.friendCode);
+  assert.equal(visit.body.prestigeAward,5);assert.equal(visit.body.friend.prestige,before+5);
+  const repeat=await service.visitFriend(a,sb.player.friendCode);
+  assert.equal(repeat.body.prestigeAward,0);assert.equal(repeat.body.friend.prestige,before+5);
+});

@@ -1,7 +1,8 @@
+import { collectionBonuses as bonusesFor } from '../domain/collectionBonuses';
 import { handleCurrencyError } from '../domain/uiOffers';
 import { trainingGuest } from '../domain/training';
 import { eventAvailability } from '../domain/eventAvailability';
-import { resetTips, tipCapacity } from '../sim/tips';
+import { resetTips, tipCapacity, tipAccumulationMs } from '../sim/tips';
 import { stealFriendTips } from '../telegram/api';
 import { fetchMailbox, answerMailGift, claimMailReward } from '../telegram/api';
 import type { MailEntry } from '../sim/mailbox';
@@ -30,7 +31,7 @@ import { negotiatedQuote } from '../sim/tradeCore';
 import type { Customer, InventoryItem, RegionId, SupplierOffer } from '../domain/types';
 import { pourableBrand } from '../domain/brandServe';
 import { formatCountdown } from '../domain/customerTiming';
-import { spinsLeft } from '../domain/roulette';
+import { spinsLeft, dailySpinLimit } from '../domain/roulette';
 import { passEndsOf, passIdOf, passLevel, passPointsFor, passThemeOf, readyPassRewards } from '../domain/pass';
 import { checkText } from '../domain/english/checker';
 import type { GameAction } from '../sim/rulesCore';
@@ -194,6 +195,9 @@ export const useGameStore = defineStore('game', () => {
   }
   const preparationCustomerId = ref('');
   const tipJar = computed(() => state.value.tipJar ?? 0);
+  const collectionBonuses = computed(() => bonusesFor(state.value));
+  const tipJarHours = computed(() => tipAccumulationMs(state.value) / 3600000);
+  const rouletteSpinLimit = computed(() => dailySpinLimit(state.value));
   const tipJarCapacity = computed(() => tipCapacity(state.value));
   const collectTips = () => dispatch({ type: 'collectTips' });
   function openPreparation(id: string) {
@@ -255,7 +259,7 @@ export const useGameStore = defineStore('game', () => {
   const languageStats = computed(() => state.value.languageStats);
   const deliveryOrders = computed(() => state.value.deliveryOrders);
   const tradeLog = computed(() => state.value.tradeLog);
-  const seatArrivals = computed(() => (state.value.seatNextCustomerAt ?? []).map((at, seat) => ({ seat, at, cost: arrivalSkipCrystalCost(at-nowMs.value), countdown: formatCountdown(Math.max(0, (at-nowMs.value)/1000)) })).filter(item => item.at > 0));
+  const seatArrivals = computed(() => (state.value.seatNextCustomerAt ?? []).map((at, seat) => ({ seat, at, cost: arrivalSkipCrystalCost(at-nowMs.value, state.value), countdown: formatCountdown(Math.max(0, (at-nowMs.value)/1000)) })).filter(item => item.at > 0));
   const nextCustomerAt = computed(() => state.value.nextCustomerAt);
   const vipCooldownUntil = computed(() => state.value.vipCooldownUntil);
   const ownedCosmeticIds = computed(() => state.value.ownedCosmeticIds ?? []);
@@ -268,7 +272,7 @@ export const useGameStore = defineStore('game', () => {
   }
   const giftableStyleItems = computed(() => { if (!giftChoices.value) loadGiftChoices(); return giftChoices.value?.giftableStyles(state.value) ?? []; });
   const giftableBackgrounds = computed(() => { if (!giftChoices.value) loadGiftChoices(); return giftChoices.value?.giftableInteriors(state.value) ?? []; });
-  const rouletteSpinsLeft = computed(() => spinsLeft(state.value.roulette, today.value));
+  const rouletteSpinsLeft = computed(() => spinsLeft(state.value.roulette, today.value, state.value));
   const rouletteLast = computed(() => state.value.roulette.last);
   // The season pass: shown from the loot counters; a pass that has not been started by an action yet counts from zero.
   // The pass clock is the player's own: it began when the game first saw them (until then it starts now).
@@ -307,7 +311,11 @@ export const useGameStore = defineStore('game', () => {
 
   const region = computed(() => REGIONS.find((item) => item.id === state.value.regionId)!);
   // Level perks and the city's current event (Hot Time, shortages…), computed exactly as the rules do.
-  const economy = computed(() => economyAt(region.value.id, region.value.marketFactor, state.value.xp, nowMs.value));
+  const economy = computed(() => {
+    const base = economyAt(region.value.id, region.value.marketFactor, state.value.xp, nowMs.value);
+    const bonus = collectionBonuses.value.rate;
+    return {...base,tips:base.tips*(1+bonus),arrival:base.arrival*(1-bonus),delivery:base.delivery*(1-bonus),vipChance:Math.min(.95,base.vipChance*(1+bonus))};
+  });
   const xpProgress = computed(() => levelProgress(state.value.xp));
   const market = computed(() => marketFor(region.value, nowMs.value, state.value.xp));
   const knownRecipes = computed(() => RECIPES.filter((recipe) => state.value.knownRecipeIds.includes(recipe.id)));
@@ -320,8 +328,8 @@ export const useGameStore = defineStore('game', () => {
   const dailyLessonsComplete = computed(() => dailyLessonCompletedIds.value.length >= dailyLessons.value.length);
   const dailyGiftAvailable = computed(() => state.value.dailyGiftClaimedKey !== today.value);
   const upcomingLoginDay = computed(() => consecutiveDays(state.value.dailyGiftClaimedKey, state.value.loginStreak, new Date(nowMs.value)));
-  const dailyCoinReward = computed(() => dailyCoinsFor(upcomingLoginDay.value));
-  const dailyCrystalReward = computed(() => dailyCrystalsFor(upcomingLoginDay.value));
+  const dailyCoinReward = computed(() => dailyCoinsFor(upcomingLoginDay.value, state.value));
+  const dailyCrystalReward = computed(() => dailyCrystalsFor(upcomingLoginDay.value, state.value));
   // Suppliers with this city's delivery fees (the same terms the rules charge).
   const localSuppliers = computed(() => SUPPLIERS.map((item) => supplierInCity(item, region.value.marketFactor)));
   const supplier = computed(() => localSuppliers.value.find((item) => item.id === selectedSupplier.value) ?? localSuppliers.value[0]!);
@@ -337,7 +345,7 @@ export const useGameStore = defineStore('game', () => {
   const customer = computed(() => state.value.customers.find((item) => item.id === state.value.activeCustomerId) ?? state.value.customers[0] ?? EMPTY_CUSTOMER);
   const nextCustomerInSeconds = computed(() => state.value.nextCustomerAt ? Math.max(0, Math.ceil((state.value.nextCustomerAt - nowMs.value) / 1000)) : 0);
   const nextCustomerCountdown = computed(() => formatCountdown(nextCustomerInSeconds.value));
-  const nextCustomerCrystalCost = computed(() => arrivalSkipCrystalCost(state.value.nextCustomerAt - nowMs.value));
+  const nextCustomerCrystalCost = computed(() => arrivalSkipCrystalCost(state.value.nextCustomerAt - nowMs.value, state.value));
   const orderCountdown = computed(() => formatCountdown(customer.value.patienceRemaining));
   const orderTimerPaused = computed(() => !!state.value.conversationCustomerId);
   const recipe = computed(() => judgeMix(currentMix.value, customer.value, shaken.value).recipe);
@@ -555,7 +563,7 @@ export const useGameStore = defineStore('game', () => {
       if (!result.ok || !result.friend) throw new Error(result.error);
       if (result.state) adoptServerState(result.state, clientNow());
       visitedFriend.value = result.friend;
-      message.value = result.rewarded ? `You visited ${result.friend.nickname}. They received +1 prestige.` : `Visiting ${result.friend.nickname}. Today's prestige was already given.`;
+      message.value = result.rewarded ? `You visited ${result.friend.nickname}. They received +${result.prestigeAward ?? 1} prestige.` : `Visiting ${result.friend.nickname}. Today's prestige was already given.`;
       void loadFriends();
       return true;
     } catch (error) { return friendError(error, 'Could not visit this bar.'); }
@@ -924,7 +932,7 @@ export const useGameStore = defineStore('game', () => {
 
   const act = (action: GameAction) => dispatch(action);
   return {
-    mailMessage, collectMailReward, collectAllMailRewards, mailboxOpen, mailboxEntries, unreadMail, theftNotices, mailBusy, loadMailbox, openMailbox, dismissTheftNotices, decideMailGift, foodRecommendations, cleanGuestAshtray, removeGuestAshtray, trainingActive, trainingPhase, trainingRestocked, beginTraining, endTraining, preparationCustomerId, openPreparation, tipJar, tipJarCapacity, collectTips, stealVisitedTips, stealingTips,
+    mailMessage, collectMailReward, collectAllMailRewards, mailboxOpen, mailboxEntries, unreadMail, theftNotices, mailBusy, loadMailbox, openMailbox, dismissTheftNotices, decideMailGift, foodRecommendations, cleanGuestAshtray, removeGuestAshtray, trainingActive, trainingPhase, trainingRestocked, beginTraining, endTraining, preparationCustomerId, openPreparation, collectionBonuses, tipJarHours, rouletteSpinLimit, tipJar, tipJarCapacity, collectTips, stealVisitedTips, stealingTips,
     topUpPreview, circle, crewBonus, recruitCompanion, giveKeepsake, buyKeepsake, assignCompanion, dismissCompanion, spotlightCompanion, levelUpCompanion, achievementStat, profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, availableEvents, act, visibleInventory, connectEpoch,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,

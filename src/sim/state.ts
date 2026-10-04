@@ -1,7 +1,7 @@
 import { INGREDIENTS, RECIPES, REGIONS, STARTING_INVENTORY } from '../domain/catalog';
 import { validWishlist } from '../domain/wishlist';
 import { ALCOHOL_PRODUCTS, isStarterBottle } from '../domain/bottleCatalog';
-import { ROULETTE_SPINS_PER_DAY, WHEEL } from '../domain/roulette';
+import { WHEEL } from '../domain/roulette';
 import { cosmeticFor } from '../domain/cosmetics';
 import { REFERENCE_COSTUME_IDS } from '../data/cosmetics/bartenderCostumes';
 import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
@@ -350,7 +350,7 @@ export function normalizePlayerState(state: PlayerState) {
   };
   const wheel = (state.roulette ?? {}) as Partial<import('../domain/roulette').RouletteState>;
   const last = wheel.last && Number.isInteger(wheel.last.index) && wheel.last.index >= 0 && wheel.last.index < WHEEL.length ? { index: wheel.last.index, text: String(wheel.last.text ?? '').slice(0, 200), n: Math.max(0, Math.floor(Number(wheel.last.n) || 0)) } : undefined;
-  state.roulette = { day: typeof wheel.day === 'string' ? wheel.day : '', spins: Math.max(0, Math.min(ROULETTE_SPINS_PER_DAY, Math.floor(Number(wheel.spins) || 0))), ...(last ? { last } : {}) };
+  state.roulette = { day: typeof wheel.day === 'string' ? wheel.day : '', spins: Math.max(0, Math.min(7, Math.floor(Number(wheel.spins) || 0))), ...(last ? { last } : {}) };
   state.cosmeticGiftLog = Array.isArray(state.cosmeticGiftLog) ? state.cosmeticGiftLog.slice(0, 30) : [];
   // The training academy was removed: old saves drop its progress and any practice guest still at the bar.
   delete (state as { training?: unknown }).training;

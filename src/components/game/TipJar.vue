@@ -29,7 +29,7 @@ watch(amount, (next, old) => { if (next > old) pulse.value++; });
   </button>
   <ModalDialog v-if="open" :title="visited ? 'Your friend’s tip jar' : 'Tip jar'" eyebrow="TIPS" width="420px" :closable="!collecting && !game.stealingTips" @close="open = false">
     <div class="tip-jar-summary"><img :src="jarImage" width="88" height="88" alt="" /><div><b>{{ Math.floor(amount) }} coins</b><small>Capacity: {{ capacity }} coins</small></div></div>
-    <p v-if="!visited">Tips accumulate for up to 12 hours or until the jar is full. Collect them here to add them to your balance.</p>
+    <p v-if="!visited">Tips accumulate for up to {{ game.tipJarHours.toFixed(1) }} hours or until the jar is full. Collect them here to add them to your balance.</p>
     <p>Visitors can steal up to 5%. At least 30% of deposited tips stay protected. One attempt per player per day, 10 attempts total.</p>
     <template v-if="visited"><p>{{ game.visitedFriend?.tips?.attemptsLeft ?? 0 }} attempts left today. Empty or protected jars also use an attempt.</p><p v-if="game.visitedFriend?.tips?.attemptedToday">You have already tried this jar today.</p><UiButton variant="solid" block :disabled="unavailable" @click="steal">{{ game.stealingTips ? 'Taking tips…' : 'Steal tips' }}</UiButton></template>
     <UiButton v-else variant="solid" block data-guide="tip-collect" :disabled="unavailable || collecting" @click="collect">{{ collecting ? 'Collecting…' : 'Collect' }}</UiButton>

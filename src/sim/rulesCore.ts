@@ -1,10 +1,11 @@
+import { collectionBonuses } from '../domain/collectionBonuses';
 import { INGREDIENTS, MODIFIERS, RECIPES, REGIONS, SUPPLIERS, estimateRecipeAbv } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS, bottleRestockCrystalCost, bottleSaleCrystalReward, bottleTotal, brandedServeCrystalReward } from '../domain/bottleCatalog';
 import { arrivalSkipCrystalCost, calendarDate, coins, specialtyFactor, supplierInCity, consecutiveDays, conversationCrystalReward, conversationDifficulty, crystalExchange, dailyCoinsFor, dailyCrystalsFor, quotePurchase, recipePurchase } from '../domain/economy';
 import { withArticle } from '../domain/english/articles';
 import { accrueTips, depositTips, resetTips } from './tips';
 import { PassError, buyPassLevels, buyPassPremium, claimPass, syncPass } from './pass';
-import { ROULETTE_SPINS_PER_DAY, spinWheel } from '../domain/roulette';
+import { dailySpinLimit, spinWheel } from '../domain/roulette';
 import { STYLE_SHOP_PRICE, styleForInterior, styleSource } from '../data/cosmetics/styleSources';
 import { BAR_PROFILE_OPTIONS, DEFAULT_BARS, INTERIORS, isEventInterior } from '../data/cosmetics/bars';
 import { consumeMix, generateCustomer, judgeMix, nearMiss, requiredRecipe } from '../domain/engine';
@@ -189,7 +190,9 @@ function makeSpecialCustomer(recipe: Recipe, level: number): Customer {
 
 const economyOf = (state: PlayerState, now: number) => {
   const region = REGIONS.find((item) => item.id === state.regionId)!;
-  return economyAt(region.id, region.marketFactor, state.xp, now);
+  const economy = economyAt(region.id, region.marketFactor, state.xp, now);
+  const bonus = collectionBonuses(state).rate;
+  return {...economy,tips:economy.tips*(1+bonus),arrival:economy.arrival*(1-bonus),delivery:economy.delivery*(1-bonus),vipChance:Math.min(.95,economy.vipChance*(1+bonus))};
 };
 // Tips are a chance: the level sets the base rate, VIP and wealthy guests are more generous, and a guest who likes the
 // bartender (or is a little drunk and happy) tips more often.
@@ -300,7 +303,7 @@ function makeArrivingCustomer(state: PlayerState, now: number, random: () => num
   // Some nights bring more women (ladies’ night): look again for a few tries.
   if (night?.womenShare !== undefined && random() < night.womenShare) for (let attempt = 0; attempt < 10 && genderOf(arriving.characterId) !== 'f'; attempt++) arriving = make();
   // Circle guests have a separate cast and visit occasionally; ordinary customer rolls never use their art.
-  if (random() < .15) {
+  if (random() < .15 * (1 + collectionBonuses(state).rate)) {
     const available = COMPANIONS.filter((person) => !state.customers.some((guest) => guest.characterId === person.id));
     if (available.length) {
       const person = available[Math.floor(random() * available.length)]!;
@@ -500,7 +503,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       const result = serveFoodAtCounter(state, guest, action.ingredientId, now);
       if (!result.accepted) throw new RuleError(result.text);
       const paid = state.money - balance;
-      const tip = rollTip(state, guest, now, random) ? Math.max(1, Math.ceil(paid * .1)) : 0;
+      const tip = rollTip(state, guest, now, random) ? Math.max(1, Math.ceil(paid * .1 * (1 + collectionBonuses(state).rate))) : 0;
       state.money = balance;
       queuePayment(state, guest, paid, tip, 0, now, false, true);
       state.message = `Food served. Accept payment in the conversation.`;
@@ -786,9 +789,9 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       if (state.dailyGiftClaimedKey === today) throw new RuleError('Today’s gift has already been claimed.');
       state.loginStreak = consecutiveDays(state.dailyGiftClaimedKey, state.loginStreak, new Date(now));
       raiseStat(state, 'loginDays', state.loginStreak);
-      const reward = dailyCoinsFor(state.loginStreak);
+      const reward = dailyCoinsFor(state.loginStreak, state);
       state.money = coins(state.money + reward);
-      const crystalReward = dailyCrystalsFor(state.loginStreak);
+      const crystalReward = dailyCrystalsFor(state.loginStreak, state);
       state.crystals += crystalReward;
       state.dailyGiftClaimedKey = today;
       const locked = lockedRecipes(state);
@@ -927,7 +930,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       if (state.customers.some(customer => customer.seatId === seat)) throw new RuleError('This customer seat is already occupied.');
       const arrivalAt = state.seatNextCustomerAt?.[seat];
       if (!arrivalAt) throw new RuleError('This customer is already arriving.');
-      const cost = arrivalSkipCrystalCost(arrivalAt - now);
+      const cost = arrivalSkipCrystalCost(arrivalAt - now, state);
       if (cost <= 0) throw new RuleError('The next customer is already arriving.');
       if (state.crystals < cost) throw new RuleError(`You need ${cost} crystals to welcome the next customer now.`);
       state.crystals -= cost;
@@ -1015,7 +1018,7 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
     case 'spinRoulette': {
       const today = calendarDate(new Date(now));
       if (state.roulette.day !== today) state.roulette = { day: today, spins: 0, last: state.roulette.last };
-      if (state.roulette.spins >= ROULETTE_SPINS_PER_DAY) throw new RuleError(`You used all ${ROULETTE_SPINS_PER_DAY} spins today. Come back tomorrow.`);
+      if (state.roulette.spins >= dailySpinLimit(state)) throw new RuleError(`You used all ${dailySpinLimit(state)} spins today. Come back tomorrow.`);
       const { index, reward } = spinWheel(levelFor(state.xp), random);
       const text = grantReward(state, reward, random);
       state.roulette.spins += 1;

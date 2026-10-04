@@ -1,12 +1,13 @@
+import { collectionBonuses, collectionReward, type CollectionOwnership } from './collectionBonuses';
 import type { Customer, Recipe, RegionId, Supplier, SupplierOffer } from './types';
 
 export const coins = (value: number) => Math.round(value);
 export const bulkDiscount = (packs: number) => packs >= 10 ? .10 : packs >= 5 ? .05 : 0;
 export const DAILY_COINS = [100, 150, 200, 260, 320, 400, 500] as const;
-export const dailyCoinsFor = (streak: number) => DAILY_COINS[Math.min(6, Math.max(0, Math.floor(streak) - 1))]!;
-export const dailyCrystalsFor = (streak: number) => {
+export const dailyCoinsFor = (streak: number, state?: CollectionOwnership) => collectionReward(DAILY_COINS[Math.min(6, Math.max(0, Math.floor(streak) - 1))]!, state);
+export const dailyCrystalsFor = (streak: number, state?: CollectionOwnership) => {
   const day = ((Math.max(1, Math.floor(streak)) - 1) % 7) + 1;
-  return day === 7 ? 90 : day === 3 ? 30 : 0;
+  return collectionReward(day === 7 ? 90 : day === 3 ? 30 : 0, state);
 };
 
 // Premium currency can only move into earned currency. Fixed server-known bundles prevent a client
@@ -38,7 +39,7 @@ export function crystalExchange(crystals: number) {
   return CRYSTAL_EXCHANGE_BUNDLES.find((bundle) => bundle.crystals === crystals);
 }
 
-export const arrivalSkipCrystalCost = (remainingMs: number) => remainingMs <= 0 ? 0 : Math.min(24, Math.max(1, Math.ceil(remainingMs / 300_000)));
+export const arrivalSkipCrystalCost = (remainingMs: number, state?: CollectionOwnership) => remainingMs <= 0 ? 0 : Math.max(1, Math.round(Math.min(24, Math.max(1, Math.ceil(remainingMs / 300_000))) * (1 - (state ? collectionBonuses(state).rate : 0))));
 
 export function conversationDifficulty(customer: Customer, recipe?: Recipe) {
   let score = customer.orderKind === 'bottle' || customer.signature ? 3 : customer.orderKind === 'serve' ? 2 : 1;

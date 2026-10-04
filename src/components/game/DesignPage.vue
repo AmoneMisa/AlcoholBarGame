@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import UiButton from '../ui/UiButton.vue';
+import CollectionBonuses from './CollectionBonuses.vue';
 import { acquisitionOffer } from '../../domain/uiOffers';
 import UiInput from '../ui/UiInput.vue';
 import CrystalAmount from '../ui/CrystalAmount.vue';
@@ -105,6 +106,7 @@ function selectBartender(id: 'noa' | 'leo') {
 <template>
 <article class="game-panel design-deck">
       <PanelHeading eyebrow="PERSONALIZE" title="Bar & bartender" aside="Live preview" />
+      <CollectionBonuses />
       <div v-if="designTabsShown.length" class="design-tabs" role="tablist" aria-label="Design sections"><button v-for="tab in designTabsShown" :key="tab.id" role="tab" type="button" :aria-selected="designTab === tab.id" :class="{ active: designTab === tab.id }" @click="designTab = tab.id">{{ tab.label }}</button></div>
       <div class="design-grid-new">
         <!-- Bar: the real bar scene in preview mode, pinned while the options scroll. -->

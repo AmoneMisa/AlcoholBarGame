@@ -1,3 +1,4 @@
+import { collectionBonuses } from '../domain/collectionBonuses';
 // Common state helpers needed by the opening bar.
 import { INGREDIENTS, RECIPES } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
@@ -346,7 +347,7 @@ export function addWeeklyScore(state: PlayerState, xpGained: number, now: number
   if (xpGained > 0) state.loot.weekly.score += Math.floor(xpGained);
 }
 
-export const deliveryFactorFor = (state: PlayerState, regionId: string) => 1 - fridgeLevelOf(state, regionId) * equipmentDef('fridge')!.perLevel;
+export const deliveryFactorFor = (state: PlayerState, regionId: string) => (1 - fridgeLevelOf(state, regionId) * equipmentDef('fridge')!.perLevel) * (1 - collectionBonuses(state).rate);
 
 export function orderDiscount(state: PlayerState, now: number) {
   const voucher = (state.loot.armed['voucher'] ?? 0) > 0;

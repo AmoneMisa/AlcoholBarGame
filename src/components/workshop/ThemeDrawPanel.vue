@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import CollectionBonuses from '../game/CollectionBonuses.vue';
 import { requestedDrawPool } from '../../domain/uiOffers';
 import { THEME_DRAW_POOLS } from '../../data/cosmetics/themeDistribution';
 import { COSMETICS, DRAWABLE_COSMETICS, interiorForCosmetic } from '../../domain/cosmetics';
@@ -19,7 +20,7 @@ const pool=computed(()=>THEME_DRAW_POOLS.find(item=>item.id===selected.value)??{
 const prizes=computed(()=>pool.value.styleIds.map(id=>({id,style:COSMETICS.find(item=>item.id===id)!,background:collection.value?INTERIORS.find(item=>item.id===interiorForCosmetic(id)):undefined})));
 const collected=(id:string,background?:string)=>game.ownedCosmeticIds.includes(id)&&(!background||game.ownedInteriorIds.includes(background));
 </script>
-<template><section class="theme-draw"><SectionTabs v-model="selected" label="Style collections" :tabs="tabs" /><p v-if="collection">Choose a small collection to find the style you want. Each prize includes a style and its matching background. Every pair has the same chance. Duplicate styles become 10 fragments; a missing background is still added.</p><p v-else>Classic odds: 70% common, 27% rare, 3% legendary. A rare or better cosmetic is guaranteed within 10 draws, and a legendary within 50. Seasonal draws feature selected legendary styles. Duplicates become fragments.</p><div class="theme-draw-prizes">
+<template><section class="theme-draw"><CollectionBonuses /><SectionTabs v-model="selected" label="Style collections" :tabs="tabs" /><p v-if="collection">Choose a small collection to find the style you want. Each prize includes a style and its matching background. Every pair has the same chance. Duplicate styles become 10 fragments; a missing background is still added.</p><p v-else>Classic odds: 70% common, 27% rare, 3% legendary. A rare or better cosmetic is guaranteed within 10 draws, and a legendary within 50. Seasonal draws feature selected legendary styles. Duplicates become fragments.</p><div class="theme-draw-prizes">
   <article v-for="prize in prizes" :key="prize.id" :class="{owned:collected(prize.id,prize.background?.id)}">
     <div class="theme-draw-look" :style="prize.background ? interiorStyle(prize.background.id) : undefined" :aria-label="prize.style.label">
       <RewardArt :line="{kind:'style',id:prize.id,text:prize.style.label}" />

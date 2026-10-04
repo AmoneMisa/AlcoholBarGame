@@ -1,3 +1,4 @@
+import { collectionBonuses } from '../src/domain/collectionBonuses';
 import { createStaffRoles } from './staffRoles.mjs';
 import { createAdministration } from './administration.mjs';
 import {resolveFragmentReward} from '../src/sim/loot';
@@ -332,19 +333,20 @@ export function createGameService({ repository, checkEnglish, ownerTelegramIds =
       const key = String(targetId);
       const today = calendarDate(new Date(now()));
       const rewarded = visitor.friendVisits[key] !== today;
+      const prestigeAward = rewarded ? 1 + collectionBonuses(owner).visitPrestige : 0;
       const visitId = `visit:${randomBytes(12).toString('hex')}`;
-      addMail(owner,{id:visitId,at:now(),kind:'visit',direction:'incoming',actorId:Number(player.id),actorName:player.name,text:`${player.name} visited your bar.${rewarded ? ' +1 prestige.' : ''}`});
+      addMail(owner,{id:visitId,at:now(),kind:'visit',direction:'incoming',actorId:Number(player.id),actorName:player.name,text:`${player.name} visited your bar.${rewarded ? ` +${prestigeAward} prestige.` : ''}`});
       addMail(visitor,{id:visitId,at:now(),kind:'visit',direction:'outgoing',actorId:targetId,actorName:target.name,text:`You visited ${target.name}’s bar.`,readAt:now()});
       if (rewarded) {
         visitor.friendVisits[key] = today;
         addStat(visitor, 'visitedFriends', 1);
         addStat(owner, 'visitedBy', 1);
-        owner.popularity += 1;
-        owner.message = `${player.name} visited your bar. +1 prestige.`;
+        owner.popularity += prestigeAward;
+        owner.message = `${player.name} visited your bar. +${prestigeAward} prestige.`;
       }
       await tx.saveState(player.id, visitor, (visitorRecord?.version ?? 0) + 1);
       await tx.saveState(targetId, owner, (friendRecord?.version ?? 0) + 1);
-      return { status: 200, body: { ok: true, rewarded, state: publicState(visitor), friend: { id: targetId, code: friendCode(targetId), nickname: target.name, customName: visitor.friendLabels[key] ?? '', prestige: owner.popularity, tips: tipVisitInfo(visitor, owner, key, today), ...publicBar(owner, target.name) } } };
+      return { status: 200, body: { ok: true, rewarded, prestigeAward, state: publicState(visitor), friend: { id: targetId, code: friendCode(targetId), nickname: target.name, customName: visitor.friendLabels[key] ?? '', prestige: owner.popularity, tips: tipVisitInfo(visitor, owner, key, today), ...publicBar(owner, target.name) } } };
     });
   }
 

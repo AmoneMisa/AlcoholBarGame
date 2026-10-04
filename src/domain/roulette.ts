@@ -1,3 +1,4 @@
+import { collectionBonuses, type CollectionOwnership } from './collectionBonuses';
 import { between, type Reward } from './loot';
 
 // The daily wheel: three free spins a day. The server picks the segment and applies the prize; the screen only
@@ -31,5 +32,6 @@ export function spinWheel(level: number, random: () => number): { index: number;
 }
 
 export interface RouletteState { day: string; spins: number; last?: { index: number; text: string; n: number } }
+export const dailySpinLimit = (state?: CollectionOwnership) => ROULETTE_SPINS_PER_DAY + (state ? collectionBonuses(state).extraSpins : 0);
 export const emptyRoulette = (): RouletteState => ({ day: '', spins: 0 });
-export const spinsLeft = (roulette: RouletteState, today: string) => Math.max(0, ROULETTE_SPINS_PER_DAY - (roulette.day === today ? roulette.spins : 0));
+export const spinsLeft = (roulette: RouletteState, today: string, state?: CollectionOwnership) => Math.max(0, dailySpinLimit(state) - (roulette.day === today ? roulette.spins : 0));

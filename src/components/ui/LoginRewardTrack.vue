@@ -13,8 +13,8 @@ const game = useGameStore();
 const cycleDay = computed(() => ((game.dailyGiftAvailable ? game.upcomingLoginDay : game.loginStreak) - 1) % 7 + 1);
 const claimedDays = computed(() => game.dailyGiftAvailable ? Math.max(0, game.upcomingLoginDay - 1) % 7 : cycleDay.value);
 const cycleStart = computed(() => Math.floor((Math.max(1, game.dailyGiftAvailable ? game.upcomingLoginDay : game.loginStreak) - 1) / 7) * 7);
-const trackRewards = computed(() => DAILY_COINS.map((_, index) => dailyCoinsFor(cycleStart.value + index + 1)));
-const crystalsFor = (day: number) => dailyCrystalsFor(day);
+const trackRewards = computed(() => DAILY_COINS.map((_, index) => dailyCoinsFor(cycleStart.value + index + 1, game)));
+const crystalsFor = (day: number) => dailyCrystalsFor(day, game);
 function claim() { game.claimDailyGift(); }
 </script>
 

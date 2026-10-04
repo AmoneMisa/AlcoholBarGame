@@ -9,7 +9,7 @@ export interface SessionResult { theftNotifications?: import('../sim/mailbox').M
 export interface FriendSummary { id:number; code:string; nickname:string; customName:string; status:'pending'|'accepted'; direction:'incoming'|'outgoing'; level:number; prestige:number; barName:string; visitedToday:boolean }
 export interface TipVisitInfo {amount:number;capacity:number;attemptsLeft:number;attemptedToday:boolean}
 export interface FriendBar { tips?:TipVisitInfo; profile?: import('../domain/profile').PlayerProfile; id:number; code:string; nickname:string; customName:string; name:string; level:number; prestige:number; regionId:string; bar:Record<string,any>; recipes:number; interiors:number; mastered:{name:string;level:number}[] }
-export interface SocialResult { ok:boolean; error?:string; message?:string; state?:PlayerState; serverTime?:number; friendCode?:string; prestige?:number; pendingGifts?:number; received?:string[]; friends?:FriendSummary[]; friend?:FriendBar; rewarded?:boolean }
+export interface SocialResult { ok:boolean; error?:string; message?:string; state?:PlayerState; serverTime?:number; friendCode?:string; prestige?:number; pendingGifts?:number; received?:string[]; friends?:FriendSummary[]; friend?:FriendBar; rewarded?:boolean; prestigeAward?:number }
 
 function authHeaders(): Record<string, string> {
   const initData = window.Telegram?.WebApp?.initData;

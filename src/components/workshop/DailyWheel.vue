@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { itemArtwork } from '../../domain/itemArtwork';
-import { ROULETTE_SPINS_PER_DAY, WHEEL } from '../../domain/roulette';
+import { WHEEL } from '../../domain/roulette';
 import { useGameStore } from '../../stores/game';
 import UiButton from '../ui/UiButton.vue';
 import ModalDialog from '../ui/ModalDialog.vue';
@@ -121,7 +121,7 @@ onBeforeUnmount(() => { clearTimeout(timer); clearTimeout(watchdog); clearPointe
       </div>
     </div>
     <div class="wheel-side">
-      <p class="wheel-spins" role="status"><b>{{ left }}</b> of {{ ROULETTE_SPINS_PER_DAY }} spins left today</p>
+      <p class="wheel-spins" role="status"><b>{{ left }}</b> of {{ game.rouletteSpinLimit }} spins left today</p>
       <p v-if="busy" class="wheel-result" role="status" aria-live="polite">{{ spinning ? 'Spinning…' : 'Waiting for the wheel…' }}</p>
       <div class="wheel-buttons">
         <UiButton variant="primary" block :disabled="busy || game.roulettePending || left <= 0" @click="spin">{{ left <= 0 ? 'Come back tomorrow' : 'Spin' }}</UiButton>
