@@ -39,7 +39,7 @@ import { adjustPitch, askPitch, cancelPitch, pitchChance, startPitch, serveFoodA
 import { pitchActsIn } from '../domain/social/pitchActs';
 import { foodById } from '../domain/foods';
 import { foodRequestLine } from '../domain/foodRequests';
-import { discardQuarantine, expireStock, fileClaim, goodAmount, receiveOrder, takeLowGrade } from './stockQuality';
+import { discardQuarantine, expireStock, fileClaim, goodAmount, lowGradeOf, receiveOrder, takeLowGrade } from './stockQuality';
 import { situationById } from '../domain/situations/catalog';
 import { MAX_SEATS, afterServed, holdForPayment, recordDrink, settleGuest, applySocialReply, askToLeave, callTaxi, cleanAshtrays, drunkGain, giveAshtray, giveWater, isOrdering, orderingGuests, removeGuest, scheduleArrival, tickGuests, ashtraysOf, serviceAshtray, type GuestContext } from './guests';
 import { addSpareCopy, RECIPE_MAX_LEVEL, recipeBonus, recipeCardsRequired, recipeCopies, recipeLevel, upgradeCost } from './recipes';
@@ -56,6 +56,7 @@ export type GameAction =
   | { type: 'buy'; supplierId: string; cart: Record<string, number> }
   | { type: 'sell'; cart: Record<string, number> }
   | { type: 'transfer'; ingredientId: string; targetId: RegionId; amount?: number }
+  | { type: 'manageStock'; kind: 'ingredient' | 'bottle'; id: string; quantity: number; operation: 'transfer' | 'discard'; targetId?: RegionId }
   | { type: 'claimDaily' }
   | { type: 'completeDailyLesson'; lessonId: string; answer: string }
   | { type: 'exchangeCrystals'; crystals: number }
@@ -764,6 +765,54 @@ export function applyAction(state: PlayerState, action: GameAction, context: Rul
       for (const line of lines) inventoryOf(state).find((stock) => stock.ingredientId === line.ingredientId)!.amount -= line.quantity;
       state.money = coins(state.money + revenue);
       log(state, `Sold ${lines.length} products for ${revenue.toFixed(0)} coins.`);
+      break;
+    }
+    case 'manageStock': {
+      const { kind, id, quantity, operation, targetId } = action;
+      if (!['ingredient', 'bottle'].includes(kind) || !['transfer', 'discard'].includes(operation) || !Number.isSafeInteger(quantity) || quantity <= 0) throw new RuleError('Choose a positive whole quantity.');
+      if (operation === 'transfer' && (!targetId || !isRegion(targetId) || targetId === state.regionId || !state.ownedBarIds.includes(targetId))) throw new RuleError('Choose another unlocked bar.');
+      let name: string;
+      let unit: string;
+      if (kind === 'ingredient') {
+        const ingredient = INGREDIENTS.find(item => item.id === id);
+        const source = inventoryOf(state).find(item => item.ingredientId === id);
+        if (!ingredient || !source || quantity > source.amount) throw new RuleError('This quantity is no longer available.');
+        if (operation === 'transfer' && quantity > roomFor(state, targetId!, id)) throw new RuleError('The destination bar does not have enough free space, including pending deliveries.');
+        const grade = lowGradeOf(state)[id];
+        const damaged = Math.min(quantity, grade?.damaged ?? 0);
+        const expiring = Math.min(quantity - damaged, grade?.expiring ?? 0);
+        if (operation === 'transfer') {
+          const inventory = state.inventories[targetId!];
+          let target = inventory.find(item => item.ingredientId === id);
+          if (!target) { target = { ingredientId: id, amount: 0 }; inventory.push(target); }
+          target.amount += quantity;
+          if (damaged || expiring) {
+            const grades = lowGradeOf(state, targetId!);
+            const targetGrade = grades[id] ??= { damaged: 0, expiring: 0, expiringAt: 0 };
+            targetGrade.damaged += damaged;
+            if (expiring) {
+              targetGrade.expiringAt = targetGrade.expiring > 0 ? Math.min(targetGrade.expiringAt, grade!.expiringAt) : grade!.expiringAt;
+              targetGrade.expiring += expiring;
+            }
+          }
+        }
+        source.amount -= quantity;
+        takeLowGrade(state, [{ ingredientId: id, amount: quantity }]);
+        name = ingredient.name; unit = ingredient.unit;
+      } else {
+        const product = ALCOHOL_PRODUCTS.find(item => item.id === id);
+        const source = state.bottleInventories[state.regionId].find(item => item.productId === id);
+        if (!product || !source || quantity > source.quantity) throw new RuleError('This bottle quantity is no longer available.');
+        if (operation === 'transfer') {
+          const inventory = state.bottleInventories[targetId!];
+          let target = inventory.find(item => item.productId === id);
+          if (!target) { target = { productId: id, quantity: 0 }; inventory.push(target); }
+          target.quantity += quantity;
+        }
+        source.quantity -= quantity;
+        name = product.name; unit = 'bottles';
+      }
+      log(state, operation === 'transfer' ? `Transferred ${quantity} ${unit} ${name} to ${REGIONS.find(item => item.id === targetId)!.name}.` : `Discarded ${quantity} ${unit} ${name}. Storage space is free.`);
       break;
     }
     case 'transfer': {

@@ -355,7 +355,7 @@ export const useGameStore = defineStore('game', () => {
   const checkEnglish = (text: string) => { const result = checkText(text); return { ok: result.ok, corrected: result.corrected || text }; };
   const ruleContext = () => ({ now: clientNow(), checkEnglish, spawnCustomers: !trainingActive.value && mode.value !== 'online', training: trainingActive.value });
   // Online, these depend on hidden orders or on the server clock, so only the server can apply them.
-  const SERVER_ONLY = new Set<GameAction['type']>(['collectTips', 'serveFood', 'say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson', 'spinRoulette', 'claimPass', 'buyPassPremium', 'buyPassLevels', 'discardLoot', 'giveAshtray', 'cleanGuestAshtray', 'removeGuestAshtray', 'cleanAshtrays', 'pitchStart', 'pitchAsk', 'pitchCancel', 'hireStaff', 'upgradeStaff', 'giveWater', 'callTaxi', 'askToLeave', 'situationChoice', 'reportIssue', 'discardStock', 'openBox', 'pickReward', 'drawStyle', 'claimLeaderboardReward']);
+  const SERVER_ONLY = new Set<GameAction['type']>(['collectTips', 'serveFood', 'say', 'serve', 'autoServe', 'openConversation', 'offerSimilar', 'sellBottle', 'rejectCustomer', 'tick', 'expediteCustomer', 'haggle', 'makeOffer', 'acceptDeal', 'completeDailyLesson', 'spinRoulette', 'claimPass', 'buyPassPremium', 'buyPassLevels', 'discardLoot', 'giveAshtray', 'cleanGuestAshtray', 'removeGuestAshtray', 'cleanAshtrays', 'pitchStart', 'pitchAsk', 'pitchCancel', 'hireStaff', 'upgradeStaff', 'giveWater', 'callTaxi', 'askToLeave', 'situationChoice', 'reportIssue', 'discardStock', 'manageStock', 'openBox', 'pickReward', 'drawStyle', 'claimLeaderboardReward']);
 
   function saveOffline() {
     if (mode.value === 'online' || trainingActive.value) return;
@@ -434,7 +434,16 @@ export const useGameStore = defineStore('game', () => {
   let pendingRareAction = false;
   const pendingRuleActions: GameAction[] = [];
   let waitingForRules = false;
+  function stockManagementAllowed(action: GameAction): boolean {
+    if (action.type === 'manageStock' && action.kind === 'ingredient') {
+      const reserved = currentMix.value.find(item => item.ingredientId === action.id)?.amount ?? 0;
+      const available = (inventory.value.find(item => item.ingredientId === action.id)?.amount ?? 0) - reserved;
+      if (action.quantity > available) { message.value = 'Stock in the current glass is reserved.'; return false; }
+    }
+    return true;
+  }
   function dispatch(action: GameAction): boolean {
+    if (!stockManagementAllowed(action)) return false;
     const before = stateSnapshot(state.value);
     if (mode.value === 'online' && SERVER_ONLY.has(action.type)) {
       if (action.type === 'openConversation') state.value.conversationCustomerId = action.customerId;
@@ -935,8 +944,15 @@ export const useGameStore = defineStore('game', () => {
   void connect();
 
   const act = (action: GameAction) => dispatch(action);
+  const manageStock = async (action: Extract<GameAction, { type: 'manageStock' }>) => {
+    if (!stockManagementAllowed(action)) return false;
+    if (mode.value === 'online') return send(action, stateSnapshot(state.value));
+    try { await loadRules(); }
+    catch { message.value = 'Could not load stock management. Please try again.'; return false; }
+    return dispatch(action);
+  };
   return {
-    mailMessage, collectMailReward, collectAllMailRewards, mailboxOpen, mailboxEntries, unreadMail, theftNotices, mailBusy, loadMailbox, openMailbox, dismissTheftNotices, decideMailGift, foodRecommendations, cleanGuestAshtray, removeGuestAshtray, trainingActive, trainingPhase, trainingRestocked, beginTraining, endTraining, preparationCustomerId, openPreparation, collectionBonuses, tipJarHours, rouletteSpinLimit, tipJar, tipJarCapacity, collectTips, stealVisitedTips, stealingTips,
+    manageStock, mailMessage, collectMailReward, collectAllMailRewards, mailboxOpen, mailboxEntries, unreadMail, theftNotices, mailBusy, loadMailbox, openMailbox, dismissTheftNotices, decideMailGift, foodRecommendations, cleanGuestAshtray, removeGuestAshtray, trainingActive, trainingPhase, trainingRestocked, beginTraining, endTraining, preparationCustomerId, openPreparation, collectionBonuses, tipJarHours, rouletteSpinLimit, tipJar, tipJarCapacity, collectTips, stealVisitedTips, stealingTips,
     topUpPreview, circle, crewBonus, recruitCompanion, giveKeepsake, buyKeepsake, assignCompanion, dismissCompanion, spotlightCompanion, levelUpCompanion, achievementStat, profile, earnedAchievements, setFeaturedAchievements, mode, playerName, playerId, playerFriendCode, friends, visitedFriend, loadFriends, addFriend, answerFriend, removeFriend, renameFriend, visitFriend, leaveVisit, giftFriend, claimGifts, friendVisits, connect, rewardReport, dismissRewards, dailyOpen, economy, xpProgress, guestPriceFactor, nowMs, loot, availableEvents, act, visibleInventory, connectEpoch,
     upgradeRecipe, recipeLevels, recipeCopies, autoServe, setAutoSupply, autoSupply,
     negotiation, negotiationQuote, startNegotiation, haggle, makeOffer, acceptDeal, leaveNegotiation,

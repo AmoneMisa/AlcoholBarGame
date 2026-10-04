@@ -133,3 +133,50 @@ test('The seller quotes the real delivery time, and standing orders and regular 
   say(other, 'Could you match the price of another supplier, please?');
   assert.ok(other.negotiation.tactics.includes('ask') && other.negotiation.tactics.includes('competitor'));
 });
+
+test('Stock management transfers ingredients and sealed bottles without spending or rewarding currency', () => {
+  const state=createInitialState(NOW);state.ownedBarIds.push('london');
+  const source=state.inventories[state.regionId].find(item=>item.amount>200);
+  const destination=state.inventories.london.find(item=>item.ingredientId===source.ingredientId);
+  const before=source.amount,targetBefore=destination.amount,money=state.money,crystals=state.crystals;
+  applyAction(state,{type:'manageStock',kind:'ingredient',id:source.ingredientId,quantity:200,operation:'transfer',targetId:'london'},context());
+  assert.equal(source.amount,before-200);assert.equal(destination.amount,targetBefore+200);
+  const bottle=state.bottleInventories[state.regionId].find(item=>item.quantity>0);const count=bottle.quantity;
+  state.bottleInventories.london=[];
+  applyAction(state,{type:'manageStock',kind:'bottle',id:bottle.productId,quantity:1,operation:'transfer',targetId:'london'},context());
+  assert.equal(bottle.quantity,count-1);assert.deepEqual(state.bottleInventories.london,[{productId:bottle.productId,quantity:1}]);
+  assert.equal(state.money,money);assert.equal(state.crystals,crystals);
+});
+
+test('Discarding current stock frees exactly the selected quantity and removes its low-grade markers', () => {
+  const state=createInitialState(NOW);const source=state.inventories[state.regionId].find(item=>item.amount>200);
+  state.lowGrade={[state.regionId]:{[source.ingredientId]:{damaged:30,expiring:50,expiringAt:NOW+10000}}};
+  const before=source.amount;
+  applyAction(state,{type:'manageStock',kind:'ingredient',id:source.ingredientId,quantity:40,operation:'discard'},context());
+  assert.equal(source.amount,before-40);assert.equal(state.lowGrade[state.regionId][source.ingredientId].damaged,0);assert.equal(state.lowGrade[state.regionId][source.ingredientId].expiring,40);
+  const bottle=state.bottleInventories[state.regionId].find(item=>item.quantity>0);const count=bottle.quantity;
+  applyAction(state,{type:'manageStock',kind:'bottle',id:bottle.productId,quantity:count,operation:'discard'},context());assert.equal(bottle.quantity,0);
+});
+
+test('Stock transfers preserve damage and the earliest expiry date', () => {
+  const state=createInitialState(NOW);state.ownedBarIds.push('london');const source=state.inventories[state.regionId].find(item=>item.amount>200),id=source.ingredientId;
+  state.lowGrade={[state.regionId]:{[id]:{damaged:30,expiring:50,expiringAt:NOW+5000}}};
+  state.lowGrade.london={[id]:{damaged:0,expiring:5,expiringAt:NOW+10000}};
+  applyAction(state,{type:'manageStock',kind:'ingredient',id,quantity:60,operation:'transfer',targetId:'london'},context());
+  assert.deepEqual(state.lowGrade.london[id],{damaged:30,expiring:35,expiringAt:NOW+5000});assert.equal(state.lowGrade[state.regionId][id].expiring,20);
+});
+
+test('Invalid stock quantities and locked, identical or full destination bars cannot consume stock', () => {
+  for(const quantity of [0,-1,1.5,Infinity,NaN,1000000]){
+    const state=createInitialState(NOW),source=state.inventories[state.regionId].find(item=>item.amount>0),before=source.amount;
+    assert.throws(()=>applyAction(state,{type:'manageStock',kind:'ingredient',id:source.ingredientId,quantity,operation:'discard'},context()));assert.equal(source.amount,before);
+  }
+  for(const target of ['london','invalid','same']){
+    const state=createInitialState(NOW),source=state.inventories[state.regionId].find(item=>item.amount>0),before=source.amount;
+    const targetId=target==='same'?state.regionId:target;
+    assert.throws(()=>applyAction(state,{type:'manageStock',kind:'ingredient',id:source.ingredientId,quantity:1,operation:'transfer',targetId},context()));assert.equal(source.amount,before);
+  }
+  const state=createInitialState(NOW);state.ownedBarIds.push('london');const source=state.inventories[state.regionId].find(item=>item.amount>0),before=source.amount;
+  state.deliveryOrders.push({barId:'london',items:[{ingredientId:source.ingredientId,amount:100000}],arrivalAt:NOW+100000});
+  assert.throws(()=>applyAction(state,{type:'manageStock',kind:'ingredient',id:source.ingredientId,quantity:1,operation:'transfer',targetId:'london'},context()),/free space/);assert.equal(source.amount,before);
+});

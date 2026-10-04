@@ -1,122 +1,142 @@
 <script setup lang="ts">
-import UiButton from '../ui/UiButton.vue';
-import WorkshopStock from './WorkshopStock.vue';
-import UiInput from '../ui/UiInput.vue';
-import CrystalAmount from '../ui/CrystalAmount.vue';
-import PanelHeading from '../ui/PanelHeading.vue';
 import { computed, ref, watch } from 'vue';
-import { INGREDIENTS, RECIPES, REGIONS } from '../../domain/catalog';
-import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS, bottleSaleCrystalReward } from '../../domain/bottleCatalog';
+import UiButton from '../ui/UiButton.vue';
+import UiInput from '../ui/UiInput.vue';
 import UiIcon from '../ui/UiIcon.vue';
+import ModalDialog from '../ui/ModalDialog.vue';
+import ConfirmDialog from '../ui/ConfirmDialog.vue';
+import PanelHeading from '../ui/PanelHeading.vue';
+import WorkshopStock from './WorkshopStock.vue';
+import OptionSelect from './OptionSelect.vue';
+import DeliveryProblems from './DeliveryProblems.vue';
+import BottleModel from '../cocktails/BottleModel.vue';
+import GlassModel from '../cocktails/GlassModel.vue';
 import BrandBottle from '../knowledge/BrandBottle.vue';
+import { INGREDIENTS, RECIPES, REGIONS } from '../../domain/catalog';
+import { ALCOHOL_PRODUCTS, ALCOHOL_TYPE_LABELS } from '../../domain/bottleCatalog';
 import { guideIdForProduct } from '../../data/knowledge/alcohol';
 import { capacityFor, isPerishable } from '../../domain/warehouse';
 import type { Ingredient, RegionId } from '../../domain/types';
 import { useGameStore } from '../../stores/game';
-import BottleModel from '../cocktails/BottleModel.vue';
-import GlassModel from '../cocktails/GlassModel.vue';
-import OptionSelect from './OptionSelect.vue';
-import DeliveryProblems from './DeliveryProblems.vue';
 const game = useGameStore();
 const stockCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh' | 'food' | 'items' | 'shards' | 'cards'>('all');
+const recipeCardInventory = computed(() => RECIPES.map(recipe => ({ recipe, quantity: game.recipeCopies[recipe.id] ?? 0 })).filter(item => item.quantity > 0));
 const stockTabs = computed(() => {
-  const loot = game.loot;
-  const tabs: { id: typeof stockCategory.value; label: string }[] = [{ id: 'all', label: 'All' }, { id: 'spirit', label: 'Spirits' }, { id: 'mixer', label: 'Mixers' }, { id: 'fresh', label: 'Fresh' }, { id: 'food', label: 'Food' }];
-  const hasItems = loot.parts > 0 || Object.values(loot.boxes).some((n) => n > 0) || Object.values(loot.consumables).some((n) => n > 0) || Object.values(game.circle.keepsakes).some((n) => n > 0);
-  const hasShards = loot.skinShards > 0 || Object.values(loot.styleShards).some((n) => n > 0) || Object.values(loot.itemShards).some((n) => n > 0) || Object.values(game.circle.shards).some((n) => n > 0);
-  if (hasItems) tabs.push({ id: 'items', label: 'Items' });
-  if (hasShards) tabs.push({ id: 'shards', label: 'Shards' });
-  if (recipeCardInventory.value.length) tabs.push({ id: 'cards', label: 'Cards' });
+  const tabs: { id: typeof stockCategory.value; label: string }[] = [{ id:'all',label:'All' },{ id:'spirit',label:'Spirits' },{ id:'mixer',label:'Mixers' },{ id:'fresh',label:'Fresh' },{ id:'food',label:'Food' }];
+  if (game.loot.parts > 0 || Object.values(game.loot.boxes).some(n=>n>0) || Object.values(game.loot.consumables).some(n=>n>0) || Object.values(game.circle.keepsakes).some(n=>n>0)) tabs.push({id:'items',label:'Items'});
+  if (game.loot.skinShards > 0 || Object.values(game.loot.styleShards).some(n=>n>0) || Object.values(game.loot.itemShards).some(n=>n>0) || Object.values(game.circle.shards).some(n=>n>0)) tabs.push({id:'shards',label:'Shards'});
+  if (recipeCardInventory.value.length) tabs.push({id:'cards',label:'Cards'});
   return tabs;
 });
-const isStockKind = computed(() => ['all', 'spirit', 'mixer', 'fresh', 'food'].includes(stockCategory.value));
-const transferIngredientId = ref(INGREDIENTS[0]!.id);
-const fridgeLevel = computed(() => game.loot.equipment[game.regionId]?.fridge?.level ?? 0);
-const capacityOf = (id: string) => capacityFor(INGREDIENTS.find((item) => item.id === id)!, fridgeLevel.value);
-const ingredientById = (id: string) => INGREDIENTS.find((item) => item.id === id)!;
-const bottleById = (id: string) => ALCOHOL_PRODUCTS.find((item) => item.id === id)!;
-const uiCategory = (ingredient: Ingredient) => ingredient.category === 'food' ? 'food' : ingredient.category === 'spirit' ? 'spirit' : ingredient.category === 'mixer' && !['sugar-syrup', 'coconut-cream', 'milk', 'coconut-milk'].includes(ingredient.id) ? 'mixer' : 'fresh';
-const visibleStock = computed(() => game.visibleInventory.filter((stock) => stockCategory.value === 'all' || uiCategory(ingredientById(stock.ingredientId)) === stockCategory.value));
-const bottleSearch = ref('');
-const bottlePage = ref(1);
-const BOTTLES_PER_PAGE = 12;
-const matchingBottles = computed(() => {
-  const query = bottleSearch.value.trim().toLowerCase();
-  return game.bottleInventory.filter(stock => {
-    const product = bottleById(stock.productId);
-    return !query || `${product.name} ${product.brand} ${ALCOHOL_TYPE_LABELS[product.type]}`.toLowerCase().includes(query);
-  });
+const isStockKind = computed(() => ['all','spirit','mixer','fresh','food'].includes(stockCategory.value));
+const search = ref('');
+const query = computed(() => search.value.trim().toLowerCase());
+const ingredientById = (id: string) => INGREDIENTS.find(item=>item.id===id)!;
+const bottleById = (id: string) => ALCOHOL_PRODUCTS.find(item=>item.id===id)!;
+const uiCategory = (ingredient: Ingredient) => ingredient.category === 'food' ? 'food' : ingredient.category === 'spirit' ? 'spirit' : ingredient.category === 'mixer' && !['sugar-syrup','coconut-cream','milk','coconut-milk'].includes(ingredient.id) ? 'mixer' : 'fresh';
+const stockedIngredients = computed(() => game.inventory.filter(stock=>stock.amount>0));
+const stockedBottles = computed(() => game.bottleInventory.filter(stock=>stock.quantity>0));
+const visibleStock = computed(() => stockedIngredients.value.filter(stock => {
+  const ingredient=ingredientById(stock.ingredientId);
+  return (stockCategory.value==='all' || uiCategory(ingredient)===stockCategory.value) && (!query.value || ingredient.name.toLowerCase().includes(query.value));
+}));
+const matchingBottles = computed(() => stockedBottles.value.filter(stock => {
+  const product=bottleById(stock.productId);
+  return !query.value || `${product.name} ${product.brand} ${ALCOHOL_TYPE_LABELS[product.type]}`.toLowerCase().includes(query.value);
+}));
+const bottlePage=ref(1);
+const BOTTLES_PER_PAGE=20;
+const bottlePages=computed(()=>Math.max(1,Math.ceil(matchingBottles.value.length/BOTTLES_PER_PAGE)));
+const currentBottlePage=computed(()=>Math.min(bottlePage.value,bottlePages.value));
+const visibleBottles=computed(()=>matchingBottles.value.slice((currentBottlePage.value-1)*BOTTLES_PER_PAGE,currentBottlePage.value*BOTTLES_PER_PAGE));
+const ownedBars=computed(()=>REGIONS.filter(region=>game.isBarOwned(region.id)));
+const targetRegions=computed(()=>ownedBars.value.filter(region=>region.id!==game.regionId));
+const barUnits=(id:RegionId)=>game.inventories[id].reduce((sum,stock)=>sum+stock.amount,0);
+const barBottles=(id:RegionId)=>game.bottleInventories[id].reduce((sum,stock)=>sum+stock.quantity,0);
+const capacityOf=(id:string)=>capacityFor(ingredientById(id),game.loot.equipment[game.regionId]?.fridge?.level??0);
+const selection=ref<{kind:'ingredient'|'bottle';id:string}>();
+const quantity=ref('1');
+const targetId=ref('');
+const busy=ref(false);
+const confirmingDiscard=ref(false);
+const selected=computed(()=>{
+  if(!selection.value)return undefined;
+  const {kind,id}=selection.value;
+  if(kind==='ingredient') {
+    const item=ingredientById(id),stock=game.inventory.find(stock=>stock.ingredientId===id);
+    if(!stock?.amount)return undefined;
+    const reserved=game.currentMix.find(part=>part.ingredientId===id)?.amount??0;
+    return {kind,id,name:item.name,amount:stock.amount,available:Math.max(0,stock.amount-reserved),unit:item.unit,reserved};
+  }
+  const item=bottleById(id),stock=game.bottleInventory.find(stock=>stock.productId===id);
+  return stock?.quantity ? {kind,id,name:item.name,amount:stock.quantity,available:stock.quantity,unit:'bottles',reserved:0} : undefined;
 });
-const bottlePages = computed(() => Math.max(1, Math.ceil(matchingBottles.value.length / BOTTLES_PER_PAGE)));
-const currentBottlePage = computed(() => Math.min(bottlePage.value, bottlePages.value));
-const visibleBottles = computed(() => matchingBottles.value.slice((currentBottlePage.value - 1) * BOTTLES_PER_PAGE, currentBottlePage.value * BOTTLES_PER_PAGE));
-watch([bottleSearch, () => game.regionId, stockCategory], () => { bottlePage.value = 1; });
-const targetRegions = computed(() => REGIONS.filter((region) => region.id !== game.regionId && game.isBarOwned(region.id)));
-const barUnits = (id: RegionId) => game.inventories[id].reduce((sum, stock) => sum + stock.amount, 0);
-const barBottles = (id: RegionId) => game.bottleInventories[id].reduce((sum, stock) => sum + stock.quantity, 0);
-const recipeCardInventory = computed(() => RECIPES.map((recipe) => ({ recipe, quantity: game.recipeCopies[recipe.id] ?? 0 })).filter((item) => item.quantity > 0));
-
+const validQuantity=computed(()=>!!selected.value && Number.isSafeInteger(Number(quantity.value)) && Number(quantity.value)>0 && Number(quantity.value)<=selected.value.available);
+function inspect(kind:'ingredient'|'bottle',id:string){selection.value={kind,id};quantity.value='1';targetId.value=targetRegions.value[0]?.id??'';confirmingDiscard.value=false;}
+async function manage(operation:'transfer'|'discard'){
+  if(!selected.value || !validQuantity.value || busy.value)return;
+  busy.value=true;
+  try {
+    const ok=await game.manageStock({type:'manageStock',kind:selected.value.kind,id:selected.value.id,quantity:Number(quantity.value),operation,...(operation==='transfer'?{targetId:targetId.value as RegionId}:{})});
+    if(ok){selection.value=undefined;confirmingDiscard.value=false;}
+  } finally {busy.value=false;}
+}
+watch([search,()=>game.regionId,stockCategory],()=>{bottlePage.value=1;selection.value=undefined;confirmingDiscard.value=false;});
 </script>
 <template>
-<article class="game-panel inventory-deck">
-      <PanelHeading :eyebrow="`STOCK ROOM · ${game.region.name}`" title="Bar inventories" :aside="`${game.inventory.length} ingredients · ${game.bottleInventory.length} sealed brands`" />
-      <div class="bar-switcher" aria-label="Choose a bar inventory">
-        <button v-for="region in REGIONS.filter(item => game.isBarOwned(item.id))" :key="region.id" :class="{ active: region.id === game.regionId }" type="button" @click="game.switchBar(region.id)"><b>{{ region.name }}</b><small>{{ barUnits(region.id).toLocaleString() }} ingredient units · {{ barBottles(region.id) }} bottles</small></button>
+  <article class="game-panel inventory-deck">
+    <PanelHeading :eyebrow="`STOCK ROOM · ${game.region.name}`" title="Current stock" :aside="`${stockedIngredients.length} ingredients · ${stockedBottles.length} sealed brands`" />
+    <div v-if="ownedBars.length>1" class="bar-switcher" aria-label="Choose a bar inventory">
+      <button v-for="region in ownedBars" :key="region.id" :class="{active:region.id===game.regionId}" type="button" @click="game.switchBar(region.id)"><b>{{region.name}}</b><small>{{barUnits(region.id).toLocaleString()}} units · {{barBottles(region.id)}} bottles</small></button>
+    </div>
+    <div class="category-tabs inventory-filter"><button v-for="tab in stockTabs" :key="tab.id" type="button" :class="{active:stockCategory===tab.id}" @click="stockCategory=tab.id">{{tab.label}}</button></div>
+    <div v-if="isStockKind" class="stock-tools"><UiInput v-model="search" label="Find stock" type="search" placeholder="Search ingredients or brands" /><small>Tap an item to transfer or discard it.</small></div>
+    <WorkshopStock v-if="stockCategory==='items'||stockCategory==='shards'" :kind="stockCategory" />
+    <section v-if="isStockKind" class="stock-section" aria-label="Ingredient stock">
+      <h3>Ingredients <span>{{visibleStock.length}}</span></h3>
+      <div class="stock-list">
+        <button v-for="stock in visibleStock" :key="stock.ingredientId" type="button" class="stock-row" :aria-label="`Manage ${ingredientById(stock.ingredientId).name}`" @click="inspect('ingredient',stock.ingredientId)">
+          <span class="stock-picture"><BottleModel :ingredient="ingredientById(stock.ingredientId)" /></span>
+          <span class="stock-copy"><b>{{ingredientById(stock.ingredientId).name}}</b><small>{{uiCategory(ingredientById(stock.ingredientId))}}<template v-if="isPerishable(ingredientById(stock.ingredientId))"> · perishable</template><template v-if="game.lowGrade[stock.ingredientId]?.damaged"> · {{game.lowGrade[stock.ingredientId]!.damaged}} damaged</template><template v-if="game.lowGrade[stock.ingredientId]?.expiring"> · {{game.lowGrade[stock.ingredientId]!.expiring}} old</template></small></span>
+          <span class="stock-quantity"><b>{{stock.amount}} {{ingredientById(stock.ingredientId).unit}}</b><small>of {{capacityOf(stock.ingredientId)}}</small></span><UiIcon name="chevron-right" />
+        </button>
       </div>
-      <div class="inventory-tools">
-        <div class="category-tabs inventory-filter">
-          <button v-for="tab in stockTabs" :key="tab.id" :class="{ active: stockCategory === tab.id }" type="button" @click="stockCategory = tab.id">{{ tab.label }}</button>
-        </div>
-        <div v-if="targetRegions.length" class="transfer-console">
-          <div><small>MOVE BETWEEN BARS</small><b>Stock transfer</b></div>
-          <OptionSelect label="Ingredient" v-model="transferIngredientId" :options="INGREDIENTS.map((ingredient) => ({ value: ingredient.id, label: ingredient.name }))" />
-          <UiIcon class="inline-icon" name="arrow-right" />
-          <OptionSelect label="To bar" v-model="game.transferTargetId" :options="targetRegions.map((region) => ({ value: region.id, label: region.name }))" />
-          <button type="button" @click="game.transferStock(transferIngredientId, game.transferTargetId)">Transfer {{ ingredientById(transferIngredientId).unit === 'ml' ? '100 ml' : '3 pcs' }}</button>
-        </div>
-        <p v-else class="transfer-locked">Unlock a second bar at level {{ game.barPurchaseLevel }} to rotate stock between locations.</p>
+      <p v-if="!visibleStock.length" class="stock-empty">No ingredients in stock match this filter.</p>
+    </section>
+    <section v-if="stockCategory==='all'||stockCategory==='spirit'" class="stock-section" aria-label="Sealed bottle stock">
+      <h3>Sealed bottles <span>{{matchingBottles.length}} brands</span></h3>
+      <div class="stock-list">
+        <button v-for="stock in visibleBottles" :key="stock.productId" type="button" class="stock-row" :aria-label="`Manage ${bottleById(stock.productId).name}`" @click="inspect('bottle',stock.productId)">
+          <span class="stock-picture"><BrandBottle :brand="bottleById(stock.productId).brand" :category="guideIdForProduct(bottleById(stock.productId))" :color="bottleById(stock.productId).color" /></span>
+          <span class="stock-copy"><b>{{bottleById(stock.productId).name}}</b><small>{{ALCOHOL_TYPE_LABELS[bottleById(stock.productId).type]}} · {{bottleById(stock.productId).volumeMl}} ml</small></span>
+          <span class="stock-quantity"><b>×{{stock.quantity}}</b></span><UiIcon name="chevron-right" />
+        </button>
       </div>
-      <WorkshopStock v-if="stockCategory === 'items' || stockCategory === 'shards'" :kind="stockCategory" />
-      <div v-if="isStockKind" class="inventory-cards">
-        <div v-for="stock in visibleStock" :key="stock.ingredientId" class="inventory-card">
-          <BottleModel :ingredient="ingredientById(stock.ingredientId)" />
-          <div><b>{{ ingredientById(stock.ingredientId).name }}</b><small>{{ stock.amount }} / {{ capacityOf(stock.ingredientId) }} {{ ingredientById(stock.ingredientId).unit }}<template v-if="isPerishable(ingredientById(stock.ingredientId))"> · fresh, spoils</template></small></div>
-          <span>{{ uiCategory(ingredientById(stock.ingredientId)) }}</span>
-          <em v-if="game.lowGrade[stock.ingredientId]?.damaged" class="grade damaged" title="Damaged: cocktails only">{{ game.lowGrade[stock.ingredientId]!.damaged }} damaged</em>
-          <em v-if="game.lowGrade[stock.ingredientId]?.expiring" class="grade expiring" title="Close to its date: use it soon">{{ game.lowGrade[stock.ingredientId]!.expiring }} old</em>
-        </div>
+      <p v-if="!matchingBottles.length" class="stock-empty">No sealed bottles in stock match this filter.</p>
+      <nav v-if="bottlePages>1" class="stock-pagination" aria-label="Bottle inventory pages"><UiButton size="sm" icon="arrow-left" aria-label="Previous bottle page" :disabled="currentBottlePage===1" @click="bottlePage=currentBottlePage-1"/><span>{{currentBottlePage}} / {{bottlePages}}</span><UiButton size="sm" icon="arrow-right" aria-label="Next bottle page" :disabled="currentBottlePage===bottlePages" @click="bottlePage=currentBottlePage+1"/></nav>
+    </section>
+    <DeliveryProblems />
+    <section v-if="(stockCategory==='all'||stockCategory==='cards')&&recipeCardInventory.length" class="stock-section">
+      <h3>Recipe cards</h3><div class="stock-list"><div v-for="item in recipeCardInventory" :key="item.recipe.id" class="stock-row recipe-stock-row"><span class="stock-picture"><GlassModel :art-index="RECIPES.indexOf(item.recipe)" :recipe-id="item.recipe.id" type="coupe"/></span><span class="stock-copy"><b>{{item.recipe.name}}</b><small>Duplicates for mastery upgrades</small></span><span class="stock-quantity"><b>×{{item.quantity}}</b></span></div></div>
+    </section>
+    <ModalDialog v-if="selected" :title="selected.name" close-label="Close stock item" @close="selection=undefined;confirmingDiscard=false">
+      <div class="stock-manage">
+        <p>{{selected.available}} {{selected.unit}} available<small v-if="selected.reserved">{{selected.reserved}} {{selected.unit}} reserved in your current glass.</small></p>
+        <UiInput v-model="quantity" :label="`Quantity (${selected.unit})`" type="number" min="1" :max="selected.available" step="1" />
+        <UiButton size="sm" variant="ghost" :disabled="busy||!selected.available" @click="quantity=String(selected.available)">All available</UiButton>
+        <template v-if="targetRegions.length"><OptionSelect label="Move to bar" v-model="targetId" :options="targetRegions.map(region=>({value:region.id,label:region.name}))"/><UiButton block icon="arrow-right" :disabled="busy||!validQuantity||!targetId" @click="manage('transfer')">Transfer</UiButton></template>
+        <small v-else>Transfer becomes available when you own another bar.</small>
+        <UiButton block variant="danger" icon="trash" :disabled="busy||!validQuantity" @click="confirmingDiscard=true">Discard</UiButton>
       </div>
-      <DeliveryProblems />
-      <section v-if="(stockCategory === 'all' || stockCategory === 'cards') && recipeCardInventory.length" class="recipe-item-inventory">
-        <header><div><small>COLLECTIBLE ITEMS</small><h3>Recipe cards</h3></div><span>Duplicates are spent on mastery upgrades.</span></header>
-        <div><article v-for="item in recipeCardInventory" :key="item.recipe.id"><GlassModel :art-index="RECIPES.indexOf(item.recipe)" :recipe-id="item.recipe.id" type="coupe" /><span><small>RECIPE ITEM</small><b>{{ item.recipe.name }}</b><em>Owned ×{{ item.quantity }}</em></span><strong>×{{ item.quantity }}</strong></article></div>
-      </section>
-      <section v-if="stockCategory === 'all' || stockCategory === 'spirit'" class="sealed-stock-section">
-        <header><div><small>FULL-BOTTLE RETAIL</small><h3>Popular brands ready to sell</h3></div></header>
-        <div class="bottle-inventory-tools">
-          <UiInput v-model="bottleSearch" label="Find a bottle" placeholder="Search by name, brand or type" type="search" />
-          <nav aria-label="Bottle inventory pages" class="bottle-pagination">
-            <UiButton size="sm" variant="secondary" aria-label="Previous bottle page" :disabled="currentBottlePage === 1" @click="bottlePage = currentBottlePage - 1"><UiIcon name="arrow-left" /></UiButton>
-            <span role="status">{{ currentBottlePage }} / {{ bottlePages }} · {{ matchingBottles.length }} brands</span>
-            <UiButton size="sm" variant="secondary" aria-label="Next bottle page" :disabled="currentBottlePage === bottlePages" @click="bottlePage = currentBottlePage + 1"><UiIcon name="arrow-right" /></UiButton>
-          </nav>
-        </div>
-        <p v-if="!matchingBottles.length">No bottles match your search.</p>
-        <div class="sealed-stock-grid">
-          <article v-for="stock in visibleBottles" :key="stock.productId">
-            <div class="stock-brand-model"><BrandBottle :brand="bottleById(stock.productId).brand" :category="guideIdForProduct(bottleById(stock.productId))" :color="bottleById(stock.productId).color" /></div>
-            <div><small>{{ ALCOHOL_TYPE_LABELS[bottleById(stock.productId).type] }} · {{ bottleById(stock.productId).abv }}% ABV</small><b>{{ bottleById(stock.productId).name }}</b><span>{{ bottleById(stock.productId).volumeMl }} ml · customer pays {{ (bottleById(stock.productId).price * game.economy.guestPriceFactor).toFixed(0) }} coins + <CrystalAmount :value="bottleSaleCrystalReward(bottleById(stock.productId))" /></span></div>
-            <strong>{{ stock.quantity }}×</strong>
-            <button v-if="game.bottleCrystalCost(stock.productId)" class="reserve-restock" type="button"  @click="game.buyBottleStock(stock.productId)">+1 reserve · <CrystalAmount :value="game.bottleCrystalCost(stock.productId)" /></button>
-          </article>
-        </div>
-      </section>
-    </article>
+    </ModalDialog>
+    <ConfirmDialog v-if="confirmingDiscard&&selected" title="Discard stock?" confirm-label="Discard stock" danger :disabled="busy||!validQuantity" @cancel="confirmingDiscard=false" @confirm="manage('discard')"><p>Discard {{quantity}} {{selected.unit}} of {{selected.name}} to free storage space. These goods will be lost.</p></ConfirmDialog>
+  </article>
 </template>
 <style scoped>
-.bottle-inventory-tools { display:flex; flex-wrap:wrap; align-items:end; justify-content:space-between; gap:12px; margin:12px 0; }
-.bottle-inventory-tools > :first-child { flex:1 1 240px; max-width:480px; }
-.bottle-pagination { display:flex; align-items:center; gap:8px; }
-.bottle-pagination span { font-size:.85rem; color:var(--muted, #a8b6c9); white-space:nowrap; }
+.inventory-deck .stock-copy,.inventory-deck .stock-copy b,.inventory-deck .stock-copy small{text-align:left}
+.inventory-filter{padding:8px 12px;border-bottom:1px solid #2b3c52;gap:5px}
+.stock-tools{display:grid;gap:6px;padding:10px 12px}.stock-tools>small{color:#9eafc2;font-size:12px}
+.stock-section{padding:6px 12px 12px}.stock-section h3{display:flex;justify-content:space-between;gap:8px;margin:4px 0 8px;color:#f4dbad;font-size:14px}.stock-section h3 span{color:#9eafc2;font-size:12px;font-weight:400}
+.stock-list{border:1px solid #304158;border-radius:10px;overflow:hidden;background:#0d1928}.stock-row{display:grid;grid-template-columns:36px minmax(0,1fr) auto 14px;align-items:center;gap:8px;width:100%;min-height:62px;padding:7px 9px;border:0;border-bottom:1px solid #293a50;border-radius:0;background:transparent;color:#e7edf4;text-align:left;cursor:pointer}.stock-row:last-child{border-bottom:0}.stock-row:hover,.stock-row:focus-visible{background:#1a2c41}.stock-row>.ui-icon{width:14px;height:14px;color:#bda473}
+.stock-picture{display:block;width:36px;height:44px;overflow:hidden}.stock-picture :deep(.bottle-visual),.stock-picture :deep(.glass-model){width:36px!important;height:44px!important;min-width:0!important;margin:0!important;transform:none!important}.stock-copy{min-width:0}.stock-copy b{display:block;font-size:13px;line-height:17px;font-weight:600;overflow-wrap:anywhere}.stock-copy small,.stock-quantity small{display:block;color:#9cabbe;font-size:11px;line-height:15px}.stock-copy small{margin-top:2px;text-transform:capitalize}.stock-quantity{text-align:right;white-space:nowrap}.stock-quantity b{font-size:12px;color:#f1d8a8}.stock-empty{margin:8px 0;color:#9eafc2;font-size:13px}.stock-pagination{display:flex;align-items:center;justify-content:center;gap:12px;padding-top:10px;font-size:12px;color:#aab9ca}.stock-manage{display:grid;gap:12px}.stock-manage p{margin:0;font-size:14px}.stock-manage small{display:block;color:#aab9ca;font-size:12px;line-height:1.4}.recipe-stock-row{grid-template-columns:36px minmax(0,1fr) auto;cursor:default}
 </style>
-

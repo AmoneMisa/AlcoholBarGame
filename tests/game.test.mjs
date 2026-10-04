@@ -629,3 +629,10 @@ test('Drink recommendations fill missing Chardonnay entries with labelled relate
   const direct=findBeveragePairings('bourbon');
   if(direct.length) assert.equal(topDrinkPairings('bourbon')[0].score,direct[0].score);
 });
+
+test('Stock management cannot discard ingredients reserved in the current glass', async () => {
+  const game=freshGame();const stock=game.inventory.find(item=>item.amount>100);const before=stock.amount;
+  game.currentMix=[{ingredientId:stock.ingredientId,amount:100}];
+  assert.equal(await game.manageStock({type:'manageStock',kind:'ingredient',id:stock.ingredientId,quantity:before,operation:'discard'}),false);
+  assert.equal(stock.amount,before);assert.match(game.message,/reserved/);
+});
