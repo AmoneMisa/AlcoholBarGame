@@ -12,7 +12,9 @@ import ScreenshotOptions from './ScreenshotOptions.vue';
 import { NOTIFICATION_EVENTS, useNotificationsStore } from '../../stores/notifications';
 import { graphicsMode, liteGraphics, type GraphicsMode } from '../../ui/graphics';
 import OptionSelect from '../game/OptionSelect.vue';
+import { sceneMotion, sceneWind, sceneWindSupported, reducedSceneMotion, type SceneMotion } from '../../ui/sceneMotion';
 const graphicsOptions = [{ value: 'auto', label: 'Automatic' }, { value: 'lite', label: 'Lightweight' }, { value: 'full', label: 'Full effects' }];
+const motionOptions = [{ value:'static',label:'Static · best performance' },{ value:'animated',label:'Animated · living bar' }];
 
 // Everything the player sets once and rarely touches again: sound, notifications, help and the version of the game.
 const notifications = useNotificationsStore();
@@ -47,6 +49,11 @@ const replayTour = () => { emit('goto', 'service'); setTimeout(() => window.disp
       <h3>Graphics</h3>
       <OptionSelect label="Visual effects" :model-value="graphicsMode" :options="graphicsOptions" @update:model-value="graphicsMode = $event as GraphicsMode" />
       <p>{{ liteGraphics ? 'Lightweight effects are active.' : 'Full effects are active.' }} Lightweight mode reduces blur and decorative effects while keeping the painted artwork.</p>
+      <OptionSelect label="Bar animation" :model-value="sceneMotion" :options="motionOptions" @update:model-value="sceneMotion = $event as SceneMotion" />
+      <p>Static by default. Animated mode adds gentle light, waves, curtain shimmer, snow or fireflies where they fit the room, and bartender breathing. Animations stop when you leave the bar.</p>
+      <p v-if="sceneMotion === 'animated' && (liteGraphics || reducedSceneMotion)" role="status">Animations are paused by {{ liteGraphics ? 'Lightweight graphics' : 'your reduced-motion preference' }}.</p>
+      <UiCheckbox v-model="sceneWind" label="Gentle wind" hint="Moving curtains in Parisian Salon and swaying leaves in the garden and beach bar. Requires animated mode." />
+      <p v-if="!sceneWindSupported" role="status">Wind is unavailable in this browser. Other animations remain available.</p>
     </section>
 
     <section class="settings-card notification-settings">

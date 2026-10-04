@@ -1,0 +1,13 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Living bar preview</title>
+<style>html,body{margin:0;background:#0b1320;color:#f8efe7;font:16px system-ui}main{max-width:1050px;margin:auto;padding:20px}h1{font:700 28px Georgia;color:#e4b35c}nav{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}button{padding:10px 18px;border:1px solid #9d7844;border-radius:10px;background:#372818;color:#fff3dc;cursor:pointer}button[aria-pressed=true]{background:#79582e}.motion-preview{position:relative;isolation:isolate;height:min(62vw,540px);min-height:300px;overflow:hidden;background-size:cover;background-position:center 62%;border:1px solid #9d7844;border-radius:16px}.motion-caption{color:#aebdce;font-size:14px}</style></head><body><main><h1>Living bar · motion preview</h1><div id="preview"></div></main>
+<script type="module">
+import { createApp,h,ref } from 'vue';
+import SceneAtmosphere from '/src/components/game/SceneAtmosphere.vue';
+const rooms=[{id:'beach',label:'Beach Club'},{id:'parisian',label:'Parisian Salon'},{id:'cyberpunk',label:'Cyberpunk Night'},{id:'marina',label:'Marina'},{id:'underwater',label:'Underwater'},{id:'winter',label:'Winter'},{id:'garden',label:'Garden',asset:'botanical-room'}];
+createApp({setup(){const room=ref(rooms[0]),animated=ref(false),size=ref({width:0,height:0});let observer;return()=>h('div',[
+  h('nav',rooms.map(item=>h('button',{'aria-pressed':room.value.id===item.id,onClick:()=>room.value=item},item.label))),
+  h('nav',[h('button',{'aria-pressed':!animated.value,onClick:()=>animated.value=false},'Static'),h('button',{'aria-pressed':animated.value,onClick:()=>animated.value=true},'Animated')]),
+  h('div',{class:'motion-preview',style:{backgroundImage:`url(/assets/bar/backgrounds/${room.value.asset ?? 'interior-'+room.value.id}.webp)`,backgroundPosition:['garden','underwater'].includes(room.value.id)?'center':'center 62%'},ref:element=>{if(element&&!observer){observer=new ResizeObserver(entries=>{const box=entries[0].contentRect;size.value={width:box.width,height:box.height};});observer.observe(element);}}},animated.value?[h(SceneAtmosphere,{interior:room.value.id,...size.value,tinted:false,backgroundSource:`/assets/bar/backgrounds/${room.value.asset ?? 'interior-'+room.value.id}.webp`})]:[]),
+  h('p',{class:'motion-caption'},'Optional living bar: local wind moves curtains and foliage; transparent WebP layers add light and water reflections.')
+]);}}).mount('#preview');
+</script></body></html>

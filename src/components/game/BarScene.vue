@@ -25,6 +25,8 @@ import { INTERIORS, shelfStyleFor } from '../../data/cosmetics/bars';
 import { liteGraphics } from '../../ui/graphics';
 import { mobileArtwork } from '../../domain/optimizedArtwork';
 import { sceneLayout } from '../../data/cosmetics/barLines';
+import { sceneMotionPlaying } from '../../ui/sceneMotion';
+import SceneAtmosphere from './SceneAtmosphere.vue';
 
 const game = useGameStore();
 const barLayout = useBarLayoutStore();
@@ -55,14 +57,17 @@ const glassTarget = ref<HTMLElement>();
 // The positions come from each background's measured geometry (data/cosmetics/barLines.ts).
 const sceneRef = ref<HTMLElement>();
 const sceneBox = ref({ width: 0, height: 0 });
-const sceneInteriorStyle = computed(() => {
-  const style = game.barInteriorStyle;
+const animateScene = computed(() => sceneMotionPlaying.value && props.active && !props.preview && !props.capture);
+const sceneBackgroundUrl = computed(() => {
   // Pick the light background on narrow screens even when device hints select Full.
   // Use viewport width until ResizeObserver has measured the scene, avoiding an initial full-size request.
   const width = sceneBox.value.width || (typeof window === 'undefined' ? Infinity : window.innerWidth);
-  if (props.capture || props.preview || (!liteGraphics.value && width > 900)) return style;
-  return { ...style, backgroundImage: style.backgroundImage.replace(game.barBackground, mobileArtwork(game.barBackground)) };
+  if (props.capture || props.preview || (!liteGraphics.value && width > 900)) return game.barBackground;
+  return mobileArtwork(game.barBackground);
 });
+const sceneInteriorStyle = computed(() => ({ ...game.barInteriorStyle,
+  backgroundImage: game.barInteriorStyle.backgroundImage.replace(game.barBackground, sceneBackgroundUrl.value)
+}));
 const sceneObserver = typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(() => measureScene());
 function measureScene() {
   const element = sceneRef.value;
@@ -515,7 +520,8 @@ onBeforeUnmount(() => {
     <div v-if="!preview && !capture && game.ashtrays.dirty" class="scene-info-dock">
       <button type="button" class="clean-ashtrays" @click="game.cleanAshtrays()"><UiIcon name="brush" /> Clean {{ game.ashtrays.dirty }}</button>
     </div>
-  <section ref="sceneRef" class="bar-scene" :class="[{ 'scene-inactive': !active, 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack && !preview, 'is-preview': preview },captureClasses]" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[sceneInteriorStyle, sceneVars]">
+  <section ref="sceneRef" class="bar-scene" :class="[{ 'scene-animated': animateScene, 'scene-inactive': !active, 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack && !preview, 'is-preview': preview },captureClasses]" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[sceneInteriorStyle, sceneVars]">
+    <SceneAtmosphere v-if="animateScene" :interior="game.decor.interior" :width="sceneBox.width" :height="sceneBox.height" :background-source="sceneBackgroundUrl" />
     <div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div>
     <div v-if="preview" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
       <small v-if="shelfRows.length && !preview" class="pshelf-hint" :style="{ left: shelfRows[0]!.style.left, top: `calc(${shelfRows[0]!.style.top} - 18px)` }">Use the arrows to browse a shelf · pull a bottle down to the glass</small>
@@ -580,6 +586,10 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .bar-scene { overflow:clip !important; }
+.bar-scene:not(.scene-animated) .bartender-layer .art-character {animation:none}
+.bar-scene.scene-animated .bartender-layer:not(.moving) .art-character {animation:bartender-breathe 5.6s ease-in-out infinite;transform-origin:50% 75%}
+@keyframes bartender-breathe {0%,100% {transform:translateY(0) rotate(-.12deg) scaleY(1)}50% {transform:translateY(-1px) rotate(.12deg) scaleY(1.004)}}
+@media(prefers-reduced-motion:reduce) {.bar-scene .bartender-layer .art-character {animation:none!important}}
 .bar-scene.phone-guests .bar-cast { min-width:0; }
 .bar-scene .bartender-layer { clip-path:inset(-12% -30% calc(42% - 4px) -30%); pointer-events:auto; touch-action:pan-y; cursor:ew-resize; }
 .bar-scene .bartender-layer.moving { touch-action:none; }

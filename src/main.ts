@@ -4,6 +4,7 @@ import { createPinia } from 'pinia';
 import { initTelegram } from './telegram/webapp';
 import { initGraphics } from './ui/graphics';
 import { requireTelegramSession } from './telegram/launchGate';
+import { initSceneMotion } from './ui/sceneMotion';
 
 // The opening bar needs recipe mechanics only; descriptions and database prose load with Study.
 if (await requireTelegramSession()) {
@@ -17,6 +18,7 @@ if (window.location.pathname === '/admin' || new URLSearchParams(window.Telegram
   } catch { document.getElementById('app')!.textContent='Access denied. Open this page through Telegram with an authorized account.'; }
 } else {
   initGraphics();
+  initSceneMotion();
   await Promise.all([
     import('./style.css'), import('./dashboard.css'), import('./game.css'),
   ]);
