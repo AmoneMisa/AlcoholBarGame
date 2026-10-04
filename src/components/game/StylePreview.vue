@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import UiIcon from '../ui/UiIcon.vue';
+import AppearancePicker from './AppearancePicker.vue';
 import { acquisitionOffer } from '../../domain/uiOffers';
 import { computed, ref } from 'vue';
 import { INTERIORS, interiorStyle, type InteriorId } from '../../data/cosmetics/bars';
-import { bartenderCostumesFor } from '../../data/cosmetics/bartenderCostumes';
 import { interiorForStyle } from '../../data/cosmetics/styleSources';
 import { interiorOrigin, styleLabel, styleOrigin } from '../../domain/styleInfo';
 import { canUseCosmetic } from '../../domain/cosmetics';
-import { ownedFirst } from '../../domain/appearanceRewards';
 import { useGameStore } from '../../stores/game';
 import CharacterModel from '../characters/CharacterModel.vue';
 import CrystalAmount from '../ui/CrystalAmount.vue';
@@ -22,12 +20,10 @@ const game = useGameStore();
 const character = ref<'noa' | 'leo'>(props.character);
 const interior = ref<string>(props.interior ?? game.decor.interior);
 const outfit = ref<string>(props.outfit ?? game.decor.bartender);
+const catalogue = ref<'background'|'style'>(props.outfit && props.outfit!==game.decor.bartender ? 'style' : 'background');
 
 const everyday = ['vest', 'shirt', 'apron'];
-const outfits = computed(() => ownedFirst([
-  ...everyday.map((value) => ({ value, label: value === 'vest' ? 'Burgundy vest' : value === 'shirt' ? 'Shirt' : 'Apron' })),
-  ...bartenderCostumesFor(character.value)
-],item=>owns(item.value)));
+
 const owns = (value: string) => canUseCosmetic(game.ownedCosmeticIds, 'bartender', value, character.value);
 function setCharacter(next: 'noa' | 'leo') { character.value = next; outfit.value = everyday[0]!; }
 
@@ -59,8 +55,8 @@ function apply() {
         :hair-style="sameCharacter ? game.decor.hairStyle : undefined" :hair-color="sameCharacter ? game.decor.hairColor : undefined" />
     </div>
     <div class="preview-info" role="status">
-      <p><b>{{ styleLabel(character, outfit) }}</b> · <span :class="styleOwned ? 'own' : 'locked'">{{ styleOwned ? 'You own it' : 'Not owned' }}</span><br /><small>{{ outfitInfo.how }}</small></p>
-      <p><b>{{ interiorName }}</b> · <span :class="interiorOwned ? 'own' : 'locked'">{{ interiorOwned ? 'You own it' : 'Not owned' }}</span><br /><small>{{ interiorInfo.how }}</small></p>
+      <p><b>{{ styleLabel(character, outfit) }}</b> · <span :class="styleOwned ? 'own' : 'locked'">{{ styleOwned ? 'You own it' : 'Not owned' }}</span><br /><small v-if="!styleOwned">{{ outfitInfo.how }}</small></p>
+      <p><b>{{ interiorName }}</b> · <span :class="interiorOwned ? 'own' : 'locked'">{{ interiorOwned ? 'You own it' : 'Not owned' }}</span><br /><small v-if="!interiorOwned">{{ interiorInfo.how }}</small></p>
       <p v-if="outfitInfo.background" class="pair">This style comes with the background “{{ outfitInfo.background }}”.</p>
       <p v-else-if="interiorInfo.style" class="pair">This background comes with the style “{{ interiorInfo.style }}”.</p>
       <p v-if="pairedInterior && pairedInterior !== interior" class="pair">Its own background is “{{ pairedInteriorName }}”.</p>
@@ -69,28 +65,24 @@ function apply() {
       <UiButton size="sm" :variant="character === 'noa' ? 'solid' : 'secondary'" @click="setCharacter('noa')">Noa</UiButton>
       <UiButton size="sm" :variant="character === 'leo' ? 'solid' : 'secondary'" @click="setCharacter('leo')">Leo</UiButton>
     </div>
-    <small class="preview-label">BACKGROUND</small>
-    <div class="preview-strip" role="listbox" aria-label="Backgrounds">
-      <button v-for="item in INTERIORS" :key="item.id" type="button" role="option" :aria-selected="interior === item.id" :class="{ active: interior === item.id, locked: !game.ownedInteriorIds.includes(item.id) }" :style="interiorStyle(item.id as InteriorId)" @click="interior = item.id"><span><UiIcon v-if="!game.ownedInteriorIds.includes(item.id)" name="lock" /> {{ item.name }}</span></button>
-    </div>
-    <small class="preview-label">STYLE</small>
-    <div class="preview-chips" role="listbox" aria-label="Styles">
-      <button v-for="item in outfits" :key="item.value" type="button" role="option" :aria-selected="outfit === item.value" :class="{ active: outfit === item.value, locked: !owns(item.value) }" @click="outfit = item.value"><UiIcon v-if="!owns(item.value)" name="lock" /> {{ item.label }}</button>
-    </div>
-    <template #footer>
+    <div class="preview-pick" aria-label="Preview catalogue"><UiButton size="sm" :variant="catalogue==='background'?'solid':'ghost'" @click="catalogue='background'">Backgrounds</UiButton><UiButton size="sm" :variant="catalogue==='style'?'solid':'ghost'" @click="catalogue='style'">Styles</UiButton></div>
+    <AppearancePicker v-if="catalogue==='background'" kind="background" :character="character" :selected="interior" @pick="interior=$event" />
+    <AppearancePicker v-else kind="style" :character="character" :selected="outfit" @pick="outfit=$event" />
+    <div class="preview-actions">
       <UiButton v-if="!styleOwned" @click="acquisitionOffer={kind:'style',id:outfitId,label:styleLabel(character,outfit)};emit('close')">How to get this style</UiButton>
       <UiButton v-if="!interiorOwned" @click="acquisitionOffer={kind:'background',id:interior,label:interiorName};emit('close')">How to get this background</UiButton>
       <UiButton v-if="canBuyStyle" variant="primary" :crystal-cost="outfitInfo.price" @click="game.buyStyle(outfitId)">Buy style · <CrystalAmount :value="outfitInfo.price" /></UiButton>
       <UiButton v-if="canBuyInterior" variant="primary" :crystal-cost="interiorInfo.price" @click="game.buyInterior(interior)">Buy background · <CrystalAmount :value="interiorInfo.price" /></UiButton>
       <UiButton v-if="canApply" variant="solid" @click="apply">Use this look</UiButton>
       <UiButton variant="secondary" @click="emit('close')">Close</UiButton>
-    </template>
+    </div>
   </ModalDialog>
 </template>
 
 <style>
-.preview-stage { position: relative; height: clamp(240px, 42vh, 380px); border-radius: 14px; overflow: hidden; border: 1px solid #d8aa5755; }
-.preview-stage .art-character { position: absolute !important; inset: auto auto 0 50% !important; transform: translateX(-50%); width: auto !important; height: 92% !important; aspect-ratio: auto !important; }
+.preview-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;position:static}
+.preview-stage { position: relative; height: 240px; border-radius: 14px; overflow: hidden; border: 1px solid #d8aa5755; }
+.preview-stage .art-character { position: absolute !important; inset: auto auto 0 50% !important; transform: translateX(-50%); width: 132px !important; height: 220px !important; min-height:0!important; aspect-ratio:.6!important; }
 .preview-stage .bartender-art { height: 100%; width: auto; object-fit: contain; }
 .preview-info { display: grid; gap: 6px; margin: 10px 0; font-size: 13px; }
 .preview-info p { margin: 0; }
@@ -98,12 +90,4 @@ function apply() {
 .preview-info .locked { color: #e4b35c; }
 .preview-info .pair { color: #c9d5e6; }
 .preview-pick { display: flex; gap: 8px; margin: 6px 0; }
-.preview-label { display: block; margin: 10px 0 6px; letter-spacing: .08em; }
-.preview-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x proximity; }
-.preview-strip button { flex: 0 0 112px; height: 64px; border: 2px solid transparent; border-radius: 10px; color: #fff; text-align: left; padding: 6px; font-size: 13px; font-weight: 700; scroll-snap-align: start; cursor: pointer; text-shadow: 0 1px 4px #000; }
-.preview-strip button.active, .preview-chips button.active { border-color: #e4b35c; }
-.preview-strip button.locked { filter: saturate(.6); }
-.preview-chips { display: flex; flex-wrap: wrap; gap: 6px; max-height: 150px; overflow-y: auto; }
-.preview-chips button { min-height: 34px; padding: 0 12px; border: 1px solid #43536b; border-radius: 999px; background: #0c1421; color: #e8e2d8; font-size: 13px; cursor: pointer; }
-.preview-chips button.locked { opacity: .75; }
 </style>

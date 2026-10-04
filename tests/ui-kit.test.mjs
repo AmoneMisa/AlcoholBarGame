@@ -46,3 +46,13 @@ test('The device voice gets drink words respelled so they sound right', async ()
   assert.equal(forDeviceVoice('Nothing special here'), 'Nothing special here');
   assert.equal(forDeviceVoice('reliqueurish'), 'reliqueurish', 'only whole words');
 });
+import { matchesInventoryCategory } from '../src/domain/inventoryCategories.ts';
+test('Inventory shards contain fragments only and full items have separate categories',()=>{
+  const entries=[{line:{kind:'material',id:'parts'}},{line:{kind:'item',id:'elixir'}},{line:{kind:'style',id:'owned-style'}},{line:{kind:'background',id:'riad'}},{line:{kind:'style',id:'style-pieces'},fragments:true},{line:{kind:'background',id:'riad'},fragments:true},{line:{kind:'material',id:'fridge'},fragments:true},{line:{kind:'material',id:'skinShards'},fragments:true}];
+  const ids=category=>entries.filter(entry=>matchesInventoryCategory(entry,category)).map(entry=>entry.line.id);
+  assert.deepEqual(ids('shards'),['style-pieces','riad','fridge','skinShards']);
+  assert.deepEqual(ids('upgrades'),['parts','fridge']);
+  assert.deepEqual(ids('styles'),['owned-style']);
+  assert.deepEqual(ids('backgrounds'),['riad']);
+  assert.deepEqual(ids('boosters'),['elixir']);
+});

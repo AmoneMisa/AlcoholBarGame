@@ -6,7 +6,8 @@ import UiIcon from '../ui/UiIcon.vue';
 import ModalDialog from '../ui/ModalDialog.vue';
 import ConfirmDialog from '../ui/ConfirmDialog.vue';
 import PanelHeading from '../ui/PanelHeading.vue';
-import WorkshopStock from './WorkshopStock.vue';
+import InventoryPanel from '../workshop/InventoryPanel.vue';
+import { INVENTORY_CATEGORIES, type InventoryCategory } from '../../domain/inventoryCategories';
 import OptionSelect from './OptionSelect.vue';
 import DeliveryProblems from './DeliveryProblems.vue';
 import BottleModel from '../cocktails/BottleModel.vue';
@@ -19,15 +20,15 @@ import { capacityFor, isPerishable } from '../../domain/warehouse';
 import type { Ingredient, RegionId } from '../../domain/types';
 import { useGameStore } from '../../stores/game';
 const game = useGameStore();
-const stockCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh' | 'food' | 'items' | 'shards' | 'cards'>('all');
+const stockCategory = ref<'all' | 'spirit' | 'mixer' | 'fresh' | 'food' | Exclude<InventoryCategory, 'all'> | 'cards'>('all');
 const recipeCardInventory = computed(() => RECIPES.map(recipe => ({ recipe, quantity: game.recipeCopies[recipe.id] ?? 0 })).filter(item => item.quantity > 0));
 const stockTabs = computed(() => {
   const tabs: { id: typeof stockCategory.value; label: string }[] = [{ id:'all',label:'All' },{ id:'spirit',label:'Spirits' },{ id:'mixer',label:'Mixers' },{ id:'fresh',label:'Fresh' },{ id:'food',label:'Food' }];
-  if (game.loot.parts > 0 || Object.values(game.loot.boxes).some(n=>n>0) || Object.values(game.loot.consumables).some(n=>n>0) || Object.values(game.circle.keepsakes).some(n=>n>0)) tabs.push({id:'items',label:'Items'});
-  if (game.loot.skinShards > 0 || Object.values(game.loot.styleShards).some(n=>n>0) || Object.values(game.loot.itemShards).some(n=>n>0) || Object.values(game.circle.shards).some(n=>n>0)) tabs.push({id:'shards',label:'Shards'});
+  tabs.push(...INVENTORY_CATEGORIES.filter(tab=>tab.id!=='all'));
   if (recipeCardInventory.value.length) tabs.push({id:'cards',label:'Cards'});
   return tabs;
 });
+const collectionCategory=computed(()=>INVENTORY_CATEGORIES.some(tab=>tab.id===stockCategory.value && tab.id!=='all') ? stockCategory.value as InventoryCategory : undefined);
 const isStockKind = computed(() => ['all','spirit','mixer','fresh','food'].includes(stockCategory.value));
 const isPagedStock = computed(() => isStockKind.value || stockCategory.value === 'cards');
 const search = ref('');
@@ -101,7 +102,7 @@ watch([search,()=>game.regionId,stockCategory],()=>{stockPage.value=1;selection.
     </div>
     <div class="category-tabs inventory-filter"><button v-for="tab in stockTabs" :key="tab.id" type="button" :class="{active:stockCategory===tab.id}" @click="stockCategory=tab.id">{{tab.label}}</button></div>
     <div v-if="isPagedStock" class="stock-tools"><UiInput v-model="search" label="Find stock" type="search" placeholder="Search ingredients, brands or cards" /><small v-if="isStockKind">Tap an item to transfer or discard it.</small></div>
-    <WorkshopStock v-if="stockCategory==='items'||stockCategory==='shards'" :kind="stockCategory" />
+    <InventoryPanel v-if="collectionCategory" :category="collectionCategory" />
     <section v-if="isStockKind && visibleStock.length" class="stock-section" aria-label="Ingredient stock">
       <h3>Ingredients <span>{{matchingStock.length}}</span></h3>
       <div class="stock-list">

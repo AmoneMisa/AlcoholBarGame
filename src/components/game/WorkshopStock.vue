@@ -108,7 +108,7 @@ function throwAway() {
 </script>
 
 <template>
-  <InventoryPanel v-if="kind === 'shards'" />
+  <InventoryPanel v-if="kind === 'shards'" category="shards" />
   <section v-else class="workshop-stock" :aria-label="kind === 'items' ? 'Workshop items' : 'Shards'">
     <button v-for="tile in tiles" :key="tile.key" class="stock-tile tappable" type="button" :data-id="tile.key" @click="popup = tile.popup">
       <ItemArt :kind="tile.art.kind" :id="tile.art.id" :fallback="tile.art.fallback" :size="64" />

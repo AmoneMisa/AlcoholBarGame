@@ -6,11 +6,15 @@ import { restrictedTheme, PROMO_THEME_IDS, NEW_PASS_THEME_IDS, THEME_DRAW_POOLS,
 
 // The words the player sees about where a bartender style or a background comes from (Design and the preview).
 const interiorName = (id: string) => INTERIORS.find((entry) => entry.id === id)?.name ?? '';
-export const styleLabel = (character: string, value: string) => bartenderCostumesFor(character).find((entry) => entry.value === value)?.label ?? value;
+export const styleLabel = (character: string, value: string) => bartenderCostumesFor(character).find((entry) => entry.value === value)?.label ?? ({
+  vest:'Burgundy vest',shirt:character==='leo'?'Shirt & suspenders':'Ivory jacket',apron:'Emerald apron',
+  'special-gala':'Midnight gown','special-cyberpunk':'Cyberpunk','special-steampunk':'Steampunk','special-post-apocalypse':'Wasteland','special-historical':'Historical','special-fantasy':'Fantasy','special-masquerade':'Masquerade'
+} as Record<string,string>)[value] ?? value;
 
 export interface StyleOrigin { source: StyleSource | 'everyday'; how: string; background: string; price: number }
 export function styleOrigin(character: string, value: string): StyleOrigin {
   const known = bartenderCostumesFor(character).some((entry) => entry.value === value);
+  if(value.startsWith('special-'))return {source:'box',how:'Find this style in chests or craft it with skin shards in the Workshop.',background:'',price:0};
   if (!known) return { source: 'everyday', how: 'An everyday outfit.', background: '', price: 0 };
   const source = styleSource(character, value);
   const theme=cosmeticTheme(`bartender:${value}:${character}`);
