@@ -107,7 +107,10 @@
   "review": {
     "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
-    "alphaEdges": "manual-review"
+    "alphaEdges": "manual-review",
+    "manualApprovedRoles": [
+      "counter"
+    ]
   },
   "windowCutoutsNormalized": [
     {
@@ -138,5 +141,59 @@
       "width": 0.063,
       "height": 0.372
     }
+  ],
+  "manualRoleMasksNormalized": {
+    "counter": {
+      "feather": 1.2,
+      "include": [
+        {
+          "type": "rect",
+          "x": 0.305,
+          "y": 0.16,
+          "width": 0.695,
+          "height": 0.84
+        }
+      ],
+      "exclude": [
+        {
+          "type": "rect",
+          "x": 0.37,
+          "y": 0.48,
+          "width": 0.1,
+          "height": 0.52
+        },
+        {
+          "type": "rect",
+          "x": 0.52,
+          "y": 0.48,
+          "width": 0.1,
+          "height": 0.52
+        },
+        {
+          "type": "rect",
+          "x": 0.67,
+          "y": 0.48,
+          "width": 0.1,
+          "height": 0.52
+        },
+        {
+          "type": "rect",
+          "x": 0.82,
+          "y": 0.48,
+          "width": 0.1,
+          "height": 0.52
+        },
+        {
+          "type": "rect",
+          "x": 0.94,
+          "y": 0.48,
+          "width": 0.06,
+          "height": 0.52
+        }
+      ]
+    }
+  },
+  "manualApprovedRoles": [
+    "counter"
   ]
 }
