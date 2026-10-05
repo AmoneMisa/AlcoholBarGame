@@ -26,12 +26,21 @@ def module_crop(manifest,role,source_size):
     if not module:
         if role=='seating':
             rect=manifest.get('slotsNormalized',{}).get('seating')
-            if not rect:
-                raise RuntimeError(f"{manifest['id']}/{role}: missing source region")
-            return (
-                round(rect['x']*source_size[0]),round(rect['y']*source_size[1]),
-                round((rect['x']+rect['width'])*source_size[0]),round((rect['y']+rect['height'])*source_size[1])
-            )
+            if rect:
+                return (
+                    round(rect['x']*source_size[0]),round(rect['y']*source_size[1]),
+                    round((rect['x']+rect['width'])*source_size[0]),round((rect['y']+rect['height'])*source_size[1])
+                )
+            rect=manifest.get('slots',{}).get('seating')
+            if rect:
+                aw=manifest.get('canvas',{}).get('width',source_size[0])
+                ah=manifest.get('canvas',{}).get('height',source_size[1])
+                sx=source_size[0]/aw; sy=source_size[1]/ah
+                return (
+                    round(rect['x']*sx),round(rect['y']*sy),
+                    round((rect['x']+rect['width'])*sx),round((rect['y']+rect['height'])*sy)
+                )
+            raise RuntimeError(f"{manifest['id']}/{role}: missing source region")
         raise RuntimeError(f"{manifest['id']}/{role}: missing module reference")
     if 'cropNormalized' in module:
         r=module['cropNormalized']
