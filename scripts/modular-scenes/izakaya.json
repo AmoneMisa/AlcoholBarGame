@@ -100,10 +100,18 @@
     }
   ],
   "bartenderAnchor": null,
-  "windowCutouts": [],
   "review": {
-    "windowCutouts": "manual-required",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review"
-  }
+  },
+  "windowCutoutsNormalized": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 0.149,
+      "width": 0.162,
+      "height": 0.489
+    }
+  ]
 }
