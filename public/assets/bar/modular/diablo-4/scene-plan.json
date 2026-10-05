@@ -33,44 +33,44 @@
     },
     "shelf-reference": {
       "cropNormalized": {
-        "x": 0.16,
-        "y": 0.1,
-        "width": 0.68,
-        "height": 0.46
+        "x": 0.29,
+        "y": 0.18,
+        "width": 0.59,
+        "height": 0.43
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture.",
       "crop": {
-        "x": 268,
-        "y": 94,
-        "width": 1137,
-        "height": 433
+        "x": 485,
+        "y": 169,
+        "width": 986,
+        "height": 405
       },
       "rect": {
-        "x": 0.160287,
-        "y": 0.099894,
-        "width": 0.680024,
-        "height": 0.460149
+        "x": 0.290072,
+        "y": 0.179596,
+        "width": 0.589713,
+        "height": 0.430393
       }
     },
     "counter-reference": {
       "cropNormalized": {
         "x": 0,
-        "y": 0.48,
+        "y": 0.59,
         "width": 1,
-        "height": 0.34
+        "height": 0.21
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings.",
       "crop": {
         "x": 0,
-        "y": 452,
+        "y": 555,
         "width": 1672,
-        "height": 320
+        "height": 198
       },
       "rect": {
         "x": 0,
-        "y": 0.48034,
+        "y": 0.589798,
         "width": 1,
-        "height": 0.340064
+        "height": 0.210414
       }
     }
   },
@@ -82,22 +82,22 @@
       "height": 0.6
     },
     "shelves": {
-      "x": 0.16,
-      "y": 0.1,
-      "width": 0.68,
-      "height": 0.46
+      "x": 0.29,
+      "y": 0.18,
+      "width": 0.59,
+      "height": 0.43
     },
     "counter": {
       "x": 0,
-      "y": 0.48,
+      "y": 0.59,
       "width": 1,
-      "height": 0.34
+      "height": 0.21
     },
     "seating": {
       "x": 0,
-      "y": 0.64,
+      "y": 0.74,
       "width": 1,
-      "height": 0.3
+      "height": 0.26
     },
     "floor": {
       "x": 0,
@@ -106,7 +106,29 @@
       "height": 0.42
     }
   },
-  "windowCutouts": [],
+  "windowCutouts": [
+    {
+      "type": "polygon",
+      "points": [
+        {
+          "x": 0,
+          "y": 0.08
+        },
+        {
+          "x": 0.27,
+          "y": 0.08
+        },
+        {
+          "x": 0.27,
+          "y": 0.56
+        },
+        {
+          "x": 0,
+          "y": 0.56
+        }
+      ]
+    }
+  ],
   "shelfRows": [
     0.28,
     0.38,
@@ -114,46 +136,55 @@
   ],
   "seatAnchors": [
     {
-      "x": 0.12,
-      "y": 0.72
+      "x": 0.1,
+      "y": 0.85
     },
     {
       "x": 0.3,
-      "y": 0.72
+      "y": 0.85
     },
     {
-      "x": 0.49,
-      "y": 0.72
+      "x": 0.5,
+      "y": 0.85
     },
     {
-      "x": 0.67,
-      "y": 0.72
+      "x": 0.7,
+      "y": 0.85
     },
     {
-      "x": 0.85,
-      "y": 0.72
+      "x": 0.9,
+      "y": 0.85
     }
   ],
   "bartenderAnchor": {
     "x": 0.5,
     "y": 0.58
   },
-  "status": "geometry-review-required",
-  "geometrySource": "provisional-normalized",
+  "status": "geometry-ready-art-review-required",
+  "geometrySource": "manual-source-review",
   "requiredRoles": [
     "counter",
     "shelf",
     "seating"
   ],
-  "manualApprovedRoles": [],
+  "manualApprovedRoles": [
+    "counter",
+    "seating",
+    "shelf"
+  ],
   "review": {
-    "geometry": "manual-required",
-    "shelfBounds": "manual-required",
-    "counterBounds": "manual-required",
-    "seatAnchors": "manual-required",
-    "windowCutouts": "manual-required",
+    "geometry": "manual-measured",
+    "shelfBounds": "manual-measured",
+    "counterBounds": "manual-measured",
+    "seatAnchors": "manual-measured",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
-    "alphaEdges": "manual-review"
+    "alphaEdges": "manual-review",
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ]
   },
   "notes": [
     "Existing themed background coverage manifest.",
