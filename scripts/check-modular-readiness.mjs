@@ -31,6 +31,13 @@ for(const name of readdirSync(MOD).sort()){
   const requiredRoles=manifest.requiredRoles??ROLES;
   const manualApprovedRoles=new Set(manifest.manualApprovedRoles??[]);
   const statuses=Object.fromEntries(ROLES.map(role=>[role,report.roles?.[role]?.status??'missing']));
+
+  for(const role of manualApprovedRoles){
+    if(!manifest.manualRoleMasksNormalized?.[role]){
+      console.error(`${name}: manual approval for ${role} has no manualRoleMasksNormalized spec`);
+      failed++;
+    }
+  }
   const promoted=Object.fromEntries(ROLES.map(role=>[role,existsSync(resolve(base,'review-ready',`${role}.webp`))]));
 
   if(kind==='candidate'){
