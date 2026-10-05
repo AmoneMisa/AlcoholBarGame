@@ -1,5 +1,5 @@
 {
-  "count": 25,
+  "count": 48,
   "scenes": [
     {
       "scene": "alan-wake",
@@ -11,9 +11,45 @@
       }
     },
     {
+      "scene": "allods",
+      "mask": "public/assets/bar/modular/allods/window-mask.png",
+      "cutouts": 2,
+      "canvas": {
+        "width": 1774,
+        "height": 887
+      }
+    },
+    {
       "scene": "among-us",
       "mask": "public/assets/bar/modular/among-us/window-mask.png",
       "cutouts": 3,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "assassins-creed",
+      "mask": "public/assets/bar/modular/assassins-creed/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 1672,
+        "height": 940
+      }
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "mask": "public/assets/bar/modular/baldurs-gate-3/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "batman",
+      "mask": "public/assets/bar/modular/batman/window-mask.png",
+      "cutouts": 2,
       "canvas": {
         "width": 1672,
         "height": 941
@@ -50,6 +86,24 @@
       "scene": "cs-2",
       "mask": "public/assets/bar/modular/cs-2/window-mask.png",
       "cutouts": 2,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "cyberpunk-2077",
+      "mask": "public/assets/bar/modular/cyberpunk-2077/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "darksiders-3",
+      "mask": "public/assets/bar/modular/darksiders-3/window-mask.png",
+      "cutouts": 1,
       "canvas": {
         "width": 1672,
         "height": 941
@@ -101,9 +155,36 @@
       }
     },
     {
+      "scene": "divinity-original-sin-2",
+      "mask": "public/assets/bar/modular/divinity-original-sin-2/window-mask.png",
+      "cutouts": 2,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
       "scene": "elden-ring",
       "mask": "public/assets/bar/modular/elden-ring/window-mask.png",
       "cutouts": 1,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "fairy",
+      "mask": "public/assets/bar/modular/fairy/window-mask.png",
+      "cutouts": 3,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "fairytale",
+      "mask": "public/assets/bar/modular/fairytale/window-mask.png",
+      "cutouts": 2,
       "canvas": {
         "width": 1672,
         "height": 941
@@ -115,6 +196,51 @@
       "cutouts": 2,
       "canvas": {
         "width": 1671,
+        "height": 941
+      }
+    },
+    {
+      "scene": "gta",
+      "mask": "public/assets/bar/modular/gta/window-mask.png",
+      "cutouts": 2,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "gta-3",
+      "mask": "public/assets/bar/modular/gta-3/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "gta-5",
+      "mask": "public/assets/bar/modular/gta-5/window-mask.png",
+      "cutouts": 2,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "gta-sa",
+      "mask": "public/assets/bar/modular/gta-sa/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "harry-potter",
+      "mask": "public/assets/bar/modular/harry-potter/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 1672,
         "height": 941
       }
     },
@@ -200,9 +326,54 @@
       }
     },
     {
+      "scene": "shadow-tomb-raider",
+      "mask": "public/assets/bar/modular/shadow-tomb-raider/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "silent-hill",
+      "mask": "public/assets/bar/modular/silent-hill/window-mask.png",
+      "cutouts": 3,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
       "scene": "skyline",
       "mask": "public/assets/bar/modular/skyline/window-mask.png",
       "cutouts": 5,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "skyrim",
+      "mask": "public/assets/bar/modular/skyrim/window-mask.png",
+      "cutouts": 2,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "sleeping-dogs",
+      "mask": "public/assets/bar/modular/sleeping-dogs/window-mask.png",
+      "cutouts": 3,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "stellar-blade",
+      "mask": "public/assets/bar/modular/stellar-blade/window-mask.png",
+      "cutouts": 1,
       "canvas": {
         "width": 1672,
         "height": 941
@@ -215,6 +386,42 @@
       "canvas": {
         "width": 623,
         "height": 623
+      }
+    },
+    {
+      "scene": "tropico-6",
+      "mask": "public/assets/bar/modular/tropico-6/window-mask.png",
+      "cutouts": 3,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "underwater",
+      "mask": "public/assets/bar/modular/underwater/window-mask.png",
+      "cutouts": 3,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "walking-dead-s3",
+      "mask": "public/assets/bar/modular/walking-dead-s3/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "watch-dogs",
+      "mask": "public/assets/bar/modular/watch-dogs/window-mask.png",
+      "cutouts": 8,
+      "canvas": {
+        "width": 1672,
+        "height": 941
       }
     },
     {

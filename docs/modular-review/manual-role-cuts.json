@@ -1,5 +1,5 @@
 {
-  "count": 84,
+  "count": 176,
   "items": [
     {
       "scene": "alan-wake",
@@ -247,6 +247,30 @@
       "size": [
         1672,
         245
+      ]
+    },
+    {
+      "scene": "cyberpunk-2077",
+      "role": "shelf",
+      "size": [
+        1472,
+        442
+      ]
+    },
+    {
+      "scene": "cyberpunk-2077",
+      "role": "counter",
+      "size": [
+        1672,
+        216
+      ]
+    },
+    {
+      "scene": "cyberpunk-2077",
+      "role": "seating",
+      "size": [
+        1672,
+        263
       ]
     },
     {
@@ -602,6 +626,30 @@
       ]
     },
     {
+      "scene": "heroes-3",
+      "role": "shelf",
+      "size": [
+        886,
+        405
+      ]
+    },
+    {
+      "scene": "heroes-3",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "heroes-3",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
       "scene": "inferno-penthouse",
       "role": "counter",
       "size": [
@@ -642,11 +690,451 @@
       ]
     },
     {
+      "scene": "lineage-2",
+      "role": "shelf",
+      "size": [
+        1103,
+        442
+      ]
+    },
+    {
+      "scene": "lineage-2",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "lineage-2",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
       "scene": "loft",
       "role": "counter",
       "size": [
         764,
         150
+      ]
+    },
+    {
+      "scene": "lost-ark",
+      "role": "shelf",
+      "size": [
+        1136,
+        442
+      ]
+    },
+    {
+      "scene": "lost-ark",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "lost-ark",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "marina",
+      "role": "shelf",
+      "size": [
+        237,
+        249
+      ]
+    },
+    {
+      "scene": "mass-effect",
+      "role": "shelf",
+      "size": [
+        1087,
+        414
+      ]
+    },
+    {
+      "scene": "mass-effect",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "mass-effect",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "max-payne",
+      "role": "shelf",
+      "size": [
+        887,
+        442
+      ]
+    },
+    {
+      "scene": "max-payne",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "max-payne",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "minecraft",
+      "role": "shelf",
+      "size": [
+        1070,
+        367
+      ]
+    },
+    {
+      "scene": "minecraft",
+      "role": "counter",
+      "size": [
+        1672,
+        226
+      ]
+    },
+    {
+      "scene": "minecraft",
+      "role": "seating",
+      "size": [
+        1672,
+        263
+      ]
+    },
+    {
+      "scene": "neighbours-from-hell",
+      "role": "shelf",
+      "size": [
+        886,
+        396
+      ]
+    },
+    {
+      "scene": "neighbours-from-hell",
+      "role": "counter",
+      "size": [
+        1672,
+        226
+      ]
+    },
+    {
+      "scene": "neighbours-from-hell",
+      "role": "seating",
+      "size": [
+        1672,
+        263
+      ]
+    },
+    {
+      "scene": "nfs-carbon",
+      "role": "shelf",
+      "size": [
+        1170,
+        433
+      ]
+    },
+    {
+      "scene": "nfs-carbon",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "nfs-carbon",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "nfs-most-wanted",
+      "role": "shelf",
+      "size": [
+        1170,
+        443
+      ]
+    },
+    {
+      "scene": "nfs-most-wanted",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "nfs-most-wanted",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "nfs-underground",
+      "role": "shelf",
+      "size": [
+        1278,
+        399
+      ]
+    },
+    {
+      "scene": "nfs-underground",
+      "role": "counter",
+      "size": [
+        1774,
+        213
+      ]
+    },
+    {
+      "scene": "nfs-underground",
+      "role": "seating",
+      "size": [
+        1774,
+        257
+      ]
+    },
+    {
+      "scene": "palworld",
+      "role": "shelf",
+      "size": [
+        1153,
+        442
+      ]
+    },
+    {
+      "scene": "palworld",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "palworld",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "perfect-world",
+      "role": "shelf",
+      "size": [
+        1170,
+        395
+      ]
+    },
+    {
+      "scene": "perfect-world",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "perfect-world",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "quantum-break",
+      "role": "shelf",
+      "size": [
+        1036,
+        423
+      ]
+    },
+    {
+      "scene": "quantum-break",
+      "role": "counter",
+      "size": [
+        1672,
+        226
+      ]
+    },
+    {
+      "scene": "quantum-break",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "repo",
+      "role": "shelf",
+      "size": [
+        1120,
+        442
+      ]
+    },
+    {
+      "scene": "repo",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "repo",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "resident-evil",
+      "role": "shelf",
+      "size": [
+        1053,
+        442
+      ]
+    },
+    {
+      "scene": "resident-evil",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "resident-evil",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "shadow-tomb-raider",
+      "role": "shelf",
+      "size": [
+        1338,
+        339
+      ]
+    },
+    {
+      "scene": "shadow-tomb-raider",
+      "role": "counter",
+      "size": [
+        1672,
+        226
+      ]
+    },
+    {
+      "scene": "shadow-tomb-raider",
+      "role": "seating",
+      "size": [
+        1672,
+        245
+      ]
+    },
+    {
+      "scene": "silent-hill",
+      "role": "shelf",
+      "size": [
+        535,
+        376
+      ]
+    },
+    {
+      "scene": "silent-hill",
+      "role": "counter",
+      "size": [
+        1672,
+        217
+      ]
+    },
+    {
+      "scene": "silent-hill",
+      "role": "seating",
+      "size": [
+        1672,
+        254
+      ]
+    },
+    {
+      "scene": "skyrim",
+      "role": "shelf",
+      "size": [
+        1136,
+        320
+      ]
+    },
+    {
+      "scene": "skyrim",
+      "role": "counter",
+      "size": [
+        1672,
+        207
+      ]
+    },
+    {
+      "scene": "skyrim",
+      "role": "seating",
+      "size": [
+        1672,
+        207
+      ]
+    },
+    {
+      "scene": "sleeping-dogs",
+      "role": "shelf",
+      "size": [
+        1103,
+        414
+      ]
+    },
+    {
+      "scene": "sleeping-dogs",
+      "role": "counter",
+      "size": [
+        1672,
+        226
+      ]
+    },
+    {
+      "scene": "sleeping-dogs",
+      "role": "seating",
+      "size": [
+        1672,
+        235
       ]
     },
     {
@@ -671,6 +1159,254 @@
       "size": [
         623,
         274
+      ]
+    },
+    {
+      "scene": "stellar-blade",
+      "role": "shelf",
+      "size": [
+        1371,
+        405
+      ]
+    },
+    {
+      "scene": "stellar-blade",
+      "role": "counter",
+      "size": [
+        1672,
+        217
+      ]
+    },
+    {
+      "scene": "stellar-blade",
+      "role": "seating",
+      "size": [
+        1672,
+        245
+      ]
+    },
+    {
+      "scene": "tropical",
+      "role": "seating",
+      "size": [
+        623,
+        225
+      ]
+    },
+    {
+      "scene": "tropico-6",
+      "role": "shelf",
+      "size": [
+        986,
+        414
+      ]
+    },
+    {
+      "scene": "tropico-6",
+      "role": "counter",
+      "size": [
+        1672,
+        217
+      ]
+    },
+    {
+      "scene": "tropico-6",
+      "role": "seating",
+      "size": [
+        1672,
+        235
+      ]
+    },
+    {
+      "scene": "underground",
+      "role": "shelf",
+      "size": [
+        1153,
+        423
+      ]
+    },
+    {
+      "scene": "underground",
+      "role": "counter",
+      "size": [
+        1672,
+        217
+      ]
+    },
+    {
+      "scene": "underground",
+      "role": "seating",
+      "size": [
+        1672,
+        235
+      ]
+    },
+    {
+      "scene": "underwater",
+      "role": "shelf",
+      "size": [
+        1120,
+        423
+      ]
+    },
+    {
+      "scene": "underwater",
+      "role": "counter",
+      "size": [
+        1672,
+        217
+      ]
+    },
+    {
+      "scene": "underwater",
+      "role": "seating",
+      "size": [
+        1672,
+        245
+      ]
+    },
+    {
+      "scene": "walking-dead-s3",
+      "role": "shelf",
+      "size": [
+        1153,
+        423
+      ]
+    },
+    {
+      "scene": "walking-dead-s3",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "walking-dead-s3",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "warcraft-3",
+      "role": "shelf",
+      "size": [
+        1153,
+        442
+      ]
+    },
+    {
+      "scene": "warcraft-3",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "warcraft-3",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "watch-dogs",
+      "role": "shelf",
+      "size": [
+        1204,
+        442
+      ]
+    },
+    {
+      "scene": "watch-dogs",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "watch-dogs",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "witcher-3",
+      "role": "shelf",
+      "size": [
+        1153,
+        423
+      ]
+    },
+    {
+      "scene": "witcher-3",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "witcher-3",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "wolf-among-us",
+      "role": "shelf",
+      "size": [
+        1003,
+        461
+      ]
+    },
+    {
+      "scene": "wolf-among-us",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "wolf-among-us",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "worms",
+      "role": "shelf",
+      "size": [
+        1153,
+        433
+      ]
+    },
+    {
+      "scene": "worms",
+      "role": "counter",
+      "size": [
+        1672,
+        225
+      ]
+    },
+    {
+      "scene": "worms",
+      "role": "seating",
+      "size": [
+        1672,
+        273
       ]
     }
   ]

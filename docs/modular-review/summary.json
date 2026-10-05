@@ -371,8 +371,12 @@
   },
   {
     "scene": "cyberpunk-2077",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "candidate",
@@ -383,10 +387,14 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -846,8 +854,12 @@
   },
   {
     "scene": "heroes-3",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "candidate",
@@ -858,10 +870,14 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -976,8 +992,12 @@
   },
   {
     "scene": "lineage-2",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "candidate",
@@ -988,10 +1008,14 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -1024,8 +1048,12 @@
   },
   {
     "scene": "lost-ark",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "candidate",
@@ -1036,10 +1064,14 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -1072,8 +1104,12 @@
   },
   {
     "scene": "mass-effect",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "review-all-edges",
@@ -1084,17 +1120,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "max-payne",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "candidate",
@@ -1105,17 +1149,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "minecraft",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "review-all-edges",
@@ -1126,17 +1178,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "neighbours-from-hell",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "candidate",
@@ -1147,17 +1207,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "nfs-carbon",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "candidate",
@@ -1168,17 +1236,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "nfs-most-wanted",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "candidate",
@@ -1189,17 +1265,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "nfs-underground",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "review-all-edges",
@@ -1210,10 +1294,14 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -1244,8 +1332,12 @@
   },
   {
     "scene": "palworld",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "review-all-edges",
@@ -1256,10 +1348,14 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -1290,8 +1386,12 @@
   },
   {
     "scene": "perfect-world",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "review-all-edges",
@@ -1302,17 +1402,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "quantum-break",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "candidate",
@@ -1323,17 +1431,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "repo",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "candidate",
@@ -1344,17 +1460,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "resident-evil",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "candidate",
@@ -1365,10 +1489,14 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -1424,8 +1552,12 @@
   },
   {
     "scene": "shadow-tomb-raider",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "candidate",
@@ -1436,17 +1568,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "silent-hill",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "candidate",
@@ -1457,10 +1597,14 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -1489,8 +1633,12 @@
   },
   {
     "scene": "skyrim",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "review-all-edges",
@@ -1501,17 +1649,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "sleeping-dogs",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "candidate",
@@ -1522,10 +1678,14 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -1560,8 +1720,12 @@
   },
   {
     "scene": "stellar-blade",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "candidate",
@@ -1572,10 +1736,14 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -1608,8 +1776,12 @@
   },
   {
     "scene": "tropico-6",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "review-all-edges",
@@ -1620,17 +1792,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "underground",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "review-all-edges",
@@ -1641,17 +1821,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "underwater",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "review-all-edges",
@@ -1662,10 +1850,14 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -1696,8 +1888,12 @@
   },
   {
     "scene": "walking-dead-s3",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "candidate",
@@ -1708,17 +1904,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "warcraft-3",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "candidate",
@@ -1729,17 +1933,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "watch-dogs",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "review-all-edges",
@@ -1750,10 +1962,14 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -1784,8 +2000,12 @@
   },
   {
     "scene": "witcher-3",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "review-all-edges",
@@ -1796,17 +2016,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "wolf-among-us",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "candidate",
       "shelf": "review-all-edges",
@@ -1817,17 +2045,25 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
   {
     "scene": "worms",
-    "kind": "candidate",
-    "promoted": [],
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "review-all-edges",
@@ -1838,10 +2074,14 @@
       "shelf",
       "seating"
     ],
-    "manualApprovedRoles": [],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   }

@@ -1,5 +1,5 @@
 {
-  "count": 43,
+  "count": 73,
   "scenes": [
     {
       "scene": "alan-wake",
@@ -333,6 +333,20 @@
       "canvas": {
         "width": 764,
         "height": 508
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "cyberpunk-2077",
+      "mask": "public/assets/bar/modular/cyberpunk-2077/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
       },
       "windowCutouts": []
     },
@@ -745,6 +759,20 @@
       "windowCutouts": []
     },
     {
+      "scene": "heroes-3",
+      "mask": "public/assets/bar/modular/heroes-3/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
       "scene": "inferno-penthouse",
       "mask": "public/assets/bar/modular/inferno-penthouse/architecture-mask.png",
       "roles": [
@@ -936,6 +964,20 @@
       ]
     },
     {
+      "scene": "lineage-2",
+      "mask": "public/assets/bar/modular/lineage-2/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
       "scene": "loft",
       "mask": "public/assets/bar/modular/loft/architecture-mask.png",
       "roles": [
@@ -977,6 +1019,20 @@
           "height": 0.372
         }
       ]
+    },
+    {
+      "scene": "lost-ark",
+      "mask": "public/assets/bar/modular/lost-ark/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
     },
     {
       "scene": "marina",
@@ -1055,6 +1111,104 @@
           ]
         }
       ]
+    },
+    {
+      "scene": "mass-effect",
+      "mask": "public/assets/bar/modular/mass-effect/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "max-payne",
+      "mask": "public/assets/bar/modular/max-payne/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "minecraft",
+      "mask": "public/assets/bar/modular/minecraft/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "neighbours-from-hell",
+      "mask": "public/assets/bar/modular/neighbours-from-hell/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "nfs-carbon",
+      "mask": "public/assets/bar/modular/nfs-carbon/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "nfs-most-wanted",
+      "mask": "public/assets/bar/modular/nfs-most-wanted/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "nfs-underground",
+      "mask": "public/assets/bar/modular/nfs-underground/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1774,
+        "height": 887
+      },
+      "windowCutouts": []
     },
     {
       "scene": "palace",
@@ -1187,6 +1341,20 @@
       ]
     },
     {
+      "scene": "palworld",
+      "mask": "public/assets/bar/modular/palworld/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
       "scene": "parisian",
       "mask": "public/assets/bar/modular/parisian/architecture-mask.png",
       "roles": [
@@ -1221,6 +1389,62 @@
           "height": 0.365
         }
       ]
+    },
+    {
+      "scene": "perfect-world",
+      "mask": "public/assets/bar/modular/perfect-world/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "quantum-break",
+      "mask": "public/assets/bar/modular/quantum-break/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 940
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "repo",
+      "mask": "public/assets/bar/modular/repo/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "resident-evil",
+      "mask": "public/assets/bar/modular/resident-evil/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
     },
     {
       "scene": "riad",
@@ -1354,6 +1578,34 @@
       ]
     },
     {
+      "scene": "shadow-tomb-raider",
+      "mask": "public/assets/bar/modular/shadow-tomb-raider/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "silent-hill",
+      "mask": "public/assets/bar/modular/silent-hill/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
       "scene": "skyline",
       "mask": "public/assets/bar/modular/skyline/architecture-mask.png",
       "roles": [
@@ -1403,6 +1655,34 @@
       ]
     },
     {
+      "scene": "skyrim",
+      "mask": "public/assets/bar/modular/skyrim/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "sleeping-dogs",
+      "mask": "public/assets/bar/modular/sleeping-dogs/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
       "scene": "speakeasy",
       "mask": "public/assets/bar/modular/speakeasy/architecture-mask.png",
       "roles": [
@@ -1413,6 +1693,20 @@
       "canvas": {
         "width": 623,
         "height": 623
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "stellar-blade",
+      "mask": "public/assets/bar/modular/stellar-blade/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
       },
       "windowCutouts": []
     },
@@ -1473,6 +1767,90 @@
       ]
     },
     {
+      "scene": "tropico-6",
+      "mask": "public/assets/bar/modular/tropico-6/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "underground",
+      "mask": "public/assets/bar/modular/underground/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "underwater",
+      "mask": "public/assets/bar/modular/underwater/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "walking-dead-s3",
+      "mask": "public/assets/bar/modular/walking-dead-s3/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "warcraft-3",
+      "mask": "public/assets/bar/modular/warcraft-3/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "watch-dogs",
+      "mask": "public/assets/bar/modular/watch-dogs/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
       "scene": "winter",
       "mask": "public/assets/bar/modular/winter/architecture-mask.png",
       "roles": [
@@ -1527,6 +1905,48 @@
           ]
         }
       ]
+    },
+    {
+      "scene": "witcher-3",
+      "mask": "public/assets/bar/modular/witcher-3/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "wolf-among-us",
+      "mask": "public/assets/bar/modular/wolf-among-us/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "worms",
+      "mask": "public/assets/bar/modular/worms/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
     }
   ]
 }
