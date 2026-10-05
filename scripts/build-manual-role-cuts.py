@@ -54,14 +54,9 @@ def module_crop(manifest,role,source_size):
     sx=source_size[0]/aw; sy=source_size[1]/ah
     return (round(r['x']*sx),round(r['y']*sy),round((r['x']+r['width'])*sx),round((r['y']+r['height'])*sy))
 
-def build(manifest_path,manifest,role,spec):
+def build(manifest,source,role,spec):
     scene_id=manifest['id']
     base=MOD/scene_id
-    source_value=manifest['source']
-    if source_value.startswith('../../../public/'):
-        source_value='../../public/'+source_value[len('../../../public/'):]
-    source_path=(manifest_path.parent/source_value).resolve()
-    source=Image.open(source_path).convert('RGBA')
     image=source.crop(module_crop(manifest,role,source.size))
     w,h=image.size
     mask=Image.new('L',(w,h),0)
@@ -85,8 +80,17 @@ def main():
     rows=[]
     for path in sorted(MANIFESTS.glob('*.json')):
         manifest=json.loads(path.read_text())
-        for role,spec in manifest.get('manualRoleMasksNormalized',{}).items():
-            rows.append(build(path,manifest,role,spec))
+        specs=manifest.get('manualRoleMasksNormalized',{})
+        if not specs:
+            continue
+        source_value=manifest['source']
+        if source_value.startswith('../../../public/'):
+            source_value='../../public/'+source_value[len('../../../public/'):]
+        source_path=(path.parent/source_value).resolve()
+        with Image.open(source_path) as source_file:
+            source=source_file.convert('RGBA')
+            for role,spec in specs.items():
+                rows.append(build(manifest,source,role,spec))
     report=ROOT/'docs/modular-review/manual-role-cuts.json'
     report.write_text(json.dumps({'count':len(rows),'items':rows},indent=2)+'\n')
     print(f'manual role cuts: {len(rows)}')
