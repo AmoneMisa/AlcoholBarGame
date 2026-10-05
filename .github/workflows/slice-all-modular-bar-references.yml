@@ -1,0 +1,56 @@
+name: Slice all modular bar references
+
+on:
+  push:
+    branches:
+      - feat/modular-velvet-scene
+  workflow_dispatch:
+
+jobs:
+  slice:
+    if: ${{ !contains(github.event.head_commit.message || '', '[scene-slice]') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: feat/modular-velvet-scene
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Install ImageMagick
+        run: sudo apt-get update && sudo apt-get install -y imagemagick
+      - name: Slice all reference modules
+        run: |
+          set -euo pipefail
+          for f in scripts/modular-scenes/*.json; do
+            echo "=== $f ==="
+            node scripts/modular-scene-plan.mjs "$f" --apply --references-only
+          done
+      - name: Verify generated coverage
+        run: |
+          count="$(find scripts/modular-scenes -maxdepth 1 -name '*.json' | wc -l)"
+          plans="$(find public/assets/bar/modular -name 'scene-plan.json' | wc -l)"
+          shelves="$(find public/assets/bar/modular -name 'shelf-reference.webp' | wc -l)"
+          counters="$(find public/assets/bar/modular -name 'counter-reference.webp' | wc -l)"
+          echo "manifests=$count plans=$plans shelves=$shelves counters=$counters"
+          test "$plans" -eq "$count"
+          test "$shelves" -eq "$count"
+          test "$counters" -eq "$count"
+      - run: pnpm test
+      - run: pnpm build
+      - name: Commit cuts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/assets/bar/modular
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git commit -m "[scene-slice] Generate reference cuts for all bar backgrounds"
+          git push origin HEAD:feat/modular-velvet-scene

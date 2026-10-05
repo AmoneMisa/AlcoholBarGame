@@ -103,7 +103,8 @@ for(const [id,spec] of moduleEntries){
   const args=[source,'-crop',`${cropW}x${cropH}+${x}+${y}`,'+repage','-quality',String(spec.quality??92),output];
   console.log(`magick ${args.map(value=>JSON.stringify(value)).join(' ')}`);
   if(apply){
-    const run=spawnSync('magick',args,{stdio:'inherit'});
+    let run=spawnSync('magick',args,{stdio:'inherit'});
+    if(run.error?.code==='ENOENT') run=spawnSync('convert',args,{stdio:'inherit'});
     if(run.error?.code==='ENOENT') throw new Error('ImageMagick is required only for --apply. Install it or run the printed commands elsewhere.');
     if(run.status!==0) process.exit(run.status??1);
   }
@@ -114,7 +115,8 @@ if(apply && slots.seating){
   const output=resolve(outDir,'seating-reference.webp');
   const args=[source,'-crop',`${crop.width}x${crop.height}+${crop.x}+${crop.y}`,'+repage','-quality','92',output];
   console.log(`magick ${args.map(value=>JSON.stringify(value)).join(' ')}`);
-  const run=spawnSync('magick',args,{stdio:'inherit'});
+  let run=spawnSync('magick',args,{stdio:'inherit'});
+  if(run.error?.code==='ENOENT') run=spawnSync('convert',args,{stdio:'inherit'});
   if(run.status!==0) process.exit(run.status??1);
 }
 if(apply && slots.floor){
@@ -122,7 +124,8 @@ if(apply && slots.floor){
   const output=resolve(outDir,'floor-reference.webp');
   const args=[source,'-crop',`${crop.width}x${crop.height}+${crop.x}+${crop.y}`,'+repage','-quality','92',output];
   console.log(`magick ${args.map(value=>JSON.stringify(value)).join(' ')}`);
-  const run=spawnSync('magick',args,{stdio:'inherit'});
+  let run=spawnSync('magick',args,{stdio:'inherit'});
+  if(run.error?.code==='ENOENT') run=spawnSync('convert',args,{stdio:'inherit'});
   if(run.status!==0) process.exit(run.status??1);
 }
 
