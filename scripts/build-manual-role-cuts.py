@@ -15,8 +15,12 @@ def shape_points(shape,w,h):
     return [(x,y),(x+rw,y+rh)]
 
 def draw_shape(draw,shape,w,h,fill):
-    if shape.get('type','rect')=='polygon':
+    shape_type=shape.get('type','rect')
+    if shape_type=='polygon':
         draw.polygon(shape_points(shape,w,h),fill=fill)
+    elif shape_type=='ellipse':
+        (x0,y0),(x1,y1)=shape_points(shape,w,h)
+        draw.ellipse((x0,y0,x1,y1),fill=fill)
     else:
         (x0,y0),(x1,y1)=shape_points(shape,w,h)
         draw.rectangle((x0,y0,x1,y1),fill=fill)
