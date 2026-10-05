@@ -22,7 +22,8 @@
     "bar:readiness": "node scripts/check-modular-readiness.mjs",
     "bar:architecture-queue": "node scripts/build-architecture-queue.mjs",
     "bar:architecture-masks": "python scripts/build-architecture-masks.py",
-    "bar:furniture-cleanup-queue": "node scripts/build-furniture-cleanup-queue.mjs"
+    "bar:furniture-cleanup-queue": "node scripts/build-furniture-cleanup-queue.mjs",
+    "bar:window-masks": "python scripts/build-window-masks.py"
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^6.0.9",
