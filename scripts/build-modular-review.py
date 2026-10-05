@@ -90,8 +90,9 @@ for base in sorted(p for p in MOD.iterdir() if p.is_dir()):
     for idx,role in enumerate(ROLES):
         x=20+idx*420
         ref=base/f'{role}-reference.webp'
-        cutdir=base/('auto' if kind=='measured' else 'auto-candidate')
-        cut=cutdir/f'{role}-cut.webp'
+        manual_cut=base/'manual'/f'{role}-cut.webp'
+        cut=(manual_cut if role in manual_approved and manual_cut.exists()
+             else base/('auto' if measured.exists() else 'auto-candidate')/f'{role}-cut.webp')
         status=statuses.get(role,'missing')
         label(sheet,(x,y),f'{role}: {status}')
         if ref.exists(): sheet.paste(thumb(Image.open(ref),(400,230)),(x,y+22))
