@@ -1,0 +1,45 @@
+{
+  "scene": "desert",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.2414,
+      "solidCoverage": 0.1892,
+      "bbox": [
+        15,
+        82,
+        606,
+        164
+      ],
+      "width": 623,
+      "height": 199,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.2839,
+      "solidCoverage": 0.0051,
+      "bbox": [
+        24,
+        0,
+        517,
+        211
+      ],
+      "width": 517,
+      "height": 243,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.2025,
+      "solidCoverage": 0.1266,
+      "bbox": [
+        0,
+        0,
+        623,
+        121
+      ],
+      "width": 623,
+      "height": 237,
+      "status": "ok"
+    }
+  }
+}

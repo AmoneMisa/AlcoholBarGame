@@ -1,0 +1,45 @@
+{
+  "scene": "beach",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.2479,
+      "solidCoverage": 0.191,
+      "bbox": [
+        171,
+        86,
+        764,
+        173
+      ],
+      "width": 764,
+      "height": 173,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.5621,
+      "solidCoverage": 0.3554,
+      "bbox": [
+        0,
+        0,
+        382,
+        214
+      ],
+      "width": 382,
+      "height": 244,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.2421,
+      "solidCoverage": 0.189,
+      "bbox": [
+        0,
+        3,
+        764,
+        97
+      ],
+      "width": 764,
+      "height": 173,
+      "status": "ok"
+    }
+  }
+}

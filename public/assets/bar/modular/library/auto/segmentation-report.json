@@ -29,7 +29,7 @@
       "status": "ok"
     },
     "seating": {
-      "coverage": 0.5824,
+      "coverage": 0.5823,
       "solidCoverage": 0.0194,
       "bbox": [
         0,
@@ -39,7 +39,7 @@
       ],
       "width": 623,
       "height": 261,
-      "status": "ok"
+      "status": "review-all-edges"
     }
   }
 }

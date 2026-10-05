@@ -1,0 +1,35 @@
+{
+  "scene": "skyline",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.2359,
+      "solidCoverage": 0.1889,
+      "bbox": [
+        0,
+        50,
+        1672,
+        130
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.2259,
+      "solidCoverage": 0.1002,
+      "bbox": [
+        82,
+        0,
+        502,
+        414
+      ],
+      "width": 502,
+      "height": 414,
+      "status": "ok"
+    },
+    "seating": {
+      "status": "missing-reference"
+    }
+  }
+}

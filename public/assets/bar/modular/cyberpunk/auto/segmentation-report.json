@@ -1,0 +1,45 @@
+{
+  "scene": "cyberpunk",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.7948,
+      "solidCoverage": 0.1562,
+      "bbox": [
+        0,
+        0,
+        764,
+        147
+      ],
+      "width": 764,
+      "height": 147,
+      "status": "review-all-edges"
+    },
+    "shelf": {
+      "coverage": 0.8392,
+      "solidCoverage": 0.6382,
+      "bbox": [
+        0,
+        0,
+        619,
+        257
+      ],
+      "width": 619,
+      "height": 257,
+      "status": "review-all-edges"
+    },
+    "seating": {
+      "coverage": 0.7754,
+      "solidCoverage": 0.1828,
+      "bbox": [
+        0,
+        0,
+        764,
+        195
+      ],
+      "width": 764,
+      "height": 203,
+      "status": "ok"
+    }
+  }
+}

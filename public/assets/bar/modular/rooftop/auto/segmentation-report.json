@@ -1,0 +1,45 @@
+{
+  "scene": "rooftop",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.5691,
+      "solidCoverage": 0.2498,
+      "bbox": [
+        0,
+        69,
+        764,
+        183
+      ],
+      "width": 764,
+      "height": 183,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.1374,
+      "solidCoverage": 0.1157,
+      "bbox": [
+        117,
+        94,
+        248,
+        193
+      ],
+      "width": 367,
+      "height": 229,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.4757,
+      "solidCoverage": 0.3169,
+      "bbox": [
+        78,
+        0,
+        764,
+        92
+      ],
+      "width": 764,
+      "height": 142,
+      "status": "ok"
+    }
+  }
+}

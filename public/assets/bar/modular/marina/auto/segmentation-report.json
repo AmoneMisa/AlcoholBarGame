@@ -1,0 +1,45 @@
+{
+  "scene": "marina",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.7049,
+      "solidCoverage": 0.6049,
+      "bbox": [
+        112,
+        2,
+        764,
+        162
+      ],
+      "width": 764,
+      "height": 162,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.7317,
+      "solidCoverage": 0.5559,
+      "bbox": [
+        0,
+        0,
+        237,
+        249
+      ],
+      "width": 237,
+      "height": 249,
+      "status": "review-all-edges"
+    },
+    "seating": {
+      "coverage": 0.3254,
+      "solidCoverage": 0.0001,
+      "bbox": [
+        0,
+        20,
+        764,
+        203
+      ],
+      "width": 764,
+      "height": 203,
+      "status": "ok"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "scene": "tropical",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.2799,
+      "solidCoverage": 0.218,
+      "bbox": [
+        0,
+        90,
+        623,
+        202
+      ],
+      "width": 623,
+      "height": 202,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.5282,
+      "solidCoverage": 0.4035,
+      "bbox": [
+        0,
+        68,
+        299,
+        249
+      ],
+      "width": 299,
+      "height": 249,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.8784,
+      "solidCoverage": 0.2042,
+      "bbox": [
+        0,
+        0,
+        623,
+        225
+      ],
+      "width": 623,
+      "height": 225,
+      "status": "review-too-much"
+    }
+  }
+}

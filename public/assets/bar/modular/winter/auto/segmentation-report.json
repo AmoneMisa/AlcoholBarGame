@@ -1,0 +1,45 @@
+{
+  "scene": "winter",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.3155,
+      "solidCoverage": 0.2581,
+      "bbox": [
+        0,
+        74,
+        612,
+        196
+      ],
+      "width": 623,
+      "height": 196,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.3553,
+      "solidCoverage": 0.3065,
+      "bbox": [
+        158,
+        0,
+        365,
+        243
+      ],
+      "width": 517,
+      "height": 243,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.2518,
+      "solidCoverage": 0.1993,
+      "bbox": [
+        0,
+        0,
+        623,
+        77
+      ],
+      "width": 623,
+      "height": 237,
+      "status": "ok"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "scene": "velvet",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.4,
+      "solidCoverage": 0.087,
+      "bbox": [
+        94,
+        32,
+        1774,
+        320
+      ],
+      "width": 1774,
+      "height": 320,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.4685,
+      "solidCoverage": 0.109,
+      "bbox": [
+        34,
+        0,
+        600,
+        356
+      ],
+      "width": 600,
+      "height": 500,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.5425,
+      "solidCoverage": 0.2291,
+      "bbox": [
+        0,
+        71,
+        1676,
+        226
+      ],
+      "width": 1676,
+      "height": 226,
+      "status": "ok"
+    }
+  }
+}

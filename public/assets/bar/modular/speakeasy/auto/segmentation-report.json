@@ -13,7 +13,7 @@
       ],
       "width": 623,
       "height": 168,
-      "status": "ok"
+      "status": "review-all-edges"
     },
     "shelf": {
       "coverage": 0.6774,
@@ -26,7 +26,7 @@
       ],
       "width": 417,
       "height": 249,
-      "status": "ok"
+      "status": "review-all-edges"
     },
     "seating": {
       "coverage": 0.7153,
@@ -39,7 +39,7 @@
       ],
       "width": 623,
       "height": 274,
-      "status": "ok"
+      "status": "review-all-edges"
     }
   }
 }
