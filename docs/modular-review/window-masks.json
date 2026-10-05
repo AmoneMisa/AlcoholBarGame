@@ -1,6 +1,24 @@
 {
-  "count": 15,
+  "count": 25,
   "scenes": [
+    {
+      "scene": "alan-wake",
+      "mask": "public/assets/bar/modular/alan-wake/window-mask.png",
+      "cutouts": 3,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "among-us",
+      "mask": "public/assets/bar/modular/among-us/window-mask.png",
+      "cutouts": 3,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
     {
       "scene": "beach",
       "mask": "public/assets/bar/modular/beach/window-mask.png",
@@ -11,12 +29,84 @@
       }
     },
     {
+      "scene": "black-desert",
+      "mask": "public/assets/bar/modular/black-desert/window-mask.png",
+      "cutouts": 2,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "borderlands",
+      "mask": "public/assets/bar/modular/borderlands/window-mask.png",
+      "cutouts": 2,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "cs-2",
+      "mask": "public/assets/bar/modular/cs-2/window-mask.png",
+      "cutouts": 2,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "death-stranding",
+      "mask": "public/assets/bar/modular/death-stranding/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
       "scene": "desert",
       "mask": "public/assets/bar/modular/desert/window-mask.png",
       "cutouts": 1,
       "canvas": {
         "width": 623,
         "height": 623
+      }
+    },
+    {
+      "scene": "detroit",
+      "mask": "public/assets/bar/modular/detroit/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "devil-may-cry",
+      "mask": "public/assets/bar/modular/devil-may-cry/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "diablo-4",
+      "mask": "public/assets/bar/modular/diablo-4/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "elden-ring",
+      "mask": "public/assets/bar/modular/elden-ring/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 1672,
+        "height": 941
       }
     },
     {

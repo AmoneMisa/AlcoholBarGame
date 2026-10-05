@@ -1,12 +1,252 @@
 {
-  "count": 12,
+  "count": 60,
   "items": [
+    {
+      "scene": "alan-wake",
+      "role": "shelf",
+      "size": [
+        1137,
+        405
+      ]
+    },
+    {
+      "scene": "alan-wake",
+      "role": "counter",
+      "size": [
+        1672,
+        207
+      ]
+    },
+    {
+      "scene": "alan-wake",
+      "role": "seating",
+      "size": [
+        1672,
+        226
+      ]
+    },
+    {
+      "scene": "allods",
+      "role": "shelf",
+      "size": [
+        1100,
+        355
+      ]
+    },
+    {
+      "scene": "allods",
+      "role": "counter",
+      "size": [
+        1774,
+        257
+      ]
+    },
+    {
+      "scene": "allods",
+      "role": "seating",
+      "size": [
+        1774,
+        266
+      ]
+    },
+    {
+      "scene": "among-us",
+      "role": "shelf",
+      "size": [
+        1070,
+        395
+      ]
+    },
+    {
+      "scene": "among-us",
+      "role": "counter",
+      "size": [
+        1672,
+        197
+      ]
+    },
+    {
+      "scene": "among-us",
+      "role": "seating",
+      "size": [
+        1672,
+        235
+      ]
+    },
     {
       "scene": "art-deco",
       "role": "shelf",
       "size": [
         362,
         287
+      ]
+    },
+    {
+      "scene": "assassins-creed",
+      "role": "shelf",
+      "size": [
+        920,
+        442
+      ]
+    },
+    {
+      "scene": "assassins-creed",
+      "role": "counter",
+      "size": [
+        1672,
+        207
+      ]
+    },
+    {
+      "scene": "assassins-creed",
+      "role": "seating",
+      "size": [
+        1672,
+        263
+      ]
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "role": "shelf",
+      "size": [
+        919,
+        461
+      ]
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "role": "counter",
+      "size": [
+        1672,
+        235
+      ]
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "role": "seating",
+      "size": [
+        1672,
+        263
+      ]
+    },
+    {
+      "scene": "batman",
+      "role": "shelf",
+      "size": [
+        970,
+        452
+      ]
+    },
+    {
+      "scene": "batman",
+      "role": "counter",
+      "size": [
+        1672,
+        207
+      ]
+    },
+    {
+      "scene": "batman",
+      "role": "seating",
+      "size": [
+        1672,
+        263
+      ]
+    },
+    {
+      "scene": "black-desert",
+      "role": "shelf",
+      "size": [
+        936,
+        442
+      ]
+    },
+    {
+      "scene": "black-desert",
+      "role": "counter",
+      "size": [
+        1672,
+        188
+      ]
+    },
+    {
+      "scene": "black-desert",
+      "role": "seating",
+      "size": [
+        1672,
+        254
+      ]
+    },
+    {
+      "scene": "borderlands",
+      "role": "shelf",
+      "size": [
+        1104,
+        414
+      ]
+    },
+    {
+      "scene": "borderlands",
+      "role": "counter",
+      "size": [
+        1672,
+        188
+      ]
+    },
+    {
+      "scene": "borderlands",
+      "role": "seating",
+      "size": [
+        1672,
+        245
+      ]
+    },
+    {
+      "scene": "control",
+      "role": "shelf",
+      "size": [
+        802,
+        433
+      ]
+    },
+    {
+      "scene": "control",
+      "role": "counter",
+      "size": [
+        1672,
+        207
+      ]
+    },
+    {
+      "scene": "control",
+      "role": "seating",
+      "size": [
+        1672,
+        245
+      ]
+    },
+    {
+      "scene": "cs-2",
+      "role": "shelf",
+      "size": [
+        586,
+        414
+      ]
+    },
+    {
+      "scene": "cs-2",
+      "role": "counter",
+      "size": [
+        1672,
+        188
+      ]
+    },
+    {
+      "scene": "cs-2",
+      "role": "seating",
+      "size": [
+        1672,
+        245
       ]
     },
     {
@@ -21,8 +261,152 @@
       "scene": "cyberpunk",
       "role": "shelf",
       "size": [
-        619,
+        618,
         257
+      ]
+    },
+    {
+      "scene": "death-stranding",
+      "role": "shelf",
+      "size": [
+        1305,
+        433
+      ]
+    },
+    {
+      "scene": "death-stranding",
+      "role": "counter",
+      "size": [
+        1672,
+        198
+      ]
+    },
+    {
+      "scene": "death-stranding",
+      "role": "seating",
+      "size": [
+        1672,
+        245
+      ]
+    },
+    {
+      "scene": "detroit",
+      "role": "shelf",
+      "size": [
+        1672,
+        480
+      ]
+    },
+    {
+      "scene": "detroit",
+      "role": "counter",
+      "size": [
+        1672,
+        198
+      ]
+    },
+    {
+      "scene": "detroit",
+      "role": "seating",
+      "size": [
+        1672,
+        245
+      ]
+    },
+    {
+      "scene": "devil-may-cry",
+      "role": "shelf",
+      "size": [
+        937,
+        433
+      ]
+    },
+    {
+      "scene": "devil-may-cry",
+      "role": "counter",
+      "size": [
+        1672,
+        198
+      ]
+    },
+    {
+      "scene": "devil-may-cry",
+      "role": "seating",
+      "size": [
+        1672,
+        245
+      ]
+    },
+    {
+      "scene": "diablo-4",
+      "role": "shelf",
+      "size": [
+        986,
+        405
+      ]
+    },
+    {
+      "scene": "diablo-4",
+      "role": "counter",
+      "size": [
+        1672,
+        198
+      ]
+    },
+    {
+      "scene": "diablo-4",
+      "role": "seating",
+      "size": [
+        1672,
+        245
+      ]
+    },
+    {
+      "scene": "elden-ring",
+      "role": "shelf",
+      "size": [
+        1254,
+        423
+      ]
+    },
+    {
+      "scene": "elden-ring",
+      "role": "counter",
+      "size": [
+        1672,
+        198
+      ]
+    },
+    {
+      "scene": "elden-ring",
+      "role": "seating",
+      "size": [
+        1672,
+        245
+      ]
+    },
+    {
+      "scene": "fairy",
+      "role": "shelf",
+      "size": [
+        1221,
+        489
+      ]
+    },
+    {
+      "scene": "fairy",
+      "role": "counter",
+      "size": [
+        1672,
+        197
+      ]
+    },
+    {
+      "scene": "fairy",
+      "role": "seating",
+      "size": [
+        1672,
+        254
       ]
     },
     {
@@ -85,7 +469,7 @@
       "scene": "speakeasy",
       "role": "shelf",
       "size": [
-        417,
+        418,
         249
       ]
     },

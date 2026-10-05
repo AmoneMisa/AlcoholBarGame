@@ -1,10 +1,26 @@
 {
-  "count": 55,
+  "count": 103,
   "scenes": [
+    "alan-wake",
+    "allods",
+    "among-us",
     "art-deco",
+    "assassins-creed",
+    "baldurs-gate-3",
+    "batman",
     "beach",
+    "black-desert",
+    "borderlands",
+    "control",
+    "cs-2",
     "cyberpunk",
+    "death-stranding",
     "desert",
+    "detroit",
+    "devil-may-cry",
+    "diablo-4",
+    "elden-ring",
+    "fairy",
     "garden",
     "inferno-penthouse",
     "izakaya",
@@ -22,6 +38,141 @@
     "winter"
   ],
   "items": [
+    {
+      "scene": "alan-wake",
+      "role": "counter",
+      "source": "public/assets/bar/modular/alan-wake/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/alan-wake/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/alan-wake/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "alan-wake",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/alan-wake/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/alan-wake/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/alan-wake/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "alan-wake",
+      "role": "seating",
+      "source": "public/assets/bar/modular/alan-wake/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/alan-wake/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/alan-wake/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "allods",
+      "role": "counter",
+      "source": "public/assets/bar/modular/allods/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/allods/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/allods/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "allods",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/allods/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/allods/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/allods/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "allods",
+      "role": "seating",
+      "source": "public/assets/bar/modular/allods/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/allods/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/allods/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "among-us",
+      "role": "counter",
+      "source": "public/assets/bar/modular/among-us/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/among-us/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/among-us/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "among-us",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/among-us/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/among-us/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/among-us/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "among-us",
+      "role": "seating",
+      "source": "public/assets/bar/modular/among-us/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/among-us/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/among-us/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
     {
       "scene": "art-deco",
       "role": "counter",
@@ -58,6 +209,141 @@
       "source": "public/assets/bar/modular/art-deco/review-ready/seating.webp",
       "sourceMask": "public/assets/bar/modular/art-deco/review-ready/seating-mask.png",
       "output": "public/assets/bar/modular/art-deco/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "assassins-creed",
+      "role": "counter",
+      "source": "public/assets/bar/modular/assassins-creed/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/assassins-creed/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/assassins-creed/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "assassins-creed",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/assassins-creed/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/assassins-creed/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/assassins-creed/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "assassins-creed",
+      "role": "seating",
+      "source": "public/assets/bar/modular/assassins-creed/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/assassins-creed/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/assassins-creed/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "role": "counter",
+      "source": "public/assets/bar/modular/baldurs-gate-3/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/baldurs-gate-3/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/baldurs-gate-3/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/baldurs-gate-3/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/baldurs-gate-3/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/baldurs-gate-3/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "role": "seating",
+      "source": "public/assets/bar/modular/baldurs-gate-3/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/baldurs-gate-3/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/baldurs-gate-3/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "batman",
+      "role": "counter",
+      "source": "public/assets/bar/modular/batman/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/batman/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/batman/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "batman",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/batman/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/batman/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/batman/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "batman",
+      "role": "seating",
+      "source": "public/assets/bar/modular/batman/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/batman/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/batman/clean-ready/seating.webp",
       "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
       "constraints": [
         "Use the existing isolated furniture asset as the visual ground truth.",
@@ -113,6 +399,186 @@
       ]
     },
     {
+      "scene": "black-desert",
+      "role": "counter",
+      "source": "public/assets/bar/modular/black-desert/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/black-desert/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/black-desert/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "black-desert",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/black-desert/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/black-desert/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/black-desert/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "black-desert",
+      "role": "seating",
+      "source": "public/assets/bar/modular/black-desert/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/black-desert/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/black-desert/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "borderlands",
+      "role": "counter",
+      "source": "public/assets/bar/modular/borderlands/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/borderlands/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/borderlands/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "borderlands",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/borderlands/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/borderlands/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/borderlands/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "borderlands",
+      "role": "seating",
+      "source": "public/assets/bar/modular/borderlands/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/borderlands/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/borderlands/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "control",
+      "role": "counter",
+      "source": "public/assets/bar/modular/control/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/control/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/control/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "control",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/control/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/control/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/control/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "control",
+      "role": "seating",
+      "source": "public/assets/bar/modular/control/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/control/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/control/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "cs-2",
+      "role": "counter",
+      "source": "public/assets/bar/modular/cs-2/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/cs-2/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/cs-2/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "cs-2",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/cs-2/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/cs-2/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/cs-2/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "cs-2",
+      "role": "seating",
+      "source": "public/assets/bar/modular/cs-2/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/cs-2/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/cs-2/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
       "scene": "cyberpunk",
       "role": "counter",
       "source": "public/assets/bar/modular/cyberpunk/review-ready/counter.webp",
@@ -158,6 +624,51 @@
       ]
     },
     {
+      "scene": "death-stranding",
+      "role": "counter",
+      "source": "public/assets/bar/modular/death-stranding/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/death-stranding/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/death-stranding/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "death-stranding",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/death-stranding/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/death-stranding/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/death-stranding/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "death-stranding",
+      "role": "seating",
+      "source": "public/assets/bar/modular/death-stranding/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/death-stranding/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/death-stranding/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
       "scene": "desert",
       "role": "counter",
       "source": "public/assets/bar/modular/desert/review-ready/counter.webp",
@@ -193,6 +704,231 @@
       "source": "public/assets/bar/modular/desert/review-ready/seating.webp",
       "sourceMask": "public/assets/bar/modular/desert/review-ready/seating-mask.png",
       "output": "public/assets/bar/modular/desert/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "detroit",
+      "role": "counter",
+      "source": "public/assets/bar/modular/detroit/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/detroit/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/detroit/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "detroit",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/detroit/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/detroit/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/detroit/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "detroit",
+      "role": "seating",
+      "source": "public/assets/bar/modular/detroit/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/detroit/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/detroit/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "devil-may-cry",
+      "role": "counter",
+      "source": "public/assets/bar/modular/devil-may-cry/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/devil-may-cry/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/devil-may-cry/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "devil-may-cry",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/devil-may-cry/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/devil-may-cry/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/devil-may-cry/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "devil-may-cry",
+      "role": "seating",
+      "source": "public/assets/bar/modular/devil-may-cry/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/devil-may-cry/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/devil-may-cry/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "diablo-4",
+      "role": "counter",
+      "source": "public/assets/bar/modular/diablo-4/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/diablo-4/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/diablo-4/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "diablo-4",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/diablo-4/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/diablo-4/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/diablo-4/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "diablo-4",
+      "role": "seating",
+      "source": "public/assets/bar/modular/diablo-4/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/diablo-4/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/diablo-4/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "elden-ring",
+      "role": "counter",
+      "source": "public/assets/bar/modular/elden-ring/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/elden-ring/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/elden-ring/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "elden-ring",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/elden-ring/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/elden-ring/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/elden-ring/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "elden-ring",
+      "role": "seating",
+      "source": "public/assets/bar/modular/elden-ring/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/elden-ring/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/elden-ring/clean-ready/seating.webp",
+      "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "fairy",
+      "role": "counter",
+      "source": "public/assets/bar/modular/fairy/review-ready/counter.webp",
+      "sourceMask": "public/assets/bar/modular/fairy/review-ready/counter-mask.png",
+      "output": "public/assets/bar/modular/fairy/clean-ready/counter.webp",
+      "prompt": "Clean the isolated counter furniture from the existing source. Remove bottles, glasses, tools, napkins and loose objects while preserving the exact counter silhouette, material, perspective, reflections and fixed trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final asset must contain furniture only; gameplay/decor objects are rendered independently."
+      ]
+    },
+    {
+      "scene": "fairy",
+      "role": "shelf",
+      "source": "public/assets/bar/modular/fairy/review-ready/shelf.webp",
+      "sourceMask": "public/assets/bar/modular/fairy/review-ready/shelf-mask.png",
+      "output": "public/assets/bar/modular/fairy/clean-ready/shelf.webp",
+      "prompt": "Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.",
+      "constraints": [
+        "Use the existing isolated furniture asset as the visual ground truth.",
+        "Do not change camera, perspective, scale or silhouette.",
+        "Keep transparent surroundings transparent.",
+        "Do not invent new furniture geometry or decorative objects.",
+        "The final shelf must contain no bottles or glassware because bottle presets are rendered independently at runtime."
+      ]
+    },
+    {
+      "scene": "fairy",
+      "role": "seating",
+      "source": "public/assets/bar/modular/fairy/review-ready/seating.webp",
+      "sourceMask": "public/assets/bar/modular/fairy/review-ready/seating-mask.png",
+      "output": "public/assets/bar/modular/fairy/clean-ready/seating.webp",
       "prompt": "Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.",
       "constraints": [
         "Use the existing isolated furniture asset as the visual ground truth.",
