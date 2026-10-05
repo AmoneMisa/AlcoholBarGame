@@ -88,7 +88,49 @@
       "height": 0.37987
     }
   },
-  "windowCutouts": [],
+  "windowCutouts": [
+    {
+      "type": "polygon",
+      "points": [
+        {
+          "x": 0.326,
+          "y": 0.527
+        },
+        {
+          "x": 0.326,
+          "y": 0.26
+        },
+        {
+          "x": 0.347,
+          "y": 0.198
+        },
+        {
+          "x": 0.394,
+          "y": 0.153
+        },
+        {
+          "x": 0.5,
+          "y": 0.137
+        },
+        {
+          "x": 0.606,
+          "y": 0.153
+        },
+        {
+          "x": 0.653,
+          "y": 0.198
+        },
+        {
+          "x": 0.674,
+          "y": 0.26
+        },
+        {
+          "x": 0.674,
+          "y": 0.527
+        }
+      ]
+    }
+  ],
   "shelfRows": [
     444,
     530,
@@ -120,7 +162,7 @@
   "status": "geometry-ready-art-review-required",
   "geometrySource": null,
   "review": {
-    "windowCutouts": "manual-required",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
     "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone."
@@ -130,6 +172,7 @@
     "Do not ship reference crops as final modules until the clean architecture plate and transparency have been visually reviewed.",
     "Keep camera, horizon and perspective identical to the source.",
     "Remove painted bottles from shelf modules; decorative bottles are rendered by shelf presets.",
-    "If counter/seating hides wall or floor, reconstruct the hidden surface by inpainting before export."
+    "If counter/seating hides wall or floor, reconstruct the hidden surface by inpainting before export.",
+    "Window cutouts manually traced from the existing source background; preserve frames, mullions, curtains and permanent trim."
   ]
 }

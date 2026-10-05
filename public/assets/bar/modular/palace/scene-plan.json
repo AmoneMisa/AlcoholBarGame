@@ -88,7 +88,123 @@
       "height": 0.37987
     }
   },
-  "windowCutouts": [],
+  "windowCutouts": [
+    {
+      "type": "polygon",
+      "points": [
+        {
+          "x": 0.36,
+          "y": 0.553
+        },
+        {
+          "x": 0.36,
+          "y": 0.255
+        },
+        {
+          "x": 0.382,
+          "y": 0.194
+        },
+        {
+          "x": 0.427,
+          "y": 0.146
+        },
+        {
+          "x": 0.503,
+          "y": 0.126
+        },
+        {
+          "x": 0.579,
+          "y": 0.146
+        },
+        {
+          "x": 0.624,
+          "y": 0.194
+        },
+        {
+          "x": 0.646,
+          "y": 0.255
+        },
+        {
+          "x": 0.646,
+          "y": 0.553
+        }
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        {
+          "x": 0.09,
+          "y": 0.326
+        },
+        {
+          "x": 0.09,
+          "y": 0.196
+        },
+        {
+          "x": 0.107,
+          "y": 0.155
+        },
+        {
+          "x": 0.144,
+          "y": 0.129
+        },
+        {
+          "x": 0.183,
+          "y": 0.121
+        },
+        {
+          "x": 0.222,
+          "y": 0.129
+        },
+        {
+          "x": 0.253,
+          "y": 0.16
+        },
+        {
+          "x": 0.253,
+          "y": 0.326
+        }
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        {
+          "x": 0.746,
+          "y": 0.326
+        },
+        {
+          "x": 0.746,
+          "y": 0.16
+        },
+        {
+          "x": 0.777,
+          "y": 0.129
+        },
+        {
+          "x": 0.816,
+          "y": 0.121
+        },
+        {
+          "x": 0.855,
+          "y": 0.129
+        },
+        {
+          "x": 0.892,
+          "y": 0.155
+        },
+        {
+          "x": 0.91,
+          "y": 0.196
+        },
+        {
+          "x": 0.91,
+          "y": 0.326
+        }
+      ]
+    }
+  ],
   "shelfRows": [
     357,
     444,
@@ -120,7 +236,7 @@
   "status": "geometry-ready-art-review-required",
   "geometrySource": "measured-gameplay",
   "review": {
-    "windowCutouts": "manual-required",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review"
   },
@@ -129,6 +245,7 @@
     "Reference crops are authoring aids, not shippable clean modules.",
     "Preserve camera/horizon/perspective.",
     "Remove painted bottles from shelf furniture.",
-    "Inpaint occluded wall/floor before export."
+    "Inpaint occluded wall/floor before export.",
+    "Window cutouts manually traced from the existing source background; preserve frames, mullions, curtains and permanent trim."
   ]
 }
