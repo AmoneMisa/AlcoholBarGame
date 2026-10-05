@@ -6,7 +6,31 @@
       "source": "../../../public/assets/bar/backgrounds/interior-beach.webp",
       "output": "public/assets/bar/modular/beach/architecture.webp",
       "mask": "public/assets/bar/modular/beach/architecture-mask.png",
-      "windowCutouts": [],
+      "inpaintMask": "public/assets/bar/modular/beach/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/beach/window-mask.png",
+      "windowCutouts": [
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.052,
+              "y": 0.143
+            },
+            {
+              "x": 0.462,
+              "y": 0.143
+            },
+            {
+              "x": 0.462,
+              "y": 0.6
+            },
+            {
+              "x": 0.052,
+              "y": 0.6
+            }
+          ]
+        }
+      ],
       "prompt": "Create a clean architecture plate from this existing background. Remove counter, stools/chairs, loose foreground decor and back-bar furniture; reconstruct hidden wall and floor. Preserve fixed architecture and source perspective.",
       "constraints": [
         "Use only the existing source background as visual ground truth.",
@@ -14,7 +38,8 @@
         "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
         "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
         "Do not bake bottle decor into shelves; bottles are rendered separately.",
-        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
       ]
     },
     {
@@ -22,7 +47,51 @@
       "source": "../../../public/assets/bar/backgrounds/interior-desert.webp",
       "output": "public/assets/bar/modular/desert/architecture.webp",
       "mask": "public/assets/bar/modular/desert/architecture-mask.png",
-      "windowCutouts": [],
+      "inpaintMask": "public/assets/bar/modular/desert/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/desert/window-mask.png",
+      "windowCutouts": [
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.326,
+              "y": 0.527
+            },
+            {
+              "x": 0.326,
+              "y": 0.26
+            },
+            {
+              "x": 0.347,
+              "y": 0.198
+            },
+            {
+              "x": 0.394,
+              "y": 0.153
+            },
+            {
+              "x": 0.5,
+              "y": 0.137
+            },
+            {
+              "x": 0.606,
+              "y": 0.153
+            },
+            {
+              "x": 0.653,
+              "y": 0.198
+            },
+            {
+              "x": 0.674,
+              "y": 0.26
+            },
+            {
+              "x": 0.674,
+              "y": 0.527
+            }
+          ]
+        }
+      ],
       "prompt": "Create a clean architecture plate from this existing background. Remove counter, stools/chairs, loose foreground decor and back-bar furniture; reconstruct hidden wall and floor. Preserve fixed architecture and source perspective.",
       "constraints": [
         "Use only the existing source background as visual ground truth.",
@@ -30,7 +99,8 @@
         "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
         "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
         "Do not bake bottle decor into shelves; bottles are rendered separately.",
-        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
       ]
     },
     {
@@ -38,7 +108,125 @@
       "source": "../../../public/assets/bar/backgrounds/interior-palace.webp",
       "output": "public/assets/bar/modular/palace/architecture.webp",
       "mask": "public/assets/bar/modular/palace/architecture-mask.png",
-      "windowCutouts": [],
+      "inpaintMask": "public/assets/bar/modular/palace/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/palace/window-mask.png",
+      "windowCutouts": [
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.36,
+              "y": 0.553
+            },
+            {
+              "x": 0.36,
+              "y": 0.255
+            },
+            {
+              "x": 0.382,
+              "y": 0.194
+            },
+            {
+              "x": 0.427,
+              "y": 0.146
+            },
+            {
+              "x": 0.503,
+              "y": 0.126
+            },
+            {
+              "x": 0.579,
+              "y": 0.146
+            },
+            {
+              "x": 0.624,
+              "y": 0.194
+            },
+            {
+              "x": 0.646,
+              "y": 0.255
+            },
+            {
+              "x": 0.646,
+              "y": 0.553
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.09,
+              "y": 0.326
+            },
+            {
+              "x": 0.09,
+              "y": 0.196
+            },
+            {
+              "x": 0.107,
+              "y": 0.155
+            },
+            {
+              "x": 0.144,
+              "y": 0.129
+            },
+            {
+              "x": 0.183,
+              "y": 0.121
+            },
+            {
+              "x": 0.222,
+              "y": 0.129
+            },
+            {
+              "x": 0.253,
+              "y": 0.16
+            },
+            {
+              "x": 0.253,
+              "y": 0.326
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.746,
+              "y": 0.326
+            },
+            {
+              "x": 0.746,
+              "y": 0.16
+            },
+            {
+              "x": 0.777,
+              "y": 0.129
+            },
+            {
+              "x": 0.816,
+              "y": 0.121
+            },
+            {
+              "x": 0.855,
+              "y": 0.129
+            },
+            {
+              "x": 0.892,
+              "y": 0.155
+            },
+            {
+              "x": 0.91,
+              "y": 0.196
+            },
+            {
+              "x": 0.91,
+              "y": 0.326
+            }
+          ]
+        }
+      ],
       "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces.",
       "constraints": [
         "Use only the existing source background as visual ground truth.",
@@ -46,7 +234,8 @@
         "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
         "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
         "Do not bake bottle decor into shelves; bottles are rendered separately.",
-        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
       ]
     },
     {
@@ -54,7 +243,31 @@
       "source": "../../../public/assets/bar/backgrounds/interior-parisian.webp",
       "output": "public/assets/bar/modular/parisian/architecture.webp",
       "mask": "public/assets/bar/modular/parisian/architecture-mask.png",
-      "windowCutouts": [],
+      "inpaintMask": "public/assets/bar/modular/parisian/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/parisian/window-mask.png",
+      "windowCutouts": [
+        {
+          "type": "rect",
+          "x": 0.154,
+          "y": 0.075,
+          "width": 0.126,
+          "height": 0.356
+        },
+        {
+          "type": "rect",
+          "x": 0.737,
+          "y": 0.075,
+          "width": 0.127,
+          "height": 0.356
+        },
+        {
+          "type": "rect",
+          "x": 0.929,
+          "y": 0.076,
+          "width": 0.071,
+          "height": 0.365
+        }
+      ],
       "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces.",
       "constraints": [
         "Use only the existing source background as visual ground truth.",
@@ -62,7 +275,8 @@
         "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
         "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
         "Do not bake bottle decor into shelves; bottles are rendered separately.",
-        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
       ]
     },
     {
@@ -70,7 +284,76 @@
       "source": "../../../public/assets/bar/backgrounds/interior-riad.webp",
       "output": "public/assets/bar/modular/riad/architecture.webp",
       "mask": "public/assets/bar/modular/riad/architecture-mask.png",
-      "windowCutouts": [],
+      "inpaintMask": "public/assets/bar/modular/riad/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/riad/window-mask.png",
+      "windowCutouts": [
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.074,
+              "y": 0.56
+            },
+            {
+              "x": 0.074,
+              "y": 0.232
+            },
+            {
+              "x": 0.1,
+              "y": 0.188
+            },
+            {
+              "x": 0.148,
+              "y": 0.161
+            },
+            {
+              "x": 0.202,
+              "y": 0.18
+            },
+            {
+              "x": 0.221,
+              "y": 0.225
+            },
+            {
+              "x": 0.221,
+              "y": 0.56
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.862,
+              "y": 0.557
+            },
+            {
+              "x": 0.862,
+              "y": 0.219
+            },
+            {
+              "x": 0.884,
+              "y": 0.172
+            },
+            {
+              "x": 0.925,
+              "y": 0.145
+            },
+            {
+              "x": 0.968,
+              "y": 0.163
+            },
+            {
+              "x": 0.995,
+              "y": 0.214
+            },
+            {
+              "x": 0.995,
+              "y": 0.557
+            }
+          ]
+        }
+      ],
       "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces.",
       "constraints": [
         "Use only the existing source background as visual ground truth.",
@@ -78,7 +361,8 @@
         "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
         "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
         "Do not bake bottle decor into shelves; bottles are rendered separately.",
-        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
       ]
     },
     {
@@ -86,7 +370,45 @@
       "source": "../../../public/assets/bar/backgrounds/interior-rooftop.webp",
       "output": "public/assets/bar/modular/rooftop/architecture.webp",
       "mask": "public/assets/bar/modular/rooftop/architecture-mask.png",
-      "windowCutouts": [],
+      "inpaintMask": "public/assets/bar/modular/rooftop/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/rooftop/window-mask.png",
+      "windowCutouts": [
+        {
+          "type": "rect",
+          "x": 0,
+          "y": 0.072,
+          "width": 0.167,
+          "height": 0.472
+        },
+        {
+          "type": "rect",
+          "x": 0.18,
+          "y": 0.072,
+          "width": 0.21,
+          "height": 0.472
+        },
+        {
+          "type": "rect",
+          "x": 0.404,
+          "y": 0.072,
+          "width": 0.164,
+          "height": 0.472
+        },
+        {
+          "type": "rect",
+          "x": 0.582,
+          "y": 0.072,
+          "width": 0.213,
+          "height": 0.472
+        },
+        {
+          "type": "rect",
+          "x": 0.81,
+          "y": 0.072,
+          "width": 0.19,
+          "height": 0.472
+        }
+      ],
       "prompt": "Create a clean architecture plate from this existing background. Remove counter, stools/chairs, loose foreground decor and back-bar furniture; reconstruct hidden wall and floor. Preserve fixed architecture and source perspective.",
       "constraints": [
         "Use only the existing source background as visual ground truth.",
@@ -94,7 +416,8 @@
         "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
         "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
         "Do not bake bottle decor into shelves; bottles are rendered separately.",
-        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
       ]
     },
     {
@@ -102,7 +425,51 @@
       "source": "../../../public/assets/bar/backgrounds/interior-winter.webp",
       "output": "public/assets/bar/modular/winter/architecture.webp",
       "mask": "public/assets/bar/modular/winter/architecture-mask.png",
-      "windowCutouts": [],
+      "inpaintMask": "public/assets/bar/modular/winter/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/winter/window-mask.png",
+      "windowCutouts": [
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.322,
+              "y": 0.532
+            },
+            {
+              "x": 0.322,
+              "y": 0.277
+            },
+            {
+              "x": 0.345,
+              "y": 0.214
+            },
+            {
+              "x": 0.39,
+              "y": 0.164
+            },
+            {
+              "x": 0.503,
+              "y": 0.137
+            },
+            {
+              "x": 0.616,
+              "y": 0.164
+            },
+            {
+              "x": 0.661,
+              "y": 0.214
+            },
+            {
+              "x": 0.684,
+              "y": 0.277
+            },
+            {
+              "x": 0.684,
+              "y": 0.532
+            }
+          ]
+        }
+      ],
       "prompt": "Create a clean architecture plate from this existing background. Remove counter, stools/chairs, loose foreground decor and back-bar furniture; reconstruct hidden wall and floor. Preserve fixed architecture and source perspective.",
       "constraints": [
         "Use only the existing source background as visual ground truth.",
@@ -110,7 +477,8 @@
         "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
         "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
         "Do not bake bottle decor into shelves; bottles are rendered separately.",
-        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
       ]
     }
   ]

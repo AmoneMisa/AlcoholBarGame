@@ -1,0 +1,68 @@
+{
+  "count": 7,
+  "scenes": [
+    {
+      "scene": "beach",
+      "mask": "public/assets/bar/modular/beach/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 764,
+        "height": 508
+      }
+    },
+    {
+      "scene": "desert",
+      "mask": "public/assets/bar/modular/desert/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 623,
+        "height": 623
+      }
+    },
+    {
+      "scene": "palace",
+      "mask": "public/assets/bar/modular/palace/window-mask.png",
+      "cutouts": 3,
+      "canvas": {
+        "width": 623,
+        "height": 623
+      }
+    },
+    {
+      "scene": "parisian",
+      "mask": "public/assets/bar/modular/parisian/window-mask.png",
+      "cutouts": 3,
+      "canvas": {
+        "width": 764,
+        "height": 508
+      }
+    },
+    {
+      "scene": "riad",
+      "mask": "public/assets/bar/modular/riad/window-mask.png",
+      "cutouts": 2,
+      "canvas": {
+        "width": 764,
+        "height": 508
+      }
+    },
+    {
+      "scene": "rooftop",
+      "mask": "public/assets/bar/modular/rooftop/window-mask.png",
+      "cutouts": 5,
+      "canvas": {
+        "width": 764,
+        "height": 508
+      }
+    },
+    {
+      "scene": "winter",
+      "mask": "public/assets/bar/modular/winter/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 623,
+        "height": 623
+      }
+    }
+  ]
+}
