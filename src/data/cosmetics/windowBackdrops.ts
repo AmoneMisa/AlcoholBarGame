@@ -7,7 +7,10 @@ export const WINDOW_BACKDROP_IDS = [
   'marina',
   'desert',
   'tropical',
-  'inferno-penthouse'
+  'inferno-penthouse',
+  'palace',
+  'parisian',
+  'riad'
 ] as const;
 
 export type WindowBackdropId = typeof WINDOW_BACKDROP_IDS[number];
@@ -30,7 +33,10 @@ export const WINDOW_BACKDROPS:readonly WindowBackdropPreset[] = [
   {id:'marina',label:'Midnight marina view',asset:'/assets/bar/backgrounds/interior-marina.webp',sourceRect:{x:.08,y:.02,width:.84,height:.58}},
   {id:'desert',label:'Desert sunset view',asset:'/assets/bar/backgrounds/interior-desert.webp',sourceRect:{x:.08,y:.02,width:.84,height:.58}},
   {id:'tropical',label:'Tropical greenhouse view',asset:'/assets/bar/backgrounds/interior-tropical.webp',sourceRect:{x:.08,y:.02,width:.84,height:.58}},
-  {id:'inferno-penthouse',label:'Midnight penthouse view',asset:'/assets/bar/backgrounds/inferno-penthouse-club.webp',sourceRect:{x:.08,y:.02,width:.84,height:.58}}
+  {id:'inferno-penthouse',label:'Midnight penthouse view',asset:'/assets/bar/backgrounds/inferno-penthouse-club.webp',sourceRect:{x:.08,y:.02,width:.84,height:.58}},
+  {id:'palace',label:'Palace sunset garden',asset:'/assets/bar/backgrounds/interior-palace.webp',sourceRect:{x:.34,y:.10,width:.32,height:.46}},
+  {id:'parisian',label:'Paris night view',asset:'/assets/bar/backgrounds/interior-parisian.webp',sourceRect:{x:.13,y:.06,width:.18,height:.39}},
+  {id:'riad',label:'Riad city dusk',asset:'/assets/bar/backgrounds/interior-riad.webp',sourceRect:{x:.84,y:.11,width:.16,height:.46}}
 ];
 
 const BY_ID=Object.fromEntries(WINDOW_BACKDROPS.map(item=>[item.id,item])) as Record<WindowBackdropId,WindowBackdropPreset>;
