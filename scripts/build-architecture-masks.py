@@ -34,13 +34,13 @@ def paste_role_mask(canvas, mask_path, rect):
         role=role.resize((w,h),Image.Resampling.LANCZOS)
     canvas.paste(ImageChops.lighter(canvas.crop((x,y,x+w,y+h)),role),(x,y))
 
-def build(scene_id):
+def build(scene_id,required_roles):
     base=MOD/scene_id
     plan=json.loads((base/'scene-plan.json').read_text())
     canvas=Image.new('L',(plan['canvas']['width'],plan['canvas']['height']),0)
 
     used=[]
-    for role in ROLES:
+    for role in required_roles:
         mask=base/'review-ready'/f'{role}-mask.png'
         if not mask.exists():
             raise RuntimeError(f'{scene_id}: missing approved {role} mask')
@@ -63,8 +63,8 @@ def build(scene_id):
 
 def main():
     summary=json.loads(SUMMARY.read_text())
-    blocked=[item['scene'] for item in summary if item.get('furnitureReady') and not item.get('architectureReady')]
-    built=[build(scene_id) for scene_id in blocked]
+    blocked=[item for item in summary if item.get('furnitureReady') and not item.get('architectureReady')]
+    built=[build(item['scene'],item.get('requiredRoles',ROLES)) for item in blocked]
     out=ROOT/'docs/modular-review/architecture-masks.json'
     out.write_text(json.dumps({'count':len(built),'scenes':built},indent=2)+'\n')
     print(f'architecture masks: {len(built)}')
