@@ -102,13 +102,12 @@
     "x": 0.5,
     "y": 0.58
   },
-  "windowCutouts": [],
   "review": {
     "geometry": "manual-measured",
     "shelfBounds": "manual-measured",
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
-    "windowCutouts": "manual-required",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
     "manualApprovedRoles": [
@@ -226,5 +225,28 @@
     "counter",
     "seating",
     "shelf"
+  ],
+  "windowCutoutsNormalized": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 0.13,
+      "width": 0.13,
+      "height": 0.34
+    },
+    {
+      "type": "rect",
+      "x": 0.38,
+      "y": 0.09,
+      "width": 0.39,
+      "height": 0.42
+    },
+    {
+      "type": "rect",
+      "x": 0.92,
+      "y": 0.12,
+      "width": 0.08,
+      "height": 0.34
+    }
   ]
 }
