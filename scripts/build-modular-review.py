@@ -40,10 +40,10 @@ for base in sorted(p for p in MOD.iterdir() if p.is_dir()):
 
     data=json.loads(report_path.read_text())
     kind='measured' if measured.exists() else 'candidate'
-    plan_path=base/'scene-plan.json'
-    plan=json.loads(plan_path.read_text()) if plan_path.exists() else {}
-    required_roles=tuple(plan.get('requiredRoles',ROLES))
-    manual_approved=set(plan.get('manualApprovedRoles',[]))
+    manifest_path=ROOT/'scripts/modular-scenes'/f'{base.name}.json'
+    manifest=json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
+    required_roles=tuple(manifest.get('requiredRoles',ROLES))
+    manual_approved=set(manifest.get('manualApprovedRoles',[]))
     review=base/'review-ready'
     review.mkdir(exist_ok=True)
     promoted=[]
