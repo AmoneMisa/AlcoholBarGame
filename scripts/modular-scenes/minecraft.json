@@ -2,8 +2,8 @@
   "id": "minecraft",
   "source": "../../../public/assets/bar/backgrounds/interior-minecraft.webp",
   "outputDir": "../../../public/assets/bar/modular/minecraft",
-  "status": "geometry-review-required",
-  "geometrySource": "provisional-normalized",
+  "status": "geometry-ready-art-review-required",
+  "geometrySource": "manual-source-review",
   "notes": [
     "Existing themed background coverage manifest.",
     "Source WebP size is auto-detected.",
@@ -22,19 +22,19 @@
     },
     "shelf-reference": {
       "cropNormalized": {
-        "x": 0.16,
-        "y": 0.1,
-        "width": 0.68,
-        "height": 0.46
+        "x": 0.18,
+        "y": 0.19,
+        "width": 0.64,
+        "height": 0.39
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture."
     },
     "counter-reference": {
       "cropNormalized": {
         "x": 0,
-        "y": 0.48,
+        "y": 0.56,
         "width": 1,
-        "height": 0.34
+        "height": 0.24
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings."
     }
@@ -47,22 +47,22 @@
       "height": 0.6
     },
     "shelves": {
-      "x": 0.16,
-      "y": 0.1,
-      "width": 0.68,
-      "height": 0.46
+      "x": 0.18,
+      "y": 0.19,
+      "width": 0.64,
+      "height": 0.39
     },
     "counter": {
       "x": 0,
-      "y": 0.48,
+      "y": 0.56,
       "width": 1,
-      "height": 0.34
+      "height": 0.24
     },
     "seating": {
       "x": 0,
-      "y": 0.64,
+      "y": 0.72,
       "width": 1,
-      "height": 0.3
+      "height": 0.28
     },
     "floor": {
       "x": 0,
@@ -78,24 +78,24 @@
   ],
   "seatAnchorsNormalized": [
     {
-      "x": 0.12,
-      "y": 0.72
+      "x": 0.1,
+      "y": 0.83
     },
     {
-      "x": 0.3,
-      "y": 0.72
+      "x": 0.31,
+      "y": 0.83
     },
     {
-      "x": 0.49,
-      "y": 0.72
+      "x": 0.5,
+      "y": 0.83
     },
     {
-      "x": 0.67,
-      "y": 0.72
+      "x": 0.7,
+      "y": 0.83
     },
     {
-      "x": 0.85,
-      "y": 0.72
+      "x": 0.9,
+      "y": 0.83
     }
   ],
   "bartenderAnchorNormalized": {
@@ -104,12 +104,127 @@
   },
   "windowCutouts": [],
   "review": {
-    "geometry": "manual-required",
-    "shelfBounds": "manual-required",
-    "counterBounds": "manual-required",
-    "seatAnchors": "manual-required",
+    "geometry": "manual-measured",
+    "shelfBounds": "manual-measured",
+    "counterBounds": "manual-measured",
+    "seatAnchors": "manual-measured",
     "windowCutouts": "manual-required",
     "architectureInpaint": "required",
-    "alphaEdges": "manual-review"
-  }
+    "alphaEdges": "manual-review",
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ]
+  },
+  "manualRoleMasksNormalized": {
+    "shelf": {
+      "feather": 1,
+      "include": [
+        {
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 1,
+          "height": 0.98
+        }
+      ],
+      "exclude": []
+    },
+    "counter": {
+      "feather": 1,
+      "include": [
+        {
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 1,
+          "height": 0.84
+        }
+      ],
+      "exclude": [
+        {
+          "type": "rect",
+          "x": 0.015,
+          "y": 0.58,
+          "width": 0.17,
+          "height": 0.42
+        },
+        {
+          "type": "rect",
+          "x": 0.22499999999999998,
+          "y": 0.58,
+          "width": 0.17,
+          "height": 0.42
+        },
+        {
+          "type": "rect",
+          "x": 0.415,
+          "y": 0.58,
+          "width": 0.17,
+          "height": 0.42
+        },
+        {
+          "type": "rect",
+          "x": 0.615,
+          "y": 0.58,
+          "width": 0.17,
+          "height": 0.42
+        },
+        {
+          "type": "rect",
+          "x": 0.8150000000000001,
+          "y": 0.58,
+          "width": 0.17,
+          "height": 0.42
+        }
+      ]
+    },
+    "seating": {
+      "feather": 1,
+      "include": [
+        {
+          "type": "rect",
+          "x": 0.015,
+          "y": 0,
+          "width": 0.17,
+          "height": 0.98
+        },
+        {
+          "type": "rect",
+          "x": 0.22499999999999998,
+          "y": 0,
+          "width": 0.17,
+          "height": 0.98
+        },
+        {
+          "type": "rect",
+          "x": 0.415,
+          "y": 0,
+          "width": 0.17,
+          "height": 0.98
+        },
+        {
+          "type": "rect",
+          "x": 0.615,
+          "y": 0,
+          "width": 0.17,
+          "height": 0.98
+        },
+        {
+          "type": "rect",
+          "x": 0.8150000000000001,
+          "y": 0,
+          "width": 0.17,
+          "height": 0.98
+        }
+      ],
+      "exclude": []
+    }
+  },
+  "manualApprovedRoles": [
+    "counter",
+    "seating",
+    "shelf"
+  ]
 }
