@@ -1,5 +1,5 @@
 {
-  "count": 60,
+  "count": 84,
   "items": [
     {
       "scene": "alan-wake",
@@ -266,6 +266,30 @@
       ]
     },
     {
+      "scene": "darksiders-3",
+      "role": "shelf",
+      "size": [
+        1087,
+        452
+      ]
+    },
+    {
+      "scene": "darksiders-3",
+      "role": "counter",
+      "size": [
+        1672,
+        245
+      ]
+    },
+    {
+      "scene": "darksiders-3",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
       "scene": "death-stranding",
       "role": "shelf",
       "size": [
@@ -362,6 +386,30 @@
       ]
     },
     {
+      "scene": "divinity-original-sin-2",
+      "role": "shelf",
+      "size": [
+        1103,
+        508
+      ]
+    },
+    {
+      "scene": "divinity-original-sin-2",
+      "role": "counter",
+      "size": [
+        1672,
+        235
+      ]
+    },
+    {
+      "scene": "divinity-original-sin-2",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
       "scene": "elden-ring",
       "role": "shelf",
       "size": [
@@ -407,6 +455,150 @@
       "size": [
         1672,
         254
+      ]
+    },
+    {
+      "scene": "fairytale",
+      "role": "shelf",
+      "size": [
+        1070,
+        471
+      ]
+    },
+    {
+      "scene": "fairytale",
+      "role": "counter",
+      "size": [
+        1672,
+        235
+      ]
+    },
+    {
+      "scene": "fairytale",
+      "role": "seating",
+      "size": [
+        1672,
+        273
+      ]
+    },
+    {
+      "scene": "gta-3",
+      "role": "shelf",
+      "size": [
+        1539,
+        452
+      ]
+    },
+    {
+      "scene": "gta-3",
+      "role": "counter",
+      "size": [
+        1672,
+        226
+      ]
+    },
+    {
+      "scene": "gta-3",
+      "role": "seating",
+      "size": [
+        1672,
+        263
+      ]
+    },
+    {
+      "scene": "gta-5",
+      "role": "shelf",
+      "size": [
+        1053,
+        376
+      ]
+    },
+    {
+      "scene": "gta-5",
+      "role": "counter",
+      "size": [
+        1672,
+        235
+      ]
+    },
+    {
+      "scene": "gta-5",
+      "role": "seating",
+      "size": [
+        1672,
+        263
+      ]
+    },
+    {
+      "scene": "gta-sa",
+      "role": "shelf",
+      "size": [
+        1438,
+        395
+      ]
+    },
+    {
+      "scene": "gta-sa",
+      "role": "counter",
+      "size": [
+        1672,
+        226
+      ]
+    },
+    {
+      "scene": "gta-sa",
+      "role": "seating",
+      "size": [
+        1672,
+        263
+      ]
+    },
+    {
+      "scene": "gta",
+      "role": "shelf",
+      "size": [
+        919,
+        358
+      ]
+    },
+    {
+      "scene": "gta",
+      "role": "counter",
+      "size": [
+        1672,
+        235
+      ]
+    },
+    {
+      "scene": "gta",
+      "role": "seating",
+      "size": [
+        1672,
+        282
+      ]
+    },
+    {
+      "scene": "harry-potter",
+      "role": "shelf",
+      "size": [
+        1020,
+        499
+      ]
+    },
+    {
+      "scene": "harry-potter",
+      "role": "counter",
+      "size": [
+        1672,
+        235
+      ]
+    },
+    {
+      "scene": "harry-potter",
+      "role": "seating",
+      "size": [
+        1672,
+        263
       ]
     },
     {

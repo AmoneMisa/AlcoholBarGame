@@ -1,5 +1,5 @@
 {
-  "count": 35,
+  "count": 43,
   "scenes": [
     {
       "scene": "alan-wake",
@@ -337,6 +337,20 @@
       "windowCutouts": []
     },
     {
+      "scene": "darksiders-3",
+      "mask": "public/assets/bar/modular/darksiders-3/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
       "scene": "death-stranding",
       "mask": "public/assets/bar/modular/death-stranding/architecture-mask.png",
       "roles": [
@@ -523,6 +537,20 @@
       ]
     },
     {
+      "scene": "divinity-original-sin-2",
+      "mask": "public/assets/bar/modular/divinity-original-sin-2/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
       "scene": "elden-ring",
       "mask": "public/assets/bar/modular/elden-ring/architecture-mask.png",
       "roles": [
@@ -561,6 +589,20 @@
     {
       "scene": "fairy",
       "mask": "public/assets/bar/modular/fairy/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "fairytale",
+      "mask": "public/assets/bar/modular/fairytale/architecture-mask.png",
       "roles": [
         "counter",
         "shelf",
@@ -631,6 +673,76 @@
           ]
         }
       ]
+    },
+    {
+      "scene": "gta",
+      "mask": "public/assets/bar/modular/gta/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "gta-3",
+      "mask": "public/assets/bar/modular/gta-3/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "gta-5",
+      "mask": "public/assets/bar/modular/gta-5/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "gta-sa",
+      "mask": "public/assets/bar/modular/gta-sa/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "harry-potter",
+      "mask": "public/assets/bar/modular/harry-potter/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": []
     },
     {
       "scene": "inferno-penthouse",

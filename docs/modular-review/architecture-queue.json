@@ -1,5 +1,5 @@
 {
-  "count": 35,
+  "count": 43,
   "scenes": [
     {
       "id": "alan-wake",
@@ -402,6 +402,25 @@
       ]
     },
     {
+      "id": "darksiders-3",
+      "source": "../../../public/assets/bar/backgrounds/interior-darksiders-3.webp",
+      "output": "public/assets/bar/modular/darksiders-3/architecture.webp",
+      "mask": "public/assets/bar/modular/darksiders-3/architecture-mask.png",
+      "inpaintMask": "public/assets/bar/modular/darksiders-3/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/darksiders-3/window-mask.png",
+      "windowCutouts": [],
+      "prompt": "Clean architecture plate from this exact source; preserve camera/perspective and reconstruct only occluded surfaces.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
+      ]
+    },
+    {
       "id": "death-stranding",
       "source": "../../../public/assets/bar/backgrounds/interior-death-stranding.webp",
       "output": "public/assets/bar/modular/death-stranding/architecture.webp",
@@ -613,6 +632,25 @@
       ]
     },
     {
+      "id": "divinity-original-sin-2",
+      "source": "../../../public/assets/bar/backgrounds/interior-divinity-original-sin-2.webp",
+      "output": "public/assets/bar/modular/divinity-original-sin-2/architecture.webp",
+      "mask": "public/assets/bar/modular/divinity-original-sin-2/architecture-mask.png",
+      "inpaintMask": "public/assets/bar/modular/divinity-original-sin-2/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/divinity-original-sin-2/window-mask.png",
+      "windowCutouts": [],
+      "prompt": "Clean architecture plate from this exact source; preserve camera/perspective and reconstruct only occluded surfaces.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
+      ]
+    },
+    {
       "id": "elden-ring",
       "source": "../../../public/assets/bar/backgrounds/interior-elden-ring.webp",
       "output": "public/assets/bar/modular/elden-ring/architecture.webp",
@@ -660,6 +698,25 @@
       "mask": "public/assets/bar/modular/fairy/architecture-mask.png",
       "inpaintMask": "public/assets/bar/modular/fairy/architecture-mask.png",
       "windowMask": "public/assets/bar/modular/fairy/window-mask.png",
+      "windowCutouts": [],
+      "prompt": "Clean architecture plate from this exact source; preserve camera/perspective and reconstruct only occluded surfaces.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
+      ]
+    },
+    {
+      "id": "fairytale",
+      "source": "../../../public/assets/bar/backgrounds/interior-fairytale.webp",
+      "output": "public/assets/bar/modular/fairytale/architecture.webp",
+      "mask": "public/assets/bar/modular/fairytale/architecture-mask.png",
+      "inpaintMask": "public/assets/bar/modular/fairytale/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/fairytale/window-mask.png",
       "windowCutouts": [],
       "prompt": "Clean architecture plate from this exact source; preserve camera/perspective and reconstruct only occluded surfaces.",
       "constraints": [
@@ -728,6 +785,101 @@
         }
       ],
       "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
+      ]
+    },
+    {
+      "id": "gta",
+      "source": "../../../public/assets/bar/backgrounds/interior-gta.webp",
+      "output": "public/assets/bar/modular/gta/architecture.webp",
+      "mask": "public/assets/bar/modular/gta/architecture-mask.png",
+      "inpaintMask": "public/assets/bar/modular/gta/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/gta/window-mask.png",
+      "windowCutouts": [],
+      "prompt": "Clean architecture plate from this exact source; preserve camera/perspective and reconstruct only occluded surfaces.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
+      ]
+    },
+    {
+      "id": "gta-3",
+      "source": "../../../public/assets/bar/backgrounds/interior-gta-3.webp",
+      "output": "public/assets/bar/modular/gta-3/architecture.webp",
+      "mask": "public/assets/bar/modular/gta-3/architecture-mask.png",
+      "inpaintMask": "public/assets/bar/modular/gta-3/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/gta-3/window-mask.png",
+      "windowCutouts": [],
+      "prompt": "Clean architecture plate from this exact source; preserve camera/perspective and reconstruct only occluded surfaces.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
+      ]
+    },
+    {
+      "id": "gta-5",
+      "source": "../../../public/assets/bar/backgrounds/interior-gta-5.webp",
+      "output": "public/assets/bar/modular/gta-5/architecture.webp",
+      "mask": "public/assets/bar/modular/gta-5/architecture-mask.png",
+      "inpaintMask": "public/assets/bar/modular/gta-5/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/gta-5/window-mask.png",
+      "windowCutouts": [],
+      "prompt": "Clean architecture plate from this exact source; preserve camera/perspective and reconstruct only occluded surfaces.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
+      ]
+    },
+    {
+      "id": "gta-sa",
+      "source": "../../../public/assets/bar/backgrounds/interior-gta-sa.webp",
+      "output": "public/assets/bar/modular/gta-sa/architecture.webp",
+      "mask": "public/assets/bar/modular/gta-sa/architecture-mask.png",
+      "inpaintMask": "public/assets/bar/modular/gta-sa/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/gta-sa/window-mask.png",
+      "windowCutouts": [],
+      "prompt": "Clean architecture plate from this exact source; preserve camera/perspective and reconstruct only occluded surfaces.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Use inpaintMask only for reconstructing surfaces hidden by removable furniture.",
+        "Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim."
+      ]
+    },
+    {
+      "id": "harry-potter",
+      "source": "../../../public/assets/bar/backgrounds/interior-harry-potter.webp",
+      "output": "public/assets/bar/modular/harry-potter/architecture.webp",
+      "mask": "public/assets/bar/modular/harry-potter/architecture-mask.png",
+      "inpaintMask": "public/assets/bar/modular/harry-potter/architecture-mask.png",
+      "windowMask": "public/assets/bar/modular/harry-potter/window-mask.png",
+      "windowCutouts": [],
+      "prompt": "Clean architecture plate from this exact source; preserve camera/perspective and reconstruct only occluded surfaces.",
       "constraints": [
         "Use only the existing source background as visual ground truth.",
         "Remove counter, seating, loose foreground decor and back-bar furniture.",
