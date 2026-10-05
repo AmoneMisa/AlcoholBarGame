@@ -25,10 +25,11 @@ def thumb(img,size=(420,250)):
 def label(canvas,xy,text):
     ImageDraw.Draw(canvas).text(xy,text,fill=(235,235,240))
 
-def clean_furniture_ready(base):
+def clean_furniture_ready(base,required_roles):
     if base.name=='velvet':
-        return all((base/name).exists() for name in ('counter.webp','shelf.webp','stool.webp'))
-    return all((base/'clean-ready'/f'{role}.webp').exists() for role in ROLES)
+        legacy={'counter':'counter.webp','shelf':'shelf.webp','seating':'stool.webp'}
+        return all((base/legacy[role]).exists() for role in required_roles)
+    return all((base/'clean-ready'/f'{role}.webp').exists() for role in required_roles)
 
 summary=[]
 for base in sorted(p for p in MOD.iterdir() if p.is_dir()):
@@ -39,6 +40,9 @@ for base in sorted(p for p in MOD.iterdir() if p.is_dir()):
 
     data=json.loads(report_path.read_text())
     kind='measured' if measured.exists() else 'candidate'
+    plan_path=base/'scene-plan.json'
+    plan=json.loads(plan_path.read_text()) if plan_path.exists() else {}
+    required_roles=tuple(plan.get('requiredRoles',ROLES))
     review=base/'review-ready'
     review.mkdir(exist_ok=True)
     promoted=[]
@@ -69,8 +73,8 @@ for base in sorted(p for p in MOD.iterdir() if p.is_dir()):
 
     statuses={k:v.get('status') for k,v in data.get('roles',{}).items()}
     architecture_ready=(base/'architecture.webp').exists()
-    isolated_furniture_ready=kind=='measured' and all(statuses.get(role)=='ok' for role in ROLES)
-    clean_furniture=clean_furniture_ready(base)
+    isolated_furniture_ready=kind=='measured' and all(statuses.get(role)=='ok' for role in required_roles)
+    clean_furniture=clean_furniture_ready(base,required_roles)
 
     sheet=Image.new('RGB',(1280,930),(15,15,19))
     label(sheet,(20,16),f'{base.name} — {kind} — promoted: {", ".join(promoted) or "none"}')
@@ -95,6 +99,7 @@ for base in sorted(p for p in MOD.iterdir() if p.is_dir()):
         'kind':kind,
         'promoted':promoted,
         'roles':statuses,
+        'requiredRoles':list(required_roles),
         'architectureReady':architecture_ready,
         'furnitureReady':isolated_furniture_ready,
         'isolatedFurnitureReady':isolated_furniture_ready,
