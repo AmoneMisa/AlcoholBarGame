@@ -25,10 +25,10 @@ for(const name of readdirSync(MOD).sort()){
 
   const kind=reportPath===measured?'measured':'candidate';
   const report=JSON.parse(readFileSync(reportPath,'utf8'));
-  const planPath=resolve(base,'scene-plan.json');
-  const plan=existsSync(planPath)?JSON.parse(readFileSync(planPath,'utf8')):{};
-  const requiredRoles=plan.requiredRoles??ROLES;
-  const manualApprovedRoles=new Set(plan.manualApprovedRoles??[]);
+  const manifestPath=resolve('scripts/modular-scenes',`${name}.json`);
+  const manifest=existsSync(manifestPath)?JSON.parse(readFileSync(manifestPath,'utf8')):{};
+  const requiredRoles=manifest.requiredRoles??ROLES;
+  const manualApprovedRoles=new Set(manifest.manualApprovedRoles??[]);
   const statuses=Object.fromEntries(ROLES.map(role=>[role,report.roles?.[role]?.status??'missing']));
   const promoted=Object.fromEntries(ROLES.map(role=>[role,existsSync(resolve(base,'review-ready',`${role}.webp`))]));
 
