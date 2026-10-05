@@ -99,11 +99,11 @@
     }
   ],
   "bartenderAnchor": null,
-  "windowCutouts": [],
   "review": {
-    "windowCutouts": "manual-required",
+    "windowCutouts": "not-applicable",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
     "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone."
-  }
+  },
+  "windowCutoutsNormalized": []
 }
