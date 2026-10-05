@@ -23,10 +23,11 @@ for(const name of readdirSync(MOD).sort()){
   const reportPath=existsSync(measured)?measured:existsSync(candidate)?candidate:null;
   if(!reportPath) continue;
 
-  const kind=reportPath===measured?'measured':'candidate';
   const report=JSON.parse(readFileSync(reportPath,'utf8'));
   const manifestPath=resolve('scripts/modular-scenes',`${name}.json`);
   const manifest=existsSync(manifestPath)?JSON.parse(readFileSync(manifestPath,'utf8')):{};
+  const reviewedGeometry=['measured-gameplay','reviewed-modular-pilot','manual-source-review'].includes(manifest.geometrySource);
+  const kind=reportPath===measured||reviewedGeometry?'measured':'candidate';
   const requiredRoles=manifest.requiredRoles??ROLES;
   const manualApprovedRoles=new Set(manifest.manualApprovedRoles??[]);
   const statuses=Object.fromEntries(ROLES.map(role=>[role,report.roles?.[role]?.status??'missing']));
