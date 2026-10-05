@@ -1,0 +1,158 @@
+{
+  "id": "gta-sa",
+  "canvas": {
+    "width": 1672,
+    "height": 941
+  },
+  "authoringCanvas": {
+    "width": 1672,
+    "height": 941
+  },
+  "source": "../../../public/assets/bar/backgrounds/interior-gta-sa.webp",
+  "modules": {
+    "architecture-reference": {
+      "cropNormalized": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      },
+      "prompt": "Clean architecture plate from this exact source; preserve camera/perspective and reconstruct only occluded surfaces.",
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1672,
+        "height": 941
+      },
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    "shelf-reference": {
+      "cropNormalized": {
+        "x": 0.16,
+        "y": 0.1,
+        "width": 0.68,
+        "height": 0.46
+      },
+      "prompt": "Review provisional region; isolate actual empty back-bar furniture.",
+      "crop": {
+        "x": 268,
+        "y": 94,
+        "width": 1137,
+        "height": 433
+      },
+      "rect": {
+        "x": 0.160287,
+        "y": 0.099894,
+        "width": 0.680024,
+        "height": 0.460149
+      }
+    },
+    "counter-reference": {
+      "cropNormalized": {
+        "x": 0,
+        "y": 0.48,
+        "width": 1,
+        "height": 0.34
+      },
+      "prompt": "Review provisional region; isolate actual counter with transparent surroundings.",
+      "crop": {
+        "x": 0,
+        "y": 452,
+        "width": 1672,
+        "height": 320
+      },
+      "rect": {
+        "x": 0,
+        "y": 0.48034,
+        "width": 1,
+        "height": 0.340064
+      }
+    }
+  },
+  "slots": {
+    "wall": {
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.6
+    },
+    "shelves": {
+      "x": 0.16,
+      "y": 0.1,
+      "width": 0.68,
+      "height": 0.46
+    },
+    "counter": {
+      "x": 0,
+      "y": 0.48,
+      "width": 1,
+      "height": 0.34
+    },
+    "seating": {
+      "x": 0,
+      "y": 0.64,
+      "width": 1,
+      "height": 0.3
+    },
+    "floor": {
+      "x": 0,
+      "y": 0.58,
+      "width": 1,
+      "height": 0.42
+    }
+  },
+  "windowCutouts": [],
+  "shelfRows": [
+    0.28,
+    0.38,
+    0.48
+  ],
+  "seatAnchors": [
+    {
+      "x": 0.12,
+      "y": 0.72
+    },
+    {
+      "x": 0.3,
+      "y": 0.72
+    },
+    {
+      "x": 0.49,
+      "y": 0.72
+    },
+    {
+      "x": 0.67,
+      "y": 0.72
+    },
+    {
+      "x": 0.85,
+      "y": 0.72
+    }
+  ],
+  "bartenderAnchor": {
+    "x": 0.5,
+    "y": 0.58
+  },
+  "status": "geometry-review-required",
+  "geometrySource": "provisional-normalized",
+  "review": {
+    "geometry": "manual-required",
+    "shelfBounds": "manual-required",
+    "counterBounds": "manual-required",
+    "seatAnchors": "manual-required",
+    "windowCutouts": "manual-required",
+    "architectureInpaint": "required",
+    "alphaEdges": "manual-review"
+  },
+  "notes": [
+    "Existing themed background coverage manifest.",
+    "Source WebP size is auto-detected.",
+    "Do not ship crops before visual geometry review.",
+    "Use segmentation/inpainting for hidden wall/floor."
+  ]
+}
