@@ -1,0 +1,52 @@
+name: Build modular review sheets
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/modular-velvet-scene
+    paths:
+      - scripts/build-modular-review.py
+      - .github/workflows/build-modular-review.yml
+
+permissions:
+  contents: write
+
+jobs:
+  review:
+    if: ${{ !contains(github.event.head_commit.message || '', '[modular-review]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: feat/modular-velvet-scene
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check pillow
+      - run: python scripts/build-modular-review.py
+      - name: Validate coverage
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path('docs/modular-review/summary.json').read_text())
+          assert len(s)==74, len(s)
+          measured=[x for x in s if x['kind']=='measured']
+          candidate=[x for x in s if x['kind']=='candidate']
+          assert len(measured)==20, len(measured)
+          assert len(candidate)==54, len(candidate)
+          print('measured',len(measured),'candidate',len(candidate),'promoted',sum(len(x['promoted']) for x in s))
+          PY
+      - name: Commit review outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/modular-review public/assets/bar/modular/*/review-ready
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+          else
+            git commit -m "[modular-review] Build scene review sheets"
+            git push origin HEAD:feat/modular-velvet-scene
+          fi
