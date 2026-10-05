@@ -53,6 +53,7 @@ jobs:
           masks=json.loads(Path('docs/modular-review/architecture-masks.json').read_text())
           queue=json.loads(Path('docs/modular-review/architecture-queue.json').read_text())
           cleanup=json.loads(Path('docs/modular-review/furniture-cleanup-queue.json').read_text())
+          windows=json.loads(Path('docs/modular-review/window-masks.json').read_text())
           assert len(readiness['furnitureReady'])==8, readiness['furnitureReady']
           assert len(readiness['cleanFurnitureReady'])==1, readiness['cleanFurnitureReady']
           assert len(readiness['productionReady'])==1, readiness['productionReady']
@@ -60,9 +61,10 @@ jobs:
           assert masks['count']==7, masks['count']
           assert queue['count']==7, queue['count']
           assert cleanup['count']==21, cleanup['count']
+          assert windows['count']==7, windows['count']
           assert len(cleanup['scenes'])==7, cleanup['scenes']
-          assert {x['scene'] for x in masks['scenes']}=={x['id'] for x in queue['scenes']}==set(cleanup['scenes'])
-          print('measured',len(measured),'candidate',len(candidate),'promoted',sum(len(x['promoted']) for x in s),'architecture-masks',masks['count'],'cleanup-items',cleanup['count'])
+          assert {x['scene'] for x in masks['scenes']}=={x['id'] for x in queue['scenes']}==set(cleanup['scenes'])=={x['scene'] for x in windows['scenes']}
+          print('measured',len(measured),'candidate',len(candidate),'promoted',sum(len(x['promoted']) for x in s),'architecture-masks',masks['count'],'cleanup-items',cleanup['count'],'window-masks',windows['count'])
           PY
       - name: Commit review outputs
         run: |
