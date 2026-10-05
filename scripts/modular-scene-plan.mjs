@@ -34,6 +34,7 @@ function webpSize(buffer){
 const manifestPath=resolve(manifestArg);
 const manifest=JSON.parse(await readFile(manifestPath,'utf8'));
 const apply=flags.includes('--apply');
+const referencesOnly=flags.includes('--references-only');
 const legacyPublic=(value)=>typeof value==='string'&&value.startsWith('../../../public/') ? value.replace('../../../public/','../../public/') : value;
 const source=resolve(dirname(manifestPath),legacyPublic(manifest.source));
 const outDir=resolve(dirname(manifestPath),legacyPublic(manifest.outputDir??`../../public/assets/bar/modular/${manifest.id}`));
@@ -93,6 +94,10 @@ console.log(`Wrote ${planPath} (${width}x${height})`);
 
 for(const [id,spec] of moduleEntries){
   const {x,y,width:cropW,height:cropH}=spec.crop;
+  if(referencesOnly && id==='architecture-reference' && x===0 && y===0 && cropW===width && cropH===height){
+    console.log('Skip full-canvas architecture reference in --references-only mode');
+    continue;
+  }
   if(x<0||y<0||cropW<=0||cropH<=0||x+cropW>width||y+cropH>height) throw new Error(`${manifest.id}.${id}: crop outside source canvas`);
   const output=resolve(outDir,`${id}.webp`);
   const args=[source,'-crop',`${cropW}x${cropH}+${x}+${y}`,'+repage','-quality',String(spec.quality??92),output];
@@ -102,6 +107,23 @@ for(const [id,spec] of moduleEntries){
     if(run.error?.code==='ENOENT') throw new Error('ImageMagick is required only for --apply. Install it or run the printed commands elsewhere.');
     if(run.status!==0) process.exit(run.status??1);
   }
+}
+
+if(apply && slots.seating){
+  const crop=sourcePixels(slots.seating);
+  const output=resolve(outDir,'seating-reference.webp');
+  const args=[source,'-crop',`${crop.width}x${crop.height}+${crop.x}+${crop.y}`,'+repage','-quality','92',output];
+  console.log(`magick ${args.map(value=>JSON.stringify(value)).join(' ')}`);
+  const run=spawnSync('magick',args,{stdio:'inherit'});
+  if(run.status!==0) process.exit(run.status??1);
+}
+if(apply && slots.floor){
+  const crop=sourcePixels(slots.floor);
+  const output=resolve(outDir,'floor-reference.webp');
+  const args=[source,'-crop',`${crop.width}x${crop.height}+${crop.x}+${crop.y}`,'+repage','-quality','92',output];
+  console.log(`magick ${args.map(value=>JSON.stringify(value)).join(' ')}`);
+  const run=spawnSync('magick',args,{stdio:'inherit'});
+  if(run.status!==0) process.exit(run.status??1);
 }
 
 if(cutouts.length) console.log(`\nWindow contract: make these normalized panes transparent in the clean architecture plate: ${JSON.stringify(cutouts)}`);

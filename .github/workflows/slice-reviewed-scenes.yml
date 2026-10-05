@@ -1,0 +1,62 @@
+name: Slice reviewed modular scenes
+
+on:
+  push:
+    branches:
+      - feat/modular-velvet-scene
+    paths:
+      - '.github/workflows/slice-reviewed-scenes.yml'
+      - 'scripts/modular-scene-plan.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  slice:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: feat/modular-velvet-scene
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          if ! command -v magick >/dev/null 2>&1; then
+            sudo ln -s "$(command -v convert)" /usr/local/bin/magick
+          fi
+      - name: Slice reviewed scenes
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const path=require('path');
+          const {spawnSync}=require('child_process');
+          const dir='scripts/modular-scenes';
+          for(const name of fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort()){
+            const file=path.join(dir,name);
+            const manifest=JSON.parse(fs.readFileSync(file,'utf8'));
+            if(manifest.geometrySource==='provisional-normalized') continue;
+            console.log('\n=== '+manifest.id+' ===');
+            const run=spawnSync('pnpm',['bar:scene-plan',file,'--apply','--references-only'],{stdio:'inherit'});
+            if(run.status!==0) process.exit(run.status??1);
+          }
+          NODE
+      - name: Remove duplicate full-canvas architecture refs
+        run: find public/assets/bar/modular -name 'architecture-reference.webp' -delete
+      - name: Commit sliced references
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/assets/bar/modular
+          if git diff --cached --quiet; then
+            echo "No generated asset changes"
+            exit 0
+          fi
+          git commit -m "Generate reviewed modular scene reference crops"
+          git push origin HEAD:feat/modular-velvet-scene
