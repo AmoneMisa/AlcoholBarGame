@@ -67,9 +67,25 @@ const slots={
   ...Object.fromEntries(Object.entries(manifest.slots??{}).map(([id,rect])=>[id,normalized(rect)])),
   ...(manifest.slotsNormalized??{})
 };
+const normalizeCutout=(cutout)=>{
+  if(Array.isArray(cutout.points)){
+    return {
+      type:'polygon',
+      points:cutout.points.map((point)=>({
+        x:+(point.x/authorWidth).toFixed(6),
+        y:+(point.y/authorHeight).toFixed(6)
+      }))
+    };
+  }
+  return {type:'rect',...normalized(cutout)};
+};
+const normalizeCutoutNormalized=(cutout)=>{
+  if(Array.isArray(cutout.points)) return {type:'polygon',points:cutout.points};
+  return {type:'rect',...cutout};
+};
 const cutouts=[
-  ...(manifest.windowCutouts??[]).map(normalized),
-  ...(manifest.windowCutoutsNormalized??[])
+  ...(manifest.windowCutouts??[]).map(normalizeCutout),
+  ...(manifest.windowCutoutsNormalized??[]).map(normalizeCutoutNormalized)
 ];
 const plan={
   id:manifest.id,
