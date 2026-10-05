@@ -13,7 +13,8 @@
     "Reference crops are authoring aids, not shippable clean modules.",
     "Preserve camera/horizon/perspective.",
     "Remove painted bottles from shelf furniture.",
-    "Inpaint occluded wall/floor before export."
+    "Inpaint occluded wall/floor before export.",
+    "Window cutouts manually traced from the existing source background; preserve frames, mullions, curtains and permanent trim."
   ],
   "modules": {
     "architecture-reference": {
@@ -104,10 +105,32 @@
     }
   ],
   "bartenderAnchor": null,
-  "windowCutouts": [],
   "review": {
-    "windowCutouts": "manual-required",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review"
-  }
+  },
+  "windowCutoutsNormalized": [
+    {
+      "type": "rect",
+      "x": 0.154,
+      "y": 0.075,
+      "width": 0.126,
+      "height": 0.356
+    },
+    {
+      "type": "rect",
+      "x": 0.737,
+      "y": 0.075,
+      "width": 0.127,
+      "height": 0.356
+    },
+    {
+      "type": "rect",
+      "x": 0.929,
+      "y": 0.076,
+      "width": 0.071,
+      "height": 0.365
+    }
+  ]
 }
