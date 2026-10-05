@@ -22,17 +22,17 @@
     },
     "shelf-reference": {
       "cropNormalized": {
-        "x": 0.14,
-        "y": 0.16,
-        "width": 0.72,
-        "height": 0.4
+        "x": 0.1,
+        "y": 0.2,
+        "width": 0.8,
+        "height": 0.36
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture."
     },
     "counter-reference": {
       "cropNormalized": {
         "x": 0,
-        "y": 0.55,
+        "y": 0.54,
         "width": 1,
         "height": 0.24
       },
@@ -47,22 +47,22 @@
       "height": 0.6
     },
     "shelves": {
-      "x": 0.14,
-      "y": 0.16,
-      "width": 0.72,
-      "height": 0.4
+      "x": 0.1,
+      "y": 0.2,
+      "width": 0.8,
+      "height": 0.36
     },
     "counter": {
       "x": 0,
-      "y": 0.55,
+      "y": 0.54,
       "width": 1,
       "height": 0.24
     },
     "seating": {
       "x": 0,
-      "y": 0.71,
+      "y": 0.74,
       "width": 1,
-      "height": 0.29
+      "height": 0.26
     },
     "floor": {
       "x": 0,
@@ -79,23 +79,23 @@
   "seatAnchorsNormalized": [
     {
       "x": 0.1,
-      "y": 0.82
+      "y": 0.85
     },
     {
       "x": 0.3,
-      "y": 0.82
+      "y": 0.85
     },
     {
-      "x": 0.5,
-      "y": 0.82
+      "x": 0.51,
+      "y": 0.85
     },
     {
-      "x": 0.7,
-      "y": 0.82
+      "x": 0.72,
+      "y": 0.85
     },
     {
-      "x": 0.9,
-      "y": 0.82
+      "x": 0.91,
+      "y": 0.85
     }
   ],
   "bartenderAnchorNormalized": {
@@ -125,7 +125,14 @@
           "type": "rect",
           "x": 0,
           "y": 0,
-          "width": 1,
+          "width": 0.34,
+          "height": 0.98
+        },
+        {
+          "type": "rect",
+          "x": 0.66,
+          "y": 0,
+          "width": 0.34,
           "height": 0.98
         }
       ],
@@ -159,21 +166,21 @@
         },
         {
           "type": "rect",
-          "x": 0.415,
+          "x": 0.425,
           "y": 0.58,
           "width": 0.17,
           "height": 0.42
         },
         {
           "type": "rect",
-          "x": 0.615,
+          "x": 0.635,
           "y": 0.58,
           "width": 0.17,
           "height": 0.42
         },
         {
           "type": "rect",
-          "x": 0.8150000000000001,
+          "x": 0.8250000000000001,
           "y": 0.58,
           "width": 0.17,
           "height": 0.42
@@ -199,21 +206,21 @@
         },
         {
           "type": "rect",
-          "x": 0.415,
+          "x": 0.425,
           "y": 0,
           "width": 0.17,
           "height": 0.98
         },
         {
           "type": "rect",
-          "x": 0.615,
+          "x": 0.635,
           "y": 0,
           "width": 0.17,
           "height": 0.98
         },
         {
           "type": "rect",
-          "x": 0.8150000000000001,
+          "x": 0.8250000000000001,
           "y": 0,
           "width": 0.17,
           "height": 0.98
