@@ -1,0 +1,113 @@
+{
+  "id": "inferno-penthouse",
+  "source": "../../../public/assets/bar/backgrounds/inferno-penthouse-club.webp",
+  "outputDir": "../../../public/assets/bar/modular/inferno-penthouse",
+  "canvas": {
+    "width": 1536,
+    "height": 1024
+  },
+  "status": "geometry-ready-art-review-required",
+  "geometrySource": "measured-gameplay",
+  "notes": [
+    "Measured from existing BarScene geometry.",
+    "Reference crops are authoring aids, not shippable clean modules.",
+    "Preserve camera/horizon/perspective.",
+    "Remove painted bottles from shelf furniture.",
+    "Inpaint occluded wall/floor before export."
+  ],
+  "modules": {
+    "architecture-reference": {
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1536,
+        "height": 1024
+      },
+      "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces."
+    },
+    "shelf-reference": {
+      "crop": {
+        "x": 399,
+        "y": 256,
+        "width": 737,
+        "height": 379
+      },
+      "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware."
+    },
+    "counter-reference": {
+      "crop": {
+        "x": 0,
+        "y": 686,
+        "width": 1536,
+        "height": 266
+      },
+      "prompt": "Isolate existing counter with transparent surroundings and bleed."
+    }
+  },
+  "slots": {
+    "wall": {
+      "x": 0,
+      "y": 0,
+      "width": 1536,
+      "height": 758
+    },
+    "shelves": {
+      "x": 461,
+      "y": 256,
+      "width": 614,
+      "height": 379
+    },
+    "counter": {
+      "x": 0,
+      "y": 686,
+      "width": 1536,
+      "height": 266
+    },
+    "floor": {
+      "x": 0,
+      "y": 758,
+      "width": 1536,
+      "height": 266
+    },
+    "seating": {
+      "x": 0,
+      "y": 768,
+      "width": 1536,
+      "height": 256
+    }
+  },
+  "shelfRows": [
+    389,
+    451,
+    512
+  ],
+  "seatAnchors": [
+    {
+      "x": 108,
+      "y": 850
+    },
+    {
+      "x": 384,
+      "y": 850
+    },
+    {
+      "x": 753,
+      "y": 850
+    },
+    {
+      "x": 1121,
+      "y": 850
+    },
+    {
+      "x": 1428,
+      "y": 850
+    }
+  ],
+  "bartenderAnchor": null,
+  "windowCutouts": [],
+  "review": {
+    "windowCutouts": "manual-required",
+    "architectureInpaint": "required",
+    "alphaEdges": "manual-review"
+  }
+}

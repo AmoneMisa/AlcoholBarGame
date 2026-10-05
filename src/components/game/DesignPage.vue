@@ -2,6 +2,9 @@
 import { computed, ref, watch } from 'vue';
 import { REGIONS } from '../../domain/catalog';
 import { BARTENDER_OUTFITS, INTERIORS, interiorStyle } from '../../data/cosmetics/bars';
+import { modularSceneFor } from '../../data/cosmetics/modularScenes';
+import { SHELF_DECOR_OPTIONS, type ShelfDecorPresetId } from '../../data/cosmetics/shelfDecor';
+import { WINDOW_BACKDROP_OPTIONS, type WindowBackdropId } from '../../data/cosmetics/windowBackdrops';
 import { styleLabel } from '../../domain/styleInfo';
 import { useGameStore } from '../../stores/game';
 import AppearancePicker from './AppearancePicker.vue';
@@ -10,12 +13,16 @@ import CharacterModel from '../characters/CharacterModel.vue';
 import UiButton from '../ui/UiButton.vue';
 import UiInput from '../ui/UiInput.vue';
 import CollectionBonuses from './CollectionBonuses.vue';
+import OptionSelect from './OptionSelect.vue';
 const props=defineProps<{activeView?:string;designSection?:'bar'|'character'}>();
 const emit=defineEmits<{close:[]}>();
 const game=useGameStore();
 const section=ref<'background'|'style'|'character'>(props.designSection==='character'?'style':'background');
 const character=computed(()=>(game.decor.bartenderCharacter==='leo'?'leo':'noa') as 'noa'|'leo');
 const backgroundName=computed(()=>INTERIORS.find(item=>item.id===game.decor.interior)?.name??'');
+const modularBackground=computed(()=>!!modularSceneFor(game.decor.interior));
+const shelfPreset=computed({get:()=>game.decor.shelfPreset??'classic-cocktails',set:(value:string)=>{game.decor.shelfPreset=value as ShelfDecorPresetId;}});
+const windowBackdrop=computed({get:()=>game.decor.windowBackdrop??'night-city',set:(value:string)=>{game.decor.windowBackdrop=value as WindowBackdropId;}});
 const barName=ref(game.decor.name);const nickname=ref(game.decor.bartenderNickname??(character.value==='leo'?'Leo':'Noa'));
 watch(()=>game.regionId,()=>{barName.value=game.decor.name;nickname.value=game.decor.bartenderNickname??(character.value==='leo'?'Leo':'Noa');});
 watch(()=>props.designSection,value=>{section.value=value==='character'?'style':'background';});
@@ -39,6 +46,11 @@ function chooseCharacter(next:'noa'|'leo'){
         <nav v-if="game.ownedBarIds.length>1" class="customization-tabs" aria-label="Choose a bar"><UiButton v-for="region in REGIONS.filter(item=>game.isBarOwned(item.id))" :key="region.id" size="sm" :variant="game.regionId===region.id?'solid':'ghost'" @click="game.switchBar(region.id)">{{region.name}}</UiButton></nav>
         <button type="button" class="customization-bar-preview" :style="interiorStyle(game.decor.interior)" aria-label="Preview backgrounds and styles" @click="openPreview()"><span>{{backgroundName}} <b>· In use</b></span></button>
         <AppearancePicker kind="background" :character="character" :selected="game.decor.interior" @pick="pickBackground" />
+        <div v-if="modularBackground" class="bar-module-controls">
+          <OptionSelect v-model="shelfPreset" label="Back-bar bottle style" :options="[...SHELF_DECOR_OPTIONS]" />
+          <OptionSelect v-if="modularSceneFor(game.decor.interior)?.exterior" v-model="windowBackdrop" label="View outside" :options="[...WINDOW_BACKDROP_OPTIONS]" />
+          <small>Decorative shelf bottles and the exterior view are visual collection pieces. Gameplay bottles remain separate and interactive.</small>
+        </div>
       </template>
       <template v-else>
         <nav class="customization-tabs" aria-label="Choose bartender"><UiButton size="sm" :variant="character==='noa'?'solid':'ghost'" @click="chooseCharacter('noa')">Noa</UiButton><UiButton size="sm" :variant="character==='leo'?'solid':'ghost'" @click="chooseCharacter('leo')">Leo</UiButton></nav>
@@ -51,5 +63,5 @@ function chooseCharacter(next:'noa'|'leo'){
   <StylePreview v-if="preview" :character="character" :interior="preview.interior" :outfit="preview.outfit" @close="preview=undefined" />
 </template>
 <style scoped>
-.customization-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-bottom:1px solid #304158}.customization-heading h1{margin:0;color:#fff0d2;font:700 23px/1.2 Georgia,serif}.customization-content{display:grid;gap:8px;min-width:0;padding:10px 12px}.customization-tabs{display:flex;flex-wrap:wrap;gap:6px;position:static}.customization-tabs[aria-label="Customization sections"]{flex-wrap:nowrap;gap:0;border:1px solid #3b516c;border-radius:8px;overflow:hidden}.customization-tabs[aria-label="Customization sections"] :deep(.ui-btn){flex:1;min-width:0;border-radius:0;border:0;font-size:12px;min-height:34px;padding:6px}.customization-name{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px}.customization-bar-preview,.customization-character-preview{position:relative;display:block;width:100%;height:96px;padding:0;overflow:hidden;border:1px solid #354962;border-radius:9px;cursor:pointer;background-position:center;background-size:cover;color:#eaf0f8}.customization-bar-preview>span,.customization-character-preview>span{position:absolute;bottom:0;left:0;right:0;padding:7px;background:linear-gradient(transparent,#07121fea);font-size:11px;text-align:center}.customization-bar-preview b,.customization-character-preview b{color:#efc579;font-weight:600}.customization-character-preview{background:radial-gradient(ellipse at top,#304158,#0d1827)}.customization-character-preview :deep(.art-character){position:relative!important;inset:auto!important;height:192px!important;min-height:0!important;width:116px!important;margin:0 auto;transform:none!important;aspect-ratio:.6!important}
+.customization-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-bottom:1px solid #304158}.customization-heading h1{margin:0;color:#fff0d2;font:700 23px/1.2 Georgia,serif}.customization-content{display:grid;gap:8px;min-width:0;padding:10px 12px}.customization-tabs{display:flex;flex-wrap:wrap;gap:6px;position:static}.customization-tabs[aria-label="Customization sections"]{flex-wrap:nowrap;gap:0;border:1px solid #3b516c;border-radius:8px;overflow:hidden}.customization-tabs[aria-label="Customization sections"] :deep(.ui-btn){flex:1;min-width:0;border-radius:0;border:0;font-size:12px;min-height:34px;padding:6px}.customization-name{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px}.customization-bar-preview,.customization-character-preview{position:relative;display:block;width:100%;height:96px;padding:0;overflow:hidden;border:1px solid #354962;border-radius:9px;cursor:pointer;background-position:center;background-size:cover;color:#eaf0f8}.customization-bar-preview>span,.customization-character-preview>span{position:absolute;bottom:0;left:0;right:0;padding:7px;background:linear-gradient(transparent,#07121fea);font-size:11px;text-align:center}.customization-bar-preview b,.customization-character-preview b{color:#efc579;font-weight:600}.customization-character-preview{background:radial-gradient(ellipse at top,#304158,#0d1827)}.bar-module-controls{display:grid;gap:6px;padding-top:2px}.bar-module-controls small{color:#8492a6;font-size:11px;line-height:1.35}.customization-character-preview :deep(.art-character){position:relative!important;inset:auto!important;height:192px!important;min-height:0!important;width:116px!important;margin:0 auto;transform:none!important;aspect-ratio:.6!important}
 </style>

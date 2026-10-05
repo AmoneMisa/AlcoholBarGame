@@ -1,0 +1,109 @@
+{
+  "id": "cyberpunk",
+  "source": "../../../public/assets/bar/backgrounds/interior-cyberpunk.webp",
+  "outputDir": "../../../public/assets/bar/modular/cyberpunk",
+  "canvas": {
+    "width": 1516,
+    "height": 1004
+  },
+  "status": "geometry-ready-art-review-required",
+  "notes": [
+    "Generated from the measured gameplay geometry already used by BarScene.",
+    "Do not ship reference crops as final modules until the clean architecture plate and transparency have been visually reviewed.",
+    "Keep camera, horizon and perspective identical to the source.",
+    "Remove painted bottles from shelf modules; decorative bottles are rendered by shelf presets.",
+    "If counter/seating hides wall or floor, reconstruct the hidden surface by inpainting before export."
+  ],
+  "modules": {
+    "architecture-reference": {
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1516,
+        "height": 1004
+      },
+      "prompt": "Create a clean architecture plate from this existing background. Remove counter, stools/chairs, loose foreground decor and back-bar furniture; reconstruct hidden wall and floor. Preserve fixed architecture and source perspective."
+    },
+    "shelf-reference": {
+      "crop": {
+        "x": 152,
+        "y": 85,
+        "width": 1228,
+        "height": 507
+      },
+      "prompt": "Isolate the existing back-bar furniture from this source region. Remove all painted bottles and glassware. Preserve exact perspective."
+    },
+    "counter-reference": {
+      "crop": {
+        "x": 0,
+        "y": 492,
+        "width": 1516,
+        "height": 291
+      },
+      "prompt": "Isolate the existing bar counter with transparent surroundings and 24 px bleed. Preserve its exact perspective and silhouette."
+    }
+  },
+  "slots": {
+    "wall": {
+      "x": 0,
+      "y": 0,
+      "width": 1516,
+      "height": 562
+    },
+    "shelves": {
+      "x": 212,
+      "y": 85,
+      "width": 1107,
+      "height": 507
+    },
+    "counter": {
+      "x": 0,
+      "y": 492,
+      "width": 1516,
+      "height": 291
+    },
+    "floor": {
+      "x": 0,
+      "y": 562,
+      "width": 1516,
+      "height": 442
+    },
+    "seating": {
+      "x": 0,
+      "y": 602,
+      "width": 1516,
+      "height": 402
+    }
+  },
+  "shelfRows": [
+    216,
+    356,
+    472
+  ],
+  "seatAnchors": [
+    {
+      "x": 197,
+      "y": 683
+    },
+    {
+      "x": 591,
+      "y": 683
+    },
+    {
+      "x": 955,
+      "y": 683
+    },
+    {
+      "x": 1319,
+      "y": 683
+    }
+  ],
+  "bartenderAnchor": null,
+  "windowCutouts": [],
+  "review": {
+    "windowCutouts": "manual-required",
+    "architectureInpaint": "required",
+    "alphaEdges": "manual-review",
+    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone."
+  }
+}

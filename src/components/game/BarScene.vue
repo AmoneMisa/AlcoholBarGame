@@ -24,9 +24,11 @@ import Glyph from '../ui/Glyph.vue';
 import { INTERIORS, shelfStyleFor } from '../../data/cosmetics/bars';
 import { liteGraphics } from '../../ui/graphics';
 import { mobileArtwork } from '../../domain/optimizedArtwork';
-import { sceneLayout } from '../../data/cosmetics/barLines';
+import { projectSceneGeometry, sceneLayout } from '../../data/cosmetics/barLines';
+import { modularSceneFor } from '../../data/cosmetics/modularScenes';
 import { sceneMotionPlaying } from '../../ui/sceneMotion';
 import SceneAtmosphere from './SceneAtmosphere.vue';
+import ModularBarBackdrop from './ModularBarBackdrop.vue';
 
 const game = useGameStore();
 const barLayout = useBarLayoutStore();
@@ -58,6 +60,7 @@ const glassTarget = ref<HTMLElement>();
 const sceneRef = ref<HTMLElement>();
 const sceneBox = ref({ width: 0, height: 0 });
 const animateScene = computed(() => sceneMotionPlaying.value && props.active && !props.preview && !props.capture);
+const modularScene = computed(() => modularSceneFor(game.decor.interior));
 const sceneBackgroundUrl = computed(() => {
   // Pick the light background on narrow screens even when device hints select Full.
   // Use viewport width until ResizeObserver has measured the scene, avoiding an initial full-size request.
@@ -65,9 +68,11 @@ const sceneBackgroundUrl = computed(() => {
   if (props.capture || props.preview || (!liteGraphics.value && width > 900)) return game.barBackground;
   return mobileArtwork(game.barBackground);
 });
-const sceneInteriorStyle = computed(() => ({ ...game.barInteriorStyle,
-  backgroundImage: game.barInteriorStyle.backgroundImage.replace(game.barBackground, sceneBackgroundUrl.value)
-}));
+const sceneInteriorStyle = computed(() => modularScene.value
+  ? { backgroundImage: 'none', backgroundColor: '#070a10' }
+  : ({ ...game.barInteriorStyle,
+    backgroundImage: game.barInteriorStyle.backgroundImage.replace(game.barBackground, sceneBackgroundUrl.value)
+  }));
 const sceneObserver = typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(() => measureScene());
 function measureScene() {
   const element = sceneRef.value;
@@ -76,6 +81,8 @@ function measureScene() {
 const layout = computed(() => {
   const { width, height } = sceneBox.value;
   if (!width || !height) return undefined;
+  const modular = modularScene.value;
+  if (modular) return projectSceneGeometry(modular.geometry, width, height, modular.positionY);
   const interior = INTERIORS.find((item) => item.id === game.decor.interior) ?? INTERIORS[0];
   const position = /(\d+)%\s*$/.exec(interior.position)?.[1];
   return sceneLayout(interior.id, width, height, position ? Number(position) / 100 : .5);
@@ -524,9 +531,10 @@ onBeforeUnmount(() => {
     <div v-if="!preview && !capture && game.ashtrays.dirty" class="scene-info-dock">
       <button type="button" class="clean-ashtrays" @click="game.cleanAshtrays()"><UiIcon name="brush" /> Clean {{ game.ashtrays.dirty }}</button>
     </div>
-  <section ref="sceneRef" class="bar-scene" :class="[{ 'scene-animated': animateScene, 'scene-inactive': !active, 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack && !preview, 'is-preview': preview },captureClasses]" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[sceneInteriorStyle, sceneVars]">
-    <SceneAtmosphere v-if="animateScene" :interior="game.decor.interior" :width="sceneBox.width" :height="sceneBox.height" :background-source="sceneBackgroundUrl" />
-    <div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div>
+  <section ref="sceneRef" class="bar-scene" :class="[{ 'scene-animated': animateScene, 'scene-inactive': !active, 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack && !preview, 'is-preview': preview, 'has-modular-backdrop': !!modularScene },captureClasses]" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[sceneInteriorStyle, sceneVars]">
+    <ModularBarBackdrop v-if="modularScene" :scene="modularScene" :width="sceneBox.width" :height="sceneBox.height" :background-source="sceneBackgroundUrl" :wall="game.decor.wall" :counter="game.decor.counter" :counter-color="game.decor.counterColor" :shelf="shelfStyleFor(game.decor)" :shelf-preset="game.decor.shelfPreset ?? 'classic-cocktails'" :window-backdrop="game.decor.windowBackdrop ?? 'skyline'" :lighting="game.decor.lighting" :highlight-strength="game.decor.highlightStrength" :animated="animateScene" />
+    <SceneAtmosphere v-else-if="animateScene" :interior="game.decor.interior" :width="sceneBox.width" :height="sceneBox.height" :background-source="sceneBackgroundUrl" />
+    <template v-if="!modularScene"><div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div></template>
     <div v-if="preview" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
       <small v-if="shelfRows.length && !preview" class="pshelf-hint" :style="{ left: shelfRows[0]!.style.left, top: `calc(${shelfRows[0]!.style.top} - 18px)` }">Use the arrows to browse a shelf · pull a bottle down to the glass</small>
       <div v-for="row in shelfRows" :key="row.id" class="pshelf-row" :style="row.style">

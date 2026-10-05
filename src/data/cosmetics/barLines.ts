@@ -41,9 +41,8 @@ export const SCENES: Record<string, SceneGeometry> = {
   riad: wide({ back: .525, seat: .665, stools: [.14, .27, .42, .58, .73, .87], shelf: { x0: .26, x1: .78, planks: [.30, .38, .46] } })
 };
 
-// Maps the painted geometry onto a scene drawn with `background-size: cover` at vertical position `positionY` (0–1).
-export function sceneLayout(interior: string, sceneWidth: number, sceneHeight: number, positionY: number) {
-  const scene = SCENES[interior] ?? SCENES.velvet!;
+// Maps scene-space geometry onto a viewport using the same cover crop as the painted artwork.
+export function projectSceneGeometry(scene: SceneGeometry, sceneWidth: number, sceneHeight: number, positionY: number) {
   const scale = Math.max(sceneWidth / scene.width, sceneHeight / scene.height);
   const drawnWidth = scene.width * scale;
   const drawnHeight = scene.height * scale;
@@ -54,8 +53,6 @@ export function sceneLayout(interior: string, sceneWidth: number, sceneHeight: n
   const margin = 10;
   let left = Math.max(margin, x(scene.shelf.x0));
   let right = Math.min(sceneWidth - margin, x(scene.shelf.x1));
-  // Keep the painted shelf's own width (rows scroll sideways); only when too little of it is in view
-  // (narrow phones, shelves at the edge of the painting) widen it around its centre.
   const minimum = Math.min(sceneWidth - margin * 2, 300);
   if (right - left < minimum) {
     const centre = Math.min(sceneWidth - margin - minimum / 2, Math.max(margin + minimum / 2, (left + right) / 2));
@@ -66,9 +63,13 @@ export function sceneLayout(interior: string, sceneWidth: number, sceneHeight: n
     drawnHeight,
     back: Math.round(y(scene.back)),
     bartenderX: scene.bartender === undefined ? undefined : Math.round(Math.min(sceneWidth - 60, Math.max(60, x(scene.bartender)))),
-    // No stools in view: the guest sits just below the counter front, torso above the bar top.
     seat: Math.min(sceneHeight, Math.round(y(scene.seat ?? scene.back + .16))),
-    stools: scene.stools.map(x).filter((value) => value > 40 && value < sceneWidth - 40),
+    stools: scene.stools.map((fraction) => Math.round(x(fraction))).filter((value) => value > 40 && value < sceneWidth - 40),
     shelf: { left: Math.round(left), right: Math.round(right), planks: scene.shelf.planks.map((fraction) => Math.round(y(fraction))) }
   };
+}
+
+// Legacy paintings still read their geometry from SCENES. Modular rooms own the same anchors in their scene definition.
+export function sceneLayout(interior: string, sceneWidth: number, sceneHeight: number, positionY: number) {
+  return projectSceneGeometry(SCENES[interior] ?? SCENES.velvet!, sceneWidth, sceneHeight, positionY);
 }

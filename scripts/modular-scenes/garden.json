@@ -1,0 +1,86 @@
+{
+  "id": "garden",
+  "source": "../../../public/assets/bar/backgrounds/botanical-room.webp",
+  "outputDir": "../../../public/assets/bar/modular/garden",
+  "canvas": {
+    "width": 1672,
+    "height": 941
+  },
+  "status": "geometry-ready-art-review-required",
+  "geometrySource": "measured-gameplay",
+  "notes": [
+    "Measured from existing BarScene geometry.",
+    "Reference crops are authoring aids, not shippable clean modules.",
+    "Preserve camera/horizon/perspective.",
+    "Remove painted bottles from shelf furniture.",
+    "Inpaint occluded wall/floor before export."
+  ],
+  "modules": {
+    "architecture-reference": {
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1672,
+        "height": 941
+      },
+      "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces."
+    },
+    "shelf-reference": {
+      "crop": {
+        "x": 435,
+        "y": 127,
+        "width": 686,
+        "height": 438
+      },
+      "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware."
+    },
+    "counter-reference": {
+      "crop": {
+        "x": 0,
+        "y": 598,
+        "width": 1672,
+        "height": 311
+      },
+      "prompt": "Isolate existing counter with transparent surroundings and bleed."
+    }
+  },
+  "slots": {
+    "wall": {
+      "x": 0,
+      "y": 0,
+      "width": 1672,
+      "height": 663
+    },
+    "shelves": {
+      "x": 502,
+      "y": 127,
+      "width": 552,
+      "height": 438
+    },
+    "counter": {
+      "x": 0,
+      "y": 598,
+      "width": 1672,
+      "height": 311
+    },
+    "floor": {
+      "x": 0,
+      "y": 663,
+      "width": 1672,
+      "height": 278
+    }
+  },
+  "shelfRows": [
+    249,
+    348,
+    452
+  ],
+  "seatAnchors": [],
+  "bartenderAnchor": null,
+  "windowCutouts": [],
+  "review": {
+    "windowCutouts": "manual-required",
+    "architectureInpaint": "required",
+    "alphaEdges": "manual-review"
+  }
+}

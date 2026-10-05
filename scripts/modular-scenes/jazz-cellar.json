@@ -1,0 +1,113 @@
+{
+  "id": "jazz-cellar",
+  "source": "../../../public/assets/bar/backgrounds/interior-jazz-cellar.webp",
+  "outputDir": "../../../public/assets/bar/modular/jazz-cellar",
+  "canvas": {
+    "width": 1232,
+    "height": 1232
+  },
+  "status": "geometry-ready-art-review-required",
+  "geometrySource": "measured-gameplay",
+  "notes": [
+    "Measured from existing BarScene geometry.",
+    "Reference crops are authoring aids, not shippable clean modules.",
+    "Preserve camera/horizon/perspective.",
+    "Remove painted bottles from shelf furniture.",
+    "Inpaint occluded wall/floor before export."
+  ],
+  "modules": {
+    "architecture-reference": {
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1232,
+        "height": 1232
+      },
+      "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces."
+    },
+    "shelf-reference": {
+      "crop": {
+        "x": 197,
+        "y": 333,
+        "width": 838,
+        "height": 487
+      },
+      "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware."
+    },
+    "counter-reference": {
+      "crop": {
+        "x": 0,
+        "y": 604,
+        "width": 1232,
+        "height": 357
+      },
+      "prompt": "Isolate existing counter with transparent surroundings and bleed."
+    }
+  },
+  "slots": {
+    "wall": {
+      "x": 0,
+      "y": 0,
+      "width": 1232,
+      "height": 690
+    },
+    "shelves": {
+      "x": 246,
+      "y": 333,
+      "width": 739,
+      "height": 487
+    },
+    "counter": {
+      "x": 0,
+      "y": 604,
+      "width": 1232,
+      "height": 357
+    },
+    "floor": {
+      "x": 0,
+      "y": 690,
+      "width": 1232,
+      "height": 542
+    },
+    "seating": {
+      "x": 0,
+      "y": 739,
+      "width": 1232,
+      "height": 493
+    }
+  },
+  "shelfRows": [
+    493,
+    579,
+    671
+  ],
+  "seatAnchors": [
+    {
+      "x": 172,
+      "y": 838
+    },
+    {
+      "x": 394,
+      "y": 838
+    },
+    {
+      "x": 616,
+      "y": 838
+    },
+    {
+      "x": 838,
+      "y": 838
+    },
+    {
+      "x": 1060,
+      "y": 838
+    }
+  ],
+  "bartenderAnchor": null,
+  "windowCutouts": [],
+  "review": {
+    "windowCutouts": "manual-required",
+    "architectureInpaint": "required",
+    "alphaEdges": "manual-review"
+  }
+}

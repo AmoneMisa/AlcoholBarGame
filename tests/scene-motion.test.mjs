@@ -1,10 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { canAnimateScene, sceneMotion } from '../src/ui/sceneMotion.ts';
 import { MOTION_LAYERS, MOTION_PAINTINGS, roomMotion, motionPaintingBox } from '../src/domain/sceneMotion.ts';
 import { roomWind } from '../src/domain/sceneMotion.ts';
 import { windCanvasSize, createWindRenderer } from '../src/ui/windRenderer.ts';
+import { modularSceneFor } from '../src/data/cosmetics/modularScenes.ts';
+import { projectSceneGeometry } from '../src/data/cosmetics/barLines.ts';
+import { SHELF_DECOR_PRESETS, shelfDecorPresetFor } from '../src/data/cosmetics/shelfDecor.ts';
+import { WINDOW_BACKDROPS, windowBackdropFor } from '../src/data/cosmetics/windowBackdrops.ts';
+import { INTERIORS } from '../src/data/cosmetics/bars.ts';
 
 test('wind stays in reviewed curtain and foliage regions, with geometry for mobile cropping', () => {
   for (const room of ['parisian','garden','beach']) {
@@ -79,5 +84,82 @@ test('every motion asset is a small transparent looping animated WebP, not a sta
     assert.equal(loop,0,'infinite loop');
     assert.equal(flags&0x12,0x12,'animation and alpha flags');
     assert.ok(width*height*frames*4 <= 3*1024*1024,'bounded decoded frame area');
+  }
+});
+
+
+test('Velvet owns modular art and geometry instead of reading positions from one painted room', () => {
+  const scene=modularSceneFor('velvet');
+  assert.ok(scene);
+  assert.equal(scene.layers[0]?.role,'architecture');
+  assert.equal(scene.layers.filter(layer=>layer.role==='shelves').length,2);
+  assert.equal(scene.layers.filter(layer=>layer.role==='seating').length,5);
+  assert.ok(scene.layers.some(layer=>layer.role==='counter'));
+  assert.ok(scene.layers.every(layer=>layer.asset?.startsWith('/assets/bar/modular/velvet/')));
+  const projected=projectSceneGeometry(scene.geometry,1774,887,scene.positionY);
+  assert.equal(projected.back,559);
+  assert.equal(projected.seat,674);
+  assert.deepEqual(projected.stools,[177,532,887,1242,1597]);
+  assert.deepEqual(projected.shelf.planks,[195,310,426]);
+  assert.equal(projected.shelf.left,213);
+  assert.equal(projected.shelf.right,727);
+  assert.equal(modularSceneFor('garden'),undefined);
+});
+
+
+test('shelf decor presets are bounded, deterministic and cover the requested visual themes', () => {
+  const ids=SHELF_DECOR_PRESETS.map(preset=>preset.id);
+  for(const required of ['luxury-whiskey','wine-cellar','budget-mix','fantasy-elixirs','cyberpunk-liquids']) assert.ok(ids.includes(required));
+  for(const preset of SHELF_DECOR_PRESETS){
+    assert.ok(preset.items.length>=9,preset.id);
+    for(const item of preset.items){
+      assert.ok(item.cell>=0 && item.cell<24,`${preset.id}: atlas cell`);
+      assert.ok(item.x>0 && item.x<1,`${preset.id}: x`);
+      assert.ok(item.row>=0 && item.row<=2,`${preset.id}: row`);
+      assert.ok((item.scale??1)>.5 && (item.scale??1)<1.5,`${preset.id}: scale`);
+    }
+  }
+  assert.ok(!ids.includes('auto'));
+  assert.equal(shelfDecorPresetFor('luxury-whiskey').id,'luxury-whiskey');
+  assert.equal(shelfDecorPresetFor('cyberpunk-liquids').id,'cyberpunk-liquids');
+});
+
+test('Velvet exposes shelf decor bays between furniture and foreground layers', () => {
+  const scene=modularSceneFor('velvet');
+  assert.ok(scene?.shelfDecor);
+  assert.equal(scene.shelfDecor.bays.length,2);
+  assert.equal(scene.shelfDecor.z,15);
+  for(const bay of scene.shelfDecor.bays){
+    assert.equal(bay.rowBaselines.length,3);
+    assert.ok(bay.rect.x>=0 && bay.rect.y>=0 && bay.rect.x+bay.rect.width<=1 && bay.rect.y+bay.rect.height<=1);
+  }
+});
+
+
+test('window backdrops are explicit collection pieces, never auto-derived from an interior', () => {
+  const ids=WINDOW_BACKDROPS.map(item=>item.id);
+  assert.ok(!ids.includes('auto'));
+  for(const required of ['skyline','rooftop','cyberpunk','winter','beach','marina','desert','tropical','inferno-penthouse']) assert.ok(ids.includes(required));
+  assert.ok(WINDOW_BACKDROPS.every(item=>item.asset.startsWith('/assets/bar/backgrounds/')));
+  assert.equal(windowBackdropFor('skyline').label,'Skyline lounge view');
+  assert.equal(windowBackdropFor('cyberpunk').asset,'/assets/bar/backgrounds/interior-cyberpunk.webp');
+  const scene=modularSceneFor('velvet');
+  assert.equal(scene?.exterior?.enabled,true);
+});
+
+
+test('every catalog interior has a modular split manifest', () => {
+  const ids=INTERIORS.map(item=>item.id);
+  assert.equal(new Set(ids).size,ids.length);
+  for(const id of ids){
+    const url=new URL(`../scripts/modular-scenes/${id}.json`,import.meta.url);
+    assert.ok(existsSync(url),`missing modular manifest: ${id}`);
+    const manifest=JSON.parse(readFileSync(url,'utf8'));
+    assert.equal(manifest.id,id);
+    assert.ok(manifest.source?.includes('/assets/bar/backgrounds/'),`${id}: source`);
+    assert.ok(manifest.modules?.['architecture-reference'],`${id}: architecture`);
+    assert.ok(manifest.modules?.['shelf-reference'],`${id}: shelf`);
+    assert.ok(manifest.modules?.['counter-reference'],`${id}: counter`);
+    assert.ok(manifest.status==='geometry-ready-art-review-required'||manifest.status==='geometry-review-required',`${id}: status`);
   }
 });

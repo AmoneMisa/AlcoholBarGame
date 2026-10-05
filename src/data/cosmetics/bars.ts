@@ -3,6 +3,8 @@ import { REFERENCE_COSTUME_IDS } from './bartenderCostumes';
 import { THEMED_INTERIORS } from './themedBars';
 import { GAME_THEME_SHELVES } from './gameThemeExpansion';
 import { restrictedTheme } from './themeDistribution';
+import { SHELF_DECOR_PRESET_IDS, type ShelfDecorPresetId } from './shelfDecor';
+import { WINDOW_BACKDROP_IDS, type WindowBackdropId } from './windowBackdrops';
 
 // Themed backgrounds are priced from a cheap first tier up to the big ones, instead of one flat price.
 const THEMED_PRICES: Record<string, number> = {
@@ -96,7 +98,7 @@ export const OUTFIT_COLORS = ['natural','black','white','red','blue','green','pl
 export const BARTENDER_OUTFITS = ['vest','shirt','apron','biker','tee-skirt','suit-jeans','bunny','kimono','baggy-tee','streetwear','special-gala','special-cyberpunk','special-steampunk','special-post-apocalypse','special-historical','special-fantasy','special-masquerade', ...REFERENCE_COSTUME_IDS] as const;
 export const BAR_PROFILE_OPTIONS = {
   wall:WALLS,counter:COUNTER_MATERIALS,counterColor:COUNTER_COLORS,counterSize:COUNTER_SIZES,
-  lighting:HIGHLIGHTS,highlightStrength:HIGHLIGHT_STRENGTHS,shelf:SHELF_STYLES,bartenderCharacter:['noa','leo'] as const,
+  lighting:HIGHLIGHTS,highlightStrength:HIGHLIGHT_STRENGTHS,shelf:SHELF_STYLES,shelfPreset:SHELF_DECOR_PRESET_IDS,windowBackdrop:WINDOW_BACKDROP_IDS,bartenderCharacter:['noa','leo'] as const,
   bartender:BARTENDER_OUTFITS,interior:INTERIORS.map((item) => item.id),face:FACE_SHAPES,
   hairStyle:HAIR_STYLES,hairColor:HAIR_COLORS,bodyShape:BODY_SHAPES,skinDetail:SKIN_DETAILS,skinTone:SKIN_TONES,tanLevel:TAN_LEVELS,
   bust:BUST_OPTIONS,pose:POSES,eyeShape:EYE_SHAPES,browShape:BROW_SHAPES,noseShape:NOSE_SHAPES,lipShape:LIP_SHAPES,
@@ -139,12 +141,16 @@ export interface BarProfile {
   outfitColor: typeof OUTFIT_COLORS[number];
   // Back-bar cabinet; missing or 'auto' follows the background.
   shelf?: typeof SHELF_STYLES[number];
+  // Decorative bottle population rendered behind gameplay bottles.
+  shelfPreset?: ShelfDecorPresetId;
+  // Explicit collection-owned view rendered behind transparent window panes.
+  windowBackdrop?: WindowBackdropId;
 }
 
 const femaleStyle = { outfitColor:'natural',face:'soft',hairStyle:'updo',hairColor:'espresso',bodyShape:'curvy',skinDetail:'clean',skinTone:'fair',tanLevel:'none',bust:'balanced',pose:'confident',eyeShape:'almond',browShape:'soft-arch',noseShape:'soft',lipShape:'full',cheekShape:'high',eyeColor:'hazel',eyeliner:'winged',eyeshadow:'bronze',lipColor:'rose',blush:'soft',facialHair:'clean' } as const;
 const maleStyle = { outfitColor:'natural',face:'angular',hairStyle:'slick',hairColor:'chestnut',bodyShape:'muscular',skinDetail:'clean',skinTone:'fair',tanLevel:'none',bust:'balanced',pose:'neutral',eyeShape:'hooded',browShape:'bold',noseShape:'straight',lipShape:'balanced',cheekShape:'defined',eyeColor:'brown',eyeliner:'none',eyeshadow:'none',lipColor:'bare',blush:'none',facialHair:'short-beard' } as const;
 export const DEFAULT_BARS: Record<RegionId, BarProfile> = {
-  'new-york': { name:'The Velvet Hour',wall:'neon',counter:'classic',counterColor:'ruby',counterSize:'standard',lighting:'amber',highlightStrength:'medium',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'vest',interior:'velvet',...femaleStyle },
+  'new-york': { name:'The Velvet Hour',wall:'neon',counter:'classic',counterColor:'ruby',counterSize:'standard',lighting:'amber',highlightStrength:'medium',shelfPreset:'luxury-whiskey',windowBackdrop:'skyline',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'vest',interior:'velvet',...femaleStyle },
   london: { name:'Juniper & Oak',wall:'emerald',counter:'walnut',counterColor:'espresso',counterSize:'grand',lighting:'amber',highlightStrength:'soft',bartenderCharacter:'leo',bartenderNickname:'Leo',bartender:'shirt',interior:'speakeasy',...maleStyle },
   berlin: { name:'Midnight Studio',wall:'charcoal',counter:'steel',counterColor:'smoke',counterSize:'slim',lighting:'blue',highlightStrength:'bright',bartenderCharacter:'noa',bartenderNickname:'Noa',bartender:'apron',interior:'loft',...femaleStyle,hairColor:'black',pose:'confident' },
   tashkent: { name:'Silk Road Social',wall:'terracotta',counter:'brass',counterColor:'gold',counterSize:'standard',lighting:'amber',highlightStrength:'medium',bartenderCharacter:'leo',bartenderNickname:'Leo',bartender:'vest',interior:'riad',...maleStyle,hairColor:'black' },
