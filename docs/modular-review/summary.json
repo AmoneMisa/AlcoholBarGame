@@ -1,0 +1,805 @@
+[
+  {
+    "scene": "alan-wake",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "allods",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "among-us",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "review-all-edges",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "art-deco",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "seating"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "review-all-edges",
+      "seating": "ok"
+    }
+  },
+  {
+    "scene": "assassins-creed",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "review-soft-mask",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "baldurs-gate-3",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "batman",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "beach",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "ok",
+      "seating": "ok"
+    }
+  },
+  {
+    "scene": "black-desert",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "borderlands",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "review-all-edges",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "control",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "review-all-edges",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "cs-2",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "cyberpunk",
+    "kind": "measured",
+    "promoted": [
+      "seating"
+    ],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "review-all-edges",
+      "seating": "ok"
+    }
+  },
+  {
+    "scene": "cyberpunk-2077",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "darksiders-3",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "review-all-edges",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "death-stranding",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "desert",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "ok",
+      "seating": "ok"
+    }
+  },
+  {
+    "scene": "detroit",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "devil-may-cry",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "review-too-much"
+    }
+  },
+  {
+    "scene": "diablo-4",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "divinity-original-sin-2",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "elden-ring",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "fairy",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "fairytale",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "review-all-edges",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "garden",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "ok",
+      "seating": "missing-reference"
+    }
+  },
+  {
+    "scene": "gta",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "gta-3",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "gta-5",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "gta-sa",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "harry-potter",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "heroes-3",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "inferno-penthouse",
+    "kind": "measured",
+    "promoted": [
+      "shelf",
+      "seating"
+    ],
+    "roles": {
+      "counter": "review-too-much",
+      "shelf": "ok",
+      "seating": "ok"
+    }
+  },
+  {
+    "scene": "izakaya",
+    "kind": "measured",
+    "promoted": [
+      "shelf"
+    ],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "ok",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "jazz-cellar",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "ok",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "library",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "ok",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "lineage-2",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "loft",
+    "kind": "measured",
+    "promoted": [
+      "shelf",
+      "seating"
+    ],
+    "roles": {
+      "counter": "review-soft-mask",
+      "shelf": "ok",
+      "seating": "ok"
+    }
+  },
+  {
+    "scene": "lost-ark",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "marina",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "seating"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "review-all-edges",
+      "seating": "ok"
+    }
+  },
+  {
+    "scene": "mass-effect",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "review-all-edges",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "max-payne",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "minecraft",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "review-all-edges",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "neighbours-from-hell",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "nfs-carbon",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "nfs-most-wanted",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "nfs-underground",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "review-all-edges",
+      "seating": "review-soft-mask"
+    }
+  },
+  {
+    "scene": "palace",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "ok",
+      "seating": "ok"
+    }
+  },
+  {
+    "scene": "palworld",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "review-all-edges",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "parisian",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "ok",
+      "seating": "ok"
+    }
+  },
+  {
+    "scene": "perfect-world",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "review-all-edges",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "quantum-break",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "repo",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "resident-evil",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "riad",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "ok",
+      "seating": "ok"
+    }
+  },
+  {
+    "scene": "rooftop",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "ok",
+      "seating": "ok"
+    }
+  },
+  {
+    "scene": "shadow-tomb-raider",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "silent-hill",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "skyline",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "ok",
+      "seating": "missing-reference"
+    }
+  },
+  {
+    "scene": "skyrim",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "review-all-edges",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "sleeping-dogs",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "speakeasy",
+    "kind": "measured",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "review-all-edges",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "stellar-blade",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "tropical",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "ok",
+      "seating": "review-too-much"
+    }
+  },
+  {
+    "scene": "tropico-6",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "review-all-edges",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "underground",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "review-all-edges",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "underwater",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "review-all-edges",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "velvet",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "ok",
+      "seating": "ok"
+    }
+  },
+  {
+    "scene": "walking-dead-s3",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "candidate",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "warcraft-3",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "candidate",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "watch-dogs",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "review-all-edges",
+      "seating": "review-all-edges"
+    }
+  },
+  {
+    "scene": "winter",
+    "kind": "measured",
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
+    "roles": {
+      "counter": "ok",
+      "shelf": "ok",
+      "seating": "ok"
+    }
+  },
+  {
+    "scene": "witcher-3",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "review-all-edges",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "wolf-among-us",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "candidate",
+      "shelf": "review-all-edges",
+      "seating": "candidate"
+    }
+  },
+  {
+    "scene": "worms",
+    "kind": "candidate",
+    "promoted": [],
+    "roles": {
+      "counter": "review-all-edges",
+      "shelf": "review-all-edges",
+      "seating": "review-all-edges"
+    }
+  }
+]
