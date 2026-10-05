@@ -48,7 +48,10 @@ def module_crop(manifest,role,source_size):
 def build(manifest_path,manifest,role,spec):
     scene_id=manifest['id']
     base=MOD/scene_id
-    source_path=(manifest_path.parent/manifest['source']).resolve()
+    source_value=manifest['source']
+    if source_value.startswith('../../../public/'):
+        source_value='../../public/'+source_value[len('../../../public/'):]
+    source_path=(manifest_path.parent/source_value).resolve()
     source=Image.open(source_path).convert('RGBA')
     image=source.crop(module_crop(manifest,role,source.size))
     w,h=image.size
