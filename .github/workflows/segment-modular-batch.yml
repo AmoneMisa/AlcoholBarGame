@@ -49,6 +49,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No generated changes"
           else
-            git commit -m "[auto-segment] Segment first measured modular batch"
+            git commit -m "[auto-segment] Segment measured modular scenes"
             git push origin HEAD:feat/modular-velvet-scene
           fi

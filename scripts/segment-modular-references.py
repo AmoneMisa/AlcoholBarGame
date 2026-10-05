@@ -7,7 +7,8 @@ from rembg import remove, new_session
 ROOT=Path(__file__).resolve().parents[1]
 DEFAULT_IDS=[
   'garden','inferno-penthouse','speakeasy','jazz-cellar','art-deco','library',
-  'palace','izakaya','parisian','loft','riad'
+  'palace','izakaya','parisian','loft','riad',
+  'velvet','skyline','rooftop','cyberpunk','winter','beach','marina','desert','tropical'
 ]
 ROLES=['counter','shelf','seating']
 
@@ -43,8 +44,13 @@ def process(scene_id,session):
             cut=cut.convert('RGBA')
         metrics=alpha_metrics(cut)
         status='ok'
+        x0,y0,x1,y1=metrics['bbox'] or [0,0,0,0]
+        touches_all=(x0<=1 and y0<=1 and x1>=cut.width-1 and y1>=cut.height-1)
         if metrics['coverage']<0.03: status='reject-empty'
         elif metrics['coverage']>0.96: status='reject-full'
+        elif metrics['coverage']>0.85: status='review-too-much'
+        elif touches_all: status='review-all-edges'
+        elif metrics['coverage']>0.45 and metrics['solidCoverage']<0.01: status='review-soft-mask'
         metrics['status']=status
         report['roles'][role]=metrics
         cut.save(out/f'{role}-cut.webp','WEBP',lossless=True,method=6)
