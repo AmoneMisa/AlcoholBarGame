@@ -1,0 +1,117 @@
+{
+  "count": 7,
+  "scenes": [
+    {
+      "id": "beach",
+      "source": "../../../public/assets/bar/backgrounds/interior-beach.webp",
+      "output": "public/assets/bar/modular/beach/architecture.webp",
+      "mask": "public/assets/bar/modular/beach/architecture-mask.png",
+      "windowCutouts": [],
+      "prompt": "Create a clean architecture plate from this existing background. Remove counter, stools/chairs, loose foreground decor and back-bar furniture; reconstruct hidden wall and floor. Preserve fixed architecture and source perspective.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+      ]
+    },
+    {
+      "id": "desert",
+      "source": "../../../public/assets/bar/backgrounds/interior-desert.webp",
+      "output": "public/assets/bar/modular/desert/architecture.webp",
+      "mask": "public/assets/bar/modular/desert/architecture-mask.png",
+      "windowCutouts": [],
+      "prompt": "Create a clean architecture plate from this existing background. Remove counter, stools/chairs, loose foreground decor and back-bar furniture; reconstruct hidden wall and floor. Preserve fixed architecture and source perspective.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+      ]
+    },
+    {
+      "id": "palace",
+      "source": "../../../public/assets/bar/backgrounds/interior-palace.webp",
+      "output": "public/assets/bar/modular/palace/architecture.webp",
+      "mask": "public/assets/bar/modular/palace/architecture-mask.png",
+      "windowCutouts": [],
+      "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+      ]
+    },
+    {
+      "id": "parisian",
+      "source": "../../../public/assets/bar/backgrounds/interior-parisian.webp",
+      "output": "public/assets/bar/modular/parisian/architecture.webp",
+      "mask": "public/assets/bar/modular/parisian/architecture-mask.png",
+      "windowCutouts": [],
+      "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+      ]
+    },
+    {
+      "id": "riad",
+      "source": "../../../public/assets/bar/backgrounds/interior-riad.webp",
+      "output": "public/assets/bar/modular/riad/architecture.webp",
+      "mask": "public/assets/bar/modular/riad/architecture-mask.png",
+      "windowCutouts": [],
+      "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+      ]
+    },
+    {
+      "id": "rooftop",
+      "source": "../../../public/assets/bar/backgrounds/interior-rooftop.webp",
+      "output": "public/assets/bar/modular/rooftop/architecture.webp",
+      "mask": "public/assets/bar/modular/rooftop/architecture-mask.png",
+      "windowCutouts": [],
+      "prompt": "Create a clean architecture plate from this existing background. Remove counter, stools/chairs, loose foreground decor and back-bar furniture; reconstruct hidden wall and floor. Preserve fixed architecture and source perspective.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+      ]
+    },
+    {
+      "id": "winter",
+      "source": "../../../public/assets/bar/backgrounds/interior-winter.webp",
+      "output": "public/assets/bar/modular/winter/architecture.webp",
+      "mask": "public/assets/bar/modular/winter/architecture-mask.png",
+      "windowCutouts": [],
+      "prompt": "Create a clean architecture plate from this existing background. Remove counter, stools/chairs, loose foreground decor and back-bar furniture; reconstruct hidden wall and floor. Preserve fixed architecture and source perspective.",
+      "constraints": [
+        "Use only the existing source background as visual ground truth.",
+        "Remove counter, seating, loose foreground decor and back-bar furniture.",
+        "Reconstruct only surfaces hidden by removed furniture; do not redesign the room.",
+        "Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.",
+        "Do not bake bottle decor into shelves; bottles are rendered separately.",
+        "Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent."
+      ]
+    }
+  ]
+}

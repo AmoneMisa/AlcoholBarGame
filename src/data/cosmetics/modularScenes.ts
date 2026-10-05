@@ -20,6 +20,7 @@ export interface ModularSceneLayer {
 
 export interface ModularSceneDefinition {
   id: string;
+  status: 'authoring' | 'production';
   canvas: { width:number; height:number };
   positionY: number;
   geometry: SceneGeometry;
@@ -57,6 +58,7 @@ const decorBayRight = mirrorShelfBay(decorBayLeft);
 export const MODULAR_SCENES: Readonly<Record<string,ModularSceneDefinition>> = {
   velvet:defineModularScene({
     id:'velvet',
+    status:'production',
     canvas:{width:1774,height:887},
     positionY:.5,
     geometry:VELVET_GEOMETRY,
@@ -94,7 +96,10 @@ export const MODULAR_SCENES: Readonly<Record<string,ModularSceneDefinition>> = {
   })
 };
 
-export const modularSceneFor = (interior:string) => MODULAR_SCENES[interior];
+export const modularSceneFor = (interior:string) => {
+  const scene=MODULAR_SCENES[interior];
+  return scene?.status==='production' ? scene : undefined;
+};
 
 export function layerAsset(layer:ModularSceneLayer, selections:Partial<Record<ModularSelectionKey,string>>, fallback?:string) {
   if (layer.id==='architecture') return layer.asset ?? fallback;

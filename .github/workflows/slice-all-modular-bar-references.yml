@@ -4,7 +4,16 @@ on:
   push:
     branches:
       - feat/modular-velvet-scene
+    paths:
+      - scripts/modular-scenes/**
+      - scripts/modular-scene-plan.mjs
+      - public/assets/bar/backgrounds/**
+      - .github/workflows/slice-all-modular-bar-references.yml
   workflow_dispatch:
+
+concurrency:
+  group: modular-scene-slice-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   slice:
@@ -53,4 +62,6 @@ jobs:
             exit 0
           fi
           git commit -m "[scene-slice] Generate reference cuts for all bar backgrounds"
+          git fetch origin feat/modular-velvet-scene
+          git rebase origin/feat/modular-velvet-scene
           git push origin HEAD:feat/modular-velvet-scene

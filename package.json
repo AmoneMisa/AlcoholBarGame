@@ -18,7 +18,11 @@
     "db:export-cocktails": "node --import ./tests/register.mjs scripts/export-cocktails.mjs",
     "docker:clean": "powershell -ExecutionPolicy Bypass -File scripts/docker-clean.ps1",
     "bar:scene-plan": "node scripts/modular-scene-plan.mjs",
-    "bar:scene-plan-all": "node scripts/modular-scene-plan-all.mjs"
+    "bar:scene-plan-all": "node scripts/modular-scene-plan-all.mjs",
+    "bar:readiness": "node scripts/check-modular-readiness.mjs",
+    "bar:architecture-queue": "node scripts/build-architecture-queue.mjs",
+    "bar:architecture-masks": "python scripts/build-architecture-masks.py",
+    "bar:furniture-cleanup-queue": "node scripts/build-furniture-cleanup-queue.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^6.0.9",

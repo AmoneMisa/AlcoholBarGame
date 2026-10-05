@@ -1,0 +1,103 @@
+{
+  "count": 7,
+  "scenes": [
+    {
+      "scene": "beach",
+      "mask": "public/assets/bar/modular/beach/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 764,
+        "height": 508
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "desert",
+      "mask": "public/assets/bar/modular/desert/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 623,
+        "height": 623
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "palace",
+      "mask": "public/assets/bar/modular/palace/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 623,
+        "height": 623
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "parisian",
+      "mask": "public/assets/bar/modular/parisian/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 764,
+        "height": 508
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "riad",
+      "mask": "public/assets/bar/modular/riad/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 764,
+        "height": 508
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "rooftop",
+      "mask": "public/assets/bar/modular/rooftop/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 764,
+        "height": 508
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "winter",
+      "mask": "public/assets/bar/modular/winter/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 623,
+        "height": 623
+      },
+      "windowCutouts": []
+    }
+  ]
+}
