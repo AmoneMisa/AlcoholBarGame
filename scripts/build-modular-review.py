@@ -60,8 +60,10 @@ for base in sorted(p for p in MOD.iterdir() if p.is_dir()):
             mask_out.unlink(missing_ok=True)
             continue
 
-        src=base/'auto'/f'{role}-cut.webp'
-        mask=base/'auto'/f'{role}-mask.png'
+        manual_src=base/'manual'/f'{role}-cut.webp'
+        manual_mask=base/'manual'/f'{role}-mask.png'
+        src=manual_src if role in manual_approved and manual_src.exists() else base/'auto'/f'{role}-cut.webp'
+        mask=manual_mask if role in manual_approved and manual_mask.exists() else base/'auto'/f'{role}-mask.png'
         if src.exists():
             Image.open(src).save(webp,'WEBP',lossless=True,method=6)
             promoted.append(role)
