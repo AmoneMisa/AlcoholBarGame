@@ -76,11 +76,51 @@
   ],
   "seatAnchors": [],
   "bartenderAnchor": null,
-  "windowCutouts": [],
   "review": {
-    "windowCutouts": "manual-required",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
     "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone."
-  }
+  },
+  "requiredRoles": [
+    "counter",
+    "shelf"
+  ],
+  "windowCutoutsNormalized": [
+    {
+      "type": "rect",
+      "x": 0.137,
+      "y": 0.012,
+      "width": 0.108,
+      "height": 0.485
+    },
+    {
+      "type": "rect",
+      "x": 0.257,
+      "y": 0.012,
+      "width": 0.118,
+      "height": 0.485
+    },
+    {
+      "type": "rect",
+      "x": 0.386,
+      "y": 0.012,
+      "width": 0.113,
+      "height": 0.485
+    },
+    {
+      "type": "rect",
+      "x": 0.511,
+      "y": 0.012,
+      "width": 0.113,
+      "height": 0.485
+    },
+    {
+      "type": "rect",
+      "x": 0.636,
+      "y": 0.012,
+      "width": 0.055,
+      "height": 0.485
+    }
+  ]
 }
