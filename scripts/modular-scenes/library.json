@@ -104,10 +104,36 @@
     }
   ],
   "bartenderAnchor": null,
-  "windowCutouts": [],
   "review": {
-    "windowCutouts": "manual-required",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review"
-  }
+  },
+  "windowCutoutsNormalized": [
+    {
+      "type": "polygon",
+      "points": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 0.083,
+          "y": 0
+        },
+        {
+          "x": 0.107,
+          "y": 0.052
+        },
+        {
+          "x": 0.107,
+          "y": 0.364
+        },
+        {
+          "x": 0,
+          "y": 0.364
+        }
+      ]
+    }
+  ]
 }
