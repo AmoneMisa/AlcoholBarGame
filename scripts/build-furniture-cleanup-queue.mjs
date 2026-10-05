@@ -19,7 +19,8 @@ const roles={
 const queue=[];
 for(const item of summary){
   if(!item.isolatedFurnitureReady||item.cleanFurnitureReady) continue;
-  for(const [role,contract] of Object.entries(roles)){
+  for(const role of item.requiredRoles ?? Object.keys(roles)){
+    const contract=roles[role];
     queue.push({
       scene:item.scene,
       role,
