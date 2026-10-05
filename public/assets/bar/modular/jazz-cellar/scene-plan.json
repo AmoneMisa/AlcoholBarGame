@@ -124,11 +124,16 @@
     "shelf",
     "seating"
   ],
-  "manualApprovedRoles": [],
+  "manualApprovedRoles": [
+    "seating"
+  ],
   "review": {
     "windowCutouts": "not-applicable",
     "architectureInpaint": "required",
-    "alphaEdges": "manual-review"
+    "alphaEdges": "manual-review",
+    "manualApprovedRoles": [
+      "seating"
+    ]
   },
   "notes": [
     "Measured from existing BarScene geometry.",

@@ -120,12 +120,19 @@
     "shelf",
     "seating"
   ],
-  "manualApprovedRoles": [],
+  "manualApprovedRoles": [
+    "counter",
+    "shelf"
+  ],
   "review": {
     "windowCutouts": "not-applicable",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
-    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone."
+    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
+    "manualApprovedRoles": [
+      "counter",
+      "shelf"
+    ]
   },
   "notes": [
     "Generated from the measured gameplay geometry already used by BarScene.",
