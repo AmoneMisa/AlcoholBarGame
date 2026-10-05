@@ -43,6 +43,7 @@ for base in sorted(p for p in MOD.iterdir() if p.is_dir()):
     plan_path=base/'scene-plan.json'
     plan=json.loads(plan_path.read_text()) if plan_path.exists() else {}
     required_roles=tuple(plan.get('requiredRoles',ROLES))
+    manual_approved=set(plan.get('manualApprovedRoles',[]))
     review=base/'review-ready'
     review.mkdir(exist_ok=True)
     promoted=[]
@@ -51,7 +52,7 @@ for base in sorted(p for p in MOD.iterdir() if p.is_dir()):
     # whenever a role stops being measured+ok or a scene falls back to candidate.
     for role in ROLES:
         item=data.get('roles',{}).get(role,{})
-        approved=kind=='measured' and item.get('status')=='ok'
+        approved=kind=='measured' and (item.get('status')=='ok' or role in manual_approved)
         webp=review/f'{role}.webp'
         mask_out=review/f'{role}-mask.png'
         if not approved:
@@ -73,7 +74,7 @@ for base in sorted(p for p in MOD.iterdir() if p.is_dir()):
 
     statuses={k:v.get('status') for k,v in data.get('roles',{}).items()}
     architecture_ready=(base/'architecture.webp').exists()
-    isolated_furniture_ready=kind=='measured' and all(statuses.get(role)=='ok' for role in required_roles)
+    isolated_furniture_ready=kind=='measured' and all(statuses.get(role)=='ok' or role in manual_approved for role in required_roles)
     clean_furniture=clean_furniture_ready(base,required_roles)
 
     sheet=Image.new('RGB',(1280,930),(15,15,19))
@@ -100,6 +101,7 @@ for base in sorted(p for p in MOD.iterdir() if p.is_dir()):
         'promoted':promoted,
         'roles':statuses,
         'requiredRoles':list(required_roles),
+        'manualApprovedRoles':sorted(manual_approved),
         'architectureReady':architecture_ready,
         'furnitureReady':isolated_furniture_ready,
         'isolatedFurnitureReady':isolated_furniture_ready,
