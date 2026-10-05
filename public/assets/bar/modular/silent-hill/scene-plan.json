@@ -145,6 +145,7 @@
     "shelf",
     "seating"
   ],
+  "manualApprovedRoles": [],
   "review": {
     "geometry": "manual-required",
     "shelfBounds": "manual-required",

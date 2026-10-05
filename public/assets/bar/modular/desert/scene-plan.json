@@ -166,6 +166,7 @@
     "shelf",
     "seating"
   ],
+  "manualApprovedRoles": [],
   "review": {
     "windowCutouts": "manual-measured",
     "architectureInpaint": "required",

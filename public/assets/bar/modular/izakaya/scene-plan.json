@@ -88,7 +88,15 @@
       "height": 0.329681
     }
   },
-  "windowCutouts": [],
+  "windowCutouts": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 0.149,
+      "width": 0.162,
+      "height": 0.489
+    }
+  ],
   "shelfRows": [
     271,
     402,
@@ -120,8 +128,9 @@
     "shelf",
     "seating"
   ],
+  "manualApprovedRoles": [],
   "review": {
-    "windowCutouts": "manual-required",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review"
   },

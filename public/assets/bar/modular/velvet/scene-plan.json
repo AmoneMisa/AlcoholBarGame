@@ -102,6 +102,7 @@
     "shelf",
     "seating"
   ],
+  "manualApprovedRoles": [],
   "review": {},
   "notes": [
     "Keep the camera, horizon and perspective fixed.",
