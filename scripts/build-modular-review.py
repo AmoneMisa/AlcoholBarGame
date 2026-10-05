@@ -39,9 +39,10 @@ for base in sorted(p for p in MOD.iterdir() if p.is_dir()):
     if not report_path: continue
 
     data=json.loads(report_path.read_text())
-    kind='measured' if measured.exists() else 'candidate'
     manifest_path=ROOT/'scripts/modular-scenes'/f'{base.name}.json'
     manifest=json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
+    reviewed_geometry=manifest.get('geometrySource') in ('measured-gameplay','reviewed-modular-pilot','manual-source-review')
+    kind='measured' if measured.exists() or reviewed_geometry else 'candidate'
     required_roles=tuple(manifest.get('requiredRoles',ROLES))
     manual_approved=set(manifest.get('manualApprovedRoles',[]))
     review=base/'review-ready'
