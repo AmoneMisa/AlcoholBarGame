@@ -1,0 +1,36 @@
+name: Materialize modular references
+
+on:
+  push:
+    branches:
+      - feat/modular-velvet-scene
+    paths:
+      - scripts/materialize-modular-references.py
+      - .github/workflows/materialize-modular-references.yml
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: feat/modular-velvet-scene
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check pillow
+      - run: python scripts/materialize-modular-references.py --status geometry-ready-art-review-required
+      - name: Commit reference crops
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/assets/bar/modular
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+          else
+            git commit -m "Materialize modular scene reference crops"
+            git push origin HEAD:feat/modular-velvet-scene
+          fi
