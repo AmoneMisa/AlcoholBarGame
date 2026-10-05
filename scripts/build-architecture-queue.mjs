@@ -16,6 +16,8 @@ for(const item of summary){
     source:manifest.source,
     output:`public/assets/bar/modular/${item.scene}/architecture.webp`,
     mask:`public/assets/bar/modular/${item.scene}/architecture-mask.png`,
+    inpaintMask:`public/assets/bar/modular/${item.scene}/architecture-mask.png`,
+    windowMask:`public/assets/bar/modular/${item.scene}/window-mask.png`,
     windowCutouts:manifest.windowCutoutsNormalized??manifest.windowCutouts??[],
     prompt:architecture.prompt??'Create a clean architecture plate from the exact source while preserving camera, horizon and perspective.',
     constraints:[
@@ -24,7 +26,8 @@ for(const item of summary){
       'Reconstruct only surfaces hidden by removed furniture; do not redesign the room.',
       'Keep camera, horizon, perspective, wall openings and permanent architecture unchanged.',
       'Do not bake bottle decor into shelves; bottles are rendered separately.',
-      'Where windowCutouts are present, keep frames/mullions/reflections but make the marked panes transparent.'
+      'Use inpaintMask only for reconstructing surfaces hidden by removable furniture.',
+      'Use windowMask only after reconstruction to clear exterior panes; never erase frames, mullions, curtains or permanent trim.'
     ]
   });
 }
