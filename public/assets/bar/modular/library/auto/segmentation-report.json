@@ -1,0 +1,45 @@
+{
+  "scene": "library",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.5024,
+      "solidCoverage": 0.458,
+      "bbox": [
+        72,
+        42,
+        536,
+        150
+      ],
+      "width": 623,
+      "height": 150,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.5566,
+      "solidCoverage": 0.3056,
+      "bbox": [
+        20,
+        22,
+        225,
+        191
+      ],
+      "width": 231,
+      "height": 225,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.5824,
+      "solidCoverage": 0.0194,
+      "bbox": [
+        0,
+        0,
+        623,
+        261
+      ],
+      "width": 623,
+      "height": 261,
+      "status": "ok"
+    }
+  }
+}

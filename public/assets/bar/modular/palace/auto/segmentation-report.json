@@ -1,0 +1,45 @@
+{
+  "scene": "palace",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.2564,
+      "solidCoverage": 0.2015,
+      "bbox": [
+        21,
+        80,
+        600,
+        182
+      ],
+      "width": 623,
+      "height": 184,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.3772,
+      "solidCoverage": 0.0986,
+      "bbox": [
+        0,
+        0,
+        481,
+        244
+      ],
+      "width": 486,
+      "height": 246,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.5302,
+      "solidCoverage": 0.1527,
+      "bbox": [
+        0,
+        0,
+        623,
+        218
+      ],
+      "width": 623,
+      "height": 237,
+      "status": "ok"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "scene": "garden",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.2949,
+      "solidCoverage": 0.2134,
+      "bbox": [
+        251,
+        0,
+        1671,
+        146
+      ],
+      "width": 1671,
+      "height": 311,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.5953,
+      "solidCoverage": 0.2811,
+      "bbox": [
+        0,
+        0,
+        662,
+        438
+      ],
+      "width": 686,
+      "height": 438,
+      "status": "ok"
+    },
+    "seating": {
+      "status": "missing-reference"
+    }
+  }
+}

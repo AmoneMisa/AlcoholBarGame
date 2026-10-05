@@ -1,0 +1,45 @@
+{
+  "scene": "jazz-cellar",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.6346,
+      "solidCoverage": 0.2373,
+      "bbox": [
+        0,
+        57,
+        623,
+        181
+      ],
+      "width": 623,
+      "height": 181,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.3393,
+      "solidCoverage": 0.0237,
+      "bbox": [
+        0,
+        37,
+        424,
+        204
+      ],
+      "width": 424,
+      "height": 246,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.1249,
+      "solidCoverage": 0.0,
+      "bbox": [
+        0,
+        0,
+        623,
+        249
+      ],
+      "width": 623,
+      "height": 249,
+      "status": "ok"
+    }
+  }
+}

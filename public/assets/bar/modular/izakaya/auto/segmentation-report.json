@@ -1,0 +1,45 @@
+{
+  "scene": "izakaya",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.8263,
+      "solidCoverage": 0.4658,
+      "bbox": [
+        0,
+        0,
+        764,
+        170
+      ],
+      "width": 764,
+      "height": 170,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.2593,
+      "solidCoverage": 0.0003,
+      "bbox": [
+        22,
+        0,
+        277,
+        228
+      ],
+      "width": 321,
+      "height": 259,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.3062,
+      "solidCoverage": 0.0001,
+      "bbox": [
+        0,
+        0,
+        764,
+        167
+      ],
+      "width": 764,
+      "height": 167,
+      "status": "ok"
+    }
+  }
+}

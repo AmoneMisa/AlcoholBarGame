@@ -1,0 +1,45 @@
+{
+  "scene": "parisian",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.7212,
+      "solidCoverage": 0.4237,
+      "bbox": [
+        81,
+        0,
+        764,
+        132
+      ],
+      "width": 764,
+      "height": 132,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.6951,
+      "solidCoverage": 0.4216,
+      "bbox": [
+        19,
+        0,
+        275,
+        227
+      ],
+      "width": 275,
+      "height": 257,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.2835,
+      "solidCoverage": 0.0741,
+      "bbox": [
+        0,
+        24,
+        764,
+        244
+      ],
+      "width": 764,
+      "height": 244,
+      "status": "ok"
+    }
+  }
+}

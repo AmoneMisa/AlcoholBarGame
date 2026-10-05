@@ -1,0 +1,45 @@
+{
+  "scene": "loft",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.5697,
+      "solidCoverage": 0.001,
+      "bbox": [
+        50,
+        0,
+        764,
+        150
+      ],
+      "width": 764,
+      "height": 150,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.5837,
+      "solidCoverage": 0.2586,
+      "bbox": [
+        0,
+        0,
+        335,
+        262
+      ],
+      "width": 367,
+      "height": 262,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.5503,
+      "solidCoverage": 0.4406,
+      "bbox": [
+        238,
+        0,
+        764,
+        229
+      ],
+      "width": 764,
+      "height": 229,
+      "status": "ok"
+    }
+  }
+}

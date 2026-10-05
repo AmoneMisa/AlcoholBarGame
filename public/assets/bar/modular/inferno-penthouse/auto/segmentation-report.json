@@ -1,0 +1,45 @@
+{
+  "scene": "inferno-penthouse",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.9178,
+      "solidCoverage": 0.0006,
+      "bbox": [
+        0,
+        0,
+        1536,
+        266
+      ],
+      "width": 1536,
+      "height": 266,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.5505,
+      "solidCoverage": 0.3647,
+      "bbox": [
+        110,
+        37,
+        737,
+        379
+      ],
+      "width": 737,
+      "height": 379,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.3929,
+      "solidCoverage": 0.3377,
+      "bbox": [
+        0,
+        42,
+        1536,
+        226
+      ],
+      "width": 1536,
+      "height": 256,
+      "status": "ok"
+    }
+  }
+}

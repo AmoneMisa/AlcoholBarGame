@@ -1,0 +1,45 @@
+{
+  "scene": "art-deco",
+  "model": "u2net",
+  "roles": {
+    "counter": {
+      "coverage": 0.2428,
+      "solidCoverage": 0.1914,
+      "bbox": [
+        33,
+        56,
+        594,
+        125
+      ],
+      "width": 623,
+      "height": 177,
+      "status": "ok"
+    },
+    "shelf": {
+      "coverage": 0.3658,
+      "solidCoverage": 0.0059,
+      "bbox": [
+        0,
+        0,
+        362,
+        287
+      ],
+      "width": 362,
+      "height": 287,
+      "status": "ok"
+    },
+    "seating": {
+      "coverage": 0.1796,
+      "solidCoverage": 0.1208,
+      "bbox": [
+        33,
+        0,
+        623,
+        261
+      ],
+      "width": 623,
+      "height": 261,
+      "status": "ok"
+    }
+  }
+}
