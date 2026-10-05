@@ -102,13 +102,12 @@
     "x": 0.5,
     "y": 0.58
   },
-  "windowCutouts": [],
   "review": {
     "geometry": "manual-measured",
     "shelfBounds": "manual-measured",
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
-    "windowCutouts": "manual-required",
+    "windowCutouts": "not-applicable",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
     "manualApprovedRoles": [
@@ -226,5 +225,6 @@
     "counter",
     "seating",
     "shelf"
-  ]
+  ],
+  "windowCutoutsNormalized": []
 }
