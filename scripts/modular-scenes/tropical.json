@@ -108,6 +108,12 @@
     "windowCutouts": "manual-required",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
-    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone."
-  }
+    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
+    "manualApprovedRoles": [
+      "seating"
+    ]
+  },
+  "manualApprovedRoles": [
+    "seating"
+  ]
 }
