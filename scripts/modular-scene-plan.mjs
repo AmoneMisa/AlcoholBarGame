@@ -101,6 +101,7 @@ const plan={
   status:manifest.status??'authoring',
   geometrySource:manifest.geometrySource??null,
   requiredRoles:manifest.requiredRoles??['counter','shelf','seating'],
+  manualApprovedRoles:manifest.manualApprovedRoles??[],
   review:manifest.review??{},
   notes:manifest.notes??[]
 };
