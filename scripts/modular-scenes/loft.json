@@ -104,10 +104,39 @@
     "x": 697,
     "y": 507
   },
-  "windowCutouts": [],
   "review": {
-    "windowCutouts": "manual-required",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review"
-  }
+  },
+  "windowCutoutsNormalized": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 0.06,
+      "width": 0.081,
+      "height": 0.372
+    },
+    {
+      "type": "rect",
+      "x": 0.092,
+      "y": 0.06,
+      "width": 0.11,
+      "height": 0.372
+    },
+    {
+      "type": "rect",
+      "x": 0.214,
+      "y": 0.06,
+      "width": 0.111,
+      "height": 0.372
+    },
+    {
+      "type": "rect",
+      "x": 0.337,
+      "y": 0.06,
+      "width": 0.063,
+      "height": 0.372
+    }
+  ]
 }
