@@ -98,13 +98,12 @@
     "x": 0.5,
     "y": 0.58
   },
-  "windowCutouts": [],
   "review": {
     "geometry": "manual-measured",
     "shelfBounds": "manual-measured",
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
-    "windowCutouts": "manual-required",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
     "manualApprovedRoles": [
@@ -208,5 +207,32 @@
     "counter",
     "seating",
     "shelf"
+  ],
+  "windowCutoutsNormalized": [
+    {
+      "type": "polygon",
+      "points": [
+        {
+          "x": 0.82,
+          "y": 0.02
+        },
+        {
+          "x": 0.9,
+          "y": 0
+        },
+        {
+          "x": 0.995,
+          "y": 0
+        },
+        {
+          "x": 0.995,
+          "y": 0.5
+        },
+        {
+          "x": 0.82,
+          "y": 0.5
+        }
+      ]
+    }
   ]
 }
