@@ -28,6 +28,7 @@ for(const name of readdirSync(MOD).sort()){
   const planPath=resolve(base,'scene-plan.json');
   const plan=existsSync(planPath)?JSON.parse(readFileSync(planPath,'utf8')):{};
   const requiredRoles=plan.requiredRoles??ROLES;
+  const manualApprovedRoles=new Set(plan.manualApprovedRoles??[]);
   const statuses=Object.fromEntries(ROLES.map(role=>[role,report.roles?.[role]?.status??'missing']));
   const promoted=Object.fromEntries(ROLES.map(role=>[role,existsSync(resolve(base,'review-ready',`${role}.webp`))]));
 
@@ -40,7 +41,7 @@ for(const name of readdirSync(MOD).sort()){
     }
   }else{
     for(const role of ROLES){
-      const shouldPromote=statuses[role]==='ok';
+      const shouldPromote=statuses[role]==='ok'||manualApprovedRoles.has(role);
       if(promoted[role]!==shouldPromote){
         console.error(`${name}: review-ready mismatch for ${role}: status=${statuses[role]}, asset=${promoted[role]}`);
         failed++;
@@ -48,7 +49,7 @@ for(const name of readdirSync(MOD).sort()){
     }
   }
 
-  const isolatedFurnitureReady=kind==='measured'&&requiredRoles.every(role=>statuses[role]==='ok');
+  const isolatedFurnitureReady=kind==='measured'&&requiredRoles.every(role=>statuses[role]==='ok'||manualApprovedRoles.has(role));
   const cleanFurnitureReady=hasFinalFurniture(base,name,requiredRoles);
   const architectureReady=existsSync(resolve(base,'architecture.webp'));
 
@@ -59,6 +60,7 @@ for(const name of readdirSync(MOD).sort()){
     isolatedFurnitureReady,
     cleanFurnitureReady,
     requiredRoles,
+    manualApprovedRoles:[...manualApprovedRoles],
     productionReady:architectureReady&&cleanFurnitureReady,
     statuses
   });
