@@ -97,6 +97,11 @@
   "bartenderAnchor": null,
   "status": "geometry-ready-art-review-required",
   "geometrySource": "reviewed-modular-pilot",
+  "requiredRoles": [
+    "counter",
+    "shelf",
+    "seating"
+  ],
   "review": {},
   "notes": [
     "Keep the camera, horizon and perspective fixed.",

@@ -151,6 +151,11 @@
   "bartenderAnchor": null,
   "status": "geometry-ready-art-review-required",
   "geometrySource": null,
+  "requiredRoles": [
+    "counter",
+    "shelf",
+    "seating"
+  ],
   "review": {
     "windowCutouts": "manual-measured",
     "architectureInpaint": "required",

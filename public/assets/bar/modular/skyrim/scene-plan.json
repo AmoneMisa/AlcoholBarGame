@@ -140,6 +140,11 @@
   },
   "status": "geometry-review-required",
   "geometrySource": "provisional-normalized",
+  "requiredRoles": [
+    "counter",
+    "shelf",
+    "seating"
+  ],
   "review": {
     "geometry": "manual-required",
     "shelfBounds": "manual-required",
