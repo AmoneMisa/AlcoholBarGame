@@ -103,7 +103,94 @@
     "windowCutouts": "not-applicable",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
-    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone."
+    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
+    "manualApprovedRoles": [
+      "counter",
+      "shelf"
+    ]
   },
-  "windowCutoutsNormalized": []
+  "windowCutoutsNormalized": [],
+  "manualRoleMasksNormalized": {
+    "counter": {
+      "feather": 1.2,
+      "include": [
+        {
+          "type": "rect",
+          "x": 0,
+          "y": 0.08,
+          "width": 1,
+          "height": 0.68
+        }
+      ],
+      "exclude": [
+        {
+          "type": "rect",
+          "x": 0.035,
+          "y": 0.34,
+          "width": 0.18,
+          "height": 0.66
+        },
+        {
+          "type": "rect",
+          "x": 0.275,
+          "y": 0.34,
+          "width": 0.18,
+          "height": 0.66
+        },
+        {
+          "type": "rect",
+          "x": 0.53,
+          "y": 0.34,
+          "width": 0.18,
+          "height": 0.66
+        },
+        {
+          "type": "rect",
+          "x": 0.785,
+          "y": 0.34,
+          "width": 0.18,
+          "height": 0.66
+        }
+      ]
+    },
+    "shelf": {
+      "feather": 1.2,
+      "include": [
+        {
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 0.245,
+          "height": 0.78
+        },
+        {
+          "type": "rect",
+          "x": 0.245,
+          "y": 0,
+          "width": 0.51,
+          "height": 0.82
+        },
+        {
+          "type": "rect",
+          "x": 0.755,
+          "y": 0,
+          "width": 0.245,
+          "height": 0.78
+        }
+      ],
+      "exclude": [
+        {
+          "type": "rect",
+          "x": 0,
+          "y": 0.84,
+          "width": 1,
+          "height": 0.16
+        }
+      ]
+    }
+  },
+  "manualApprovedRoles": [
+    "counter",
+    "shelf"
+  ]
 }
