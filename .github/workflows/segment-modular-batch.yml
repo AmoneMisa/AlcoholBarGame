@@ -1,0 +1,54 @@
+name: Auto-segment modular scene batch
+
+on:
+  push:
+    branches:
+      - feat/modular-velvet-scene
+    paths:
+      - scripts/segment-modular-references.py
+      - .github/workflows/segment-modular-batch.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  segment:
+    if: ${{ !contains(github.event.head_commit.message || '', '[auto-segment]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: feat/modular-velvet-scene
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check pillow "rembg[cpu]"
+      - run: python scripts/segment-modular-references.py
+      - name: Validate reports
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          reports=list(Path('public/assets/bar/modular').glob('*/auto/segmentation-report.json'))
+          assert len(reports)>=11, len(reports)
+          for p in reports:
+              data=json.loads(p.read_text())
+              for role,item in data['roles'].items():
+                  if item.get('status')=='ok':
+                      assert 0.03 <= item['coverage'] <= 0.96, (p,role,item)
+          print('reports',len(reports))
+          PY
+      - name: Commit auto segmentation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/assets/bar/modular/*/auto
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+          else
+            git commit -m "[auto-segment] Segment first measured modular batch"
+            git push origin HEAD:feat/modular-velvet-scene
+          fi
