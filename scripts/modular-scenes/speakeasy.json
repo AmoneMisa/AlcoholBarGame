@@ -104,10 +104,10 @@
     }
   ],
   "bartenderAnchor": null,
-  "windowCutouts": [],
   "review": {
-    "windowCutouts": "manual-required",
+    "windowCutouts": "not-applicable",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review"
-  }
+  },
+  "windowCutoutsNormalized": []
 }
