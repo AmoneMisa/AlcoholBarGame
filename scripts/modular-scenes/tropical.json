@@ -103,9 +103,8 @@
     }
   ],
   "bartenderAnchor": null,
-  "windowCutouts": [],
   "review": {
-    "windowCutouts": "manual-required",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
     "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
@@ -115,5 +114,48 @@
   },
   "manualApprovedRoles": [
     "seating"
+  ],
+  "windowCutoutsNormalized": [
+    {
+      "type": "polygon",
+      "points": [
+        {
+          "x": 0.286,
+          "y": 0
+        },
+        {
+          "x": 0.714,
+          "y": 0
+        },
+        {
+          "x": 0.714,
+          "y": 0.347
+        },
+        {
+          "x": 0.669,
+          "y": 0.299
+        },
+        {
+          "x": 0.615,
+          "y": 0.253
+        },
+        {
+          "x": 0.5,
+          "y": 0.22
+        },
+        {
+          "x": 0.385,
+          "y": 0.253
+        },
+        {
+          "x": 0.331,
+          "y": 0.299
+        },
+        {
+          "x": 0.286,
+          "y": 0.347
+        }
+      ]
+    }
   ]
 }
