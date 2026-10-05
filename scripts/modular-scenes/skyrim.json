@@ -23,18 +23,18 @@
     "shelf-reference": {
       "cropNormalized": {
         "x": 0.16,
-        "y": 0.2,
-        "width": 0.7,
-        "height": 0.38
+        "y": 0.26,
+        "width": 0.68,
+        "height": 0.34
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture."
     },
     "counter-reference": {
       "cropNormalized": {
         "x": 0,
-        "y": 0.55,
+        "y": 0.57,
         "width": 1,
-        "height": 0.24
+        "height": 0.22
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings."
     }
@@ -48,21 +48,21 @@
     },
     "shelves": {
       "x": 0.16,
-      "y": 0.2,
-      "width": 0.7,
-      "height": 0.38
+      "y": 0.26,
+      "width": 0.68,
+      "height": 0.34
     },
     "counter": {
       "x": 0,
-      "y": 0.55,
+      "y": 0.57,
       "width": 1,
-      "height": 0.24
+      "height": 0.22
     },
     "seating": {
       "x": 0,
-      "y": 0.71,
+      "y": 0.78,
       "width": 1,
-      "height": 0.29
+      "height": 0.22
     },
     "floor": {
       "x": 0,
@@ -79,28 +79,28 @@
   "seatAnchorsNormalized": [
     {
       "x": 0.1,
-      "y": 0.82
+      "y": 0.89
     },
     {
       "x": 0.3,
-      "y": 0.82
+      "y": 0.89
     },
     {
       "x": 0.5,
-      "y": 0.82
+      "y": 0.89
     },
     {
       "x": 0.7,
-      "y": 0.82
+      "y": 0.89
     },
     {
       "x": 0.9,
-      "y": 0.82
+      "y": 0.89
     }
   ],
   "bartenderAnchorNormalized": {
     "x": 0.5,
-    "y": 0.58
+    "y": 0.6
   },
   "windowCutouts": [],
   "review": {
@@ -125,7 +125,14 @@
           "type": "rect",
           "x": 0,
           "y": 0,
-          "width": 1,
+          "width": 0.3,
+          "height": 0.98
+        },
+        {
+          "type": "rect",
+          "x": 0.7,
+          "y": 0,
+          "width": 0.3,
           "height": 0.98
         }
       ],
