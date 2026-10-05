@@ -1,6 +1,20 @@
 {
-  "count": 7,
+  "count": 19,
   "scenes": [
+    {
+      "scene": "art-deco",
+      "mask": "public/assets/bar/modular/art-deco/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 623,
+        "height": 623
+      },
+      "windowCutouts": []
+    },
     {
       "scene": "beach",
       "mask": "public/assets/bar/modular/beach/architecture-mask.png",
@@ -36,6 +50,20 @@
           ]
         }
       ]
+    },
+    {
+      "scene": "cyberpunk",
+      "mask": "public/assets/bar/modular/cyberpunk/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 764,
+        "height": 508
+      },
+      "windowCutouts": []
     },
     {
       "scene": "desert",
@@ -88,6 +116,378 @@
             {
               "x": 0.674,
               "y": 0.527
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scene": "garden",
+      "mask": "public/assets/bar/modular/garden/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf"
+      ],
+      "canvas": {
+        "width": 1671,
+        "height": 941
+      },
+      "windowCutouts": [
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0,
+              "y": 0.032
+            },
+            {
+              "x": 0.07,
+              "y": 0.032
+            },
+            {
+              "x": 0.07,
+              "y": 0.348
+            },
+            {
+              "x": 0,
+              "y": 0.348
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.096,
+              "y": 0.043
+            },
+            {
+              "x": 0.224,
+              "y": 0.043
+            },
+            {
+              "x": 0.242,
+              "y": 0.095
+            },
+            {
+              "x": 0.242,
+              "y": 0.47
+            },
+            {
+              "x": 0.096,
+              "y": 0.47
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scene": "inferno-penthouse",
+      "mask": "public/assets/bar/modular/inferno-penthouse/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 1536,
+        "height": 1024
+      },
+      "windowCutouts": [
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.03,
+              "y": 0.015
+            },
+            {
+              "x": 0.113,
+              "y": 0.015
+            },
+            {
+              "x": 0.142,
+              "y": 0.072
+            },
+            {
+              "x": 0.142,
+              "y": 0.425
+            },
+            {
+              "x": 0.03,
+              "y": 0.425
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.175,
+              "y": 0.015
+            },
+            {
+              "x": 0.286,
+              "y": 0.015
+            },
+            {
+              "x": 0.315,
+              "y": 0.077
+            },
+            {
+              "x": 0.315,
+              "y": 0.432
+            },
+            {
+              "x": 0.175,
+              "y": 0.432
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.686,
+              "y": 0.077
+            },
+            {
+              "x": 0.715,
+              "y": 0.015
+            },
+            {
+              "x": 0.826,
+              "y": 0.015
+            },
+            {
+              "x": 0.826,
+              "y": 0.432
+            },
+            {
+              "x": 0.686,
+              "y": 0.432
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.858,
+              "y": 0.072
+            },
+            {
+              "x": 0.887,
+              "y": 0.015
+            },
+            {
+              "x": 0.97,
+              "y": 0.015
+            },
+            {
+              "x": 0.97,
+              "y": 0.425
+            },
+            {
+              "x": 0.858,
+              "y": 0.425
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scene": "izakaya",
+      "mask": "public/assets/bar/modular/izakaya/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 764,
+        "height": 508
+      },
+      "windowCutouts": [
+        {
+          "type": "rect",
+          "x": 0,
+          "y": 0.149,
+          "width": 0.162,
+          "height": 0.489
+        }
+      ]
+    },
+    {
+      "scene": "jazz-cellar",
+      "mask": "public/assets/bar/modular/jazz-cellar/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 623,
+        "height": 623
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "library",
+      "mask": "public/assets/bar/modular/library/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 623,
+        "height": 623
+      },
+      "windowCutouts": [
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 0.083,
+              "y": 0
+            },
+            {
+              "x": 0.107,
+              "y": 0.052
+            },
+            {
+              "x": 0.107,
+              "y": 0.364
+            },
+            {
+              "x": 0,
+              "y": 0.364
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scene": "loft",
+      "mask": "public/assets/bar/modular/loft/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 764,
+        "height": 508
+      },
+      "windowCutouts": [
+        {
+          "type": "rect",
+          "x": 0,
+          "y": 0.06,
+          "width": 0.081,
+          "height": 0.372
+        },
+        {
+          "type": "rect",
+          "x": 0.092,
+          "y": 0.06,
+          "width": 0.11,
+          "height": 0.372
+        },
+        {
+          "type": "rect",
+          "x": 0.214,
+          "y": 0.06,
+          "width": 0.111,
+          "height": 0.372
+        },
+        {
+          "type": "rect",
+          "x": 0.337,
+          "y": 0.06,
+          "width": 0.063,
+          "height": 0.372
+        }
+      ]
+    },
+    {
+      "scene": "marina",
+      "mask": "public/assets/bar/modular/marina/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 764,
+        "height": 508
+      },
+      "windowCutouts": [
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0,
+              "y": 0.086
+            },
+            {
+              "x": 0.327,
+              "y": 0.086
+            },
+            {
+              "x": 0.327,
+              "y": 0.522
+            },
+            {
+              "x": 0,
+              "y": 0.522
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.333,
+              "y": 0.101
+            },
+            {
+              "x": 0.451,
+              "y": 0.101
+            },
+            {
+              "x": 0.451,
+              "y": 0.51
+            },
+            {
+              "x": 0.333,
+              "y": 0.51
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.462,
+              "y": 0.151
+            },
+            {
+              "x": 0.596,
+              "y": 0.151
+            },
+            {
+              "x": 0.596,
+              "y": 0.358
+            },
+            {
+              "x": 0.462,
+              "y": 0.358
             }
           ]
         }
@@ -387,6 +787,125 @@
           "y": 0.072,
           "width": 0.19,
           "height": 0.472
+        }
+      ]
+    },
+    {
+      "scene": "skyline",
+      "mask": "public/assets/bar/modular/skyline/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf"
+      ],
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      },
+      "windowCutouts": [
+        {
+          "type": "rect",
+          "x": 0.137,
+          "y": 0.012,
+          "width": 0.108,
+          "height": 0.485
+        },
+        {
+          "type": "rect",
+          "x": 0.257,
+          "y": 0.012,
+          "width": 0.118,
+          "height": 0.485
+        },
+        {
+          "type": "rect",
+          "x": 0.386,
+          "y": 0.012,
+          "width": 0.113,
+          "height": 0.485
+        },
+        {
+          "type": "rect",
+          "x": 0.511,
+          "y": 0.012,
+          "width": 0.113,
+          "height": 0.485
+        },
+        {
+          "type": "rect",
+          "x": 0.636,
+          "y": 0.012,
+          "width": 0.055,
+          "height": 0.485
+        }
+      ]
+    },
+    {
+      "scene": "speakeasy",
+      "mask": "public/assets/bar/modular/speakeasy/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 623,
+        "height": 623
+      },
+      "windowCutouts": []
+    },
+    {
+      "scene": "tropical",
+      "mask": "public/assets/bar/modular/tropical/architecture-mask.png",
+      "roles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "canvas": {
+        "width": 623,
+        "height": 623
+      },
+      "windowCutouts": [
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.286,
+              "y": 0
+            },
+            {
+              "x": 0.714,
+              "y": 0
+            },
+            {
+              "x": 0.714,
+              "y": 0.347
+            },
+            {
+              "x": 0.669,
+              "y": 0.299
+            },
+            {
+              "x": 0.615,
+              "y": 0.253
+            },
+            {
+              "x": 0.5,
+              "y": 0.22
+            },
+            {
+              "x": 0.385,
+              "y": 0.253
+            },
+            {
+              "x": 0.331,
+              "y": 0.299
+            },
+            {
+              "x": 0.286,
+              "y": 0.347
+            }
+          ]
         }
       ]
     },

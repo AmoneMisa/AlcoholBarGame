@@ -13,6 +13,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -33,6 +34,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -53,6 +55,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -64,6 +67,7 @@
     "kind": "measured",
     "promoted": [
       "counter",
+      "shelf",
       "seating"
     ],
     "roles": {
@@ -76,9 +80,12 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -96,6 +103,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -116,6 +124,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -136,6 +145,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -160,6 +170,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
@@ -180,6 +191,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -200,6 +212,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -220,6 +233,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -240,6 +254,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -250,6 +265,8 @@
     "scene": "cyberpunk",
     "kind": "measured",
     "promoted": [
+      "counter",
+      "shelf",
       "seating"
     ],
     "roles": {
@@ -262,9 +279,13 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [
+      "counter",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -282,6 +303,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -302,6 +324,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -322,6 +345,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -346,6 +370,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
@@ -366,6 +391,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -386,6 +412,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -406,6 +433,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -426,6 +454,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -446,6 +475,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -466,6 +496,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -486,6 +517,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -506,12 +538,12 @@
     },
     "requiredRoles": [
       "counter",
-      "shelf",
-      "seating"
+      "shelf"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -529,6 +561,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -549,6 +582,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -569,6 +603,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -589,6 +624,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -609,6 +645,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -629,6 +666,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -639,6 +677,7 @@
     "scene": "inferno-penthouse",
     "kind": "measured",
     "promoted": [
+      "counter",
       "shelf",
       "seating"
     ],
@@ -652,9 +691,12 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [
+      "counter"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -662,7 +704,9 @@
     "scene": "izakaya",
     "kind": "measured",
     "promoted": [
-      "shelf"
+      "counter",
+      "shelf",
+      "seating"
     ],
     "roles": {
       "counter": "review-all-edges",
@@ -674,9 +718,13 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [
+      "counter",
+      "seating"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -685,7 +733,8 @@
     "kind": "measured",
     "promoted": [
       "counter",
-      "shelf"
+      "shelf",
+      "seating"
     ],
     "roles": {
       "counter": "ok",
@@ -697,9 +746,12 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [
+      "seating"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -708,7 +760,8 @@
     "kind": "measured",
     "promoted": [
       "counter",
-      "shelf"
+      "shelf",
+      "seating"
     ],
     "roles": {
       "counter": "ok",
@@ -720,9 +773,12 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [
+      "seating"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -740,6 +796,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -750,6 +807,7 @@
     "scene": "loft",
     "kind": "measured",
     "promoted": [
+      "counter",
       "shelf",
       "seating"
     ],
@@ -763,9 +821,12 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [
+      "counter"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -783,6 +844,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -794,6 +856,7 @@
     "kind": "measured",
     "promoted": [
       "counter",
+      "shelf",
       "seating"
     ],
     "roles": {
@@ -806,9 +869,12 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -826,6 +892,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -846,6 +913,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -866,6 +934,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -886,6 +955,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -906,6 +976,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -926,6 +997,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -946,6 +1018,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -970,6 +1043,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
@@ -990,6 +1064,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1014,6 +1089,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
@@ -1034,6 +1110,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1054,6 +1131,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1074,6 +1152,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1094,6 +1173,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1118,6 +1198,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
@@ -1142,6 +1223,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
@@ -1162,6 +1244,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1182,6 +1265,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1202,12 +1286,12 @@
     },
     "requiredRoles": [
       "counter",
-      "shelf",
-      "seating"
+      "shelf"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -1225,6 +1309,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1245,6 +1330,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1254,7 +1340,11 @@
   {
     "scene": "speakeasy",
     "kind": "measured",
-    "promoted": [],
+    "promoted": [
+      "counter",
+      "shelf",
+      "seating"
+    ],
     "roles": {
       "counter": "review-all-edges",
       "shelf": "review-all-edges",
@@ -1265,9 +1355,14 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [
+      "counter",
+      "seating",
+      "shelf"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -1285,6 +1380,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1296,7 +1392,8 @@
     "kind": "measured",
     "promoted": [
       "counter",
-      "shelf"
+      "shelf",
+      "seating"
     ],
     "roles": {
       "counter": "ok",
@@ -1308,9 +1405,12 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [
+      "seating"
+    ],
     "architectureReady": false,
-    "furnitureReady": false,
-    "isolatedFurnitureReady": false,
+    "furnitureReady": true,
+    "isolatedFurnitureReady": true,
     "cleanFurnitureReady": false,
     "productionReady": false
   },
@@ -1328,6 +1428,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1348,6 +1449,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1368,6 +1470,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1392,6 +1495,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
@@ -1412,6 +1516,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1432,6 +1537,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1452,6 +1558,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1476,6 +1583,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
@@ -1496,6 +1604,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1516,6 +1625,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,
@@ -1536,6 +1646,7 @@
       "shelf",
       "seating"
     ],
+    "manualApprovedRoles": [],
     "architectureReady": false,
     "furnitureReady": false,
     "isolatedFurnitureReady": false,

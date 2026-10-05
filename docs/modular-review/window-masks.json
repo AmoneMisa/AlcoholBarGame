@@ -1,5 +1,5 @@
 {
-  "count": 7,
+  "count": 15,
   "scenes": [
     {
       "scene": "beach",
@@ -17,6 +17,60 @@
       "canvas": {
         "width": 623,
         "height": 623
+      }
+    },
+    {
+      "scene": "garden",
+      "mask": "public/assets/bar/modular/garden/window-mask.png",
+      "cutouts": 2,
+      "canvas": {
+        "width": 1671,
+        "height": 941
+      }
+    },
+    {
+      "scene": "inferno-penthouse",
+      "mask": "public/assets/bar/modular/inferno-penthouse/window-mask.png",
+      "cutouts": 4,
+      "canvas": {
+        "width": 1536,
+        "height": 1024
+      }
+    },
+    {
+      "scene": "izakaya",
+      "mask": "public/assets/bar/modular/izakaya/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 764,
+        "height": 508
+      }
+    },
+    {
+      "scene": "library",
+      "mask": "public/assets/bar/modular/library/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 623,
+        "height": 623
+      }
+    },
+    {
+      "scene": "loft",
+      "mask": "public/assets/bar/modular/loft/window-mask.png",
+      "cutouts": 4,
+      "canvas": {
+        "width": 764,
+        "height": 508
+      }
+    },
+    {
+      "scene": "marina",
+      "mask": "public/assets/bar/modular/marina/window-mask.png",
+      "cutouts": 3,
+      "canvas": {
+        "width": 764,
+        "height": 508
       }
     },
     {
@@ -53,6 +107,24 @@
       "canvas": {
         "width": 764,
         "height": 508
+      }
+    },
+    {
+      "scene": "skyline",
+      "mask": "public/assets/bar/modular/skyline/window-mask.png",
+      "cutouts": 5,
+      "canvas": {
+        "width": 1672,
+        "height": 941
+      }
+    },
+    {
+      "scene": "tropical",
+      "mask": "public/assets/bar/modular/tropical/window-mask.png",
+      "cutouts": 1,
+      "canvas": {
+        "width": 623,
+        "height": 623
       }
     },
     {

@@ -1,0 +1,101 @@
+{
+  "count": 12,
+  "items": [
+    {
+      "scene": "art-deco",
+      "role": "shelf",
+      "size": [
+        362,
+        287
+      ]
+    },
+    {
+      "scene": "cyberpunk",
+      "role": "counter",
+      "size": [
+        764,
+        147
+      ]
+    },
+    {
+      "scene": "cyberpunk",
+      "role": "shelf",
+      "size": [
+        619,
+        257
+      ]
+    },
+    {
+      "scene": "inferno-penthouse",
+      "role": "counter",
+      "size": [
+        1536,
+        266
+      ]
+    },
+    {
+      "scene": "izakaya",
+      "role": "counter",
+      "size": [
+        764,
+        170
+      ]
+    },
+    {
+      "scene": "izakaya",
+      "role": "seating",
+      "size": [
+        764,
+        167
+      ]
+    },
+    {
+      "scene": "jazz-cellar",
+      "role": "seating",
+      "size": [
+        623,
+        249
+      ]
+    },
+    {
+      "scene": "library",
+      "role": "seating",
+      "size": [
+        623,
+        261
+      ]
+    },
+    {
+      "scene": "loft",
+      "role": "counter",
+      "size": [
+        764,
+        150
+      ]
+    },
+    {
+      "scene": "speakeasy",
+      "role": "counter",
+      "size": [
+        623,
+        168
+      ]
+    },
+    {
+      "scene": "speakeasy",
+      "role": "shelf",
+      "size": [
+        417,
+        249
+      ]
+    },
+    {
+      "scene": "speakeasy",
+      "role": "seating",
+      "size": [
+        623,
+        274
+      ]
+    }
+  ]
+}
