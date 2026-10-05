@@ -100,6 +100,7 @@ const plan={
   bartenderAnchor:manifest.bartenderAnchorNormalized??manifest.bartenderAnchor??null,
   status:manifest.status??'authoring',
   geometrySource:manifest.geometrySource??null,
+  requiredRoles:manifest.requiredRoles??['counter','shelf','seating'],
   review:manifest.review??{},
   notes:manifest.notes??[]
 };
