@@ -103,7 +103,11 @@
   "review": {
     "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
-    "alphaEdges": "manual-review"
+    "alphaEdges": "manual-review",
+    "manualApprovedRoles": [
+      "counter",
+      "seating"
+    ]
   },
   "windowCutoutsNormalized": [
     {
@@ -113,5 +117,87 @@
       "width": 0.162,
       "height": 0.489
     }
+  ],
+  "manualRoleMasksNormalized": {
+    "counter": {
+      "feather": 1.2,
+      "include": [
+        {
+          "type": "rect",
+          "x": 0.055,
+          "y": 0.11,
+          "width": 0.945,
+          "height": 0.89
+        }
+      ],
+      "exclude": [
+        {
+          "type": "rect",
+          "x": 0.12,
+          "y": 0.36,
+          "width": 0.13,
+          "height": 0.64
+        },
+        {
+          "type": "rect",
+          "x": 0.36,
+          "y": 0.36,
+          "width": 0.13,
+          "height": 0.64
+        },
+        {
+          "type": "rect",
+          "x": 0.6,
+          "y": 0.36,
+          "width": 0.13,
+          "height": 0.64
+        },
+        {
+          "type": "rect",
+          "x": 0.83,
+          "y": 0.36,
+          "width": 0.13,
+          "height": 0.64
+        }
+      ]
+    },
+    "seating": {
+      "feather": 1.2,
+      "include": [
+        {
+          "type": "rect",
+          "x": 0.1,
+          "y": 0.02,
+          "width": 0.16,
+          "height": 0.92
+        },
+        {
+          "type": "rect",
+          "x": 0.34,
+          "y": 0.02,
+          "width": 0.16,
+          "height": 0.92
+        },
+        {
+          "type": "rect",
+          "x": 0.57,
+          "y": 0.02,
+          "width": 0.16,
+          "height": 0.92
+        },
+        {
+          "type": "rect",
+          "x": 0.81,
+          "y": 0.02,
+          "width": 0.16,
+          "height": 0.92
+        }
+      ],
+      "exclude": []
+    }
+  },
+  "manualApprovedRoles": [
+    "counter",
+    "seating"
   ]
 }
