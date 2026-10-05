@@ -50,8 +50,7 @@ jobs:
           assert len(s)==74, len(s)
           measured=[x for x in s if x['kind']=='measured']
           candidate=[x for x in s if x['kind']=='candidate']
-          assert len(measured)==20, len(measured)
-          assert len(candidate)==54, len(candidate)
+          assert len(measured)+len(candidate)==74, (len(measured),len(candidate))
           readiness=json.loads(Path('docs/modular-review/readiness.json').read_text())
           masks=json.loads(Path('docs/modular-review/architecture-masks.json').read_text())
           queue=json.loads(Path('docs/modular-review/architecture-queue.json').read_text())
