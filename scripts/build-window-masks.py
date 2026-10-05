@@ -25,7 +25,9 @@ def main():
     for item in queue['scenes']:
         base=MOD/item['id']
         plan=json.loads((base/'scene-plan.json').read_text())
-        cutouts=plan.get('windowCutouts',[])
+        manifest_path=ROOT/'scripts/modular-scenes'/f"{item['id']}.json"
+        manifest=json.loads(manifest_path.read_text())
+        cutouts=manifest.get('windowCutoutsNormalized') or plan.get('windowCutouts',[])
         if not cutouts:
             continue
         width=plan['canvas']['width']
