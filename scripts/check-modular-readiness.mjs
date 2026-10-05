@@ -5,11 +5,12 @@ import { resolve } from 'node:path';
 const MOD=resolve('public/assets/bar/modular');
 const ROLES=['counter','shelf','seating'];
 
-function hasFinalFurniture(base,name){
+function hasFinalFurniture(base,name,requiredRoles){
   if(name==='velvet'){
-    return ['counter.webp','shelf.webp','stool.webp'].every(file=>existsSync(resolve(base,file)));
+    const legacy={counter:'counter.webp',shelf:'shelf.webp',seating:'stool.webp'};
+    return requiredRoles.every(role=>existsSync(resolve(base,legacy[role])));
   }
-  return ROLES.every(role=>existsSync(resolve(base,'clean-ready',`${role}.webp`)));
+  return requiredRoles.every(role=>existsSync(resolve(base,'clean-ready',`${role}.webp`)));
 }
 
 let failed=0;
@@ -24,6 +25,9 @@ for(const name of readdirSync(MOD).sort()){
 
   const kind=reportPath===measured?'measured':'candidate';
   const report=JSON.parse(readFileSync(reportPath,'utf8'));
+  const planPath=resolve(base,'scene-plan.json');
+  const plan=existsSync(planPath)?JSON.parse(readFileSync(planPath,'utf8')):{};
+  const requiredRoles=plan.requiredRoles??ROLES;
   const statuses=Object.fromEntries(ROLES.map(role=>[role,report.roles?.[role]?.status??'missing']));
   const promoted=Object.fromEntries(ROLES.map(role=>[role,existsSync(resolve(base,'review-ready',`${role}.webp`))]));
 
@@ -44,8 +48,8 @@ for(const name of readdirSync(MOD).sort()){
     }
   }
 
-  const isolatedFurnitureReady=kind==='measured'&&ROLES.every(role=>statuses[role]==='ok');
-  const cleanFurnitureReady=hasFinalFurniture(base,name);
+  const isolatedFurnitureReady=kind==='measured'&&requiredRoles.every(role=>statuses[role]==='ok');
+  const cleanFurnitureReady=hasFinalFurniture(base,name,requiredRoles);
   const architectureReady=existsSync(resolve(base,'architecture.webp'));
 
   rows.push({
@@ -54,6 +58,7 @@ for(const name of readdirSync(MOD).sort()){
     architectureReady,
     isolatedFurnitureReady,
     cleanFurnitureReady,
+    requiredRoles,
     productionReady:architectureReady&&cleanFurnitureReady,
     statuses
   });
