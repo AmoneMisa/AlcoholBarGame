@@ -1,0 +1,46 @@
+{
+  "scene": "fairy",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.2371,
+      "solidCoverage": 0.0,
+      "bbox": [
+        0,
+        0,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "review-all-edges"
+    },
+    "shelf": {
+      "coverage": 0.1552,
+      "solidCoverage": 0.0003,
+      "bbox": [
+        0,
+        0,
+        992,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.2317,
+      "solidCoverage": 0.1622,
+      "bbox": [
+        0,
+        13,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "scene": "max-payne",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.4142,
+      "solidCoverage": 0.0,
+      "bbox": [
+        0,
+        0,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "review-all-edges"
+    },
+    "shelf": {
+      "coverage": 0.1845,
+      "solidCoverage": 0.0003,
+      "bbox": [
+        0,
+        0,
+        1130,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.2485,
+      "solidCoverage": 0.089,
+      "bbox": [
+        0,
+        75,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "scene": "resident-evil",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.0623,
+      "solidCoverage": 0.006,
+      "bbox": [
+        0,
+        0,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "review-all-edges"
+    },
+    "shelf": {
+      "coverage": 0.1181,
+      "solidCoverage": 0.0572,
+      "bbox": [
+        170,
+        0,
+        1109,
+        314
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.4614,
+      "solidCoverage": 0.1818,
+      "bbox": [
+        0,
+        108,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

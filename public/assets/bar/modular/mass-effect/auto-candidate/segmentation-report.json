@@ -1,0 +1,46 @@
+{
+  "scene": "mass-effect",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.0938,
+      "solidCoverage": 0.0006,
+      "bbox": [
+        41,
+        0,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.7063,
+      "solidCoverage": 0.3659,
+      "bbox": [
+        0,
+        0,
+        1137,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "review-all-edges"
+    },
+    "seating": {
+      "coverage": 0.308,
+      "solidCoverage": 0.1996,
+      "bbox": [
+        0,
+        0,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "review-all-edges"
+    }
+  }
+}

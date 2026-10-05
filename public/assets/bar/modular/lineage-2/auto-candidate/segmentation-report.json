@@ -1,0 +1,46 @@
+{
+  "scene": "lineage-2",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.388,
+      "solidCoverage": 0.007,
+      "bbox": [
+        0,
+        0,
+        1662,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.3634,
+      "solidCoverage": 0.1145,
+      "bbox": [
+        35,
+        0,
+        821,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.7773,
+      "solidCoverage": 0.0288,
+      "bbox": [
+        0,
+        0,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "review-all-edges"
+    }
+  }
+}

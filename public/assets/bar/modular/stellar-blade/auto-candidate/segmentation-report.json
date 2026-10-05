@@ -1,0 +1,46 @@
+{
+  "scene": "stellar-blade",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.2233,
+      "solidCoverage": 0.022,
+      "bbox": [
+        78,
+        53,
+        1526,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.5197,
+      "solidCoverage": 0.089,
+      "bbox": [
+        163,
+        0,
+        1137,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.3252,
+      "solidCoverage": 0.1524,
+      "bbox": [
+        0,
+        94,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

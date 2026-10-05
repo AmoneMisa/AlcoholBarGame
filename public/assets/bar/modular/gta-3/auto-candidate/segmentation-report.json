@@ -1,0 +1,46 @@
+{
+  "scene": "gta-3",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.0628,
+      "solidCoverage": 0.0,
+      "bbox": [
+        0,
+        0,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "review-all-edges"
+    },
+    "shelf": {
+      "coverage": 0.3546,
+      "solidCoverage": 0.0003,
+      "bbox": [
+        68,
+        0,
+        1137,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.2508,
+      "solidCoverage": 0.156,
+      "bbox": [
+        47,
+        112,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "scene": "allods",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.3294,
+      "solidCoverage": 0.0014,
+      "bbox": [
+        0,
+        7,
+        1774,
+        302
+      ],
+      "width": 1774,
+      "height": 302,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.1478,
+      "solidCoverage": 0.0301,
+      "bbox": [
+        37,
+        0,
+        810,
+        408
+      ],
+      "width": 1206,
+      "height": 408,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.3824,
+      "solidCoverage": 0.1353,
+      "bbox": [
+        0,
+        0,
+        1774,
+        266
+      ],
+      "width": 1774,
+      "height": 266,
+      "status": "review-all-edges"
+    }
+  }
+}

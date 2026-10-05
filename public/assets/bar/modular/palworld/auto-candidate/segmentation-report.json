@@ -1,0 +1,46 @@
+{
+  "scene": "palworld",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.3294,
+      "solidCoverage": 0.1156,
+      "bbox": [
+        0,
+        9,
+        1672,
+        286
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.1301,
+      "solidCoverage": 0.0645,
+      "bbox": [
+        0,
+        0,
+        1137,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "review-all-edges"
+    },
+    "seating": {
+      "coverage": 0.3104,
+      "solidCoverage": 0.0776,
+      "bbox": [
+        0,
+        9,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

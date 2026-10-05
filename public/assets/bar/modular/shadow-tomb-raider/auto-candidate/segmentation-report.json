@@ -1,0 +1,46 @@
+{
+  "scene": "shadow-tomb-raider",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.1889,
+      "solidCoverage": 0.0932,
+      "bbox": [
+        42,
+        98,
+        1667,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.5313,
+      "solidCoverage": 0.1467,
+      "bbox": [
+        0,
+        0,
+        1002,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.2013,
+      "solidCoverage": 0.0753,
+      "bbox": [
+        0,
+        0,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "review-all-edges"
+    }
+  }
+}

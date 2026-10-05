@@ -1,0 +1,46 @@
+{
+  "scene": "assassins-creed",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.2049,
+      "solidCoverage": 0.0848,
+      "bbox": [
+        52,
+        53,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.4557,
+      "solidCoverage": 0.0017,
+      "bbox": [
+        89,
+        0,
+        725,
+        432
+      ],
+      "width": 1137,
+      "height": 432,
+      "status": "review-soft-mask"
+    },
+    "seating": {
+      "coverage": 0.3178,
+      "solidCoverage": 0.1015,
+      "bbox": [
+        0,
+        0,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "review-all-edges"
+    }
+  }
+}

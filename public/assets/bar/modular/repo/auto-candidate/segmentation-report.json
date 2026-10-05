@@ -1,0 +1,46 @@
+{
+  "scene": "repo",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.0753,
+      "solidCoverage": 0.0001,
+      "bbox": [
+        0,
+        0,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "review-all-edges"
+    },
+    "shelf": {
+      "coverage": 0.0735,
+      "solidCoverage": 0.0109,
+      "bbox": [
+        53,
+        0,
+        1130,
+        412
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.3694,
+      "solidCoverage": 0.182,
+      "bbox": [
+        0,
+        13,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "scene": "death-stranding",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.0653,
+      "solidCoverage": 0.0379,
+      "bbox": [
+        47,
+        6,
+        1630,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.6549,
+      "solidCoverage": 0.0566,
+      "bbox": [
+        28,
+        0,
+        1137,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.2708,
+      "solidCoverage": 0.0929,
+      "bbox": [
+        37,
+        135,
+        1625,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

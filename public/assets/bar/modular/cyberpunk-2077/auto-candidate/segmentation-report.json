@@ -1,0 +1,46 @@
+{
+  "scene": "cyberpunk-2077",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.0969,
+      "solidCoverage": 0.0271,
+      "bbox": [
+        0,
+        0,
+        1656,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.277,
+      "solidCoverage": 0.0679,
+      "bbox": [
+        252,
+        0,
+        1137,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.3653,
+      "solidCoverage": 0.1032,
+      "bbox": [
+        0,
+        0,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "review-all-edges"
+    }
+  }
+}

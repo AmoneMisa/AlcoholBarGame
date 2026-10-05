@@ -1,0 +1,46 @@
+{
+  "scene": "minecraft",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.4203,
+      "solidCoverage": 0.2751,
+      "bbox": [
+        0,
+        61,
+        1672,
+        290
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.034,
+      "solidCoverage": 0.0,
+      "bbox": [
+        0,
+        0,
+        1137,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "review-all-edges"
+    },
+    "seating": {
+      "coverage": 0.087,
+      "solidCoverage": 0.0,
+      "bbox": [
+        0,
+        0,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "review-all-edges"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "scene": "walking-dead-s3",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.3542,
+      "solidCoverage": 0.1478,
+      "bbox": [
+        46,
+        17,
+        1635,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.6103,
+      "solidCoverage": 0.0702,
+      "bbox": [
+        0,
+        0,
+        1105,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.3088,
+      "solidCoverage": 0.0804,
+      "bbox": [
+        0,
+        63,
+        1662,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

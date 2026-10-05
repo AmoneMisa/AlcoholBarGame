@@ -1,0 +1,46 @@
+{
+  "scene": "black-desert",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.047,
+      "solidCoverage": 0.0,
+      "bbox": [
+        0,
+        0,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "review-all-edges"
+    },
+    "shelf": {
+      "coverage": 0.3878,
+      "solidCoverage": 0.0758,
+      "bbox": [
+        131,
+        0,
+        1073,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.2712,
+      "solidCoverage": 0.1407,
+      "bbox": [
+        0,
+        0,
+        1469,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

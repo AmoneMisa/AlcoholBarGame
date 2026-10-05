@@ -1,0 +1,46 @@
+{
+  "scene": "baldurs-gate-3",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.2492,
+      "solidCoverage": 0.0002,
+      "bbox": [
+        0,
+        0,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "review-all-edges"
+    },
+    "shelf": {
+      "coverage": 0.2344,
+      "solidCoverage": 0.0002,
+      "bbox": [
+        210,
+        0,
+        931,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.3041,
+      "solidCoverage": 0.1684,
+      "bbox": [
+        0,
+        23,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

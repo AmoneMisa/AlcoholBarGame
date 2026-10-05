@@ -1,0 +1,46 @@
+{
+  "scene": "batman",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.4017,
+      "solidCoverage": 0.0205,
+      "bbox": [
+        0,
+        80,
+        1505,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.2593,
+      "solidCoverage": 0.001,
+      "bbox": [
+        78,
+        0,
+        1131,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.3335,
+      "solidCoverage": 0.1289,
+      "bbox": [
+        0,
+        53,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

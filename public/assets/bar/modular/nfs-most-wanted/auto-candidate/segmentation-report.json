@@ -1,0 +1,46 @@
+{
+  "scene": "nfs-most-wanted",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.0376,
+      "solidCoverage": 0.0,
+      "bbox": [
+        0,
+        0,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "review-all-edges"
+    },
+    "shelf": {
+      "coverage": 0.1246,
+      "solidCoverage": 0.003,
+      "bbox": [
+        0,
+        0,
+        1137,
+        403
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.3103,
+      "solidCoverage": 0.1326,
+      "bbox": [
+        0,
+        18,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

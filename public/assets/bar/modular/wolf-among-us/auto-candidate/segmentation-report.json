@@ -1,0 +1,46 @@
+{
+  "scene": "wolf-among-us",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.0824,
+      "solidCoverage": 0.0577,
+      "bbox": [
+        0,
+        5,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.6969,
+      "solidCoverage": 0.0143,
+      "bbox": [
+        0,
+        0,
+        1137,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "review-all-edges"
+    },
+    "seating": {
+      "coverage": 0.4191,
+      "solidCoverage": 0.1368,
+      "bbox": [
+        0,
+        72,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "scene": "detroit",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.2175,
+      "solidCoverage": 0.1475,
+      "bbox": [
+        52,
+        47,
+        1588,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.6201,
+      "solidCoverage": 0.5517,
+      "bbox": [
+        60,
+        0,
+        1127,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.6797,
+      "solidCoverage": 0.0016,
+      "bbox": [
+        0,
+        0,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "review-all-edges"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "scene": "perfect-world",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.4208,
+      "solidCoverage": 0.0012,
+      "bbox": [
+        0,
+        46,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.2217,
+      "solidCoverage": 0.1035,
+      "bbox": [
+        0,
+        0,
+        1137,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "review-all-edges"
+    },
+    "seating": {
+      "coverage": 0.3465,
+      "solidCoverage": 0.204,
+      "bbox": [
+        0,
+        0,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "review-all-edges"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "scene": "nfs-underground",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.7641,
+      "solidCoverage": 0.2033,
+      "bbox": [
+        0,
+        0,
+        1774,
+        302
+      ],
+      "width": 1774,
+      "height": 302,
+      "status": "review-all-edges"
+    },
+    "shelf": {
+      "coverage": 0.3227,
+      "solidCoverage": 0.0041,
+      "bbox": [
+        0,
+        0,
+        1206,
+        408
+      ],
+      "width": 1206,
+      "height": 408,
+      "status": "review-all-edges"
+    },
+    "seating": {
+      "coverage": 0.7058,
+      "solidCoverage": 0.0043,
+      "bbox": [
+        0,
+        37,
+        1774,
+        266
+      ],
+      "width": 1774,
+      "height": 266,
+      "status": "review-soft-mask"
+    }
+  }
+}

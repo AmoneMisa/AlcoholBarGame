@@ -1,0 +1,46 @@
+{
+  "scene": "underwater",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.2745,
+      "solidCoverage": 0.004,
+      "bbox": [
+        225,
+        46,
+        1541,
+        296
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.3348,
+      "solidCoverage": 0.0439,
+      "bbox": [
+        0,
+        0,
+        1137,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "review-all-edges"
+    },
+    "seating": {
+      "coverage": 0.6777,
+      "solidCoverage": 0.0893,
+      "bbox": [
+        0,
+        28,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

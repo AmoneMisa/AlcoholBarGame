@@ -1,0 +1,46 @@
+{
+  "scene": "silent-hill",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.3205,
+      "solidCoverage": 0.131,
+      "bbox": [
+        0,
+        0,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "review-all-edges"
+    },
+    "shelf": {
+      "coverage": 0.5443,
+      "solidCoverage": 0.2744,
+      "bbox": [
+        0,
+        0,
+        1137,
+        424
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.4313,
+      "solidCoverage": 0.1317,
+      "bbox": [
+        0,
+        118,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

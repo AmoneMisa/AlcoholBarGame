@@ -1,0 +1,46 @@
+{
+  "scene": "quantum-break",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.1297,
+      "solidCoverage": 0.0366,
+      "bbox": [
+        37,
+        57,
+        1635,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.1657,
+      "solidCoverage": 0.0203,
+      "bbox": [
+        223,
+        0,
+        789,
+        323
+      ],
+      "width": 1137,
+      "height": 432,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.3345,
+      "solidCoverage": 0.1444,
+      "bbox": [
+        0,
+        9,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}

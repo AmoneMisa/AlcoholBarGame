@@ -1,0 +1,46 @@
+{
+  "scene": "heroes-3",
+  "model": "u2netp",
+  "quality": "candidate-only",
+  "roles": {
+    "counter": {
+      "coverage": 0.3474,
+      "solidCoverage": 0.0762,
+      "bbox": [
+        0,
+        57,
+        1672,
+        320
+      ],
+      "width": 1672,
+      "height": 320,
+      "status": "candidate"
+    },
+    "shelf": {
+      "coverage": 0.4229,
+      "solidCoverage": 0.0002,
+      "bbox": [
+        0,
+        0,
+        1070,
+        433
+      ],
+      "width": 1137,
+      "height": 433,
+      "status": "candidate"
+    },
+    "seating": {
+      "coverage": 0.4717,
+      "solidCoverage": 0.026,
+      "bbox": [
+        0,
+        36,
+        1672,
+        282
+      ],
+      "width": 1672,
+      "height": 282,
+      "status": "candidate"
+    }
+  }
+}
