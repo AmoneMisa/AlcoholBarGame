@@ -1,0 +1,107 @@
+{
+  "id": "garden",
+  "canvas": {
+    "width": 1671,
+    "height": 941
+  },
+  "authoringCanvas": {
+    "width": 1672,
+    "height": 941
+  },
+  "source": "../../../public/assets/bar/backgrounds/botanical-room.webp",
+  "modules": {
+    "architecture-reference": {
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1671,
+        "height": 941
+      },
+      "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces.",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.999402,
+        "height": 1
+      }
+    },
+    "shelf-reference": {
+      "crop": {
+        "x": 435,
+        "y": 127,
+        "width": 686,
+        "height": 438
+      },
+      "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware.",
+      "rect": {
+        "x": 0.260167,
+        "y": 0.134963,
+        "width": 0.410287,
+        "height": 0.465462
+      }
+    },
+    "counter-reference": {
+      "crop": {
+        "x": 0,
+        "y": 598,
+        "width": 1671,
+        "height": 311
+      },
+      "prompt": "Isolate existing counter with transparent surroundings and bleed.",
+      "rect": {
+        "x": 0,
+        "y": 0.635494,
+        "width": 0.999402,
+        "height": 0.330499
+      }
+    }
+  },
+  "slots": {
+    "wall": {
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.70457
+    },
+    "shelves": {
+      "x": 0.300239,
+      "y": 0.134963,
+      "width": 0.330144,
+      "height": 0.465462
+    },
+    "counter": {
+      "x": 0,
+      "y": 0.635494,
+      "width": 1,
+      "height": 0.330499
+    },
+    "floor": {
+      "x": 0,
+      "y": 0.70457,
+      "width": 1,
+      "height": 0.29543
+    }
+  },
+  "windowCutouts": [],
+  "shelfRows": [
+    249,
+    348,
+    452
+  ],
+  "seatAnchors": [],
+  "bartenderAnchor": null,
+  "status": "geometry-ready-art-review-required",
+  "geometrySource": "measured-gameplay",
+  "review": {
+    "windowCutouts": "manual-required",
+    "architectureInpaint": "required",
+    "alphaEdges": "manual-review"
+  },
+  "notes": [
+    "Measured from existing BarScene geometry.",
+    "Reference crops are authoring aids, not shippable clean modules.",
+    "Preserve camera/horizon/perspective.",
+    "Remove painted bottles from shelf furniture.",
+    "Inpaint occluded wall/floor before export."
+  ]
+}

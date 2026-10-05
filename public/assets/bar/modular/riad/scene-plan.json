@@ -1,0 +1,138 @@
+{
+  "id": "riad",
+  "canvas": {
+    "width": 764,
+    "height": 508
+  },
+  "authoringCanvas": {
+    "width": 1516,
+    "height": 1004
+  },
+  "source": "../../../public/assets/bar/backgrounds/interior-riad.webp",
+  "modules": {
+    "architecture-reference": {
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 764,
+        "height": 508
+      },
+      "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces.",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.503958,
+        "height": 0.505976
+      }
+    },
+    "shelf-reference": {
+      "crop": {
+        "x": 168,
+        "y": 87,
+        "width": 459,
+        "height": 208
+      },
+      "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware.",
+      "rect": {
+        "x": 0.110818,
+        "y": 0.086653,
+        "width": 0.30277,
+        "height": 0.207171
+      }
+    },
+    "counter-reference": {
+      "crop": {
+        "x": 0,
+        "y": 231,
+        "width": 764,
+        "height": 157
+      },
+      "prompt": "Isolate existing counter with transparent surroundings and bleed.",
+      "rect": {
+        "x": 0,
+        "y": 0.23008,
+        "width": 0.503958,
+        "height": 0.156375
+      }
+    }
+  },
+  "slots": {
+    "wall": {
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.5249
+    },
+    "shelves": {
+      "x": 0.259894,
+      "y": 0.170319,
+      "width": 0.519789,
+      "height": 0.410359
+    },
+    "counter": {
+      "x": 0,
+      "y": 0.455179,
+      "width": 1,
+      "height": 0.309761
+    },
+    "floor": {
+      "x": 0,
+      "y": 0.5249,
+      "width": 1,
+      "height": 0.4751
+    },
+    "seating": {
+      "x": 0,
+      "y": 0.584661,
+      "width": 1,
+      "height": 0.415339
+    }
+  },
+  "windowCutouts": [],
+  "shelfRows": [
+    301,
+    382,
+    462
+  ],
+  "seatAnchors": [
+    {
+      "x": 212,
+      "y": 668
+    },
+    {
+      "x": 409,
+      "y": 668
+    },
+    {
+      "x": 637,
+      "y": 668
+    },
+    {
+      "x": 879,
+      "y": 668
+    },
+    {
+      "x": 1107,
+      "y": 668
+    },
+    {
+      "x": 1319,
+      "y": 668
+    }
+  ],
+  "bartenderAnchor": null,
+  "status": "geometry-ready-art-review-required",
+  "geometrySource": "measured-gameplay",
+  "review": {
+    "windowCutouts": "manual-required",
+    "architectureInpaint": "required",
+    "alphaEdges": "manual-review"
+  },
+  "notes": [
+    "Measured from existing BarScene geometry.",
+    "Reference crops are authoring aids, not shippable clean modules.",
+    "Preserve camera/horizon/perspective.",
+    "Remove painted bottles from shelf furniture.",
+    "Inpaint occluded wall/floor before export."
+  ]
+}

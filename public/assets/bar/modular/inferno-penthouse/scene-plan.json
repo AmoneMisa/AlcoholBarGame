@@ -1,0 +1,134 @@
+{
+  "id": "inferno-penthouse",
+  "canvas": {
+    "width": 1536,
+    "height": 1024
+  },
+  "authoringCanvas": {
+    "width": 1536,
+    "height": 1024
+  },
+  "source": "../../../public/assets/bar/backgrounds/inferno-penthouse-club.webp",
+  "modules": {
+    "architecture-reference": {
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1536,
+        "height": 1024
+      },
+      "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces.",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    "shelf-reference": {
+      "crop": {
+        "x": 399,
+        "y": 256,
+        "width": 737,
+        "height": 379
+      },
+      "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware.",
+      "rect": {
+        "x": 0.259766,
+        "y": 0.25,
+        "width": 0.479818,
+        "height": 0.370117
+      }
+    },
+    "counter-reference": {
+      "crop": {
+        "x": 0,
+        "y": 686,
+        "width": 1536,
+        "height": 266
+      },
+      "prompt": "Isolate existing counter with transparent surroundings and bleed.",
+      "rect": {
+        "x": 0,
+        "y": 0.669922,
+        "width": 1,
+        "height": 0.259766
+      }
+    }
+  },
+  "slots": {
+    "wall": {
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.740234
+    },
+    "shelves": {
+      "x": 0.30013,
+      "y": 0.25,
+      "width": 0.39974,
+      "height": 0.370117
+    },
+    "counter": {
+      "x": 0,
+      "y": 0.669922,
+      "width": 1,
+      "height": 0.259766
+    },
+    "floor": {
+      "x": 0,
+      "y": 0.740234,
+      "width": 1,
+      "height": 0.259766
+    },
+    "seating": {
+      "x": 0,
+      "y": 0.75,
+      "width": 1,
+      "height": 0.25
+    }
+  },
+  "windowCutouts": [],
+  "shelfRows": [
+    389,
+    451,
+    512
+  ],
+  "seatAnchors": [
+    {
+      "x": 108,
+      "y": 850
+    },
+    {
+      "x": 384,
+      "y": 850
+    },
+    {
+      "x": 753,
+      "y": 850
+    },
+    {
+      "x": 1121,
+      "y": 850
+    },
+    {
+      "x": 1428,
+      "y": 850
+    }
+  ],
+  "bartenderAnchor": null,
+  "status": "geometry-ready-art-review-required",
+  "geometrySource": "measured-gameplay",
+  "review": {
+    "windowCutouts": "manual-required",
+    "architectureInpaint": "required",
+    "alphaEdges": "manual-review"
+  },
+  "notes": [
+    "Measured from existing BarScene geometry.",
+    "Reference crops are authoring aids, not shippable clean modules.",
+    "Preserve camera/horizon/perspective.",
+    "Remove painted bottles from shelf furniture.",
+    "Inpaint occluded wall/floor before export."
+  ]
+}

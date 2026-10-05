@@ -1,0 +1,131 @@
+{
+  "id": "rooftop",
+  "canvas": {
+    "width": 764,
+    "height": 508
+  },
+  "authoringCanvas": {
+    "width": 1516,
+    "height": 1004
+  },
+  "source": "../../../public/assets/bar/backgrounds/interior-rooftop.webp",
+  "modules": {
+    "architecture-reference": {
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 764,
+        "height": 508
+      },
+      "prompt": "Create a clean architecture plate from this existing background. Remove counter, stools/chairs, loose foreground decor and back-bar furniture; reconstruct hidden wall and floor. Preserve fixed architecture and source perspective.",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 0.503958,
+        "height": 0.505976
+      }
+    },
+    "shelf-reference": {
+      "crop": {
+        "x": 199,
+        "y": 87,
+        "width": 367,
+        "height": 229
+      },
+      "prompt": "Isolate the existing back-bar furniture from this source region. Remove all painted bottles and glassware. Preserve exact perspective.",
+      "rect": {
+        "x": 0.131266,
+        "y": 0.086653,
+        "width": 0.242084,
+        "height": 0.228088
+      }
+    },
+    "counter-reference": {
+      "crop": {
+        "x": 0,
+        "y": 274,
+        "width": 764,
+        "height": 183
+      },
+      "prompt": "Isolate the existing bar counter with transparent surroundings and 24 px bleed. Preserve its exact perspective and silhouette.",
+      "rect": {
+        "x": 0,
+        "y": 0.272908,
+        "width": 0.503958,
+        "height": 0.182271
+      }
+    }
+  },
+  "slots": {
+    "wall": {
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.609562
+    },
+    "shelves": {
+      "x": 0.300132,
+      "y": 0.170319,
+      "width": 0.399736,
+      "height": 0.450199
+    },
+    "counter": {
+      "x": 0,
+      "y": 0.539841,
+      "width": 1,
+      "height": 0.359562
+    },
+    "floor": {
+      "x": 0,
+      "y": 0.609562,
+      "width": 1,
+      "height": 0.390438
+    },
+    "seating": {
+      "x": 0,
+      "y": 0.72012,
+      "width": 1,
+      "height": 0.27988
+    }
+  },
+  "windowCutouts": [],
+  "shelfRows": [
+    301,
+    402,
+    502
+  ],
+  "seatAnchors": [
+    {
+      "x": 303,
+      "y": 803
+    },
+    {
+      "x": 652,
+      "y": 803
+    },
+    {
+      "x": 1001,
+      "y": 803
+    },
+    {
+      "x": 1364,
+      "y": 803
+    }
+  ],
+  "bartenderAnchor": null,
+  "status": "geometry-ready-art-review-required",
+  "geometrySource": null,
+  "review": {
+    "windowCutouts": "manual-required",
+    "architectureInpaint": "required",
+    "alphaEdges": "manual-review",
+    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone."
+  },
+  "notes": [
+    "Generated from the measured gameplay geometry already used by BarScene.",
+    "Do not ship reference crops as final modules until the clean architecture plate and transparency have been visually reviewed.",
+    "Keep camera, horizon and perspective identical to the source.",
+    "Remove painted bottles from shelf modules; decorative bottles are rendered by shelf presets.",
+    "If counter/seating hides wall or floor, reconstruct the hidden surface by inpainting before export."
+  ]
+}

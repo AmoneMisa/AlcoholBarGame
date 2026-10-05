@@ -1,0 +1,105 @@
+{
+  "id": "velvet",
+  "canvas": {
+    "width": 1774,
+    "height": 887
+  },
+  "authoringCanvas": {
+    "width": 1774,
+    "height": 887
+  },
+  "source": "../../../public/assets/bar/backgrounds/velvet-hour-bar.webp",
+  "modules": {
+    "architecture-reference": {
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1774,
+        "height": 887
+      },
+      "prompt": "Clean room plate: remove counter, stools and back-bar furniture, reconstruct hidden wall and floor, and make the two marked window panes transparent while preserving frames, mullions, curtains and reflections.",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    "shelf-reference": {
+      "crop": {
+        "x": 150,
+        "y": 65,
+        "width": 600,
+        "height": 500
+      },
+      "prompt": "Isolated back-bar cabinet matching this camera. Keep shelves empty; bottle decor is rendered separately.",
+      "rect": {
+        "x": 0.084555,
+        "y": 0.073281,
+        "width": 0.338219,
+        "height": 0.563698
+      }
+    },
+    "counter-reference": {
+      "crop": {
+        "x": 0,
+        "y": 470,
+        "width": 1774,
+        "height": 320
+      },
+      "prompt": "Isolated counter with transparent surroundings and 16-24 px visual bleed around its silhouette.",
+      "rect": {
+        "x": 0,
+        "y": 0.529876,
+        "width": 1,
+        "height": 0.360767
+      }
+    }
+  },
+  "slots": {
+    "wall": {
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.630214
+    },
+    "counter": {
+      "x": 0,
+      "y": 0.569335,
+      "width": 1,
+      "height": 0.285231
+    },
+    "seating": {
+      "x": 0.027621,
+      "y": 0.741826,
+      "width": 0.944758,
+      "height": 0.254791
+    }
+  },
+  "windowCutouts": [
+    {
+      "x": 0.20575,
+      "y": 0.033822,
+      "width": 0.18602,
+      "height": 0.462232
+    },
+    {
+      "x": 0.608794,
+      "y": 0.033822,
+      "width": 0.18602,
+      "height": 0.462232
+    }
+  ],
+  "shelfRows": [],
+  "seatAnchors": [],
+  "bartenderAnchor": null,
+  "status": "geometry-ready-art-review-required",
+  "geometrySource": "reviewed-modular-pilot",
+  "review": {},
+  "notes": [
+    "Keep the camera, horizon and perspective fixed.",
+    "Modules overlap by design; do not trim to the visible contour.",
+    "Lighting should stay neutral enough for the runtime shader.",
+    "Window panes must be transparent in architecture.webp so the exterior layer can change independently."
+  ]
+}
