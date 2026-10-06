@@ -58,6 +58,19 @@ def module_crop(manifest,role,source_size):
     sx=source_size[0]/aw; sy=source_size[1]/ah
     return (round(r['x']*sx),round(r['y']*sy),round((r['x']+r['width'])*sx),round((r['y']+r['height'])*sy))
 
+def crop_normalized(source,rect):
+    w,h=source.size
+    return source.crop((
+        round(rect['x']*w), round(rect['y']*h),
+        round((rect['x']+rect['width'])*w),
+        round((rect['y']+rect['height'])*h)
+    ))
+
+def build_masked_cut(image,spec):
+    w,h=image.size
+    cut,mask=build_masked_cut(image,spec)
+    return cut,mask
+
 def build(manifest,source,role,spec):
     scene_id=manifest['id']
     base=MOD/scene_id
@@ -80,6 +93,18 @@ def build(manifest,source,role,spec):
     mask.save(out/f'{role}-mask.png','PNG',optimize=True)
     return {'scene':scene_id,'role':role,'size':[w,h]}
 
+def build_seat(manifest,source,index,item):
+    scene_id=manifest['id']
+    seat_id=item.get('id',f'seat-{index+1:02d}')
+    image=crop_normalized(source,item['cropNormalized'])
+    w,h=image.size
+    cut,mask=build_masked_cut(image,item.get('mask',{}))
+    out=MOD/scene_id/'manual'/'seats'
+    out.mkdir(parents=True,exist_ok=True)
+    cut.save(out/f'{seat_id}.webp','WEBP',lossless=True,method=6)
+    mask.save(out/f'{seat_id}-mask.png','PNG',optimize=True)
+    return {'scene':scene_id,'role':'seat','id':seat_id,'size':[w,h]}
+
 def main():
     rows=[]
     for path in sorted(MANIFESTS.glob('*.json')):
@@ -95,6 +120,8 @@ def main():
             source=source_file.convert('RGBA')
             for role,spec in specs.items():
                 rows.append(build(manifest,source,role,spec))
+            for index,item in enumerate(manifest.get('manualSeatCutsNormalized',[])):
+                rows.append(build_seat(manifest,source,index,item))
     report=ROOT/'docs/modular-review/manual-role-cuts.json'
     report.write_text(json.dumps({'count':len(rows),'items':rows},indent=2)+'\n')
     print(f'manual role cuts: {len(rows)}')
