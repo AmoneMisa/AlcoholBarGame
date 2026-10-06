@@ -110,7 +110,7 @@
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
     "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-manual-refined"
   },
   "windowCutoutsNormalized": [
     {
@@ -157,32 +157,61 @@
   ],
   "manualSeatCutNormalized": {
     "cropNormalized": {
-      "x": 0.44,
-      "y": 0.57,
-      "width": 0.14,
+      "x": 0.385,
+      "y": 0.59,
+      "width": 0.21,
       "height": 0.34
     },
     "mask": {
-      "feather": 0.7,
+      "feather": 0.6,
       "include": [
         {
           "type": "polygon",
           "points": [
             {
-              "x": 0.07,
-              "y": 0.02
-            },
-            {
-              "x": 0.93,
-              "y": 0.02
+              "x": 0.12,
+              "y": 0.06
             },
             {
               "x": 0.88,
+              "y": 0.06
+            },
+            {
+              "x": 0.91,
               "y": 0.34
             },
             {
-              "x": 0.12,
+              "x": 0.82,
+              "y": 0.42
+            },
+            {
+              "x": 0.18,
+              "y": 0.42
+            },
+            {
+              "x": 0.09,
               "y": 0.34
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.1,
+              "y": 0.36
+            },
+            {
+              "x": 0.9,
+              "y": 0.36
+            },
+            {
+              "x": 0.86,
+              "y": 0.5
+            },
+            {
+              "x": 0.14,
+              "y": 0.5
             }
           ]
         },
@@ -191,19 +220,19 @@
           "points": [
             {
               "x": 0.18,
-              "y": 0.28
+              "y": 0.46
             },
             {
-              "x": 0.31,
-              "y": 0.28
+              "x": 0.25,
+              "y": 0.46
             },
             {
-              "x": 0.24,
-              "y": 1
+              "x": 0.18,
+              "y": 0.98
             },
             {
-              "x": 0.1,
-              "y": 1
+              "x": 0.11,
+              "y": 0.98
             }
           ]
         },
@@ -211,29 +240,29 @@
           "type": "polygon",
           "points": [
             {
-              "x": 0.69,
-              "y": 0.28
+              "x": 0.75,
+              "y": 0.46
             },
             {
               "x": 0.82,
-              "y": 0.28
+              "y": 0.46
             },
             {
-              "x": 0.9,
-              "y": 1
+              "x": 0.89,
+              "y": 0.98
             },
             {
-              "x": 0.76,
-              "y": 1
+              "x": 0.82,
+              "y": 0.98
             }
           ]
         },
         {
-          "type": "rect",
-          "x": 0.15,
-          "y": 0.58,
-          "width": 0.7,
-          "height": 0.05
+          "type": "ellipse",
+          "x": 0.13,
+          "y": 0.7,
+          "width": 0.74,
+          "height": 0.07
         }
       ],
       "exclude": []
