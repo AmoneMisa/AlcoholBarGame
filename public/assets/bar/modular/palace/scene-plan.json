@@ -244,7 +244,8 @@
   "review": {
     "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
-    "alphaEdges": "manual-review"
+    "alphaEdges": "manual-review",
+    "seatAsset": "single-reusable-manual"
   },
   "notes": [
     "Measured from existing BarScene geometry.",
@@ -252,6 +253,7 @@
     "Preserve camera/horizon/perspective.",
     "Remove painted bottles from shelf furniture.",
     "Inpaint occluded wall/floor before export.",
-    "Window cutouts manually traced from the existing source background; preserve frames, mullions, curtains and permanent trim."
+    "Window cutouts manually traced from the existing source background; preserve frames, mullions, curtains and permanent trim.",
+    "One reusable seat asset per scene; seatAnchors control runtime count and placement."
   ]
 }
