@@ -8,7 +8,8 @@
     "Existing themed background coverage manifest.",
     "Source WebP size is auto-detected.",
     "Do not ship crops before visual geometry review.",
-    "Use segmentation/inpainting for hidden wall/floor."
+    "Use segmentation/inpainting for hidden wall/floor.",
+    "Individual stool assets are runtime seating units; combined seating remains review-only."
   ],
   "modules": {
     "architecture-reference": {
@@ -115,7 +116,7 @@
       "seating",
       "shelf"
     ],
-    "individualSeatCuts": "manual-measured"
+    "individualSeatCuts": "manual-refined"
   },
   "manualRoleMasksNormalized": {
     "shelf": {
@@ -463,38 +464,38 @@
     {
       "id": "seat-01",
       "cropNormalized": {
-        "x": 0,
-        "y": 0.748,
-        "width": 0.16,
-        "height": 0.252
+        "x": 0.005,
+        "y": 0.785,
+        "width": 0.145,
+        "height": 0.215
       },
       "mask": {
-        "feather": 0.8,
+        "feather": 0.65,
         "include": [
           {
             "type": "ellipse",
-            "x": 0.02,
-            "y": 0,
-            "width": 0.96,
-            "height": 0.3
+            "x": 0.015,
+            "y": 0.015,
+            "width": 0.97,
+            "height": 0.22
           },
           {
             "type": "polygon",
             "points": [
               {
-                "x": 0.16,
-                "y": 0.22
+                "x": 0.17,
+                "y": 0.19
               },
               {
-                "x": 0.34,
-                "y": 0.22
+                "x": 0.31,
+                "y": 0.19
               },
               {
-                "x": 0.27,
+                "x": 0.24,
                 "y": 1
               },
               {
-                "x": 0.08,
+                "x": 0.09,
                 "y": 1
               }
             ]
@@ -503,69 +504,77 @@
             "type": "polygon",
             "points": [
               {
-                "x": 0.66,
-                "y": 0.22
+                "x": 0.69,
+                "y": 0.19
               },
               {
-                "x": 0.84,
-                "y": 0.22
+                "x": 0.83,
+                "y": 0.19
               },
               {
-                "x": 0.92,
+                "x": 0.91,
                 "y": 1
               },
               {
-                "x": 0.73,
+                "x": 0.76,
                 "y": 1
               }
             ]
           },
           {
             "type": "rect",
-            "x": 0.13,
-            "y": 0.5,
-            "width": 0.74,
-            "height": 0.08
+            "x": 0.12,
+            "y": 0.52,
+            "width": 0.76,
+            "height": 0.045
           }
         ],
-        "exclude": []
+        "exclude": [
+          {
+            "type": "rect",
+            "x": 0.31,
+            "y": 0.24,
+            "width": 0.38,
+            "height": 0.27
+          }
+        ]
       }
     },
     {
       "id": "seat-02",
       "cropNormalized": {
-        "x": 0.205,
-        "y": 0.748,
-        "width": 0.17,
-        "height": 0.252
+        "x": 0.215,
+        "y": 0.785,
+        "width": 0.155,
+        "height": 0.215
       },
       "mask": {
-        "feather": 0.8,
+        "feather": 0.65,
         "include": [
           {
             "type": "ellipse",
-            "x": 0.02,
-            "y": 0,
-            "width": 0.96,
-            "height": 0.3
+            "x": 0.015,
+            "y": 0.015,
+            "width": 0.97,
+            "height": 0.22
           },
           {
             "type": "polygon",
             "points": [
               {
-                "x": 0.16,
-                "y": 0.22
+                "x": 0.17,
+                "y": 0.19
               },
               {
-                "x": 0.34,
-                "y": 0.22
+                "x": 0.31,
+                "y": 0.19
               },
               {
-                "x": 0.27,
+                "x": 0.24,
                 "y": 1
               },
               {
-                "x": 0.08,
+                "x": 0.09,
                 "y": 1
               }
             ]
@@ -574,69 +583,77 @@
             "type": "polygon",
             "points": [
               {
-                "x": 0.66,
-                "y": 0.22
+                "x": 0.69,
+                "y": 0.19
               },
               {
-                "x": 0.84,
-                "y": 0.22
+                "x": 0.83,
+                "y": 0.19
               },
               {
-                "x": 0.92,
+                "x": 0.91,
                 "y": 1
               },
               {
-                "x": 0.73,
+                "x": 0.76,
                 "y": 1
               }
             ]
           },
           {
             "type": "rect",
-            "x": 0.13,
-            "y": 0.5,
-            "width": 0.74,
-            "height": 0.08
+            "x": 0.12,
+            "y": 0.52,
+            "width": 0.76,
+            "height": 0.045
           }
         ],
-        "exclude": []
+        "exclude": [
+          {
+            "type": "rect",
+            "x": 0.31,
+            "y": 0.24,
+            "width": 0.38,
+            "height": 0.27
+          }
+        ]
       }
     },
     {
       "id": "seat-03",
       "cropNormalized": {
-        "x": 0.415,
-        "y": 0.748,
-        "width": 0.17,
-        "height": 0.252
+        "x": 0.425,
+        "y": 0.785,
+        "width": 0.155,
+        "height": 0.215
       },
       "mask": {
-        "feather": 0.8,
+        "feather": 0.65,
         "include": [
           {
             "type": "ellipse",
-            "x": 0.02,
-            "y": 0,
-            "width": 0.96,
-            "height": 0.3
+            "x": 0.015,
+            "y": 0.015,
+            "width": 0.97,
+            "height": 0.22
           },
           {
             "type": "polygon",
             "points": [
               {
-                "x": 0.16,
-                "y": 0.22
+                "x": 0.17,
+                "y": 0.19
               },
               {
-                "x": 0.34,
-                "y": 0.22
+                "x": 0.31,
+                "y": 0.19
               },
               {
-                "x": 0.27,
+                "x": 0.24,
                 "y": 1
               },
               {
-                "x": 0.08,
+                "x": 0.09,
                 "y": 1
               }
             ]
@@ -645,69 +662,77 @@
             "type": "polygon",
             "points": [
               {
-                "x": 0.66,
-                "y": 0.22
+                "x": 0.69,
+                "y": 0.19
               },
               {
-                "x": 0.84,
-                "y": 0.22
+                "x": 0.83,
+                "y": 0.19
               },
               {
-                "x": 0.92,
+                "x": 0.91,
                 "y": 1
               },
               {
-                "x": 0.73,
+                "x": 0.76,
                 "y": 1
               }
             ]
           },
           {
             "type": "rect",
-            "x": 0.13,
-            "y": 0.5,
-            "width": 0.74,
-            "height": 0.08
+            "x": 0.12,
+            "y": 0.52,
+            "width": 0.76,
+            "height": 0.045
           }
         ],
-        "exclude": []
+        "exclude": [
+          {
+            "type": "rect",
+            "x": 0.31,
+            "y": 0.24,
+            "width": 0.38,
+            "height": 0.27
+          }
+        ]
       }
     },
     {
       "id": "seat-04",
       "cropNormalized": {
-        "x": 0.625,
-        "y": 0.748,
-        "width": 0.17,
-        "height": 0.252
+        "x": 0.635,
+        "y": 0.785,
+        "width": 0.155,
+        "height": 0.215
       },
       "mask": {
-        "feather": 0.8,
+        "feather": 0.65,
         "include": [
           {
             "type": "ellipse",
-            "x": 0.02,
-            "y": 0,
-            "width": 0.96,
-            "height": 0.3
+            "x": 0.015,
+            "y": 0.015,
+            "width": 0.97,
+            "height": 0.22
           },
           {
             "type": "polygon",
             "points": [
               {
-                "x": 0.16,
-                "y": 0.22
+                "x": 0.17,
+                "y": 0.19
               },
               {
-                "x": 0.34,
-                "y": 0.22
+                "x": 0.31,
+                "y": 0.19
               },
               {
-                "x": 0.27,
+                "x": 0.24,
                 "y": 1
               },
               {
-                "x": 0.08,
+                "x": 0.09,
                 "y": 1
               }
             ]
@@ -716,69 +741,77 @@
             "type": "polygon",
             "points": [
               {
-                "x": 0.66,
-                "y": 0.22
+                "x": 0.69,
+                "y": 0.19
               },
               {
-                "x": 0.84,
-                "y": 0.22
+                "x": 0.83,
+                "y": 0.19
               },
               {
-                "x": 0.92,
+                "x": 0.91,
                 "y": 1
               },
               {
-                "x": 0.73,
+                "x": 0.76,
                 "y": 1
               }
             ]
           },
           {
             "type": "rect",
-            "x": 0.13,
-            "y": 0.5,
-            "width": 0.74,
-            "height": 0.08
+            "x": 0.12,
+            "y": 0.52,
+            "width": 0.76,
+            "height": 0.045
           }
         ],
-        "exclude": []
+        "exclude": [
+          {
+            "type": "rect",
+            "x": 0.31,
+            "y": 0.24,
+            "width": 0.38,
+            "height": 0.27
+          }
+        ]
       }
     },
     {
       "id": "seat-05",
       "cropNormalized": {
-        "x": 0.835,
-        "y": 0.748,
-        "width": 0.165,
-        "height": 0.252
+        "x": 0.845,
+        "y": 0.785,
+        "width": 0.15,
+        "height": 0.215
       },
       "mask": {
-        "feather": 0.8,
+        "feather": 0.65,
         "include": [
           {
             "type": "ellipse",
-            "x": 0.02,
-            "y": 0,
-            "width": 0.96,
-            "height": 0.3
+            "x": 0.015,
+            "y": 0.015,
+            "width": 0.97,
+            "height": 0.22
           },
           {
             "type": "polygon",
             "points": [
               {
-                "x": 0.16,
-                "y": 0.22
+                "x": 0.17,
+                "y": 0.19
               },
               {
-                "x": 0.34,
-                "y": 0.22
+                "x": 0.31,
+                "y": 0.19
               },
               {
-                "x": 0.27,
+                "x": 0.24,
                 "y": 1
               },
               {
-                "x": 0.08,
+                "x": 0.09,
                 "y": 1
               }
             ]
@@ -787,32 +820,40 @@
             "type": "polygon",
             "points": [
               {
-                "x": 0.66,
-                "y": 0.22
+                "x": 0.69,
+                "y": 0.19
               },
               {
-                "x": 0.84,
-                "y": 0.22
+                "x": 0.83,
+                "y": 0.19
               },
               {
-                "x": 0.92,
+                "x": 0.91,
                 "y": 1
               },
               {
-                "x": 0.73,
+                "x": 0.76,
                 "y": 1
               }
             ]
           },
           {
             "type": "rect",
-            "x": 0.13,
-            "y": 0.5,
-            "width": 0.74,
-            "height": 0.08
+            "x": 0.12,
+            "y": 0.52,
+            "width": 0.76,
+            "height": 0.045
           }
         ],
-        "exclude": []
+        "exclude": [
+          {
+            "type": "rect",
+            "x": 0.31,
+            "y": 0.24,
+            "width": 0.38,
+            "height": 0.27
+          }
+        ]
       }
     }
   ]
