@@ -13,7 +13,8 @@
     "Keep camera, horizon and perspective identical to the source.",
     "Remove painted bottles from shelf modules; decorative bottles are rendered by shelf presets.",
     "If counter/seating hides wall or floor, reconstruct the hidden surface by inpainting before export.",
-    "Window cutouts manually traced from the existing source background; preserve frames, mullions, curtains and permanent trim."
+    "Window cutouts manually traced from the existing source background; preserve frames, mullions, curtains and permanent trim.",
+    "One reusable seat asset per scene; seatAnchors control runtime count and placement."
   ],
   "modules": {
     "architecture-reference": {
@@ -107,7 +108,8 @@
     "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
-    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone."
+    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
+    "seatAsset": "single-reusable-manual"
   },
   "windowCutoutsNormalized": [
     {
@@ -131,5 +133,89 @@
         }
       ]
     }
-  ]
+  ],
+  "manualSeatCutNormalized": {
+    "cropNormalized": {
+      "x": 0.445,
+      "y": 0.6,
+      "width": 0.14,
+      "height": 0.31
+    },
+    "mask": {
+      "feather": 0.7,
+      "include": [
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.08,
+              "y": 0.03
+            },
+            {
+              "x": 0.92,
+              "y": 0.03
+            },
+            {
+              "x": 0.86,
+              "y": 0.34
+            },
+            {
+              "x": 0.14,
+              "y": 0.34
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.18,
+              "y": 0.29
+            },
+            {
+              "x": 0.31,
+              "y": 0.29
+            },
+            {
+              "x": 0.24,
+              "y": 1
+            },
+            {
+              "x": 0.1,
+              "y": 1
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.69,
+              "y": 0.29
+            },
+            {
+              "x": 0.82,
+              "y": 0.29
+            },
+            {
+              "x": 0.9,
+              "y": 1
+            },
+            {
+              "x": 0.76,
+              "y": 1
+            }
+          ]
+        },
+        {
+          "type": "rect",
+          "x": 0.15,
+          "y": 0.58,
+          "width": 0.7,
+          "height": 0.05
+        }
+      ],
+      "exclude": []
+    }
+  }
 }
