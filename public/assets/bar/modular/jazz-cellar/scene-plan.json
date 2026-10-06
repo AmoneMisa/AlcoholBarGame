@@ -21,8 +21,8 @@
       "rect": {
         "x": 0,
         "y": 0,
-        "width": 0.505682,
-        "height": 0.505682
+        "width": 1,
+        "height": 1
       }
     },
     "shelf-reference": {
@@ -34,10 +34,10 @@
       },
       "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware.",
       "rect": {
-        "x": 0.081169,
-        "y": 0.136364,
-        "width": 0.344156,
-        "height": 0.199675
+        "x": 0.159903,
+        "y": 0.270292,
+        "width": 0.680195,
+        "height": 0.395292
       }
     },
     "counter-reference": {
@@ -50,9 +50,9 @@
       "prompt": "Isolate existing counter with transparent surroundings and bleed.",
       "rect": {
         "x": 0,
-        "y": 0.247565,
-        "width": 0.505682,
-        "height": 0.146916
+        "y": 0.49026,
+        "width": 1,
+        "height": 0.289773
       }
     }
   },
@@ -90,30 +90,30 @@
   },
   "windowCutouts": [],
   "shelfRows": [
-    493,
-    579,
-    671
+    0.400162,
+    0.469968,
+    0.544643
   ],
   "seatAnchors": [
     {
-      "x": 172,
-      "y": 838
+      "x": 0.13961,
+      "y": 0.680195
     },
     {
-      "x": 394,
-      "y": 838
+      "x": 0.319805,
+      "y": 0.680195
     },
     {
-      "x": 616,
-      "y": 838
+      "x": 0.5,
+      "y": 0.680195
     },
     {
-      "x": 838,
-      "y": 838
+      "x": 0.680195,
+      "y": 0.680195
     },
     {
-      "x": 1060,
-      "y": 838
+      "x": 0.86039,
+      "y": 0.680195
     }
   ],
   "bartenderAnchor": null,
