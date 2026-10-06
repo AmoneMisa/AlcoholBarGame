@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { INTERIORS, BAR_PROFILE_OPTIONS } from '../src/data/cosmetics/bars.ts';
+import { INTERIORS, BAR_PROFILE_OPTIONS, SEAT_COUNTS } from '../src/data/cosmetics/bars.ts';
+import { MODULAR_SCENES, modularSceneFor } from '../src/data/cosmetics/modularScenes.ts';
 import { bartenderCostumeFor, bartenderCostumesFor } from '../src/data/cosmetics/bartenderCostumes.ts';
 import { THEMED_INTERIORS, THEMED_COSTUMES, costumesForInterior } from '../src/data/cosmetics/themedBars.ts';
 import { GAME_THEME_INTERIORS } from '../src/data/cosmetics/gameThemeExpansion.ts';
@@ -56,5 +57,25 @@ test('All original and new backgrounds are individually installed and unique', (
     assert.equal(bytes.toString('ascii',8,12),'WEBP');
     const hash=createHash('sha256').update(bytes).digest('hex');
     assert.ok(!hashes.has(hash),`${interior.id} duplicates another background`);hashes.add(hash);
+  }
+});
+
+
+test('Every background has a modular authoring definition and one reusable seat asset', () => {
+  assert.equal(INTERIORS.length,74);
+  assert.equal(Object.keys(MODULAR_SCENES).length,INTERIORS.length);
+  assert.deepEqual([...SEAT_COUNTS],['0','1','2','3','4','5','6']);
+  for(const interior of INTERIORS) {
+    const scene=modularSceneFor(interior.id,true);
+    assert.ok(scene,`${interior.id} has no modular scene`);
+    const seatLayers=scene.layers.filter(layer=>layer.role==='seating');
+    if(seatLayers.length) {
+      assert.equal(new Set(seatLayers.map(layer=>layer.asset)).size,1,`${interior.id} duplicates seat art`);
+      assert.equal(seatLayers.length,scene.geometry.stools.length,`${interior.id} seat anchors/layers differ`);
+      const seatAsset=seatLayers[0].asset;
+      assert.ok(seatAsset.endsWith('/seat.webp') || (interior.id==='velvet' && seatAsset.endsWith('/stool.webp')),seatAsset);
+    }
+    if(interior.id==='velvet') assert.equal(modularSceneFor(interior.id)?.status,'production');
+    else assert.equal(modularSceneFor(interior.id),undefined,`${interior.id} authoring scene leaked into gameplay`);
   }
 });
