@@ -52,6 +52,7 @@ export const WALLS = ['neon','burgundy','emerald','navy','plum','charcoal','ivor
 export const COUNTER_MATERIALS = ['classic','marble','brass','obsidian','walnut','terrazzo','steel','glass'] as const;
 export const COUNTER_COLORS = ['espresso','ruby','ivory','gold','emerald','navy','plum','smoke'] as const;
 export const COUNTER_SIZES = ['slim','standard','grand'] as const;
+export const SEAT_COUNTS = ['0','1','2','3','4','5','6'] as const;
 // Back-bar cabinet looks. 'auto' follows the background (see shelfStyleFor).
 export const SHELF_STYLES = ['auto','walnut','brass','glass','neon','marble','bamboo','rustic'] as const;
 export type ShelfStyle = Exclude<typeof SHELF_STYLES[number], 'auto'>;
@@ -97,7 +98,7 @@ export const POSES = ['neutral','confident','working'] as const;
 export const OUTFIT_COLORS = ['natural','black','white','red','blue','green','plum','sand'] as const;
 export const BARTENDER_OUTFITS = ['vest','shirt','apron','biker','tee-skirt','suit-jeans','bunny','kimono','baggy-tee','streetwear','special-gala','special-cyberpunk','special-steampunk','special-post-apocalypse','special-historical','special-fantasy','special-masquerade', ...REFERENCE_COSTUME_IDS] as const;
 export const BAR_PROFILE_OPTIONS = {
-  wall:WALLS,counter:COUNTER_MATERIALS,counterColor:COUNTER_COLORS,counterSize:COUNTER_SIZES,
+  wall:WALLS,counter:COUNTER_MATERIALS,counterColor:COUNTER_COLORS,counterSize:COUNTER_SIZES,seatCount:SEAT_COUNTS,
   lighting:HIGHLIGHTS,highlightStrength:HIGHLIGHT_STRENGTHS,shelf:SHELF_STYLES,shelfPreset:SHELF_DECOR_PRESET_IDS,windowBackdrop:WINDOW_BACKDROP_IDS,bartenderCharacter:['noa','leo'] as const,
   bartender:BARTENDER_OUTFITS,interior:INTERIORS.map((item) => item.id),face:FACE_SHAPES,
   hairStyle:HAIR_STYLES,hairColor:HAIR_COLORS,bodyShape:BODY_SHAPES,skinDetail:SKIN_DETAILS,skinTone:SKIN_TONES,tanLevel:TAN_LEVELS,
@@ -112,6 +113,8 @@ export interface BarProfile {
   counter: typeof COUNTER_MATERIALS[number];
   counterColor: typeof COUNTER_COLORS[number];
   counterSize: typeof COUNTER_SIZES[number];
+  // One reusable seat art asset is instanced this many times; missing means use every scene anchor.
+  seatCount?: typeof SEAT_COUNTS[number];
   lighting: typeof HIGHLIGHTS[number];
   highlightStrength: typeof HIGHLIGHT_STRENGTHS[number];
   bartenderCharacter: 'noa' | 'leo';
