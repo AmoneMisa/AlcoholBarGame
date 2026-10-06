@@ -9,6 +9,7 @@ on:
       - scripts/build-modular-review.py
       - scripts/build-architecture-queue.mjs
       - scripts/build-architecture-masks.py
+      - scripts/build-architecture-prep.py
       - scripts/build-furniture-cleanup-queue.mjs
       - scripts/build-window-masks.py
       - scripts/build-manual-role-cuts.py
@@ -39,6 +40,7 @@ jobs:
       - run: python scripts/build-manual-role-cuts.py
       - run: python scripts/build-modular-review.py
       - run: python scripts/build-architecture-masks.py
+      - run: python scripts/build-architecture-prep.py
       - run: node scripts/build-architecture-queue.mjs
       - run: node scripts/build-furniture-cleanup-queue.mjs
       - run: python scripts/build-window-masks.py
@@ -58,6 +60,7 @@ jobs:
           queue=json.loads(Path('docs/modular-review/architecture-queue.json').read_text())
           cleanup=json.loads(Path('docs/modular-review/furniture-cleanup-queue.json').read_text())
           windows=json.loads(Path('docs/modular-review/window-masks.json').read_text())
+          prep=json.loads(Path('docs/modular-review/architecture-prep.json').read_text())
           assert readiness['productionReady']==['velvet'], readiness['productionReady']
           blocked_arch=set(readiness['blockedArchitecture'])
           blocked_cleanup=set(readiness['blockedFurnitureCleanup'])
@@ -67,18 +70,21 @@ jobs:
           window_scenes={x['scene'] for x in windows['scenes']}
           expected_window_scenes={x['id'] for x in queue['scenes'] if x.get('windowCutouts')}
           expected_cleanup_items=sum(len(x.get('requiredRoles', ['counter','shelf','seating'])) for x in s if x['scene'] in blocked_cleanup)
+          expected_prep={x['scene'] for x in s if not x['productionReady']}
           assert mask_scenes==blocked_arch, (mask_scenes,blocked_arch)
           assert queue_scenes==blocked_arch, (queue_scenes,blocked_arch)
           assert cleanup_scenes==blocked_cleanup, (cleanup_scenes,blocked_cleanup)
           assert cleanup['count']==expected_cleanup_items, (cleanup['count'],expected_cleanup_items)
           assert window_scenes==expected_window_scenes, (window_scenes,expected_window_scenes)
+          assert prep['count']==len(expected_prep), (prep['count'],len(expected_prep))
+          assert {x['scene'] for x in prep['scenes']}==expected_prep
           print('measured',len(measured),'candidate',len(candidate),'promoted',sum(len(x['promoted']) for x in s),'architecture-masks',masks['count'],'cleanup-items',cleanup['count'],'window-masks',windows['count'])
           PY
       - name: Commit review outputs
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/modular-review public/assets/bar/modular/*/review-ready public/assets/bar/modular/*/architecture-mask.png public/assets/bar/modular/*/window-mask.png public/assets/bar/modular/*/manual
+          git add docs/modular-review public/assets/bar/modular/*/review-ready public/assets/bar/modular/*/architecture-mask.png public/assets/bar/modular/*/window-mask.png public/assets/bar/modular/*/architecture-prep.webp public/assets/bar/modular/*/manual
           if git diff --cached --quiet; then
             echo "No generated changes"
           else
