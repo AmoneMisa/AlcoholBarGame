@@ -127,5 +127,27 @@ readiness={
     'blockedFurnitureCleanup':[item['scene'] for item in summary if item['isolatedFurnitureReady'] and not item['cleanFurnitureReady']]
 }
 (OUT/'readiness.json').write_text(json.dumps(readiness,indent=2)+'\n')
+
+# One-page visual audit of the single reusable seat asset for every seating scene.
+seat_items=[]
+for item in summary:
+    if 'seating' not in item['requiredRoles']:
+        continue
+    seat=MOD/item['scene']/'manual'/'seat.webp'
+    if seat.exists():
+        seat_items.append((item['scene'],seat))
+
+cols=6
+cell_w,cell_h=240,190
+rows=max(1,(len(seat_items)+cols-1)//cols)
+seat_sheet=Image.new('RGB',(cols*cell_w,rows*cell_h),(15,15,19))
+for idx,(scene,seat_path) in enumerate(seat_items):
+    x=(idx%cols)*cell_w
+    y=(idx//cols)*cell_h
+    label(seat_sheet,(x+8,y+6),scene)
+    seat_sheet.paste(thumb(Image.open(seat_path),(cell_w-16,cell_h-30)),(x+8,y+26))
+seat_sheet.save(OUT/'seat-assets.jpg','JPEG',quality=88,optimize=True)
+
 print('review sheets',len(summary),'promoted roles',sum(len(x['promoted']) for x in summary))
+print('seat assets',len(seat_items))
 print('isolated furniture',len(readiness['isolatedFurnitureReady']),'clean furniture',len(readiness['cleanFurnitureReady']),'production ready',len(readiness['productionReady']))
