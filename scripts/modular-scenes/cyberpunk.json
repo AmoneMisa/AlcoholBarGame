@@ -109,7 +109,7 @@
       "counter",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-manual-refined"
   },
   "windowCutoutsNormalized": [],
   "manualRoleMasksNormalized": {
@@ -197,26 +197,26 @@
   ],
   "manualSeatCutNormalized": {
     "cropNormalized": {
-      "x": 0.45,
-      "y": 0.61,
-      "width": 0.13,
-      "height": 0.27
+      "x": 0.555,
+      "y": 0.635,
+      "width": 0.15,
+      "height": 0.34
     },
     "mask": {
-      "feather": 0.65,
+      "feather": 0.55,
       "include": [
         {
           "type": "ellipse",
-          "x": 0.04,
-          "y": 0.01,
-          "width": 0.92,
-          "height": 0.22
+          "x": 0.05,
+          "y": 0.05,
+          "width": 0.9,
+          "height": 0.18
         },
         {
           "type": "rect",
-          "x": 0.44,
-          "y": 0.18,
-          "width": 0.12,
+          "x": 0.465,
+          "y": 0.2,
+          "width": 0.07,
           "height": 0.58
         },
         {
@@ -224,6 +224,13 @@
           "x": 0.18,
           "y": 0.58,
           "width": 0.64,
+          "height": 0.08
+        },
+        {
+          "type": "ellipse",
+          "x": 0.24,
+          "y": 0.84,
+          "width": 0.52,
           "height": 0.11
         }
       ],
