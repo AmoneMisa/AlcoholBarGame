@@ -24,7 +24,8 @@
     "bar:architecture-masks": "python scripts/build-architecture-masks.py",
     "bar:furniture-cleanup-queue": "node scripts/build-furniture-cleanup-queue.mjs",
     "bar:window-masks": "python scripts/build-window-masks.py",
-    "bar:manual-role-cuts": "python scripts/build-manual-role-cuts.py"
+    "bar:manual-role-cuts": "python scripts/build-manual-role-cuts.py",
+    "bar:architecture-prep": "python scripts/build-architecture-prep.py"
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^6.0.9",
