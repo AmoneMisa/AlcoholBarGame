@@ -114,7 +114,8 @@
       "counter",
       "seating",
       "shelf"
-    ]
+    ],
+    "individualSeatCuts": "manual-measured"
   },
   "manualRoleMasksNormalized": {
     "shelf": {
@@ -456,6 +457,363 @@
           "y": 0.57
         }
       ]
+    }
+  ],
+  "manualSeatCutsNormalized": [
+    {
+      "id": "seat-01",
+      "cropNormalized": {
+        "x": 0,
+        "y": 0.748,
+        "width": 0.16,
+        "height": 0.252
+      },
+      "mask": {
+        "feather": 0.8,
+        "include": [
+          {
+            "type": "ellipse",
+            "x": 0.02,
+            "y": 0,
+            "width": 0.96,
+            "height": 0.3
+          },
+          {
+            "type": "polygon",
+            "points": [
+              {
+                "x": 0.16,
+                "y": 0.22
+              },
+              {
+                "x": 0.34,
+                "y": 0.22
+              },
+              {
+                "x": 0.27,
+                "y": 1
+              },
+              {
+                "x": 0.08,
+                "y": 1
+              }
+            ]
+          },
+          {
+            "type": "polygon",
+            "points": [
+              {
+                "x": 0.66,
+                "y": 0.22
+              },
+              {
+                "x": 0.84,
+                "y": 0.22
+              },
+              {
+                "x": 0.92,
+                "y": 1
+              },
+              {
+                "x": 0.73,
+                "y": 1
+              }
+            ]
+          },
+          {
+            "type": "rect",
+            "x": 0.13,
+            "y": 0.5,
+            "width": 0.74,
+            "height": 0.08
+          }
+        ],
+        "exclude": []
+      }
+    },
+    {
+      "id": "seat-02",
+      "cropNormalized": {
+        "x": 0.205,
+        "y": 0.748,
+        "width": 0.17,
+        "height": 0.252
+      },
+      "mask": {
+        "feather": 0.8,
+        "include": [
+          {
+            "type": "ellipse",
+            "x": 0.02,
+            "y": 0,
+            "width": 0.96,
+            "height": 0.3
+          },
+          {
+            "type": "polygon",
+            "points": [
+              {
+                "x": 0.16,
+                "y": 0.22
+              },
+              {
+                "x": 0.34,
+                "y": 0.22
+              },
+              {
+                "x": 0.27,
+                "y": 1
+              },
+              {
+                "x": 0.08,
+                "y": 1
+              }
+            ]
+          },
+          {
+            "type": "polygon",
+            "points": [
+              {
+                "x": 0.66,
+                "y": 0.22
+              },
+              {
+                "x": 0.84,
+                "y": 0.22
+              },
+              {
+                "x": 0.92,
+                "y": 1
+              },
+              {
+                "x": 0.73,
+                "y": 1
+              }
+            ]
+          },
+          {
+            "type": "rect",
+            "x": 0.13,
+            "y": 0.5,
+            "width": 0.74,
+            "height": 0.08
+          }
+        ],
+        "exclude": []
+      }
+    },
+    {
+      "id": "seat-03",
+      "cropNormalized": {
+        "x": 0.415,
+        "y": 0.748,
+        "width": 0.17,
+        "height": 0.252
+      },
+      "mask": {
+        "feather": 0.8,
+        "include": [
+          {
+            "type": "ellipse",
+            "x": 0.02,
+            "y": 0,
+            "width": 0.96,
+            "height": 0.3
+          },
+          {
+            "type": "polygon",
+            "points": [
+              {
+                "x": 0.16,
+                "y": 0.22
+              },
+              {
+                "x": 0.34,
+                "y": 0.22
+              },
+              {
+                "x": 0.27,
+                "y": 1
+              },
+              {
+                "x": 0.08,
+                "y": 1
+              }
+            ]
+          },
+          {
+            "type": "polygon",
+            "points": [
+              {
+                "x": 0.66,
+                "y": 0.22
+              },
+              {
+                "x": 0.84,
+                "y": 0.22
+              },
+              {
+                "x": 0.92,
+                "y": 1
+              },
+              {
+                "x": 0.73,
+                "y": 1
+              }
+            ]
+          },
+          {
+            "type": "rect",
+            "x": 0.13,
+            "y": 0.5,
+            "width": 0.74,
+            "height": 0.08
+          }
+        ],
+        "exclude": []
+      }
+    },
+    {
+      "id": "seat-04",
+      "cropNormalized": {
+        "x": 0.625,
+        "y": 0.748,
+        "width": 0.17,
+        "height": 0.252
+      },
+      "mask": {
+        "feather": 0.8,
+        "include": [
+          {
+            "type": "ellipse",
+            "x": 0.02,
+            "y": 0,
+            "width": 0.96,
+            "height": 0.3
+          },
+          {
+            "type": "polygon",
+            "points": [
+              {
+                "x": 0.16,
+                "y": 0.22
+              },
+              {
+                "x": 0.34,
+                "y": 0.22
+              },
+              {
+                "x": 0.27,
+                "y": 1
+              },
+              {
+                "x": 0.08,
+                "y": 1
+              }
+            ]
+          },
+          {
+            "type": "polygon",
+            "points": [
+              {
+                "x": 0.66,
+                "y": 0.22
+              },
+              {
+                "x": 0.84,
+                "y": 0.22
+              },
+              {
+                "x": 0.92,
+                "y": 1
+              },
+              {
+                "x": 0.73,
+                "y": 1
+              }
+            ]
+          },
+          {
+            "type": "rect",
+            "x": 0.13,
+            "y": 0.5,
+            "width": 0.74,
+            "height": 0.08
+          }
+        ],
+        "exclude": []
+      }
+    },
+    {
+      "id": "seat-05",
+      "cropNormalized": {
+        "x": 0.835,
+        "y": 0.748,
+        "width": 0.165,
+        "height": 0.252
+      },
+      "mask": {
+        "feather": 0.8,
+        "include": [
+          {
+            "type": "ellipse",
+            "x": 0.02,
+            "y": 0,
+            "width": 0.96,
+            "height": 0.3
+          },
+          {
+            "type": "polygon",
+            "points": [
+              {
+                "x": 0.16,
+                "y": 0.22
+              },
+              {
+                "x": 0.34,
+                "y": 0.22
+              },
+              {
+                "x": 0.27,
+                "y": 1
+              },
+              {
+                "x": 0.08,
+                "y": 1
+              }
+            ]
+          },
+          {
+            "type": "polygon",
+            "points": [
+              {
+                "x": 0.66,
+                "y": 0.22
+              },
+              {
+                "x": 0.84,
+                "y": 0.22
+              },
+              {
+                "x": 0.92,
+                "y": 1
+              },
+              {
+                "x": 0.73,
+                "y": 1
+              }
+            ]
+          },
+          {
+            "type": "rect",
+            "x": 0.13,
+            "y": 0.5,
+            "width": 0.74,
+            "height": 0.08
+          }
+        ],
+        "exclude": []
+      }
     }
   ]
 }
