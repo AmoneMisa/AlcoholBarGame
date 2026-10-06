@@ -115,7 +115,7 @@
     "manualApprovedRoles": [
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-manual-refined"
   },
   "manualApprovedRoles": [
     "shelf"
@@ -240,76 +240,41 @@
   },
   "manualSeatCutNormalized": {
     "cropNormalized": {
-      "x": 0.45,
-      "y": 0.66,
+      "x": 0.485,
+      "y": 0.625,
       "width": 0.13,
-      "height": 0.3
+      "height": 0.35
     },
     "mask": {
-      "feather": 0.65,
+      "feather": 0.55,
       "include": [
         {
           "type": "ellipse",
-          "x": 0.04,
-          "y": 0,
-          "width": 0.92,
+          "x": 0.05,
+          "y": 0.05,
+          "width": 0.9,
           "height": 0.18
         },
         {
           "type": "rect",
-          "x": 0.44,
-          "y": 0.14,
-          "width": 0.12,
-          "height": 0.62
+          "x": 0.465,
+          "y": 0.2,
+          "width": 0.07,
+          "height": 0.58
         },
         {
           "type": "ellipse",
           "x": 0.18,
-          "y": 0.6,
+          "y": 0.58,
           "width": 0.64,
-          "height": 0.12
+          "height": 0.08
         },
         {
-          "type": "polygon",
-          "points": [
-            {
-              "x": 0.42,
-              "y": 0.7
-            },
-            {
-              "x": 0.48,
-              "y": 0.7
-            },
-            {
-              "x": 0.35,
-              "y": 1
-            },
-            {
-              "x": 0.27,
-              "y": 1
-            }
-          ]
-        },
-        {
-          "type": "polygon",
-          "points": [
-            {
-              "x": 0.52,
-              "y": 0.7
-            },
-            {
-              "x": 0.58,
-              "y": 0.7
-            },
-            {
-              "x": 0.73,
-              "y": 1
-            },
-            {
-              "x": 0.65,
-              "y": 1
-            }
-          ]
+          "type": "ellipse",
+          "x": 0.24,
+          "y": 0.84,
+          "width": 0.52,
+          "height": 0.11
         }
       ],
       "exclude": []
