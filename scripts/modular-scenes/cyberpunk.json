@@ -12,7 +12,8 @@
     "Do not ship reference crops as final modules until the clean architecture plate and transparency have been visually reviewed.",
     "Keep camera, horizon and perspective identical to the source.",
     "Remove painted bottles from shelf modules; decorative bottles are rendered by shelf presets.",
-    "If counter/seating hides wall or floor, reconstruct the hidden surface by inpainting before export."
+    "If counter/seating hides wall or floor, reconstruct the hidden surface by inpainting before export.",
+    "One reusable seat asset per scene; seatAnchors control runtime count and placement."
   ],
   "modules": {
     "architecture-reference": {
@@ -107,7 +108,8 @@
     "manualApprovedRoles": [
       "counter",
       "shelf"
-    ]
+    ],
+    "seatAsset": "single-reusable-manual"
   },
   "windowCutoutsNormalized": [],
   "manualRoleMasksNormalized": {
@@ -192,5 +194,40 @@
   "manualApprovedRoles": [
     "counter",
     "shelf"
-  ]
+  ],
+  "manualSeatCutNormalized": {
+    "cropNormalized": {
+      "x": 0.45,
+      "y": 0.61,
+      "width": 0.13,
+      "height": 0.27
+    },
+    "mask": {
+      "feather": 0.65,
+      "include": [
+        {
+          "type": "ellipse",
+          "x": 0.04,
+          "y": 0.01,
+          "width": 0.92,
+          "height": 0.22
+        },
+        {
+          "type": "rect",
+          "x": 0.44,
+          "y": 0.18,
+          "width": 0.12,
+          "height": 0.58
+        },
+        {
+          "type": "ellipse",
+          "x": 0.18,
+          "y": 0.58,
+          "width": 0.64,
+          "height": 0.11
+        }
+      ],
+      "exclude": []
+    }
+  }
 }
