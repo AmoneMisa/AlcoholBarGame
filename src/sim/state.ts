@@ -4,7 +4,7 @@ import { ALCOHOL_PRODUCTS, isStarterBottle } from '../domain/bottleCatalog';
 import { WHEEL } from '../domain/roulette';
 import { cosmeticFor } from '../domain/cosmetics';
 import { REFERENCE_COSTUME_IDS } from '../data/cosmetics/bartenderCostumes';
-import { DEFAULT_BARS, INTERIORS, type BarProfile } from '../data/cosmetics/bars';
+import { DEFAULT_BARS, INTERIORS, SEAT_COUNTS, type BarProfile } from '../data/cosmetics/bars';
 import { CHARACTER_ART, CUSTOMER_ART_BY_SLOT } from '../data/cosmetics/artCatalog';
 import { generateCustomer } from '../domain/engine';
 import { BOND_STEPS, COMPANIONS, COMPANION_START_LEVEL, KEEPSAKE_IDS, LEGACY_COMPANION_IDS, MAX_BOND, bondLevel, companionSlots, levelCapForGrade } from '../domain/companions';
@@ -385,6 +385,7 @@ export function normalizePlayerState(state: PlayerState) {
     state.bars[region.id] = { ...structuredClone(DEFAULT_BARS[region.id]), ...saved };
     const bar = state.bars[region.id];
     const defaultInterior = DEFAULT_BARS[region.id].interior;
+    if (bar.seatCount !== undefined && !(SEAT_COUNTS as readonly string[]).includes(bar.seatCount)) delete bar.seatCount;
     // Locked city cards always preview that city's included interior. Opening a
     // bar grants this background; paid custom backgrounds stay player-owned.
     if (!state.ownedBarIds.includes(region.id)) bar.interior = defaultInterior;
