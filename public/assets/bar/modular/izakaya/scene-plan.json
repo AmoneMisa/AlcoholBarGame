@@ -139,13 +139,15 @@
     "manualApprovedRoles": [
       "counter",
       "seating"
-    ]
+    ],
+    "seatAsset": "single-reusable-manual"
   },
   "notes": [
     "Measured from existing BarScene geometry.",
     "Reference crops are authoring aids, not shippable clean modules.",
     "Preserve camera/horizon/perspective.",
     "Remove painted bottles from shelf furniture.",
-    "Inpaint occluded wall/floor before export."
+    "Inpaint occluded wall/floor before export.",
+    "One reusable seat asset per scene; seatAnchors control runtime count and placement."
   ]
 }

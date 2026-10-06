@@ -150,7 +150,8 @@
     "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
-    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone."
+    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
+    "seatAsset": "single-reusable-manual"
   },
   "notes": [
     "Generated from the measured gameplay geometry already used by BarScene.",
@@ -158,6 +159,7 @@
     "Keep camera, horizon and perspective identical to the source.",
     "Remove painted bottles from shelf modules; decorative bottles are rendered by shelf presets.",
     "If counter/seating hides wall or floor, reconstruct the hidden surface by inpainting before export.",
-    "Window cutouts manually traced from the existing source background; preserve frames, mullions, curtains and permanent trim."
+    "Window cutouts manually traced from the existing source background; preserve frames, mullions, curtains and permanent trim.",
+    "One reusable seat asset per scene; seatAnchors control runtime count and placement."
   ]
 }

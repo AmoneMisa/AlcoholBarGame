@@ -103,11 +103,14 @@
     "seating"
   ],
   "manualApprovedRoles": [],
-  "review": {},
+  "review": {
+    "seatAsset": "single-reusable-manual"
+  },
   "notes": [
     "Keep the camera, horizon and perspective fixed.",
     "Modules overlap by design; do not trim to the visible contour.",
     "Lighting should stay neutral enough for the runtime shader.",
-    "Window panes must be transparent in architecture.webp so the exterior layer can change independently."
+    "Window panes must be transparent in architecture.webp so the exterior layer can change independently.",
+    "One reusable seat asset per scene; seatAnchors control runtime count and placement."
   ]
 }
