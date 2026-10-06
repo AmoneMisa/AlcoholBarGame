@@ -98,9 +98,9 @@ export const MODULAR_SCENES: Readonly<Record<string,ModularSceneDefinition>> = {
   })
 };
 
-export const modularSceneFor = (interior:string) => {
+export const modularSceneFor = (interior:string, allowAuthoring=false) => {
   const scene=MODULAR_SCENES[interior];
-  return scene?.status==='production' ? scene : undefined;
+  return scene && (scene.status==='production' || allowAuthoring) ? scene : undefined;
 };
 
 export function layerAsset(layer:ModularSceneLayer, selections:Partial<Record<ModularSelectionKey,string>>, fallback?:string) {
