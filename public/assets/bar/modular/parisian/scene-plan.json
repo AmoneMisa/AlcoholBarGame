@@ -151,7 +151,7 @@
     "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-manual-refined"
   },
   "notes": [
     "Measured from existing BarScene geometry.",

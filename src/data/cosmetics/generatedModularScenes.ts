@@ -2424,10 +2424,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/cyberpunk/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.064947,
-          "y": 0.61,
-          "width": 0.13,
-          "height": 0.27
+          "x": 0.054947,
+          "y": 0.635,
+          "width": 0.15,
+          "height": 0.34
         }
       },
       {
@@ -2437,10 +2437,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/cyberpunk/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.324842,
-          "y": 0.61,
-          "width": 0.13,
-          "height": 0.27
+          "x": 0.314842,
+          "y": 0.635,
+          "width": 0.15,
+          "height": 0.34
         }
       },
       {
@@ -2450,10 +2450,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/cyberpunk/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.564947,
-          "y": 0.61,
-          "width": 0.13,
-          "height": 0.27
+          "x": 0.554947,
+          "y": 0.635,
+          "width": 0.15,
+          "height": 0.34
         }
       },
       {
@@ -2463,10 +2463,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/cyberpunk/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.805053,
-          "y": 0.61,
-          "width": 0.13,
-          "height": 0.27
+          "x": 0.795053,
+          "y": 0.635,
+          "width": 0.15,
+          "height": 0.34
         }
       }
     ],
@@ -3193,9 +3193,9 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/desert/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.05013,
-          "y": 0.57,
-          "width": 0.14,
+          "x": 0.01513,
+          "y": 0.59,
+          "width": 0.21,
           "height": 0.34
         }
       },
@@ -3206,9 +3206,9 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/desert/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.230325,
-          "y": 0.57,
-          "width": 0.14,
+          "x": 0.195325,
+          "y": 0.59,
+          "width": 0.21,
           "height": 0.34
         }
       },
@@ -3219,9 +3219,9 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/desert/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.42026,
-          "y": 0.57,
-          "width": 0.14,
+          "x": 0.38526,
+          "y": 0.59,
+          "width": 0.21,
           "height": 0.34
         }
       },
@@ -3232,9 +3232,9 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/desert/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.599643,
-          "y": 0.57,
-          "width": 0.14,
+          "x": 0.564643,
+          "y": 0.59,
+          "width": 0.21,
           "height": 0.34
         }
       },
@@ -3245,9 +3245,9 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/desert/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.779838,
-          "y": 0.57,
-          "width": 0.14,
+          "x": 0.744838,
+          "y": 0.59,
+          "width": 0.21,
           "height": 0.34
         }
       }
@@ -6481,10 +6481,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/jazz-cellar/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.08461,
-          "y": 0.56,
-          "width": 0.11,
-          "height": 0.22
+          "x": 0.07961,
+          "y": 0.64,
+          "width": 0.12,
+          "height": 0.25
         }
       },
       {
@@ -6494,10 +6494,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/jazz-cellar/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.264805,
-          "y": 0.56,
-          "width": 0.11,
-          "height": 0.22
+          "x": 0.259805,
+          "y": 0.64,
+          "width": 0.12,
+          "height": 0.25
         }
       },
       {
@@ -6507,10 +6507,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/jazz-cellar/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.445,
-          "y": 0.56,
-          "width": 0.11,
-          "height": 0.22
+          "x": 0.44,
+          "y": 0.64,
+          "width": 0.12,
+          "height": 0.25
         }
       },
       {
@@ -6520,10 +6520,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/jazz-cellar/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.625195,
-          "y": 0.56,
-          "width": 0.11,
-          "height": 0.22
+          "x": 0.620195,
+          "y": 0.64,
+          "width": 0.12,
+          "height": 0.25
         }
       },
       {
@@ -6533,10 +6533,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/jazz-cellar/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.80539,
-          "y": 0.56,
-          "width": 0.11,
-          "height": 0.22
+          "x": 0.80039,
+          "y": 0.64,
+          "width": 0.12,
+          "height": 0.25
         }
       }
     ],
@@ -6677,10 +6677,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/library/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.177208,
-          "y": 0.56,
-          "width": 0.105,
-          "height": 0.23
+          "x": 0.174708,
+          "y": 0.635,
+          "width": 0.11,
+          "height": 0.205
         }
       },
       {
@@ -6690,10 +6690,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/library/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.30789,
-          "y": 0.56,
-          "width": 0.105,
-          "height": 0.23
+          "x": 0.30539,
+          "y": 0.635,
+          "width": 0.11,
+          "height": 0.205
         }
       },
       {
@@ -6703,10 +6703,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/library/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.43776,
-          "y": 0.56,
-          "width": 0.105,
-          "height": 0.23
+          "x": 0.43526,
+          "y": 0.635,
+          "width": 0.11,
+          "height": 0.205
         }
       },
       {
@@ -6716,10 +6716,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/library/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.56763,
-          "y": 0.56,
-          "width": 0.105,
-          "height": 0.23
+          "x": 0.56513,
+          "y": 0.635,
+          "width": 0.11,
+          "height": 0.205
         }
       },
       {
@@ -6729,10 +6729,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/library/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.6975,
-          "y": 0.56,
-          "width": 0.105,
-          "height": 0.23
+          "x": 0.695,
+          "y": 0.635,
+          "width": 0.11,
+          "height": 0.205
         }
       }
     ],
@@ -7460,9 +7460,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.175106,
-          "y": 0.66,
+          "y": 0.625,
           "width": 0.13,
-          "height": 0.3
+          "height": 0.35
         }
       },
       {
@@ -7473,9 +7473,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.324842,
-          "y": 0.66,
+          "y": 0.625,
           "width": 0.13,
-          "height": 0.3
+          "height": 0.35
         }
       },
       {
@@ -7486,9 +7486,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.485132,
-          "y": 0.66,
+          "y": 0.625,
           "width": 0.13,
-          "height": 0.3
+          "height": 0.35
         }
       },
       {
@@ -7499,9 +7499,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.655317,
-          "y": 0.66,
+          "y": 0.625,
           "width": 0.13,
-          "height": 0.3
+          "height": 0.35
         }
       },
       {
@@ -7512,9 +7512,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.855185,
-          "y": 0.66,
+          "y": 0.625,
           "width": 0.13,
-          "height": 0.3
+          "height": 0.35
         }
       }
     ],
@@ -9419,10 +9419,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/parisian/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.160211,
-          "y": 0.53,
-          "width": 0.14,
-          "height": 0.34
+          "x": 0.165211,
+          "y": 0.55,
+          "width": 0.13,
+          "height": 0.35
         }
       },
       {
@@ -9432,10 +9432,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/parisian/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.309947,
-          "y": 0.53,
-          "width": 0.14,
-          "height": 0.34
+          "x": 0.314947,
+          "y": 0.55,
+          "width": 0.13,
+          "height": 0.35
         }
       },
       {
@@ -9445,10 +9445,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/parisian/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.470237,
-          "y": 0.53,
-          "width": 0.14,
-          "height": 0.34
+          "x": 0.475237,
+          "y": 0.55,
+          "width": 0.13,
+          "height": 0.35
         }
       },
       {
@@ -9458,10 +9458,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/parisian/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.619974,
-          "y": 0.53,
-          "width": 0.14,
-          "height": 0.34
+          "x": 0.624974,
+          "y": 0.55,
+          "width": 0.13,
+          "height": 0.35
         }
       },
       {
@@ -9471,10 +9471,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/parisian/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.76971,
-          "y": 0.53,
-          "width": 0.14,
-          "height": 0.34
+          "x": 0.77471,
+          "y": 0.55,
+          "width": 0.13,
+          "height": 0.35
         }
       }
     ],
@@ -10408,9 +10408,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.079842,
-          "y": 0.655,
+          "y": 0.63,
           "width": 0.12,
-          "height": 0.23
+          "height": 0.21
         }
       },
       {
@@ -10421,9 +10421,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.209789,
-          "y": 0.655,
+          "y": 0.63,
           "width": 0.12,
-          "height": 0.23
+          "height": 0.21
         }
       },
       {
@@ -10434,9 +10434,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.360185,
-          "y": 0.655,
+          "y": 0.63,
           "width": 0.12,
-          "height": 0.23
+          "height": 0.21
         }
       },
       {
@@ -10447,9 +10447,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.519815,
-          "y": 0.655,
+          "y": 0.63,
           "width": 0.12,
-          "height": 0.23
+          "height": 0.21
         }
       },
       {
@@ -10460,9 +10460,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.670211,
-          "y": 0.655,
+          "y": 0.63,
           "width": 0.12,
-          "height": 0.23
+          "height": 0.21
         }
       },
       {
@@ -10473,9 +10473,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.810053,
-          "y": 0.655,
+          "y": 0.63,
           "width": 0.12,
-          "height": 0.23
+          "height": 0.21
         }
       }
     ],
@@ -11726,10 +11726,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/speakeasy/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.15539,
-          "y": 0.63,
-          "width": 0.16,
-          "height": 0.24
+          "x": 0.18539,
+          "y": 0.625,
+          "width": 0.1,
+          "height": 0.235
         }
       },
       {
@@ -11739,10 +11739,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/speakeasy/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.30961,
-          "y": 0.63,
-          "width": 0.16,
-          "height": 0.24
+          "x": 0.33961,
+          "y": 0.625,
+          "width": 0.1,
+          "height": 0.235
         }
       },
       {
@@ -11752,10 +11752,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/speakeasy/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.459773,
-          "y": 0.63,
-          "width": 0.16,
-          "height": 0.24
+          "x": 0.489773,
+          "y": 0.625,
+          "width": 0.1,
+          "height": 0.235
         }
       },
       {
@@ -11765,10 +11765,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/speakeasy/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.619675,
-          "y": 0.63,
-          "width": 0.16,
-          "height": 0.24
+          "x": 0.649675,
+          "y": 0.625,
+          "width": 0.1,
+          "height": 0.235
         }
       },
       {
@@ -11778,10 +11778,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/speakeasy/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.760097,
-          "y": 0.63,
-          "width": 0.16,
-          "height": 0.24
+          "x": 0.790097,
+          "y": 0.625,
+          "width": 0.1,
+          "height": 0.235
         }
       }
     ],
@@ -12123,9 +12123,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.03513,
-          "y": 0.64,
+          "y": 0.63,
           "width": 0.17,
-          "height": 0.31
+          "height": 0.32
         }
       },
       {
@@ -12136,9 +12136,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.215325,
-          "y": 0.64,
+          "y": 0.63,
           "width": 0.17,
-          "height": 0.31
+          "height": 0.32
         }
       },
       {
@@ -12149,9 +12149,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.40526,
-          "y": 0.64,
+          "y": 0.63,
           "width": 0.17,
-          "height": 0.31
+          "height": 0.32
         }
       },
       {
@@ -12162,9 +12162,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.584643,
-          "y": 0.64,
+          "y": 0.63,
           "width": 0.17,
-          "height": 0.31
+          "height": 0.32
         }
       },
       {
@@ -12175,9 +12175,9 @@ export const GENERATED_MODULAR_SCENES = {
         "selection": "seating",
         "rect": {
           "x": 0.764838,
-          "y": 0.64,
+          "y": 0.63,
           "width": 0.17,
-          "height": 0.31
+          "height": 0.32
         }
       }
     ],
@@ -13515,10 +13515,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/winter/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.04013,
-          "y": 0.66,
-          "width": 0.16,
-          "height": 0.28
+          "x": 0.03013,
+          "y": 0.64,
+          "width": 0.18,
+          "height": 0.31
         }
       },
       {
@@ -13528,10 +13528,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/winter/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.220325,
-          "y": 0.66,
-          "width": 0.16,
-          "height": 0.28
+          "x": 0.210325,
+          "y": 0.64,
+          "width": 0.18,
+          "height": 0.31
         }
       },
       {
@@ -13541,10 +13541,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/winter/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.41026,
-          "y": 0.66,
-          "width": 0.16,
-          "height": 0.28
+          "x": 0.40026,
+          "y": 0.64,
+          "width": 0.18,
+          "height": 0.31
         }
       },
       {
@@ -13554,10 +13554,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/winter/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.589643,
-          "y": 0.66,
-          "width": 0.16,
-          "height": 0.28
+          "x": 0.579643,
+          "y": 0.64,
+          "width": 0.18,
+          "height": 0.31
         }
       },
       {
@@ -13567,10 +13567,10 @@ export const GENERATED_MODULAR_SCENES = {
         "asset": "/assets/bar/modular/winter/composite-ready/seat.webp",
         "selection": "seating",
         "rect": {
-          "x": 0.769838,
-          "y": 0.66,
-          "width": 0.16,
-          "height": 0.28
+          "x": 0.759838,
+          "y": 0.64,
+          "width": 0.18,
+          "height": 0.31
         }
       }
     ],

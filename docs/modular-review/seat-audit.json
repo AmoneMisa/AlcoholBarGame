@@ -1,18 +1,7 @@
 {
   "count": 72,
-  "flaggedCount": 10,
-  "flagged": [
-    "cyberpunk",
-    "desert",
-    "jazz-cellar",
-    "library",
-    "marina",
-    "parisian",
-    "riad",
-    "speakeasy",
-    "tropical",
-    "winter"
-  ],
+  "flaggedCount": 0,
+  "flagged": [],
   "items": [
     {
       "scene": "alan-wake",
@@ -210,19 +199,17 @@
       "scene": "cyberpunk",
       "missing": false,
       "size": [
-        99,
-        137
+        115,
+        172
       ],
       "edge": {
         "left": 0.0,
         "right": 0.0,
-        "top": 0.3838,
+        "top": 0.0,
         "bottom": 0.0
       },
-      "occupied": 0.3091,
-      "flags": [
-        "top-edge-contact"
-      ]
+      "occupied": 0.2962,
+      "flags": []
     },
     {
       "scene": "cyberpunk-2077",
@@ -276,19 +263,17 @@
       "scene": "desert",
       "missing": false,
       "size": [
-        87,
-        212
+        131,
+        211
       ],
       "edge": {
         "left": 0.0,
         "right": 0.0,
-        "top": 0.354,
-        "bottom": 0.3448
+        "top": 0.0,
+        "bottom": 0.113
       },
-      "occupied": 0.5294,
-      "flags": [
-        "top-edge-contact"
-      ]
+      "occupied": 0.499,
+      "flags": []
     },
     {
       "scene": "detroit",
@@ -534,37 +519,33 @@
       "scene": "jazz-cellar",
       "missing": false,
       "size": [
-        69,
-        137
+        75,
+        155
       ],
       "edge": {
         "left": 0.0,
         "right": 0.0,
-        "top": 0.3865,
-        "bottom": 0.2222
+        "top": 0.0,
+        "bottom": 0.0
       },
-      "occupied": 0.3528,
-      "flags": [
-        "top-edge-contact"
-      ]
+      "occupied": 0.3049,
+      "flags": []
     },
     {
       "scene": "library",
       "missing": false,
       "size": [
-        66,
-        143
+        69,
+        127
       ],
       "edge": {
         "left": 0.0,
-        "right": 0.028,
-        "top": 0.404,
-        "bottom": 0.2323
+        "right": 0.0,
+        "top": 0.0,
+        "bottom": 0.0
       },
-      "occupied": 0.3523,
-      "flags": [
-        "top-edge-contact"
-      ]
+      "occupied": 0.3179,
+      "flags": []
     },
     {
       "scene": "lineage-2",
@@ -619,18 +600,16 @@
       "missing": false,
       "size": [
         99,
-        153
+        177
       ],
       "edge": {
         "left": 0.0,
         "right": 0.0,
-        "top": 0.5118,
-        "bottom": 0.2222
+        "top": 0.0,
+        "bottom": 0.0
       },
-      "occupied": 0.3382,
-      "flags": [
-        "top-edge-contact"
-      ]
+      "occupied": 0.2945,
+      "flags": []
     },
     {
       "scene": "mass-effect",
@@ -780,19 +759,17 @@
       "scene": "parisian",
       "missing": false,
       "size": [
-        107,
-        173
+        99,
+        178
       ],
       "edge": {
         "left": 0.0,
         "right": 0.0,
-        "top": 0.4252,
-        "bottom": 0.3364
+        "top": 0.0,
+        "bottom": 0.0404
       },
-      "occupied": 0.5187,
-      "flags": [
-        "top-edge-contact"
-      ]
+      "occupied": 0.5327,
+      "flags": []
     },
     {
       "scene": "perfect-world",
@@ -863,18 +840,16 @@
       "missing": false,
       "size": [
         92,
-        117
+        107
       ],
       "edge": {
         "left": 0.0,
         "right": 0.0,
-        "top": 0.5217,
+        "top": 0.0,
         "bottom": 0.0
       },
-      "occupied": 0.6089,
-      "flags": [
-        "top-edge-contact"
-      ]
+      "occupied": 0.5641,
+      "flags": []
     },
     {
       "scene": "rooftop",
@@ -960,19 +935,17 @@
       "scene": "speakeasy",
       "missing": false,
       "size": [
-        100,
-        150
+        63,
+        147
       ],
       "edge": {
         "left": 0.0,
         "right": 0.0,
-        "top": 0.4833,
-        "bottom": 0.2333
+        "top": 0.0,
+        "bottom": 0.0
       },
-      "occupied": 0.3433,
-      "flags": [
-        "top-edge-contact"
-      ]
+      "occupied": 0.3102,
+      "flags": []
     },
     {
       "scene": "stellar-blade",
@@ -995,18 +968,16 @@
       "missing": false,
       "size": [
         106,
-        193
+        200
       ],
       "edge": {
         "left": 0.0,
         "right": 0.0,
-        "top": 0.4009,
-        "bottom": 0.3019
+        "top": 0.0,
+        "bottom": 0.1057
       },
-      "occupied": 0.5972,
-      "flags": [
-        "top-edge-contact"
-      ]
+      "occupied": 0.5088,
+      "flags": []
     },
     {
       "scene": "tropico-6",
@@ -1124,19 +1095,17 @@
       "scene": "winter",
       "missing": false,
       "size": [
-        99,
-        175
+        112,
+        193
       ],
       "edge": {
         "left": 0.0,
-        "right": 0.02,
-        "top": 0.4293,
-        "bottom": 0.3232
+        "right": 0.0,
+        "top": 0.0,
+        "bottom": 0.0804
       },
-      "occupied": 0.5373,
-      "flags": [
-        "top-edge-contact"
-      ]
+      "occupied": 0.4584,
+      "flags": []
     },
     {
       "scene": "witcher-3",

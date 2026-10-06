@@ -133,7 +133,7 @@
       "counter",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-manual-refined"
   },
   "notes": [
     "Generated from the measured gameplay geometry already used by BarScene.",

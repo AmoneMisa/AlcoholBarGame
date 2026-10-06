@@ -172,7 +172,7 @@
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
     "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-manual-refined"
   },
   "notes": [
     "Generated from the measured gameplay geometry already used by BarScene.",

@@ -138,7 +138,7 @@
       "seating",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-manual-refined"
   },
   "notes": [
     "Measured from existing BarScene geometry.",
