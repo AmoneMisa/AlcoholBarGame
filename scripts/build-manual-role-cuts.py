@@ -120,8 +120,25 @@ def build_seat(manifest,source,item):
 
 def main():
     rows=[]
+    manifests=[]
     for path in sorted(MANIFESTS.glob('*.json')):
         manifest=json.loads(path.read_text())
+        manifests.append((path,manifest))
+
+    missing_seats=[]
+    unexpected_seats=[]
+    for path,manifest in manifests:
+        required=manifest.get('requiredRoles',['counter','shelf','seating'])
+        has_seating='seating' in required
+        has_seat_cut=bool(manifest.get('manualSeatCutNormalized'))
+        if has_seating and not has_seat_cut:
+            missing_seats.append(manifest['id'])
+        if not has_seating and has_seat_cut:
+            unexpected_seats.append(manifest['id'])
+    if missing_seats or unexpected_seats:
+        raise RuntimeError(f"seat coverage mismatch: missing={missing_seats}, unexpected={unexpected_seats}")
+
+    for path,manifest in manifests:
         specs=manifest.get('manualRoleMasksNormalized',{})
         if not specs:
             continue
