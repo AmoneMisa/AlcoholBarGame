@@ -29,7 +29,8 @@ def clean_furniture_ready(base,required_roles):
     if base.name=='velvet':
         legacy={'counter':'counter.webp','shelf':'shelf.webp','seating':'stool.webp'}
         return all((base/legacy[role]).exists() for role in required_roles)
-    return all((base/'clean-ready'/f'{role}.webp').exists() for role in required_roles)
+    outputs={'counter':'counter.webp','shelf':'shelf.webp','seating':'seat.webp'}
+    return all((base/'clean-ready'/outputs[role]).exists() for role in required_roles)
 
 summary=[]
 for base in sorted(p for p in MOD.iterdir() if p.is_dir()):
