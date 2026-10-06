@@ -15,6 +15,7 @@ on:
       - scripts/build-furniture-cleanup-queue.mjs
       - scripts/build-window-masks.py
       - scripts/build-manual-role-cuts.py
+      - scripts/audit-seat-assets.py
       - scripts/modular-scenes/**
       - public/assets/bar/modular/**/scene-plan.json
       - .github/workflows/build-modular-review.yml
@@ -40,6 +41,7 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check pillow
       - run: python scripts/build-manual-role-cuts.py
+      - run: python scripts/audit-seat-assets.py
       - run: python scripts/build-modular-review.py
       - run: python scripts/build-architecture-masks.py
       - run: python scripts/build-architecture-prep.py
