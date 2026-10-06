@@ -10,6 +10,7 @@ on:
       - scripts/build-architecture-queue.mjs
       - scripts/build-architecture-masks.py
       - scripts/build-architecture-prep.py
+      - scripts/build-composite-ready.py
       - scripts/build-furniture-cleanup-queue.mjs
       - scripts/build-window-masks.py
       - scripts/build-manual-role-cuts.py
@@ -44,6 +45,7 @@ jobs:
       - run: node scripts/build-architecture-queue.mjs
       - run: node scripts/build-furniture-cleanup-queue.mjs
       - run: python scripts/build-window-masks.py
+      - run: python scripts/build-composite-ready.py
       - name: Validate coverage
         run: |
           python - <<'PY'
@@ -61,6 +63,7 @@ jobs:
           cleanup=json.loads(Path('docs/modular-review/furniture-cleanup-queue.json').read_text())
           windows=json.loads(Path('docs/modular-review/window-masks.json').read_text())
           prep=json.loads(Path('docs/modular-review/architecture-prep.json').read_text())
+          composite=json.loads(Path('docs/modular-review/composite-ready.json').read_text())
           assert readiness['productionReady']==['velvet'], readiness['productionReady']
           blocked_arch=set(readiness['blockedArchitecture'])
           blocked_cleanup=set(readiness['blockedFurnitureCleanup'])
@@ -78,13 +81,16 @@ jobs:
           assert window_scenes==expected_window_scenes, (window_scenes,expected_window_scenes)
           assert prep['count']==len(expected_prep), (prep['count'],len(expected_prep))
           assert {x['scene'] for x in prep['scenes']}==expected_prep
-          print('measured',len(measured),'candidate',len(candidate),'promoted',sum(len(x['promoted']) for x in s),'architecture-masks',masks['count'],'cleanup-items',cleanup['count'],'window-masks',windows['count'])
+          assert composite['count']==74, composite['count']
+          assert composite['complete']==74, composite['complete']
+          assert all(item['complete'] for item in composite['scenes'])
+          print('measured',len(measured),'candidate',len(candidate),'promoted',sum(len(x['promoted']) for x in s),'architecture-masks',masks['count'],'cleanup-items',cleanup['count'],'window-masks',windows['count'],'composite-ready',composite['complete'])
           PY
       - name: Commit review outputs
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/modular-review public/assets/bar/modular/*/review-ready public/assets/bar/modular/*/architecture-mask.png public/assets/bar/modular/*/window-mask.png public/assets/bar/modular/*/architecture-prep.webp public/assets/bar/modular/*/manual
+          git add docs/modular-review public/assets/bar/modular/*/review-ready public/assets/bar/modular/*/architecture-mask.png public/assets/bar/modular/*/window-mask.png public/assets/bar/modular/*/architecture-prep.webp public/assets/bar/modular/*/manual public/assets/bar/modular/*/composite-ready
           if git diff --cached --quiet; then
             echo "No generated changes"
           else
