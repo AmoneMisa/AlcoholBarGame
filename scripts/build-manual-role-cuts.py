@@ -68,7 +68,17 @@ def crop_normalized(source,rect):
 
 def build_masked_cut(image,spec):
     w,h=image.size
-    cut,mask=build_masked_cut(image,spec)
+    mask=Image.new('L',(w,h),0)
+    draw=ImageDraw.Draw(mask)
+    for shape in spec.get('include',[]):
+        draw_shape(draw,shape,w,h,255)
+    for shape in spec.get('exclude',[]):
+        draw_shape(draw,shape,w,h,0)
+    feather=float(spec.get('feather',1.5))
+    if feather>0:
+        mask=mask.filter(ImageFilter.GaussianBlur(feather))
+    cut=image.copy()
+    cut.putalpha(mask)
     return cut,mask
 
 def build(manifest,source,role,spec):
