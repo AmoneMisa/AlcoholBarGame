@@ -20,9 +20,16 @@ const game=useGameStore();
 const section=ref<'background'|'style'|'character'>(props.designSection==='character'?'style':'background');
 const character=computed(()=>(game.decor.bartenderCharacter==='leo'?'leo':'noa') as 'noa'|'leo');
 const backgroundName=computed(()=>INTERIORS.find(item=>item.id===game.decor.interior)?.name??'');
-const modularBackground=computed(()=>!!modularSceneFor(game.decor.interior));
+const modularDefinition=computed(()=>modularSceneFor(game.decor.interior,true));
+const modularBackground=computed(()=>!!modularDefinition.value);
 const shelfPreset=computed({get:()=>game.decor.shelfPreset??'classic-cocktails',set:(value:string)=>{game.decor.shelfPreset=value as ShelfDecorPresetId;}});
 const windowBackdrop=computed({get:()=>game.decor.windowBackdrop??'night-city',set:(value:string)=>{game.decor.windowBackdrop=value as WindowBackdropId;}});
+const seatMaximum=computed(()=>modularDefinition.value?.layers.filter(layer=>layer.role==='seating').length??0);
+const seatCount=computed({
+  get:()=>String(Math.min(seatMaximum.value,Number(game.decor.seatCount??seatMaximum.value))),
+  set:(value:string)=>{game.decor.seatCount=value as NonNullable<typeof game.decor.seatCount>;}
+});
+const seatCountOptions=computed(()=>Array.from({length:seatMaximum.value+1},(_,count)=>({value:String(count),label:count===0?'No seats':count===1?'1 seat':`${count} seats`})));
 const barName=ref(game.decor.name);const nickname=ref(game.decor.bartenderNickname??(character.value==='leo'?'Leo':'Noa'));
 watch(()=>game.regionId,()=>{barName.value=game.decor.name;nickname.value=game.decor.bartenderNickname??(character.value==='leo'?'Leo':'Noa');});
 watch(()=>props.designSection,value=>{section.value=value==='character'?'style':'background';});
@@ -48,8 +55,9 @@ function chooseCharacter(next:'noa'|'leo'){
         <AppearancePicker kind="background" :character="character" :selected="game.decor.interior" @pick="pickBackground" />
         <div v-if="modularBackground" class="bar-module-controls">
           <OptionSelect v-model="shelfPreset" label="Back-bar bottle style" :options="[...SHELF_DECOR_OPTIONS]" />
-          <OptionSelect v-if="modularSceneFor(game.decor.interior)?.exterior" v-model="windowBackdrop" label="View outside" :options="[...WINDOW_BACKDROP_OPTIONS]" />
-          <small>Decorative shelf bottles and the exterior view are visual collection pieces. Gameplay bottles remain separate and interactive.</small>
+          <OptionSelect v-if="seatMaximum" v-model="seatCount" label="Bar seats" :options="seatCountOptions" />
+          <OptionSelect v-if="modularDefinition?.exterior" v-model="windowBackdrop" label="View outside" :options="[...WINDOW_BACKDROP_OPTIONS]" />
+          <small>One seat image is reused at the scene anchors, so changing the count does not duplicate art files. Decorative shelf bottles and the exterior view remain independent layers.</small>
         </div>
       </template>
       <template v-else>
