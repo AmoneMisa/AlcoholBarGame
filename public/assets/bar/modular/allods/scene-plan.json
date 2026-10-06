@@ -106,7 +106,58 @@
       "height": 0.42
     }
   },
-  "windowCutouts": [],
+  "windowCutouts": [
+    {
+      "type": "polygon",
+      "points": [
+        {
+          "x": 0.005,
+          "y": 0.015
+        },
+        {
+          "x": 0.12,
+          "y": 0.015
+        },
+        {
+          "x": 0.19,
+          "y": 0.12
+        },
+        {
+          "x": 0.19,
+          "y": 0.46
+        },
+        {
+          "x": 0.005,
+          "y": 0.46
+        }
+      ]
+    },
+    {
+      "type": "polygon",
+      "points": [
+        {
+          "x": 0.815,
+          "y": 0.11
+        },
+        {
+          "x": 0.88,
+          "y": 0.015
+        },
+        {
+          "x": 0.995,
+          "y": 0.015
+        },
+        {
+          "x": 0.995,
+          "y": 0.46
+        },
+        {
+          "x": 0.815,
+          "y": 0.46
+        }
+      ]
+    }
+  ],
   "shelfRows": [
     0.28,
     0.38,
@@ -155,7 +206,7 @@
     "shelfBounds": "manual-measured",
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
-    "windowCutouts": "manual-required",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
     "manualApprovedRoles": [

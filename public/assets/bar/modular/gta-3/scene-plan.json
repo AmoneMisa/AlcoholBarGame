@@ -106,7 +106,29 @@
       "height": 0.42
     }
   },
-  "windowCutouts": [],
+  "windowCutouts": [
+    {
+      "type": "polygon",
+      "points": [
+        {
+          "x": 0.365,
+          "y": 0
+        },
+        {
+          "x": 0.805,
+          "y": 0
+        },
+        {
+          "x": 0.805,
+          "y": 0.49
+        },
+        {
+          "x": 0.365,
+          "y": 0.49
+        }
+      ]
+    }
+  ],
   "shelfRows": [
     0.28,
     0.38,
@@ -151,7 +173,7 @@
     "shelfBounds": "manual-measured",
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
-    "windowCutouts": "manual-required",
+    "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
     "manualApprovedRoles": [
