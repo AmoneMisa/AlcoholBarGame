@@ -19,6 +19,7 @@ const props=defineProps<{
   lighting:string;
   highlightStrength:string;
   animated?:boolean;
+  seatCount?:string | number;
 }>();
 
 const canvas=ref<HTMLCanvasElement>();
@@ -188,8 +189,12 @@ async function compose(){
   context.imageSmoothingQuality='high';
   await drawExterior(context);
   const layers=[...props.scene.layers].sort((a,b)=>a.z-b.z);
+  const availableSeats=layers.filter(layer=>layer.role==='seating').length;
+  const requestedSeats=props.seatCount===undefined ? availableSeats : Math.max(0,Math.min(availableSeats,Math.floor(Number(props.seatCount)||0)));
+  let seatsDrawn=0;
   let decorDrawn=false;
   for(const layer of layers){
+    if(layer.role==='seating' && seatsDrawn++>=requestedSeats) continue;
     if(!decorDrawn && props.scene.shelfDecor && layer.z>props.scene.shelfDecor.z){
       await drawShelfDecor(context);
       decorDrawn=true;
@@ -304,7 +309,7 @@ async function build(){
     renderer=undefined;
   }
 }
-watch(()=>[props.scene,props.backgroundSource,props.wall,props.counter,props.counterColor,props.shelf,props.shelfPreset,props.windowBackdrop],()=>{void build();},{deep:true});
+watch(()=>[props.scene,props.backgroundSource,props.wall,props.counter,props.counterColor,props.shelf,props.shelfPreset,props.windowBackdrop,props.seatCount],()=>{void build();},{deep:true});
 watch(()=>[props.width,props.height],()=>{if(renderer)resize();else void build();});
 watch(()=>[props.lighting,props.highlightStrength],()=>{applyUniforms();render();});
 watch(()=>props.animated,syncAnimation);
