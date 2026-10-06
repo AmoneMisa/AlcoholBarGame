@@ -12,7 +12,8 @@
     "Do not ship reference crops as final modules until the clean architecture plate and transparency have been visually reviewed.",
     "Keep camera, horizon and perspective identical to the source.",
     "Remove painted bottles from shelf modules; decorative bottles are rendered by shelf presets.",
-    "If counter/seating hides wall or floor, reconstruct the hidden surface by inpainting before export."
+    "If counter/seating hides wall or floor, reconstruct the hidden surface by inpainting before export.",
+    "One reusable seat asset per scene; seatAnchors control runtime count and placement."
   ],
   "modules": {
     "architecture-reference": {
@@ -113,7 +114,8 @@
     "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
     "manualApprovedRoles": [
       "shelf"
-    ]
+    ],
+    "seatAsset": "single-reusable-manual"
   },
   "manualApprovedRoles": [
     "shelf"
@@ -234,6 +236,83 @@
           "height": 0.42
         }
       ]
+    }
+  },
+  "manualSeatCutNormalized": {
+    "cropNormalized": {
+      "x": 0.45,
+      "y": 0.66,
+      "width": 0.13,
+      "height": 0.3
+    },
+    "mask": {
+      "feather": 0.65,
+      "include": [
+        {
+          "type": "ellipse",
+          "x": 0.04,
+          "y": 0,
+          "width": 0.92,
+          "height": 0.18
+        },
+        {
+          "type": "rect",
+          "x": 0.44,
+          "y": 0.14,
+          "width": 0.12,
+          "height": 0.62
+        },
+        {
+          "type": "ellipse",
+          "x": 0.18,
+          "y": 0.6,
+          "width": 0.64,
+          "height": 0.12
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.42,
+              "y": 0.7
+            },
+            {
+              "x": 0.48,
+              "y": 0.7
+            },
+            {
+              "x": 0.35,
+              "y": 1
+            },
+            {
+              "x": 0.27,
+              "y": 1
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.52,
+              "y": 0.7
+            },
+            {
+              "x": 0.58,
+              "y": 0.7
+            },
+            {
+              "x": 0.73,
+              "y": 1
+            },
+            {
+              "x": 0.65,
+              "y": 1
+            }
+          ]
+        }
+      ],
+      "exclude": []
     }
   }
 }
