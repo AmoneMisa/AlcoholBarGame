@@ -60,7 +60,7 @@ const glassTarget = ref<HTMLElement>();
 const sceneRef = ref<HTMLElement>();
 const sceneBox = ref({ width: 0, height: 0 });
 const animateScene = computed(() => sceneMotionPlaying.value && props.active && !props.preview && !props.capture);
-const modularScene = computed(() => modularSceneFor(game.decor.interior));
+const modularScene = computed(() => modularSceneFor(game.decor.interior, props.preview));
 const sceneBackgroundUrl = computed(() => {
   // Pick the light background on narrow screens even when device hints select Full.
   // Use viewport width until ResizeObserver has measured the scene, avoiding an initial full-size request.
