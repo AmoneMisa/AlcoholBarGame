@@ -10,7 +10,8 @@ function hasFinalFurniture(base,name,requiredRoles){
     const legacy={counter:'counter.webp',shelf:'shelf.webp',seating:'stool.webp'};
     return requiredRoles.every(role=>existsSync(resolve(base,legacy[role])));
   }
-  return requiredRoles.every(role=>existsSync(resolve(base,'clean-ready',`${role}.webp`)));
+  const outputs={counter:'counter.webp',shelf:'shelf.webp',seating:'seat.webp'};
+  return requiredRoles.every(role=>existsSync(resolve(base,'clean-ready',outputs[role])));
 }
 
 let failed=0;
