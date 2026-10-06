@@ -1,0 +1,65 @@
+name: Build modular furniture auto review
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/modular-velvet-scene
+    paths:
+      - scripts/build-furniture-auto.py
+      - .github/workflows/build-furniture-auto.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: modular-furniture-auto-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  furniture-auto:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: feat/modular-velvet-scene
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check pillow numpy opencv-python-headless
+      - run: python scripts/build-manual-role-cuts.py
+      - run: python scripts/build-modular-review.py
+      - run: python scripts/build-furniture-auto.py
+      - name: Validate auto furniture
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('docs/modular-review/furniture-auto.json').read_text())
+          assert report['count']==73, report['count']
+          for item in report['scenes']:
+            base=Path('public/assets/bar/modular')/item['scene']/'clean-auto'
+            for asset in item['assets']:
+              assert (base/f'{asset}.webp').exists(), (item['scene'],asset)
+          print('furniture-auto',report['count'])
+          PY
+      - name: Publish review-only auto furniture
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/modular-review/furniture-auto.json docs/modular-review/furniture-auto.jpg public/assets/bar/modular/*/clean-auto
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git commit -m "[furniture-auto] Build review-only clean furniture"
+          for attempt in 1 2 3; do
+            git fetch origin feat/modular-velvet-scene
+            if git rebase origin/feat/modular-velvet-scene && git push origin HEAD:feat/modular-velvet-scene; then
+              exit 0
+            fi
+            git rebase --abort || true
+            sleep $((attempt * 2))
+          done
+          exit 1
