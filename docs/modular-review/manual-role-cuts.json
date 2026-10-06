@@ -1,5 +1,5 @@
 {
-  "count": 181,
+  "count": 240,
   "items": [
     {
       "scene": "alan-wake",
@@ -23,6 +23,15 @@
       "size": [
         1672,
         226
+      ]
+    },
+    {
+      "scene": "alan-wake",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        169
       ]
     },
     {
@@ -50,6 +59,15 @@
       ]
     },
     {
+      "scene": "allods",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        178,
+        159
+      ]
+    },
+    {
       "scene": "among-us",
       "role": "shelf",
       "size": [
@@ -74,11 +92,29 @@
       ]
     },
     {
+      "scene": "among-us",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        160
+      ]
+    },
+    {
       "scene": "art-deco",
       "role": "shelf",
       "size": [
         362,
         287
+      ]
+    },
+    {
+      "scene": "art-deco",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        75,
+        187
       ]
     },
     {
@@ -106,6 +142,15 @@
       ]
     },
     {
+      "scene": "assassins-creed",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        169
+      ]
+    },
+    {
       "scene": "baldurs-gate-3",
       "role": "shelf",
       "size": [
@@ -127,6 +172,15 @@
       "size": [
         1672,
         263
+      ]
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        169
       ]
     },
     {
@@ -154,6 +208,15 @@
       ]
     },
     {
+      "scene": "batman",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "black-desert",
       "role": "shelf",
       "size": [
@@ -175,6 +238,15 @@
       "size": [
         1672,
         254
+      ]
+    },
+    {
+      "scene": "black-desert",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        178
       ]
     },
     {
@@ -202,6 +274,15 @@
       ]
     },
     {
+      "scene": "borderlands",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "control",
       "role": "shelf",
       "size": [
@@ -223,6 +304,15 @@
       "size": [
         1672,
         245
+      ]
+    },
+    {
+      "scene": "control",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        169
       ]
     },
     {
@@ -250,6 +340,15 @@
       ]
     },
     {
+      "scene": "cs-2",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        184,
+        188
+      ]
+    },
+    {
       "scene": "cyberpunk-2077",
       "role": "shelf",
       "size": [
@@ -274,6 +373,15 @@
       ]
     },
     {
+      "scene": "cyberpunk-2077",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "cyberpunk",
       "role": "counter",
       "size": [
@@ -287,6 +395,15 @@
       "size": [
         618,
         257
+      ]
+    },
+    {
+      "scene": "cyberpunk",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        99,
+        137
       ]
     },
     {
@@ -314,6 +431,15 @@
       ]
     },
     {
+      "scene": "darksiders-3",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "death-stranding",
       "role": "shelf",
       "size": [
@@ -335,6 +461,15 @@
       "size": [
         1672,
         245
+      ]
+    },
+    {
+      "scene": "death-stranding",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        218,
+        198
       ]
     },
     {
@@ -362,6 +497,15 @@
       ]
     },
     {
+      "scene": "detroit",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "devil-may-cry",
       "role": "shelf",
       "size": [
@@ -383,6 +527,15 @@
       "size": [
         1672,
         245
+      ]
+    },
+    {
+      "scene": "devil-may-cry",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
       ]
     },
     {
@@ -410,6 +563,15 @@
       ]
     },
     {
+      "scene": "diablo-4",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "divinity-original-sin-2",
       "role": "shelf",
       "size": [
@@ -431,6 +593,15 @@
       "size": [
         1672,
         273
+      ]
+    },
+    {
+      "scene": "divinity-original-sin-2",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        200,
+        188
       ]
     },
     {
@@ -458,6 +629,15 @@
       ]
     },
     {
+      "scene": "elden-ring",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "fairy",
       "role": "shelf",
       "size": [
@@ -479,6 +659,15 @@
       "size": [
         1672,
         254
+      ]
+    },
+    {
+      "scene": "fairy",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
       ]
     },
     {
@@ -506,6 +695,15 @@
       ]
     },
     {
+      "scene": "fairytale",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "gta-3",
       "role": "shelf",
       "size": [
@@ -527,6 +725,15 @@
       "size": [
         1672,
         263
+      ]
+    },
+    {
+      "scene": "gta-3",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        200,
+        198
       ]
     },
     {
@@ -554,6 +761,15 @@
       ]
     },
     {
+      "scene": "gta-5",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "gta-sa",
       "role": "shelf",
       "size": [
@@ -578,6 +794,15 @@
       ]
     },
     {
+      "scene": "gta-sa",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "gta",
       "role": "shelf",
       "size": [
@@ -599,6 +824,15 @@
       "size": [
         1672,
         282
+      ]
+    },
+    {
+      "scene": "gta",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        207
       ]
     },
     {
@@ -628,46 +862,10 @@
     {
       "scene": "harry-potter",
       "role": "seat",
-      "id": "seat-01",
+      "id": "seat",
       "size": [
-        268,
-        237
-      ]
-    },
-    {
-      "scene": "harry-potter",
-      "role": "seat",
-      "id": "seat-02",
-      "size": [
-        284,
-        237
-      ]
-    },
-    {
-      "scene": "harry-potter",
-      "role": "seat",
-      "id": "seat-03",
-      "size": [
-        284,
-        237
-      ]
-    },
-    {
-      "scene": "harry-potter",
-      "role": "seat",
-      "id": "seat-04",
-      "size": [
-        284,
-        237
-      ]
-    },
-    {
-      "scene": "harry-potter",
-      "role": "seat",
-      "id": "seat-05",
-      "size": [
-        276,
-        237
+        259,
+        202
       ]
     },
     {
@@ -695,11 +893,29 @@
       ]
     },
     {
+      "scene": "heroes-3",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        200,
+        188
+      ]
+    },
+    {
       "scene": "inferno-penthouse",
       "role": "counter",
       "size": [
         1536,
         266
+      ]
+    },
+    {
+      "scene": "inferno-penthouse",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        216,
+        338
       ]
     },
     {
@@ -719,6 +935,15 @@
       ]
     },
     {
+      "scene": "izakaya",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        91,
+        132
+      ]
+    },
+    {
       "scene": "jazz-cellar",
       "role": "seating",
       "size": [
@@ -727,11 +952,29 @@
       ]
     },
     {
+      "scene": "jazz-cellar",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        69,
+        137
+      ]
+    },
+    {
       "scene": "library",
       "role": "seating",
       "size": [
         623,
         261
+      ]
+    },
+    {
+      "scene": "library",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        66,
+        143
       ]
     },
     {
@@ -759,11 +1002,29 @@
       ]
     },
     {
+      "scene": "lineage-2",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "loft",
       "role": "counter",
       "size": [
         764,
         150
+      ]
+    },
+    {
+      "scene": "loft",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        84,
+        127
       ]
     },
     {
@@ -791,11 +1052,29 @@
       ]
     },
     {
+      "scene": "lost-ark",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        207
+      ]
+    },
+    {
       "scene": "marina",
       "role": "shelf",
       "size": [
         237,
         249
+      ]
+    },
+    {
+      "scene": "marina",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        99,
+        153
       ]
     },
     {
@@ -823,6 +1102,15 @@
       ]
     },
     {
+      "scene": "mass-effect",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        200,
+        207
+      ]
+    },
+    {
       "scene": "max-payne",
       "role": "shelf",
       "size": [
@@ -844,6 +1132,15 @@
       "size": [
         1672,
         273
+      ]
+    },
+    {
+      "scene": "max-payne",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
       ]
     },
     {
@@ -871,6 +1168,15 @@
       ]
     },
     {
+      "scene": "minecraft",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        200,
+        188
+      ]
+    },
+    {
       "scene": "neighbours-from-hell",
       "role": "shelf",
       "size": [
@@ -895,6 +1201,15 @@
       ]
     },
     {
+      "scene": "neighbours-from-hell",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "nfs-carbon",
       "role": "shelf",
       "size": [
@@ -916,6 +1231,15 @@
       "size": [
         1672,
         273
+      ]
+    },
+    {
+      "scene": "nfs-carbon",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
       ]
     },
     {
@@ -943,6 +1267,15 @@
       ]
     },
     {
+      "scene": "nfs-most-wanted",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "nfs-underground",
       "role": "shelf",
       "size": [
@@ -967,6 +1300,15 @@
       ]
     },
     {
+      "scene": "nfs-underground",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        178,
+        177
+      ]
+    },
+    {
       "scene": "palworld",
       "role": "shelf",
       "size": [
@@ -988,6 +1330,15 @@
       "size": [
         1672,
         273
+      ]
+    },
+    {
+      "scene": "palworld",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
       ]
     },
     {
@@ -1015,6 +1366,15 @@
       ]
     },
     {
+      "scene": "perfect-world",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        250,
+        198
+      ]
+    },
+    {
       "scene": "quantum-break",
       "role": "shelf",
       "size": [
@@ -1039,6 +1399,15 @@
       ]
     },
     {
+      "scene": "quantum-break",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        267,
+        197
+      ]
+    },
+    {
       "scene": "repo",
       "role": "shelf",
       "size": [
@@ -1060,6 +1429,15 @@
       "size": [
         1672,
         273
+      ]
+    },
+    {
+      "scene": "repo",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        250,
+        198
       ]
     },
     {
@@ -1087,6 +1465,15 @@
       ]
     },
     {
+      "scene": "resident-evil",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        250,
+        198
+      ]
+    },
+    {
       "scene": "shadow-tomb-raider",
       "role": "shelf",
       "size": [
@@ -1108,6 +1495,15 @@
       "size": [
         1672,
         245
+      ]
+    },
+    {
+      "scene": "shadow-tomb-raider",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        198
       ]
     },
     {
@@ -1135,6 +1531,15 @@
       ]
     },
     {
+      "scene": "silent-hill",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "skyrim",
       "role": "shelf",
       "size": [
@@ -1156,6 +1561,15 @@
       "size": [
         1672,
         207
+      ]
+    },
+    {
+      "scene": "skyrim",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        198
       ]
     },
     {
@@ -1183,6 +1597,15 @@
       ]
     },
     {
+      "scene": "sleeping-dogs",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "speakeasy",
       "role": "counter",
       "size": [
@@ -1204,6 +1627,15 @@
       "size": [
         623,
         274
+      ]
+    },
+    {
+      "scene": "speakeasy",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        100,
+        150
       ]
     },
     {
@@ -1231,11 +1663,29 @@
       ]
     },
     {
+      "scene": "stellar-blade",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "tropical",
       "role": "seating",
       "size": [
         623,
         225
+      ]
+    },
+    {
+      "scene": "tropical",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        106,
+        193
       ]
     },
     {
@@ -1263,6 +1713,15 @@
       ]
     },
     {
+      "scene": "tropico-6",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "underground",
       "role": "shelf",
       "size": [
@@ -1284,6 +1743,15 @@
       "size": [
         1672,
         235
+      ]
+    },
+    {
+      "scene": "underground",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
       ]
     },
     {
@@ -1311,6 +1779,15 @@
       ]
     },
     {
+      "scene": "underwater",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        217
+      ]
+    },
+    {
       "scene": "walking-dead-s3",
       "role": "shelf",
       "size": [
@@ -1335,6 +1812,15 @@
       ]
     },
     {
+      "scene": "walking-dead-s3",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "warcraft-3",
       "role": "shelf",
       "size": [
@@ -1356,6 +1842,15 @@
       "size": [
         1672,
         273
+      ]
+    },
+    {
+      "scene": "warcraft-3",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        198
       ]
     },
     {
@@ -1383,6 +1878,15 @@
       ]
     },
     {
+      "scene": "watch-dogs",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "witcher-3",
       "role": "shelf",
       "size": [
@@ -1404,6 +1908,15 @@
       "size": [
         1672,
         273
+      ]
+    },
+    {
+      "scene": "witcher-3",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        198
       ]
     },
     {
@@ -1431,6 +1944,15 @@
       ]
     },
     {
+      "scene": "wolf-among-us",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
+      ]
+    },
+    {
       "scene": "worms",
       "role": "shelf",
       "size": [
@@ -1452,6 +1974,15 @@
       "size": [
         1672,
         273
+      ]
+    },
+    {
+      "scene": "worms",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        167,
+        188
       ]
     }
   ]
