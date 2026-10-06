@@ -1,5 +1,5 @@
 {
-  "count": 176,
+  "count": 181,
   "items": [
     {
       "scene": "alan-wake",
@@ -623,6 +623,51 @@
       "size": [
         1672,
         263
+      ]
+    },
+    {
+      "scene": "harry-potter",
+      "role": "seat",
+      "id": "seat-01",
+      "size": [
+        268,
+        237
+      ]
+    },
+    {
+      "scene": "harry-potter",
+      "role": "seat",
+      "id": "seat-02",
+      "size": [
+        284,
+        237
+      ]
+    },
+    {
+      "scene": "harry-potter",
+      "role": "seat",
+      "id": "seat-03",
+      "size": [
+        284,
+        237
+      ]
+    },
+    {
+      "scene": "harry-potter",
+      "role": "seat",
+      "id": "seat-04",
+      "size": [
+        284,
+        237
+      ]
+    },
+    {
+      "scene": "harry-potter",
+      "role": "seat",
+      "id": "seat-05",
+      "size": [
+        276,
+        237
       ]
     },
     {
