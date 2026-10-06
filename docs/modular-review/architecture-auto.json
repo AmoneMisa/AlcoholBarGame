@@ -1,0 +1,735 @@
+{
+  "count": 73,
+  "scenes": [
+    {
+      "scene": "alan-wake",
+      "output": "public/assets/bar/modular/alan-wake/architecture-auto.webp",
+      "maskFraction": 0.547,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "allods",
+      "output": "public/assets/bar/modular/allods/architecture-auto.webp",
+      "maskFraction": 0.6387,
+      "size": [
+        1774,
+        887
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "among-us",
+      "output": "public/assets/bar/modular/among-us/architecture-auto.webp",
+      "maskFraction": 0.6176,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "art-deco",
+      "output": "public/assets/bar/modular/art-deco/architecture-auto.webp",
+      "maskFraction": 0.3236,
+      "size": [
+        623,
+        623
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "assassins-creed",
+      "output": "public/assets/bar/modular/assassins-creed/architecture-auto.webp",
+      "maskFraction": 0.6349,
+      "size": [
+        1672,
+        940
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "output": "public/assets/bar/modular/baldurs-gate-3/architecture-auto.webp",
+      "maskFraction": 0.6382,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "batman",
+      "output": "public/assets/bar/modular/batman/architecture-auto.webp",
+      "maskFraction": 0.6427,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "beach",
+      "output": "public/assets/bar/modular/beach/architecture-auto.webp",
+      "maskFraction": 0.246,
+      "size": [
+        764,
+        508
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "black-desert",
+      "output": "public/assets/bar/modular/black-desert/architecture-auto.webp",
+      "maskFraction": 0.619,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "borderlands",
+      "output": "public/assets/bar/modular/borderlands/architecture-auto.webp",
+      "maskFraction": 0.6446,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "control",
+      "output": "public/assets/bar/modular/control/architecture-auto.webp",
+      "maskFraction": 0.6036,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "cs-2",
+      "output": "public/assets/bar/modular/cs-2/architecture-auto.webp",
+      "maskFraction": 0.5064,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "cyberpunk",
+      "output": "public/assets/bar/modular/cyberpunk/architecture-auto.webp",
+      "maskFraction": 0.7993,
+      "size": [
+        764,
+        508
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "cyberpunk-2077",
+      "output": "public/assets/bar/modular/cyberpunk-2077/architecture-auto.webp",
+      "maskFraction": 0.8188,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "darksiders-3",
+      "output": "public/assets/bar/modular/darksiders-3/architecture-auto.webp",
+      "maskFraction": 0.7398,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "death-stranding",
+      "output": "public/assets/bar/modular/death-stranding/architecture-auto.webp",
+      "maskFraction": 0.5678,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "desert",
+      "output": "public/assets/bar/modular/desert/architecture-auto.webp",
+      "maskFraction": 0.1604,
+      "size": [
+        623,
+        623
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "detroit",
+      "output": "public/assets/bar/modular/detroit/architecture-auto.webp",
+      "maskFraction": 0.7046,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "devil-may-cry",
+      "output": "public/assets/bar/modular/devil-may-cry/architecture-auto.webp",
+      "maskFraction": 0.6223,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "diablo-4",
+      "output": "public/assets/bar/modular/diablo-4/architecture-auto.webp",
+      "maskFraction": 0.6186,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "divinity-original-sin-2",
+      "output": "public/assets/bar/modular/divinity-original-sin-2/architecture-auto.webp",
+      "maskFraction": 0.7693,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "elden-ring",
+      "output": "public/assets/bar/modular/elden-ring/architecture-auto.webp",
+      "maskFraction": 0.595,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "fairy",
+      "output": "public/assets/bar/modular/fairy/architecture-auto.webp",
+      "maskFraction": 0.7526,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "fairytale",
+      "output": "public/assets/bar/modular/fairytale/architecture-auto.webp",
+      "maskFraction": 0.7453,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "garden",
+      "output": "public/assets/bar/modular/garden/architecture-auto.webp",
+      "maskFraction": 0.1797,
+      "size": [
+        1671,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "gta",
+      "output": "public/assets/bar/modular/gta/architecture-auto.webp",
+      "maskFraction": 0.6637,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "gta-3",
+      "output": "public/assets/bar/modular/gta-3/architecture-auto.webp",
+      "maskFraction": 0.7936,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "gta-5",
+      "output": "public/assets/bar/modular/gta-5/architecture-auto.webp",
+      "maskFraction": 0.6801,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "gta-sa",
+      "output": "public/assets/bar/modular/gta-sa/architecture-auto.webp",
+      "maskFraction": 0.7945,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "harry-potter",
+      "output": "public/assets/bar/modular/harry-potter/architecture-auto.webp",
+      "maskFraction": 0.668,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "heroes-3",
+      "output": "public/assets/bar/modular/heroes-3/architecture-auto.webp",
+      "maskFraction": 0.6453,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "inferno-penthouse",
+      "output": "public/assets/bar/modular/inferno-penthouse/architecture-auto.webp",
+      "maskFraction": 0.3508,
+      "size": [
+        1536,
+        1024
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "izakaya",
+      "output": "public/assets/bar/modular/izakaya/architecture-auto.webp",
+      "maskFraction": 0.441,
+      "size": [
+        764,
+        508
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "jazz-cellar",
+      "output": "public/assets/bar/modular/jazz-cellar/architecture-auto.webp",
+      "maskFraction": 0.3839,
+      "size": [
+        623,
+        623
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "library",
+      "output": "public/assets/bar/modular/library/architecture-auto.webp",
+      "maskFraction": 0.258,
+      "size": [
+        623,
+        623
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "lineage-2",
+      "output": "public/assets/bar/modular/lineage-2/architecture-auto.webp",
+      "maskFraction": 0.7392,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "loft",
+      "output": "public/assets/bar/modular/loft/architecture-auto.webp",
+      "maskFraction": 0.4567,
+      "size": [
+        764,
+        508
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "lost-ark",
+      "output": "public/assets/bar/modular/lost-ark/architecture-auto.webp",
+      "maskFraction": 0.7408,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "marina",
+      "output": "public/assets/bar/modular/marina/architecture-auto.webp",
+      "maskFraction": 0.3574,
+      "size": [
+        764,
+        508
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "mass-effect",
+      "output": "public/assets/bar/modular/mass-effect/architecture-auto.webp",
+      "maskFraction": 0.7067,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "max-payne",
+      "output": "public/assets/bar/modular/max-payne/architecture-auto.webp",
+      "maskFraction": 0.6805,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "minecraft",
+      "output": "public/assets/bar/modular/minecraft/architecture-auto.webp",
+      "maskFraction": 0.6689,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "neighbours-from-hell",
+      "output": "public/assets/bar/modular/neighbours-from-hell/architecture-auto.webp",
+      "maskFraction": 0.6609,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "nfs-carbon",
+      "output": "public/assets/bar/modular/nfs-carbon/architecture-auto.webp",
+      "maskFraction": 0.7714,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "nfs-most-wanted",
+      "output": "public/assets/bar/modular/nfs-most-wanted/architecture-auto.webp",
+      "maskFraction": 0.7714,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "nfs-underground",
+      "output": "public/assets/bar/modular/nfs-underground/architecture-auto.webp",
+      "maskFraction": 0.7584,
+      "size": [
+        1774,
+        887
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "palace",
+      "output": "public/assets/bar/modular/palace/architecture-auto.webp",
+      "maskFraction": 0.1989,
+      "size": [
+        623,
+        623
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "palworld",
+      "output": "public/assets/bar/modular/palworld/architecture-auto.webp",
+      "maskFraction": 0.7527,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "parisian",
+      "output": "public/assets/bar/modular/parisian/architecture-auto.webp",
+      "maskFraction": 0.4159,
+      "size": [
+        764,
+        508
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "perfect-world",
+      "output": "public/assets/bar/modular/perfect-world/architecture-auto.webp",
+      "maskFraction": 0.7215,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "quantum-break",
+      "output": "public/assets/bar/modular/quantum-break/architecture-auto.webp",
+      "maskFraction": 0.7213,
+      "size": [
+        1672,
+        940
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "repo",
+      "output": "public/assets/bar/modular/repo/architecture-auto.webp",
+      "maskFraction": 0.7436,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "resident-evil",
+      "output": "public/assets/bar/modular/resident-evil/architecture-auto.webp",
+      "maskFraction": 0.7316,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "riad",
+      "output": "public/assets/bar/modular/riad/architecture-auto.webp",
+      "maskFraction": 0.3919,
+      "size": [
+        764,
+        508
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "rooftop",
+      "output": "public/assets/bar/modular/rooftop/architecture-auto.webp",
+      "maskFraction": 0.2441,
+      "size": [
+        764,
+        508
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "shadow-tomb-raider",
+      "output": "public/assets/bar/modular/shadow-tomb-raider/architecture-auto.webp",
+      "maskFraction": 0.606,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "silent-hill",
+      "output": "public/assets/bar/modular/silent-hill/architecture-auto.webp",
+      "maskFraction": 0.5472,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "skyline",
+      "output": "public/assets/bar/modular/skyline/architecture-auto.webp",
+      "maskFraction": 0.1114,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "skyrim",
+      "output": "public/assets/bar/modular/skyrim/architecture-auto.webp",
+      "maskFraction": 0.4997,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "sleeping-dogs",
+      "output": "public/assets/bar/modular/sleeping-dogs/architecture-auto.webp",
+      "maskFraction": 0.6176,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "speakeasy",
+      "output": "public/assets/bar/modular/speakeasy/architecture-auto.webp",
+      "maskFraction": 0.4918,
+      "size": [
+        623,
+        623
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "stellar-blade",
+      "output": "public/assets/bar/modular/stellar-blade/architecture-auto.webp",
+      "maskFraction": 0.6002,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "tropical",
+      "output": "public/assets/bar/modular/tropical/architecture-auto.webp",
+      "maskFraction": 0.4096,
+      "size": [
+        623,
+        623
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "tropico-6",
+      "output": "public/assets/bar/modular/tropico-6/architecture-auto.webp",
+      "maskFraction": 0.5912,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "underground",
+      "output": "public/assets/bar/modular/underground/architecture-auto.webp",
+      "maskFraction": 0.68,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "underwater",
+      "output": "public/assets/bar/modular/underwater/architecture-auto.webp",
+      "maskFraction": 0.6941,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "walking-dead-s3",
+      "output": "public/assets/bar/modular/walking-dead-s3/architecture-auto.webp",
+      "maskFraction": 0.7386,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "warcraft-3",
+      "output": "public/assets/bar/modular/warcraft-3/architecture-auto.webp",
+      "maskFraction": 0.7527,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "watch-dogs",
+      "output": "public/assets/bar/modular/watch-dogs/architecture-auto.webp",
+      "maskFraction": 0.7662,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "winter",
+      "output": "public/assets/bar/modular/winter/architecture-auto.webp",
+      "maskFraction": 0.2562,
+      "size": [
+        623,
+        623
+      ],
+      "windowTransparent": true
+    },
+    {
+      "scene": "witcher-3",
+      "output": "public/assets/bar/modular/witcher-3/architecture-auto.webp",
+      "maskFraction": 0.7386,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "wolf-among-us",
+      "output": "public/assets/bar/modular/wolf-among-us/architecture-auto.webp",
+      "maskFraction": 0.7205,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    },
+    {
+      "scene": "worms",
+      "output": "public/assets/bar/modular/worms/architecture-auto.webp",
+      "maskFraction": 0.7527,
+      "size": [
+        1672,
+        941
+      ],
+      "windowTransparent": false
+    }
+  ]
+}
