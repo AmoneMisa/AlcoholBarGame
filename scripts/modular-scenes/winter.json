@@ -13,7 +13,8 @@
     "Keep camera, horizon and perspective identical to the source.",
     "Remove painted bottles from shelf modules; decorative bottles are rendered by shelf presets.",
     "If counter/seating hides wall or floor, reconstruct the hidden surface by inpainting before export.",
-    "Window cutouts manually traced from the existing source background; preserve frames, mullions, curtains and permanent trim."
+    "Window cutouts manually traced from the existing source background; preserve frames, mullions, curtains and permanent trim.",
+    "One reusable seat asset per scene; seatAnchors control runtime count and placement."
   ],
   "modules": {
     "architecture-reference": {
@@ -108,7 +109,8 @@
     "windowCutouts": "manual-measured",
     "architectureInpaint": "required",
     "alphaEdges": "manual-review",
-    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone."
+    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
+    "seatAsset": "single-reusable-manual"
   },
   "windowCutoutsNormalized": [
     {
@@ -152,5 +154,75 @@
         }
       ]
     }
-  ]
+  ],
+  "manualSeatCutNormalized": {
+    "cropNormalized": {
+      "x": 0.42,
+      "y": 0.66,
+      "width": 0.16,
+      "height": 0.28
+    },
+    "mask": {
+      "feather": 0.75,
+      "include": [
+        {
+          "type": "ellipse",
+          "x": 0.03,
+          "y": 0,
+          "width": 0.94,
+          "height": 0.3
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.18,
+              "y": 0.23
+            },
+            {
+              "x": 0.32,
+              "y": 0.23
+            },
+            {
+              "x": 0.25,
+              "y": 1
+            },
+            {
+              "x": 0.12,
+              "y": 1
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.68,
+              "y": 0.23
+            },
+            {
+              "x": 0.82,
+              "y": 0.23
+            },
+            {
+              "x": 0.88,
+              "y": 1
+            },
+            {
+              "x": 0.75,
+              "y": 1
+            }
+          ]
+        },
+        {
+          "type": "ellipse",
+          "x": 0.13,
+          "y": 0.55,
+          "width": 0.74,
+          "height": 0.14
+        }
+      ],
+      "exclude": []
+    }
+  }
 }
