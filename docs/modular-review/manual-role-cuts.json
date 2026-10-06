@@ -1,5 +1,5 @@
 {
-  "count": 240,
+  "count": 248,
   "items": [
     {
       "scene": "alan-wake",
@@ -214,6 +214,15 @@
       "size": [
         167,
         188
+      ]
+    },
+    {
+      "scene": "beach",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        107,
+        157
       ]
     },
     {
@@ -470,6 +479,15 @@
       "size": [
         218,
         198
+      ]
+    },
+    {
+      "scene": "desert",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        87,
+        212
       ]
     },
     {
@@ -1309,6 +1327,15 @@
       ]
     },
     {
+      "scene": "palace",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        99,
+        175
+      ]
+    },
+    {
       "scene": "palworld",
       "role": "shelf",
       "size": [
@@ -1339,6 +1366,15 @@
       "size": [
         167,
         188
+      ]
+    },
+    {
+      "scene": "parisian",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        107,
+        173
       ]
     },
     {
@@ -1471,6 +1507,24 @@
       "size": [
         250,
         198
+      ]
+    },
+    {
+      "scene": "riad",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        92,
+        117
+      ]
+    },
+    {
+      "scene": "rooftop",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        107,
+        147
       ]
     },
     {
@@ -1788,6 +1842,15 @@
       ]
     },
     {
+      "scene": "velvet",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        178,
+        195
+      ]
+    },
+    {
       "scene": "walking-dead-s3",
       "role": "shelf",
       "size": [
@@ -1884,6 +1947,15 @@
       "size": [
         167,
         188
+      ]
+    },
+    {
+      "scene": "winter",
+      "role": "seat",
+      "id": "seat",
+      "size": [
+        99,
+        175
       ]
     },
     {
