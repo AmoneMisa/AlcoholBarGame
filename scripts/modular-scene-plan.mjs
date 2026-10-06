@@ -58,9 +58,19 @@ const moduleCrop=(spec)=>{
   if(spec.cropNormalized)return sourcePixels(spec.cropNormalized);
   throw new Error(`${manifest.id}: module is missing crop/cropNormalized`);
 };
+const moduleRect=(spec)=>{
+  if(spec.cropNormalized) return {
+    x:+Number(spec.cropNormalized.x).toFixed(6),
+    y:+Number(spec.cropNormalized.y).toFixed(6),
+    width:+Number(spec.cropNormalized.width).toFixed(6),
+    height:+Number(spec.cropNormalized.height).toFixed(6)
+  };
+  if(spec.crop) return normalized(spec.crop);
+  throw new Error(`${manifest.id}: module is missing crop/cropNormalized`);
+};
 const moduleEntries=Object.entries(manifest.modules??{}).map(([id,spec])=>{
   const crop=moduleCrop(spec);
-  const rect=normalized(crop);
+  const rect=moduleRect(spec);
   return [id,{...spec,crop,rect}];
 });
 const slots={
@@ -95,9 +105,15 @@ const plan={
   modules:Object.fromEntries(moduleEntries),
   slots,
   windowCutouts:cutouts,
-  shelfRows:manifest.shelfRowsNormalized??manifest.shelfRows??[],
-  seatAnchors:manifest.seatAnchorsNormalized??manifest.seatAnchors??[],
-  bartenderAnchor:manifest.bartenderAnchorNormalized??manifest.bartenderAnchor??null,
+  shelfRows:manifest.shelfRowsNormalized??(manifest.shelfRows??[]).map(value=>+(value/authorHeight).toFixed(6)),
+  seatAnchors:manifest.seatAnchorsNormalized??(manifest.seatAnchors??[]).map(point=>({
+    x:+(point.x/authorWidth).toFixed(6),
+    y:+(point.y/authorHeight).toFixed(6)
+  })),
+  bartenderAnchor:manifest.bartenderAnchorNormalized??(manifest.bartenderAnchor?{
+    x:+(manifest.bartenderAnchor.x/authorWidth).toFixed(6),
+    y:+(manifest.bartenderAnchor.y/authorHeight).toFixed(6)
+  }:null),
   status:manifest.status??'authoring',
   geometrySource:manifest.geometrySource??null,
   requiredRoles:manifest.requiredRoles??['counter','shelf','seating'],
