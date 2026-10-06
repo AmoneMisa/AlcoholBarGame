@@ -13,7 +13,8 @@
     "Reference crops are authoring aids, not shippable clean modules.",
     "Preserve camera/horizon/perspective.",
     "Remove painted bottles from shelf furniture.",
-    "Inpaint occluded wall/floor before export."
+    "Inpaint occluded wall/floor before export.",
+    "One reusable seat asset per scene; seatAnchors control runtime count and placement."
   ],
   "modules": {
     "architecture-reference": {
@@ -110,7 +111,8 @@
     "alphaEdges": "manual-review",
     "manualApprovedRoles": [
       "seating"
-    ]
+    ],
+    "seatAsset": "single-reusable-manual"
   },
   "windowCutoutsNormalized": [
     {
@@ -184,5 +186,82 @@
   },
   "manualApprovedRoles": [
     "seating"
-  ]
+  ],
+  "manualSeatCutNormalized": {
+    "cropNormalized": {
+      "x": 0.455,
+      "y": 0.56,
+      "width": 0.105,
+      "height": 0.23
+    },
+    "mask": {
+      "feather": 0.65,
+      "include": [
+        {
+          "type": "ellipse",
+          "x": 0.04,
+          "y": 0.01,
+          "width": 0.92,
+          "height": 0.19
+        },
+        {
+          "type": "rect",
+          "x": 0.44,
+          "y": 0.15,
+          "width": 0.12,
+          "height": 0.6
+        },
+        {
+          "type": "ellipse",
+          "x": 0.18,
+          "y": 0.58,
+          "width": 0.64,
+          "height": 0.1
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.42,
+              "y": 0.69
+            },
+            {
+              "x": 0.48,
+              "y": 0.69
+            },
+            {
+              "x": 0.34,
+              "y": 1
+            },
+            {
+              "x": 0.26,
+              "y": 1
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.52,
+              "y": 0.69
+            },
+            {
+              "x": 0.58,
+              "y": 0.69
+            },
+            {
+              "x": 0.74,
+              "y": 1
+            },
+            {
+              "x": 0.66,
+              "y": 1
+            }
+          ]
+        }
+      ],
+      "exclude": []
+    }
+  }
 }
