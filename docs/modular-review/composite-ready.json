@@ -1,0 +1,1384 @@
+{
+  "count": 74,
+  "complete": 74,
+  "finalArchitecture": 1,
+  "prepArchitecture": 73,
+  "scenes": [
+    {
+      "scene": "alan-wake",
+      "directory": "public/assets/bar/modular/alan-wake/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/alan-wake/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "allods",
+      "directory": "public/assets/bar/modular/allods/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/allods/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "among-us",
+      "directory": "public/assets/bar/modular/among-us/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/among-us/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "art-deco",
+      "directory": "public/assets/bar/modular/art-deco/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "assassins-creed",
+      "directory": "public/assets/bar/modular/assassins-creed/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/assassins-creed/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "directory": "public/assets/bar/modular/baldurs-gate-3/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/baldurs-gate-3/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "batman",
+      "directory": "public/assets/bar/modular/batman/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/batman/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "beach",
+      "directory": "public/assets/bar/modular/beach/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/beach/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "black-desert",
+      "directory": "public/assets/bar/modular/black-desert/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/black-desert/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "borderlands",
+      "directory": "public/assets/bar/modular/borderlands/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/borderlands/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "control",
+      "directory": "public/assets/bar/modular/control/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "cs-2",
+      "directory": "public/assets/bar/modular/cs-2/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/cs-2/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "cyberpunk",
+      "directory": "public/assets/bar/modular/cyberpunk/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "cyberpunk-2077",
+      "directory": "public/assets/bar/modular/cyberpunk-2077/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/cyberpunk-2077/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "darksiders-3",
+      "directory": "public/assets/bar/modular/darksiders-3/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/darksiders-3/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "death-stranding",
+      "directory": "public/assets/bar/modular/death-stranding/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/death-stranding/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "desert",
+      "directory": "public/assets/bar/modular/desert/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/desert/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "detroit",
+      "directory": "public/assets/bar/modular/detroit/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/detroit/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "devil-may-cry",
+      "directory": "public/assets/bar/modular/devil-may-cry/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/devil-may-cry/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "diablo-4",
+      "directory": "public/assets/bar/modular/diablo-4/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/diablo-4/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "divinity-original-sin-2",
+      "directory": "public/assets/bar/modular/divinity-original-sin-2/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/divinity-original-sin-2/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "elden-ring",
+      "directory": "public/assets/bar/modular/elden-ring/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/elden-ring/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "fairy",
+      "directory": "public/assets/bar/modular/fairy/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/fairy/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "fairytale",
+      "directory": "public/assets/bar/modular/fairytale/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/fairytale/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "garden",
+      "directory": "public/assets/bar/modular/garden/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/garden/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "gta",
+      "directory": "public/assets/bar/modular/gta/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/gta/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "gta-3",
+      "directory": "public/assets/bar/modular/gta-3/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/gta-3/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "gta-5",
+      "directory": "public/assets/bar/modular/gta-5/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/gta-5/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "gta-sa",
+      "directory": "public/assets/bar/modular/gta-sa/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/gta-sa/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "harry-potter",
+      "directory": "public/assets/bar/modular/harry-potter/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/harry-potter/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "heroes-3",
+      "directory": "public/assets/bar/modular/heroes-3/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "inferno-penthouse",
+      "directory": "public/assets/bar/modular/inferno-penthouse/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/inferno-penthouse/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "izakaya",
+      "directory": "public/assets/bar/modular/izakaya/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/izakaya/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "jazz-cellar",
+      "directory": "public/assets/bar/modular/jazz-cellar/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "library",
+      "directory": "public/assets/bar/modular/library/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/library/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "lineage-2",
+      "directory": "public/assets/bar/modular/lineage-2/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "loft",
+      "directory": "public/assets/bar/modular/loft/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/loft/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "lost-ark",
+      "directory": "public/assets/bar/modular/lost-ark/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "marina",
+      "directory": "public/assets/bar/modular/marina/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/marina/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "mass-effect",
+      "directory": "public/assets/bar/modular/mass-effect/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "max-payne",
+      "directory": "public/assets/bar/modular/max-payne/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "minecraft",
+      "directory": "public/assets/bar/modular/minecraft/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "neighbours-from-hell",
+      "directory": "public/assets/bar/modular/neighbours-from-hell/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "nfs-carbon",
+      "directory": "public/assets/bar/modular/nfs-carbon/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "nfs-most-wanted",
+      "directory": "public/assets/bar/modular/nfs-most-wanted/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "nfs-underground",
+      "directory": "public/assets/bar/modular/nfs-underground/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "palace",
+      "directory": "public/assets/bar/modular/palace/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/palace/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "palworld",
+      "directory": "public/assets/bar/modular/palworld/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "parisian",
+      "directory": "public/assets/bar/modular/parisian/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/parisian/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "perfect-world",
+      "directory": "public/assets/bar/modular/perfect-world/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "quantum-break",
+      "directory": "public/assets/bar/modular/quantum-break/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "repo",
+      "directory": "public/assets/bar/modular/repo/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "resident-evil",
+      "directory": "public/assets/bar/modular/resident-evil/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "riad",
+      "directory": "public/assets/bar/modular/riad/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/riad/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "rooftop",
+      "directory": "public/assets/bar/modular/rooftop/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/rooftop/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "shadow-tomb-raider",
+      "directory": "public/assets/bar/modular/shadow-tomb-raider/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/shadow-tomb-raider/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "silent-hill",
+      "directory": "public/assets/bar/modular/silent-hill/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/silent-hill/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "skyline",
+      "directory": "public/assets/bar/modular/skyline/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/skyline/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "skyrim",
+      "directory": "public/assets/bar/modular/skyrim/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/skyrim/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "sleeping-dogs",
+      "directory": "public/assets/bar/modular/sleeping-dogs/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/sleeping-dogs/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "speakeasy",
+      "directory": "public/assets/bar/modular/speakeasy/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "stellar-blade",
+      "directory": "public/assets/bar/modular/stellar-blade/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/stellar-blade/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "tropical",
+      "directory": "public/assets/bar/modular/tropical/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/tropical/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "tropico-6",
+      "directory": "public/assets/bar/modular/tropico-6/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/tropico-6/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "underground",
+      "directory": "public/assets/bar/modular/underground/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "underwater",
+      "directory": "public/assets/bar/modular/underwater/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/underwater/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "velvet",
+      "directory": "public/assets/bar/modular/velvet/composite-ready",
+      "architectureKind": "final",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "walking-dead-s3",
+      "directory": "public/assets/bar/modular/walking-dead-s3/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/walking-dead-s3/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "warcraft-3",
+      "directory": "public/assets/bar/modular/warcraft-3/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "watch-dogs",
+      "directory": "public/assets/bar/modular/watch-dogs/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/watch-dogs/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "winter",
+      "directory": "public/assets/bar/modular/winter/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat",
+        "exterior"
+      ],
+      "exterior": "public/assets/bar/modular/winter/composite-ready/exterior.webp",
+      "complete": true
+    },
+    {
+      "scene": "witcher-3",
+      "directory": "public/assets/bar/modular/witcher-3/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "wolf-among-us",
+      "directory": "public/assets/bar/modular/wolf-among-us/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    },
+    {
+      "scene": "worms",
+      "directory": "public/assets/bar/modular/worms/composite-ready",
+      "architectureKind": "prep",
+      "requiredRoles": [
+        "counter",
+        "shelf",
+        "seating"
+      ],
+      "assets": [
+        "architecture",
+        "counter",
+        "shelf",
+        "seat"
+      ],
+      "exterior": null,
+      "complete": true
+    }
+  ]
+}

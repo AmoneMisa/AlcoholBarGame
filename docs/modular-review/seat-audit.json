@@ -1,0 +1,1190 @@
+{
+  "count": 72,
+  "flaggedCount": 10,
+  "flagged": [
+    "cyberpunk",
+    "desert",
+    "jazz-cellar",
+    "library",
+    "marina",
+    "parisian",
+    "riad",
+    "speakeasy",
+    "tropical",
+    "winter"
+  ],
+  "items": [
+    {
+      "scene": "alan-wake",
+      "missing": false,
+      "size": [
+        167,
+        169
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0059,
+        "top": 0.2575,
+        "bottom": 0.3114
+      },
+      "occupied": 0.4503,
+      "flags": []
+    },
+    {
+      "scene": "allods",
+      "missing": false,
+      "size": [
+        178,
+        159
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.1948,
+        "bottom": 0.3146
+      },
+      "occupied": 0.4513,
+      "flags": []
+    },
+    {
+      "scene": "among-us",
+      "missing": false,
+      "size": [
+        167,
+        160
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0078,
+        "top": 0.2635,
+        "bottom": 0.1976
+      },
+      "occupied": 0.371,
+      "flags": []
+    },
+    {
+      "scene": "art-deco",
+      "missing": false,
+      "size": [
+        75,
+        187
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.2133,
+        "bottom": 0.2367
+      },
+      "occupied": 0.4438,
+      "flags": []
+    },
+    {
+      "scene": "assassins-creed",
+      "missing": false,
+      "size": [
+        167,
+        169
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0059,
+        "top": 0.2575,
+        "bottom": 0.3114
+      },
+      "occupied": 0.4503,
+      "flags": []
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "missing": false,
+      "size": [
+        167,
+        169
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0059,
+        "top": 0.2575,
+        "bottom": 0.3114
+      },
+      "occupied": 0.4503,
+      "flags": []
+    },
+    {
+      "scene": "batman",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2515,
+        "bottom": 0.3114
+      },
+      "occupied": 0.4426,
+      "flags": []
+    },
+    {
+      "scene": "beach",
+      "missing": false,
+      "size": [
+        107,
+        157
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.0,
+        "bottom": 0.3364
+      },
+      "occupied": 0.5022,
+      "flags": []
+    },
+    {
+      "scene": "black-desert",
+      "missing": false,
+      "size": [
+        167,
+        178
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0056,
+        "top": 0.2515,
+        "bottom": 0.3114
+      },
+      "occupied": 0.45,
+      "flags": []
+    },
+    {
+      "scene": "borderlands",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "control",
+      "missing": false,
+      "size": [
+        167,
+        169
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0059,
+        "top": 0.2575,
+        "bottom": 0.3114
+      },
+      "occupied": 0.4503,
+      "flags": []
+    },
+    {
+      "scene": "cs-2",
+      "missing": false,
+      "size": [
+        184,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2446,
+        "bottom": 0.3152
+      },
+      "occupied": 0.4468,
+      "flags": []
+    },
+    {
+      "scene": "cyberpunk",
+      "missing": false,
+      "size": [
+        99,
+        137
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.3838,
+        "bottom": 0.0
+      },
+      "occupied": 0.3091,
+      "flags": [
+        "top-edge-contact"
+      ]
+    },
+    {
+      "scene": "cyberpunk-2077",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "darksiders-3",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "death-stranding",
+      "missing": false,
+      "size": [
+        218,
+        198
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0051,
+        "top": 0.2362,
+        "bottom": 0.3028
+      },
+      "occupied": 0.4437,
+      "flags": []
+    },
+    {
+      "scene": "desert",
+      "missing": false,
+      "size": [
+        87,
+        212
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.354,
+        "bottom": 0.3448
+      },
+      "occupied": 0.5294,
+      "flags": [
+        "top-edge-contact"
+      ]
+    },
+    {
+      "scene": "detroit",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "devil-may-cry",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "diablo-4",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "divinity-original-sin-2",
+      "missing": false,
+      "size": [
+        200,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0043,
+        "top": 0.2462,
+        "bottom": 0.31
+      },
+      "occupied": 0.4435,
+      "flags": []
+    },
+    {
+      "scene": "elden-ring",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "fairy",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "fairytale",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "gta",
+      "missing": false,
+      "size": [
+        167,
+        207
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.006,
+        "top": 0.285,
+        "bottom": 0.3114
+      },
+      "occupied": 0.4479,
+      "flags": []
+    },
+    {
+      "scene": "gta-3",
+      "missing": false,
+      "size": [
+        200,
+        198
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0051,
+        "top": 0.2387,
+        "bottom": 0.31
+      },
+      "occupied": 0.4452,
+      "flags": []
+    },
+    {
+      "scene": "gta-5",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "gta-sa",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "harry-potter",
+      "missing": false,
+      "size": [
+        259,
+        202
+      ],
+      "edge": {
+        "left": 0.0157,
+        "right": 0.0248,
+        "top": 0.1992,
+        "bottom": 0.3228
+      },
+      "occupied": 0.4506,
+      "flags": []
+    },
+    {
+      "scene": "heroes-3",
+      "missing": false,
+      "size": [
+        200,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0043,
+        "top": 0.2462,
+        "bottom": 0.31
+      },
+      "occupied": 0.4435,
+      "flags": []
+    },
+    {
+      "scene": "inferno-penthouse",
+      "missing": false,
+      "size": [
+        216,
+        338
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.2176,
+        "bottom": 0.3044
+      },
+      "occupied": 0.4946,
+      "flags": []
+    },
+    {
+      "scene": "izakaya",
+      "missing": false,
+      "size": [
+        91,
+        132
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.0,
+        "bottom": 0.3516
+      },
+      "occupied": 0.5027,
+      "flags": []
+    },
+    {
+      "scene": "jazz-cellar",
+      "missing": false,
+      "size": [
+        69,
+        137
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.3865,
+        "bottom": 0.2222
+      },
+      "occupied": 0.3528,
+      "flags": [
+        "top-edge-contact"
+      ]
+    },
+    {
+      "scene": "library",
+      "missing": false,
+      "size": [
+        66,
+        143
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.028,
+        "top": 0.404,
+        "bottom": 0.2323
+      },
+      "occupied": 0.3523,
+      "flags": [
+        "top-edge-contact"
+      ]
+    },
+    {
+      "scene": "lineage-2",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "loft",
+      "missing": false,
+      "size": [
+        84,
+        127
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.0833,
+        "bottom": 0.3571
+      },
+      "occupied": 0.4661,
+      "flags": []
+    },
+    {
+      "scene": "lost-ark",
+      "missing": false,
+      "size": [
+        167,
+        207
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.006,
+        "top": 0.285,
+        "bottom": 0.3114
+      },
+      "occupied": 0.4479,
+      "flags": []
+    },
+    {
+      "scene": "marina",
+      "missing": false,
+      "size": [
+        99,
+        153
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.5118,
+        "bottom": 0.2222
+      },
+      "occupied": 0.3382,
+      "flags": [
+        "top-edge-contact"
+      ]
+    },
+    {
+      "scene": "mass-effect",
+      "missing": false,
+      "size": [
+        200,
+        207
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0048,
+        "top": 0.282,
+        "bottom": 0.31
+      },
+      "occupied": 0.4434,
+      "flags": []
+    },
+    {
+      "scene": "max-payne",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "minecraft",
+      "missing": false,
+      "size": [
+        200,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.0,
+        "bottom": 0.29
+      },
+      "occupied": 0.4487,
+      "flags": []
+    },
+    {
+      "scene": "neighbours-from-hell",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "nfs-carbon",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "nfs-most-wanted",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "nfs-underground",
+      "missing": false,
+      "size": [
+        178,
+        177
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.25,
+        "bottom": 0.3146
+      },
+      "occupied": 0.4495,
+      "flags": []
+    },
+    {
+      "scene": "palace",
+      "missing": false,
+      "size": [
+        99,
+        175
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.0,
+        "bottom": 0.3434
+      },
+      "occupied": 0.5316,
+      "flags": []
+    },
+    {
+      "scene": "palworld",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "parisian",
+      "missing": false,
+      "size": [
+        107,
+        173
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.4252,
+        "bottom": 0.3364
+      },
+      "occupied": 0.5187,
+      "flags": [
+        "top-edge-contact"
+      ]
+    },
+    {
+      "scene": "perfect-world",
+      "missing": false,
+      "size": [
+        250,
+        198
+      ],
+      "edge": {
+        "left": 0.0177,
+        "right": 0.0269,
+        "top": 0.134,
+        "bottom": 0.342
+      },
+      "occupied": 0.4719,
+      "flags": []
+    },
+    {
+      "scene": "quantum-break",
+      "missing": false,
+      "size": [
+        267,
+        197
+      ],
+      "edge": {
+        "left": 0.0152,
+        "right": 0.0237,
+        "top": 0.1404,
+        "bottom": 0.3202
+      },
+      "occupied": 0.4503,
+      "flags": []
+    },
+    {
+      "scene": "repo",
+      "missing": false,
+      "size": [
+        250,
+        198
+      ],
+      "edge": {
+        "left": 0.0177,
+        "right": 0.0269,
+        "top": 0.134,
+        "bottom": 0.342
+      },
+      "occupied": 0.4719,
+      "flags": []
+    },
+    {
+      "scene": "resident-evil",
+      "missing": false,
+      "size": [
+        250,
+        198
+      ],
+      "edge": {
+        "left": 0.0177,
+        "right": 0.0269,
+        "top": 0.134,
+        "bottom": 0.342
+      },
+      "occupied": 0.4719,
+      "flags": []
+    },
+    {
+      "scene": "riad",
+      "missing": false,
+      "size": [
+        92,
+        117
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.5217,
+        "bottom": 0.0
+      },
+      "occupied": 0.6089,
+      "flags": [
+        "top-edge-contact"
+      ]
+    },
+    {
+      "scene": "rooftop",
+      "missing": false,
+      "size": [
+        107,
+        147
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.0,
+        "bottom": 0.3364
+      },
+      "occupied": 0.5424,
+      "flags": []
+    },
+    {
+      "scene": "shadow-tomb-raider",
+      "missing": false,
+      "size": [
+        167,
+        198
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0063,
+        "top": 0.2395,
+        "bottom": 0.3114
+      },
+      "occupied": 0.4495,
+      "flags": []
+    },
+    {
+      "scene": "silent-hill",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "skyrim",
+      "missing": false,
+      "size": [
+        167,
+        198
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0063,
+        "top": 0.2395,
+        "bottom": 0.3114
+      },
+      "occupied": 0.4495,
+      "flags": []
+    },
+    {
+      "scene": "sleeping-dogs",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "speakeasy",
+      "missing": false,
+      "size": [
+        100,
+        150
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.4833,
+        "bottom": 0.2333
+      },
+      "occupied": 0.3433,
+      "flags": [
+        "top-edge-contact"
+      ]
+    },
+    {
+      "scene": "stellar-blade",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "tropical",
+      "missing": false,
+      "size": [
+        106,
+        193
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.4009,
+        "bottom": 0.3019
+      },
+      "occupied": 0.5972,
+      "flags": [
+        "top-edge-contact"
+      ]
+    },
+    {
+      "scene": "tropico-6",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "underground",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "underwater",
+      "missing": false,
+      "size": [
+        167,
+        217
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0058,
+        "top": 0.2802,
+        "bottom": 0.3114
+      },
+      "occupied": 0.4476,
+      "flags": []
+    },
+    {
+      "scene": "velvet",
+      "missing": false,
+      "size": [
+        178,
+        195
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0,
+        "top": 0.2388,
+        "bottom": 0.3146
+      },
+      "occupied": 0.4475,
+      "flags": []
+    },
+    {
+      "scene": "walking-dead-s3",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "warcraft-3",
+      "missing": false,
+      "size": [
+        167,
+        198
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0063,
+        "top": 0.2395,
+        "bottom": 0.3114
+      },
+      "occupied": 0.4495,
+      "flags": []
+    },
+    {
+      "scene": "watch-dogs",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "winter",
+      "missing": false,
+      "size": [
+        99,
+        175
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.02,
+        "top": 0.4293,
+        "bottom": 0.3232
+      },
+      "occupied": 0.5373,
+      "flags": [
+        "top-edge-contact"
+      ]
+    },
+    {
+      "scene": "witcher-3",
+      "missing": false,
+      "size": [
+        167,
+        198
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0063,
+        "top": 0.2395,
+        "bottom": 0.3114
+      },
+      "occupied": 0.4495,
+      "flags": []
+    },
+    {
+      "scene": "wolf-among-us",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    },
+    {
+      "scene": "worms",
+      "missing": false,
+      "size": [
+        167,
+        188
+      ],
+      "edge": {
+        "left": 0.0,
+        "right": 0.0053,
+        "top": 0.2485,
+        "bottom": 0.3114
+      },
+      "occupied": 0.447,
+      "flags": []
+    }
+  ]
+}
