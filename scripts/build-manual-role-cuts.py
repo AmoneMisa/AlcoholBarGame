@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import shutil
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter
 
@@ -103,17 +104,19 @@ def build(manifest,source,role,spec):
     mask.save(out/f'{role}-mask.png','PNG',optimize=True)
     return {'scene':scene_id,'role':role,'size':[w,h]}
 
-def build_seat(manifest,source,index,item):
+def build_seat(manifest,source,item):
     scene_id=manifest['id']
-    seat_id=item.get('id',f'seat-{index+1:02d}')
     image=crop_normalized(source,item['cropNormalized'])
     w,h=image.size
     cut,mask=build_masked_cut(image,item.get('mask',{}))
-    out=MOD/scene_id/'manual'/'seats'
+    out=MOD/scene_id/'manual'
     out.mkdir(parents=True,exist_ok=True)
-    cut.save(out/f'{seat_id}.webp','WEBP',lossless=True,method=6)
-    mask.save(out/f'{seat_id}-mask.png','PNG',optimize=True)
-    return {'scene':scene_id,'role':'seat','id':seat_id,'size':[w,h]}
+    legacy=out/'seats'
+    if legacy.exists():
+        shutil.rmtree(legacy)
+    cut.save(out/'seat.webp','WEBP',lossless=True,method=6)
+    mask.save(out/'seat-mask.png','PNG',optimize=True)
+    return {'scene':scene_id,'role':'seat','id':'seat','size':[w,h]}
 
 def main():
     rows=[]
@@ -130,8 +133,9 @@ def main():
             source=source_file.convert('RGBA')
             for role,spec in specs.items():
                 rows.append(build(manifest,source,role,spec))
-            for index,item in enumerate(manifest.get('manualSeatCutsNormalized',[])):
-                rows.append(build_seat(manifest,source,index,item))
+            item=manifest.get('manualSeatCutNormalized')
+            if item:
+                rows.append(build_seat(manifest,source,item))
     report=ROOT/'docs/modular-review/manual-role-cuts.json'
     report.write_text(json.dumps({'count':len(rows),'items':rows},indent=2)+'\n')
     print(f'manual role cuts: {len(rows)}')
