@@ -140,7 +140,8 @@ def main():
 
     for path,manifest in manifests:
         specs=manifest.get('manualRoleMasksNormalized',{})
-        if not specs:
+        item=manifest.get('manualSeatCutNormalized')
+        if not specs and not item:
             continue
         source_value=manifest['source']
         if source_value.startswith('../../../public/'):
@@ -150,7 +151,6 @@ def main():
             source=source_file.convert('RGBA')
             for role,spec in specs.items():
                 rows.append(build(manifest,source,role,spec))
-            item=manifest.get('manualSeatCutNormalized')
             if item:
                 rows.append(build_seat(manifest,source,item))
     report=ROOT/'docs/modular-review/manual-role-cuts.json'
