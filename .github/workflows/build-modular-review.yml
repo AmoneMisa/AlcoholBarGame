@@ -11,6 +11,7 @@ on:
       - scripts/build-architecture-masks.py
       - scripts/build-architecture-prep.py
       - scripts/build-composite-ready.py
+      - scripts/build-generated-modular-scenes.mjs
       - scripts/build-furniture-cleanup-queue.mjs
       - scripts/build-window-masks.py
       - scripts/build-manual-role-cuts.py
@@ -46,6 +47,7 @@ jobs:
       - run: node scripts/build-furniture-cleanup-queue.mjs
       - run: python scripts/build-window-masks.py
       - run: python scripts/build-composite-ready.py
+      - run: node scripts/build-generated-modular-scenes.mjs
       - name: Validate coverage
         run: |
           python - <<'PY'
@@ -90,7 +92,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/modular-review public/assets/bar/modular/*/review-ready public/assets/bar/modular/*/architecture-mask.png public/assets/bar/modular/*/window-mask.png public/assets/bar/modular/*/architecture-prep.webp public/assets/bar/modular/*/manual public/assets/bar/modular/*/composite-ready
+          git add docs/modular-review public/assets/bar/modular/*/review-ready public/assets/bar/modular/*/architecture-mask.png public/assets/bar/modular/*/window-mask.png public/assets/bar/modular/*/architecture-prep.webp public/assets/bar/modular/*/manual public/assets/bar/modular/*/composite-ready src/data/cosmetics/generatedModularScenes.ts
           if git diff --cached --quiet; then
             echo "No generated changes"
           else
