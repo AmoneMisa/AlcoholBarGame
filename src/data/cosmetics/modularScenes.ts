@@ -1,5 +1,6 @@
 import type { SceneGeometry } from './barLines';
 import { defineModularScene, mirrorLayer, mirrorShelfBay } from './modularSceneFactory';
+import { GENERATED_MODULAR_SCENES } from './generatedModularScenes';
 
 export type ModularLayerRole = 'architecture' | 'floor' | 'wall' | 'shelves' | 'seating' | 'counter' | 'decor';
 export type ModularSelectionKey = 'wall' | 'counter' | 'counterColor' | 'shelf' | 'seating' | 'floor';
@@ -56,6 +57,7 @@ const decorBayLeft:ShelfDecorBay = {rect:{x:.145,y:.145,width:.24,height:.34},ro
 const decorBayRight = mirrorShelfBay(decorBayLeft);
 
 export const MODULAR_SCENES: Readonly<Record<string,ModularSceneDefinition>> = {
+  ...GENERATED_MODULAR_SCENES,
   velvet:defineModularScene({
     id:'velvet',
     status:'production',
