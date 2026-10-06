@@ -12,7 +12,7 @@ const roles={
     prompt:'Clean the isolated back-bar shelf/cabinet from the existing source. Remove every painted bottle, glass, label and loose object. Preserve only the empty furniture, shelf boards, cabinet frame, material, perspective, permanent lighting and fixed decorative trim.'
   },
   seating:{
-    prompt:'Clean the isolated seating furniture from the existing source. Remove loose objects and accidental foreground clutter while preserving the exact chairs/stools, upholstery, legs, perspective and permanent material details.'
+    prompt:'Clean the single reusable seat asset from the existing source. Remove accidental background/counter pixels and loose objects while preserving the exact chair/stool silhouette, upholstery, legs, perspective and permanent material details.'
   }
 };
 
@@ -21,12 +21,17 @@ for(const item of summary){
   if(!item.isolatedFurnitureReady||item.cleanFurnitureReady) continue;
   for(const role of item.requiredRoles ?? Object.keys(roles)){
     const contract=roles[role];
+    const isSeat=role==='seating';
     queue.push({
       scene:item.scene,
-      role,
-      source:`public/assets/bar/modular/${item.scene}/review-ready/${role}.webp`,
-      sourceMask:`public/assets/bar/modular/${item.scene}/review-ready/${role}-mask.png`,
-      output:`public/assets/bar/modular/${item.scene}/clean-ready/${role}.webp`,
+      role:isSeat?'seat':role,
+      source:isSeat
+        ? `public/assets/bar/modular/${item.scene}/manual/seat.webp`
+        : `public/assets/bar/modular/${item.scene}/review-ready/${role}.webp`,
+      sourceMask:isSeat
+        ? `public/assets/bar/modular/${item.scene}/manual/seat-mask.png`
+        : `public/assets/bar/modular/${item.scene}/review-ready/${role}-mask.png`,
+      output:`public/assets/bar/modular/${item.scene}/clean-ready/${isSeat?'seat':role}.webp`,
       prompt:contract.prompt,
       constraints:[
         'Use the existing isolated furniture asset as the visual ground truth.',
