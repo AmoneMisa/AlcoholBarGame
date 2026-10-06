@@ -10,7 +10,8 @@
     "Keep the camera, horizon and perspective fixed.",
     "Modules overlap by design; do not trim to the visible contour.",
     "Lighting should stay neutral enough for the runtime shader.",
-    "Window panes must be transparent in architecture.webp so the exterior layer can change independently."
+    "Window panes must be transparent in architecture.webp so the exterior layer can change independently.",
+    "One reusable seat asset per scene; seatAnchors control runtime count and placement."
   ],
   "modules": {
     "architecture-reference": {
@@ -76,5 +77,78 @@
     }
   ],
   "status": "geometry-ready-art-review-required",
-  "geometrySource": "reviewed-modular-pilot"
+  "geometrySource": "reviewed-modular-pilot",
+  "manualSeatCutNormalized": {
+    "cropNormalized": {
+      "x": 0.455,
+      "y": 0.68,
+      "width": 0.1,
+      "height": 0.22
+    },
+    "mask": {
+      "feather": 0.65,
+      "include": [
+        {
+          "type": "ellipse",
+          "x": 0.03,
+          "y": 0.01,
+          "width": 0.94,
+          "height": 0.23
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.18,
+              "y": 0.19
+            },
+            {
+              "x": 0.31,
+              "y": 0.19
+            },
+            {
+              "x": 0.24,
+              "y": 1
+            },
+            {
+              "x": 0.1,
+              "y": 1
+            }
+          ]
+        },
+        {
+          "type": "polygon",
+          "points": [
+            {
+              "x": 0.69,
+              "y": 0.19
+            },
+            {
+              "x": 0.82,
+              "y": 0.19
+            },
+            {
+              "x": 0.9,
+              "y": 1
+            },
+            {
+              "x": 0.76,
+              "y": 1
+            }
+          ]
+        },
+        {
+          "type": "rect",
+          "x": 0.14,
+          "y": 0.55,
+          "width": 0.72,
+          "height": 0.05
+        }
+      ],
+      "exclude": []
+    }
+  },
+  "review": {
+    "seatAsset": "single-reusable-manual"
+  }
 }
