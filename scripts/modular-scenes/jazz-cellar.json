@@ -112,7 +112,7 @@
     "manualApprovedRoles": [
       "seating"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-manual-refined"
   },
   "windowCutoutsNormalized": [],
   "manualRoleMasksNormalized": {
@@ -163,76 +163,41 @@
   ],
   "manualSeatCutNormalized": {
     "cropNormalized": {
-      "x": 0.45,
-      "y": 0.56,
-      "width": 0.11,
-      "height": 0.22
+      "x": 0.44,
+      "y": 0.64,
+      "width": 0.12,
+      "height": 0.25
     },
     "mask": {
-      "feather": 0.65,
+      "feather": 0.55,
       "include": [
         {
           "type": "ellipse",
-          "x": 0.04,
-          "y": 0.01,
-          "width": 0.92,
-          "height": 0.2
+          "x": 0.05,
+          "y": 0.05,
+          "width": 0.9,
+          "height": 0.18
         },
         {
           "type": "rect",
-          "x": 0.44,
-          "y": 0.16,
-          "width": 0.12,
+          "x": 0.465,
+          "y": 0.2,
+          "width": 0.07,
           "height": 0.58
         },
         {
           "type": "ellipse",
           "x": 0.18,
-          "y": 0.56,
+          "y": 0.58,
           "width": 0.64,
-          "height": 0.1
+          "height": 0.08
         },
         {
-          "type": "polygon",
-          "points": [
-            {
-              "x": 0.42,
-              "y": 0.68
-            },
-            {
-              "x": 0.48,
-              "y": 0.68
-            },
-            {
-              "x": 0.34,
-              "y": 1
-            },
-            {
-              "x": 0.26,
-              "y": 1
-            }
-          ]
-        },
-        {
-          "type": "polygon",
-          "points": [
-            {
-              "x": 0.52,
-              "y": 0.68
-            },
-            {
-              "x": 0.58,
-              "y": 0.68
-            },
-            {
-              "x": 0.74,
-              "y": 1
-            },
-            {
-              "x": 0.66,
-              "y": 1
-            }
-          ]
+          "type": "ellipse",
+          "x": 0.24,
+          "y": 0.84,
+          "width": 0.52,
+          "height": 0.11
         }
       ],
       "exclude": []
