@@ -185,13 +185,13 @@
       "seating",
       "shelf"
     ],
-    "individualSeatCuts": "manual-refined"
+    "seatAsset": "single-reusable-manual"
   },
   "notes": [
     "Existing themed background coverage manifest.",
     "Source WebP size is auto-detected.",
     "Do not ship crops before visual geometry review.",
     "Use segmentation/inpainting for hidden wall/floor.",
-    "Individual stool assets are runtime seating units; combined seating remains review-only."
+    "One reusable seat asset per scene; seatAnchors control runtime count and placement."
   ]
 }
