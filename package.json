@@ -25,7 +25,11 @@
     "bar:furniture-cleanup-queue": "node scripts/build-furniture-cleanup-queue.mjs",
     "bar:window-masks": "python scripts/build-window-masks.py",
     "bar:manual-role-cuts": "python scripts/build-manual-role-cuts.py",
-    "bar:architecture-prep": "python scripts/build-architecture-prep.py"
+    "bar:architecture-prep": "python scripts/build-architecture-prep.py",
+    "bar:seat-audit": "python scripts/audit-seat-assets.py",
+    "bar:composite-ready": "python scripts/build-composite-ready.py",
+    "bar:generated-scenes": "node scripts/build-generated-modular-scenes.mjs",
+    "bar:architecture-auto": "python scripts/build-architecture-auto.py"
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^6.0.9",
