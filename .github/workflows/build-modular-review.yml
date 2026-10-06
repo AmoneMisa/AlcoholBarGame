@@ -83,5 +83,18 @@ jobs:
             echo "No generated changes"
           else
             git commit -m "[modular-review] Build scene review sheets"
-            git push origin HEAD:feat/modular-velvet-scene
+            for attempt in 1 2 3; do
+              git fetch origin feat/modular-velvet-scene
+              if git rebase origin/feat/modular-velvet-scene; then
+                if git push origin HEAD:feat/modular-velvet-scene; then
+                  exit 0
+                fi
+              else
+                git rebase --abort || true
+              fi
+              echo "Publish attempt $attempt failed; retrying..."
+              sleep $((attempt * 2))
+            done
+            echo "Could not publish modular review outputs after 3 attempts"
+            exit 1
           fi
