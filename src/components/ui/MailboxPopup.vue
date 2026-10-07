@@ -22,6 +22,22 @@ const date=(at:number)=>new Date(at).toLocaleString('en-GB',{timeZone:'Europe/Mo
 const title=(item:MailEntry)=>item.kind==='system'?(item.title||'Message from BarLingo'):item.kind==='visit'?'Bar visit':item.kind==='theft'?(item.direction==='incoming'?'Your tips were stolen':'Tip jar raid'):item.kind==='reward'?(item.id.startsWith('promo:')?`Promo code ${item.id.slice(6)}`:'Event rewards'):item.status==='returned'?'Gift returned':item.direction==='incoming'?'Gift received':'Gift sent';
 const status=(item:MailEntry)=>item.status==='pending'?(item.kind==='reward'?'Ready to claim':'Awaiting a decision'):item.status==='accepted'?(item.kind==='reward'?'Claimed':'Accepted'):item.status==='returned'?'Returned to sender':item.status==='declined'?'Declined · returned to sender':'';
 const body=(item:MailEntry)=>item.kind==='theft'?(item.direction==='incoming'?`At ${date(item.at)} MSK, player ${item.actorName} stole ${Math.round(item.amount??0)} coins from your tip jar!`:`At ${date(item.at)} MSK, you stole ${Math.round(item.amount??0)} coins from player ${item.actorName}'s tip jar!`):item.text;
+// System mail supports **bold** and `code` (tap to copy). Parsed into plain segments, never injected as HTML.
+type Piece={kind:'text'|'bold'|'code';text:string};
+function pieces(text:string):Piece[]{
+  const out:Piece[]=[];let last=0;
+  for(const match of text.matchAll(/\*\*(.+?)\*\*|`([^`\n]+)`/g)){
+    if(match.index>last)out.push({kind:'text',text:text.slice(last,match.index)});
+    out.push(match[1]!==undefined?{kind:'bold',text:match[1]}:{kind:'code',text:match[2]!});
+    last=match.index+match[0].length;
+  }
+  if(last<text.length)out.push({kind:'text',text:text.slice(last)});
+  return out;
+}
+const copied=ref('');
+async function copy(text:string){
+  try{await navigator.clipboard.writeText(text);copied.value=text;setTimeout(()=>{if(copied.value===text)copied.value='';},1500);}catch{copied.value='';}
+}
 const attachments=computed(()=>selected.value?.attachments ?? rewardAttachments(selected.value?.reward));
 async function open(item:MailEntry){selectedId.value=item.id;if(!item.readAt && game.mode==='online') await game.loadMailbox([item.id]);}
 </script>
@@ -36,7 +52,8 @@ async function open(item:MailEntry){selectedId.value=item.id;if(!item.readAt && 
       <UiButton class="mail-back" size="sm" variant="secondary" @click="selectedId=undefined">‹ Back to mail</UiButton>
       <header class="mail-letter-head"><span class="mail-emblem"><UiIcon :name="icon(selected)" /></span><h2>{{ title(selected) }}</h2></header>
       <div class="mail-sender"><b>{{ selected.actorName }}</b><time :datetime="new Date(selected.at).toISOString()">{{ date(selected.at) }} MSK</time></div>
-      <p class="mail-body">{{ body(selected) }}</p>
+      <p v-if="selected.kind==='system'" class="mail-body rich"><template v-for="(piece,index) in pieces(body(selected))" :key="index"><b v-if="piece.kind==='bold'">{{ piece.text }}</b><code v-else-if="piece.kind==='code'" class="mail-code" role="button" tabindex="0" :title="'Copy'" @click="copy(piece.text)" @keydown.enter.prevent="copy(piece.text)">{{ piece.text }}<small v-if="copied===piece.text"> · copied</small></code><template v-else>{{ piece.text }}</template></template></p>
+      <p v-else class="mail-body">{{ body(selected) }}</p>
       <section v-if="attachments.length" class="mail-attachments" aria-label="Mail attachments">
         <h3>Attachments</h3>
         <ul><li v-for="(line,index) in attachments" :key="index"><div class="attachment-art"><RewardArt :line="line" /></div><span>{{ line.text }}</span></li></ul>
@@ -65,7 +82,7 @@ async function open(item:MailEntry){selectedId.value=item.id;if(!item.readAt && 
 .mail-row-end{display:grid;align-content:space-between;justify-items:end;gap:8px;flex:none;max-width:35%;}
 .mail-row-end>span{font-size:24px;color:#f3d291;}
 .mail-sender{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin:20px 0 12px;}
-.mail-body{line-height:1.6;overflow-wrap:anywhere;}
+.mail-body{line-height:1.6;overflow-wrap:anywhere;}.mail-body.rich{white-space:pre-wrap}.mail-code{display:inline-block;padding:1px 7px;border:1px solid #6f8a95;border-radius:6px;background:#06101a;color:#ffe39a;font:13px ui-monospace,Consolas,monospace;cursor:copy;white-space:pre-wrap;user-select:all}.mail-code small{color:#9fd9a6}
 .mail-status{color:#f3d291;font-size:13px;}
 .mail-attachments h3{font-size:14px;margin:20px 0 12px;}
 .mail-attachments ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;list-style:none;padding:0;}

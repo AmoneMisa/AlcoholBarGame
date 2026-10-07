@@ -87,7 +87,7 @@ onMounted(()=>run(async()=> {if(elevated.value) catalog.value=(await api('catalo
         <UiCheckbox v-model="message.everyone" label="Send to every player" />
         <label v-if="!message.everyone">Telegram ID<UiInput v-model="message.telegramId" required inputmode="numeric" pattern="[0-9]+" /></label>
         <label>Title<UiInput v-model="message.title" required minlength="3" maxlength="80" /></label>
-        <label>Message<textarea v-model="message.body" required minlength="3" maxlength="2000" rows="6" /></label>
+        <label>Message<textarea v-model="message.body" required minlength="3" maxlength="2000" rows="6" /></label><small>Line breaks are kept. Use **bold** for bold text and `code` for text players can tap to copy (promo codes, IDs).</small>
         <label>Keep for (days, 1–30)<input v-model.number="message.days" type="number" required min="1" max="30" step="1" /></label>
         <button :disabled="busy">Send message…</button>
       </form>
