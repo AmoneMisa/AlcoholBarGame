@@ -38,6 +38,8 @@ watch(amount, (next, old) => { if (next > old) pulse.value++; });
 <style scoped>
 .tip-jar-summary {display:flex;align-items:center;gap:18px;margin-bottom:16px;}.tip-jar-summary img{object-fit:contain;flex:none;}.tip-jar-summary b{display:block;font-size:22px;color:#f4ce83;}.tip-jar-summary small{display:block;margin-top:6px;color:#aebdce;}
 .tip-jar { position: absolute; z-index: 8; left: auto; right: 2px; top: calc(var(--glass-y, 58%) - 16px); width: 64px; min-height: 84px; transform: translateY(-50%); display: grid; justify-items: center; align-content: end; gap: 8px; padding: 0; border: 0; background: transparent; color: #f2d8a0; cursor: pointer; }
+.mobile-modular .tip-jar { left:var(--jar-x); right:auto; top:calc(var(--jar-base) - var(--jar-size)); width:var(--jar-size); min-height:var(--jar-size); transform:translateX(-50%); }
+.mobile-modular .tip-jar-art { width:var(--jar-size); height:var(--jar-size); }
 .tip-jar:disabled { cursor: default; opacity: .85; }
 .tip-jar-art { display: block; width: 64px; height: 64px; object-fit: contain; pointer-events: none; filter: drop-shadow(0 3px 3px #0008); }
 .ready .tip-jar-art { filter: drop-shadow(0 0 5px #ffcc6655) drop-shadow(0 3px 3px #0008); }

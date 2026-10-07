@@ -1,6 +1,7 @@
 import type { SceneGeometry } from './barLines';
 import { defineModularScene, mirrorLayer, mirrorShelfBay } from './modularSceneFactory';
 import { GENERATED_MODULAR_SCENES } from './generatedModularScenes';
+import { ORIGINAL_ROOM_SHELVES } from './originalRoomShelves';
 
 export type ModularLayerRole = 'architecture' | 'floor' | 'wall' | 'shelves' | 'seating' | 'counter' | 'decor';
 export type ModularSelectionKey = 'wall' | 'counter' | 'counterColor' | 'shelf' | 'seating' | 'floor';
@@ -14,6 +15,7 @@ export interface ModularSceneLayer {
   z: number;
   asset?: string;
   rect?: NormalizedRect;
+  sourceRect?: NormalizedRect;
   selection?: ModularSelectionKey;
   variants?: Readonly<Record<string,string>>;
   flipX?: boolean;
@@ -99,9 +101,12 @@ export const MODULAR_SCENES: Readonly<Record<string,ModularSceneDefinition>> = {
   })
 };
 
-export const modularSceneFor = (interior:string, allowAuthoring=false) => {
+export const modularSceneFor = (interior:string, allowAuthoring=false, shelfPreset?:string) => {
   const scene=MODULAR_SCENES[interior];
-  return scene && (scene.status==='production' || allowAuthoring) ? scene : undefined;
+  if(!scene || (scene.status!=='production' && !allowAuthoring))return undefined;
+  const original=ORIGINAL_ROOM_SHELVES[interior];
+  if(shelfPreset!=='room-original' || !original)return scene;
+  return {...scene,layers:scene.layers.map(layer=>layer.role==='shelves'?{...layer,asset:original.asset,variants:undefined}:layer),shelfDecor:undefined};
 };
 
 export function layerAsset(layer:ModularSceneLayer, selections:Partial<Record<ModularSelectionKey,string>>, fallback?:string) {

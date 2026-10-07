@@ -7,7 +7,7 @@ import ModularBarBackdrop from './ModularBarBackdrop.vue';
 
 const props=defineProps<{interior:string}>();
 const game=useGameStore();
-const scene=computed(()=>modularSceneFor(props.interior));
+const scene=computed(()=>modularSceneFor(props.interior,false,game.decor.shelfPreset??'room-original'));
 const background=computed(()=>INTERIORS.find(item=>item.id===props.interior)?.asset);
 const host=ref<HTMLElement>();
 const size=ref({width:0,height:0});
@@ -31,7 +31,7 @@ onBeforeUnmount(()=>observer?.disconnect());
     <ModularBarBackdrop v-if="scene" :scene="scene" :width="size.width" :height="size.height"
       :background-source="background" :wall="game.decor.wall" :counter="game.decor.counter"
       :counter-color="game.decor.counterColor" :shelf="shelfStyleFor({...game.decor,interior:scene.id as InteriorId})"
-      :shelf-preset="game.decor.shelfPreset ?? 'classic-cocktails'"
+      :shelf-preset="game.decor.shelfPreset ?? 'room-original'"
       :window-backdrop="game.decor.windowBackdrop ?? 'original'" :seat-count="game.decor.seatCount"
       :lighting="game.decor.lighting" :highlight-strength="game.decor.highlightStrength" :animated="false" />
   </div>

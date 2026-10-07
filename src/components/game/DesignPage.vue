@@ -23,7 +23,7 @@ const character=computed(()=>(game.decor.bartenderCharacter==='leo'?'leo':'noa')
 const backgroundName=computed(()=>INTERIORS.find(item=>item.id===game.decor.interior)?.name??'');
 const modularDefinition=computed(()=>modularSceneFor(game.decor.interior,true));
 const modularBackground=computed(()=>!!modularDefinition.value);
-const shelfPreset=computed({get:()=>game.decor.shelfPreset??'classic-cocktails',set:(value:string)=>{game.decor.shelfPreset=value as ShelfDecorPresetId;}});
+const shelfPreset=computed({get:()=>game.decor.shelfPreset??'room-original',set:(value:string)=>{game.decor.shelfPreset=value as ShelfDecorPresetId;}});
 const windowBackdrop=computed({get:()=>game.decor.windowBackdrop??'original',set:(value:string)=>{game.decor.windowBackdrop=value as WindowBackdropId;}});
 const seatMaximum=computed(()=>modularDefinition.value?.layers.filter(layer=>layer.role==='seating').length??0);
 const seatCount=computed({

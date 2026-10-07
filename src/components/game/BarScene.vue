@@ -26,6 +26,7 @@ import { liteGraphics } from '../../ui/graphics';
 import { mobileArtwork } from '../../domain/optimizedArtwork';
 import { projectSceneGeometry, sceneLayout } from '../../data/cosmetics/barLines';
 import { modularSceneFor } from '../../data/cosmetics/modularScenes';
+import { mobileModularLayout } from '../../data/cosmetics/mobileModularLayout';
 import { sceneMotionPlaying } from '../../ui/sceneMotion';
 import SceneAtmosphere from './SceneAtmosphere.vue';
 import ModularBarBackdrop from './ModularBarBackdrop.vue';
@@ -60,7 +61,9 @@ const glassTarget = ref<HTMLElement>();
 const sceneRef = ref<HTMLElement>();
 const sceneBox = ref({ width: 0, height: 0 });
 const animateScene = computed(() => sceneMotionPlaying.value && props.active && !props.preview && !props.capture);
-const modularScene = computed(() => modularSceneFor(game.decor.interior, props.preview));
+const baseModularScene = computed(() => modularSceneFor(game.decor.interior, props.preview, game.decor.shelfPreset ?? 'room-original'));
+const modularScene = computed(() => baseModularScene.value && mobileModularLayout(baseModularScene.value, sceneBox.value.width, sceneBox.value.height, game.decor.seatCount));
+const mobileModular = computed(() => !!modularScene.value && modularScene.value !== baseModularScene.value);
 const sceneBackgroundUrl = computed(() => {
   // Pick the light background on narrow screens even when device hints select Full.
   // Use viewport width until ResizeObserver has measured the scene, avoiding an initial full-size request.
@@ -97,8 +100,8 @@ const people = computed(() => {
   const plankGap = planks.length > 1 ? (planks[planks.length - 1]! - planks[0]!) / (planks.length - 1) : current.drawnHeight * .1;
   // Phones show a compact scene, so people get smaller limits there.
   const phone = width < 760;
-  const guest = Math.round(phone ? Math.min(200, Math.max(150, plankGap * 2.3)) : Math.min(300, Math.max(150, plankGap * 2.3)));
-  const bartender = Math.round(phone ? Math.min(260, Math.max(150, plankGap * 3.4)) : Math.min(440, Math.max(240, plankGap * 3.4)));
+  const guest = Math.round(mobileModular.value ? Math.min(200, width * .46) : phone ? Math.min(200, Math.max(150, plankGap * 2.3)) : Math.min(300, Math.max(150, plankGap * 2.3)));
+  const bartender = Math.round(mobileModular.value ? Math.min(240, width * .56, sceneBox.value.height * .34) : phone ? Math.min(260, Math.max(150, plankGap * 3.4)) : Math.min(440, Math.max(240, plankGap * 3.4)));
   // The bartender works on the side away from the bottle shelf, so they never hide the bottles.
   const shelfOnRight = (current.shelf.left + current.shelf.right) / 2 > width * .6;
   const side = phone ? .84 : .86;
@@ -115,6 +118,7 @@ const sceneVars = computed(() => {
   const sizes = people.value;
   if (!current || !sizes) return {};
   return {
+    ...(mobileModular.value ? { '--jar-size': `${Math.min(56, sceneBox.value.width * .13)}px`, '--jar-x': `${sceneBox.value.width * .93}px`, '--jar-base': `${current.back + 5}px` } : {}),
     ...(phoneTrack.value ? { '--cast-left': `${phoneTrack.value.start}px`, '--cast-right': `${sceneBox.value.width - phoneTrack.value.end}px`, '--guest-slot': `${phoneTrack.value.spacing - 8}px` } : {}),
     '--back': `${current.back}px`, '--seat-top': `${current.seat}px`, '--guest-h': `${sizes.guest}px`, '--bt-h': `${sizes.bartender}px`,
     '--bt-x': `${sizes.bartenderX}px`, '--glass-x': `${Math.round(sizes.glassX)}px`,
@@ -145,6 +149,7 @@ const guestZone = computed(() => {
   const sizes = people.value;
   const { width } = sceneBox.value;
   if (!sizes || !width) return undefined;
+  if (mobileModular.value) return { start: 0, end: width };
   const reserve = sizes.bartenderHalfWidth + 14;
   const bartenderOnLeft = sizes.guestAnchorX < width / 2;
   const start = bartenderOnLeft ? Math.min(width - 80, Math.round(sizes.guestAnchorX + reserve)) : 0;
@@ -155,7 +160,7 @@ const phoneTrack = computed(() => {
   const sizes = people.value;
   const zone = guestZone.value;
   if (!sizes || !zone || (sceneBox.value.width >= 760 && zone.end - zone.start >= MAX_CUSTOMER_SEATS * sizes.guest * .8)) return undefined;
-  const spacing = sceneBox.value.width < 760 ? Math.floor((zone.end - zone.start) / 2) : Math.round(sizes.guest * .8) + 4;
+  const spacing = sceneBox.value.width < 760 ? (zone.end - zone.start) / (mobileModular.value ? Math.max(1, modularScene.value!.geometry.stools.length) : 2) : Math.round(sizes.guest * .8) + 4;
   const visible = Math.max(1, Math.floor((zone.end - zone.start) / spacing)) * spacing;
   const start = sizes.guestAnchorX < sceneBox.value.width / 2 ? zone.end - visible : zone.start;
   return { start, end:start + visible, zone:visible, spacing, content: MAX_CUSTOMER_SEATS * spacing };
@@ -531,11 +536,11 @@ onBeforeUnmount(() => {
     <div v-if="!preview && !capture && game.ashtrays.dirty" class="scene-info-dock">
       <button type="button" class="clean-ashtrays" @click="game.cleanAshtrays()"><UiIcon name="brush" /> Clean {{ game.ashtrays.dirty }}</button>
     </div>
-  <section ref="sceneRef" class="bar-scene" :class="[{ 'scene-animated': animateScene, 'scene-inactive': !active, 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack && !preview, 'is-preview': preview, 'has-modular-backdrop': !!modularScene },captureClasses]" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[sceneInteriorStyle, sceneVars]">
-    <ModularBarBackdrop v-if="modularScene" :scene="modularScene" :width="sceneBox.width" :height="sceneBox.height" :background-source="sceneBackgroundUrl" :wall="game.decor.wall" :counter="game.decor.counter" :counter-color="game.decor.counterColor" :shelf="shelfStyleFor(game.decor)" :shelf-preset="game.decor.shelfPreset ?? 'classic-cocktails'" :window-backdrop="game.decor.windowBackdrop ?? 'original'" :seat-count="game.decor.seatCount" :lighting="game.decor.lighting" :highlight-strength="game.decor.highlightStrength" :animated="animateScene" />
+  <section ref="sceneRef" class="bar-scene" :class="[{ 'scene-animated': animateScene, 'scene-inactive': !active, 'is-building': buildingEnabled, 'shelf-right': people?.shelfOnRight, 'phone-guests': !!phoneTrack && !preview, 'is-preview': preview, 'has-modular-backdrop': !!modularScene, 'mobile-modular': mobileModular },captureClasses]" :data-wall="game.decor.wall" :data-counter="game.decor.counter" :data-counter-color="game.decor.counterColor" :data-counter-size="game.decor.counterSize" :data-lighting="game.decor.lighting" :data-highlight-strength="game.decor.highlightStrength" :style="[sceneInteriorStyle, sceneVars]">
+    <ModularBarBackdrop v-if="modularScene" :scene="modularScene" :width="sceneBox.width" :height="sceneBox.height" :background-source="sceneBackgroundUrl" :wall="game.decor.wall" :counter="game.decor.counter" :counter-color="game.decor.counterColor" :shelf="shelfStyleFor(game.decor)" :shelf-preset="game.decor.shelfPreset ?? 'room-original'" :window-backdrop="game.decor.windowBackdrop ?? 'original'" :seat-count="game.decor.seatCount" :lighting="game.decor.lighting" :highlight-strength="game.decor.highlightStrength" :animated="animateScene" />
     <SceneAtmosphere v-else-if="animateScene" :interior="game.decor.interior" :width="sceneBox.width" :height="sceneBox.height" :background-source="sceneBackgroundUrl" />
     <template v-if="!modularScene"><div class="scene-light scene-light-left"></div><div class="scene-light scene-light-right"></div></template>
-    <div v-if="preview" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
+    <div v-if="preview && !modularScene" class="pshelf-box" :data-shelf="shelfStyleFor(game.decor)" aria-label="Back bar bottles">
       <small v-if="shelfRows.length && !preview" class="pshelf-hint" :style="{ left: shelfRows[0]!.style.left, top: `calc(${shelfRows[0]!.style.top} - 18px)` }">Use the arrows to browse a shelf · pull a bottle down to the glass</small>
       <div v-for="row in shelfRows" :key="row.id" class="pshelf-row" :style="row.style">
         <small class="pshelf-label">{{ row.label }}</small>
@@ -553,6 +558,7 @@ onBeforeUnmount(() => {
       <span class="name-ribbon">{{ (game.decor.bartenderNickname || (game.decor.bartenderCharacter === 'leo' ? 'Leo' : 'Noa')).toUpperCase() }} · BARTENDER</span>
     </div>
     <div v-if="!preview" ref="castRef" class="bar-cast" @scroll.passive="onGuestScroll">
+      <template v-if="mobileModular && phoneTrack"><span v-for="index in MAX_CUSTOMER_SEATS" :key="`stop-${index}`" class="mobile-seat-stop" aria-hidden="true" :style="{left:`${(index-1)*phoneTrack.spacing}px`,width:`${phoneTrack.spacing}px`}" /></template>
       <!-- Only the figure and the card take taps; the rest of the guest's column lets presses reach the shelves. -->
       <template v-for="{ index, customer, countdown } in seats" :key="index">
       <button v-if="customer" type="button" class="scene-customer" :class="{ active: customer.id === game.activeCustomerId, waiting: customer.id !== game.activeCustomerId }" :style="customerStyle(index)" :aria-label="`Talk to ${customer.name}`" @click="game.openConversation(customer.id)">
@@ -604,6 +610,11 @@ onBeforeUnmount(() => {
 @media(prefers-reduced-motion:reduce) {.bar-scene .bartender-layer .art-character {animation:none!important}}
 .bar-scene.phone-guests .bar-cast { min-width:0; }
 .bar-scene .bartender-layer { clip-path:inset(-12% -30% calc(42% - 4px) -30%); pointer-events:auto; touch-action:pan-y; cursor:ew-resize; }
+.bar-scene.mobile-modular .bartender-layer { clip-path:inset(-12% -30% calc(34% - 4px) -30%); }
+.bar-scene.mobile-modular .guest-nudge { top:calc(var(--seat-top) - var(--guest-h) * .65); }
+.bar-scene.mobile-modular .scene-customer .art-character { bottom:calc(100% - var(--seat-top) - var(--guest-h) * .04 - 2px)!important; }
+.bar-scene.mobile-modular .bar-cast { scroll-snap-type:x mandatory; }
+.mobile-seat-stop { position:absolute;top:0;height:1px;scroll-snap-align:start;pointer-events:none; }
 .bar-scene .bartender-layer.moving { touch-action:none; }
 .bar-scene .bartender-layer:focus-visible { outline:2px solid #eac780; outline-offset:4px; }
 .bar-scene.capture .bartender-layer { pointer-events:none; }

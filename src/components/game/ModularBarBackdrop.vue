@@ -4,6 +4,8 @@ import * as THREE from 'three';
 import { layerAsset, type ModularSceneDefinition, type ModularSelectionKey } from '../../data/cosmetics/modularScenes';
 import { PAINTED_BOTTLE_ATLAS, PAINTED_BOTTLE_COLUMNS, PAINTED_BOTTLE_ROWS, shelfDecorPresetFor, type ShelfDecorPresetId } from '../../data/cosmetics/shelfDecor';
 import { windowBackdropFor, type WindowBackdropId } from '../../data/cosmetics/windowBackdrops';
+import { shelfBottlePlacements, shelfSurface } from '../../data/cosmetics/shelfBottleLayout';
+import { COUNTER_GLASSWARE, ORIGINAL_ROOM_SHELVES } from '../../data/cosmetics/originalRoomShelves';
 
 const props=defineProps<{
   scene:ModularSceneDefinition;
@@ -35,6 +37,10 @@ let frame=0;
 let startedAt=0;
 let disposed=false;
 let buildEpoch=0;
+const bottleBounds=new Map<string,{x:number;y:number;width:number;height:number}[]>();
+const imageCache=new Map<string,Promise<HTMLImageElement>>();
+const shelfPixels=new Map<string,ImageData>();
+const softenedShelves=new Map<string,HTMLCanvasElement>();
 
 const vertex=`
 varying vec2 vUv;
@@ -104,19 +110,28 @@ function selections():Partial<Record<ModularSelectionKey,string>>{
   return {wall:props.wall,counter:props.counter,counterColor:props.counterColor,shelf:props.shelf};
 }
 function loadImage(src:string){
-  return new Promise<HTMLImageElement>((resolve,reject)=>{
+  if(imageCache.has(src))return imageCache.get(src)!;
+  const request=new Promise<HTMLImageElement>((resolve,reject)=>{
     const image=new Image();
     image.decoding='async';
     image.onload=()=>resolve(image);
     image.onerror=()=>reject(new Error('Could not load modular bar layer '+src));
     image.src=src;
   });
+  imageCache.set(src,request);
+  request.catch(()=>imageCache.delete(src));
+  return request;
+}
+function drawCover(context:CanvasRenderingContext2D,image:HTMLImageElement){
+  const {width,height}=props.scene.canvas;
+  const scale=Math.max(width/image.naturalWidth,height/image.naturalHeight);
+  context.drawImage(image,(width-image.naturalWidth*scale)/2,(height-image.naturalHeight*scale)*props.scene.positionY,image.naturalWidth*scale,image.naturalHeight*scale);
 }
 async function drawExterior(context:CanvasRenderingContext2D){
   if(!props.scene.exterior)return;
   if((props.windowBackdrop??'original')==='original' && props.scene.exterior.asset){
     const image=await loadImage(props.scene.exterior.asset);
-    context.drawImage(image,0,0,props.scene.canvas.width,props.scene.canvas.height);
+    drawCover(context,image);
     return;
   }
   const preset=windowBackdropFor(props.windowBackdrop??'skyline');
@@ -135,14 +150,57 @@ async function drawExterior(context:CanvasRenderingContext2D){
 async function drawShelfDecor(context:CanvasRenderingContext2D){
   const decor=props.scene.shelfDecor;
   if(!decor)return;
-  const preset=shelfDecorPresetFor(props.shelfPreset??'classic-cocktails');
+  const selection=props.shelfPreset??'room-original';
+  const preset=shelfDecorPresetFor(selection==='room-original' && props.scene.id==='velvet' ? 'velvet-original' : selection);
   const columns=preset.atlas?.columns??PAINTED_BOTTLE_COLUMNS;
   const rows=preset.atlas?.rows??PAINTED_BOTTLE_ROWS;
   const atlas=await loadImage(preset.atlas?.asset??PAINTED_BOTTLE_ATLAS);
   const cellW=atlas.naturalWidth/columns;
   const cellH=atlas.naturalHeight/rows;
+  const boundsKey=`${atlas.src}:${columns}:${rows}`;
+  if(!bottleBounds.has(boundsKey)){
+    const sample=document.createElement('canvas');
+    sample.width=atlas.naturalWidth;sample.height=atlas.naturalHeight;
+    const scan=sample.getContext('2d',{willReadFrequently:true})!;
+    scan.drawImage(atlas,0,0);
+    const pixels=scan.getImageData(0,0,sample.width,sample.height).data;
+    bottleBounds.set(boundsKey,Array.from({length:columns*rows},(_,cell)=>{
+      const x0=Math.floor(cell%columns*cellW),y0=Math.floor(Math.floor(cell/columns)*cellH);
+      const x1=Math.floor((cell%columns+1)*cellW),y1=Math.floor((Math.floor(cell/columns)+1)*cellH);
+      let left=x1,right=x0,top=y1,bottom=y0;
+      for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)if(pixels[(y*sample.width+x)*4+3]!>40){left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);}
+      return right>=left?{x:left,y:top,width:right-left+1,height:bottom-top+1}:{x:x0,y:y0,width:cellW,height:cellH};
+    }));
+  }
+  const bounds=bottleBounds.get(boundsKey)!;
 
-  for(const bay of decor.bays){
+  const bays=await Promise.all(decor.bays.map(async bay=>{
+    if(decor.paintBacking!==false)return bay;
+    const centre=bay.rect.x+bay.rect.width/2;
+    const layer=props.scene.layers.find(layer=>layer.role==='shelves' && layer.rect && centre>=layer.rect.x-.001 && centre<=layer.rect.x+layer.rect.width+.001);
+    if(!layer?.rect)return bay;
+    const src=layerAsset(layer,selections(),props.backgroundSource);
+    if(!src)return bay;
+    const image=await loadImage(src);
+    if(!shelfPixels.has(src)){
+      const sample=document.createElement('canvas');sample.width=image.naturalWidth;sample.height=image.naturalHeight;
+      const scan=sample.getContext('2d',{willReadFrequently:true})!;scan.drawImage(image,0,0);
+      shelfPixels.set(src,scan.getImageData(0,0,sample.width,sample.height));
+    }
+    const pixels=shelfPixels.get(src)!;
+    const rect=layer.rect;
+    let x0=(bay.rect.x-rect.x)/rect.width,x1=(bay.rect.x+bay.rect.width-rect.x)/rect.width;
+    if(layer.flipX)[x0,x1]=[1-x1,1-x0];
+    const inset=(x1-x0)*.12;
+    const rowBaselines=bay.rowBaselines.map((line,index)=>{
+      const baseline=(bay.rect.y+line*bay.rect.height-rect.y)/rect.height*pixels.height;
+      const gap=(line-(index?bay.rowBaselines[index-1]!:0))*bay.rect.height/rect.height*pixels.height;
+      const y=shelfSurface(pixels.data,pixels.width,pixels.height,(x0+inset)*pixels.width,(x1-inset)*pixels.width,baseline,Math.min(gap*.4,pixels.height*.045));
+      return (rect.y+y/pixels.height*rect.height-bay.rect.y)/bay.rect.height;
+    });
+    return {...bay,rowBaselines};
+  }));
+  for(const bay of bays){
     const bx=bay.rect.x*props.scene.canvas.width;
     const by=bay.rect.y*props.scene.canvas.height;
     const bw=bay.rect.width*props.scene.canvas.width;
@@ -166,29 +224,47 @@ async function drawShelfDecor(context:CanvasRenderingContext2D){
     }
     context.restore();
 
-    const rowCount=bay.rowBaselines.length;
-      const rowGaps=bay.rowBaselines.map((baseline,index)=>baseline-(index ? bay.rowBaselines[index-1]! : 0)).filter(gap=>gap>0);
-      const maxBottleH=decor.paintBacking===false && rowGaps.length ? Math.min(...rowGaps)*bh*.88 : Infinity;
-    for(const item of preset.items){
-      const row=Math.max(0,Math.min(rowCount-1,item.row));
-      const baseline=by+bay.rowBaselines[row]!*bh;
-      const scale=item.scale??1;
-        const targetH=Math.min(Math.min(bh*.27,props.scene.canvas.height*.115)*scale,maxBottleH);
-      const targetW=targetH*(cellW/cellH);
-      const x=bx+item.x*bw-targetW/2;
-      const y=baseline-targetH;
-      const column=item.cell%columns;
-      const sourceRow=Math.floor(item.cell/columns)%rows;
-
-      context.save();
-      context.globalAlpha=item.alpha??1;
-      context.filter=[preset.filter,preset.glow ? `drop-shadow(0 0 ${Math.max(2,targetH*.045)}px ${preset.glow})` : ''].filter(Boolean).join(' ');
-      context.translate(x+targetW/2,baseline);
-      context.rotate((item.rotate??0)*Math.PI/180);
-      context.drawImage(atlas,column*cellW,sourceRow*cellH,cellW,cellH,-targetW/2,-targetH,targetW,targetH);
-      context.restore();
-    }
   }
+  for(const bottle of shelfBottlePlacements(bays,preset,bounds,props.scene.canvas.width,props.scene.canvas.height)){
+    const {item,crop,x,y,width,height}=bottle;
+    context.save();
+    context.globalAlpha=item.alpha??1;
+    context.filter=[preset.filter,preset.glow ? `drop-shadow(0 0 ${Math.max(2,height*.045)}px ${preset.glow})` : ''].filter(Boolean).join(' ');
+    context.drawImage(atlas,crop.x,crop.y,crop.width,crop.height,x-width/2,y-height,width,height);
+    context.restore();
+  }
+}
+
+async function sourceShelfImage(image:HTMLImageElement){
+  const maskAsset=props.scene.exterior?.asset;
+  const original=ORIGINAL_ROOM_SHELVES[props.scene.id];
+  const key=`${image.src}:${maskAsset??''}`;
+  if(!softenedShelves.has(key)){
+    const softened=document.createElement('canvas');softened.width=image.naturalWidth;softened.height=image.naturalHeight;
+    const context=softened.getContext('2d')!;context.drawImage(image,0,0);
+    const fade=context.createLinearGradient(0,0,0,softened.height);
+    fade.addColorStop(0,'#0000');fade.addColorStop(.025,'#000');fade.addColorStop(1,'#000');
+    context.globalCompositeOperation='destination-in';context.fillStyle=fade;context.fillRect(0,0,softened.width,softened.height);
+    if(maskAsset && original){
+      const mask=await loadImage(maskAsset),r=original.sourceRect;
+      context.globalCompositeOperation='destination-out';
+      context.drawImage(mask,r.x*mask.naturalWidth,r.y*mask.naturalHeight,r.width*mask.naturalWidth,r.height*mask.naturalHeight,0,0,softened.width,softened.height);
+    }
+    softenedShelves.set(key,softened);
+  }
+  return softenedShelves.get(key)!;
+}
+
+async function drawCounterGlassware(context:CanvasRenderingContext2D){
+  const image=await loadImage(COUNTER_GLASSWARE.asset),crop=COUNTER_GLASSWARE.crop;
+  const {width,height}=props.scene.canvas;
+  const h=Math.min(52,height*.075,width*.10),w=h*COUNTER_GLASSWARE.aspect;
+  const baseline=props.scene.geometry.back*height+5;
+  context.save();context.globalAlpha=.78;
+  for(const [x,scale] of [[.10,1],[.17,.92],[.84,1]] as const){
+    context.drawImage(image,crop.x*image.naturalWidth,crop.y*image.naturalHeight,crop.width*image.naturalWidth,crop.height*image.naturalHeight,x*width-w*scale/2,baseline-h*scale,w*scale,h*scale);
+  }
+  context.restore();
 }
 
 async function compose(){
@@ -215,17 +291,21 @@ async function compose(){
     const src=layerAsset(layer,selections(),props.backgroundSource);
     if(!src) continue;
     const image=await loadImage(src);
+    const drawable=layer.role==='shelves' && props.shelfPreset==='room-original' && !props.scene.shelfDecor ? await sourceShelfImage(image) : image;
     const rect=layer.rect;
+    const crop=layer.sourceRect??{x:0,y:0,width:1,height:1};
+    const sx=crop.x*image.naturalWidth,sy=crop.y*image.naturalHeight,sw=crop.width*image.naturalWidth,sh=crop.height*image.naturalHeight;
     if(rect){
       const x=rect.x*source.width,y=rect.y*source.height,w=rect.width*source.width,h=rect.height*source.height;
       if(layer.flipX){
         context.save();
         context.translate(x+w,y);
         context.scale(-1,1);
-        context.drawImage(image,0,0,w,h);
+        context.drawImage(drawable,sx,sy,sw,sh,0,0,w,h);
         context.restore();
-      }else context.drawImage(image,x,y,w,h);
-    }else context.drawImage(image,0,0,source.width,source.height);
+      }else context.drawImage(drawable,sx,sy,sw,sh,x,y,w,h);
+    }else drawCover(context,image);
+    if(layer.role==='counter')await drawCounterGlassware(context);
   }
   if(!decorDrawn && props.scene.shelfDecor) await drawShelfDecor(context);
   return source;

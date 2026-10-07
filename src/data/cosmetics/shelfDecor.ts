@@ -3,6 +3,7 @@ import { PAINTED_BOTTLE_ATLAS, PAINTED_BOTTLE_COLUMNS, PAINTED_BOTTLE_ROWS } fro
 export { PAINTED_BOTTLE_ATLAS, PAINTED_BOTTLE_COLUMNS, PAINTED_BOTTLE_ROWS };
 
 export const SHELF_DECOR_PRESET_IDS = [
+  'room-original',
   'classic-cocktails',
   'luxury-whiskey',
   'wine-cellar',
@@ -38,6 +39,10 @@ const spread=(cells:readonly number[],row:number,scale=1,offset=0):ShelfDecorIte
   cells.map((cell,index)=>item(cell,(index+1)/(cells.length+1)+offset,row,scale,(index%3-1)*1.5));
 
 export const SHELF_DECOR_PRESETS:readonly ShelfDecorPreset[] = [
+  {
+    id:'room-original',label:'Original room arrangement',description:'The room’s original glassware, bottles, plants and ornaments.',density:'high',
+    items:[...spread([0,2,3,4,6],0,.92),...spread([7,8,10,12,13],1,.9),...spread([9,5,11,14],2,.96)]
+  },
   {
     id:'velvet-original',label:'Original Velvet bottles',description:'The original painted bottles from the Velvet shelf.',density:'medium',
     atlas:{asset:'/assets/drinks/bottles/velvet-bottles-v2.webp',columns:4,rows:3},
