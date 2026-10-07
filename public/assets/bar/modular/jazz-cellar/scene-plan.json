@@ -27,17 +27,17 @@
     },
     "shelf-reference": {
       "crop": {
-        "x": 100,
-        "y": 168,
-        "width": 424,
-        "height": 246
+        "x": 0,
+        "y": 215,
+        "width": 623,
+        "height": 140
       },
       "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware.",
       "rect": {
-        "x": 0.159903,
-        "y": 0.270292,
-        "width": 0.680195,
-        "height": 0.395292
+        "x": 0,
+        "y": 0.344968,
+        "width": 1,
+        "height": 0.224838
       }
     },
     "counter-reference": {
@@ -45,14 +45,29 @@
         "x": 0,
         "y": 305,
         "width": 623,
-        "height": 181
+        "height": 207
       },
       "prompt": "Isolate existing counter with transparent surroundings and bleed.",
       "rect": {
         "x": 0,
         "y": 0.49026,
         "width": 1,
-        "height": 0.289773
+        "height": 0.332792
+      }
+    },
+    "band-reference": {
+      "crop": {
+        "x": 71,
+        "y": 116,
+        "width": 485,
+        "height": 172
+      },
+      "prompt": "Isolate the complete jazz band setup as transparent decorative furniture: piano, bench, drums, bass, saxophone and stands; remove room, curtains and stage.",
+      "rect": {
+        "x": 0.113636,
+        "y": 0.186688,
+        "width": 0.779221,
+        "height": 0.275974
       }
     }
   },
@@ -64,16 +79,16 @@
       "height": 0.560065
     },
     "shelves": {
-      "x": 0.199675,
-      "y": 0.270292,
-      "width": 0.599838,
-      "height": 0.395292
+      "x": 0.006494,
+      "y": 0.344968,
+      "width": 0.100649,
+      "height": 0.224838
     },
     "counter": {
       "x": 0,
       "y": 0.49026,
       "width": 1,
-      "height": 0.289773
+      "height": 0.332792
     },
     "floor": {
       "x": 0,
@@ -90,9 +105,9 @@
   },
   "windowCutouts": [],
   "shelfRows": [
-    0.400162,
-    0.469968,
-    0.544643
+    0.413961,
+    0.499188,
+    0.560065
   ],
   "seatAnchors": [
     {
@@ -117,7 +132,7 @@
     }
   ],
   "bartenderAnchor": null,
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "measured-gameplay",
   "requiredRoles": [
     "counter",
@@ -129,12 +144,13 @@
   ],
   "review": {
     "windowCutouts": "not-applicable",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "seating"
     ],
-    "seatAsset": "single-reusable-manual-refined"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "notes": [
     "Measured from existing BarScene geometry.",

@@ -36,20 +36,20 @@
         "x": 0.28,
         "y": 0.13,
         "width": 0.53,
-        "height": 0.42
+        "height": 0.54
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture.",
       "crop": {
         "x": 468,
         "y": 122,
         "width": 886,
-        "height": 395
+        "height": 508
       },
       "rect": {
         "x": 0.28,
         "y": 0.13,
         "width": 0.53,
-        "height": 0.42
+        "height": 0.54
       }
     },
     "counter-reference": {
@@ -57,20 +57,20 @@
         "x": 0,
         "y": 0.56,
         "width": 1,
-        "height": 0.24
+        "height": 0.43999999999999995
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings.",
       "crop": {
         "x": 0,
         "y": 527,
         "width": 1672,
-        "height": 226
+        "height": 414
       },
       "rect": {
         "x": 0,
         "y": 0.56,
         "width": 1,
-        "height": 0.24
+        "height": 0.44
       }
     }
   },
@@ -106,7 +106,15 @@
       "height": 0.42
     }
   },
-  "windowCutouts": [],
+  "windowCutouts": [
+    {
+      "type": "rect",
+      "x": 0,
+      "y": 0,
+      "width": 0.19,
+      "height": 0.66
+    }
+  ],
   "shelfRows": [
     0.28,
     0.38,
@@ -138,7 +146,7 @@
     "x": 0.5,
     "y": 0.58
   },
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "manual-source-review",
   "requiredRoles": [
     "counter",
@@ -155,15 +163,16 @@
     "shelfBounds": "manual-measured",
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
-    "windowCutouts": "manual-required",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "notes": [
     "Existing themed background coverage manifest.",

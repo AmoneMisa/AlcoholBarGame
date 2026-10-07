@@ -1,0 +1,140 @@
+{
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "garden",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\garden\\architecture-2026-10-07.png",
+      "output": "public\\assets\\bar\\modular\\garden\\architecture.webp",
+      "size": [
+        1671,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1670,
+          942
+        ]
+      }
+    },
+    {
+      "scene": "garden",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\garden\\shelf-2026-10-07.png",
+      "output": "public\\assets\\bar\\modular\\garden\\clean-ready\\shelf.webp",
+      "size": [
+        686,
+        438
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1570,
+          1002
+        ]
+      }
+    },
+    {
+      "scene": "garden",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\garden\\counter-2026-10-07.png",
+      "output": "public\\assets\\bar\\modular\\garden\\clean-ready\\counter.webp",
+      "size": [
+        1671,
+        343
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2171,
+          724
+        ],
+        "contentBounds": [
+          0,
+          218,
+          2171,
+          561
+        ],
+        "visibleTopPixels": 44
+      }
+    },
+    {
+      "scene": "skyline",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\skyline\\architecture-2026-10-07.png",
+      "output": "public\\assets\\bar\\modular\\skyline\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "skyline",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\skyline\\shelf-2026-10-07.png",
+      "output": "public\\assets\\bar\\modular\\skyline\\clean-ready\\shelf.webp",
+      "size": [
+        502,
+        414
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1381,
+          1139
+        ]
+      }
+    },
+    {
+      "scene": "skyline",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\skyline\\counter-2026-10-07.png",
+      "output": "public\\assets\\bar\\modular\\skyline\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        348
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          0,
+          221,
+          2170,
+          664
+        ],
+        "visibleTopPixels": 52
+      }
+    }
+  ],
+  "preview": "docs\\modular-review\\generated-batch-2026-10-07.webp"
+}

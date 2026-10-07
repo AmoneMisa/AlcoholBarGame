@@ -6,7 +6,7 @@
     "width": 1232,
     "height": 1232
   },
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "measured-gameplay",
   "notes": [
     "Measured from existing BarScene geometry.",
@@ -40,7 +40,7 @@
         "x": 0,
         "y": 579,
         "width": 1232,
-        "height": 333
+        "height": 370
       },
       "prompt": "Isolate existing counter with transparent surroundings and bleed."
     }
@@ -62,7 +62,7 @@
       "x": 0,
       "y": 579,
       "width": 1232,
-      "height": 333
+      "height": 370
     },
     "floor": {
       "x": 0,
@@ -107,14 +107,15 @@
   "bartenderAnchor": null,
   "review": {
     "windowCutouts": "not-applicable",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual-refined"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "windowCutoutsNormalized": [],
   "manualRoleMasksNormalized": {
@@ -348,5 +349,64 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "shelfUnits": [
+    {
+      "x0": 0.2387,
+      "x1": 0.4034,
+      "rows": [
+        0.354,
+        0.4248,
+        0.4961
+      ]
+    },
+    {
+      "x0": 0.4491,
+      "x1": 0.626,
+      "rows": [
+        0.3376,
+        0.4126,
+        0.498
+      ]
+    },
+    {
+      "x0": 0.6748,
+      "x1": 0.8395,
+      "rows": [
+        0.3528,
+        0.4248,
+        0.4961
+      ]
+    }
+  ],
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-02.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.255,
+      "x1": 0.398,
+      "rows": [
+        0.356,
+        0.438,
+        0.522
+      ]
+    },
+    {
+      "x0": 0.443,
+      "x1": 0.605,
+      "rows": [
+        0.356,
+        0.438,
+        0.522
+      ]
+    },
+    {
+      "x0": 0.652,
+      "x1": 0.797,
+      "rows": [
+        0.356,
+        0.438,
+        0.522
+      ]
+    }
+  ]
 }

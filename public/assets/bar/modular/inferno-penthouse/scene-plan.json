@@ -45,14 +45,14 @@
         "x": 0,
         "y": 686,
         "width": 1536,
-        "height": 266
+        "height": 338
       },
       "prompt": "Isolate existing counter with transparent surroundings and bleed.",
       "rect": {
         "x": 0,
         "y": 0.669922,
         "width": 1,
-        "height": 0.259766
+        "height": 0.330078
       }
     }
   },
@@ -64,16 +64,16 @@
       "height": 0.740234
     },
     "shelves": {
-      "x": 0.30013,
-      "y": 0.25,
-      "width": 0.39974,
-      "height": 0.370117
+      "x": 0.485677,
+      "y": 0.376953,
+      "width": 0.049479,
+      "height": 0.146484
     },
     "counter": {
       "x": 0,
       "y": 0.669922,
       "width": 1,
-      "height": 0.259766
+      "height": 0.330078
     },
     "floor": {
       "x": 0,
@@ -90,110 +90,18 @@
   },
   "windowCutouts": [
     {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.03,
-          "y": 0.015
-        },
-        {
-          "x": 0.113,
-          "y": 0.015
-        },
-        {
-          "x": 0.142,
-          "y": 0.072
-        },
-        {
-          "x": 0.142,
-          "y": 0.425
-        },
-        {
-          "x": 0.03,
-          "y": 0.425
-        }
-      ]
-    },
-    {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.175,
-          "y": 0.015
-        },
-        {
-          "x": 0.286,
-          "y": 0.015
-        },
-        {
-          "x": 0.315,
-          "y": 0.077
-        },
-        {
-          "x": 0.315,
-          "y": 0.432
-        },
-        {
-          "x": 0.175,
-          "y": 0.432
-        }
-      ]
-    },
-    {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.686,
-          "y": 0.077
-        },
-        {
-          "x": 0.715,
-          "y": 0.015
-        },
-        {
-          "x": 0.826,
-          "y": 0.015
-        },
-        {
-          "x": 0.826,
-          "y": 0.432
-        },
-        {
-          "x": 0.686,
-          "y": 0.432
-        }
-      ]
-    },
-    {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.858,
-          "y": 0.072
-        },
-        {
-          "x": 0.887,
-          "y": 0.015
-        },
-        {
-          "x": 0.97,
-          "y": 0.015
-        },
-        {
-          "x": 0.97,
-          "y": 0.425
-        },
-        {
-          "x": 0.858,
-          "y": 0.425
-        }
-      ]
+      "type": "rect",
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78
     }
   ],
   "shelfRows": [
-    0.379883,
-    0.44043,
-    0.5
+    0.412109,
+    0.447266,
+    0.482422,
+    0.519531
   ],
   "seatAnchors": [
     {
@@ -218,7 +126,7 @@
     }
   ],
   "bartenderAnchor": null,
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "measured-gameplay",
   "requiredRoles": [
     "counter",
@@ -229,13 +137,14 @@
     "counter"
   ],
   "review": {
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "notes": [
     "Measured from existing BarScene geometry.",

@@ -6,7 +6,7 @@
     "width": 1516,
     "height": 1004
   },
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "notes": [
     "Generated from the measured gameplay geometry already used by BarScene.",
     "Do not ship reference crops as final modules until the clean architecture plate and transparency have been visually reviewed.",
@@ -26,22 +26,22 @@
       "prompt": "Create a clean architecture plate from this existing background. Remove counter, stools/chairs, loose foreground decor and back-bar furniture; reconstruct hidden wall and floor. Preserve fixed architecture and source perspective."
     },
     "shelf-reference": {
-      "crop": {
-        "x": 1001,
-        "y": 100,
-        "width": 470,
-        "height": 492
-      },
-      "prompt": "Isolate the existing back-bar furniture from this source region. Remove all painted bottles and glassware. Preserve exact perspective."
+      "prompt": "Isolate the existing back-bar furniture from this source region. Remove all painted bottles and glassware. Preserve exact perspective.",
+      "cropNormalized": {
+        "x": 0.6602902374670184,
+        "y": 0.099601593625498,
+        "width": 0.3100263852242744,
+        "height": 0.4900398406374502
+      }
     },
     "counter-reference": {
-      "crop": {
-        "x": 0,
-        "y": 462,
-        "width": 1516,
-        "height": 321
-      },
-      "prompt": "Isolate the existing bar counter with transparent surroundings and 24 px bleed. Preserve its exact perspective and silhouette."
+      "prompt": "Isolate the existing bar counter with transparent surroundings and 24 px bleed. Preserve its exact perspective and silhouette.",
+      "cropNormalized": {
+        "x": 0.0,
+        "y": 0.4601593625498008,
+        "width": 1.0,
+        "height": 0.5398406374501992
+      }
     }
   },
   "slots": {
@@ -108,81 +108,26 @@
     "y": 532
   },
   "review": {
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
     "manualApprovedRoles": [
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual-refined"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "manualApprovedRoles": [
     "shelf"
   ],
   "windowCutoutsNormalized": [
     {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0,
-          "y": 0.086
-        },
-        {
-          "x": 0.327,
-          "y": 0.086
-        },
-        {
-          "x": 0.327,
-          "y": 0.522
-        },
-        {
-          "x": 0,
-          "y": 0.522
-        }
-      ]
-    },
-    {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.333,
-          "y": 0.101
-        },
-        {
-          "x": 0.451,
-          "y": 0.101
-        },
-        {
-          "x": 0.451,
-          "y": 0.51
-        },
-        {
-          "x": 0.333,
-          "y": 0.51
-        }
-      ]
-    },
-    {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.462,
-          "y": 0.151
-        },
-        {
-          "x": 0.596,
-          "y": 0.151
-        },
-        {
-          "x": 0.596,
-          "y": 0.358
-        },
-        {
-          "x": 0.462,
-          "y": 0.358
-        }
-      ]
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78,
+      "type": "rect"
     }
   ],
   "manualRoleMasksNormalized": {
@@ -279,5 +224,37 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "shelfUnits": [
+    {
+      "x0": 0.7104,
+      "x1": 0.9205,
+      "rows": [
+        0.2425,
+        0.354,
+        0.4685
+      ]
+    }
+  ],
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-all-05.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.71,
+      "x1": 0.92,
+      "rows": [
+        0.265,
+        0.361,
+        0.446
+      ]
+    }
+  ],
+  "generatedArchitectureAlpha": true,
+  "generatedExteriorBoundsNormalized": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78
+    }
+  ]
 }

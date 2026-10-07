@@ -1,0 +1,894 @@
+{
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "heroes-3",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\heroes-3\\architecture-2026-10-07-all-05-99b09300dc8c.png",
+      "output": "public\\assets\\bar\\modular\\heroes-3\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "heroes-3",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\heroes-3\\shelf-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\heroes-3\\clean-ready\\shelf.webp",
+      "size": [
+        886,
+        518
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1642,
+          958
+        ],
+        "contentBounds": [
+          8,
+          5,
+          1635,
+          910
+        ],
+        "contentRectPixels": [
+          31,
+          31,
+          824,
+          482
+        ]
+      }
+    },
+    {
+      "scene": "heroes-3",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\heroes-3\\counter-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\heroes-3\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          7,
+          155,
+          2163,
+          558
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "heroes-3",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\heroes-3\\seat-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\heroes-3\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1199,
+          1312
+        ],
+        "contentBounds": [
+          145,
+          80,
+          1050,
+          1236
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "lineage-2",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\lineage-2\\architecture-2026-10-07-all-05-0a2d4bff1bba.png",
+      "output": "public\\assets\\bar\\modular\\lineage-2\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "lineage-2",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\lineage-2\\shelf-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\lineage-2\\clean-ready\\shelf.webp",
+      "size": [
+        1104,
+        536
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1798,
+          875
+        ],
+        "contentBounds": [
+          8,
+          0,
+          1794,
+          866
+        ],
+        "contentRectPixels": [
+          39,
+          32,
+          1027,
+          498
+        ]
+      }
+    },
+    {
+      "scene": "lineage-2",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\lineage-2\\counter-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\lineage-2\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          11,
+          146,
+          2159,
+          576
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "lineage-2",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\lineage-2\\seat-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\lineage-2\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1144,
+          1375
+        ],
+        "contentBounds": [
+          106,
+          63,
+          1035,
+          1287
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "lost-ark",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\lost-ark\\architecture-2026-10-07-all-05-4861959d7a88.png",
+      "output": "public\\assets\\bar\\modular\\lost-ark\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "lost-ark",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\lost-ark\\shelf-2026-10-07-all-05-10c83ceb3863.png",
+      "output": "public\\assets\\bar\\modular\\lost-ark\\clean-ready\\shelf.webp",
+      "size": [
+        1137,
+        527
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1843,
+          853
+        ],
+        "contentBounds": [
+          4,
+          32,
+          1841,
+          843
+        ],
+        "contentRectPixels": [
+          41,
+          31,
+          1057,
+          491
+        ]
+      }
+    },
+    {
+      "scene": "lost-ark",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\lost-ark\\counter-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\lost-ark\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          4,
+          189,
+          2164,
+          623
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "lost-ark",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\lost-ark\\seat-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\lost-ark\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1127,
+          1396
+        ],
+        "contentBounds": [
+          130,
+          81,
+          994,
+          1318
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "marina",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\marina\\architecture-2026-10-07-all-05-3921549f3436.png",
+      "output": "public\\assets\\bar\\modular\\marina\\architecture.webp",
+      "size": [
+        764,
+        508
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1538,
+          1023
+        ]
+      }
+    },
+    {
+      "scene": "marina",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\marina\\shelf-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\marina\\clean-ready\\shelf.webp",
+      "size": [
+        237,
+        249
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1223,
+          1286
+        ],
+        "contentBounds": [
+          2,
+          4,
+          1221,
+          1250
+        ],
+        "contentRectPixels": [
+          8,
+          15,
+          220,
+          232
+        ]
+      }
+    },
+    {
+      "scene": "marina",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\marina\\counter-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\marina\\clean-ready\\counter.webp",
+      "size": [
+        764,
+        274
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2094,
+          751
+        ],
+        "contentBounds": [
+          46,
+          96,
+          2059,
+          709
+        ],
+        "contentRectPixels": [
+          160,
+          61,
+          604,
+          142
+        ]
+      }
+    },
+    {
+      "scene": "marina",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\marina\\seat-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\marina\\clean-ready\\seat.webp",
+      "size": [
+        99,
+        178
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1036,
+          1518
+        ],
+        "contentBounds": [
+          189,
+          121,
+          881,
+          1438
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "mass-effect",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\mass-effect\\architecture-2026-10-07-all-05-7ed6af37da55.png",
+      "output": "public\\assets\\bar\\modular\\mass-effect\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "mass-effect",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\mass-effect\\shelf-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\mass-effect\\clean-ready\\shelf.webp",
+      "size": [
+        1087,
+        518
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1818,
+          865
+        ],
+        "contentBounds": [
+          16,
+          31,
+          1804,
+          834
+        ],
+        "contentRectPixels": [
+          38,
+          31,
+          1011,
+          482
+        ]
+      }
+    },
+    {
+      "scene": "mass-effect",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\mass-effect\\counter-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\mass-effect\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2171,
+          724
+        ],
+        "contentBounds": [
+          18,
+          162,
+          2154,
+          577
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "mass-effect",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\mass-effect\\seat-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\mass-effect\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1145,
+          1374
+        ],
+        "contentBounds": [
+          206,
+          63,
+          939,
+          1282
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "max-payne",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\max-payne\\architecture-2026-10-07-all-05-bc2538fc7524.png",
+      "output": "public\\assets\\bar\\modular\\max-payne\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1671,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "max-payne",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\max-payne\\shelf-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\max-payne\\clean-ready\\shelf.webp",
+      "size": [
+        886,
+        536
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1614,
+          974
+        ],
+        "contentBounds": [
+          22,
+          0,
+          1593,
+          961
+        ],
+        "contentRectPixels": [
+          31,
+          32,
+          824,
+          498
+        ]
+      }
+    },
+    {
+      "scene": "max-payne",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\max-payne\\counter-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\max-payne\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          3,
+          218,
+          2167,
+          644
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "max-payne",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\max-payne\\seat-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\max-payne\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1145,
+          1374
+        ],
+        "contentBounds": [
+          129,
+          62,
+          1016,
+          1281
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "minecraft",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\minecraft\\architecture-2026-10-07-all-05-29d4f70e8e69.png",
+      "output": "public\\assets\\bar\\modular\\minecraft\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "minecraft",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\minecraft\\shelf-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\minecraft\\clean-ready\\shelf.webp",
+      "size": [
+        1070,
+        452
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1931,
+          814
+        ],
+        "contentBounds": [
+          11,
+          30,
+          1920,
+          781
+        ],
+        "contentRectPixels": [
+          37,
+          27,
+          995,
+          420
+        ]
+      }
+    },
+    {
+      "scene": "minecraft",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\minecraft\\counter-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\minecraft\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        414
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          12,
+          218,
+          2162,
+          597
+        ],
+        "contentRectPixels": [
+          0,
+          94,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "minecraft",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\minecraft\\seat-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\minecraft\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1245,
+          1263
+        ],
+        "contentBounds": [
+          222,
+          61,
+          1024,
+          1205
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "neighbours-from-hell",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\neighbours-from-hell\\architecture-2026-10-07-all-05-a5560a1ff7c5.png",
+      "output": "public\\assets\\bar\\modular\\neighbours-from-hell\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "neighbours-from-hell",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\neighbours-from-hell\\shelf-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\neighbours-from-hell\\clean-ready\\shelf.webp",
+      "size": [
+        886,
+        508
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1656,
+          950
+        ],
+        "contentBounds": [
+          7,
+          2,
+          1650,
+          938
+        ],
+        "contentRectPixels": [
+          31,
+          30,
+          824,
+          472
+        ]
+      }
+    },
+    {
+      "scene": "neighbours-from-hell",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\neighbours-from-hell\\counter-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\neighbours-from-hell\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        414
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          10,
+          194,
+          2161,
+          611
+        ],
+        "contentRectPixels": [
+          0,
+          94,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "neighbours-from-hell",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\neighbours-from-hell\\seat-2026-10-07-all-05.png",
+      "output": "public\\assets\\bar\\modular\\neighbours-from-hell\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1024,
+          1536
+        ],
+        "contentBounds": [
+          62,
+          64,
+          962,
+          1440
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    }
+  ],
+  "preview": "docs\\modular-review\\generated-batch-2026-10-07-all-05.webp"
+}

@@ -6,7 +6,7 @@
     "width": 1516,
     "height": 1004
   },
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "measured-gameplay",
   "notes": [
     "Measured from existing BarScene geometry.",
@@ -29,9 +29,9 @@
     "shelf-reference": {
       "crop": {
         "x": 879,
-        "y": 141,
+        "y": 100,
         "width": 637,
-        "height": 512
+        "height": 500
       },
       "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware."
     },
@@ -40,7 +40,7 @@
         "x": 0,
         "y": 517,
         "width": 1516,
-        "height": 336
+        "height": 450
       },
       "prompt": "Isolate existing counter with transparent surroundings and bleed."
     }
@@ -54,15 +54,15 @@
     },
     "shelves": {
       "x": 940,
-      "y": 141,
+      "y": 100,
       "width": 546,
-      "height": 512
+      "height": 500
     },
     "counter": {
       "x": 0,
       "y": 517,
       "width": 1516,
-      "height": 336
+      "height": 450
     },
     "floor": {
       "x": 0,
@@ -84,32 +84,33 @@
   ],
   "seatAnchors": [
     {
-      "x": 303,
+      "x": 306,
       "y": 753
     },
     {
-      "x": 606,
+      "x": 645,
       "y": 753
     },
     {
-      "x": 910,
+      "x": 957,
       "y": 753
     },
     {
-      "x": 1273,
+      "x": 1322,
       "y": 753
     }
   ],
   "bartenderAnchor": null,
   "review": {
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "measured-pane-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "windowCutoutsNormalized": [
     {
@@ -204,10 +205,10 @@
   ],
   "manualSeatCutNormalized": {
     "cropNormalized": {
-      "x": 0.455,
-      "y": 0.54,
-      "width": 0.12,
-      "height": 0.26
+      "x": 0.36,
+      "y": 0.68,
+      "width": 0.18,
+      "height": 0.31
     },
     "mask": {
       "feather": 0.65,
@@ -285,5 +286,70 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-05.json",
+  "generatedWindowCutoutsNormalized": [
+    {
+      "type": "rect",
+      "x": 0.03664921465968586,
+      "y": 0.2854330708661417,
+      "width": 0.112565445026178,
+      "height": 0.36220472440944884
+    },
+    {
+      "type": "rect",
+      "x": 0.0,
+      "y": 0.2854330708661417,
+      "width": 0.017015706806282723,
+      "height": 0.0688976377952756
+    },
+    {
+      "type": "rect",
+      "x": 0.0,
+      "y": 0.36811023622047245,
+      "width": 0.017015706806282723,
+      "height": 0.05511811023622047
+    },
+    {
+      "type": "rect",
+      "x": 0.0,
+      "y": 0.43700787401574803,
+      "width": 0.017015706806282723,
+      "height": 0.05511811023622047
+    },
+    {
+      "type": "rect",
+      "x": 0.0,
+      "y": 0.5059055118110236,
+      "width": 0.017015706806282723,
+      "height": 0.05905511811023622
+    },
+    {
+      "type": "rect",
+      "x": 0.0,
+      "y": 0.5787401574803149,
+      "width": 0.017015706806282723,
+      "height": 0.06299212598425197
+    }
+  ],
+  "generatedShelfUnits": [
+    {
+      "x0": 0.653,
+      "x1": 0.897,
+      "rows": [
+        0.285,
+        0.402,
+        0.535
+      ]
+    },
+    {
+      "x0": 0.919,
+      "x1": 0.984,
+      "rows": [
+        0.35,
+        0.449,
+        0.537
+      ]
+    }
+  ]
 }

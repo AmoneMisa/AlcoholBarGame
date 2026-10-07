@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import json
 import shutil
 from pathlib import Path
@@ -22,6 +23,10 @@ def copy_required(src,dst,label):
     shutil.copyfile(src,dst)
 
 def exterior_cut(manifest_path,manifest,base,out):
+    clean=base/'exterior.webp'
+    if clean.exists():
+        copy_required(clean,out/'exterior.webp',f'{base.name} clean exterior')
+        return str((out/'exterior.webp').relative_to(ROOT))
     mask_path=base/'window-mask.png'
     if not mask_path.exists():
         return None
@@ -52,14 +57,21 @@ def build(item):
     copy_required(arch_source,out/'architecture.webp',f'{scene} architecture')
 
     copied=['architecture']
+    for module in manifest.get('decorModules',[]):
+        name=module['id']
+        copy_required(base/'clean-ready'/f'{name}.webp',out/f'{name}.webp',f'{scene} {name}')
+        copied.append(name)
     if 'counter' in required:
-        copy_required(base/'review-ready'/'counter.webp',out/'counter.webp',f'{scene} counter')
+        clean=base/'clean-ready'/'counter.webp'
+        copy_required(clean if clean.exists() else base/'review-ready'/'counter.webp',out/'counter.webp',f'{scene} counter')
         copied.append('counter')
     if 'shelf' in required:
-        copy_required(base/'review-ready'/'shelf.webp',out/'shelf.webp',f'{scene} shelf')
+        clean=base/'clean-ready'/'shelf.webp'
+        copy_required(clean if clean.exists() else base/'review-ready'/'shelf.webp',out/'shelf.webp',f'{scene} shelf')
         copied.append('shelf')
     if 'seating' in required:
-        copy_required(base/'manual'/'seat.webp',out/'seat.webp',f'{scene} seat')
+        clean=base/'clean-ready'/'seat.webp'
+        copy_required(clean if clean.exists() else base/'manual'/'seat.webp',out/'seat.webp',f'{scene} seat')
         copied.append('seat')
 
     exterior=exterior_cut(manifest_path,manifest,base,out)
@@ -76,9 +88,12 @@ def build(item):
         'complete':True
     }
 
-def main():
+def main(scene_ids=None):
     summary=json.loads(SUMMARY.read_text())
-    rows=[build(item) for item in summary]
+    report_path=ROOT/'docs/modular-review/composite-ready.json'
+    previous=json.loads(report_path.read_text()) if scene_ids else {}
+    previous_rows={row['scene']:row for row in previous.get('scenes',[])}
+    rows=[build(item) if not scene_ids or item['scene'] in scene_ids else previous_rows[item['scene']] for item in summary]
     report={
         'count':len(rows),
         'complete':sum(item['complete'] for item in rows),
@@ -92,4 +107,6 @@ def main():
     print(f"architecture final={report['finalArchitecture']} prep={report['prepArchitecture']}")
 
 if __name__=='__main__':
-    main()
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--scenes',nargs='+',help='Rebuild only these scenes and keep other prepared assets unchanged')
+    main(parser.parse_args().scenes)

@@ -1,0 +1,45 @@
+from pathlib import Path
+import re
+
+path = Path('C:/Users/kubai/.codex/visualizations/2026/10/07/01a11537-35c9-7660-8318-346e7cc5f58f/bar-customizer-design.html')
+text = path.read_text(encoding='utf-8')
+text = re.sub(r'<div class="preview-hint">.*?</div>', '', text, count=1)
+panel = '''  <div class="placement-panel"><div class="scale-control"><label>Масштаб <output class="scale-value">115%</output><input type="range" class="scale-input" min="100" max="170" value="115" aria-label="Масштаб выбранной части"></label></div><p class="position-note"></p></div>'''
+text = re.sub(r'  <div class="placement-panel">.*?</p></div>', panel, text, count=1)
+text = text.replace(" editor.querySelector('.placement-scope').remove();\n", '')
+text = text.replace("scope='part',", '')
+text = text.replace('scope=saved.scope??scope;', '')
+text = text.replace("scope=['room','lighting','bottles'].includes(id)?'camera':'part';", '')
+text = text.replace('state,active,scope', 'state,active')
+text = text.replace('position:pose()', 'scale:pose().z')
+text = text.replace(' delete state.poses.camera;applied=clone(state);', ' normalizeScales();applied=clone(state);')
+text = text.replace(" const q=selector", " function normalizeScales(){const defaults=initial().poses;state.poses=Object.fromEntries(Object.entries(defaults).map(([key,value])=>[key,{x:0,y:0,z:Math.max(key==='outside'?100:60,Math.min(170,Number(state.poses[key]?.z)||value.z))}]));}\n const q=selector")
+text = text.replace("const p=pose();q('.position-x-input').value=p.x;q('.position-y-input').value=p.y;q('.scale-input').value=p.z;", "const p=pose();q('.scale-input').value=p.z;")
+text = text.replace("q('.position-x').textContent=p.x;q('.position-y').textContent=p.y;", '')
+text = re.sub(r"   q\('\.preview-hint span'\).*?\n", '', text)
+text = text.replace("q('.placement-controls').querySelectorAll('button,input')", "q('.scale-control').querySelectorAll('input')")
+text = text.replace('Для свободного перемещения выберите другой пейзаж.', 'Для изменения масштаба выберите другой пейзаж.')
+text = text.replace('Пейзаж движется за окнами.', 'Масштабируется только пейзаж за окнами.')
+text = text.replace('Бармен и банка чаевых перемещаются вместе со стойкой.', 'Банка стоит на столешнице и масштабируется вместе со стойкой и барменом.')
+text = text.replace('Гости перемещаются вместе со своими сиденьями.', 'Гости масштабируются вместе со своими сиденьями.')
+text = text.replace('Бутылки перемещаются вместе с полками.', 'Бутылки масштабируются вместе с полками.')
+text = text.replace("const min=['outside','camera'].includes(poseKey())?100:60;", "const min=poseKey()==='outside'?100:60;")
+text = text.replace("q('.scale-input').max=poseKey()==='camera'?150:170;", "q('.scale-input').max=170;")
+start = text.index(' function changePosition(')
+end = text.index(" q('.apply-button').onclick", start)
+text = text[:start] + " q('.scale-input').oninput=event=>{if(active==='outside'&&state.outside==='original')return;pose().z=Number(event.target.value);syncControls();draw();remember();};\n" + text[end:]
+text = text.replace('state=saved.state;active=', 'state={...initial(),...saved.state};normalizeScales();active=')
+text = text.replace('touch-action:none;cursor:grab', 'touch-action:auto')
+text = text.replace('#bar-customizer-design canvas:active{cursor:grabbing}\n', '')
+text = re.sub(r'^#bar-customizer-design (?:\.placement-heading|\.placement-scope|\.direction-pad|\[data-move|\.center-position|\.position-values|\.reset-position|\.preview-hint|\.placement-controls).*?\n', '', text, flags=re.M)
+text = re.sub(r'#bar-customizer-design \.placement-controls\{[^}]*\}', '', text)
+text = re.sub(r'#bar-customizer-design \.direction-pad\{[^}]*\}', '', text)
+text = re.sub(r'#bar-customizer-design \.placement-heading\{[^}]*\}', '', text)
+text = text.replace('#bar-customizer-design .position-values label,#bar-customizer-design .scale-control label', '#bar-customizer-design .scale-control label')
+text = text.replace('grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px', 'grid-template-columns:minmax(0,1fr);align-items:center;gap:10px')
+# The jar shares the counter transform and uses its visible base as the surface anchor.
+text = text.replace('const height=H*.085;ctx.drawImage(jar,(targetBounds.x+targetBounds.width*.88)*W,(targetBounds.y+targetBounds.height*.10)*H-height,height*jar.width/jar.height,height);', 'const height=H*.085,width=height*jar.width/jar.height;const anchorX=(targetBounds.x+targetBounds.width*.71)*W,anchorY=(targetBounds.y+targetBounds.height*.10)*H;ctx.drawImage(jar,anchorX-width/2,anchorY-height*(367/384),width,height);')
+path.write_text(text, encoding='utf-8')
+assert path.stat().st_size < 1_000_000
+assert 'onpointerdown' not in text and 'position-x-input' not in text and 'data-move=' not in text
+print(f'Updated scale-only design: {path.stat().st_size} bytes')

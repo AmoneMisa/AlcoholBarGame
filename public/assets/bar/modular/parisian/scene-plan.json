@@ -26,13 +26,19 @@
       }
     },
     "shelf-reference": {
+      "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware.",
+      "cropNormalized": {
+        "x": 0.3502638522427441,
+        "y": 0.0697211155378486,
+        "width": 0.36015831134564646,
+        "height": 0.5049800796812749
+      },
       "crop": {
         "x": 268,
         "y": 35,
         "width": 275,
         "height": 257
       },
-      "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware.",
       "rect": {
         "x": 0.350264,
         "y": 0.069721,
@@ -41,18 +47,24 @@
       }
     },
     "counter-reference": {
+      "prompt": "Isolate existing counter with transparent surroundings and bleed.",
+      "cropNormalized": {
+        "x": 0,
+        "y": 0.4402390438247012,
+        "width": 1,
+        "height": 0.5597609561752988
+      },
       "crop": {
         "x": 0,
         "y": 224,
         "width": 764,
-        "height": 132
+        "height": 284
       },
-      "prompt": "Isolate existing counter with transparent surroundings and bleed.",
       "rect": {
         "x": 0,
         "y": 0.440239,
         "width": 1,
-        "height": 0.25996
+        "height": 0.559761
       }
     }
   },
@@ -91,24 +103,10 @@
   "windowCutouts": [
     {
       "type": "rect",
-      "x": 0.154,
-      "y": 0.075,
-      "width": 0.126,
-      "height": 0.356
-    },
-    {
-      "type": "rect",
-      "x": 0.737,
-      "y": 0.075,
-      "width": 0.127,
-      "height": 0.356
-    },
-    {
-      "type": "rect",
-      "x": 0.929,
-      "y": 0.076,
-      "width": 0.071,
-      "height": 0.365
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78
     }
   ],
   "shelfRows": [
@@ -139,7 +137,7 @@
     }
   ],
   "bartenderAnchor": null,
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "measured-gameplay",
   "requiredRoles": [
     "counter",
@@ -148,10 +146,11 @@
   ],
   "manualApprovedRoles": [],
   "review": {
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
-    "seatAsset": "single-reusable-manual-refined"
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "notes": [
     "Measured from existing BarScene geometry.",

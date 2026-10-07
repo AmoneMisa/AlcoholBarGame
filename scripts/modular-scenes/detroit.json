@@ -2,7 +2,7 @@
   "id": "detroit",
   "source": "../../../public/assets/bar/backgrounds/interior-detroit.webp",
   "outputDir": "../../../public/assets/bar/modular/detroit",
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "manual-source-review",
   "notes": [
     "Existing themed background coverage manifest.",
@@ -26,7 +26,7 @@
         "x": 0,
         "y": 0.08,
         "width": 1,
-        "height": 0.51
+        "height": 0.5900000000000001
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture."
     },
@@ -35,7 +35,7 @@
         "x": 0,
         "y": 0.59,
         "width": 1,
-        "height": 0.21
+        "height": 0.41000000000000003
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings."
     }
@@ -108,15 +108,16 @@
     "shelfBounds": "manual-measured",
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "manualRoleMasksNormalized": {
     "shelf": {
@@ -237,33 +238,19 @@
   ],
   "windowCutoutsNormalized": [
     {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.35,
-          "y": 0
-        },
-        {
-          "x": 0.72,
-          "y": 0
-        },
-        {
-          "x": 0.72,
-          "y": 0.56
-        },
-        {
-          "x": 0.35,
-          "y": 0.56
-        }
-      ]
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78,
+      "type": "rect"
     }
   ],
   "manualSeatCutNormalized": {
     "cropNormalized": {
-      "x": 0.455,
-      "y": 0.7,
-      "width": 0.1,
-      "height": 0.2
+      "x": 0.41,
+      "y": 0.8,
+      "width": 0.18,
+      "height": 0.34
     },
     "mask": {
       "feather": 0.65,
@@ -327,5 +314,35 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-all-03.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.09,
+      "x1": 0.3,
+      "rows": [
+        0.279,
+        0.423,
+        0.555
+      ]
+    },
+    {
+      "x0": 0.74,
+      "x1": 0.94,
+      "rows": [
+        0.282,
+        0.423,
+        0.555
+      ]
+    }
+  ],
+  "generatedArchitectureAlpha": true,
+  "generatedExteriorBoundsNormalized": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78
+    }
+  ]
 }

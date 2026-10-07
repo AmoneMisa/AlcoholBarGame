@@ -26,13 +26,19 @@
       }
     },
     "shelf-reference": {
+      "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware.",
+      "cropNormalized": {
+        "x": 0.11038961038961038,
+        "y": 0.1599025974025974,
+        "width": 0.7800324675324676,
+        "height": 0.3952922077922078
+      },
       "crop": {
         "x": 69,
         "y": 100,
         "width": 486,
         "height": 246
       },
-      "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware.",
       "rect": {
         "x": 0.11039,
         "y": 0.159903,
@@ -41,18 +47,24 @@
       }
     },
     "counter-reference": {
+      "prompt": "Isolate existing counter with transparent surroundings and bleed.",
+      "cropNormalized": {
+        "x": 0,
+        "y": 0.5048701298701299,
+        "width": 1,
+        "height": 0.4951298701298701
+      },
       "crop": {
         "x": 0,
         "y": 315,
         "width": 623,
-        "height": 184
+        "height": 308
       },
-      "prompt": "Isolate existing counter with transparent surroundings and bleed.",
       "rect": {
         "x": 0,
         "y": 0.50487,
         "width": 1,
-        "height": 0.294643
+        "height": 0.49513
       }
     }
   },
@@ -90,119 +102,11 @@
   },
   "windowCutouts": [
     {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.36,
-          "y": 0.553
-        },
-        {
-          "x": 0.36,
-          "y": 0.255
-        },
-        {
-          "x": 0.382,
-          "y": 0.194
-        },
-        {
-          "x": 0.427,
-          "y": 0.146
-        },
-        {
-          "x": 0.503,
-          "y": 0.126
-        },
-        {
-          "x": 0.579,
-          "y": 0.146
-        },
-        {
-          "x": 0.624,
-          "y": 0.194
-        },
-        {
-          "x": 0.646,
-          "y": 0.255
-        },
-        {
-          "x": 0.646,
-          "y": 0.553
-        }
-      ]
-    },
-    {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.09,
-          "y": 0.326
-        },
-        {
-          "x": 0.09,
-          "y": 0.196
-        },
-        {
-          "x": 0.107,
-          "y": 0.155
-        },
-        {
-          "x": 0.144,
-          "y": 0.129
-        },
-        {
-          "x": 0.183,
-          "y": 0.121
-        },
-        {
-          "x": 0.222,
-          "y": 0.129
-        },
-        {
-          "x": 0.253,
-          "y": 0.16
-        },
-        {
-          "x": 0.253,
-          "y": 0.326
-        }
-      ]
-    },
-    {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.746,
-          "y": 0.326
-        },
-        {
-          "x": 0.746,
-          "y": 0.16
-        },
-        {
-          "x": 0.777,
-          "y": 0.129
-        },
-        {
-          "x": 0.816,
-          "y": 0.121
-        },
-        {
-          "x": 0.855,
-          "y": 0.129
-        },
-        {
-          "x": 0.892,
-          "y": 0.155
-        },
-        {
-          "x": 0.91,
-          "y": 0.196
-        },
-        {
-          "x": 0.91,
-          "y": 0.326
-        }
-      ]
+      "type": "rect",
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78
     }
   ],
   "shelfRows": [
@@ -233,7 +137,7 @@
     }
   ],
   "bartenderAnchor": null,
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "measured-gameplay",
   "requiredRoles": [
     "counter",
@@ -242,10 +146,11 @@
   ],
   "manualApprovedRoles": [],
   "review": {
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
-    "seatAsset": "single-reusable-manual"
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "notes": [
     "Measured from existing BarScene geometry.",

@@ -1,0 +1,228 @@
+{
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "loft",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\loft\\architecture-2026-10-07-04.png",
+      "output": "public\\assets\\bar\\modular\\loft\\architecture.webp",
+      "size": [
+        764,
+        508
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1540,
+          1021
+        ]
+      }
+    },
+    {
+      "scene": "loft",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\loft\\shelf-2026-10-07-04.png",
+      "output": "public\\assets\\bar\\modular\\loft\\clean-ready\\shelf.webp",
+      "size": [
+        367,
+        262
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1713,
+          918
+        ],
+        "contentBounds": [
+          55,
+          44,
+          1656,
+          811
+        ],
+        "contentRectPixels": [
+          18,
+          24,
+          305,
+          194
+        ]
+      }
+    },
+    {
+      "scene": "loft",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\loft\\counter-2026-10-07-04.png",
+      "output": "public\\assets\\bar\\modular\\loft\\clean-ready\\counter.webp",
+      "size": [
+        764,
+        218
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2038,
+          771
+        ],
+        "contentBounds": [
+          529,
+          178,
+          2038,
+          692
+        ],
+        "contentRectPixels": [
+          243,
+          31,
+          521,
+          179
+        ]
+      }
+    },
+    {
+      "scene": "loft",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\loft\\seat-2026-10-07-04.png",
+      "output": "public\\assets\\bar\\modular\\loft\\clean-ready\\seat.webp",
+      "size": [
+        76,
+        163
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          892,
+          1763
+        ],
+        "contentBounds": [
+          25,
+          54,
+          869,
+          1674
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "library",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\library\\architecture-2026-10-07-04.png",
+      "output": "public\\assets\\bar\\modular\\library\\architecture.webp",
+      "size": [
+        623,
+        623
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1254,
+          1254
+        ]
+      }
+    },
+    {
+      "scene": "library",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\library\\shelf-2026-10-07-04.png",
+      "output": "public\\assets\\bar\\modular\\library\\clean-ready\\shelf.webp",
+      "size": [
+        231,
+        225
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1536,
+          1024
+        ],
+        "contentBounds": [
+          71,
+          73,
+          1461,
+          934
+        ],
+        "contentRectPixels": [
+          35,
+          36,
+          173,
+          130
+        ]
+      }
+    },
+    {
+      "scene": "library",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\library\\counter-2026-10-07-04.png",
+      "output": "public\\assets\\bar\\modular\\library\\clean-ready\\counter.webp",
+      "size": [
+        623,
+        185
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          100,
+          106,
+          2066,
+          626
+        ],
+        "contentRectPixels": [
+          85,
+          45,
+          445,
+          133
+        ]
+      }
+    },
+    {
+      "scene": "library",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\library\\seat-2026-10-07-04.png",
+      "output": "public\\assets\\bar\\modular\\library\\clean-ready\\seat.webp",
+      "size": [
+        69,
+        128
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          869,
+          1810
+        ],
+        "contentBounds": [
+          46,
+          100,
+          823,
+          1703
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    }
+  ],
+  "preview": "docs\\modular-review\\generated-batch-2026-10-07-04.webp"
+}

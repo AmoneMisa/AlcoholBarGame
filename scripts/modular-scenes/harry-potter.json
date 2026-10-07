@@ -2,7 +2,7 @@
   "id": "harry-potter",
   "source": "../../../public/assets/bar/backgrounds/interior-harry-potter.webp",
   "outputDir": "../../../public/assets/bar/modular/harry-potter",
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "manual-source-review",
   "notes": [
     "Existing themed background coverage manifest.",
@@ -26,7 +26,7 @@
         "x": 0.19,
         "y": 0.07,
         "width": 0.61,
-        "height": 0.53
+        "height": 0.6000000000000001
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture."
     },
@@ -35,7 +35,7 @@
         "x": 0,
         "y": 0.55,
         "width": 1,
-        "height": 0.25
+        "height": 0.44999999999999996
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings."
     }
@@ -108,15 +108,16 @@
     "shelfBounds": "manual-measured",
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "manualRoleMasksNormalized": {
     "shelf": {
@@ -439,33 +440,26 @@
   ],
   "windowCutoutsNormalized": [
     {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.82,
-          "y": 0.055
-        },
-        {
-          "x": 0.99,
-          "y": 0.055
-        },
-        {
-          "x": 0.99,
-          "y": 0.57
-        },
-        {
-          "x": 0.82,
-          "y": 0.57
-        }
-      ]
+      "x": 0,
+      "y": 0,
+      "width": 0.1,
+      "height": 0.72,
+      "type": "rect"
+    },
+    {
+      "x": 0.8,
+      "y": 0,
+      "width": 0.19999999999999996,
+      "height": 0.72,
+      "type": "rect"
     }
   ],
   "manualSeatCutNormalized": {
     "cropNormalized": {
-      "x": 0.425,
-      "y": 0.785,
-      "width": 0.155,
-      "height": 0.215
+      "x": 0.41,
+      "y": 0.8,
+      "width": 0.18,
+      "height": 0.34
     },
     "mask": {
       "feather": 0.65,
@@ -537,5 +531,87 @@
         }
       ]
     }
-  }
+  },
+  "shelfUnits": [
+    {
+      "x0": 0.2318,
+      "x1": 0.4093,
+      "rows": [
+        0.2721,
+        0.3874,
+        0.5017,
+        0.5924
+      ]
+    },
+    {
+      "x0": 0.412,
+      "x1": 0.62,
+      "rows": [
+        0.147,
+        0.2574,
+        0.3658,
+        0.5353
+      ]
+    },
+    {
+      "x0": 0.6255,
+      "x1": 0.767,
+      "rows": [
+        0.2032,
+        0.2988,
+        0.4101,
+        0.5155,
+        0.5973
+      ]
+    }
+  ],
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-all-04.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.29,
+      "x1": 0.42,
+      "rows": [
+        0.297,
+        0.366,
+        0.435,
+        0.498
+      ]
+    },
+    {
+      "x0": 0.445,
+      "x1": 0.567,
+      "rows": [
+        0.214,
+        0.28,
+        0.354,
+        0.417,
+        0.498
+      ]
+    },
+    {
+      "x0": 0.598,
+      "x1": 0.69,
+      "rows": [
+        0.311,
+        0.378,
+        0.446,
+        0.499
+      ]
+    }
+  ],
+  "generatedArchitectureAlpha": true,
+  "generatedExteriorBoundsNormalized": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 0.1,
+      "height": 0.72
+    },
+    {
+      "x": 0.8,
+      "y": 0,
+      "width": 0.19999999999999996,
+      "height": 0.72
+    }
+  ]
 }

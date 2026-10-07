@@ -2,7 +2,7 @@
   "id": "minecraft",
   "source": "../../../public/assets/bar/backgrounds/interior-minecraft.webp",
   "outputDir": "../../../public/assets/bar/modular/minecraft",
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "manual-source-review",
   "notes": [
     "Existing themed background coverage manifest.",
@@ -26,7 +26,7 @@
         "x": 0.18,
         "y": 0.19,
         "width": 0.64,
-        "height": 0.39
+        "height": 0.48000000000000004
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture."
     },
@@ -35,7 +35,7 @@
         "x": 0,
         "y": 0.56,
         "width": 1,
-        "height": 0.24
+        "height": 0.43999999999999995
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings."
     }
@@ -109,15 +109,16 @@
     "shelfBounds": "manual-measured",
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
-    "windowCutouts": "manual-required",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "manualRoleMasksNormalized": {
     "shelf": {
@@ -231,10 +232,10 @@
   ],
   "manualSeatCutNormalized": {
     "cropNormalized": {
-      "x": 0.44,
-      "y": 0.68,
-      "width": 0.12,
-      "height": 0.2
+      "x": 0.41,
+      "y": 0.8,
+      "width": 0.18,
+      "height": 0.34
     },
     "mask": {
       "feather": 0.4,
@@ -298,5 +299,57 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-all-05.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.25,
+      "x1": 0.39,
+      "rows": [
+        0.354,
+        0.45,
+        0.54
+      ]
+    },
+    {
+      "x0": 0.62,
+      "x1": 0.775,
+      "rows": [
+        0.354,
+        0.45,
+        0.538
+      ]
+    }
+  ],
+  "generatedArchitectureAlpha": true,
+  "generatedExteriorBoundsNormalized": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 0.18,
+      "height": 0.65
+    },
+    {
+      "x": 0.86,
+      "y": 0,
+      "width": 0.14,
+      "height": 0.65
+    }
+  ],
+  "windowCutoutsNormalized": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 0.18,
+      "height": 0.65,
+      "type": "rect"
+    },
+    {
+      "x": 0.86,
+      "y": 0,
+      "width": 0.14,
+      "height": 0.65,
+      "type": "rect"
+    }
+  ]
 }

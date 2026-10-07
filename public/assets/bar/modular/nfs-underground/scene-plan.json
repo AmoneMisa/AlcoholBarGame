@@ -36,20 +36,20 @@
         "x": 0.14,
         "y": 0.11,
         "width": 0.72,
-        "height": 0.45
+        "height": 0.56
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture.",
       "crop": {
         "x": 248,
         "y": 98,
         "width": 1277,
-        "height": 399
+        "height": 497
       },
       "rect": {
         "x": 0.14,
         "y": 0.11,
         "width": 0.72,
-        "height": 0.45
+        "height": 0.56
       }
     },
     "counter-reference": {
@@ -57,20 +57,20 @@
         "x": 0,
         "y": 0.55,
         "width": 1,
-        "height": 0.24
+        "height": 0.44999999999999996
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings.",
       "crop": {
         "x": 0,
         "y": 488,
         "width": 1774,
-        "height": 213
+        "height": 399
       },
       "rect": {
         "x": 0,
         "y": 0.55,
         "width": 1,
-        "height": 0.24
+        "height": 0.45
       }
     }
   },
@@ -138,7 +138,7 @@
     "x": 0.5,
     "y": 0.58
   },
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "manual-source-review",
   "requiredRoles": [
     "counter",
@@ -156,14 +156,15 @@
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
     "windowCutouts": "manual-required",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "notes": [
     "Existing themed background coverage manifest.",

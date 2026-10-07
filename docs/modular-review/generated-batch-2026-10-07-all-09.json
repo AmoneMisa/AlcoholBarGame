@@ -1,0 +1,339 @@
+{
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "witcher-3",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\witcher-3\\architecture-2026-10-07-all-09.png",
+      "output": "public\\assets\\bar\\modular\\witcher-3\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "witcher-3",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\witcher-3\\shelf-2026-10-07-all-09.png",
+      "output": "public\\assets\\bar\\modular\\witcher-3\\clean-ready\\shelf.webp",
+      "size": [
+        1154,
+        518
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1873,
+          840
+        ],
+        "contentBounds": [
+          15,
+          93,
+          1858,
+          824
+        ],
+        "contentRectPixels": [
+          40,
+          31,
+          1073,
+          482
+        ]
+      }
+    },
+    {
+      "scene": "witcher-3",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\witcher-3\\counter-2026-10-07-all-09.png",
+      "output": "public\\assets\\bar\\modular\\witcher-3\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          26,
+          144,
+          2144,
+          635
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "witcher-3",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\witcher-3\\seat-2026-10-07-all-09.png",
+      "output": "public\\assets\\bar\\modular\\witcher-3\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1024,
+          1536
+        ],
+        "contentBounds": [
+          58,
+          79,
+          977,
+          1460
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "wolf-among-us",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\wolf-among-us\\architecture-2026-10-07-all-09.png",
+      "output": "public\\assets\\bar\\modular\\wolf-among-us\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "wolf-among-us",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\wolf-among-us\\shelf-2026-10-07-all-09.png",
+      "output": "public\\assets\\bar\\modular\\wolf-among-us\\clean-ready\\shelf.webp",
+      "size": [
+        1003,
+        555
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1686,
+          933
+        ],
+        "contentBounds": [
+          4,
+          0,
+          1682,
+          933
+        ],
+        "contentRectPixels": [
+          35,
+          33,
+          933,
+          516
+        ]
+      }
+    },
+    {
+      "scene": "wolf-among-us",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\wolf-among-us\\counter-2026-10-07-all-09.png",
+      "output": "public\\assets\\bar\\modular\\wolf-among-us\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          7,
+          125,
+          2160,
+          634
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "wolf-among-us",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\wolf-among-us\\seat-2026-10-07-all-09.png",
+      "output": "public\\assets\\bar\\modular\\wolf-among-us\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1024,
+          1536
+        ],
+        "contentBounds": [
+          57,
+          103,
+          968,
+          1443
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "worms",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\worms\\architecture-2026-10-07-all-09.png",
+      "output": "public\\assets\\bar\\modular\\worms\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "worms",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\worms\\shelf-2026-10-07-all-09.png",
+      "output": "public\\assets\\bar\\modular\\worms\\clean-ready\\shelf.webp",
+      "size": [
+        1154,
+        536
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1840,
+          855
+        ],
+        "contentBounds": [
+          6,
+          1,
+          1834,
+          855
+        ],
+        "contentRectPixels": [
+          40,
+          32,
+          1073,
+          498
+        ]
+      }
+    },
+    {
+      "scene": "worms",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\worms\\counter-2026-10-07-all-09.png",
+      "output": "public\\assets\\bar\\modular\\worms\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          6,
+          172,
+          2164,
+          600
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "worms",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\worms\\seat-2026-10-07-all-09.png",
+      "output": "public\\assets\\bar\\modular\\worms\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1212,
+          1298
+        ],
+        "contentBounds": [
+          222,
+          66,
+          1039,
+          1209
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    }
+  ],
+  "preview": "docs\\modular-review\\generated-batch-2026-10-07-all-09.webp"
+}

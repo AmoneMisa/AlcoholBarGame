@@ -2,7 +2,7 @@
   "id": "cyberpunk-2077",
   "source": "../../../public/assets/bar/backgrounds/interior-cyberpunk-2077.webp",
   "outputDir": "../../../public/assets/bar/modular/cyberpunk-2077",
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "manual-source-review",
   "notes": [
     "Existing themed background coverage manifest.",
@@ -26,7 +26,7 @@
         "x": 0.06,
         "y": 0.1,
         "width": 0.88,
-        "height": 0.47
+        "height": 0.5700000000000001
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture."
     },
@@ -35,7 +35,7 @@
         "x": 0,
         "y": 0.55,
         "width": 1,
-        "height": 0.23
+        "height": 0.44999999999999996
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings."
     }
@@ -108,15 +108,16 @@
     "shelfBounds": "manual-measured",
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "manualRoleMasksNormalized": {
     "shelf": {
@@ -230,33 +231,19 @@
   ],
   "windowCutoutsNormalized": [
     {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.325,
-          "y": 0.075
-        },
-        {
-          "x": 0.68,
-          "y": 0.075
-        },
-        {
-          "x": 0.68,
-          "y": 0.5
-        },
-        {
-          "x": 0.325,
-          "y": 0.5
-        }
-      ]
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78,
+      "type": "rect"
     }
   ],
   "manualSeatCutNormalized": {
     "cropNormalized": {
-      "x": 0.455,
-      "y": 0.7,
-      "width": 0.1,
-      "height": 0.2
+      "x": 0.41,
+      "y": 0.8,
+      "width": 0.18,
+      "height": 0.34
     },
     "mask": {
       "feather": 0.65,
@@ -320,5 +307,57 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "shelfUnits": [
+    {
+      "x0": 0.0718,
+      "x1": 0.2999,
+      "rows": [
+        0.235,
+        0.3559,
+        0.4412,
+        0.5265
+      ]
+    },
+    {
+      "x0": 0.6841,
+      "x1": 0.9362,
+      "rows": [
+        0.235,
+        0.3559,
+        0.4412,
+        0.5265
+      ]
+    }
+  ],
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-all-03.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.13,
+      "x1": 0.27,
+      "rows": [
+        0.261,
+        0.35,
+        0.464
+      ]
+    },
+    {
+      "x0": 0.73,
+      "x1": 0.88,
+      "rows": [
+        0.261,
+        0.35,
+        0.464
+      ]
+    }
+  ],
+  "generatedArchitectureAlpha": true,
+  "generatedExteriorBoundsNormalized": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78
+    }
+  ]
 }

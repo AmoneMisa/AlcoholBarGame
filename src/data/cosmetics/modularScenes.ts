@@ -28,9 +28,10 @@ export interface ModularSceneDefinition {
   layers: readonly ModularSceneLayer[];
   // Slots are scene-space contracts. Art can be replaced without changing gameplay anchors.
   slots: Readonly<Record<string, NormalizedRect>>;
-  exterior?: { enabled:true };
+  exterior?: { enabled:true; asset?:string };
   shelfDecor?: {
     z:number;
+    paintBacking?:boolean;
     bays:readonly ShelfDecorBay[];
     panelTop:string;
     panelBottom:string;
@@ -82,7 +83,7 @@ export const MODULAR_SCENES: Readonly<Record<string,ModularSceneDefinition>> = {
       counter:{x:-.015,y:.57,width:1.03,height:.285},
       floor:{x:0,y:.63,width:1,height:.37}
     },
-    exterior:{enabled:true},
+    exterior:{enabled:true,asset:'/assets/bar/modular/velvet/exterior.webp'},
     shelfDecor:{
       z:15,
       bays:[decorBayLeft,decorBayRight],

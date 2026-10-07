@@ -26,33 +26,45 @@
       }
     },
     "shelf-reference": {
-      "crop": {
-        "x": 199,
-        "y": 87,
-        "width": 367,
-        "height": 229
-      },
       "prompt": "Isolate the existing back-bar furniture from this source region. Remove all painted bottles and glassware. Preserve exact perspective.",
+      "cropNormalized": {
+        "x": 0.402,
+        "y": 0.335,
+        "width": 0.1764,
+        "height": 0.2685
+      },
+      "crop": {
+        "x": 307,
+        "y": 170,
+        "width": 135,
+        "height": 136
+      },
       "rect": {
-        "x": 0.259894,
-        "y": 0.170319,
-        "width": 0.480211,
-        "height": 0.450199
+        "x": 0.402,
+        "y": 0.335,
+        "width": 0.1764,
+        "height": 0.2685
       }
     },
     "counter-reference": {
+      "prompt": "Isolate the existing bar counter with transparent surroundings and 24 px bleed. Preserve its exact perspective and silhouette.",
+      "cropNormalized": {
+        "x": 0,
+        "y": 0.5398406374501992,
+        "width": 1,
+        "height": 0.46015936254980083
+      },
       "crop": {
         "x": 0,
         "y": 274,
         "width": 764,
-        "height": 183
+        "height": 234
       },
-      "prompt": "Isolate the existing bar counter with transparent surroundings and 24 px bleed. Preserve its exact perspective and silhouette.",
       "rect": {
         "x": 0,
         "y": 0.539841,
         "width": 1,
-        "height": 0.359562
+        "height": 0.460159
       }
     }
   },
@@ -92,37 +104,9 @@
     {
       "type": "rect",
       "x": 0,
-      "y": 0.072,
-      "width": 0.167,
-      "height": 0.472
-    },
-    {
-      "type": "rect",
-      "x": 0.18,
-      "y": 0.072,
-      "width": 0.21,
-      "height": 0.472
-    },
-    {
-      "type": "rect",
-      "x": 0.404,
-      "y": 0.072,
-      "width": 0.164,
-      "height": 0.472
-    },
-    {
-      "type": "rect",
-      "x": 0.582,
-      "y": 0.072,
-      "width": 0.213,
-      "height": 0.472
-    },
-    {
-      "type": "rect",
-      "x": 0.81,
-      "y": 0.072,
-      "width": 0.19,
-      "height": 0.472
+      "y": 0,
+      "width": 1,
+      "height": 0.78
     }
   ],
   "shelfRows": [
@@ -149,7 +133,7 @@
     }
   ],
   "bartenderAnchor": null,
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": null,
   "requiredRoles": [
     "counter",
@@ -158,11 +142,12 @@
   ],
   "manualApprovedRoles": [],
   "review": {
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "notes": [
     "Generated from the measured gameplay geometry already used by BarScene.",

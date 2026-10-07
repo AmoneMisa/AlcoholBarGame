@@ -1,0 +1,91 @@
+{
+  "id": "2026-10-07-03",
+  "date": "2026-10-07",
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "jazz-cellar",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-3ac9bc3f-eb4f-49ac-b340-0ed9cc00d3bf.png",
+      "prompt": "Use case: precise-object-edit. Asset type: clean architecture plate for modular painted Jazz Cellar bar. EDIT TARGET exact square source. Preserve EXACT square framing, perspective, stone barrel vault, brick sidewalls, framed musician portraits, fixed wall sconces, hanging lamps, rich red stage curtains and elevated back stage/platform at its exact height. Remove ALL furniture and loose objects: foreground counter and front panels, five foreground stools, side tables/chairs and candles, lamps sitting on countertop, bottles/glasses/taps/tools, ALL left/right bottle shelving and central backbar cubby cabinetry beneath stage. Also REMOVE piano/bench, drums/cymbals, bass/saxophone, microphone and instrument stands/amps from stage; these will be generated as a SEPARATE modular music decoration. Reconstruct uninterrupted brick wall beneath stage where cabinet removed, and warm dark parquet floor where furniture hid it. Stage stays complete, bare and empty, with original red curtains and stageboard. Preserve the same ambient amber light, cozy cellar stone and crimson stage atmosphere. No new furniture, people, text, transparent holes or crop changes. Detailed semi-realistic painted game art."
+    },
+    {
+      "scene": "jazz-cellar",
+      "role": "shelf",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-822933e3-a75e-4381-9eee-0015997bd871.png",
+      "prompt": "Use case: precise-object-edit. Asset type: transparent EMPTY backbar furniture module for modular Jazz Cellar. EDIT TARGET very wide 1232:277 shelf-generation reference crop. Preserve exact crop proportions/layout: slim THREE-level shelf cabinet at extreme LEFT ~0%-11% and RIGHT ~89%-100%, and low rectangular cubby cabinet across central span~11%-89% in bottom part ~55%-100%. Isolate ONLY these wood/black-and-gold shelf cabinets, original thin shelf boards and gold trim, clean dark backing. Remove EVERY bottle/glass/tools/countertop lamps and remove ALL stage, curtains, piano/bench/drums/bass/sax/stands, brick walls and room pixels behind furniture. Restore empty furniture backs and complete narrow frame caps where reference edge clipped them. Keep left/right side units at original extreme positions, central cubby low; THREE shelf boards per side at original heights. Actual furniture only, truly transparent outside furniture and above central low cubbies. Do not recenter/enlarge. Same semi-realistic painted dark wood/gold/amber materials. No people/text/decor.",
+      "contentRectNormalized": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "scene": "jazz-cellar",
+      "role": "counter",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-c853fda3-45f9-48e1-834a-ce95529d9fbf.png",
+      "prompt": "Use case: precise-object-edit. Asset type: complete transparent Jazz Cellar counter. First image EDIT TARGET existing counter crop, second full room context for silhouette/material only. Preserve exact ultrawide 1232:357 reference crop framing: full-width deep emerald-green painted oak counter with golden rectangular panel trim and warm dark polished wood worktop. Top starts about30% down crop, gold front lip~42%, paneled front fills rest. Remove ALL foreground stools including every seat/pedestal/ring/base pixel, bottles and glassware, tabletop lamps, shakers/taps/tools, candles, room/backbar shelves, foreground tables/chairs. Reconstruct a clean continuous empty worktop and COMPLETE uninterrupted green/gold panel facade where stools hid it. Entire counter edge-to-edge, same source perspective, fixed gold bottom trim, no holes. Counter only, truly transparent area above silhouette, no room/decor/text/people. Detailed semi-realistic painterly emerald/dark oak/gold same as source.",
+      "contentRectNormalized": {
+        "x": 0,
+        "y": 0.24,
+        "width": 1,
+        "height": 0.76
+      }
+    },
+    {
+      "scene": "jazz-cellar",
+      "role": "seat",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-a5f8cea0-7965-4bc0-9bc5-3e45498827e4.png",
+      "prompt": "Use case: precise-object-edit. Asset type: ONE complete transparent reusable Jazz Cellar bar stool. First image EDIT TARGET rough source stool cutout, second full room material/perspective reference only. Restore exactly one whole original stool: circular deep forest-green leather padded seat viewed slightly from above, thin brass seat rim with tiny gold upholstery studs, ONE central slender polished brass pedestal, ONE circular brass footrest ring at middle/low height and flared round brass base with sculpted stem. Preserve original elegant narrow silhouette/proportions and warm amber painterly light. Remove every accidental room/counter/blue/dark backdrop pixel from cutout. Restore complete footrest and base, every foot visible inside canvas. Exactly ONE centered upright stool in portrait image ratio~0.48, narrow transparent margins, genuine transparent gaps around stem and through ring, no floor shadow or background. No room, bar, bottles, people/text. Same detailed hand-painted game material finish."
+    },
+    {
+      "scene": "jazz-cellar",
+      "role": "band",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-41303168-2c7d-4d93-a488-9f36c093386c.png",
+      "prompt": "Use case: precise-object-edit. Asset type: transparent modular Jazz Cellar band setup decorative layer. EDIT TARGET exact wide band-generation-reference crop, original ratio960:340, camera/perspective and object locations are invariant. Isolate ALL original instruments/gear as ONE transparent sprite arranged EXACTLY as source: glossy black grand piano with raised lid and complete legs and small bench at LEFT; small dark amplifier center-left; center drum kit with bass drum, snare/toms and brass cymbals with COMPLETE stands; slender microphones and cables/stands; upright wooden double bass and golden saxophone with stands at RIGHT. Preserve existing spacing, original object silhouettes and whole visible instrument parts. Remove all room pixels, red curtains, stage floor, walls, lights and backdrop everywhere including gaps beneath piano and between stands. Reconstruct accidentally clipped instrument feet/tiny edges naturally INSIDE canvas, leaving small transparent margin. Same detailed semi-realistic painterly black wood/copper/red/gold and warm amber lighting. No people, text, logos, extra instruments, counter/furniture other than piano bench, no shadow/background rectangle. A clean fully transparent band setup to overlay on the separately generated bare stage.",
+      "contentRectNormalized": {
+        "x": 0.015,
+        "y": 0.02,
+        "width": 0.97,
+        "height": 0.96
+      }
+    },
+    {
+      "scene": "art-deco",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-1960ca89-b4a8-451a-9e32-f5b2632139a0.png",
+      "prompt": "Use case: precise-object-edit. Asset type: clean architecture plate for modular painted Art Deco bar. EDIT TARGET exact square source. Preserve EXACT square framing/camera/perspective and luxurious black gold architecture: columns, stepped wall panels, giant central gold sunburst fan ornament with original silhouette and location, gold-trimmed black wall panels, fixed hanging geometric lanterns, gold ceiling, black/gold diamond parquet or marble floor. Remove ALL removable furniture and loose objects: entire foreground curved black marble counter and its gold-veined front, five green velvet high-backed stools, central and side bottle shelves including all shelf boards and cabinet frames, every bottle/glass/tap/shaker/fruit, tabletop lamps, flower arrangements, vases, potted plants, side furniture/chairs/tables. Reconstruct matching black panels where shelf furniture removed, KEEP huge gold fan and fixed vertical gold decorations intact, restore continuous detailed diamond patterned floor to bottom. One complete empty symmetrical room. Identical warm amber/gold illumination and semi-realistic painterly detail. No new furniture, people/text, transparent holes or reframing."
+    },
+    {
+      "scene": "art-deco",
+      "role": "shelf",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-215cd08e-fd19-4020-92bf-58ecd1ac14f8.png",
+      "prompt": "Use case: precise-object-edit. Asset type: transparent EMPTY shelf module for modular Art Deco bar. EDIT TARGET shelf-reference crop. Preserve EXACT landscape 715:567 canvas and furniture original coordinates. Isolate ONLY three gold-framed dark wood/black shelf cabinet units: narrow left~5%-25%, wide center~29%-71%, narrow right~75%-95%. Preserve FOUR empty shelf levels per cabinet at original y heights, thin gold shelf edges, vertical cabinet posts, clean dark warm backing and fixed built-in shelf lights. Remove EVERY painted bottle, decanter, glass and goblet, flowers/vases, counter/cabinet below shelves, beer taps/shakers/tools, table lamps. Also REMOVE the large gold sunburst fan and decorative gold stepped wall panels ABOVE/BEHIND cabinets: those are fixed ARCHITECTURE already in a separate plate; do not duplicate them. Keep only actual cabinets, transparent surroundings and gaps between them, including region above central cabinet. Same perspective/frame position/scale, no new furniture or recentering. Rich semi-realistic black/gold painterly game art, no text/people.",
+      "contentRectNormalized": {
+        "x": 0.055,
+        "y": 0.2,
+        "width": 0.87,
+        "height": 0.66
+      }
+    },
+    {
+      "scene": "art-deco",
+      "role": "counter",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-2e33dd1e-08b1-443c-a689-05a24ce83e65.png",
+      "prompt": "Use case: precise-object-edit. Asset type: complete transparent Art Deco counter. First image EDIT TARGET existing counter crop, second full room context only. Preserve original softly bowed black marble counter with spectacular gold veins and Art Deco radiating geometric brass inlays on front, gold illuminated lip below polished black top, narrow brass bottom rail and complete cabinet plinth. Counter located x~3%-97% of wide crop. Remove all FIVE emerald velvet foreground stools INCLUDING stems, rings and bases, remove every vase/flower/table lamp, bottles/glasses/shakers/tools from worktop, room backdrop, shelving and floor outside counter. Repaint continuous empty reflective worktop, full marble FRONT PANELS where seats hid them, and COMPLETE counter base naturally. No chair-shaped holes. Preserve full original silhouette, gold sunray front pattern and material detail, slight original perspective/bow, exact crop layout. Actual whole counter only with transparent surroundings above and outside its left/right curved ends. Warm luminous polished marble/gold semi-realistic painted game style. No text, people or new objects.",
+      "contentRectNormalized": {
+        "x": 0.03,
+        "y": 0.189,
+        "width": 0.94,
+        "height": 0.811
+      }
+    },
+    {
+      "scene": "art-deco",
+      "role": "seat",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-69877d56-e297-48c6-a1e1-0d69fddc4a9e.png",
+      "prompt": "Use case: stylized-concept. Asset type: ONE complete transparent reusable Art Deco bar chair sprite. Full room is STYLE AND OBJECT reference, specifically FIVE EMERALD GREEN VELVET foreground chairs nearest camera. Generate ONE matching chair viewed FROM ITS BACK with original slight raised camera perspective: low rounded curved emerald velvet upholstered back wraps around to small arm sides, plush emerald seat, thin polished gold/brass seat rim, ONE central elegant gold pedestal stem, ONE circular gold footrest ring below seat and sculpted round gold ground base. Restore all footrest/base parts hidden or clipped in reference. EXACTLY ONE chair centered, whole silhouette fully visible including complete base, no missing back or feet. Portrait width:height~0.55, small transparent margins, truly transparent all surroundings and all gaps around pedestal/ring. Preserve original source upholstery and gold design and semi-realistic detailed painterly warm light. No room, counter, background rectangle, floor shadow, bottles, text/people/extrachairs."
+    }
+  ]
+}

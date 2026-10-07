@@ -24,6 +24,7 @@ const props=defineProps<{
 
 const canvas=ref<HTMLCanvasElement>();
 const fallback=ref(false);
+const fallbackSource=ref<string>();
 let renderer:THREE.WebGLRenderer|undefined;
 let threeScene:THREE.Scene|undefined;
 let camera:THREE.Camera|undefined;
@@ -113,6 +114,11 @@ function loadImage(src:string){
 }
 async function drawExterior(context:CanvasRenderingContext2D){
   if(!props.scene.exterior)return;
+  if((props.windowBackdrop??'original')==='original' && props.scene.exterior.asset){
+    const image=await loadImage(props.scene.exterior.asset);
+    context.drawImage(image,0,0,props.scene.canvas.width,props.scene.canvas.height);
+    return;
+  }
   const preset=windowBackdropFor(props.windowBackdrop??'skyline');
   const image=await loadImage(preset.asset);
   const crop=preset.sourceRect;
@@ -120,16 +126,21 @@ async function drawExterior(context:CanvasRenderingContext2D){
   const sy=crop.y*image.naturalHeight;
   const sw=crop.width*image.naturalWidth;
   const sh=crop.height*image.naturalHeight;
-  context.drawImage(image,sx,sy,sw,sh,0,0,props.scene.canvas.width,props.scene.canvas.height);
+  const aspect=props.scene.canvas.width/props.scene.canvas.height;
+  const width=Math.min(sw,sh*aspect);
+  const height=Math.min(sh,sw/aspect);
+  context.drawImage(image,sx+(sw-width)/2,sy+(sh-height)/2,width,height,0,0,props.scene.canvas.width,props.scene.canvas.height);
 }
 
 async function drawShelfDecor(context:CanvasRenderingContext2D){
   const decor=props.scene.shelfDecor;
   if(!decor)return;
   const preset=shelfDecorPresetFor(props.shelfPreset??'classic-cocktails');
-  const atlas=await loadImage(PAINTED_BOTTLE_ATLAS);
-  const cellW=atlas.naturalWidth/PAINTED_BOTTLE_COLUMNS;
-  const cellH=atlas.naturalHeight/PAINTED_BOTTLE_ROWS;
+  const columns=preset.atlas?.columns??PAINTED_BOTTLE_COLUMNS;
+  const rows=preset.atlas?.rows??PAINTED_BOTTLE_ROWS;
+  const atlas=await loadImage(preset.atlas?.asset??PAINTED_BOTTLE_ATLAS);
+  const cellW=atlas.naturalWidth/columns;
+  const cellH=atlas.naturalHeight/rows;
 
   for(const bay of decor.bays){
     const bx=bay.rect.x*props.scene.canvas.width;
@@ -142,11 +153,11 @@ async function drawShelfDecor(context:CanvasRenderingContext2D){
     panel.addColorStop(1,decor.panelBottom);
     context.save();
     context.fillStyle=panel;
-    context.fillRect(bx,by,bw,bh);
+    if(decor.paintBacking!==false) context.fillRect(bx,by,bw,bh);
 
     context.strokeStyle=decor.rail;
     context.lineWidth=Math.max(2,props.scene.canvas.height*.0024);
-    for(const baseline of bay.rowBaselines){
+    for(const baseline of decor.paintBacking===false ? [] : bay.rowBaselines){
       const y=by+baseline*bh;
       context.beginPath();
       context.moveTo(bx,y);
@@ -156,16 +167,18 @@ async function drawShelfDecor(context:CanvasRenderingContext2D){
     context.restore();
 
     const rowCount=bay.rowBaselines.length;
+      const rowGaps=bay.rowBaselines.map((baseline,index)=>baseline-(index ? bay.rowBaselines[index-1]! : 0)).filter(gap=>gap>0);
+      const maxBottleH=decor.paintBacking===false && rowGaps.length ? Math.min(...rowGaps)*bh*.88 : Infinity;
     for(const item of preset.items){
       const row=Math.max(0,Math.min(rowCount-1,item.row));
       const baseline=by+bay.rowBaselines[row]!*bh;
       const scale=item.scale??1;
-      const targetH=Math.min(bh*.27,props.scene.canvas.height*.115)*scale;
+        const targetH=Math.min(Math.min(bh*.27,props.scene.canvas.height*.115)*scale,maxBottleH);
       const targetW=targetH*(cellW/cellH);
       const x=bx+item.x*bw-targetW/2;
       const y=baseline-targetH;
-      const column=item.cell%PAINTED_BOTTLE_COLUMNS;
-      const sourceRow=Math.floor(item.cell/PAINTED_BOTTLE_COLUMNS)%PAINTED_BOTTLE_ROWS;
+      const column=item.cell%columns;
+      const sourceRow=Math.floor(item.cell/columns)%rows;
 
       context.save();
       context.globalAlpha=item.alpha??1;
@@ -271,8 +284,9 @@ async function build(){
   if(!canvas.value||!props.width||!props.height)return;
   const epoch=++buildEpoch;
   stopAnimation();
+  let composite:HTMLCanvasElement|undefined;
   try{
-    const composite=await compose();
+    composite=await compose();
     if(disposed||epoch!==buildEpoch)return;
     texture?.dispose();
     texture=new THREE.CanvasTexture(composite);
@@ -304,6 +318,8 @@ async function build(){
     resize();
     syncAnimation();
   }catch{
+    if(disposed||epoch!==buildEpoch)return;
+    fallbackSource.value=composite?.toDataURL('image/webp');
     fallback.value=true;
     renderer?.dispose();
     renderer=undefined;
@@ -327,7 +343,7 @@ onBeforeUnmount(()=>{
 
 <template>
   <div class="modular-bar-backdrop" aria-hidden="true">
-    <img v-if="fallback" :src="backgroundSource || scene.layers[0]?.asset" alt="" draggable="false" />
+    <img v-if="fallback" :src="fallbackSource || backgroundSource || scene.layers[0]?.asset" :style="{objectPosition:`center ${scene.positionY*100}%`}" alt="" draggable="false" />
     <canvas v-show="!fallback" ref="canvas" />
   </div>
 </template>

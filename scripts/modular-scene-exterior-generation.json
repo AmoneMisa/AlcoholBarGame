@@ -1,0 +1,676 @@
+{
+  "tool": "built-in image_gen",
+  "purpose": "One independently reusable faithful exterior for every open room; the 12 existing panoramas remain additional choices.",
+  "items": [
+    {
+      "id": "scene-velvet",
+      "scene": "velvet",
+      "label": "Velvet lounge — original scenery",
+      "reference": "public/assets/bar/backgrounds/velvet-hour-bar.webp",
+      "preservedExterior": "public/assets/bar/modular/velvet/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-velvet.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Velvet lounge reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-garden",
+      "scene": "garden",
+      "label": "Botanical room — original scenery",
+      "reference": "public/assets/bar/backgrounds/botanical-room.webp",
+      "preservedExterior": "public/assets/bar/modular/garden/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-garden.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Botanical room reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-skyline",
+      "scene": "skyline",
+      "label": "Skyline lounge — original scenery",
+      "reference": "public/assets/bar/backgrounds/skyline-lounge.webp",
+      "preservedExterior": "public/assets/bar/modular/skyline/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-skyline.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Skyline lounge reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-inferno-penthouse",
+      "scene": "inferno-penthouse",
+      "label": "Midnight Penthouse — original scenery",
+      "reference": "public/assets/bar/backgrounds/inferno-penthouse-club.webp",
+      "preservedExterior": "public/assets/bar/modular/inferno-penthouse/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-inferno-penthouse.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Midnight Penthouse reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-library",
+      "scene": "library",
+      "label": "Private library — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-library.webp",
+      "preservedExterior": "public/assets/bar/modular/library/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-library.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Private library reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-palace",
+      "scene": "palace",
+      "label": "Champagne palace — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-palace.webp",
+      "preservedExterior": "public/assets/bar/modular/palace/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-palace.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Champagne palace reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-tropical",
+      "scene": "tropical",
+      "label": "Tropical greenhouse — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-tropical.webp",
+      "preservedExterior": "public/assets/bar/modular/tropical/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-tropical.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Tropical greenhouse reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-desert",
+      "scene": "desert",
+      "label": "Desert sunset bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-desert.webp",
+      "preservedExterior": "public/assets/bar/modular/desert/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-desert.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Desert sunset bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-winter",
+      "scene": "winter",
+      "label": "Winter conservatory — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-winter.webp",
+      "preservedExterior": "public/assets/bar/modular/winter/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-winter.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Winter conservatory reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-beach",
+      "scene": "beach",
+      "label": "Beach club — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-beach.webp",
+      "preservedExterior": "public/assets/bar/modular/beach/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-beach.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Beach club reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-rooftop",
+      "scene": "rooftop",
+      "label": "Metropolitan rooftop — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-rooftop.webp",
+      "preservedExterior": "public/assets/bar/modular/rooftop/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-rooftop.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Metropolitan rooftop reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-izakaya",
+      "scene": "izakaya",
+      "label": "Lantern izakaya — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-izakaya.webp",
+      "preservedExterior": "public/assets/bar/modular/izakaya/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-izakaya.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Lantern izakaya reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-marina",
+      "scene": "marina",
+      "label": "Midnight marina — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-marina.webp",
+      "preservedExterior": "public/assets/bar/modular/marina/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-marina.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Midnight marina reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-parisian",
+      "scene": "parisian",
+      "label": "Parisian salon — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-parisian.webp",
+      "preservedExterior": "public/assets/bar/modular/parisian/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-parisian.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Parisian salon reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-loft",
+      "scene": "loft",
+      "label": "Industrial loft — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-loft.webp",
+      "preservedExterior": "public/assets/bar/modular/loft/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-loft.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Industrial loft reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-riad",
+      "scene": "riad",
+      "label": "Moroccan riad — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-riad.webp",
+      "preservedExterior": "public/assets/bar/modular/riad/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-riad.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Moroccan riad reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-underwater",
+      "scene": "underwater",
+      "label": "Underwater reef bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-underwater.webp",
+      "preservedExterior": "public/assets/bar/modular/underwater/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-underwater.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Underwater reef bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-fairy",
+      "scene": "fairy",
+      "label": "Fairy grove bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-fairy.webp",
+      "preservedExterior": "public/assets/bar/modular/fairy/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-fairy.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Fairy grove bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-fairytale",
+      "scene": "fairytale",
+      "label": "Fairytale castle bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-fairytale.webp",
+      "preservedExterior": "public/assets/bar/modular/fairytale/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-fairytale.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Fairytale castle bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-lineage-2",
+      "scene": "lineage-2",
+      "label": "Lineage II · Aden tavern — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-lineage-2.webp",
+      "preservedExterior": "public/assets/bar/modular/lineage-2/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-lineage-2.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Lineage II · Aden tavern reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-perfect-world",
+      "scene": "perfect-world",
+      "label": "Perfect World · celestial bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-perfect-world.webp",
+      "preservedExterior": "public/assets/bar/modular/perfect-world/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-perfect-world.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Perfect World · celestial bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-warcraft-3",
+      "scene": "warcraft-3",
+      "label": "Warcraft III · crossroads bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-warcraft-3.webp",
+      "preservedExterior": "public/assets/bar/modular/warcraft-3/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-warcraft-3.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Warcraft III · crossroads bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-allods",
+      "scene": "allods",
+      "label": "Allods Online · astral bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-allods.webp",
+      "preservedExterior": "public/assets/bar/modular/allods/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-allods.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Allods Online · astral bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-lost-ark",
+      "scene": "lost-ark",
+      "label": "Lost Ark · beach club — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-lost-ark.webp",
+      "preservedExterior": "public/assets/bar/modular/lost-ark/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-lost-ark.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Lost Ark · beach club reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-mass-effect",
+      "scene": "mass-effect",
+      "label": "Mass Effect · Citadel lounge — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-mass-effect.webp",
+      "preservedExterior": "public/assets/bar/modular/mass-effect/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-mass-effect.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Mass Effect · Citadel lounge reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-nfs-most-wanted",
+      "scene": "nfs-most-wanted",
+      "label": "Most Wanted · garage bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-nfs-most-wanted.webp",
+      "preservedExterior": "public/assets/bar/modular/nfs-most-wanted/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-nfs-most-wanted.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Most Wanted · garage bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-nfs-carbon",
+      "scene": "nfs-carbon",
+      "label": "Carbon · night garage bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-nfs-carbon.webp",
+      "preservedExterior": "public/assets/bar/modular/nfs-carbon/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-nfs-carbon.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Carbon · night garage bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-witcher-3",
+      "scene": "witcher-3",
+      "label": "Witcher 3 • Novigrad tavern — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-witcher-3.webp",
+      "preservedExterior": "public/assets/bar/modular/witcher-3/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-witcher-3.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Witcher 3 • Novigrad tavern reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-heroes-3",
+      "scene": "heroes-3",
+      "label": "Heroes of Might and Magic III • Erathia inn — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-heroes-3.webp",
+      "preservedExterior": "public/assets/bar/modular/heroes-3/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-heroes-3.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Heroes of Might and Magic III • Erathia inn reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-elden-ring",
+      "scene": "elden-ring",
+      "label": "Elden Ring • Lands Between tavern — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-elden-ring.webp",
+      "preservedExterior": "public/assets/bar/modular/elden-ring/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-elden-ring.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Elden Ring • Lands Between tavern reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-minecraft",
+      "scene": "minecraft",
+      "label": "Minecraft • Block village taproom — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-minecraft.webp",
+      "preservedExterior": "public/assets/bar/modular/minecraft/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-minecraft.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Minecraft • Block village taproom reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-skyrim",
+      "scene": "skyrim",
+      "label": "Skyrim • Whiterun mead hall — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-skyrim.webp",
+      "preservedExterior": "public/assets/bar/modular/skyrim/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-skyrim.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Skyrim • Whiterun mead hall reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-cyberpunk-2077",
+      "scene": "cyberpunk-2077",
+      "label": "Cyberpunk 2077 • Night City lounge — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-cyberpunk-2077.webp",
+      "preservedExterior": "public/assets/bar/modular/cyberpunk-2077/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-cyberpunk-2077.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Cyberpunk 2077 • Night City lounge reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-cs-2",
+      "scene": "cs-2",
+      "label": "Counter-Strike 2 • Tactical clubhouse — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-cs-2.webp",
+      "preservedExterior": "public/assets/bar/modular/cs-2/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-cs-2.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Counter-Strike 2 • Tactical clubhouse reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-assassins-creed",
+      "scene": "assassins-creed",
+      "label": "Assassin’s Creed • Venetian hidden tavern — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-assassins-creed.webp",
+      "preservedExterior": "public/assets/bar/modular/assassins-creed/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-assassins-creed.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Assassin’s Creed • Venetian hidden tavern reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-watch-dogs",
+      "scene": "watch-dogs",
+      "label": "Watch Dogs • Chicago hacker bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-watch-dogs.webp",
+      "preservedExterior": "public/assets/bar/modular/watch-dogs/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-watch-dogs.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Watch Dogs • Chicago hacker bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-sleeping-dogs",
+      "scene": "sleeping-dogs",
+      "label": "Sleeping Dogs • Hong Kong night bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-sleeping-dogs.webp",
+      "preservedExterior": "public/assets/bar/modular/sleeping-dogs/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-sleeping-dogs.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Sleeping Dogs • Hong Kong night bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-detroit",
+      "scene": "detroit",
+      "label": "Detroit: Become Human • Android lounge — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-detroit.webp",
+      "preservedExterior": "public/assets/bar/modular/detroit/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-detroit.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Detroit: Become Human • Android lounge reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-neighbours-from-hell",
+      "scene": "neighbours-from-hell",
+      "label": "Neighbours from Hell • Prankster pub — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-neighbours-from-hell.webp",
+      "preservedExterior": "public/assets/bar/modular/neighbours-from-hell/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-neighbours-from-hell.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Neighbours from Hell • Prankster pub reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-gta",
+      "scene": "gta",
+      "label": "Grand Theft Auto • Vice City beach bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-gta.webp",
+      "preservedExterior": "public/assets/bar/modular/gta/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-gta.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Grand Theft Auto • Vice City beach bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-stellar-blade",
+      "scene": "stellar-blade",
+      "label": "Stellar Blade • Xion lounge — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-stellar-blade.webp",
+      "preservedExterior": "public/assets/bar/modular/stellar-blade/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-stellar-blade.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Stellar Blade • Xion lounge reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-repo",
+      "scene": "repo",
+      "label": "R.E.P.O. • Salvage depot bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-repo.webp",
+      "preservedExterior": "public/assets/bar/modular/repo/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-repo.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied R.E.P.O. • Salvage depot bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-among-us",
+      "scene": "among-us",
+      "label": "Among Us • Skeld cafeteria bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-among-us.webp",
+      "preservedExterior": "public/assets/bar/modular/among-us/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-among-us.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Among Us • Skeld cafeteria bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-borderlands",
+      "scene": "borderlands",
+      "label": "Borderlands • Pandora saloon — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-borderlands.webp",
+      "preservedExterior": "public/assets/bar/modular/borderlands/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-borderlands.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Borderlands • Pandora saloon reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-harry-potter",
+      "scene": "harry-potter",
+      "label": "Harry Potter • Hogsmeade wizard pub — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-harry-potter.webp",
+      "preservedExterior": "public/assets/bar/modular/harry-potter/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-harry-potter.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Harry Potter • Hogsmeade wizard pub reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-gta-5",
+      "scene": "gta-5",
+      "label": "GTA V • Los Santos rooftop bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-gta-5.webp",
+      "preservedExterior": "public/assets/bar/modular/gta-5/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-gta-5.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied GTA V • Los Santos rooftop bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-gta-sa",
+      "scene": "gta-sa",
+      "label": "GTA San Andreas • Grove Street backyard bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-gta-sa.webp",
+      "preservedExterior": "public/assets/bar/modular/gta-sa/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-gta-sa.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied GTA San Andreas • Grove Street backyard bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-gta-3",
+      "scene": "gta-3",
+      "label": "GTA III • Liberty City dockside bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-gta-3.webp",
+      "preservedExterior": "public/assets/bar/modular/gta-3/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-gta-3.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied GTA III • Liberty City dockside bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-alan-wake",
+      "scene": "alan-wake",
+      "label": "Alan Wake • Bright Falls lodge bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-alan-wake.webp",
+      "preservedExterior": "public/assets/bar/modular/alan-wake/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-alan-wake.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Alan Wake • Bright Falls lodge bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-quantum-break",
+      "scene": "quantum-break",
+      "label": "Quantum Break • Monarch time-lab bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-quantum-break.webp",
+      "preservedExterior": "public/assets/bar/modular/quantum-break/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-quantum-break.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Quantum Break • Monarch time-lab bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-max-payne",
+      "scene": "max-payne",
+      "label": "Max Payne • Manhattan noir bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-max-payne.webp",
+      "preservedExterior": "public/assets/bar/modular/max-payne/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-max-payne.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Max Payne • Manhattan noir bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-resident-evil",
+      "scene": "resident-evil",
+      "label": "Resident Evil • Raccoon City officers’ bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-resident-evil.webp",
+      "preservedExterior": "public/assets/bar/modular/resident-evil/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-resident-evil.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Resident Evil • Raccoon City officers’ bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-silent-hill",
+      "scene": "silent-hill",
+      "label": "Silent Hill • Fogbound diner bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-silent-hill.webp",
+      "preservedExterior": "public/assets/bar/modular/silent-hill/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-silent-hill.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Silent Hill • Fogbound diner bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-batman",
+      "scene": "batman",
+      "label": "Batman • Gotham private lounge — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-batman.webp",
+      "preservedExterior": "public/assets/bar/modular/batman/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-batman.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Batman • Gotham private lounge reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-baldurs-gate-3",
+      "scene": "baldurs-gate-3",
+      "label": "Baldur’s Gate 3 • Elfsong tavern — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-baldurs-gate-3.webp",
+      "preservedExterior": "public/assets/bar/modular/baldurs-gate-3/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-baldurs-gate-3.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Baldur’s Gate 3 • Elfsong tavern reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-divinity-original-sin-2",
+      "scene": "divinity-original-sin-2",
+      "label": "Divinity: Original Sin II • Rivellon inn — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-divinity-original-sin-2.webp",
+      "preservedExterior": "public/assets/bar/modular/divinity-original-sin-2/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-divinity-original-sin-2.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Divinity: Original Sin II • Rivellon inn reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-diablo-4",
+      "scene": "diablo-4",
+      "label": "Diablo IV • Sanctuary candle tavern — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-diablo-4.webp",
+      "preservedExterior": "public/assets/bar/modular/diablo-4/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-diablo-4.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Diablo IV • Sanctuary candle tavern reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-black-desert",
+      "scene": "black-desert",
+      "label": "Black Desert • Calpheon merchant bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-black-desert.webp",
+      "preservedExterior": "public/assets/bar/modular/black-desert/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-black-desert.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Black Desert • Calpheon merchant bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-darksiders-3",
+      "scene": "darksiders-3",
+      "label": "Darksiders III • Vulgrim’s forge bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-darksiders-3.webp",
+      "preservedExterior": "public/assets/bar/modular/darksiders-3/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-darksiders-3.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Darksiders III • Vulgrim’s forge bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-death-stranding",
+      "scene": "death-stranding",
+      "label": "Death Stranding • Chiral depot lounge — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-death-stranding.webp",
+      "preservedExterior": "public/assets/bar/modular/death-stranding/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-death-stranding.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Death Stranding • Chiral depot lounge reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-devil-may-cry",
+      "scene": "devil-may-cry",
+      "label": "Devil May Cry • Demon hunter pub — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-devil-may-cry.webp",
+      "preservedExterior": "public/assets/bar/modular/devil-may-cry/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-devil-may-cry.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Devil May Cry • Demon hunter pub reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-palworld",
+      "scene": "palworld",
+      "label": "Palworld • Island trainer tavern — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-palworld.webp",
+      "preservedExterior": "public/assets/bar/modular/palworld/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-palworld.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Palworld • Island trainer tavern reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-shadow-tomb-raider",
+      "scene": "shadow-tomb-raider",
+      "label": "Shadow of the Tomb Raider • Paititi jungle bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-shadow-tomb-raider.webp",
+      "preservedExterior": "public/assets/bar/modular/shadow-tomb-raider/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-shadow-tomb-raider.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Shadow of the Tomb Raider • Paititi jungle bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-wolf-among-us",
+      "scene": "wolf-among-us",
+      "label": "The Wolf Among Us • Fabletown Trip Trap bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-wolf-among-us.webp",
+      "preservedExterior": "public/assets/bar/modular/wolf-among-us/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-wolf-among-us.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied The Wolf Among Us • Fabletown Trip Trap bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-walking-dead-s3",
+      "scene": "walking-dead-s3",
+      "label": "The Walking Dead: Season 3 • Richmond safehouse bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-walking-dead-s3.webp",
+      "preservedExterior": "public/assets/bar/modular/walking-dead-s3/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-walking-dead-s3.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied The Walking Dead: Season 3 • Richmond safehouse bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-tropico-6",
+      "scene": "tropico-6",
+      "label": "Tropico 6 • Presidential Caribbean bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-tropico-6.webp",
+      "preservedExterior": "public/assets/bar/modular/tropico-6/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-tropico-6.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Tropico 6 • Presidential Caribbean bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    },
+    {
+      "id": "scene-worms",
+      "scene": "worms",
+      "label": "Worms • Cartoon island bunker bar — original scenery",
+      "reference": "public/assets/bar/backgrounds/interior-worms.webp",
+      "preservedExterior": "public/assets/bar/modular/worms/composite-ready/exterior.webp",
+      "output": "public/assets/bar/exteriors/scene-worms.webp",
+      "prompt": "Create a standalone outdoor scenery panorama faithfully reconstructing ONLY the original view visible outside the windows or open balcony of the supplied Worms • Cartoon island bunker bar reference. Use the supplied artwork as the authority for scenery, landmarks, architecture outdoors, vegetation, weather, time of day, colors and painterly game art style. Preserve this scene's specific original exterior; do not substitute a generic city or forest. Reconstruct the outdoor areas obscured by the interior and extend the vista into a continuous wide 16:9 panorama. Human eye level, horizon consistent with the reference, natural foreground/middle distance/background depth. ONLY scenery outside: absolutely NO room interior, window frames, mullions, curtains, foreground balcony railings or floor, furniture, bottles, shelves, pillars, borders, writing or UI. Opaque full canvas edge to edge, no transparent gaps. The outdoor buildings, bridges or spaceships that belong to the actual original distant scenery should remain. This asset will be reused behind separately rendered windows and balconies of other rooms.",
+      "status": "pending-generation"
+    }
+  ]
+}

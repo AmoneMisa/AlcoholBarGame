@@ -2,7 +2,7 @@
   "id": "assassins-creed",
   "source": "../../../public/assets/bar/backgrounds/interior-assassins-creed.webp",
   "outputDir": "../../../public/assets/bar/modular/assassins-creed",
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "manual-source-review",
   "notes": [
     "Existing themed background coverage manifest.",
@@ -26,7 +26,7 @@
         "x": 0.2,
         "y": 0.13,
         "width": 0.55,
-        "height": 0.47
+        "height": 0.55
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture."
     },
@@ -35,7 +35,7 @@
         "x": 0,
         "y": 0.57,
         "width": 1,
-        "height": 0.22
+        "height": 0.43000000000000005
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings."
     }
@@ -108,15 +108,16 @@
     "shelfBounds": "manual-measured",
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "manualRoleMasksNormalized": {
     "shelf": {
@@ -230,37 +231,19 @@
   ],
   "windowCutoutsNormalized": [
     {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.775,
-          "y": 0.03
-        },
-        {
-          "x": 0.845,
-          "y": 0
-        },
-        {
-          "x": 0.995,
-          "y": 0
-        },
-        {
-          "x": 0.995,
-          "y": 0.5
-        },
-        {
-          "x": 0.775,
-          "y": 0.5
-        }
-      ]
+      "x": 0.7,
+      "y": 0,
+      "width": 0.30000000000000004,
+      "height": 0.78,
+      "type": "rect"
     }
   ],
   "manualSeatCutNormalized": {
     "cropNormalized": {
-      "x": 0.455,
-      "y": 0.72,
-      "width": 0.1,
-      "height": 0.18
+      "x": 0.41,
+      "y": 0.795,
+      "width": 0.18,
+      "height": 0.34
     },
     "mask": {
       "feather": 0.65,
@@ -324,5 +307,35 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-all-01.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.33,
+      "x1": 0.565,
+      "rows": [
+        0.307,
+        0.393,
+        0.476
+      ]
+    },
+    {
+      "x0": 0.6,
+      "x1": 0.665,
+      "rows": [
+        0.34,
+        0.399,
+        0.476
+      ]
+    }
+  ],
+  "generatedArchitectureAlpha": true,
+  "generatedExteriorBoundsNormalized": [
+    {
+      "x": 0.7,
+      "y": 0,
+      "width": 0.30000000000000004,
+      "height": 0.78
+    }
+  ]
 }

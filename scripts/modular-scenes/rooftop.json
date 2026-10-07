@@ -6,7 +6,7 @@
     "width": 1516,
     "height": 1004
   },
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "notes": [
     "Generated from the measured gameplay geometry already used by BarScene.",
     "Do not ship reference crops as final modules until the clean architecture plate and transparency have been visually reviewed.",
@@ -27,22 +27,22 @@
       "prompt": "Create a clean architecture plate from this existing background. Remove counter, stools/chairs, loose foreground decor and back-bar furniture; reconstruct hidden wall and floor. Preserve fixed architecture and source perspective."
     },
     "shelf-reference": {
-      "crop": {
-        "x": 394,
-        "y": 171,
-        "width": 728,
-        "height": 452
-      },
-      "prompt": "Isolate the existing back-bar furniture from this source region. Remove all painted bottles and glassware. Preserve exact perspective."
+      "prompt": "Isolate the existing back-bar furniture from this source region. Remove all painted bottles and glassware. Preserve exact perspective.",
+      "cropNormalized": {
+        "x": 0.402,
+        "y": 0.335,
+        "width": 0.1764,
+        "height": 0.2685
+      }
     },
     "counter-reference": {
-      "crop": {
-        "x": 0,
-        "y": 542,
-        "width": 1516,
-        "height": 361
-      },
-      "prompt": "Isolate the existing bar counter with transparent surroundings and 24 px bleed. Preserve its exact perspective and silhouette."
+      "prompt": "Isolate the existing bar counter with transparent surroundings and 24 px bleed. Preserve its exact perspective and silhouette.",
+      "cropNormalized": {
+        "x": 0.0,
+        "y": 0.5398406374501992,
+        "width": 1.0,
+        "height": 0.46015936254980083
+      }
     }
   },
   "slots": {
@@ -102,47 +102,20 @@
   ],
   "bartenderAnchor": null,
   "review": {
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "windowCutoutsNormalized": [
     {
-      "type": "rect",
       "x": 0,
-      "y": 0.072,
-      "width": 0.167,
-      "height": 0.472
-    },
-    {
-      "type": "rect",
-      "x": 0.18,
-      "y": 0.072,
-      "width": 0.21,
-      "height": 0.472
-    },
-    {
-      "type": "rect",
-      "x": 0.404,
-      "y": 0.072,
-      "width": 0.164,
-      "height": 0.472
-    },
-    {
-      "type": "rect",
-      "x": 0.582,
-      "y": 0.072,
-      "width": 0.213,
-      "height": 0.472
-    },
-    {
-      "type": "rect",
-      "x": 0.81,
-      "y": 0.072,
-      "width": 0.19,
-      "height": 0.472
+      "y": 0,
+      "width": 1,
+      "height": 0.78,
+      "type": "rect"
     }
   ],
   "manualSeatCutNormalized": {
@@ -228,5 +201,37 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "shelfUnits": [
+    {
+      "x0": 0.402,
+      "x1": 0.5784,
+      "rows": [
+        0.4084,
+        0.5151,
+        0.5826
+      ]
+    }
+  ],
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-all-07.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.402,
+      "x1": 0.5784,
+      "rows": [
+        0.448,
+        0.511,
+        0.548
+      ]
+    }
+  ],
+  "generatedArchitectureAlpha": true,
+  "generatedExteriorBoundsNormalized": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78
+    }
+  ]
 }

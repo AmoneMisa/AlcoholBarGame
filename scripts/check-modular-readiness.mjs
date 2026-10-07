@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const MOD=resolve('public/assets/bar/modular');
@@ -61,6 +61,8 @@ for(const name of readdirSync(MOD).sort()){
   const isolatedFurnitureReady=kind==='measured'&&requiredRoles.every(role=>statuses[role]==='ok'||manualApprovedRoles.has(role));
   const cleanFurnitureReady=hasFinalFurniture(base,name,requiredRoles);
   const architectureReady=existsSync(resolve(base,'architecture.webp'));
+  const decorReady=(manifest.decorModules??[]).every(module=>existsSync(resolve(base,'clean-ready',`${module.id}.webp`)));
+  const generationReviewed=manifest.review?.generationState!=='prepared-not-reviewed';
 
   rows.push({
     scene:name,
@@ -70,7 +72,7 @@ for(const name of readdirSync(MOD).sort()){
     cleanFurnitureReady,
     requiredRoles,
     manualApprovedRoles:[...manualApprovedRoles],
-    productionReady:architectureReady&&cleanFurnitureReady,
+    productionReady:generationReviewed&&architectureReady&&cleanFurnitureReady&&decorReady,
     statuses
   });
 }
@@ -91,4 +93,25 @@ console.log(`production-ready: ${productionReady.length} [${productionReady.join
 if(failed){
   console.error(`${failed} modular readiness invariant(s) failed.`);
   process.exit(1);
+}
+
+// Refresh reports without re-encoding the existing reference art and masks.
+if(process.argv.includes('--write')){
+  const report={
+    total:rows.length,measured:measured.length,candidates:candidates.length,
+    furnitureReady:isolatedFurnitureReady,isolatedFurnitureReady,
+    cleanFurnitureReady,architectureReady,productionReady,
+    blockedArchitecture:rows.filter(row=>row.isolatedFurnitureReady&&!row.architectureReady).map(row=>row.scene),
+    blockedFurnitureCleanup:rows.filter(row=>row.isolatedFurnitureReady&&!row.cleanFurnitureReady).map(row=>row.scene)
+  };
+  writeFileSync(resolve('docs/modular-review/readiness.json'),JSON.stringify(report,null,2)+'\n');
+  const byScene=new Map(rows.map(row=>[row.scene,row]));
+  const summaryPath=resolve('docs/modular-review/summary.json');
+  const summary=JSON.parse(readFileSync(summaryPath,'utf8')).map(item=>{
+    const row=byScene.get(item.scene);
+    return row ? {...item,architectureReady:row.architectureReady,
+      furnitureReady:row.isolatedFurnitureReady,isolatedFurnitureReady:row.isolatedFurnitureReady,
+      cleanFurnitureReady:row.cleanFurnitureReady,productionReady:row.productionReady} : item;
+  });
+  writeFileSync(summaryPath,JSON.stringify(summary,null,2)+'\n');
 }

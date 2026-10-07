@@ -6,7 +6,7 @@
     "width": 1536,
     "height": 1024
   },
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "measured-gameplay",
   "notes": [
     "Measured from existing BarScene geometry.",
@@ -40,7 +40,7 @@
         "x": 0,
         "y": 686,
         "width": 1536,
-        "height": 266
+        "height": 338
       },
       "prompt": "Isolate existing counter with transparent surroundings and bleed."
     }
@@ -53,16 +53,16 @@
       "height": 758
     },
     "shelves": {
-      "x": 461,
-      "y": 256,
-      "width": 614,
-      "height": 379
+      "x": 746,
+      "y": 386,
+      "width": 76,
+      "height": 150
     },
     "counter": {
       "x": 0,
       "y": 686,
       "width": 1536,
-      "height": 266
+      "height": 338
     },
     "floor": {
       "x": 0,
@@ -78,9 +78,10 @@
     }
   },
   "shelfRows": [
-    389,
-    451,
-    512
+    422,
+    458,
+    494,
+    532
   ],
   "seatAnchors": [
     {
@@ -106,114 +107,22 @@
   ],
   "bartenderAnchor": null,
   "review": {
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "windowCutoutsNormalized": [
     {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.03,
-          "y": 0.015
-        },
-        {
-          "x": 0.113,
-          "y": 0.015
-        },
-        {
-          "x": 0.142,
-          "y": 0.072
-        },
-        {
-          "x": 0.142,
-          "y": 0.425
-        },
-        {
-          "x": 0.03,
-          "y": 0.425
-        }
-      ]
-    },
-    {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.175,
-          "y": 0.015
-        },
-        {
-          "x": 0.286,
-          "y": 0.015
-        },
-        {
-          "x": 0.315,
-          "y": 0.077
-        },
-        {
-          "x": 0.315,
-          "y": 0.432
-        },
-        {
-          "x": 0.175,
-          "y": 0.432
-        }
-      ]
-    },
-    {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.686,
-          "y": 0.077
-        },
-        {
-          "x": 0.715,
-          "y": 0.015
-        },
-        {
-          "x": 0.826,
-          "y": 0.015
-        },
-        {
-          "x": 0.826,
-          "y": 0.432
-        },
-        {
-          "x": 0.686,
-          "y": 0.432
-        }
-      ]
-    },
-    {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.858,
-          "y": 0.072
-        },
-        {
-          "x": 0.887,
-          "y": 0.015
-        },
-        {
-          "x": 0.97,
-          "y": 0.015
-        },
-        {
-          "x": 0.97,
-          "y": 0.425
-        },
-        {
-          "x": 0.858,
-          "y": 0.425
-        }
-      ]
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78,
+      "type": "rect"
     }
   ],
   "manualRoleMasksNormalized": {
@@ -273,7 +182,7 @@
   "manualSeatCutNormalized": {
     "cropNormalized": {
       "x": 0.43,
-      "y": 0.55,
+      "y": 0.805,
       "width": 0.14,
       "height": 0.33
     },
@@ -353,5 +262,15 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-02.json",
+  "generatedArchitectureAlpha": true,
+  "generatedExteriorBoundsNormalized": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78
+    }
+  ]
 }

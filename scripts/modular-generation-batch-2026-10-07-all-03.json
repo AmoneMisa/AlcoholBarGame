@@ -1,0 +1,503 @@
+{
+  "id": "2026-10-07-all-03",
+  "date": "2026-10-07",
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "cyberpunk-2077",
+      "role": "architecture",
+      "prompt": "Use case: precise-object-edit. Modular game asset for cyberpunk-2077. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original cyberpunk-2077 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET exact full room, aspect 1672:941. Produce ONE complete empty architecture plate. Preserve structural ceiling/walls/posts/arches, fixed lights and chandeliers, window frames and curtains, original exterior view, fixed architectural ornaments and murals. Remove ALL bar counters including rear storage/worktops, every liquor shelf frame/board/backing and rack, all stools/chairs/sofas/tables, all bottles/glasses/cups/ceramics/tools/machines resting on furniture, tabletop lights, vases/plants/vines/flowers/fruit/books/globes/barrels and other loose furniture/decor. Keep permanently built-in book walls when present, embedded crystals and architectural control panels. Reconstruct continuous matching wall panels/stone/brick in removed shelving regions and uninterrupted complete floor behind all counters/seats to bottom edge. Same framing, horizon and light. No new furniture or reframing, no transparent holes.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-cyberpunk-2077.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-840e0b42-f84a-4b4b-9427-471bdc700780.png",
+      "opaqueArchitectureSource": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-50d1a50c-e9d3-4d30-9331-896b143f77d7.png",
+      "corrections": [
+        {
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-50d1a50c-e9d3-4d30-9331-896b143f77d7.png",
+          "prompt": "Precise alpha isolation of reference cyberpunk-2077 empty room architecture for a modular game. Retain EXACT full rectangular canvas and camera, original aspect, proportions, composition, all opaque room walls/floor/ceiling, every pillar, exterior window frames and mullions, curtains, lamps, terrace canopy, balcony ledges and every railing/baluster. Remove ONLY the outdoor scenery visible through ALL real exterior windows, portholes and open balcony/terrace apertures, including narrow views at image edges and scenery BETWEEN railing bars. Those exterior scenery pixels become genuinely transparent alpha zero. Keep all structural bars/branches/frames in front of apertures opaque. Indoor niches, fireplaces, mirrors, emblems, decorative wall carvings/panels, wooden lattice cabinets and portals are interior objects and remain opaque. Entire indoor floor remains opaque, even reflected scenery. No cropped cutout, transparent canvas margin, new windows, reframe, padding, furniture or changes to design. Replace no scenery: output only existing complete room architecture with precisely transparent outdoor apertures, a separate landscape will show BEHIND it."
+        }
+      ]
+    },
+    {
+      "scene": "cyberpunk-2077",
+      "role": "shelf",
+      "prompt": "Use case: precise-object-edit. Modular game asset for cyberpunk-2077. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original cyberpunk-2077 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first exact rear furniture crop, second full original room is strict coordinate/material context. Isolate the complete original EMPTY backbar furniture: all rear liquor shelf racks/cabinets within this crop, original boards, vertical posts, cabinet backing if present, brass/metal trim, fixed shelf lights and connected lower storage cabinets/worktop. Restore full frames and bases. Keep original number of levels, separate cabinet positions and DIFFERENT board heights per cabinet. Preserve original gaps between units: stone pillars/wall in those gaps are NOT furniture and must be transparent. Remove ALL bottles/glasses/ceramics/tools/machines/tabletop lamps/plants/vines/flowers/books/fruit and every object resting on boards. Remove ceiling/wall lights, structural pillars/walls/window/curtains and main foreground counter. If racks have open backs, keep ALL spaces between boards transparent; do not invent backing. Preserve crop aspect and furniture positions, do not center/reframe/rearrange columns. True transparent surroundings, clean empty compartments, complete furniture only.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\cyberpunk-2077\\shelf-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-cyberpunk-2077.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0.035,
+        "y": 0.06,
+        "width": 0.93,
+        "height": 0.93
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-d01fb164-cdb9-42f3-8afd-fd5d1083a8a3.png"
+    },
+    {
+      "scene": "cyberpunk-2077",
+      "role": "counter",
+      "prompt": "Use case: precise-object-edit. Modular game asset for cyberpunk-2077. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original cyberpunk-2077 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first expanded foreground counter crop, second exact original room for shape/material. Isolate ONLY the complete original MAIN FOREGROUND counter: uninterrupted empty full worktop, whole front facade with original trim/crest/panel pattern, complete left/right edges and bottom plinth. Preserve original horizontal footprint and perspective. Remove all stools/chairs and every seat/leg/ring pixel, ALL tabletop objects, bottles/tools/plants/fruit/glasses/lamps, rear counter/cabinets, room/walls/windows/floor. Reconstruct continuous original front material behind former seats, NO floor/stone patches or leg silhouettes baked into facade. Restore COMPLETE bottom base naturally INSIDE canvas even when original base was occluded/clipped. True transparency above/around outer counter silhouette and original empty left/right area if counter does not fill width. Whole counter only, no background/floor shadow/new objects.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\cyberpunk-2077\\counter-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-cyberpunk-2077.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0,
+        "y": 0.24444444444444444,
+        "width": 1,
+        "height": 0.7555555555555555
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-358e53a9-8339-4055-89c0-099ff993dfc5.png"
+    },
+    {
+      "scene": "cyberpunk-2077",
+      "role": "seat",
+      "prompt": "Use case: precise-object-edit. Modular game asset for cyberpunk-2077. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original cyberpunk-2077 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. First image is a source seat crop, possibly clipped/occluded; second full room determines the correct original seat design. Create exactly ONE complete reusable original bar stool/chair, matching the central source seat: same upholstery or wood/rattan seat, original backrest if present, frame/pedestal/legs, footrest/braces and base/feet. Reconstruct all occluded or clipped lower parts to a naturally complete whole seat. EVERY foot/base/ring/backrest fully INSIDE portrait canvas with narrow transparent margins. Restore genuine transparent holes between supports and through footrest; remove ALL counter/floor/room pixels including gaps, no floor shadow or background rectangle. Exactly one upright centered complete object, never multiple seats or a cropped seat. Same source perspective and lighting.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\cyberpunk-2077\\seat-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-cyberpunk-2077.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-e0c29006-b21a-499f-a013-e65c4e034a9e.png"
+    },
+    {
+      "scene": "darksiders-3",
+      "role": "architecture",
+      "prompt": "Use case: precise-object-edit. Modular game asset for darksiders-3. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original darksiders-3 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET exact full room, aspect 1672:941. Produce ONE complete empty architecture plate. Preserve structural ceiling/walls/posts/arches, fixed lights and chandeliers, window frames and curtains, original exterior view, fixed architectural ornaments and murals. Remove ALL bar counters including rear storage/worktops, every liquor shelf frame/board/backing and rack, all stools/chairs/sofas/tables, all bottles/glasses/cups/ceramics/tools/machines resting on furniture, tabletop lights, vases/plants/vines/flowers/fruit/books/globes/barrels and other loose furniture/decor. Keep permanently built-in book walls when present, embedded crystals and architectural control panels. Reconstruct continuous matching wall panels/stone/brick in removed shelving regions and uninterrupted complete floor behind all counters/seats to bottom edge. Same framing, horizon and light. No new furniture or reframing, no transparent holes.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-darksiders-3.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-925d8a2a-2b5e-4279-b3fc-060799b1e34d.png",
+      "opaqueArchitectureSource": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-2ca20081-1f9b-48bc-9342-23b0715756fe.png",
+      "corrections": [
+        {
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-2ca20081-1f9b-48bc-9342-23b0715756fe.png",
+          "prompt": "Precise alpha isolation of reference darksiders-3 empty room architecture for a modular game. Retain EXACT full rectangular canvas and camera, original aspect, proportions, composition, all opaque room walls/floor/ceiling, every pillar, exterior window frames and mullions, curtains, lamps, terrace canopy, balcony ledges and every railing/baluster. Remove ONLY the outdoor scenery visible through ALL real exterior windows, portholes and open balcony/terrace apertures, including narrow views at image edges and scenery BETWEEN railing bars. Those exterior scenery pixels become genuinely transparent alpha zero. Keep all structural bars/branches/frames in front of apertures opaque. Indoor niches, fireplaces, mirrors, emblems, decorative wall carvings/panels, wooden lattice cabinets and portals are interior objects and remain opaque. Entire indoor floor remains opaque, even reflected scenery. No cropped cutout, transparent canvas margin, new windows, reframe, padding, furniture or changes to design. Replace no scenery: output only existing complete room architecture with precisely transparent outdoor apertures, a separate landscape will show BEHIND it."
+        }
+      ]
+    },
+    {
+      "scene": "darksiders-3",
+      "role": "shelf",
+      "prompt": "Use case: precise-object-edit. Modular game asset for darksiders-3. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original darksiders-3 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first exact rear furniture crop, second full original room is strict coordinate/material context. Isolate the complete original EMPTY backbar furniture: all rear liquor shelf racks/cabinets within this crop, original boards, vertical posts, cabinet backing if present, brass/metal trim, fixed shelf lights and connected lower storage cabinets/worktop. Restore full frames and bases. Keep original number of levels, separate cabinet positions and DIFFERENT board heights per cabinet. Preserve original gaps between units: stone pillars/wall in those gaps are NOT furniture and must be transparent. Remove ALL bottles/glasses/ceramics/tools/machines/tabletop lamps/plants/vines/flowers/books/fruit and every object resting on boards. Remove ceiling/wall lights, structural pillars/walls/window/curtains and main foreground counter. If racks have open backs, keep ALL spaces between boards transparent; do not invent backing. Preserve crop aspect and furniture positions, do not center/reframe/rearrange columns. True transparent surroundings, clean empty compartments, complete furniture only.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\darksiders-3\\shelf-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-darksiders-3.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0.035,
+        "y": 0.06,
+        "width": 0.93,
+        "height": 0.93
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-8b8d5232-90c4-449c-9b3f-c9367ce84394.png"
+    },
+    {
+      "scene": "darksiders-3",
+      "role": "counter",
+      "prompt": "Use case: precise-object-edit. Modular game asset for darksiders-3. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original darksiders-3 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first expanded foreground counter crop, second exact original room for shape/material. Isolate ONLY the complete original MAIN FOREGROUND counter: uninterrupted empty full worktop, whole front facade with original trim/crest/panel pattern, complete left/right edges and bottom plinth. Preserve original horizontal footprint and perspective. Remove all stools/chairs and every seat/leg/ring pixel, ALL tabletop objects, bottles/tools/plants/fruit/glasses/lamps, rear counter/cabinets, room/walls/windows/floor. Reconstruct continuous original front material behind former seats, NO floor/stone patches or leg silhouettes baked into facade. Restore COMPLETE bottom base naturally INSIDE canvas even when original base was occluded/clipped. True transparency above/around outer counter silhouette and original empty left/right area if counter does not fill width. Whole counter only, no background/floor shadow/new objects.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\darksiders-3\\counter-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-darksiders-3.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0,
+        "y": 0.2608695652173913,
+        "width": 1,
+        "height": 0.7391304347826086
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-cb0d1221-0a43-4f47-be6b-dd9faffcdb8a.png"
+    },
+    {
+      "scene": "darksiders-3",
+      "role": "seat",
+      "prompt": "Use case: precise-object-edit. Modular game asset for darksiders-3. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original darksiders-3 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. First image is a source seat crop, possibly clipped/occluded; second full room determines the correct original seat design. Create exactly ONE complete reusable original bar stool/chair, matching the central source seat: same upholstery or wood/rattan seat, original backrest if present, frame/pedestal/legs, footrest/braces and base/feet. Reconstruct all occluded or clipped lower parts to a naturally complete whole seat. EVERY foot/base/ring/backrest fully INSIDE portrait canvas with narrow transparent margins. Restore genuine transparent holes between supports and through footrest; remove ALL counter/floor/room pixels including gaps, no floor shadow or background rectangle. Exactly one upright centered complete object, never multiple seats or a cropped seat. Same source perspective and lighting.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\darksiders-3\\seat-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-darksiders-3.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-04a8469d-fa58-4716-975e-bf9bee363454.png"
+    },
+    {
+      "scene": "death-stranding",
+      "role": "architecture",
+      "prompt": "Use case: precise-object-edit. Modular game asset for death-stranding. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original death-stranding themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET exact full room, aspect 1672:941. Produce ONE complete empty architecture plate. Preserve structural ceiling/walls/posts/arches, fixed lights and chandeliers, window frames and curtains, original exterior view, fixed architectural ornaments and murals. Remove ALL bar counters including rear storage/worktops, every liquor shelf frame/board/backing and rack, all stools/chairs/sofas/tables, all bottles/glasses/cups/ceramics/tools/machines resting on furniture, tabletop lights, vases/plants/vines/flowers/fruit/books/globes/barrels and other loose furniture/decor. Keep permanently built-in book walls when present, embedded crystals and architectural control panels. Reconstruct continuous matching wall panels/stone/brick in removed shelving regions and uninterrupted complete floor behind all counters/seats to bottom edge. Same framing, horizon and light. No new furniture or reframing, no transparent holes.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-death-stranding.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-55d9fcc1-64f9-4e36-995a-014bee927a56.png",
+      "opaqueArchitectureSource": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-275007a8-1f3a-421a-acc0-8822e185c9a6.png",
+      "corrections": [
+        {
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-275007a8-1f3a-421a-acc0-8822e185c9a6.png",
+          "prompt": "Precise alpha isolation of reference death-stranding empty room architecture for a modular game. Retain EXACT full rectangular canvas and camera, original aspect, proportions, composition, all opaque room walls/floor/ceiling, every pillar, exterior window frames and mullions, curtains, lamps, terrace canopy, balcony ledges and every railing/baluster. Remove ONLY the outdoor scenery visible through ALL real exterior windows, portholes and open balcony/terrace apertures, including narrow views at image edges and scenery BETWEEN railing bars. Those exterior scenery pixels become genuinely transparent alpha zero. Keep all structural bars/branches/frames in front of apertures opaque. Indoor niches, fireplaces, mirrors, emblems, decorative wall carvings/panels, wooden lattice cabinets and portals are interior objects and remain opaque. Entire indoor floor remains opaque, even reflected scenery. No cropped cutout, transparent canvas margin, new windows, reframe, padding, furniture or changes to design. Replace no scenery: output only existing complete room architecture with precisely transparent outdoor apertures, a separate landscape will show BEHIND it."
+        }
+      ]
+    },
+    {
+      "scene": "death-stranding",
+      "role": "shelf",
+      "prompt": "Use case: precise-object-edit. Modular game asset for death-stranding. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original death-stranding themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first exact rear furniture crop, second full original room is strict coordinate/material context. Isolate the complete original EMPTY backbar furniture: all rear liquor shelf racks/cabinets within this crop, original boards, vertical posts, cabinet backing if present, brass/metal trim, fixed shelf lights and connected lower storage cabinets/worktop. Restore full frames and bases. Keep original number of levels, separate cabinet positions and DIFFERENT board heights per cabinet. Preserve original gaps between units: stone pillars/wall in those gaps are NOT furniture and must be transparent. Remove ALL bottles/glasses/ceramics/tools/machines/tabletop lamps/plants/vines/flowers/books/fruit and every object resting on boards. Remove ceiling/wall lights, structural pillars/walls/window/curtains and main foreground counter. If racks have open backs, keep ALL spaces between boards transparent; do not invent backing. Preserve crop aspect and furniture positions, do not center/reframe/rearrange columns. True transparent surroundings, clean empty compartments, complete furniture only.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\death-stranding\\shelf-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-death-stranding.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0.035,
+        "y": 0.06,
+        "width": 0.93,
+        "height": 0.93
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-42d7a989-5dbf-4235-956d-71af159689eb.png"
+    },
+    {
+      "scene": "death-stranding",
+      "role": "counter",
+      "prompt": "Use case: precise-object-edit. Modular game asset for death-stranding. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original death-stranding themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first expanded foreground counter crop, second exact original room for shape/material. Isolate ONLY the complete original MAIN FOREGROUND counter: uninterrupted empty full worktop, whole front facade with original trim/crest/panel pattern, complete left/right edges and bottom plinth. Preserve original horizontal footprint and perspective. Remove all stools/chairs and every seat/leg/ring pixel, ALL tabletop objects, bottles/tools/plants/fruit/glasses/lamps, rear counter/cabinets, room/walls/windows/floor. Reconstruct continuous original front material behind former seats, NO floor/stone patches or leg silhouettes baked into facade. Restore COMPLETE bottom base naturally INSIDE canvas even when original base was occluded/clipped. True transparency above/around outer counter silhouette and original empty left/right area if counter does not fill width. Whole counter only, no background/floor shadow/new objects.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\death-stranding\\counter-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-death-stranding.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0,
+        "y": 0.17073170731707332,
+        "width": 1,
+        "height": 0.8292682926829267
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-40f3d62b-e392-4e99-b846-3788ffcfe71b.png"
+    },
+    {
+      "scene": "death-stranding",
+      "role": "seat",
+      "prompt": "Use case: precise-object-edit. Modular game asset for death-stranding. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original death-stranding themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. First image is a source seat crop, possibly clipped/occluded; second full room determines the correct original seat design. Create exactly ONE complete reusable original bar stool/chair, matching the central source seat: same upholstery or wood/rattan seat, original backrest if present, frame/pedestal/legs, footrest/braces and base/feet. Reconstruct all occluded or clipped lower parts to a naturally complete whole seat. EVERY foot/base/ring/backrest fully INSIDE portrait canvas with narrow transparent margins. Restore genuine transparent holes between supports and through footrest; remove ALL counter/floor/room pixels including gaps, no floor shadow or background rectangle. Exactly one upright centered complete object, never multiple seats or a cropped seat. Same source perspective and lighting.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\death-stranding\\seat-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-death-stranding.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-c3188687-9eb2-4585-9833-592da7212324.png"
+    },
+    {
+      "scene": "desert",
+      "role": "architecture",
+      "prompt": "Use case: precise-object-edit. Modular game asset for desert. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original desert themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET exact full room, aspect 623:623. Produce ONE complete empty architecture plate. Preserve structural ceiling/walls/posts/arches, fixed lights and chandeliers, window frames and curtains, original exterior view, fixed architectural ornaments and murals. Remove ALL bar counters including rear storage/worktops, every liquor shelf frame/board/backing and rack, all stools/chairs/sofas/tables, all bottles/glasses/cups/ceramics/tools/machines resting on furniture, tabletop lights, vases/plants/vines/flowers/fruit/books/globes/barrels and other loose furniture/decor. Keep permanently built-in book walls when present, embedded crystals and architectural control panels. Reconstruct continuous matching wall panels/stone/brick in removed shelving regions and uninterrupted complete floor behind all counters/seats to bottom edge. Same framing, horizon and light. No new furniture or reframing, no transparent holes.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-desert.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-18e851fd-6bd4-4746-9e97-3e91059703e8.png",
+      "opaqueArchitectureSource": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-43011b44-831c-40db-90e1-801a6e0dda04.png",
+      "corrections": [
+        {
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-43011b44-831c-40db-90e1-801a6e0dda04.png",
+          "prompt": "Precise alpha isolation of reference desert empty room architecture for a modular game. Retain EXACT full rectangular canvas and camera, original aspect, proportions, composition, all opaque room walls/floor/ceiling, every pillar, exterior window frames and mullions, curtains, lamps, terrace canopy, balcony ledges and every railing/baluster. Remove ONLY the outdoor scenery visible through ALL real exterior windows, portholes and open balcony/terrace apertures, including narrow views at image edges and scenery BETWEEN railing bars. Those exterior scenery pixels become genuinely transparent alpha zero. Keep all structural bars/branches/frames in front of apertures opaque. Indoor niches, fireplaces, mirrors, emblems, decorative wall carvings/panels, wooden lattice cabinets and portals are interior objects and remain opaque. Entire indoor floor remains opaque, even reflected scenery. No cropped cutout, transparent canvas margin, new windows, reframe, padding, furniture or changes to design. Replace no scenery: output only existing complete room architecture with precisely transparent outdoor apertures, a separate landscape will show BEHIND it."
+        }
+      ]
+    },
+    {
+      "scene": "desert",
+      "role": "shelf",
+      "prompt": "Use case: precise-object-edit. Modular game asset for desert. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original desert themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first exact rear furniture crop, second full original room is strict coordinate/material context. Isolate the complete original EMPTY backbar furniture: all rear liquor shelf racks/cabinets within this crop, original boards, vertical posts, cabinet backing if present, brass/metal trim, fixed shelf lights and connected lower storage cabinets/worktop. Restore full frames and bases. Keep original number of levels, separate cabinet positions and DIFFERENT board heights per cabinet. Preserve original gaps between units: stone pillars/wall in those gaps are NOT furniture and must be transparent. Remove ALL bottles/glasses/ceramics/tools/machines/tabletop lamps/plants/vines/flowers/books/fruit and every object resting on boards. Remove ceiling/wall lights, structural pillars/walls/window/curtains and main foreground counter. If racks have open backs, keep ALL spaces between boards transparent; do not invent backing. Preserve crop aspect and furniture positions, do not center/reframe/rearrange columns. True transparent surroundings, clean empty compartments, complete furniture only.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\desert\\shelf-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-desert.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0.035,
+        "y": 0.06,
+        "width": 0.93,
+        "height": 0.93
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-29fdcade-c149-405a-afc9-3eef21ee4712.png"
+    },
+    {
+      "scene": "desert",
+      "role": "counter",
+      "prompt": "Use case: precise-object-edit. Modular game asset for desert. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original desert themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first expanded foreground counter crop, second exact original room for shape/material. Isolate ONLY the complete original MAIN FOREGROUND counter: uninterrupted empty full worktop, whole front facade with original trim/crest/panel pattern, complete left/right edges and bottom plinth. Preserve original horizontal footprint and perspective. Remove all stools/chairs and every seat/leg/ring pixel, ALL tabletop objects, bottles/tools/plants/fruit/glasses/lamps, rear counter/cabinets, room/walls/windows/floor. Reconstruct continuous original front material behind former seats, NO floor/stone patches or leg silhouettes baked into facade. Restore COMPLETE bottom base naturally INSIDE canvas even when original base was occluded/clipped. True transparency above/around outer counter silhouette and original empty left/right area if counter does not fill width. Whole counter only, no background/floor shadow/new objects.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\desert\\counter-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-desert.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0,
+        "y": 0.192761310452418,
+        "width": 1,
+        "height": 0.49971918876755067
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-3dfa055e-ed9b-4f6e-927b-24e173f5faef.png"
+    },
+    {
+      "scene": "desert",
+      "role": "seat",
+      "prompt": "Use case: precise-object-edit. Modular game asset for desert. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original desert themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. First image is a source seat crop, possibly clipped/occluded; second full room determines the correct original seat design. Create exactly ONE complete reusable original bar stool/chair, matching the central source seat: same upholstery or wood/rattan seat, original backrest if present, frame/pedestal/legs, footrest/braces and base/feet. Reconstruct all occluded or clipped lower parts to a naturally complete whole seat. EVERY foot/base/ring/backrest fully INSIDE portrait canvas with narrow transparent margins. Restore genuine transparent holes between supports and through footrest; remove ALL counter/floor/room pixels including gaps, no floor shadow or background rectangle. Exactly one upright centered complete object, never multiple seats or a cropped seat. Same source perspective and lighting.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\desert\\seat-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-desert.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-51ad9111-814f-48df-ad18-da8e14935915.png"
+    },
+    {
+      "scene": "detroit",
+      "role": "architecture",
+      "prompt": "Use case: precise-object-edit. Modular game asset for detroit. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original detroit themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET exact full room, aspect 1672:941. Produce ONE complete empty architecture plate. Preserve structural ceiling/walls/posts/arches, fixed lights and chandeliers, window frames and curtains, original exterior view, fixed architectural ornaments and murals. Remove ALL bar counters including rear storage/worktops, every liquor shelf frame/board/backing and rack, all stools/chairs/sofas/tables, all bottles/glasses/cups/ceramics/tools/machines resting on furniture, tabletop lights, vases/plants/vines/flowers/fruit/books/globes/barrels and other loose furniture/decor. Keep permanently built-in book walls when present, embedded crystals and architectural control panels. Reconstruct continuous matching wall panels/stone/brick in removed shelving regions and uninterrupted complete floor behind all counters/seats to bottom edge. Same framing, horizon and light. No new furniture or reframing, no transparent holes.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-detroit.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-9ea70f38-a18e-4c2f-b288-c8af743cbedb.png",
+      "opaqueArchitectureSource": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-b7b96f89-78cd-4c10-bd0c-7e0c001f344f.png",
+      "corrections": [
+        {
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-b7b96f89-78cd-4c10-bd0c-7e0c001f344f.png",
+          "prompt": "Precise alpha isolation of reference detroit empty room architecture for a modular game. Retain EXACT full rectangular canvas and camera, original aspect, proportions, composition, all opaque room walls/floor/ceiling, every pillar, exterior window frames and mullions, curtains, lamps, terrace canopy, balcony ledges and every railing/baluster. Remove ONLY the outdoor scenery visible through ALL real exterior windows, portholes and open balcony/terrace apertures, including narrow views at image edges and scenery BETWEEN railing bars. Those exterior scenery pixels become genuinely transparent alpha zero. Keep all structural bars/branches/frames in front of apertures opaque. Indoor niches, fireplaces, mirrors, emblems, decorative wall carvings/panels, wooden lattice cabinets and portals are interior objects and remain opaque. Entire indoor floor remains opaque, even reflected scenery. No cropped cutout, transparent canvas margin, new windows, reframe, padding, furniture or changes to design. Replace no scenery: output only existing complete room architecture with precisely transparent outdoor apertures, a separate landscape will show BEHIND it."
+        }
+      ]
+    },
+    {
+      "scene": "detroit",
+      "role": "shelf",
+      "prompt": "Use case: precise-object-edit. Modular game asset for detroit. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original detroit themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first exact rear furniture crop, second full original room is strict coordinate/material context. Isolate the complete original EMPTY backbar furniture: all rear liquor shelf racks/cabinets within this crop, original boards, vertical posts, cabinet backing if present, brass/metal trim, fixed shelf lights and connected lower storage cabinets/worktop. Restore full frames and bases. Keep original number of levels, separate cabinet positions and DIFFERENT board heights per cabinet. Preserve original gaps between units: stone pillars/wall in those gaps are NOT furniture and must be transparent. Remove ALL bottles/glasses/ceramics/tools/machines/tabletop lamps/plants/vines/flowers/books/fruit and every object resting on boards. Remove ceiling/wall lights, structural pillars/walls/window/curtains and main foreground counter. If racks have open backs, keep ALL spaces between boards transparent; do not invent backing. Preserve crop aspect and furniture positions, do not center/reframe/rearrange columns. True transparent surroundings, clean empty compartments, complete furniture only.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\detroit\\shelf-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-detroit.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0.035,
+        "y": 0.06,
+        "width": 0.93,
+        "height": 0.93
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-775f530c-62ea-437e-b6a4-17b7f9c07929.png"
+    },
+    {
+      "scene": "detroit",
+      "role": "counter",
+      "prompt": "Use case: precise-object-edit. Modular game asset for detroit. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original detroit themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first expanded foreground counter crop, second exact original room for shape/material. Isolate ONLY the complete original MAIN FOREGROUND counter: uninterrupted empty full worktop, whole front facade with original trim/crest/panel pattern, complete left/right edges and bottom plinth. Preserve original horizontal footprint and perspective. Remove all stools/chairs and every seat/leg/ring pixel, ALL tabletop objects, bottles/tools/plants/fruit/glasses/lamps, rear counter/cabinets, room/walls/windows/floor. Reconstruct continuous original front material behind former seats, NO floor/stone patches or leg silhouettes baked into facade. Restore COMPLETE bottom base naturally INSIDE canvas even when original base was occluded/clipped. True transparency above/around outer counter silhouette and original empty left/right area if counter does not fill width. Whole counter only, no background/floor shadow/new objects.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\detroit\\counter-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-detroit.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0,
+        "y": 0.17073170731707332,
+        "width": 1,
+        "height": 0.8292682926829267
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-de6bc209-0493-42b7-af50-098b5503a613.png"
+    },
+    {
+      "scene": "detroit",
+      "role": "seat",
+      "prompt": "Use case: precise-object-edit. Modular game asset for detroit. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original detroit themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. First image is a source seat crop, possibly clipped/occluded; second full room determines the correct original seat design. Create exactly ONE complete reusable original bar stool/chair, matching the central source seat: same upholstery or wood/rattan seat, original backrest if present, frame/pedestal/legs, footrest/braces and base/feet. Reconstruct all occluded or clipped lower parts to a naturally complete whole seat. EVERY foot/base/ring/backrest fully INSIDE portrait canvas with narrow transparent margins. Restore genuine transparent holes between supports and through footrest; remove ALL counter/floor/room pixels including gaps, no floor shadow or background rectangle. Exactly one upright centered complete object, never multiple seats or a cropped seat. Same source perspective and lighting.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\detroit\\seat-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-detroit.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-9a441835-6516-4ce4-93e1-e0de1037cd3b.png"
+    },
+    {
+      "scene": "devil-may-cry",
+      "role": "architecture",
+      "prompt": "Use case: precise-object-edit. Modular game asset for devil-may-cry. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original devil-may-cry themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET exact full room, aspect 1672:941. Produce ONE complete empty architecture plate. Preserve structural ceiling/walls/posts/arches, fixed lights and chandeliers, window frames and curtains, original exterior view, fixed architectural ornaments and murals. Remove ALL bar counters including rear storage/worktops, every liquor shelf frame/board/backing and rack, all stools/chairs/sofas/tables, all bottles/glasses/cups/ceramics/tools/machines resting on furniture, tabletop lights, vases/plants/vines/flowers/fruit/books/globes/barrels and other loose furniture/decor. Keep permanently built-in book walls when present, embedded crystals and architectural control panels. Reconstruct continuous matching wall panels/stone/brick in removed shelving regions and uninterrupted complete floor behind all counters/seats to bottom edge. Same framing, horizon and light. No new furniture or reframing, no transparent holes.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-devil-may-cry.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-6c724411-4610-449f-8a65-5de971e4e441.png",
+      "opaqueArchitectureSource": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-5d0134ef-f9bd-4d99-a62b-83e543abb39b.png",
+      "corrections": [
+        {
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-5d0134ef-f9bd-4d99-a62b-83e543abb39b.png",
+          "prompt": "Precise alpha isolation of reference devil-may-cry empty room architecture for a modular game. Retain EXACT full rectangular canvas and camera, original aspect, proportions, composition, all opaque room walls/floor/ceiling, every pillar, exterior window frames and mullions, curtains, lamps, terrace canopy, balcony ledges and every railing/baluster. Remove ONLY the outdoor scenery visible through ALL real exterior windows, portholes and open balcony/terrace apertures, including narrow views at image edges and scenery BETWEEN railing bars. Those exterior scenery pixels become genuinely transparent alpha zero. Keep all structural bars/branches/frames in front of apertures opaque. Indoor niches, fireplaces, mirrors, emblems, decorative wall carvings/panels, wooden lattice cabinets and portals are interior objects and remain opaque. Entire indoor floor remains opaque, even reflected scenery. No cropped cutout, transparent canvas margin, new windows, reframe, padding, furniture or changes to design. Replace no scenery: output only existing complete room architecture with precisely transparent outdoor apertures, a separate landscape will show BEHIND it."
+        }
+      ]
+    },
+    {
+      "scene": "devil-may-cry",
+      "role": "shelf",
+      "prompt": "Use case: precise-object-edit. Modular game asset for devil-may-cry. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original devil-may-cry themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first exact rear furniture crop, second full original room is strict coordinate/material context. Isolate the complete original EMPTY backbar furniture: all rear liquor shelf racks/cabinets within this crop, original boards, vertical posts, cabinet backing if present, brass/metal trim, fixed shelf lights and connected lower storage cabinets/worktop. Restore full frames and bases. Keep original number of levels, separate cabinet positions and DIFFERENT board heights per cabinet. Preserve original gaps between units: stone pillars/wall in those gaps are NOT furniture and must be transparent. Remove ALL bottles/glasses/ceramics/tools/machines/tabletop lamps/plants/vines/flowers/books/fruit and every object resting on boards. Remove ceiling/wall lights, structural pillars/walls/window/curtains and main foreground counter. If racks have open backs, keep ALL spaces between boards transparent; do not invent backing. Preserve crop aspect and furniture positions, do not center/reframe/rearrange columns. True transparent surroundings, clean empty compartments, complete furniture only.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\devil-may-cry\\shelf-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-devil-may-cry.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0.035,
+        "y": 0.06,
+        "width": 0.93,
+        "height": 0.93
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-332734ac-328f-470d-a5b5-fe6a378e71a8.png"
+    },
+    {
+      "scene": "devil-may-cry",
+      "role": "counter",
+      "prompt": "Use case: precise-object-edit. Modular game asset for devil-may-cry. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original devil-may-cry themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first expanded foreground counter crop, second exact original room for shape/material. Isolate ONLY the complete original MAIN FOREGROUND counter: uninterrupted empty full worktop, whole front facade with original trim/crest/panel pattern, complete left/right edges and bottom plinth. Preserve original horizontal footprint and perspective. Remove all stools/chairs and every seat/leg/ring pixel, ALL tabletop objects, bottles/tools/plants/fruit/glasses/lamps, rear counter/cabinets, room/walls/windows/floor. Reconstruct continuous original front material behind former seats, NO floor/stone patches or leg silhouettes baked into facade. Restore COMPLETE bottom base naturally INSIDE canvas even when original base was occluded/clipped. True transparency above/around outer counter silhouette and original empty left/right area if counter does not fill width. Whole counter only, no background/floor shadow/new objects.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\devil-may-cry\\counter-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-devil-may-cry.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0,
+        "y": 0.17073170731707332,
+        "width": 1,
+        "height": 0.8292682926829267
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-3f10cfeb-89ff-49ca-b553-38268bee675b.png"
+    },
+    {
+      "scene": "devil-may-cry",
+      "role": "seat",
+      "prompt": "Use case: precise-object-edit. Modular game asset for devil-may-cry. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original devil-may-cry themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. First image is a source seat crop, possibly clipped/occluded; second full room determines the correct original seat design. Create exactly ONE complete reusable original bar stool/chair, matching the central source seat: same upholstery or wood/rattan seat, original backrest if present, frame/pedestal/legs, footrest/braces and base/feet. Reconstruct all occluded or clipped lower parts to a naturally complete whole seat. EVERY foot/base/ring/backrest fully INSIDE portrait canvas with narrow transparent margins. Restore genuine transparent holes between supports and through footrest; remove ALL counter/floor/room pixels including gaps, no floor shadow or background rectangle. Exactly one upright centered complete object, never multiple seats or a cropped seat. Same source perspective and lighting.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\devil-may-cry\\seat-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-devil-may-cry.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-0a51b524-aa00-4f0d-8a35-f969759b7e7a.png"
+    },
+    {
+      "scene": "diablo-4",
+      "role": "architecture",
+      "prompt": "Use case: precise-object-edit. Modular game asset for diablo-4. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original diablo-4 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET exact full room, aspect 1672:941. Produce ONE complete empty architecture plate. Preserve structural ceiling/walls/posts/arches, fixed lights and chandeliers, window frames and curtains, original exterior view, fixed architectural ornaments and murals. Remove ALL bar counters including rear storage/worktops, every liquor shelf frame/board/backing and rack, all stools/chairs/sofas/tables, all bottles/glasses/cups/ceramics/tools/machines resting on furniture, tabletop lights, vases/plants/vines/flowers/fruit/books/globes/barrels and other loose furniture/decor. Keep permanently built-in book walls when present, embedded crystals and architectural control panels. Reconstruct continuous matching wall panels/stone/brick in removed shelving regions and uninterrupted complete floor behind all counters/seats to bottom edge. Same framing, horizon and light. No new furniture or reframing, no transparent holes.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-diablo-4.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-b023add0-f694-4f5d-a6f0-6b5641fb2b86.png",
+      "opaqueArchitectureSource": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-f09ad5b3-c221-44ee-8b30-68345d5ee69f.png",
+      "corrections": [
+        {
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-f09ad5b3-c221-44ee-8b30-68345d5ee69f.png",
+          "prompt": "Precise alpha isolation of reference diablo-4 empty room architecture for a modular game. Retain EXACT full rectangular canvas and camera, original aspect, proportions, composition, all opaque room walls/floor/ceiling, every pillar, exterior window frames and mullions, curtains, lamps, terrace canopy, balcony ledges and every railing/baluster. Remove ONLY the outdoor scenery visible through ALL real exterior windows, portholes and open balcony/terrace apertures, including narrow views at image edges and scenery BETWEEN railing bars. Those exterior scenery pixels become genuinely transparent alpha zero. Keep all structural bars/branches/frames in front of apertures opaque. Indoor niches, fireplaces, mirrors, emblems, decorative wall carvings/panels, wooden lattice cabinets and portals are interior objects and remain opaque. Entire indoor floor remains opaque, even reflected scenery. No cropped cutout, transparent canvas margin, new windows, reframe, padding, furniture or changes to design. Replace no scenery: output only existing complete room architecture with precisely transparent outdoor apertures, a separate landscape will show BEHIND it."
+        }
+      ]
+    },
+    {
+      "scene": "diablo-4",
+      "role": "shelf",
+      "prompt": "Use case: precise-object-edit. Modular game asset for diablo-4. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original diablo-4 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first exact rear furniture crop, second full original room is strict coordinate/material context. Isolate the complete original EMPTY backbar furniture: all rear liquor shelf racks/cabinets within this crop, original boards, vertical posts, cabinet backing if present, brass/metal trim, fixed shelf lights and connected lower storage cabinets/worktop. Restore full frames and bases. Keep original number of levels, separate cabinet positions and DIFFERENT board heights per cabinet. Preserve original gaps between units: stone pillars/wall in those gaps are NOT furniture and must be transparent. Remove ALL bottles/glasses/ceramics/tools/machines/tabletop lamps/plants/vines/flowers/books/fruit and every object resting on boards. Remove ceiling/wall lights, structural pillars/walls/window/curtains and main foreground counter. If racks have open backs, keep ALL spaces between boards transparent; do not invent backing. Preserve crop aspect and furniture positions, do not center/reframe/rearrange columns. True transparent surroundings, clean empty compartments, complete furniture only.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\diablo-4\\shelf-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-diablo-4.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0.035,
+        "y": 0.06,
+        "width": 0.93,
+        "height": 0.93
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-d9648800-10de-47aa-a7d8-a9626c7a6f3f.png"
+    },
+    {
+      "scene": "diablo-4",
+      "role": "counter",
+      "prompt": "Use case: precise-object-edit. Modular game asset for diablo-4. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original diablo-4 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first expanded foreground counter crop, second exact original room for shape/material. Isolate ONLY the complete original MAIN FOREGROUND counter: uninterrupted empty full worktop, whole front facade with original trim/crest/panel pattern, complete left/right edges and bottom plinth. Preserve original horizontal footprint and perspective. Remove all stools/chairs and every seat/leg/ring pixel, ALL tabletop objects, bottles/tools/plants/fruit/glasses/lamps, rear counter/cabinets, room/walls/windows/floor. Reconstruct continuous original front material behind former seats, NO floor/stone patches or leg silhouettes baked into facade. Restore COMPLETE bottom base naturally INSIDE canvas even when original base was occluded/clipped. True transparency above/around outer counter silhouette and original empty left/right area if counter does not fill width. Whole counter only, no background/floor shadow/new objects.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\diablo-4\\counter-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-diablo-4.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0,
+        "y": 0.17073170731707332,
+        "width": 1,
+        "height": 0.8292682926829267
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-08b3a18c-c102-4620-9b45-68c6b4adbc8f.png"
+    },
+    {
+      "scene": "diablo-4",
+      "role": "seat",
+      "prompt": "Use case: precise-object-edit. Modular game asset for diablo-4. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original diablo-4 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. First image is a source seat crop, possibly clipped/occluded; second full room determines the correct original seat design. Create exactly ONE complete reusable original bar stool/chair, matching the central source seat: same upholstery or wood/rattan seat, original backrest if present, frame/pedestal/legs, footrest/braces and base/feet. Reconstruct all occluded or clipped lower parts to a naturally complete whole seat. EVERY foot/base/ring/backrest fully INSIDE portrait canvas with narrow transparent margins. Restore genuine transparent holes between supports and through footrest; remove ALL counter/floor/room pixels including gaps, no floor shadow or background rectangle. Exactly one upright centered complete object, never multiple seats or a cropped seat. Same source perspective and lighting.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\diablo-4\\seat-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-diablo-4.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-fea50655-a1cf-44b8-aecb-b43893d310f4.png"
+    },
+    {
+      "scene": "divinity-original-sin-2",
+      "role": "architecture",
+      "prompt": "Use case: precise-object-edit. Modular game asset for divinity-original-sin-2. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original divinity-original-sin-2 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET exact full room, aspect 1672:941. Produce ONE complete empty architecture plate. Preserve structural ceiling/walls/posts/arches, fixed lights and chandeliers, window frames and curtains, original exterior view, fixed architectural ornaments and murals. Remove ALL bar counters including rear storage/worktops, every liquor shelf frame/board/backing and rack, all stools/chairs/sofas/tables, all bottles/glasses/cups/ceramics/tools/machines resting on furniture, tabletop lights, vases/plants/vines/flowers/fruit/books/globes/barrels and other loose furniture/decor. Keep permanently built-in book walls when present, embedded crystals and architectural control panels. Reconstruct continuous matching wall panels/stone/brick in removed shelving regions and uninterrupted complete floor behind all counters/seats to bottom edge. Same framing, horizon and light. No new furniture or reframing, no transparent holes.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-divinity-original-sin-2.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-dc9cdd6a-eb97-47d3-bbc2-262e8347a182.png",
+      "opaqueArchitectureSource": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-f13feb37-96a6-4bf3-b12b-a5ce2fe7dddb.png",
+      "corrections": [
+        {
+          "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-f13feb37-96a6-4bf3-b12b-a5ce2fe7dddb.png",
+          "prompt": "Precise alpha isolation of reference divinity-original-sin-2 empty room architecture for a modular game. Retain EXACT full rectangular canvas and camera, original aspect, proportions, composition, all opaque room walls/floor/ceiling, every pillar, exterior window frames and mullions, curtains, lamps, terrace canopy, balcony ledges and every railing/baluster. Remove ONLY the outdoor scenery visible through ALL real exterior windows, portholes and open balcony/terrace apertures, including narrow views at image edges and scenery BETWEEN railing bars. Those exterior scenery pixels become genuinely transparent alpha zero. Keep all structural bars/branches/frames in front of apertures opaque. Indoor niches, fireplaces, mirrors, emblems, decorative wall carvings/panels, wooden lattice cabinets and portals are interior objects and remain opaque. Entire indoor floor remains opaque, even reflected scenery. No cropped cutout, transparent canvas margin, new windows, reframe, padding, furniture or changes to design. Replace no scenery: output only existing complete room architecture with precisely transparent outdoor apertures, a separate landscape will show BEHIND it."
+        }
+      ]
+    },
+    {
+      "scene": "divinity-original-sin-2",
+      "role": "shelf",
+      "prompt": "Use case: precise-object-edit. Modular game asset for divinity-original-sin-2. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original divinity-original-sin-2 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first exact rear furniture crop, second full original room is strict coordinate/material context. Isolate the complete original EMPTY backbar furniture: all rear liquor shelf racks/cabinets within this crop, original boards, vertical posts, cabinet backing if present, brass/metal trim, fixed shelf lights and connected lower storage cabinets/worktop. Restore full frames and bases. Keep original number of levels, separate cabinet positions and DIFFERENT board heights per cabinet. Preserve original gaps between units: stone pillars/wall in those gaps are NOT furniture and must be transparent. Remove ALL bottles/glasses/ceramics/tools/machines/tabletop lamps/plants/vines/flowers/books/fruit and every object resting on boards. Remove ceiling/wall lights, structural pillars/walls/window/curtains and main foreground counter. If racks have open backs, keep ALL spaces between boards transparent; do not invent backing. Preserve crop aspect and furniture positions, do not center/reframe/rearrange columns. True transparent surroundings, clean empty compartments, complete furniture only.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\divinity-original-sin-2\\shelf-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-divinity-original-sin-2.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0.035,
+        "y": 0.06,
+        "width": 0.93,
+        "height": 0.93
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-2dd38238-9407-43ae-93ea-719e10028b01.png"
+    },
+    {
+      "scene": "divinity-original-sin-2",
+      "role": "counter",
+      "prompt": "Use case: precise-object-edit. Modular game asset for divinity-original-sin-2. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original divinity-original-sin-2 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. EDIT TARGET first expanded foreground counter crop, second exact original room for shape/material. Isolate ONLY the complete original MAIN FOREGROUND counter: uninterrupted empty full worktop, whole front facade with original trim/crest/panel pattern, complete left/right edges and bottom plinth. Preserve original horizontal footprint and perspective. Remove all stools/chairs and every seat/leg/ring pixel, ALL tabletop objects, bottles/tools/plants/fruit/glasses/lamps, rear counter/cabinets, room/walls/windows/floor. Reconstruct continuous original front material behind former seats, NO floor/stone patches or leg silhouettes baked into facade. Restore COMPLETE bottom base naturally INSIDE canvas even when original base was occluded/clipped. True transparency above/around outer counter silhouette and original empty left/right area if counter does not fill width. Whole counter only, no background/floor shadow/new objects.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\divinity-original-sin-2\\counter-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-divinity-original-sin-2.webp"
+      ],
+      "transparent": true,
+      "contentRectNormalized": {
+        "x": 0,
+        "y": 0.24444444444444444,
+        "width": 1,
+        "height": 0.7555555555555555
+      },
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-35a51f5b-2dd9-4813-8aca-06829cd5dd3e.png"
+    },
+    {
+      "scene": "divinity-original-sin-2",
+      "role": "seat",
+      "prompt": "Use case: precise-object-edit. Modular game asset for divinity-original-sin-2. Match the original detailed semi-realistic hand-painted finish. Original setting: the exact original divinity-original-sin-2 themed room and its unique original materials, ornaments and lighting. Preserve camera/perspective, original furniture designs and unique colors/materials. No people or invented text/logos. First image is a source seat crop, possibly clipped/occluded; second full room determines the correct original seat design. Create exactly ONE complete reusable original bar stool/chair, matching the central source seat: same upholstery or wood/rattan seat, original backrest if present, frame/pedestal/legs, footrest/braces and base/feet. Reconstruct all occluded or clipped lower parts to a naturally complete whole seat. EVERY foot/base/ring/backrest fully INSIDE portrait canvas with narrow transparent margins. Restore genuine transparent holes between supports and through footrest; remove ALL counter/floor/room pixels including gaps, no floor shadow or background rectangle. Exactly one upright centered complete object, never multiple seats or a cropped seat. Same source perspective and lighting.",
+      "references": [
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\modular\\divinity-original-sin-2\\seat-generation-reference-all.webp",
+        "C:\\Users\\kubai\\IdeaProjects\\AlcoholBarGame\\public\\assets\\bar\\backgrounds\\interior-divinity-original-sin-2.webp"
+      ],
+      "transparent": true,
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-c4ca1040-ce7e-4edb-8b1c-0d0d61ee3a08.png"
+    }
+  ]
+}

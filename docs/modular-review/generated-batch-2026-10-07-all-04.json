@@ -1,0 +1,894 @@
+{
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "elden-ring",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\elden-ring\\architecture-2026-10-07-all-04-aea8015ca97b.png",
+      "output": "public\\assets\\bar\\modular\\elden-ring\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "elden-ring",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\elden-ring\\shelf-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\elden-ring\\clean-ready\\shelf.webp",
+      "size": [
+        1254,
+        499
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1989,
+          790
+        ],
+        "contentBounds": [
+          10,
+          23,
+          1981,
+          776
+        ],
+        "contentRectPixels": [
+          44,
+          30,
+          1166,
+          464
+        ]
+      }
+    },
+    {
+      "scene": "elden-ring",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\elden-ring\\counter-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\elden-ring\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        386
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          2,
+          130,
+          2168,
+          639
+        ],
+        "contentRectPixels": [
+          0,
+          66,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "elden-ring",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\elden-ring\\seat-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\elden-ring\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1216,
+          1294
+        ],
+        "contentBounds": [
+          221,
+          44,
+          1006,
+          1202
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "fairy",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\fairy\\architecture-2026-10-07-all-04-b105ef64ee9b.png",
+      "output": "public\\assets\\bar\\modular\\fairy\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "fairy",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\fairy\\shelf-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\fairy\\clean-ready\\shelf.webp",
+      "size": [
+        1221,
+        565
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1844,
+          853
+        ],
+        "contentBounds": [
+          13,
+          23,
+          1833,
+          825
+        ],
+        "contentRectPixels": [
+          43,
+          34,
+          1136,
+          525
+        ]
+      }
+    },
+    {
+      "scene": "fairy",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\fairy\\counter-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\fairy\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        395
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          7,
+          142,
+          2164,
+          568
+        ],
+        "contentRectPixels": [
+          0,
+          75,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "fairy",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\fairy\\seat-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\fairy\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1230,
+          1278
+        ],
+        "contentBounds": [
+          159,
+          77,
+          1075,
+          1214
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "fairytale",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\fairytale\\architecture-2026-10-07-all-04-afc0c0e63663.png",
+      "output": "public\\assets\\bar\\modular\\fairytale\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "fairytale",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\fairytale\\shelf-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\fairytale\\clean-ready\\shelf.webp",
+      "size": [
+        1070,
+        555
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1741,
+          903
+        ],
+        "contentBounds": [
+          1,
+          0,
+          1741,
+          897
+        ],
+        "contentRectPixels": [
+          37,
+          33,
+          995,
+          516
+        ]
+      }
+    },
+    {
+      "scene": "fairytale",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\fairytale\\counter-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\fairytale\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          14,
+          174,
+          2157,
+          605
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "fairytale",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\fairytale\\seat-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\fairytale\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1133,
+          1388
+        ],
+        "contentBounds": [
+          117,
+          58,
+          1012,
+          1327
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "gta",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\gta\\architecture-2026-10-07-all-04-7dfe60924a1b.png",
+      "output": "public\\assets\\bar\\modular\\gta\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "gta",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\gta\\shelf-2026-10-07-all-04-0a5b9354a7f0.png",
+      "output": "public\\assets\\bar\\modular\\gta\\clean-ready\\shelf.webp",
+      "size": [
+        920,
+        508
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1686,
+          933
+        ],
+        "contentBounds": [
+          4,
+          65,
+          1684,
+          923
+        ],
+        "contentRectPixels": [
+          31,
+          63,
+          859,
+          438
+        ]
+      }
+    },
+    {
+      "scene": "gta",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\gta\\counter-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\gta\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        461
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          18,
+          144,
+          2151,
+          597
+        ],
+        "contentRectPixels": [
+          0,
+          141,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "gta",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\gta\\seat-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\gta\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1024,
+          1536
+        ],
+        "contentBounds": [
+          143,
+          62,
+          878,
+          1484
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "gta-3",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\gta-3\\architecture-2026-10-07-all-04-63f254c7de0a.png",
+      "output": "public\\assets\\bar\\modular\\gta-3\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "gta-3",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\gta-3\\shelf-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\gta-3\\clean-ready\\shelf.webp",
+      "size": [
+        1538,
+        518
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2164,
+          727
+        ],
+        "contentBounds": [
+          2,
+          3,
+          2162,
+          720
+        ],
+        "contentRectPixels": [
+          54,
+          31,
+          1430,
+          482
+        ]
+      }
+    },
+    {
+      "scene": "gta-3",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\gta-3\\counter-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\gta-3\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        414
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          16,
+          157,
+          2156,
+          636
+        ],
+        "contentRectPixels": [
+          0,
+          94,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "gta-3",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\gta-3\\seat-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\gta-3\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1145,
+          1374
+        ],
+        "contentBounds": [
+          225,
+          113,
+          924,
+          1292
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "gta-5",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\gta-5\\architecture-2026-10-07-all-04-f34aa477fd65.png",
+      "output": "public\\assets\\bar\\modular\\gta-5\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "gta-5",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\gta-5\\shelf-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\gta-5\\clean-ready\\shelf.webp",
+      "size": [
+        1053,
+        471
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1877,
+          838
+        ],
+        "contentBounds": [
+          35,
+          71,
+          1842,
+          798
+        ],
+        "contentRectPixels": [
+          37,
+          28,
+          979,
+          438
+        ]
+      }
+    },
+    {
+      "scene": "gta-5",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\gta-5\\counter-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\gta-5\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2167,
+          726
+        ],
+        "contentBounds": [
+          6,
+          152,
+          2161,
+          647
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "gta-5",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\gta-5\\seat-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\gta-5\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1090,
+          1443
+        ],
+        "contentBounds": [
+          99,
+          93,
+          972,
+          1358
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "gta-sa",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\gta-sa\\architecture-2026-10-07-all-04-21743bd6b72e.png",
+      "output": "public\\assets\\bar\\modular\\gta-sa\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "gta-sa",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\gta-sa\\shelf-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\gta-sa\\clean-ready\\shelf.webp",
+      "size": [
+        1438,
+        518
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2092,
+          752
+        ],
+        "contentBounds": [
+          13,
+          4,
+          2085,
+          737
+        ],
+        "contentRectPixels": [
+          50,
+          31,
+          1337,
+          482
+        ]
+      }
+    },
+    {
+      "scene": "gta-sa",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\gta-sa\\counter-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\gta-sa\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        414
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          11,
+          155,
+          2158,
+          629
+        ],
+        "contentRectPixels": [
+          0,
+          94,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "gta-sa",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\gta-sa\\seat-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\gta-sa\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1171,
+          1343
+        ],
+        "contentBounds": [
+          237,
+          95,
+          919,
+          1234
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "harry-potter",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\harry-potter\\architecture-2026-10-07-all-04-1cd15d981011.png",
+      "output": "public\\assets\\bar\\modular\\harry-potter\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "harry-potter",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\harry-potter\\shelf-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\harry-potter\\clean-ready\\shelf.webp",
+      "size": [
+        1020,
+        565
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1687,
+          932
+        ],
+        "contentBounds": [
+          7,
+          0,
+          1680,
+          909
+        ],
+        "contentRectPixels": [
+          36,
+          34,
+          949,
+          525
+        ]
+      }
+    },
+    {
+      "scene": "harry-potter",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\harry-potter\\counter-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\harry-potter\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          17,
+          140,
+          2153,
+          608
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "harry-potter",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\harry-potter\\seat-2026-10-07-all-04.png",
+      "output": "public\\assets\\bar\\modular\\harry-potter\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1145,
+          1374
+        ],
+        "contentBounds": [
+          154,
+          56,
+          1028,
+          1288
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    }
+  ],
+  "preview": "docs\\modular-review\\generated-batch-2026-10-07-all-04.webp"
+}

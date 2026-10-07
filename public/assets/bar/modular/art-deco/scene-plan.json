@@ -45,14 +45,14 @@
         "x": 0,
         "y": 296,
         "width": 623,
-        "height": 177
+        "height": 212
       },
       "prompt": "Isolate existing counter with transparent surroundings and bleed.",
       "rect": {
         "x": 0,
         "y": 0.474838,
         "width": 1,
-        "height": 0.284903
+        "height": 0.340909
       }
     }
   },
@@ -73,7 +73,7 @@
       "x": 0,
       "y": 0.474838,
       "width": 1,
-      "height": 0.284903
+      "height": 0.340909
     },
     "floor": {
       "x": 0,
@@ -118,7 +118,7 @@
     }
   ],
   "bartenderAnchor": null,
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "measured-gameplay",
   "requiredRoles": [
     "counter",
@@ -130,12 +130,13 @@
   ],
   "review": {
     "windowCutouts": "not-applicable",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "notes": [
     "Measured from existing BarScene geometry.",

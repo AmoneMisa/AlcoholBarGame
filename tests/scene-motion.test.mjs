@@ -8,7 +8,7 @@ import { windCanvasSize, createWindRenderer } from '../src/ui/windRenderer.ts';
 import { modularSceneFor } from '../src/data/cosmetics/modularScenes.ts';
 import { projectSceneGeometry } from '../src/data/cosmetics/barLines.ts';
 import { SHELF_DECOR_PRESETS, shelfDecorPresetFor } from '../src/data/cosmetics/shelfDecor.ts';
-import { WINDOW_BACKDROPS, windowBackdropFor } from '../src/data/cosmetics/windowBackdrops.ts';
+import { WINDOW_BACKDROPS, WINDOW_BACKDROP_OPTIONS, windowBackdropFor } from '../src/data/cosmetics/windowBackdrops.ts';
 import { INTERIORS } from '../src/data/cosmetics/bars.ts';
 
 test('wind stays in reviewed curtain and foliage regions, with geometry for mobile cropping', () => {
@@ -103,7 +103,7 @@ test('Velvet owns modular art and geometry instead of reading positions from one
   assert.deepEqual(projected.shelf.planks,[195,310,426]);
   assert.equal(projected.shelf.left,213);
   assert.equal(projected.shelf.right,727);
-  assert.equal(modularSceneFor('garden'),undefined);
+  assert.equal(modularSceneFor('garden')?.status,'production');
 });
 
 
@@ -113,7 +113,8 @@ test('shelf decor presets are bounded, deterministic and cover the requested vis
   for(const preset of SHELF_DECOR_PRESETS){
     assert.ok(preset.items.length>=9,preset.id);
     for(const item of preset.items){
-      assert.ok(item.cell>=0 && item.cell<24,`${preset.id}: atlas cell`);
+      const cellCount=preset.atlas ? preset.atlas.columns*preset.atlas.rows : 24;
+      assert.ok(item.cell>=0 && item.cell<cellCount,`${preset.id}: atlas cell`);
       assert.ok(item.x>0 && item.x<1,`${preset.id}: x`);
       assert.ok(item.row>=0 && item.row<=2,`${preset.id}: row`);
       assert.ok((item.scale??1)>.5 && (item.scale??1)<1.5,`${preset.id}: scale`);
@@ -122,6 +123,11 @@ test('shelf decor presets are bounded, deterministic and cover the requested vis
   assert.ok(!ids.includes('auto'));
   assert.equal(shelfDecorPresetFor('luxury-whiskey').id,'luxury-whiskey');
   assert.equal(shelfDecorPresetFor('cyberpunk-liquids').id,'cyberpunk-liquids');
+  const original=shelfDecorPresetFor('velvet-original');
+  assert.equal(original.atlas.columns,4);
+  assert.equal(original.atlas.rows,3);
+  assert.ok(existsSync(new URL(`../public${original.atlas.asset}`,import.meta.url)));
+  assert.deepEqual(new Set(original.items.map(item=>item.cell)),new Set(Array.from({length:12},(_,index)=>index)));
 });
 
 test('Velvet exposes shelf decor bays between furniture and foreground layers', () => {
@@ -140,11 +146,17 @@ test('window backdrops are explicit collection pieces, never auto-derived from a
   const ids=WINDOW_BACKDROPS.map(item=>item.id);
   assert.ok(!ids.includes('auto'));
   for(const required of ['skyline','rooftop','cyberpunk','winter','beach','marina','desert','tropical','inferno-penthouse']) assert.ok(ids.includes(required));
-  assert.ok(WINDOW_BACKDROPS.every(item=>item.asset.startsWith('/assets/bar/backgrounds/')));
+  assert.ok(WINDOW_BACKDROPS.every(item=>item.asset.startsWith('/assets/bar/exteriors/')));
+  for(const preset of WINDOW_BACKDROPS){
+    assert.ok(existsSync(new URL(`../public${preset.asset}`,import.meta.url)),preset.id);
+    assert.deepEqual(preset.sourceRect,{x:0,y:0,width:1,height:1});
+  }
   assert.equal(windowBackdropFor('skyline').label,'Skyline lounge view');
-  assert.equal(windowBackdropFor('cyberpunk').asset,'/assets/bar/backgrounds/interior-cyberpunk.webp');
+  assert.equal(windowBackdropFor('cyberpunk').asset,'/assets/bar/exteriors/cyberpunk.webp');
+  assert.equal(windowBackdropFor('night-city'),windowBackdropFor('skyline'));
   const scene=modularSceneFor('velvet');
   assert.equal(scene?.exterior?.enabled,true);
+  assert.ok(existsSync(new URL(`../public${scene.exterior.asset}`,import.meta.url)));
 });
 
 
@@ -160,6 +172,36 @@ test('every catalog interior has a modular split manifest', () => {
     assert.ok(manifest.modules?.['architecture-reference'],`${id}: architecture`);
     assert.ok(manifest.modules?.['shelf-reference'],`${id}: shelf`);
     assert.ok(manifest.modules?.['counter-reference'],`${id}: counter`);
-    assert.ok(manifest.status==='geometry-ready-art-review-required'||manifest.status==='geometry-review-required',`${id}: status`);
+    assert.ok(['production','geometry-ready-art-review-required','geometry-review-required'].includes(manifest.status),`${id}: status`);
+  }
+});
+
+test('every open modular room can restore its own exterior independently of the selected landscape', () => {
+  assert.ok(WINDOW_BACKDROP_OPTIONS.some(option=>option.value==='original'));
+  let openRooms=0;
+  for(const interior of INTERIORS){
+    const scene=modularSceneFor(interior.id);
+    assert.equal(scene?.status,'production',interior.id);
+    if(!scene.exterior)continue;
+    openRooms++;
+    assert.equal(scene.exterior.enabled,true,interior.id);
+    assert.ok(scene.exterior.asset,`${interior.id}: original exterior`);
+    assert.ok(existsSync(new URL(`../public${scene.exterior.asset}`,import.meta.url)),interior.id);
+    for(const layer of scene.layers)assert.ok(existsSync(new URL(`../public${layer.asset}`,import.meta.url)),`${interior.id}: ${layer.id}`);
+  }
+  assert.equal(openRooms,67);
+});
+
+test('the shared scenery generation queue covers each original open room once without exposing unfinished images', () => {
+  const queue=JSON.parse(readFileSync(new URL('../scripts/modular-scene-exterior-generation.json',import.meta.url),'utf8'));
+  const expected=INTERIORS.filter(interior=>modularSceneFor(interior.id)?.exterior).map(interior=>interior.id).sort();
+  assert.deepEqual(queue.items.map(item=>item.scene).sort(),expected);
+  assert.equal(new Set(queue.items.map(item=>item.id)).size,expected.length);
+  for(const item of queue.items){
+    assert.ok(existsSync(new URL(`../${item.reference}`,import.meta.url)),item.id);
+    assert.ok(existsSync(new URL(`../${item.preservedExterior}`,import.meta.url)),item.id);
+    const shared=WINDOW_BACKDROPS.find(preset=>preset.id===item.id);
+    if(item.status!=='ready')assert.equal(shared,undefined,`${item.id}: pending image must not appear in the picker`);
+    else assert.ok(shared,item.id);
   }
 });

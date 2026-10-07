@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const ROOT=resolve('.');
@@ -38,6 +38,11 @@ function shelfGeometry(plan){
 function sceneDefinition(id,plan,manifest){
   const author=plan.authoringCanvas??plan.canvas;
   const required=plan.requiredRoles??['counter','shelf','seating'];
+  const decorModules=manifest.decorModules??[];
+  const base=resolve(MOD,id);
+  const productionReady=manifest.review?.generationState!=='prepared-not-reviewed'&&existsSync(resolve(base,'architecture.webp'))&&required.every(role=>
+    existsSync(resolve(base,'clean-ready',`${role==='seating'?'seat':role}.webp`)))&&
+    decorModules.every(module=>existsSync(resolve(base,'clean-ready',`${module.id}.webp`)));
   const anchors=(plan.seatAnchors??[]).map(value=>point(value,author)).filter(Boolean);
   const seatCrop=manifest.manualSeatCutNormalized?.cropNormalized;
   const shelf=shelfGeometry(plan);
@@ -52,6 +57,11 @@ function sceneDefinition(id,plan,manifest){
   const layers=[
     {id:'architecture',role:'architecture',z:0,asset:`/assets/bar/modular/${id}/composite-ready/architecture.webp`}
   ];
+  for(const module of decorModules){
+    const decorRect=rect(plan.modules?.[module.reference]?.rect);
+    if(decorRect) layers.push({id:module.id,role:'decor',z:module.z,
+      asset:`/assets/bar/modular/${id}/composite-ready/${module.id}.webp`,rect:decorRect});
+  }
   const shelfRect=rect(plan.modules?.['shelf-reference']?.rect)??rect(plan.slots?.shelves);
   if(required.includes('shelf')&&shelfRect) layers.push({
     id:'shelf',role:'shelves',z:10,asset:`/assets/bar/modular/${id}/composite-ready/shelf.webp`,selection:'shelf',rect:shelfRect
@@ -69,11 +79,17 @@ function sceneDefinition(id,plan,manifest){
       });
     }
   }
-  const bay=rect(plan.slots?.shelves)??shelfRect;
+  // Complete generated furniture can extend below the old provisional shelf slot.
+  const bay=productionReady ? shelfRect??rect(plan.slots?.shelves) : rect(plan.slots?.shelves)??shelfRect;
   const rowBaselines=bay ? shelf.planks.map(y=>fmt(clamp((y-bay.y)/bay.height,.05,.95))) : [];
+  const shelfUnits=productionReady ? (manifest.generatedShelfUnits??manifest.shelfUnits??[]) : [];
+  const decorBays=shelfUnits.length&&bay ? shelfUnits.map(unit=>({
+    rect:{x:unit.x0,y:bay.y,width:fmt(unit.x1-unit.x0),height:bay.height},
+    rowBaselines:unit.rows.map(y=>fmt(clamp((y-bay.y)/bay.height,.05,.95)))
+  })) : bay ? [{rect:bay,rowBaselines:rowBaselines.length?rowBaselines:[.3,.6,.9]}] : [];
   return {
     id,
-    status:'authoring',
+    status:productionReady?'production':'authoring',
     canvas:plan.canvas,
     positionY:LOWER_POSITION.has(id)?.62:.5,
     geometry:{
@@ -84,9 +100,9 @@ function sceneDefinition(id,plan,manifest){
     },
     layers,
     slots:plan.slots??{},
-    ...((plan.windowCutouts??[]).length?{exterior:{enabled:true}}:{}),
+    ...((plan.windowCutouts??[]).length?{exterior:{enabled:true,...(existsSync(resolve(base,'composite-ready/exterior.webp'))?{asset:`/assets/bar/modular/${id}/composite-ready/exterior.webp`}:{})}}:{}),
     ...(bay?{shelfDecor:{
-      z:15,bays:[{rect:bay,rowBaselines:rowBaselines.length?rowBaselines:[.3,.6,.9]}],
+      z:15,...(productionReady?{paintBacking:false}:{}),bays:decorBays,
       panelTop:'#241914',panelBottom:'#100b09',rail:'#8b6438'
     }}:{}),
     lighting:{

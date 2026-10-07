@@ -1,0 +1,126 @@
+{
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "inferno-penthouse",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\inferno-penthouse\\architecture-2026-10-07-window-apertures.png",
+      "output": "public\\assets\\bar\\modular\\inferno-penthouse\\architecture.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1536,
+          1024
+        ]
+      }
+    },
+    {
+      "scene": "library",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\library\\architecture-2026-10-07-window-apertures.png",
+      "output": "public\\assets\\bar\\modular\\library\\architecture.webp",
+      "size": [
+        623,
+        623
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1254,
+          1254
+        ]
+      }
+    },
+    {
+      "scene": "loft",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\loft\\architecture-2026-10-07-window-apertures.png",
+      "output": "public\\assets\\bar\\modular\\loft\\architecture.webp",
+      "size": [
+        764,
+        508
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1540,
+          1021
+        ]
+      }
+    },
+    {
+      "scene": "izakaya",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\izakaya\\architecture-2026-10-07-window-apertures.png",
+      "output": "public\\assets\\bar\\modular\\izakaya\\architecture.webp",
+      "size": [
+        764,
+        508
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1540,
+          1021
+        ]
+      }
+    },
+    {
+      "scene": "garden",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\garden\\architecture-2026-10-07-window-apertures.png",
+      "output": "public\\assets\\bar\\modular\\garden\\architecture.webp",
+      "size": [
+        1671,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1670,
+          942
+        ]
+      }
+    },
+    {
+      "scene": "skyline",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\skyline\\architecture-2026-10-07-window-apertures.png",
+      "output": "public\\assets\\bar\\modular\\skyline\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    }
+  ],
+  "preview": "docs\\modular-review\\generated-batch-2026-10-07-window-apertures.webp"
+}

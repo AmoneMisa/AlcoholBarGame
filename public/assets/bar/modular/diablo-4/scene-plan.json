@@ -36,20 +36,20 @@
         "x": 0.29,
         "y": 0.18,
         "width": 0.59,
-        "height": 0.43
+        "height": 0.49000000000000005
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture.",
       "crop": {
         "x": 485,
         "y": 169,
         "width": 986,
-        "height": 405
+        "height": 461
       },
       "rect": {
         "x": 0.29,
         "y": 0.18,
         "width": 0.59,
-        "height": 0.43
+        "height": 0.49
       }
     },
     "counter-reference": {
@@ -57,20 +57,20 @@
         "x": 0,
         "y": 0.59,
         "width": 1,
-        "height": 0.21
+        "height": 0.41000000000000003
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings.",
       "crop": {
         "x": 0,
         "y": 555,
         "width": 1672,
-        "height": 198
+        "height": 386
       },
       "rect": {
         "x": 0,
         "y": 0.59,
         "width": 1,
-        "height": 0.21
+        "height": 0.41
       }
     }
   },
@@ -108,25 +108,11 @@
   },
   "windowCutouts": [
     {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0,
-          "y": 0.08
-        },
-        {
-          "x": 0.27,
-          "y": 0.08
-        },
-        {
-          "x": 0.27,
-          "y": 0.56
-        },
-        {
-          "x": 0,
-          "y": 0.56
-        }
-      ]
+      "type": "rect",
+      "x": 0,
+      "y": 0,
+      "width": 0.29,
+      "height": 0.78
     }
   ],
   "shelfRows": [
@@ -160,7 +146,7 @@
     "x": 0.5,
     "y": 0.58
   },
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "manual-source-review",
   "requiredRoles": [
     "counter",
@@ -177,15 +163,16 @@
     "shelfBounds": "manual-measured",
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "notes": [
     "Existing themed background coverage manifest.",

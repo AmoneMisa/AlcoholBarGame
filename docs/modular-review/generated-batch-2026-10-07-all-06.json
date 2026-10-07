@@ -1,0 +1,894 @@
+{
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "nfs-carbon",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\nfs-carbon\\architecture-2026-10-07-all-06-975c4c3a105e.png",
+      "output": "public\\assets\\bar\\modular\\nfs-carbon\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "nfs-carbon",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\nfs-carbon\\shelf-2026-10-07-all-06-25fa88223d8c.png",
+      "output": "public\\assets\\bar\\modular\\nfs-carbon\\clean-ready\\shelf.webp",
+      "size": [
+        1170,
+        555
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1821,
+          864
+        ],
+        "contentBounds": [
+          11,
+          0,
+          1810,
+          851
+        ],
+        "contentRectPixels": [
+          41,
+          30,
+          1088,
+          520
+        ]
+      }
+    },
+    {
+      "scene": "nfs-carbon",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\nfs-carbon\\counter-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\nfs-carbon\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          13,
+          177,
+          2159,
+          603
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "nfs-carbon",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\nfs-carbon\\seat-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\nfs-carbon\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1024,
+          1536
+        ],
+        "contentBounds": [
+          96,
+          125,
+          923,
+          1428
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "nfs-most-wanted",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\nfs-most-wanted\\architecture-2026-10-07-all-06-052c105910d2.png",
+      "output": "public\\assets\\bar\\modular\\nfs-most-wanted\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "nfs-most-wanted",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\nfs-most-wanted\\shelf-2026-10-07-all-06-b521b953b0ff.png",
+      "output": "public\\assets\\bar\\modular\\nfs-most-wanted\\clean-ready\\shelf.webp",
+      "size": [
+        1170,
+        555
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1820,
+          864
+        ],
+        "contentBounds": [
+          7,
+          0,
+          1814,
+          863
+        ],
+        "contentRectPixels": [
+          41,
+          33,
+          1089,
+          517
+        ]
+      }
+    },
+    {
+      "scene": "nfs-most-wanted",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\nfs-most-wanted\\counter-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\nfs-most-wanted\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          4,
+          178,
+          2167,
+          593
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "nfs-most-wanted",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\nfs-most-wanted\\seat-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\nfs-most-wanted\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1024,
+          1536
+        ],
+        "contentBounds": [
+          50,
+          113,
+          973,
+          1453
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "nfs-underground",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\nfs-underground\\architecture-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\nfs-underground\\architecture.webp",
+      "size": [
+        1774,
+        887
+      ],
+      "alphaRange": [
+        255,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1774,
+          887
+        ]
+      }
+    },
+    {
+      "scene": "nfs-underground",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\nfs-underground\\shelf-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\nfs-underground\\clean-ready\\shelf.webp",
+      "size": [
+        1277,
+        497
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2012,
+          781
+        ],
+        "contentBounds": [
+          4,
+          3,
+          2007,
+          774
+        ],
+        "contentRectPixels": [
+          45,
+          30,
+          1188,
+          462
+        ]
+      }
+    },
+    {
+      "scene": "nfs-underground",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\nfs-underground\\counter-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\nfs-underground\\clean-ready\\counter.webp",
+      "size": [
+        1774,
+        399
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          16,
+          228,
+          2155,
+          628
+        ],
+        "contentRectPixels": [
+          0,
+          98,
+          1774,
+          301
+        ]
+      }
+    },
+    {
+      "scene": "nfs-underground",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\nfs-underground\\seat-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\nfs-underground\\clean-ready\\seat.webp",
+      "size": [
+        319,
+        302
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1143,
+          1376
+        ],
+        "contentBounds": [
+          93,
+          49,
+          1052,
+          1321
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "palace",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\palace\\architecture-2026-10-07-all-06-40d23234de31.png",
+      "output": "public\\assets\\bar\\modular\\palace\\architecture.webp",
+      "size": [
+        623,
+        623
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1254,
+          1254
+        ]
+      }
+    },
+    {
+      "scene": "palace",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\palace\\shelf-2026-10-07-all-06-956a7da10afa.png",
+      "output": "public\\assets\\bar\\modular\\palace\\clean-ready\\shelf.webp",
+      "size": [
+        486,
+        246
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1763,
+          892
+        ],
+        "contentBounds": [
+          84,
+          62,
+          1679,
+          860
+        ],
+        "contentRectPixels": [
+          16,
+          29,
+          454,
+          211
+        ]
+      }
+    },
+    {
+      "scene": "palace",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\palace\\counter-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\palace\\clean-ready\\counter.webp",
+      "size": [
+        623,
+        308
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2172,
+          724
+        ],
+        "contentBounds": [
+          10,
+          71,
+          2162,
+          640
+        ],
+        "contentRectPixels": [
+          0,
+          47,
+          623,
+          162
+        ]
+      }
+    },
+    {
+      "scene": "palace",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\palace\\seat-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\palace\\clean-ready\\seat.webp",
+      "size": [
+        100,
+        174
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1024,
+          1536
+        ],
+        "contentBounds": [
+          169,
+          51,
+          871,
+          1467
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "palworld",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\palworld\\architecture-2026-10-07-all-06-eab306a8ce0e.png",
+      "output": "public\\assets\\bar\\modular\\palworld\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "palworld",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\palworld\\shelf-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\palworld\\clean-ready\\shelf.webp",
+      "size": [
+        1154,
+        536
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1840,
+          855
+        ],
+        "contentBounds": [
+          12,
+          30,
+          1829,
+          830
+        ],
+        "contentRectPixels": [
+          40,
+          32,
+          1073,
+          498
+        ]
+      }
+    },
+    {
+      "scene": "palworld",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\palworld\\counter-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\palworld\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          11,
+          146,
+          2160,
+          604
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "palworld",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\palworld\\seat-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\palworld\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1199,
+          1312
+        ],
+        "contentBounds": [
+          190,
+          96,
+          1007,
+          1218
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "parisian",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\parisian\\architecture-2026-10-07-all-06-6bebc1b19da0.png",
+      "output": "public\\assets\\bar\\modular\\parisian\\architecture.webp",
+      "size": [
+        764,
+        508
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1537,
+          1023
+        ]
+      }
+    },
+    {
+      "scene": "parisian",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\parisian\\shelf-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\parisian\\clean-ready\\shelf.webp",
+      "size": [
+        275,
+        257
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1297,
+          1212
+        ],
+        "contentBounds": [
+          6,
+          0,
+          1292,
+          1196
+        ],
+        "contentRectPixels": [
+          10,
+          15,
+          256,
+          239
+        ]
+      }
+    },
+    {
+      "scene": "parisian",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\parisian\\counter-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\parisian\\clean-ready\\counter.webp",
+      "size": [
+        764,
+        284
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2057,
+          764
+        ],
+        "contentBounds": [
+          23,
+          138,
+          2036,
+          681
+        ],
+        "contentRectPixels": [
+          92,
+          25,
+          619,
+          157
+        ]
+      }
+    },
+    {
+      "scene": "parisian",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\parisian\\seat-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\parisian\\clean-ready\\seat.webp",
+      "size": [
+        99,
+        178
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          935,
+          1681
+        ],
+        "contentBounds": [
+          122,
+          41,
+          809,
+          1602
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "perfect-world",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\perfect-world\\architecture-2026-10-07-all-06-c70667c5f249.png",
+      "output": "public\\assets\\bar\\modular\\perfect-world\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "perfect-world",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\perfect-world\\shelf-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\perfect-world\\clean-ready\\shelf.webp",
+      "size": [
+        1170,
+        489
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1940,
+          811
+        ],
+        "contentBounds": [
+          1,
+          1,
+          1940,
+          803
+        ],
+        "contentRectPixels": [
+          41,
+          29,
+          1088,
+          455
+        ]
+      }
+    },
+    {
+      "scene": "perfect-world",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\perfect-world\\counter-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\perfect-world\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          2,
+          138,
+          2168,
+          620
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "perfect-world",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\perfect-world\\seat-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\perfect-world\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1217,
+          1292
+        ],
+        "contentBounds": [
+          159,
+          53,
+          1050,
+          1226
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "quantum-break",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\quantum-break\\architecture-2026-10-07-all-06-08605cc9720f.png",
+      "output": "public\\assets\\bar\\modular\\quantum-break\\architecture.webp",
+      "size": [
+        1672,
+        940
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "quantum-break",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\quantum-break\\shelf-2026-10-07-all-06-0f29ee687667.png",
+      "output": "public\\assets\\bar\\modular\\quantum-break\\clean-ready\\shelf.webp",
+      "size": [
+        1037,
+        536
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1743,
+          902
+        ],
+        "contentBounds": [
+          0,
+          82,
+          1743,
+          894
+        ],
+        "contentRectPixels": [
+          36,
+          76,
+          964,
+          456
+        ]
+      }
+    },
+    {
+      "scene": "quantum-break",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\quantum-break\\counter-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\quantum-break\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        423
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          15,
+          168,
+          2156,
+          605
+        ],
+        "contentRectPixels": [
+          0,
+          103,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "quantum-break",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\quantum-break\\seat-2026-10-07-all-06.png",
+      "output": "public\\assets\\bar\\modular\\quantum-break\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1024,
+          1536
+        ],
+        "contentBounds": [
+          44,
+          66,
+          975,
+          1428
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    }
+  ],
+  "preview": "docs\\modular-review\\generated-batch-2026-10-07-all-06.webp"
+}

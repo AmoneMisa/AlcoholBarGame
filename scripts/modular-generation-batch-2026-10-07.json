@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-07",
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "garden",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-58e67ff5-f3ac-46bd-a07f-5486fb72d459.png",
+      "prompt": "Use case: precise-object-edit. Asset type: final clean architecture plate for a modular 2D painted bar game. Input is the EDIT TARGET, botanical-room. Keep EXACT original wide 16:9 canvas composition, camera, perspective, positions of window frames, arches, wall panels, door on right, ceiling trim, hanging vines, fixed wall sconces and pendant lighting, emerald/dark teal and carved warm wood architecture, painterly detail and warm golden lighting. Remove ALL movable furniture: entire long foreground counter including its front, back-bar base cabinet, central bottle shelving including boards and cabinet framework, side bottle shelving, couches/chairs/tables, potted plants, tabletop lamps, all bottles, glasses, shakers, fruit, vases and candles. Reconstruct the wall where shelving was removed using matching emerald wall panels with subtle botanical ornament; reconstruct believable uninterrupted dark warm wood floor where counters and seating were removed. Preserve arched wall shape above central shelf as architecture, but remove shelving and contents. Preserve original outdoor views through left windows for subsequent exact window-mask separation. One continuous empty room, no holes, no transparency, no new furniture, no text, no people. Do not reframe or redesign the room."
+    },
+    {
+      "scene": "garden",
+      "role": "shelf",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-07af243c-f00d-449c-9f07-642a2c11a61c.png",
+      "prompt": "Use case: precise-object-edit. Asset type: transparent shelf module for painted modular bar. Input is exact shelf-reference crop from botanical-room, EDIT TARGET. Keep same 686:438 landscape crop layout. Remove every bottle, glass, goblet, fruit bowl, plant, hanging leaf, vase, flowers and side wall/background pixels. Isolate ONLY the empty brass-and-dark carved wood shelving furniture: central illuminated shelving at original x roughly 36%-90%, plus slender left shelving at roughly 10%-24%. Keep these original positions and sizes in this SAME crop canvas, do not center or enlarge. Preserve all horizontal shelf boards at exactly original y, vertical supporting frame, gold edge trim, warm built-in shelf illumination. Restore empty teal botanical back panels wherever bottles/glassware were painted. Shelving must be fully constructed including supports; no glass rack contents. All surroundings outside actual shelf furniture truly transparent. No shadow/background rectangle, no people, no labels, no new objects. Warm detailed painterly style identical to source."
+    },
+    {
+      "scene": "garden",
+      "role": "counter",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-40aa54f9-95c8-4fde-8d9b-4ac063d968e5.png",
+      "prompt": "Use case: precise-object-edit. Asset type: complete transparent foreground counter module for botanical painted bar game. Input is EDIT TARGET, a very wide 1672:311 counter crop. Preserve this EXACT ultrawide canvas and crop registration: original counter top starts about 14% down and front lip is around 45%-58% down, carved front panels fill rest down to bottom edge. Keep entire counter from left canvas edge to right canvas edge, no recentering, no new perspective, no padding added to sides. Remove all objects sitting on countertop: lamps, plants/pots, glassware, shakers, tray, candles, bowls, fruit; remove all room background above countertop. Restore the continuous polished warm wood countertop under these items and retain carved botanical dark wood front panels and fixed posts below top. Include BOTH countertop AND the whole visible front facade, no hollow missing panels. Transparent surroundings ABOVE silhouette. No bottles, people, text, new objects, tabletop highlights from removed lamps. Rich semi-realistic hand-painted gold/wood style identical to source.",
+      "visibleTopPixels": 44
+    },
+    {
+      "scene": "skyline",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-c003d8f1-b6f9-4ee6-8f46-4e11c0ad8719.png",
+      "prompt": "Use case: precise-object-edit. Asset type: final architecture plate for modular painted 2D bar game. Input is EDIT TARGET skyline-lounge. Preserve exact wide 16:9 canvas composition and all fixed room architecture, camera and perspective, full panoramic window frames and mullions, marble pillars, black gold wall trim, right arched wall recesses, ceiling and hanging amber pendant lights and wall sconces. Preserve original sunset skyline through windows (will be separated with exact mask later). Remove ALL furniture and loose decor, entire foreground bar counter including front and stools at bottom, right back counter and cabinet, every shelf board and bottle/glass/fruit, sofas/chairs/tables/lamps/vases/potted plants. Reconstruct matching blue-black marble floor with gold detail all the way to bottom and clean architectural marble wall inside right arched recesses. Keep every window/pillar and permanent arch in EXACT existing place. Empty room must be continuous and complete, surfaces naturally restored, no cutout holes, no new furniture, no people, no text. Same rich semi-realistic painterly finish, dark blue marble/gold and warm amber lighting."
+    },
+    {
+      "scene": "skyline",
+      "role": "shelf",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-2e2cd5e5-1fcc-4992-98ec-9c40ee9fe2f5.png",
+      "prompt": "Use case: precise-object-edit. Asset type: transparent empty shelf module for painted modular Skyline bar. Input is EDIT TARGET, shelf-reference crop. Preserve exact 502:414 crop proportions, original layout and perspective. Remove every bottle, decanter, glass/goblet, fruit and bowl, tabletop lamp, plant, loose shaker and foreground counter. Isolate ONLY the EMPTY gold-framed black/navy marble shelving furniture with its fixed gold vertical supports and horizontal thin gold shelf boards, including the stylized gold art deco fan/arch trim. Restore smooth matching dark marble backing under removed bottles and glasses. Keep actual shelves at exact original positions in canvas; do not center, enlarge or redesign. Empty shelf boards around y=14%, 36%, 60% and bottom region stay aligned to original crop. All pixels outside this shelf cabinet/frame/backing truly transparent. No room wall outside shelf, no people, text, items or drop shadow. Preserve semi-realistic painterly finish and restrained amber built-in glow."
+    },
+    {
+      "scene": "skyline",
+      "role": "counter",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-a508a8e7-e2b3-41b4-b185-0c12e5812e66.png",
+      "prompt": "Use case: precise-object-edit. Asset type: complete transparent foreground counter module for Skyline painted modular bar game. Input is EDIT TARGET, ultrawide counter-reference crop, original 1672:320 aspect. Keep EXACT original very wide crop composition and geometry: marble countertop top edge at about 16% down, fascia gold band around 56%-63% down, black marble rectangular front panels down to bottom. Remove ALL objects on top at left (vase, candles, tray, shakers, tools), ALL three foreground stools intruding from bottom, ALL room/sofa/table background above counter silhouette. Reconstruct continuous polished navy-black marble countertop and unobstructed counter front panels where objects and stools were removed. Preserve original gold veining, gold horizontal edge band, slim gold vertical panel posts, straight original perspective and full edge-to-edge silhouette. Include countertop AND entire visible front facade with solid opaque panels, no holes. Keep full width touching left and right canvas edges. Truly transparent area above top. No recentering, no people, bottles, text, new decor. Same painterly realism, cool dark marble and warm gold reflections.",
+      "visibleTopPixels": 52
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "id": "2026-10-07-05",
+  "date": "2026-10-07",
+  "tool": "built-in image_gen",
+  "generationCalls": 10,
+  "revisionInputs": [
+    {
+      "scene": "underground",
+      "role": "shelf",
+      "source": "C:/Users/kubai/.codex/generated_images/01a11537-35c9-7660-8318-346e7cc5f58f/exec-87d3b3b6-d005-46f5-a916-cca9eb87672a.png",
+      "archive": "assets-src/bar-modular/underground/shelf-2026-10-07-05-initial.png",
+      "prompt": "Use case: precise-object-edit. Asset type: transparent complete EMPTY rear backbar furniture for modular Underground bar. EDIT TARGET exact wide crop, second original room for matching coordinates/material only. Preserve camera/framing/perspective and ALL rear wooden furniture as one transparent sprite: left three-tier open rack at x~9%-32% of crop with boards at original heights; middle shorter two-tier rack at x~36%-63%; right three-tier rack x~68%-91%; AND the long low dark wood carved storage cabinet below racks, its empty continuous rear worktop, whole cabinet front and plinth. Reconstruct complete bases where obscured. Keep dark polished timber, copper/brass thin board edges, small fixed amber shelf lighting and brass cabinet handles/trim. All three upper racks have OPEN gaps between boards: remove stone wall/arches/pillars/embedded crystals completely from between rack boards and surrounding them, NO opaque room backing. Remove every bottle/glass/utensil/copper kettle/tap/shaker/plant/vine/fruit/flower/book, miniature wheel ornaments and loose lanterns resting on boards, all hanging wall/ceiling lamps and their chains. Remove foreground counter at bottom if present. Only bare wooden racks and lower storage cabinet, genuinely transparent outside and BETWEEN upper boards and rack groups. Original detailed semi-realistic painted wood/copper warm amber finish, no text/people/new props."
+    },
+    {
+      "scene": "underground",
+      "role": "counter",
+      "source": "C:/Users/kubai/.codex/generated_images/01a11537-35c9-7660-8318-346e7cc5f58f/exec-15297142-3e1e-4af7-ab1a-822bf132e685.png",
+      "archive": "assets-src/bar-modular/underground/counter-2026-10-07-05-initial.png",
+      "prompt": "Use case: precise-object-edit. Asset type: complete transparent modular Underground foreground counter. EDIT TARGET first wide reference crop, second full room material/scale only. Isolate ONLY enormous full-width foreground polished dark wood bar counter: reflective dark thick worktop with copper/amber sheen and natural wood grain, black/brown vertical timber front panels, riveted brass/copper vertical strips, amber illuminated under-worktop band, whole bottom wood/brass plinth. Preserve exact wide16:4.1 framing/camera: foreground counter top starts~25% down crop, worktop front edge around45%; facade below. Remove all five burgundy/brass stools and every leg/seat/ring pixel, all bottles/glasses/shakers/utensils/fruit/plants/vessels/loose lights on counter, rear cabinets/worktop at TOP, shelves, stone/crystals/lanterns/pipes and floor. Reconstruct continuous empty worktop and COMPLETE uninterrupted facade behind seats. Restore whole bottom base hidden beyond original frame, completing it INSIDE canvas (bottom~98%), counter edge to edge. Counter only, true transparent region above silhouette, same deep-closeup painted wood/copper with warm amber light, no text/people/new objects."
+    }
+  ],
+  "items": [
+    {
+      "scene": "izakaya",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-5af8bb3f-4cdf-4dc6-8290-ab03d288e7e6.png",
+      "prompt": "Use case: precise-object-edit. Asset type: clean architecture plate for modular hand-painted Izakaya bar. EDIT TARGET attached original wide image. Preserve EXACT landscape1516:1004 framing/camera/perspective, honey-brown timber beams/posts, ceiling rafters, glowing suspended paper lanterns, translucent wooden shoji wall left-center, original central cream noren curtains with black circular enso and mountain brush painting, curtain support and blue-gray wood wall beneath them. Keep the open garden LEFT with original red maple, greenery, stone Japanese lantern and garden ground: garden vegetation/stone lantern belong to exterior and must remain. Remove ALL indoor furniture and loose props: entire foreground wooden bar counter, all four chair/stools and legs/rails, main and small right liquor shelf cabinets including frames/boards/backing, ALL bottles/cups/glasses/bowls/stacked ceramics/boxes/brewing tools/candles/flowers/vases and indoor plant arrangements, little floor tables. Reconstruct continuous plain dark timber panel wall on right where shelving was and uninterrupted original warm wooden plank floor across all hidden foreground surfaces. Whole empty room with exact source camera and warm golden light, same semi-realistic painterly game style. No new objects, people/text, no reframing or transparent holes."
+    },
+    {
+      "scene": "izakaya",
+      "role": "shelf",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-c9392697-2dc2-4b2e-ad5c-e277cf1e23ec.png",
+      "prompt": "Use case: precise-object-edit. Asset type: transparent EMPTY liquor shelving for modular Izakaya bar. EDIT TARGET first exact crop, second full original room for material only. Isolate ONLY original two dark honey-brown timber liquor cabinets: main wide unit occupying x~12%-78% of crop, narrower unit x~80%-100% continuing beyond right crop edge. Keep source front perspective and relative sizes/positions. Main unit has THREE empty horizontal levels with warm golden built-in shelf lighting and dark wooden backing. Narrow right unit has matching wooden top small cubbies and three empty lower shelf compartments. Remove ALL sake bottles, ceramics/cups/bowls/boxes and stacked plates, people/text/labels, and EVERY paper pendant lantern/cable, curtain, shoji/wall/beams, main counter or tabletop objects/candles/flowers/tools. Remove loose storage boxes too. Reconstruct clean empty shelves where objects were, full cabinet framework and bottom base. Genuine transparent all surroundings and gap between units, keep only actual furniture not painted room. Same warm semi-realistic hand-painted brown timber/gold light, no new objects or reframing.",
+      "contentRectNormalized": {
+        "x": 0.12,
+        "y": 0.04,
+        "width": 0.88,
+        "height": 0.91
+      }
+    },
+    {
+      "scene": "izakaya",
+      "role": "counter",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-ac528a34-9d2e-4bcb-ad80-f1e700242d37.png",
+      "prompt": "Use case: precise-object-edit. Asset type: complete transparent modular Izakaya bar counter. EDIT TARGET first expanded exact wide counter crop, second original room context only. Isolate ONLY whole foreground honey-brown solid timber counter: uninterrupted polished thick wood worktop with slightly angled left end/overhang, straight warm dark vertical timber panel facade, posts and complete bottom wood plinth. Keep original camera and EXACT wide1516:450 framing: counter starts about6% from left and extends right edge, worktop near14% down crop, base near93%. Remove ALL four chair/stools including woven seat/back/legs/rails and every occlusion, candles, flowers/vase, ALL bottles/cups/ceramics/bowls/shakers/utensils, backbar/room/shoji/curtains/paper lanterns/garden/stone lantern/floor. Reconstruct continuous empty worktop and whole wooden panel facade where stools hid it. True transparent surroundings, no new objects or shadows/background. Entire counter including left edge and base, semi-realistic painterly honey timber grain and warm golden original light. No people/text.",
+      "contentRectNormalized": {
+        "x": 0.058,
+        "y": 0.135,
+        "width": 0.942,
+        "height": 0.79
+      }
+    },
+    {
+      "scene": "izakaya",
+      "role": "seat",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-1e519e2b-d548-4cdc-ae99-0977cb5de94e.png",
+      "prompt": "Use case: precise-object-edit. Asset type: ONE complete transparent reusable Izakaya bar chair. EDIT TARGET first original source chair crop, second full room for material/perspective only. Restore exactly ONE original tall low-back wooden chair: short horizontal dark brown wood backrest rail, two back upright supports, wide square honey-tan tightly woven straw/rattan padded seat, four straight/slightly splayed dark brown square wood legs and rectangular wooden footrest crossbars at low/mid height. Preserve source view from rear/front as reference: backrest rail visible ABOVE straw seat, original flat seat perspective slightly from above. Restore COMPLETE all four legs/feet and every crossbar INSIDE canvas, leave narrow genuinely transparent surrounding margin and true transparent gaps between legs and under backrest. Remove all counter/floor/room pixels everywhere, no floor shadow, no extra chair, bottles/cups/props, people/text. Same detailed semi-realistic hand-painted dark wood/rattan and warm golden original light. One whole chair centered upright portrait ratio~0.8, original silhouette."
+    },
+    {
+      "scene": "underground",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-287f613f-b481-4eb6-8c2f-a62ca24ddcd8.png",
+      "prompt": "Use case: precise-object-edit. Asset type: clean architecture plate for modular Underground fantasy bar. EDIT TARGET exact attached wide source. Preserve EXACT wide16:9 framing/camera and deep close-up perspective: dark volcanic stone wall, three original stone arch recesses, copper ceiling pipes, riveted brass structural bands around arch pillars, hanging brass lanterns and fixed wall lights, embedded glowing amber and blue crystal veins/clusters in original locations. All embedded crystals and structural pipes belong to architecture. Remove ALL movable furniture: whole foreground long polished dark wood/copper bar counter, five burgundy/brass stools including all visible legs, all three shelf sets and lower rear cabinets/worktop, every bottle/glass/utensil/shaker/tap/copper brewing kettle and vessel, plants/vines/flowers/fruit, barrels, books, loose decorative wheel models/clock ornaments and anything resting on shelf boards. Reconstruct uninterrupted rough volcanic stone in niches and below removed cabinets; restore believable dark stone floor from original counter's lower region to bottom preserving camera/perspective, warm reflections from lanterns/crystals. Empty architectural room, complete continuous walls/floor, no furniture/text/people, no new crystal placement or transparent holes. Detailed semi-realistic hand-painted stone/copper finish matching source."
+    },
+    {
+      "scene": "underground",
+      "role": "shelf",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-a2c2cd51-2613-46c7-a114-dffc1c7103d0.png",
+      "prompt": "Use case: precise-object-edit. Asset type: corrected transparent modular rear backbar furniture. EDIT TARGET FIRST generated empty furniture, SECOND original shelf crop is STRICT position/silhouette reference. Preserve target's wood/brass material, empty compartments, warm lights and full lower cabinet. Correct ONLY geometry of upper three rack sets to match original second reference EXACTLY: ORIGINAL stone pillars at x~32%-36% and x~63%-68% of original cropped canvas must be WIDE EMPTY TRANSPARENT VERTICAL GAPS between upper racks. Left THREE-tier upper rack spans x~9%-32% (narrower than first target), central TWO-tier upper rack spans x~36%-63%, right THREE-tier rack spans x~68%-91%. Upper cabinet posts must NOT meet or connect across these gaps. Place top of side racks y~12% crop, top central rack y~37%; side boards y~36%,59%,80%, central boards y~62%,80%. Long low continuous storage cabinet stays full width x~2%-98%, worktop at~80% crop and complete carved cabinet front/plinth below. KEEP empty transparent spaces inside rack compartments (stone architecture will show through), no opaque wall/backing and absolutely no stone pillars baked into sprite. All racks are separate above common base, preserve exact wide cropped camera. No bottles/glasses, room, hanging lanterns, plants, text, people or loose props. Whole clean complete wood/brass furniture with true transparent background.",
+      "contentRectNormalized": {
+        "x": 0.025,
+        "y": 0.115,
+        "width": 0.95,
+        "height": 0.87
+      }
+    },
+    {
+      "scene": "underground",
+      "role": "counter",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-6966c972-cce5-4fbd-be11-7221524a7605.png",
+      "prompt": "Use case: precise-object-edit. Asset type: corrected complete transparent modular Underground counter. EDIT TARGET attached generated counter. Keep EXACT same canvas, outer silhouette, size/camera, polished dark wood top and its amber/copper reflections, under-counter glowing band, all brass vertical riveted strips and whole bottom brass plinth. Correct ONLY the accidental ROCK/STONE FLOOR patches baked into the lower quarter of every timber front panel. Remove ALL jagged gray/brown stone shapes INSIDE counter facade, replace them with continuous dark vertical wooden plank grain seamlessly matching upper wood portions, all the way down to lower horizontal brass plinth. The facade is uninterrupted complete timber paneling from top to base; no holes, no stone inserts or silhouettes from former stools. Preserve true transparent area above/around counter and exact full-width silhouette. Nothing else changes. No room/floor/stools/bottles/text/people/added objects.",
+      "contentRectNormalized": {
+        "x": 0,
+        "y": 0.255,
+        "width": 1,
+        "height": 0.745
+      }
+    },
+    {
+      "scene": "underground",
+      "role": "seat",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-5e06ba72-415e-4fd6-b4c5-5c71454ddee5.png",
+      "prompt": "Use case: precise-object-edit. Asset type: ONE COMPLETE transparent reusable Underground bar stool. EDIT TARGET first original cropped stool; second full original room only for proportions/material/light. Source legs are clipped at bottom; RECONSTRUCT all full legs and feet naturally to complete stool. Exactly ONE original round deep burgundy leather padded seat with broad hammered brass/copper rim and spaced dark brass rivets, four gently splayed cylindrical polished brass legs with black iron collars under seat, circular dark iron/brass footrest ring below middle and complete round brass feet. Preserve original stool seat oval perspective and deep-closeup proportions. Center one upright entire stool in portrait ratio~0.70 with every foot and ring INSIDE canvas and small transparent margins. Genuine transparent background/gaps between legs and through ring. Remove ALL counter/floor/stone/room pixels around/inside silhouette, no floor shadow, room, people/text/extra objects. Same detailed semi-realistic hand-painted burgundy leather/brass with warm amber lantern reflections."
+    }
+  ]
+}

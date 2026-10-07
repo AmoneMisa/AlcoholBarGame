@@ -1,0 +1,260 @@
+{
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "jazz-cellar",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\jazz-cellar\\architecture-2026-10-07-03.png",
+      "output": "public\\assets\\bar\\modular\\jazz-cellar\\architecture.webp",
+      "size": [
+        623,
+        623
+      ],
+      "alphaRange": [
+        255,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1254,
+          1254
+        ]
+      }
+    },
+    {
+      "scene": "jazz-cellar",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\jazz-cellar\\shelf-2026-10-07-03.png",
+      "output": "public\\assets\\bar\\modular\\jazz-cellar\\clean-ready\\shelf.webp",
+      "size": [
+        623,
+        140
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          2,
+          119,
+          2168,
+          608
+        ],
+        "contentRectPixels": [
+          0,
+          0,
+          623,
+          140
+        ]
+      }
+    },
+    {
+      "scene": "jazz-cellar",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\jazz-cellar\\counter-2026-10-07-03.png",
+      "output": "public\\assets\\bar\\modular\\jazz-cellar\\clean-ready\\counter.webp",
+      "size": [
+        623,
+        207
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2160,
+          728
+        ],
+        "contentBounds": [
+          0,
+          178,
+          2160,
+          696
+        ],
+        "contentRectPixels": [
+          0,
+          50,
+          623,
+          157
+        ]
+      }
+    },
+    {
+      "scene": "jazz-cellar",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\jazz-cellar\\seat-2026-10-07-03.png",
+      "output": "public\\assets\\bar\\modular\\jazz-cellar\\clean-ready\\seat.webp",
+      "size": [
+        75,
+        146
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          872,
+          1802
+        ],
+        "contentBounds": [
+          48,
+          108,
+          825,
+          1734
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "jazz-cellar",
+      "role": "band",
+      "source": "assets-src\\bar-modular\\jazz-cellar\\band-2026-10-07-03.png",
+      "output": "public\\assets\\bar\\modular\\jazz-cellar\\clean-ready\\band.webp",
+      "size": [
+        485,
+        172
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2106,
+          747
+        ],
+        "contentBounds": [
+          18,
+          7,
+          2099,
+          737
+        ],
+        "contentRectPixels": [
+          7,
+          3,
+          470,
+          165
+        ]
+      }
+    },
+    {
+      "scene": "art-deco",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\art-deco\\architecture-2026-10-07-03.png",
+      "output": "public\\assets\\bar\\modular\\art-deco\\architecture.webp",
+      "size": [
+        623,
+        623
+      ],
+      "alphaRange": [
+        255,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1254,
+          1254
+        ]
+      }
+    },
+    {
+      "scene": "art-deco",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\art-deco\\shelf-2026-10-07-03.png",
+      "output": "public\\assets\\bar\\modular\\art-deco\\clean-ready\\shelf.webp",
+      "size": [
+        362,
+        287
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1408,
+          1117
+        ],
+        "contentBounds": [
+          36,
+          170,
+          1376,
+          954
+        ],
+        "contentRectPixels": [
+          20,
+          57,
+          315,
+          189
+        ]
+      }
+    },
+    {
+      "scene": "art-deco",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\art-deco\\counter-2026-10-07-03.png",
+      "output": "public\\assets\\bar\\modular\\art-deco\\clean-ready\\counter.webp",
+      "size": [
+        623,
+        212
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2169,
+          725
+        ],
+        "contentBounds": [
+          64,
+          126,
+          2103,
+          650
+        ],
+        "contentRectPixels": [
+          19,
+          40,
+          586,
+          172
+        ]
+      }
+    },
+    {
+      "scene": "art-deco",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\art-deco\\seat-2026-10-07-03.png",
+      "output": "public\\assets\\bar\\modular\\art-deco\\clean-ready\\seat.webp",
+      "size": [
+        93,
+        187
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          930,
+          1692
+        ],
+        "contentBounds": [
+          47,
+          137,
+          888,
+          1596
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    }
+  ],
+  "preview": "docs\\modular-review\\generated-batch-2026-10-07-03.webp"
+}

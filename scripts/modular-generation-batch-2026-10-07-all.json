@@ -1,0 +1,139 @@
+{
+  "date": "2026-10-07",
+  "tool": "built-in image_gen",
+  "parts": [
+    {
+      "id": "2026-10-07-all-03",
+      "batch": "modular-generation-batch-2026-10-07-all-03.json",
+      "scenes": [
+        "cyberpunk-2077",
+        "darksiders-3",
+        "death-stranding",
+        "desert",
+        "detroit",
+        "devil-may-cry",
+        "diablo-4",
+        "divinity-original-sin-2"
+      ],
+      "state": "reviewed-production"
+    },
+    {
+      "id": "2026-10-07-all-04",
+      "batch": "modular-generation-batch-2026-10-07-all-04.json",
+      "scenes": [
+        "elden-ring",
+        "fairy",
+        "fairytale",
+        "gta",
+        "gta-3",
+        "gta-5",
+        "gta-sa",
+        "harry-potter"
+      ],
+      "state": "reviewed-production"
+    },
+    {
+      "id": "2026-10-07-all-05",
+      "batch": "modular-generation-batch-2026-10-07-all-05.json",
+      "scenes": [
+        "heroes-3",
+        "lineage-2",
+        "lost-ark",
+        "marina",
+        "mass-effect",
+        "max-payne",
+        "minecraft",
+        "neighbours-from-hell"
+      ],
+      "state": "reviewed-production"
+    },
+    {
+      "id": "2026-10-07-all-02",
+      "batch": "modular-generation-batch-2026-10-07-all-02.json",
+      "scenes": [
+        "baldurs-gate-3",
+        "batman",
+        "beach",
+        "black-desert",
+        "borderlands",
+        "control",
+        "cs-2",
+        "cyberpunk"
+      ],
+      "state": "reviewed-production"
+    },
+    {
+      "id": "2026-10-07-all-01",
+      "batch": "modular-generation-batch-2026-10-07-all-01.json",
+      "scenes": [
+        "alan-wake",
+        "allods",
+        "among-us",
+        "assassins-creed"
+      ],
+      "state": "reviewed-production"
+    },
+    {
+      "id": "2026-10-07-all-06",
+      "batch": "modular-generation-batch-2026-10-07-all-06.json",
+      "scenes": [
+        "nfs-carbon",
+        "nfs-most-wanted",
+        "nfs-underground",
+        "palace",
+        "palworld",
+        "parisian",
+        "perfect-world",
+        "quantum-break"
+      ],
+      "state": "reviewed-production"
+    },
+    {
+      "id": "2026-10-07-all-07",
+      "batch": "modular-generation-batch-2026-10-07-all-07.json",
+      "scenes": [
+        "repo",
+        "resident-evil",
+        "riad",
+        "rooftop",
+        "shadow-tomb-raider",
+        "silent-hill",
+        "skyrim",
+        "sleeping-dogs"
+      ],
+      "state": "reviewed-production"
+    },
+    {
+      "id": "2026-10-07-all-08",
+      "batch": "modular-generation-batch-2026-10-07-all-08.json",
+      "scenes": [
+        "stellar-blade",
+        "tropical",
+        "tropico-6",
+        "underwater",
+        "walking-dead-s3",
+        "warcraft-3",
+        "watch-dogs",
+        "winter"
+      ],
+      "state": "reviewed-production"
+    },
+    {
+      "id": "2026-10-07-all-09",
+      "batch": "modular-generation-batch-2026-10-07-all-09.json",
+      "scenes": [
+        "witcher-3",
+        "wolf-among-us",
+        "worms"
+      ],
+      "state": "reviewed-production"
+    }
+  ],
+  "exteriors": {
+    "standaloneLandscapes": 12,
+    "nativeAlphaScenes": 56,
+    "measuredApertureScenes": 11,
+    "exteriorEnabledScenes": 67,
+    "validation": "docs/modular-review/exterior-validation.json"
+  }
+}

@@ -8,7 +8,8 @@ export const SHELF_DECOR_PRESET_IDS = [
   'wine-cellar',
   'budget-mix',
   'fantasy-elixirs',
-  'cyberpunk-liquids'
+  'cyberpunk-liquids',
+  'velvet-original'
 ] as const;
 export type ShelfDecorPresetId = typeof SHELF_DECOR_PRESET_IDS[number];
 
@@ -28,6 +29,7 @@ export interface ShelfDecorPreset {
   density:'low'|'medium'|'high';
   filter?:string;
   glow?:string;
+  atlas?:{asset:string;columns:number;rows:number};
   items:readonly ShelfDecorItem[];
 }
 
@@ -36,6 +38,11 @@ const spread=(cells:readonly number[],row:number,scale=1,offset=0):ShelfDecorIte
   cells.map((cell,index)=>item(cell,(index+1)/(cells.length+1)+offset,row,scale,(index%3-1)*1.5));
 
 export const SHELF_DECOR_PRESETS:readonly ShelfDecorPreset[] = [
+  {
+    id:'velvet-original',label:'Original Velvet bottles',description:'The original painted bottles from the Velvet shelf.',density:'medium',
+    atlas:{asset:'/assets/drinks/bottles/velvet-bottles-v2.webp',columns:4,rows:3},
+    items:[...spread([0,1,2,3],0,.95),...spread([4,5,6,7],1,.95),...spread([8,9,10,11],2,.95)]
+  },
   {
     id:'classic-cocktails',label:'Classic cocktails',description:'Balanced spirits, liqueurs and sparkling bottles.',density:'medium',
     items:[

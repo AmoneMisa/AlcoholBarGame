@@ -28,16 +28,16 @@
     "shelf-reference": {
       "crop": {
         "x": 443,
-        "y": 71,
+        "y": 51,
         "width": 321,
-        "height": 259
+        "height": 253
       },
       "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware.",
       "rect": {
         "x": 0.579815,
-        "y": 0.140438,
+        "y": 0.099602,
         "width": 0.420185,
-        "height": 0.50996
+        "height": 0.498008
       }
     },
     "counter-reference": {
@@ -45,14 +45,14 @@
         "x": 0,
         "y": 262,
         "width": 764,
-        "height": 170
+        "height": 228
       },
       "prompt": "Isolate existing counter with transparent surroundings and bleed.",
       "rect": {
         "x": 0,
         "y": 0.51494,
         "width": 1,
-        "height": 0.334661
+        "height": 0.448207
       }
     }
   },
@@ -65,15 +65,15 @@
     },
     "shelves": {
       "x": 0.620053,
-      "y": 0.140438,
+      "y": 0.099602,
       "width": 0.360158,
-      "height": 0.50996
+      "height": 0.498008
     },
     "counter": {
       "x": 0,
       "y": 0.51494,
       "width": 1,
-      "height": 0.334661
+      "height": 0.448207
     },
     "floor": {
       "x": 0,
@@ -104,24 +104,24 @@
   ],
   "seatAnchors": [
     {
-      "x": 0.199868,
+      "x": 0.201847,
       "y": 0.75
     },
     {
-      "x": 0.399736,
+      "x": 0.425462,
       "y": 0.75
     },
     {
-      "x": 0.600264,
+      "x": 0.631266,
       "y": 0.75
     },
     {
-      "x": 0.83971,
+      "x": 0.872032,
       "y": 0.75
     }
   ],
   "bartenderAnchor": null,
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "measured-gameplay",
   "requiredRoles": [
     "counter",
@@ -133,14 +133,15 @@
     "seating"
   ],
   "review": {
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "measured-pane-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "notes": [
     "Measured from existing BarScene geometry.",

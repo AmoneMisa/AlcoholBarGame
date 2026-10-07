@@ -1,0 +1,894 @@
+{
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "baldurs-gate-3",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\baldurs-gate-3\\architecture-2026-10-07-all-02-43452820c1df.png",
+      "output": "public\\assets\\bar\\modular\\baldurs-gate-3\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\baldurs-gate-3\\shelf-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\baldurs-gate-3\\clean-ready\\shelf.webp",
+      "size": [
+        920,
+        508
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1688,
+          932
+        ],
+        "contentBounds": [
+          44,
+          0,
+          1646,
+          914
+        ],
+        "contentRectPixels": [
+          32,
+          30,
+          856,
+          472
+        ]
+      }
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\baldurs-gate-3\\counter-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\baldurs-gate-3\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        386
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          22,
+          183,
+          2147,
+          631
+        ],
+        "contentRectPixels": [
+          0,
+          66,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\baldurs-gate-3\\seat-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\baldurs-gate-3\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1145,
+          1374
+        ],
+        "contentBounds": [
+          165,
+          47,
+          980,
+          1310
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "batman",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\batman\\architecture-2026-10-07-all-02-a7b19ff2a276.png",
+      "output": "public\\assets\\bar\\modular\\batman\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "batman",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\batman\\shelf-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\batman\\clean-ready\\shelf.webp",
+      "size": [
+        970,
+        508
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1733,
+          907
+        ],
+        "contentBounds": [
+          25,
+          0,
+          1709,
+          889
+        ],
+        "contentRectPixels": [
+          34,
+          30,
+          902,
+          472
+        ]
+      }
+    },
+    {
+      "scene": "batman",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\batman\\counter-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\batman\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        414
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          10,
+          143,
+          2161,
+          636
+        ],
+        "contentRectPixels": [
+          0,
+          94,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "batman",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\batman\\seat-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\batman\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1024,
+          1536
+        ],
+        "contentBounds": [
+          70,
+          65,
+          948,
+          1461
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "beach",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\beach\\architecture-2026-10-07-all-02-4ca3a8f7db2d.png",
+      "output": "public\\assets\\bar\\modular\\beach\\architecture.webp",
+      "size": [
+        764,
+        508
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1537,
+          1023
+        ]
+      }
+    },
+    {
+      "scene": "beach",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\beach\\shelf-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\beach\\clean-ready\\shelf.webp",
+      "size": [
+        382,
+        244
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1569,
+          1002
+        ],
+        "contentBounds": [
+          31,
+          21,
+          1538,
+          980
+        ],
+        "contentRectPixels": [
+          13,
+          15,
+          355,
+          227
+        ]
+      }
+    },
+    {
+      "scene": "beach",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\beach\\counter-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\beach\\clean-ready\\counter.webp",
+      "size": [
+        764,
+        254
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          21,
+          108,
+          2148,
+          691
+        ],
+        "contentRectPixels": [
+          122,
+          41,
+          642,
+          152
+        ]
+      }
+    },
+    {
+      "scene": "beach",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\beach\\seat-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\beach\\clean-ready\\seat.webp",
+      "size": [
+        107,
+        157
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1035,
+          1519
+        ],
+        "contentBounds": [
+          64,
+          75,
+          988,
+          1453
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "black-desert",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\black-desert\\architecture-2026-10-07-all-02-ebf20f62f1fe.png",
+      "output": "public\\assets\\bar\\modular\\black-desert\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1670,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "black-desert",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\black-desert\\shelf-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\black-desert\\clean-ready\\shelf.webp",
+      "size": [
+        936,
+        499
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1721,
+          914
+        ],
+        "contentBounds": [
+          6,
+          5,
+          1715,
+          894
+        ],
+        "contentRectPixels": [
+          33,
+          30,
+          870,
+          464
+        ]
+      }
+    },
+    {
+      "scene": "black-desert",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\black-desert\\counter-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\black-desert\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        376
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          16,
+          180,
+          2154,
+          628
+        ],
+        "contentRectPixels": [
+          0,
+          56,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "black-desert",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\black-desert\\seat-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\black-desert\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1145,
+          1374
+        ],
+        "contentBounds": [
+          219,
+          77,
+          950,
+          1300
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "borderlands",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\borderlands\\architecture-2026-10-07-all-02-e375568a4862.png",
+      "output": "public\\assets\\bar\\modular\\borderlands\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1671,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "borderlands",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\borderlands\\shelf-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\borderlands\\clean-ready\\shelf.webp",
+      "size": [
+        1104,
+        461
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1940,
+          810
+        ],
+        "contentBounds": [
+          9,
+          19,
+          1931,
+          786
+        ],
+        "contentRectPixels": [
+          39,
+          28,
+          1027,
+          429
+        ]
+      }
+    },
+    {
+      "scene": "borderlands",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\borderlands\\counter-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\borderlands\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        386
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          8,
+          181,
+          2164,
+          633
+        ],
+        "contentRectPixels": [
+          0,
+          66,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "borderlands",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\borderlands\\seat-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\borderlands\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1024,
+          1536
+        ],
+        "contentBounds": [
+          43,
+          80,
+          996,
+          1461
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "control",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\control\\architecture-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\control\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        255,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "control",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\control\\shelf-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\control\\clean-ready\\shelf.webp",
+      "size": [
+        803,
+        518
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1562,
+          1007
+        ],
+        "contentBounds": [
+          6,
+          0,
+          1555,
+          1004
+        ],
+        "contentRectPixels": [
+          28,
+          31,
+          747,
+          482
+        ]
+      }
+    },
+    {
+      "scene": "control",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\control\\counter-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\control\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        395
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2172,
+          724
+        ],
+        "contentBounds": [
+          12,
+          135,
+          2160,
+          628
+        ],
+        "contentRectPixels": [
+          0,
+          75,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "control",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\control\\seat-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\control\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1145,
+          1374
+        ],
+        "contentBounds": [
+          228,
+          88,
+          916,
+          1289
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "cs-2",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\cs-2\\architecture-2026-10-07-all-02-3a7ebc34fa1a.png",
+      "output": "public\\assets\\bar\\modular\\cs-2\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1671,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "cs-2",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\cs-2\\shelf-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\cs-2\\clean-ready\\shelf.webp",
+      "size": [
+        585,
+        489
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1373,
+          1145
+        ],
+        "contentBounds": [
+          17,
+          51,
+          1361,
+          1124
+        ],
+        "contentRectPixels": [
+          20,
+          29,
+          544,
+          455
+        ]
+      }
+    },
+    {
+      "scene": "cs-2",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\cs-2\\counter-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\cs-2\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        376
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          9,
+          158,
+          2160,
+          642
+        ],
+        "contentRectPixels": [
+          0,
+          56,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "cs-2",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\cs-2\\seat-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\cs-2\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1161,
+          1355
+        ],
+        "contentBounds": [
+          193,
+          76,
+          958,
+          1274
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "cyberpunk",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\cyberpunk\\architecture-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\cyberpunk\\architecture.webp",
+      "size": [
+        764,
+        508
+      ],
+      "alphaRange": [
+        255,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1537,
+          1023
+        ]
+      }
+    },
+    {
+      "scene": "cyberpunk",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\cyberpunk\\shelf-2026-10-07-all-02-8ba174521f72.png",
+      "output": "public\\assets\\bar\\modular\\cyberpunk\\clean-ready\\shelf.webp",
+      "size": [
+        619,
+        257
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1947,
+          808
+        ],
+        "contentBounds": [
+          8,
+          89,
+          1941,
+          792
+        ],
+        "contentRectPixels": [
+          22,
+          42,
+          577,
+          213
+        ]
+      }
+    },
+    {
+      "scene": "cyberpunk",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\cyberpunk\\counter-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\cyberpunk\\clean-ready\\counter.webp",
+      "size": [
+        764,
+        259
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2154,
+          730
+        ],
+        "contentBounds": [
+          11,
+          145,
+          2145,
+          664
+        ],
+        "contentRectPixels": [
+          0,
+          30,
+          764,
+          173
+        ]
+      }
+    },
+    {
+      "scene": "cyberpunk",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\cyberpunk\\seat-2026-10-07-all-02.png",
+      "output": "public\\assets\\bar\\modular\\cyberpunk\\clean-ready\\seat.webp",
+      "size": [
+        115,
+        173
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1025,
+          1534
+        ],
+        "contentBounds": [
+          64,
+          106,
+          960,
+          1454
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    }
+  ],
+  "preview": "docs\\modular-review\\generated-batch-2026-10-07-all-02.webp"
+}

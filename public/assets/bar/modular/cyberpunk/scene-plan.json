@@ -26,13 +26,19 @@
       }
     },
     "shelf-reference": {
+      "prompt": "Isolate the existing back-bar furniture from this source region. Remove all painted bottles and glassware. Preserve exact perspective.",
+      "cropNormalized": {
+        "x": 0.10026385224274406,
+        "y": 0.0846613545816733,
+        "width": 0.8100263852242744,
+        "height": 0.5049800796812749
+      },
       "crop": {
         "x": 77,
         "y": 43,
         "width": 619,
         "height": 257
       },
-      "prompt": "Isolate the existing back-bar furniture from this source region. Remove all painted bottles and glassware. Preserve exact perspective.",
       "rect": {
         "x": 0.100264,
         "y": 0.084661,
@@ -41,18 +47,24 @@
       }
     },
     "counter-reference": {
+      "prompt": "Isolate the existing bar counter with transparent surroundings and 24 px bleed. Preserve its exact perspective and silhouette.",
+      "cropNormalized": {
+        "x": 0,
+        "y": 0.4900398406374502,
+        "width": 1,
+        "height": 0.5099601593625498
+      },
       "crop": {
         "x": 0,
         "y": 249,
         "width": 764,
-        "height": 147
+        "height": 259
       },
-      "prompt": "Isolate the existing bar counter with transparent surroundings and 24 px bleed. Preserve its exact perspective and silhouette.",
       "rect": {
         "x": 0,
         "y": 0.49004,
         "width": 1,
-        "height": 0.289841
+        "height": 0.50996
       }
     }
   },
@@ -113,7 +125,7 @@
     }
   ],
   "bartenderAnchor": null,
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": null,
   "requiredRoles": [
     "counter",
@@ -126,14 +138,15 @@
   ],
   "review": {
     "windowCutouts": "not-applicable",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
     "manualApprovedRoles": [
       "counter",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual-refined"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "notes": [
     "Generated from the measured gameplay geometry already used by BarScene.",

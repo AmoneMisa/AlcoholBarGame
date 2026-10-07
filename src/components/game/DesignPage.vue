@@ -9,6 +9,7 @@ import { styleLabel } from '../../domain/styleInfo';
 import { useGameStore } from '../../stores/game';
 import AppearancePicker from './AppearancePicker.vue';
 import StylePreview from './StylePreview.vue';
+import ModularBarPreview from './ModularBarPreview.vue';
 import CharacterModel from '../characters/CharacterModel.vue';
 import UiButton from '../ui/UiButton.vue';
 import UiInput from '../ui/UiInput.vue';
@@ -23,7 +24,7 @@ const backgroundName=computed(()=>INTERIORS.find(item=>item.id===game.decor.inte
 const modularDefinition=computed(()=>modularSceneFor(game.decor.interior,true));
 const modularBackground=computed(()=>!!modularDefinition.value);
 const shelfPreset=computed({get:()=>game.decor.shelfPreset??'classic-cocktails',set:(value:string)=>{game.decor.shelfPreset=value as ShelfDecorPresetId;}});
-const windowBackdrop=computed({get:()=>game.decor.windowBackdrop??'night-city',set:(value:string)=>{game.decor.windowBackdrop=value as WindowBackdropId;}});
+const windowBackdrop=computed({get:()=>game.decor.windowBackdrop??'original',set:(value:string)=>{game.decor.windowBackdrop=value as WindowBackdropId;}});
 const seatMaximum=computed(()=>modularDefinition.value?.layers.filter(layer=>layer.role==='seating').length??0);
 const seatCount=computed({
   get:()=>String(Math.min(seatMaximum.value,Number(game.decor.seatCount??seatMaximum.value))),
@@ -51,13 +52,13 @@ function chooseCharacter(next:'noa'|'leo'){
       <nav class="customization-tabs" aria-label="Customization sections"><UiButton size="sm" :variant="section==='background'?'solid':'ghost'" @click="section='background'">Backgrounds</UiButton><UiButton size="sm" :variant="section==='style'?'solid':'ghost'" @click="section='style'">Styles</UiButton><UiButton size="sm" :variant="section==='character'?'solid':'ghost'" @click="section='character'">Character</UiButton></nav>
       <template v-if="section==='background'">
         <nav v-if="game.ownedBarIds.length>1" class="customization-tabs" aria-label="Choose a bar"><UiButton v-for="region in REGIONS.filter(item=>game.isBarOwned(item.id))" :key="region.id" size="sm" :variant="game.regionId===region.id?'solid':'ghost'" @click="game.switchBar(region.id)">{{region.name}}</UiButton></nav>
-        <button type="button" class="customization-bar-preview" :style="interiorStyle(game.decor.interior)" aria-label="Preview backgrounds and styles" @click="openPreview()"><span>{{backgroundName}} <b>· In use</b></span></button>
+        <button type="button" class="customization-bar-preview" :style="interiorStyle(game.decor.interior)" aria-label="Preview backgrounds and styles" @click="openPreview()"><ModularBarPreview :interior="game.decor.interior" /><span>{{backgroundName}} <b>· In use</b></span></button>
         <AppearancePicker kind="background" :character="character" :selected="game.decor.interior" @pick="pickBackground" />
         <div v-if="modularBackground" class="bar-module-controls">
           <OptionSelect v-model="shelfPreset" label="Back-bar bottle style" :options="[...SHELF_DECOR_OPTIONS]" />
           <OptionSelect v-if="seatMaximum" v-model="seatCount" label="Bar seats" :options="seatCountOptions" />
           <OptionSelect v-if="modularDefinition?.exterior" v-model="windowBackdrop" label="View outside" :options="[...WINDOW_BACKDROP_OPTIONS]" />
-          <small>One seat image is reused at the scene anchors, so changing the count does not duplicate art files. Decorative shelf bottles and the exterior view remain independent layers.</small>
+          <small>Choose the bottles, seats and view outside. The window frames and balcony railings belong to your room.</small>
         </div>
       </template>
       <template v-else>

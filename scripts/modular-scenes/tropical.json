@@ -6,7 +6,7 @@
     "width": 1232,
     "height": 1232
   },
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "notes": [
     "Generated from the measured gameplay geometry already used by BarScene.",
     "Do not ship reference crops as final modules until the clean architecture plate and transparency have been visually reviewed.",
@@ -26,22 +26,22 @@
       "prompt": "Create a clean architecture plate from this existing background. Remove counter, stools/chairs, loose foreground decor and back-bar furniture; reconstruct hidden wall and floor. Preserve fixed architecture and source perspective."
     },
     "shelf-reference": {
-      "crop": {
-        "x": 320,
-        "y": 283,
-        "width": 591,
-        "height": 493
-      },
-      "prompt": "Isolate the existing back-bar furniture from this source region. Remove all painted bottles and glassware. Preserve exact perspective."
+      "prompt": "Isolate the existing back-bar furniture from this source region. Remove all painted bottles and glassware. Preserve exact perspective.",
+      "cropNormalized": {
+        "x": 0.2597402597402597,
+        "y": 0.2297077922077922,
+        "width": 0.4797077922077922,
+        "height": 0.40016233766233766
+      }
     },
     "counter-reference": {
-      "crop": {
-        "x": 0,
-        "y": 610,
-        "width": 1232,
-        "height": 400
-      },
-      "prompt": "Isolate the existing bar counter with transparent surroundings and 24 px bleed. Preserve its exact perspective and silhouette."
+      "prompt": "Isolate the existing bar counter with transparent surroundings and 24 px bleed. Preserve its exact perspective and silhouette.",
+      "cropNormalized": {
+        "x": 0.0,
+        "y": 0.49512987012987014,
+        "width": 1.0,
+        "height": 0.5048701298701299
+      }
     }
   },
   "slots": {
@@ -105,59 +105,26 @@
   ],
   "bartenderAnchor": null,
   "review": {
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
     "manualApprovedRoles": [
       "seating"
     ],
-    "seatAsset": "single-reusable-manual-refined"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "manualApprovedRoles": [
     "seating"
   ],
   "windowCutoutsNormalized": [
     {
-      "type": "polygon",
-      "points": [
-        {
-          "x": 0.286,
-          "y": 0
-        },
-        {
-          "x": 0.714,
-          "y": 0
-        },
-        {
-          "x": 0.714,
-          "y": 0.347
-        },
-        {
-          "x": 0.669,
-          "y": 0.299
-        },
-        {
-          "x": 0.615,
-          "y": 0.253
-        },
-        {
-          "x": 0.5,
-          "y": 0.22
-        },
-        {
-          "x": 0.385,
-          "y": 0.253
-        },
-        {
-          "x": 0.331,
-          "y": 0.299
-        },
-        {
-          "x": 0.286,
-          "y": 0.347
-        }
-      ]
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78,
+      "type": "rect"
     }
   ],
   "manualRoleMasksNormalized": {
@@ -405,5 +372,74 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "shelfUnits": [
+    {
+      "x0": 0.2775,
+      "x1": 0.3953,
+      "rows": [
+        0.3931,
+        0.4673,
+        0.5402
+      ]
+    },
+    {
+      "x0": 0.4062,
+      "x1": 0.6069,
+      "rows": [
+        0.3931,
+        0.4673,
+        0.5402
+      ]
+    },
+    {
+      "x0": 0.6178,
+      "x1": 0.7334,
+      "rows": [
+        0.3931,
+        0.4673,
+        0.5402
+      ]
+    }
+  ],
+  "shelfBottom": 0.5677,
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-all-08.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.2775,
+      "x1": 0.3953,
+      "rows": [
+        0.357,
+        0.447,
+        0.506
+      ]
+    },
+    {
+      "x0": 0.4062,
+      "x1": 0.6069,
+      "rows": [
+        0.357,
+        0.447,
+        0.506
+      ]
+    },
+    {
+      "x0": 0.6178,
+      "x1": 0.7334,
+      "rows": [
+        0.357,
+        0.447,
+        0.506
+      ]
+    }
+  ],
+  "generatedArchitectureAlpha": true,
+  "generatedExteriorBoundsNormalized": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78
+    }
+  ]
 }

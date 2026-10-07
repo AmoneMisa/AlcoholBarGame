@@ -6,7 +6,7 @@
     "width": 1516,
     "height": 1004
   },
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "measured-gameplay",
   "notes": [
     "Measured from existing BarScene geometry.",
@@ -28,22 +28,22 @@
       "prompt": "Clean architecture plate; remove counter, seating, loose foreground decor and back-bar furniture; reconstruct hidden surfaces."
     },
     "shelf-reference": {
-      "crop": {
-        "x": 531,
-        "y": 70,
-        "width": 546,
-        "height": 507
-      },
-      "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware."
+      "prompt": "Isolate existing back-bar furniture and remove painted bottles/glassware.",
+      "cropNormalized": {
+        "x": 0.3502638522427441,
+        "y": 0.0697211155378486,
+        "width": 0.36015831134564646,
+        "height": 0.5049800796812749
+      }
     },
     "counter-reference": {
-      "crop": {
-        "x": 0,
-        "y": 442,
-        "width": 1516,
-        "height": 261
-      },
-      "prompt": "Isolate existing counter with transparent surroundings and bleed."
+      "prompt": "Isolate existing counter with transparent surroundings and bleed.",
+      "cropNormalized": {
+        "x": 0.0,
+        "y": 0.4402390438247012,
+        "width": 1.0,
+        "height": 0.5597609561752988
+      }
     }
   },
   "slots": {
@@ -107,32 +107,19 @@
   ],
   "bartenderAnchor": null,
   "review": {
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
-    "seatAsset": "single-reusable-manual-refined"
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "windowCutoutsNormalized": [
     {
-      "type": "rect",
-      "x": 0.154,
-      "y": 0.075,
-      "width": 0.126,
-      "height": 0.356
-    },
-    {
-      "type": "rect",
-      "x": 0.737,
-      "y": 0.075,
-      "width": 0.127,
-      "height": 0.356
-    },
-    {
-      "type": "rect",
-      "x": 0.929,
-      "y": 0.076,
-      "width": 0.071,
-      "height": 0.365
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78,
+      "type": "rect"
     }
   ],
   "manualSeatCutNormalized": {
@@ -253,5 +240,35 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-all-06.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.36,
+      "x1": 0.48,
+      "rows": [
+        0.237,
+        0.331,
+        0.445
+      ]
+    },
+    {
+      "x0": 0.5,
+      "x1": 0.61,
+      "rows": [
+        0.239,
+        0.333,
+        0.445
+      ]
+    }
+  ],
+  "generatedArchitectureAlpha": true,
+  "generatedExteriorBoundsNormalized": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 1,
+      "height": 0.78
+    }
+  ]
 }

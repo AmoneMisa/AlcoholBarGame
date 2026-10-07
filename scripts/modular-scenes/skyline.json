@@ -6,7 +6,7 @@
     "width": 1672,
     "height": 941
   },
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "notes": [
     "Generated from the measured gameplay geometry already used by BarScene.",
     "Do not ship reference crops as final modules until the clean architecture plate and transparency have been visually reviewed.",
@@ -38,7 +38,7 @@
         "x": 0,
         "y": 593,
         "width": 1672,
-        "height": 320
+        "height": 348
       },
       "prompt": "Isolate the existing bar counter with transparent surroundings and 24 px bleed. Preserve its exact perspective and silhouette."
     }
@@ -60,7 +60,7 @@
       "x": 0,
       "y": 593,
       "width": 1672,
-      "height": 320
+      "height": 348
     },
     "floor": {
       "x": 0,
@@ -77,10 +77,12 @@
   "seatAnchors": [],
   "bartenderAnchor": null,
   "review": {
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
-    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone."
+    "windowCutouts": "measured-pane-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
+    "reason": "Window geometry and occluded surfaces cannot be inferred reliably from gameplay anchors alone.",
+    "generationState": "generated-and-composite-reviewed",
+    "seatAsset": "single-reusable-generated-and-reviewed"
   },
   "requiredRoles": [
     "counter",
@@ -122,5 +124,6 @@
       "width": 0.055,
       "height": 0.485
     }
-  ]
+  ],
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07.json"
 }

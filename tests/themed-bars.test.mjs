@@ -75,7 +75,27 @@ test('Every background has a modular authoring definition and one reusable seat 
       const seatAsset=seatLayers[0].asset;
       assert.ok(seatAsset.endsWith('/seat.webp') || (interior.id==='velvet' && seatAsset.endsWith('/stool.webp')),seatAsset);
     }
-    if(interior.id==='velvet') assert.equal(modularSceneFor(interior.id)?.status,'production');
+    const manifest=JSON.parse(readFileSync(new URL(`../scripts/modular-scenes/${interior.id}.json`,import.meta.url)));
+    const reviewed=['velvet','garden','skyline','inferno-penthouse','speakeasy','jazz-cellar','art-deco','loft','library','izakaya','underground'].includes(interior.id)
+      || manifest.review?.generationState==='generated-and-composite-reviewed';
+    if(reviewed) {
+      assert.equal(modularSceneFor(interior.id)?.status,'production');
+      for(const layer of scene.layers) if(layer.asset) {
+        assert.ok(readFileSync(new URL(`../public${layer.asset}`,import.meta.url)).length,layer.asset);
+      }
+      if(interior.id!=='velvet') assert.equal(scene.shelfDecor.paintBacking,false);
+      if(interior.id==='jazz-cellar') {
+        const band=scene.layers.find(layer=>layer.id==='band');
+        assert.equal(band?.role,'decor');
+        assert.ok(band.z<scene.layers.find(layer=>layer.role==='shelves').z);
+        assert.equal(scene.shelfDecor.bays.length,2);
+      }
+      if(interior.id==='art-deco') assert.equal(scene.shelfDecor.bays.length,3);
+      if(interior.id==='loft') assert.deepEqual(scene.shelfDecor.bays.map(bay=>bay.rowBaselines.length),[3,4,3]);
+      if(interior.id==='library') assert.equal(scene.shelfDecor.bays.length,1);
+      if(interior.id==='izakaya') assert.equal(scene.shelfDecor.bays.length,2);
+      if(interior.id==='underground') assert.deepEqual(scene.shelfDecor.bays.map(bay=>bay.rowBaselines.length),[3,2,3]);
+    }
     else assert.equal(modularSceneFor(interior.id),undefined,`${interior.id} authoring scene leaked into gameplay`);
   }
 });

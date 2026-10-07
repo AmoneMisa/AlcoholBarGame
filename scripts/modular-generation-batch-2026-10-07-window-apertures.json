@@ -1,0 +1,49 @@
+{
+  "id": "2026-10-07-window-apertures",
+  "date": "2026-10-07",
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "inferno-penthouse",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-22f9f5ba-0d9f-4b56-b0e1-9d6b1a8a3ca2.png",
+      "opaqueArchitectureSource": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-a64c6299-6260-47f1-b21b-4631118bc574.png",
+      "transparent": true,
+      "prompt": "Precise alpha isolation of the attached EMPTY inferno-penthouse room architecture. Exact existing canvas, aspect, camera and interior preserved. Make ONLY the outdoor scenery through ALL genuine exterior windows and balcony/terrace openings truly transparent. Retain all window frames, every mullion/grid/slat, columns, curtains, hanging lamps, plants physically inside the room, railings/balustrades and ledges, including bars over windows and scenery between railing bars. No furniture or loose objects added. All wall niches, mirrors, cabinets, fireplaces, floor including reflections, ceiling, wall art and carved decoration remain fully opaque unchanged. No new apertures, crop, reframe, transparent exterior margin or redesign. Whole room plate with transparent apertures, so an independently selected landscape can show behind fixed architecture."
+    },
+    {
+      "scene": "library",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-1cfb924c-a49e-4b6e-8743-e28fdf9756ec.png",
+      "opaqueArchitectureSource": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-79d3807b-51af-400f-ac9f-d5255b113c8a.png",
+      "transparent": true,
+      "prompt": "Precise alpha isolation of the attached EMPTY library room architecture. Exact existing canvas, aspect, camera and interior preserved. Make ONLY the outdoor scenery through ALL genuine exterior windows and balcony/terrace openings truly transparent. Retain all window frames, every mullion/grid/slat, columns, curtains, hanging lamps, plants physically inside the room, railings/balustrades and ledges, including bars over windows and scenery between railing bars. No furniture or loose objects added. All wall niches, mirrors, cabinets, fireplaces, floor including reflections, ceiling, wall art and carved decoration remain fully opaque unchanged. No new apertures, crop, reframe, transparent exterior margin or redesign. Whole room plate with transparent apertures, so an independently selected landscape can show behind fixed architecture."
+    },
+    {
+      "scene": "loft",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-0a786146-f21d-4f0a-8c1f-3c3201fd9555.png",
+      "opaqueArchitectureSource": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-14ccf600-ffbf-4db8-aa66-eb38eaa53b99.png",
+      "transparent": true,
+      "prompt": "Precise alpha isolation of the attached EMPTY loft room architecture. Exact existing canvas, aspect, camera and interior preserved. Make ONLY the outdoor scenery through ALL genuine exterior windows and balcony/terrace openings truly transparent. Retain all window frames, every mullion/grid/slat, columns, curtains, hanging lamps, plants physically inside the room, railings/balustrades and ledges, including bars over windows and scenery between railing bars. No furniture or loose objects added. All wall niches, mirrors, cabinets, fireplaces, floor including reflections, ceiling, wall art and carved decoration remain fully opaque unchanged. No new apertures, crop, reframe, transparent exterior margin or redesign. Whole room plate with transparent apertures, so an independently selected landscape can show behind fixed architecture."
+    },
+    {
+      "scene": "izakaya",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-5af8bb3f-4cdf-4dc6-8290-ab03d288e7e6.png",
+      "prompt": "Existing generated architecture, registered measured exterior pane geometry."
+    },
+    {
+      "scene": "garden",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-58e67ff5-f3ac-46bd-a07f-5486fb72d459.png",
+      "prompt": "Existing generated architecture, registered measured exterior pane geometry."
+    },
+    {
+      "scene": "skyline",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-c003d8f1-b6f9-4ee6-8f46-4e11c0ad8719.png",
+      "prompt": "Existing generated architecture, registered measured exterior pane geometry."
+    }
+  ]
+}

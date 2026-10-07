@@ -1,0 +1,228 @@
+{
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "inferno-penthouse",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\inferno-penthouse\\architecture-2026-10-07-02.png",
+      "output": "public\\assets\\bar\\modular\\inferno-penthouse\\architecture.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1536,
+          1024
+        ]
+      }
+    },
+    {
+      "scene": "inferno-penthouse",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\inferno-penthouse\\shelf-2026-10-07-02.png",
+      "output": "public\\assets\\bar\\modular\\inferno-penthouse\\clean-ready\\shelf.webp",
+      "size": [
+        737,
+        379
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1748,
+          899
+        ],
+        "contentBounds": [
+          681,
+          205,
+          1072,
+          662
+        ],
+        "contentRectPixels": [
+          327,
+          108,
+          115,
+          173
+        ]
+      }
+    },
+    {
+      "scene": "inferno-penthouse",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\inferno-penthouse\\counter-2026-10-07-02.png",
+      "output": "public\\assets\\bar\\modular\\inferno-penthouse\\clean-ready\\counter.webp",
+      "size": [
+        1536,
+        338
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2172,
+          724
+        ],
+        "contentBounds": [
+          0,
+          242,
+          2172,
+          724
+        ],
+        "contentRectPixels": [
+          0,
+          64,
+          1536,
+          274
+        ]
+      }
+    },
+    {
+      "scene": "inferno-penthouse",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\inferno-penthouse\\seat-2026-10-07-02.png",
+      "output": "public\\assets\\bar\\modular\\inferno-penthouse\\clean-ready\\seat.webp",
+      "size": [
+        215,
+        338
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1003,
+          1568
+        ],
+        "contentBounds": [
+          101,
+          106,
+          902,
+          1497
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "speakeasy",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\speakeasy\\architecture-2026-10-07-02.png",
+      "output": "public\\assets\\bar\\modular\\speakeasy\\architecture.webp",
+      "size": [
+        623,
+        623
+      ],
+      "alphaRange": [
+        255,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1254,
+          1254
+        ]
+      }
+    },
+    {
+      "scene": "speakeasy",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\speakeasy\\shelf-2026-10-07-02.png",
+      "output": "public\\assets\\bar\\modular\\speakeasy\\clean-ready\\shelf.webp",
+      "size": [
+        417,
+        249
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1622,
+          969
+        ],
+        "contentBounds": [
+          66,
+          133,
+          1553,
+          774
+        ],
+        "contentRectPixels": [
+          23,
+          5,
+          361,
+          187
+        ]
+      }
+    },
+    {
+      "scene": "speakeasy",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\speakeasy\\counter-2026-10-07-02.png",
+      "output": "public\\assets\\bar\\modular\\speakeasy\\clean-ready\\counter.webp",
+      "size": [
+        623,
+        187
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          115,
+          180,
+          2085,
+          632
+        ],
+        "contentRectPixels": [
+          87,
+          50,
+          511,
+          137
+        ]
+      }
+    },
+    {
+      "scene": "speakeasy",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\speakeasy\\seat-2026-10-07-02.png",
+      "output": "public\\assets\\bar\\modular\\speakeasy\\clean-ready\\seat.webp",
+      "size": [
+        62,
+        146
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          817,
+          1925
+        ],
+        "contentBounds": [
+          29,
+          294,
+          789,
+          1793
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    }
+  ],
+  "preview": "docs\\modular-review\\generated-batch-2026-10-07-02.webp"
+}

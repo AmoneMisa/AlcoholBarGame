@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppearancePicker from './AppearancePicker.vue';
+import ModularBarPreview from './ModularBarPreview.vue';
 import { acquisitionOffer } from '../../domain/uiOffers';
 import { computed, ref } from 'vue';
 import { INTERIORS, interiorStyle, type InteriorId } from '../../data/cosmetics/bars';
@@ -51,6 +52,7 @@ function apply() {
 <template>
   <ModalDialog title="Preview" eyebrow="TRY BEFORE YOU OWN" width="760px" @close="emit('close')">
     <div class="preview-stage" :style="interiorStyle(interior as InteriorId)" aria-label="Preview of the background and style together">
+      <ModularBarPreview :interior="interior" />
       <CharacterModel role="bartender" :character-id="character" :outfit="outfit"
         :hair-style="sameCharacter ? game.decor.hairStyle : undefined" :hair-color="sameCharacter ? game.decor.hairColor : undefined" />
     </div>

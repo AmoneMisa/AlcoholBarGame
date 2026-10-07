@@ -45,14 +45,14 @@
         "x": 0,
         "y": 221,
         "width": 764,
-        "height": 150
+        "height": 218
       },
       "prompt": "Isolate existing counter with transparent surroundings and bleed.",
       "rect": {
         "x": 0,
         "y": 0.435259,
         "width": 1,
-        "height": 0.294821
+        "height": 0.428287
       }
     }
   },
@@ -73,7 +73,7 @@
       "x": 0,
       "y": 0.435259,
       "width": 1,
-      "height": 0.294821
+      "height": 0.428287
     },
     "floor": {
       "x": 0,
@@ -92,30 +92,9 @@
     {
       "type": "rect",
       "x": 0,
-      "y": 0.06,
-      "width": 0.081,
-      "height": 0.372
-    },
-    {
-      "type": "rect",
-      "x": 0.092,
-      "y": 0.06,
-      "width": 0.11,
-      "height": 0.372
-    },
-    {
-      "type": "rect",
-      "x": 0.214,
-      "y": 0.06,
-      "width": 0.111,
-      "height": 0.372
-    },
-    {
-      "type": "rect",
-      "x": 0.337,
-      "y": 0.06,
-      "width": 0.063,
-      "height": 0.372
+      "y": 0,
+      "width": 0.4,
+      "height": 0.7
     }
   ],
   "shelfRows": [
@@ -146,7 +125,7 @@
     "x": 0.459763,
     "y": 0.50498
   },
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "measured-gameplay",
   "requiredRoles": [
     "counter",
@@ -157,13 +136,14 @@
     "counter"
   ],
   "review": {
-    "windowCutouts": "manual-measured",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "notes": [
     "Measured from existing BarScene geometry.",

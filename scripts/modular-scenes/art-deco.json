@@ -6,7 +6,7 @@
     "width": 1232,
     "height": 1232
   },
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "measured-gameplay",
   "notes": [
     "Measured from existing BarScene geometry.",
@@ -40,7 +40,7 @@
         "x": 0,
         "y": 585,
         "width": 1232,
-        "height": 351
+        "height": 420
       },
       "prompt": "Isolate existing counter with transparent surroundings and bleed."
     }
@@ -62,7 +62,7 @@
       "x": 0,
       "y": 585,
       "width": 1232,
-      "height": 351
+      "height": 420
     },
     "floor": {
       "x": 0,
@@ -108,12 +108,13 @@
   "bartenderAnchor": null,
   "review": {
     "windowCutouts": "not-applicable",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "windowCutoutsNormalized": [],
   "manualRoleMasksNormalized": {
@@ -151,8 +152,8 @@
   "manualSeatCutNormalized": {
     "cropNormalized": {
       "x": 0.455,
-      "y": 0.52,
-      "width": 0.12,
+      "y": 0.56,
+      "width": 0.15,
       "height": 0.3
     },
     "mask": {
@@ -238,5 +239,70 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "shelfUnits": [
+    {
+      "x0": 0.2446,
+      "x1": 0.3487,
+      "rows": [
+        0.2688,
+        0.3348,
+        0.4077,
+        0.4853
+      ]
+    },
+    {
+      "x0": 0.3872,
+      "x1": 0.617,
+      "rows": [
+        0.2978,
+        0.3665,
+        0.4404,
+        0.4985
+      ]
+    },
+    {
+      "x0": 0.6593,
+      "x1": 0.7544,
+      "rows": [
+        0.2688,
+        0.3348,
+        0.4077,
+        0.4853
+      ]
+    }
+  ],
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-03.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.268,
+      "x1": 0.345,
+      "rows": [
+        0.299,
+        0.369,
+        0.44,
+        0.502
+      ]
+    },
+    {
+      "x0": 0.38,
+      "x1": 0.605,
+      "rows": [
+        0.299,
+        0.369,
+        0.44,
+        0.502
+      ]
+    },
+    {
+      "x0": 0.65,
+      "x1": 0.733,
+      "rows": [
+        0.299,
+        0.369,
+        0.44,
+        0.502
+      ]
+    }
+  ]
 }

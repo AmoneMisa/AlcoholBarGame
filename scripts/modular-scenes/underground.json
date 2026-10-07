@@ -2,7 +2,7 @@
   "id": "underground",
   "source": "../../../public/assets/bar/backgrounds/interior-underground.webp",
   "outputDir": "../../../public/assets/bar/modular/underground",
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "manual-source-review",
   "notes": [
     "Existing themed background coverage manifest.",
@@ -23,10 +23,10 @@
     },
     "shelf-reference": {
       "cropNormalized": {
-        "x": 0.16,
+        "x": 0.1,
         "y": 0.14,
-        "width": 0.69,
-        "height": 0.45
+        "width": 0.8,
+        "height": 0.54
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture."
     },
@@ -35,7 +35,7 @@
         "x": 0,
         "y": 0.54,
         "width": 1,
-        "height": 0.23
+        "height": 0.46
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings."
     }
@@ -57,7 +57,7 @@
       "x": 0,
       "y": 0.54,
       "width": 1,
-      "height": 0.23
+      "height": 0.46
     },
     "seating": {
       "x": 0,
@@ -109,14 +109,15 @@
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
     "windowCutouts": "not-applicable",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "manualRoleMasksNormalized": {
     "shelf": {
@@ -231,10 +232,10 @@
   "windowCutoutsNormalized": [],
   "manualSeatCutNormalized": {
     "cropNormalized": {
-      "x": 0.455,
-      "y": 0.7,
-      "width": 0.1,
-      "height": 0.2
+      "x": 0.41,
+      "y": 0.805,
+      "width": 0.18,
+      "height": 0.32
     },
     "mask": {
       "feather": 0.65,
@@ -298,5 +299,34 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-05.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.193,
+      "x1": 0.35,
+      "rows": [
+        0.328,
+        0.434,
+        0.51
+      ]
+    },
+    {
+      "x0": 0.402,
+      "x1": 0.599,
+      "rows": [
+        0.436,
+        0.51
+      ]
+    },
+    {
+      "x0": 0.658,
+      "x1": 0.81,
+      "rows": [
+        0.328,
+        0.434,
+        0.51
+      ]
+    }
+  ]
 }

@@ -1,0 +1,79 @@
+{
+  "id": "2026-10-07-02",
+  "date": "2026-10-07",
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "inferno-penthouse",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-a64c6299-6260-47f1-b21b-4631118bc574.png",
+      "prompt": "Use case: precise-object-edit. Asset type: clean architecture plate for modular 2D painted Inferno Penthouse bar. EDIT TARGET is exact existing source. Preserve EXACT 3:2 canvas, camera, monumental stone columns, four tall arched panoramic windows, crimson curtains, dark red upper wall with gold sun medallion, central balcony and symmetrical double staircase, black/gold stair railings, steps, fixed golden winged wall sculptures, flame wall sconces and hanging golden chandeliers. Preserve original exterior city twilight visible through windows for separate masking. Remove ALL furniture: entire foreground bar counter and its front cabinet, all five foreground burgundy chairs, ALL sofas/chairs/tables and candles, left piano and its bench, raised left circular piano platform, right circular pole stage including pole and portable spotlights, all plants/vases, all bottles/glasses/shakers/tools/fruit, central back-bar shelf cabinet under balcony and its counter. Reconstruct seamless dark marble floor where furniture/stages/counter were removed and original dark stone architectural wall beneath stairs and balcony where shelf stood. Keep stairs and balcony as permanent architecture, but remove DJ gear. Empty luxurious crimson/gold/marble room; no props, people, text, new furniture, holes or transparency. Identical painterly detail and dramatic amber/violet lighting."
+    },
+    {
+      "scene": "inferno-penthouse",
+      "role": "shelf",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-6c351df5-56b4-4a98-a28b-f4835fe27278.png",
+      "prompt": "Use case: precise-object-edit. Asset type: transparent EMPTY shelving for modular painted Inferno Penthouse bar. EDIT TARGET is landscape shelf-reference crop 737:379. Isolate ONLY the small CENTRAL bottle-shelf cabinet under the balcony: located x=44% to60% of this crop, y=28% to74%, framed black marble with slim gold edges and four illuminated shelf boards. Preserve its EXACT small position, scale, rectangular silhouette and original front-on perspective in the SAME full crop canvas. Remove every bottle/glass and repaint empty amber lit dark backing under the removed contents. Preserve shelf boards at their exact y positions. Remove EVERYTHING else outside the central cabinet: staircase and railings, architectural pillars and windows, red flowers/vases/candles, central lower bar counter, sofas/tables. These belong to separate layers. Only one isolated complete EMPTY cabinet at existing coordinates, transparent everywhere outside cabinet. Do not enlarge to fill canvas or recenter. No broad background rectangle, no plants, tools, bottles, text or people. Rich dark marble/gold painterly game style identical to reference.",
+      "contentRectNormalized": {
+        "x": 0.444,
+        "y": 0.285,
+        "width": 0.156,
+        "height": 0.457
+      }
+    },
+    {
+      "scene": "inferno-penthouse",
+      "role": "counter",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-2ef6ce98-dd15-43c8-90cf-e39c3c2e9d14.png",
+      "prompt": "Use case: precise-object-edit. Asset type: full transparent foreground bar counter for Inferno Penthouse modular painted game. EDIT TARGET is exact ultrawide counter-reference crop, reference2 is full room for material/silhouette context only. Preserve existing counter's camera and front-on perspective, edge-to-edge full width black polished marble top with amber/gold veins, gold illuminated horizontal front lip and dark marble front fascia. Remove all objects on countertop including flowers/vases, candles, bottles, shaker sets, glasses, tools, fruit and all FIVE burgundy foreground chairs including ALL chair pixels. Reconstruct continuous empty polished marble top beneath objects and COMPLETE SOLID unobstructed dark gold-veined marble front facade under it, extending naturally to bottom of crop. Do not leave chair-shaped holes. Entire full-width counter only, no room or furniture behind it, truly transparent above counter silhouette. Keep original top-edge height around23% down ultrawide crop, lip around45%, counter face filling bottom. Full object ready to overlay, no centered thumbnail, no people/text/new decor, rich painterly finish exactly source.",
+      "contentRectNormalized": {
+        "x": 0,
+        "y": 0.1893491124260355,
+        "width": 1,
+        "height": 0.8106508875739645
+      }
+    },
+    {
+      "scene": "inferno-penthouse",
+      "role": "seat",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-f19a68bb-04e6-4717-9690-2008651e231f.png",
+      "prompt": "Use case: stylized-concept. Asset type: ONE complete transparent reusable bar chair sprite for modular Inferno Penthouse bar. Input image is a STYLE AND OBJECT REFERENCE, specifically the FIVE burgundy velvet chairs in the BOTTOM FOREGROUND nearest camera. Generate exactly ONE matching chair viewed FROM ITS BACK, front-on symmetrical as foreground reference: rounded rectangular tall wine-red/burgundy velvet upholstered back, subtly plush seams/shading, matching small visible upholstered seat at sides, slim polished gold/brass trim wrapping lower back/seat, four elegant slim dark bronze/gold legs and small fixed crossbar/footrest. Do not copy any room pixels. The source legs are clipped by image edge; RESTORE complete anatomically plausible furniture legs all the way to feet. Show WHOLE chair with every leg and foot visible inside canvas, no cropping at bottom, no missing back. Exactly one chair centered on truly transparent background, upright perspective identical to source foreground. Canvas portrait width-to-height approx0.64. Chair takes~90% height with comfortable transparent margins. No room, counter, sofa, tables, candles, shadows on floor, bottles, text, people, arms or extrachairs. Semi-realistic detailed painted game asset matching existing red velvet and gold lighting."
+    },
+    {
+      "scene": "speakeasy",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-b124b598-8622-4500-b062-cc16fd0d8a8b.png",
+      "prompt": "Use case: precise-object-edit. Asset type: final architecture plate for modular painted Speakeasy bar game. EDIT TARGET is existing square 1:1 source scene. Preserve exact square framing, perspective and camera, enclosing brick ceiling barrel arch in foreground, beams, warm brick rear wall and its THREE arched niches, left doorway and burgundy curtain, right curtain, fixed sconces and three hanging amber pendant lamps. Remove all furniture and loose props: foreground long counter and back cabinet, all five brass/burgundy stools, ALL shelf boards and cabinet frames from the three niches, every bottle and glass, beer taps/shakers/candles/tools, gramophone, barrel, foreground table/leather chairs, potted plant and ornate rug. Fill the empty niches with continuous brick or matching dark architectural niche backs, and restore uninterrupted warm dark wood floor from wall to bottom canvas. Restore obscured lower brick wall naturally. Keep arched niche positions and silhouette exactly. Same hand-painted amber/copper/dark oak/crimson mood, no new furniture, no people, no text, no cutout holes or transparency. One complete empty room."
+    },
+    {
+      "scene": "speakeasy",
+      "role": "shelf",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-dcfd767d-c993-4157-9078-0ad3b39000cd.png",
+      "prompt": "Use case: precise-object-edit. Asset type: transparent EMPTY triple shelf module for modular painted Speakeasy bar. EDIT TARGET is exact landscape shelf-reference crop. Keep original 825:493 crop layout and coordinates. Isolate ONLY THREE dark oak arched cabinet units in the rear niches, including thin warm brass shelf edges, dark wood niche backing and complete arched wooden frames. Left unit at x~6%-31%, central ~34%-63%, right ~66%-92%, all aligned to original source. Remove ALL bottles and glasses, repaint clean empty dark wooden backing beneath them, keep all THREE horizontal shelf levels in each cabinet at original positions. Remove brick wall/background surrounding cabinets, lamps/candles, tap, shakers and tools, gramophone, foreground lower counter and its front panels. All pixels outside the three cabinets and in gaps between them truly transparent. Preserve original perspective/scale/frame/shelf silhouettes, no enlarging or recentering. Detailed warm amber/copper/dark wood semi-realistic painted game art. Empty furniture only, no text or people.",
+      "contentRectNormalized": {
+        "x": 0.055,
+        "y": 0.02,
+        "width": 0.865,
+        "height": 0.75
+      }
+    },
+    {
+      "scene": "speakeasy",
+      "role": "counter",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-36b3314e-d3df-46c8-aa96-e2f79a32431e.png",
+      "prompt": "Use case: precise-object-edit. Asset type: complete transparent dark oak counter furniture for modular painted Speakeasy bar. EDIT TARGET is exact existing counter-reference crop 1232:333, full source is supporting context only. Preserve exact crop registration, front-on source perspective and counter location x~14%-96% of canvas. Top edge y~28%, brass warm-lit horizontal lip around35%, paneled cabinet front fills remaining crop. Isolate only complete dark polished wood counter, brass illuminated trim and rectangular carved oak front panels. Remove ALL five stools, all bottles and glasses behind, taps and candles and shakers on top, gramophone at right, barrel, plant, doorway, curtain and wall/floor pixels surrounding furniture. Repaint continuous empty counter surface beneath objects and whole cabinet front where stools hid it. Keep solid whole front panels, no stool-shaped holes, keep left and right end faces complete. Surroundings outside actual counter including both side margins and above top edge truly transparent. No enlarging/recentering, no room background, no text or people. Identical warm hand-painted amber-dark oak-brass style.",
+      "contentRectNormalized": {
+        "x": 0.14,
+        "y": 0.266,
+        "width": 0.82,
+        "height": 0.734
+      }
+    },
+    {
+      "scene": "speakeasy",
+      "role": "seat",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-c25c4bd7-85ef-4012-85d3-9b0817d9f81f.png",
+      "prompt": "Use case: precise-object-edit. Asset type: ONE complete reusable transparent stool sprite for modular Speakeasy painted bar. First image is EDIT TARGET existing small stool cutout. Second full room is MATERIAL/SHAPE/PERSPECTIVE reference only. Rebuild the exact foreground stool as a clean WHOLE single object: round wine-red/burgundy padded leather seat viewed slightly from above, brass cylindrical center pedestal, ONE horizontal circular brass footrest ring around middle height, flared sculpted brass pedestal base and flat small round brass ground plate. Preserve source perspective, size proportions and warm painterly lighting. Remove all accidental blue/black/room/counter pixels in first image; recover naturally shaped continuous brass footrest and pedestal where current extraction is broken. Make all gaps outside central pedestal and footrest ring truly transparent, including visible space through ring. Include whole seat, complete base and feet, centered with narrow transparent margins in tall portrait sprite ratio~0.425. ONE stool only, no background rectangle, room, counter, tabletop, text, people, bottles, floor shadow or extra supports. Match recognizable original upholstery and brass silhouette; detailed hand-painted game style."
+    }
+  ]
+}

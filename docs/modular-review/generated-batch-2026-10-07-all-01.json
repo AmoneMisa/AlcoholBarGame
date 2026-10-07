@@ -1,0 +1,450 @@
+{
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "alan-wake",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\alan-wake\\architecture-2026-10-07-all-01-edca39bf932c.png",
+      "output": "public\\assets\\bar\\modular\\alan-wake\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "alan-wake",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\alan-wake\\shelf-2026-10-07-all-01.png",
+      "output": "public\\assets\\bar\\modular\\alan-wake\\clean-ready\\shelf.webp",
+      "size": [
+        1137,
+        527
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1842,
+          854
+        ],
+        "contentBounds": [
+          18,
+          70,
+          1830,
+          826
+        ],
+        "contentRectPixels": [
+          28,
+          13,
+          1080,
+          514
+        ]
+      }
+    },
+    {
+      "scene": "alan-wake",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\alan-wake\\counter-2026-10-07-all-01.png",
+      "output": "public\\assets\\bar\\modular\\alan-wake\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        376
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          28,
+          188,
+          2139,
+          598
+        ],
+        "contentRectPixels": [
+          0,
+          85,
+          1672,
+          291
+        ]
+      }
+    },
+    {
+      "scene": "alan-wake",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\alan-wake\\seat-2026-10-07-all-01.png",
+      "output": "public\\assets\\bar\\modular\\alan-wake\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1145,
+          1374
+        ],
+        "contentBounds": [
+          84,
+          31,
+          1061,
+          1325
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "allods",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\allods\\architecture-2026-10-07-all-01-d866b94a00c1.png",
+      "output": "public\\assets\\bar\\modular\\allods\\architecture.webp",
+      "size": [
+        1774,
+        887
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1774,
+          887
+        ]
+      }
+    },
+    {
+      "scene": "allods",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\allods\\shelf-2026-10-07-all-01.png",
+      "output": "public\\assets\\bar\\modular\\allods\\clean-ready\\shelf.webp",
+      "size": [
+        1100,
+        444
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1974,
+          797
+        ],
+        "contentBounds": [
+          1,
+          2,
+          1972,
+          796
+        ],
+        "contentRectPixels": [
+          11,
+          44,
+          1078,
+          400
+        ]
+      }
+    },
+    {
+      "scene": "allods",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\allods\\counter-2026-10-07-all-01.png",
+      "output": "public\\assets\\bar\\modular\\allods\\clean-ready\\counter.webp",
+      "size": [
+        1774,
+        381
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          19,
+          211,
+          2150,
+          589
+        ],
+        "contentRectPixels": [
+          0,
+          106,
+          1774,
+          275
+        ]
+      }
+    },
+    {
+      "scene": "allods",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\allods\\seat-2026-10-07-all-01.png",
+      "output": "public\\assets\\bar\\modular\\allods\\clean-ready\\seat.webp",
+      "size": [
+        319,
+        302
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1209,
+          1301
+        ],
+        "contentBounds": [
+          173,
+          59,
+          1037,
+          1232
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "among-us",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\among-us\\architecture-2026-10-07-all-01-fbfeab8e3d10.png",
+      "output": "public\\assets\\bar\\modular\\among-us\\architecture.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1672,
+          941
+        ]
+      }
+    },
+    {
+      "scene": "among-us",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\among-us\\shelf-2026-10-07-all-01.png",
+      "output": "public\\assets\\bar\\modular\\among-us\\clean-ready\\shelf.webp",
+      "size": [
+        1070,
+        433
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1971,
+          798
+        ],
+        "contentBounds": [
+          20,
+          97,
+          1952,
+          757
+        ],
+        "contentRectPixels": [
+          17,
+          38,
+          1049,
+          394
+        ]
+      }
+    },
+    {
+      "scene": "among-us",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\among-us\\counter-2026-10-07-all-01.png",
+      "output": "public\\assets\\bar\\modular\\among-us\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        376
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          6,
+          190,
+          2164,
+          599
+        ],
+        "contentRectPixels": [
+          0,
+          56,
+          1672,
+          320
+        ]
+      }
+    },
+    {
+      "scene": "among-us",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\among-us\\seat-2026-10-07-all-01.png",
+      "output": "public\\assets\\bar\\modular\\among-us\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1225,
+          1284
+        ],
+        "contentBounds": [
+          274,
+          71,
+          950,
+          1214
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    },
+    {
+      "scene": "assassins-creed",
+      "role": "architecture",
+      "source": "assets-src\\bar-modular\\assassins-creed\\architecture-2026-10-07-all-01-90b35d2214b8.png",
+      "output": "public\\assets\\bar\\modular\\assassins-creed\\architecture.webp",
+      "size": [
+        1672,
+        940
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1673,
+          940
+        ]
+      }
+    },
+    {
+      "scene": "assassins-creed",
+      "role": "shelf",
+      "source": "assets-src\\bar-modular\\assassins-creed\\shelf-2026-10-07-all-01.png",
+      "output": "public\\assets\\bar\\modular\\assassins-creed\\clean-ready\\shelf.webp",
+      "size": [
+        920,
+        517
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1674,
+          940
+        ],
+        "contentBounds": [
+          9,
+          4,
+          1665,
+          926
+        ],
+        "contentRectPixels": [
+          74,
+          72,
+          837,
+          445
+        ]
+      }
+    },
+    {
+      "scene": "assassins-creed",
+      "role": "counter",
+      "source": "assets-src\\bar-modular\\assassins-creed\\counter-2026-10-07-all-01.png",
+      "output": "public\\assets\\bar\\modular\\assassins-creed\\clean-ready\\counter.webp",
+      "size": [
+        1672,
+        404
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          2170,
+          725
+        ],
+        "contentBounds": [
+          15,
+          160,
+          2155,
+          573
+        ],
+        "contentRectPixels": [
+          0,
+          75,
+          1672,
+          329
+        ]
+      }
+    },
+    {
+      "scene": "assassins-creed",
+      "role": "seat",
+      "source": "assets-src\\bar-modular\\assassins-creed\\seat-2026-10-07-all-01.png",
+      "output": "public\\assets\\bar\\modular\\assassins-creed\\clean-ready\\seat.webp",
+      "size": [
+        301,
+        320
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "packing": {
+        "generatedSize": [
+          1227,
+          1282
+        ],
+        "contentBounds": [
+          239,
+          50,
+          984,
+          1226
+        ],
+        "fit": "contain-with-transparent-margins"
+      }
+    }
+  ],
+  "preview": "docs\\modular-review\\generated-batch-2026-10-07-all-01.webp"
+}

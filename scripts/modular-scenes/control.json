@@ -2,7 +2,7 @@
   "id": "control",
   "source": "../../../public/assets/bar/backgrounds/interior-control.webp",
   "outputDir": "../../../public/assets/bar/modular/control",
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "manual-source-review",
   "notes": [
     "Existing themed background coverage manifest.",
@@ -26,7 +26,7 @@
         "x": 0.05,
         "y": 0.12,
         "width": 0.48,
-        "height": 0.46
+        "height": 0.55
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture."
     },
@@ -35,7 +35,7 @@
         "x": 0,
         "y": 0.58,
         "width": 1,
-        "height": 0.22
+        "height": 0.42000000000000004
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings."
     }
@@ -109,14 +109,15 @@
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
     "windowCutouts": "not-applicable",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "manualRoleMasksNormalized": {
     "shelf": {
@@ -231,10 +232,10 @@
   "windowCutoutsNormalized": [],
   "manualSeatCutNormalized": {
     "cropNormalized": {
-      "x": 0.455,
-      "y": 0.71,
-      "width": 0.1,
-      "height": 0.18
+      "x": 0.41,
+      "y": 0.8,
+      "width": 0.18,
+      "height": 0.34
     },
     "mask": {
       "feather": 0.65,
@@ -298,5 +299,36 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-all-02.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.055,
+      "x1": 0.1,
+      "rows": [
+        0.274,
+        0.44,
+        0.569
+      ]
+    },
+    {
+      "x0": 0.14,
+      "x1": 0.3,
+      "rows": [
+        0.309,
+        0.443,
+        0.569
+      ]
+    },
+    {
+      "x0": 0.315,
+      "x1": 0.405,
+      "rows": [
+        0.308,
+        0.443,
+        0.512,
+        0.569
+      ]
+    }
+  ]
 }

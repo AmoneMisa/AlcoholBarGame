@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-07",
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "id": "beach",
+      "prompt": "Standalone exterior scenery plate for a hand painted semi-realistic detailed bar game. Wide 16:9 panorama, turquoise ocean, white sandy shore, remote lush island cliffs, bright tropical blue sky. Camera at human eye level looking straight out across scenery, continuous vista edge to edge. This asset sits behind transparent windows or balcony openings of many separately rendered rooms. ONLY outdoors: absolutely NO interior, bar, furniture, shelves, bottles, window frame, glass panes, curtains, railing, terrace, balcony floor, pillars, canopy, borders, lettering or UI. Natural harmonious environment composition and layered depth, horizon near middle, restrained cinematic lighting, fine painterly detail. Opaque full canvas landscape.",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-83555e6b-50bb-4ee1-8708-ddc189fb24ee.png",
+      "archive": "assets-src\\bar-exteriors\\beach-2026-10-07.png",
+      "output": "public/assets/bar/exteriors/beach.webp"
+    },
+    {
+      "id": "cyberpunk",
+      "prompt": "Standalone exterior scenery plate for a hand painted semi-realistic detailed bar game. Wide 16:9 panorama, rainy futuristic city at night with magenta and cyan holographic light reflections and skyscrapers. Camera at human eye level looking straight out across scenery, continuous vista edge to edge. This asset sits behind transparent windows or balcony openings of many separately rendered rooms. ONLY outdoors: absolutely NO interior, bar, furniture, shelves, bottles, window frame, glass panes, curtains, railing, terrace, balcony floor, pillars, canopy, borders, lettering or UI. Natural harmonious environment composition and layered depth, horizon near middle, restrained cinematic lighting, fine painterly detail. Opaque full canvas landscape.",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-e32bffd5-891e-4441-bfad-36fd49a714e3.png",
+      "archive": "assets-src\\bar-exteriors\\cyberpunk-2026-10-07.png",
+      "output": "public/assets/bar/exteriors/cyberpunk.webp"
+    },
+    {
+      "id": "desert",
+      "prompt": "Standalone exterior scenery plate for a hand painted semi-realistic detailed bar game. Wide 16:9 panorama, sunset sandstone canyon, distant mesas and dunes, orange purple sky. Camera at human eye level looking straight out across scenery, continuous vista edge to edge. This asset sits behind transparent windows or balcony openings of many separately rendered rooms. ONLY outdoors: absolutely NO interior, bar, furniture, shelves, bottles, window frame, glass panes, curtains, railing, terrace, balcony floor, pillars, canopy, borders, lettering or UI. Natural harmonious environment composition and layered depth, horizon near middle, restrained cinematic lighting, fine painterly detail. Opaque full canvas landscape.",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-50a65a68-6df1-48c4-bb5e-91bea254b5e5.png",
+      "archive": "assets-src\\bar-exteriors\\desert-2026-10-07.png",
+      "output": "public/assets/bar/exteriors/desert.webp"
+    },
+    {
+      "id": "inferno-penthouse",
+      "prompt": "Standalone exterior scenery plate for a hand painted semi-realistic detailed bar game. Wide 16:9 panorama, dramatic nighttime distant city skyline beneath crimson violet clouds, luxurious dark atmospheric dusk. Camera at human eye level looking straight out across scenery, continuous vista edge to edge. This asset sits behind transparent windows or balcony openings of many separately rendered rooms. ONLY outdoors: absolutely NO interior, bar, furniture, shelves, bottles, window frame, glass panes, curtains, railing, terrace, balcony floor, pillars, canopy, borders, lettering or UI. Natural harmonious environment composition and layered depth, horizon near middle, restrained cinematic lighting, fine painterly detail. Opaque full canvas landscape.",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-528f41dd-b1b9-4204-95a3-6d7ea64bd8cc.png",
+      "archive": "assets-src\\bar-exteriors\\inferno-penthouse-2026-10-07.png",
+      "output": "public/assets/bar/exteriors/inferno-penthouse.webp"
+    },
+    {
+      "id": "marina",
+      "prompt": "Standalone exterior scenery plate for a hand painted semi-realistic detailed bar game. Wide 16:9 panorama, quiet moonlit harbor, distant moored sailboats and shoreline lights reflected on dark blue water. Camera at human eye level looking straight out across scenery, continuous vista edge to edge. This asset sits behind transparent windows or balcony openings of many separately rendered rooms. ONLY outdoors: absolutely NO interior, bar, furniture, shelves, bottles, window frame, glass panes, curtains, railing, terrace, balcony floor, pillars, canopy, borders, lettering or UI. Natural harmonious environment composition and layered depth, horizon near middle, restrained cinematic lighting, fine painterly detail. Opaque full canvas landscape.",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-58c1ff35-c8ca-4e39-a4e2-010407a7b2c2.png",
+      "archive": "assets-src\\bar-exteriors\\marina-2026-10-07.png",
+      "output": "public/assets/bar/exteriors/marina.webp"
+    },
+    {
+      "id": "palace",
+      "prompt": "Standalone exterior scenery plate for a hand painted semi-realistic detailed bar game. Wide 16:9 panorama, formal French palace gardens, distant chateau, cypress trees and fountains at golden sunset. Camera at human eye level looking straight out across scenery, continuous vista edge to edge. This asset sits behind transparent windows or balcony openings of many separately rendered rooms. ONLY outdoors: absolutely NO interior, bar, furniture, shelves, bottles, window frame, glass panes, curtains, railing, terrace, balcony floor, pillars, canopy, borders, lettering or UI. Natural harmonious environment composition and layered depth, horizon near middle, restrained cinematic lighting, fine painterly detail. Opaque full canvas landscape.",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-2b515c71-e236-42bb-ade8-de5f4589cb79.png",
+      "archive": "assets-src\\bar-exteriors\\palace-2026-10-07.png",
+      "output": "public/assets/bar/exteriors/palace.webp"
+    },
+    {
+      "id": "parisian",
+      "prompt": "Standalone exterior scenery plate for a hand painted semi-realistic detailed bar game. Wide 16:9 panorama, Paris skyline at night with Eiffel tower in the distance, warm city lights, deep indigo sky. Camera at human eye level looking straight out across scenery, continuous vista edge to edge. This asset sits behind transparent windows or balcony openings of many separately rendered rooms. ONLY outdoors: absolutely NO interior, bar, furniture, shelves, bottles, window frame, glass panes, curtains, railing, terrace, balcony floor, pillars, canopy, borders, lettering or UI. Natural harmonious environment composition and layered depth, horizon near middle, restrained cinematic lighting, fine painterly detail. Opaque full canvas landscape.",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-e70d4f9b-549a-4f46-893f-41d55968037b.png",
+      "archive": "assets-src\\bar-exteriors\\parisian-2026-10-07.png",
+      "output": "public/assets/bar/exteriors/parisian.webp"
+    },
+    {
+      "id": "riad",
+      "prompt": "Standalone exterior scenery plate for a hand painted semi-realistic detailed bar game. Wide 16:9 panorama, old Moroccan city rooftops, distant minaret and palms at orange lilac dusk. Camera at human eye level looking straight out across scenery, continuous vista edge to edge. This asset sits behind transparent windows or balcony openings of many separately rendered rooms. ONLY outdoors: absolutely NO interior, bar, furniture, shelves, bottles, window frame, glass panes, curtains, railing, terrace, balcony floor, pillars, canopy, borders, lettering or UI. Natural harmonious environment composition and layered depth, horizon near middle, restrained cinematic lighting, fine painterly detail. Opaque full canvas landscape.",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-e955b473-ced7-42aa-a20d-3a23f4fac6e3.png",
+      "archive": "assets-src\\bar-exteriors\\riad-2026-10-07.png",
+      "output": "public/assets/bar/exteriors/riad.webp"
+    },
+    {
+      "id": "rooftop",
+      "prompt": "Standalone exterior scenery plate for a hand painted semi-realistic detailed bar game. Wide 16:9 panorama, elevated panoramic metropolis at night with distant lit skyscrapers and stars. Camera at human eye level looking straight out across scenery, continuous vista edge to edge. This asset sits behind transparent windows or balcony openings of many separately rendered rooms. ONLY outdoors: absolutely NO interior, bar, furniture, shelves, bottles, window frame, glass panes, curtains, railing, terrace, balcony floor, pillars, canopy, borders, lettering or UI. Natural harmonious environment composition and layered depth, horizon near middle, restrained cinematic lighting, fine painterly detail. Opaque full canvas landscape.",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-0e3b5fea-e966-4377-b194-35efb97b7c48.png",
+      "archive": "assets-src\\bar-exteriors\\rooftop-2026-10-07.png",
+      "output": "public/assets/bar/exteriors/rooftop.webp"
+    },
+    {
+      "id": "skyline",
+      "prompt": "Standalone exterior scenery plate for a hand painted semi-realistic detailed bar game. Wide 16:9 panorama, modern metropolitan skyline at blue hour with scattered warm windows, distant river, deep navy sky. Camera at human eye level looking straight out across scenery, continuous vista edge to edge. This asset sits behind transparent windows or balcony openings of many separately rendered rooms. ONLY outdoors: absolutely NO interior, bar, furniture, shelves, bottles, window frame, glass panes, curtains, railing, terrace, balcony floor, pillars, canopy, borders, lettering or UI. Natural harmonious environment composition and layered depth, horizon near middle, restrained cinematic lighting, fine painterly detail. Opaque full canvas landscape.",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-32ca1a72-6229-4ce2-880a-db44e17a52c5.png",
+      "archive": "assets-src\\bar-exteriors\\skyline-2026-10-07.png",
+      "output": "public/assets/bar/exteriors/skyline.webp"
+    },
+    {
+      "id": "tropical",
+      "prompt": "Standalone exterior scenery plate for a hand painted semi-realistic detailed bar game. Wide 16:9 panorama, dense lush tropical rainforest valley, palms, distant waterfall, soft daylight. Camera at human eye level looking straight out across scenery, continuous vista edge to edge. This asset sits behind transparent windows or balcony openings of many separately rendered rooms. ONLY outdoors: absolutely NO interior, bar, furniture, shelves, bottles, window frame, glass panes, curtains, railing, terrace, balcony floor, pillars, canopy, borders, lettering or UI. Natural harmonious environment composition and layered depth, horizon near middle, restrained cinematic lighting, fine painterly detail. Opaque full canvas landscape.",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-18c2ce7b-241a-48fe-8a51-cb0672a13d9d.png",
+      "archive": "assets-src\\bar-exteriors\\tropical-2026-10-07.png",
+      "output": "public/assets/bar/exteriors/tropical.webp"
+    },
+    {
+      "id": "winter",
+      "prompt": "Standalone exterior scenery plate for a hand painted semi-realistic detailed bar game. Wide 16:9 panorama, snow covered alpine pine forest and mountain peaks in clear pale winter daylight. Camera at human eye level looking straight out across scenery, continuous vista edge to edge. This asset sits behind transparent windows or balcony openings of many separately rendered rooms. ONLY outdoors: absolutely NO interior, bar, furniture, shelves, bottles, window frame, glass panes, curtains, railing, terrace, balcony floor, pillars, canopy, borders, lettering or UI. Natural harmonious environment composition and layered depth, horizon near middle, restrained cinematic lighting, fine painterly detail. Opaque full canvas landscape.",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-9a63ba12-442a-4387-a21c-b6616a5b40a4.png",
+      "archive": "assets-src\\bar-exteriors\\winter-2026-10-07.png",
+      "output": "public/assets/bar/exteriors/winter.webp"
+    }
+  ]
+}

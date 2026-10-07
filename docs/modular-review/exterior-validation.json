@@ -1,0 +1,888 @@
+{
+  "scenes": 74,
+  "exteriorScenes": 67,
+  "errors": [],
+  "rows": [
+    {
+      "scene": "alan-wake",
+      "exteriorEnabled": true,
+      "transparentPixels": 274322,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "allods",
+      "exteriorEnabled": true,
+      "transparentPixels": 193553,
+      "canvas": [
+        1774,
+        887
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "among-us",
+      "exteriorEnabled": true,
+      "transparentPixels": 128883,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "art-deco",
+      "exteriorEnabled": false,
+      "transparentPixels": 0,
+      "canvas": [
+        623,
+        623
+      ],
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "assassins-creed",
+      "exteriorEnabled": true,
+      "transparentPixels": 129736,
+      "canvas": [
+        1672,
+        940
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "baldurs-gate-3",
+      "exteriorEnabled": true,
+      "transparentPixels": 100131,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "batman",
+      "exteriorEnabled": true,
+      "transparentPixels": 199371,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "beach",
+      "exteriorEnabled": true,
+      "transparentPixels": 57750,
+      "canvas": [
+        764,
+        508
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "black-desert",
+      "exteriorEnabled": true,
+      "transparentPixels": 148494,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "borderlands",
+      "exteriorEnabled": true,
+      "transparentPixels": 107418,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "control",
+      "exteriorEnabled": false,
+      "transparentPixels": 0,
+      "canvas": [
+        1672,
+        941
+      ],
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "cs-2",
+      "exteriorEnabled": true,
+      "transparentPixels": 141527,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "cyberpunk-2077",
+      "exteriorEnabled": true,
+      "transparentPixels": 261418,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "cyberpunk",
+      "exteriorEnabled": false,
+      "transparentPixels": 0,
+      "canvas": [
+        764,
+        508
+      ],
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "darksiders-3",
+      "exteriorEnabled": true,
+      "transparentPixels": 102731,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "death-stranding",
+      "exteriorEnabled": true,
+      "transparentPixels": 479212,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "desert",
+      "exteriorEnabled": true,
+      "transparentPixels": 45635,
+      "canvas": [
+        623,
+        623
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "detroit",
+      "exteriorEnabled": true,
+      "transparentPixels": 380959,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "devil-may-cry",
+      "exteriorEnabled": true,
+      "transparentPixels": 60278,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "diablo-4",
+      "exteriorEnabled": true,
+      "transparentPixels": 118166,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "divinity-original-sin-2",
+      "exteriorEnabled": true,
+      "transparentPixels": 144002,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "elden-ring",
+      "exteriorEnabled": true,
+      "transparentPixels": 182406,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "fairy",
+      "exteriorEnabled": true,
+      "transparentPixels": 104998,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "fairytale",
+      "exteriorEnabled": true,
+      "transparentPixels": 72237,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "garden",
+      "exteriorEnabled": true,
+      "transparentPixels": 86213,
+      "canvas": [
+        1671,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "gta-3",
+      "exteriorEnabled": true,
+      "transparentPixels": 275250,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "gta-5",
+      "exteriorEnabled": true,
+      "transparentPixels": 546662,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "gta-sa",
+      "exteriorEnabled": true,
+      "transparentPixels": 420758,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "gta",
+      "exteriorEnabled": true,
+      "transparentPixels": 248409,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "harry-potter",
+      "exteriorEnabled": true,
+      "transparentPixels": 99685,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "heroes-3",
+      "exteriorEnabled": true,
+      "transparentPixels": 109688,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "inferno-penthouse",
+      "exteriorEnabled": true,
+      "transparentPixels": 224100,
+      "canvas": [
+        1536,
+        1024
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "izakaya",
+      "exteriorEnabled": true,
+      "transparentPixels": 17813,
+      "canvas": [
+        764,
+        508
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "jazz-cellar",
+      "exteriorEnabled": false,
+      "transparentPixels": 0,
+      "canvas": [
+        623,
+        623
+      ],
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "library",
+      "exteriorEnabled": true,
+      "transparentPixels": 4364,
+      "canvas": [
+        623,
+        623
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "lineage-2",
+      "exteriorEnabled": true,
+      "transparentPixels": 45224,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "loft",
+      "exteriorEnabled": true,
+      "transparentPixels": 39720,
+      "canvas": [
+        764,
+        508
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "lost-ark",
+      "exteriorEnabled": true,
+      "transparentPixels": 250384,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "marina",
+      "exteriorEnabled": true,
+      "transparentPixels": 72143,
+      "canvas": [
+        764,
+        508
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "mass-effect",
+      "exteriorEnabled": true,
+      "transparentPixels": 380980,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "max-payne",
+      "exteriorEnabled": true,
+      "transparentPixels": 97080,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "minecraft",
+      "exteriorEnabled": true,
+      "transparentPixels": 121972,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "neighbours-from-hell",
+      "exteriorEnabled": true,
+      "transparentPixels": 47944,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "nfs-carbon",
+      "exteriorEnabled": true,
+      "transparentPixels": 148269,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "nfs-most-wanted",
+      "exteriorEnabled": true,
+      "transparentPixels": 179201,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "nfs-underground",
+      "exteriorEnabled": false,
+      "transparentPixels": 0,
+      "canvas": [
+        1774,
+        887
+      ],
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "palace",
+      "exteriorEnabled": true,
+      "transparentPixels": 67140,
+      "canvas": [
+        623,
+        623
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "palworld",
+      "exteriorEnabled": true,
+      "transparentPixels": 97358,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "parisian",
+      "exteriorEnabled": true,
+      "transparentPixels": 15448,
+      "canvas": [
+        764,
+        508
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "perfect-world",
+      "exteriorEnabled": true,
+      "transparentPixels": 446046,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "quantum-break",
+      "exteriorEnabled": true,
+      "transparentPixels": 306375,
+      "canvas": [
+        1672,
+        940
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "repo",
+      "exteriorEnabled": true,
+      "transparentPixels": 127671,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "resident-evil",
+      "exteriorEnabled": true,
+      "transparentPixels": 114726,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "riad",
+      "exteriorEnabled": true,
+      "transparentPixels": 18675,
+      "canvas": [
+        764,
+        508
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "rooftop",
+      "exteriorEnabled": true,
+      "transparentPixels": 147397,
+      "canvas": [
+        764,
+        508
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "shadow-tomb-raider",
+      "exteriorEnabled": true,
+      "transparentPixels": 424588,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "silent-hill",
+      "exteriorEnabled": true,
+      "transparentPixels": 247100,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "skyline",
+      "exteriorEnabled": true,
+      "transparentPixels": 389821,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "skyrim",
+      "exteriorEnabled": true,
+      "transparentPixels": 92126,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "sleeping-dogs",
+      "exteriorEnabled": true,
+      "transparentPixels": 251274,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "speakeasy",
+      "exteriorEnabled": false,
+      "transparentPixels": 0,
+      "canvas": [
+        623,
+        623
+      ],
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "stellar-blade",
+      "exteriorEnabled": true,
+      "transparentPixels": 204080,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "tropical",
+      "exteriorEnabled": true,
+      "transparentPixels": 38633,
+      "canvas": [
+        623,
+        623
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "tropico-6",
+      "exteriorEnabled": true,
+      "transparentPixels": 257077,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "underground",
+      "exteriorEnabled": false,
+      "transparentPixels": 0,
+      "canvas": [
+        1672,
+        941
+      ],
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "underwater",
+      "exteriorEnabled": true,
+      "transparentPixels": 566636,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "velvet",
+      "exteriorEnabled": true,
+      "transparentPixels": 47002,
+      "canvas": [
+        1024,
+        512
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "walking-dead-s3",
+      "exteriorEnabled": true,
+      "transparentPixels": 123355,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "warcraft-3",
+      "exteriorEnabled": true,
+      "transparentPixels": 57678,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "watch-dogs",
+      "exteriorEnabled": true,
+      "transparentPixels": 193552,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "winter",
+      "exteriorEnabled": true,
+      "transparentPixels": 94670,
+      "canvas": [
+        623,
+        623
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "witcher-3",
+      "exteriorEnabled": true,
+      "transparentPixels": 94378,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "wolf-among-us",
+      "exteriorEnabled": true,
+      "transparentPixels": 114504,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    },
+    {
+      "scene": "worms",
+      "exteriorEnabled": true,
+      "transparentPixels": 82510,
+      "canvas": [
+        1672,
+        941
+      ],
+      "architectureMaskDifference": 0,
+      "floorAlphaMinimum": 255,
+      "review": "alternate-beach-composite"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "id": "2026-10-07-04",
+  "date": "2026-10-07",
+  "tool": "built-in image_gen",
+  "items": [
+    {
+      "scene": "loft",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-14ccf600-ffbf-4db8-aa66-eb38eaa53b99.png",
+      "prompt": "Use case: precise-object-edit. Asset type: clean architecture plate for modular painted Loft bar. EDIT TARGET attached original wide room. Preserve EXACT landscape framing 1516:1004, camera, perspective and location of structural elements. Keep original sunset city seen through entire left industrial window, exact black steel window mullions, brick piers/walls, vertical riveted columns, steel ceiling beams and suspended black industrial pendant lamps and fixed wall sconces. Remove ALL removable furniture and loose props: complete foreground concrete/metal counter, all five wood stools and every leg/footrest, entire bottle shelving and cabinet frames on right including bottles and glassware, brewing vessels/taps, leather sofas/chairs, tables, rug, barrel, books, all plants/vines and potted greenery, loose candles and objects. Reconstruct continuous detailed original brick wall on right where cabinet removed and uninterrupted gray concrete/stone tile floor across all hidden areas. Empty room, same warm amber interior light and cool sunset window view, semi-realistic hand-painted game finish. No people/text, no new furniture, no reframing, no transparent holes. Keep windows and city exactly aligned."
+    },
+    {
+      "scene": "loft",
+      "role": "shelf",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-33ebace0-de30-4d02-a960-d9d108cc387f.png",
+      "prompt": "Use case: precise-object-edit. Asset type: transparent empty liquor shelving for modular Loft bar. EDIT TARGET first cropped reference, second full original room for materials only. Isolate ONLY three connected industrial liquor shelf cabinets occupying left~5%-30%, middle~30%-63%, right~63%-86% of crop: black steel vertical posts/outer frame, dark wood shelf boards, amber-lit dark wood backing and tiny fixed built-in strip lights. Preserve exact source front perspective and relative column widths/positions. Four empty levels per column, keep original shelf-board heights including different middle heights. REMOVE all bottles, glassware, decanters, every pendant lamp and cable, brick/wall/ceiling/structural beams, all plants/vines, concrete counter, taps/brewing tanks at sides/bottom and any utensils. Keep only main three cabinet units, no adjacent narrow cabinet at right. Restore clean empty shelves where bottles removed, complete frame and bottom plinth inside canvas. True transparent background and all gaps outside cabinets. Detailed semi-realistic hand-painted black metal/dark wood with amber illumination matching source. No text, people, new furniture or loose props.",
+      "contentRectNormalized": {
+        "x": 0.05,
+        "y": 0.09,
+        "width": 0.83,
+        "height": 0.74
+      }
+    },
+    {
+      "scene": "loft",
+      "role": "counter",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-30e3b591-11d9-412c-8140-794488537b36.png",
+      "prompt": "Use case: precise-object-edit. Asset type: complete transparent modular Loft bar counter. First reference EDIT TARGET updated crop, second original room context. Isolate ONLY original foreground concrete counter, gray polished stone worktop, warm backlit textured gray concrete front, riveted black steel left upright and steel bottom plinth. Exact wide 1516:430 crop framing: counter occupies RIGHT 68% of image (starts at x~32%, extends to right edge); preserve original rectilinear perspective. Left32% must be transparent, no sofa/floor/barrel. REMOVE every stool including seats, iron legs/footrests, all glasses/bottles/shakers/taps/vessels/tabletop loose props, shelf and room/brick/floor. Reconstruct uninterrupted concrete facade where stools hid it, empty polished stone worktop across full counter length, full base/plinth and entire left edge. Counter silhouette top begins~16% down crop, bottom~97%. Complete clean counter only against genuine transparent background. Semi-realistic hand-painted stone/black iron with original amber under-counter lighting, no added people/text/furniture.",
+      "contentRectNormalized": {
+        "x": 0.318,
+        "y": 0.14,
+        "width": 0.682,
+        "height": 0.82
+      }
+    },
+    {
+      "scene": "loft",
+      "role": "seat",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-0b0eab78-edce-4c32-bec6-e68b76961513.png",
+      "prompt": "Use case: precise-object-edit. Asset type: ONE complete transparent reusable Loft bar stool. EDIT TARGET first source stool crop; second full room material/perspective reference only. Restore exactly one original stool: round honey-brown solid wood seat with visible thickness and oval top seen slightly from above, four gently splayed black tubular iron legs, curved supporting iron seat frame, circular black metal footrest ring around legs at middle height. Preserve original proportions and perspective. Remove ALL concrete counter, floor and shadows/background pixels between legs and outside silhouette. Entire stool upright centered in portrait image approx0.47 width-to-height with narrow transparent margins, every foot fully inside frame. Genuine transparency through leg gaps and footrest ring, no floor shadow, no second stool, room, people/text. Detailed semi-realistic hand-painted wood grain/black iron and warm original amber lighting."
+    },
+    {
+      "scene": "library",
+      "role": "architecture",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-79d3807b-51af-400f-ac9f-d5255b113c8a.png",
+      "prompt": "Use case: precise-object-edit. Asset type: clean architecture plate for modular painted Library bar. EDIT TARGET attached exact square room. Preserve EXACT square framing and original dark carved wood architecture, tall book-filled wall units and shelves on BOTH levels, balcony rail/posts, rolling library ladder at RIGHT, ceiling chandelier, wall sconces, framed paintings, marble fireplace LEFT with fire, narrow blue arched window at far left and all structural trim. Fixed book walls and books belong to architecture and MUST remain. Remove ONLY the liquor backbar cabinet in central lower niche (all gold frame/shelf boards and all bottles/glasses), full foreground wooden counter and bottles/tools on it, all five burgundy/brass bar stools, green tabletop lamps, sofas/chairs, globe, bust and little cabinet below bust, tables, rugs, books on tables, vases/candles, all plants/vines/flowers. Restore dark wood paneling inside central lower niche where liquor cabinet was, and continuous original parquet floor in all hidden areas including foreground. Preserve fireplace/ladder/books/rail, exact camera/perspective and warm amber painterly illumination. Complete empty architectural room, no text/people/new objects, no transparent holes."
+    },
+    {
+      "scene": "library",
+      "role": "shelf",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-90414093-077b-4233-b6de-af7260d1d68a.png",
+      "prompt": "Use case: precise-object-edit. Asset type: transparent EMPTY liquor shelving module for modular Library bar. EDIT TARGET first shelf crop; second full room is context only. Isolate only original central lower liquor cabinet: warm dark mahogany rectangular frame, delicate brass shelf edges, gold/amber illuminated dark wood backing, three horizontal empty bottle compartments/tiers. Keep original cabinet proportions and front perspective. Remove EVERY bottle/glass/decanter/goblet, shakers/tools/taps/tabletop objects, counter and stools at bottom, all bookshelf books and fixed carved pillars/sconces/ceiling/gallery above around it (architecture separate). Three clean empty levels with horizontal boards and thin brass supports, complete cabinet bottom/base, genuinely transparent all surrounding pixels, no room backdrop. Same rich semi-realistic painted mahogany/brass finish, no people/text or new ornament.",
+      "contentRectNormalized": {
+        "x": 0.15,
+        "y": 0.16,
+        "width": 0.75,
+        "height": 0.58
+      }
+    },
+    {
+      "scene": "library",
+      "role": "counter",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-2d526175-3c9a-407f-ae8d-4ded6ec55b4a.png",
+      "prompt": "Use case: precise-object-edit. Asset type: complete transparent Library counter. EDIT TARGET first updated wide counter crop, second room context for silhouette/material only. Isolate ONLY whole dark carved mahogany counter: polished wooden full-width worktop overhang, carved panel front and corner pilasters, gold/brass horizontal trim, complete stepped bottom plinth. Preserve original symmetric front perspective and placement: counter starts~14% from left, ends~85% from left, top~25% down crop and base~94%. Remove ALL five burgundy/brass stools including rings/legs/bases, all lamps, bottles, glasses, shakers/taps/tools, books, globe, sofas/tables, bust/side cabinet, fireplace, backdrop/window/bookshelves/ladder and floor. Restore continuous empty worktop and whole unbroken panel facade where seats hid it, no holes, complete counter base inside canvas. True transparent surroundings, only the counter. Rich painterly mahogany/gold and warm amber illumination matching original. No people/text or new objects.",
+      "contentRectNormalized": {
+        "x": 0.136,
+        "y": 0.245,
+        "width": 0.714,
+        "height": 0.72
+      }
+    },
+    {
+      "scene": "library",
+      "role": "seat",
+      "source": "C:\\Users\\kubai\\.codex\\generated_images\\01a11537-35c9-7660-8318-346e7cc5f58f\\exec-626d807f-5a00-464f-b229-c3b8c5600d62.png",
+      "prompt": "Use case: precise-object-edit. Asset type: ONE complete transparent reusable Library bar stool. EDIT TARGET first source stool crop, second full room for lighting/material/perspective only. Restore exactly one original stool: round padded burgundy leather seat with thin gold brass rim and small brass upholstery studs, elegant four slender polished brass legs gently splayed with round floor feet, a delicate circular brass footrest ring and brass lower structural braces. Preserve original circular seat silhouette and top visible slightly from above, classic brass/mahogany-library style. Entire stool centered upright in narrow portrait canvas~0.48 width-to-height, all legs and feet completely inside canvas with transparent margin. Remove ALL background counter/floor/window/room pixels, restore holes between legs and through ring to genuine transparency, no cast-floor shadow. Exactly one whole stool, no text/people/extra objects. Same detailed semi-realistic painterly burgundy and gold, warm amber illumination."
+    }
+  ]
+}

@@ -22,11 +22,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "allods",
@@ -51,11 +51,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "among-us",
@@ -80,11 +80,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "art-deco",
@@ -107,11 +107,11 @@
     "manualApprovedRoles": [
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "assassins-creed",
@@ -136,11 +136,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "baldurs-gate-3",
@@ -165,11 +165,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "batman",
@@ -194,11 +194,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "beach",
@@ -219,11 +219,11 @@
       "seating"
     ],
     "manualApprovedRoles": [],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "black-desert",
@@ -248,11 +248,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "borderlands",
@@ -277,11 +277,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "control",
@@ -306,11 +306,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "cs-2",
@@ -335,11 +335,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "cyberpunk",
@@ -363,11 +363,11 @@
       "counter",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "cyberpunk-2077",
@@ -392,11 +392,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "darksiders-3",
@@ -421,11 +421,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "death-stranding",
@@ -450,11 +450,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "desert",
@@ -475,11 +475,11 @@
       "seating"
     ],
     "manualApprovedRoles": [],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "detroit",
@@ -504,11 +504,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "devil-may-cry",
@@ -533,11 +533,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "diablo-4",
@@ -562,11 +562,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "divinity-original-sin-2",
@@ -591,11 +591,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "elden-ring",
@@ -620,11 +620,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "fairy",
@@ -649,11 +649,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "fairytale",
@@ -678,11 +678,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "garden",
@@ -701,11 +701,11 @@
       "shelf"
     ],
     "manualApprovedRoles": [],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "gta",
@@ -730,11 +730,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "gta-3",
@@ -759,11 +759,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "gta-5",
@@ -788,11 +788,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "gta-sa",
@@ -817,11 +817,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "harry-potter",
@@ -846,11 +846,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "heroes-3",
@@ -875,11 +875,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "inferno-penthouse",
@@ -902,11 +902,11 @@
     "manualApprovedRoles": [
       "counter"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "izakaya",
@@ -930,11 +930,11 @@
       "counter",
       "seating"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "jazz-cellar",
@@ -957,11 +957,11 @@
     "manualApprovedRoles": [
       "seating"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "library",
@@ -984,11 +984,11 @@
     "manualApprovedRoles": [
       "seating"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "lineage-2",
@@ -1013,11 +1013,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "loft",
@@ -1040,11 +1040,11 @@
     "manualApprovedRoles": [
       "counter"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "lost-ark",
@@ -1069,11 +1069,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "marina",
@@ -1096,11 +1096,11 @@
     "manualApprovedRoles": [
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "mass-effect",
@@ -1125,11 +1125,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "max-payne",
@@ -1154,11 +1154,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "minecraft",
@@ -1183,11 +1183,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "neighbours-from-hell",
@@ -1212,11 +1212,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "nfs-carbon",
@@ -1241,11 +1241,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "nfs-most-wanted",
@@ -1270,11 +1270,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "nfs-underground",
@@ -1299,11 +1299,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "palace",
@@ -1324,11 +1324,11 @@
       "seating"
     ],
     "manualApprovedRoles": [],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "palworld",
@@ -1353,11 +1353,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "parisian",
@@ -1378,11 +1378,11 @@
       "seating"
     ],
     "manualApprovedRoles": [],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "perfect-world",
@@ -1407,11 +1407,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "quantum-break",
@@ -1436,11 +1436,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "repo",
@@ -1465,11 +1465,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "resident-evil",
@@ -1494,11 +1494,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "riad",
@@ -1519,11 +1519,11 @@
       "seating"
     ],
     "manualApprovedRoles": [],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "rooftop",
@@ -1544,11 +1544,11 @@
       "seating"
     ],
     "manualApprovedRoles": [],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "shadow-tomb-raider",
@@ -1573,11 +1573,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "silent-hill",
@@ -1602,11 +1602,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "skyline",
@@ -1625,11 +1625,11 @@
       "shelf"
     ],
     "manualApprovedRoles": [],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "skyrim",
@@ -1654,11 +1654,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "sleeping-dogs",
@@ -1683,11 +1683,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "speakeasy",
@@ -1712,11 +1712,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "stellar-blade",
@@ -1741,11 +1741,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "tropical",
@@ -1768,11 +1768,11 @@
     "manualApprovedRoles": [
       "seating"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "tropico-6",
@@ -1797,11 +1797,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "underground",
@@ -1826,11 +1826,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "underwater",
@@ -1855,11 +1855,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "velvet",
@@ -1909,11 +1909,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "warcraft-3",
@@ -1938,11 +1938,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "watch-dogs",
@@ -1967,11 +1967,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "winter",
@@ -1992,11 +1992,11 @@
       "seating"
     ],
     "manualApprovedRoles": [],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "witcher-3",
@@ -2021,11 +2021,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "wolf-among-us",
@@ -2050,11 +2050,11 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   },
   {
     "scene": "worms",
@@ -2079,10 +2079,10 @@
       "seating",
       "shelf"
     ],
-    "architectureReady": false,
+    "architectureReady": true,
     "furnitureReady": true,
     "isolatedFurnitureReady": true,
-    "cleanFurnitureReady": false,
-    "productionReady": false
+    "cleanFurnitureReady": true,
+    "productionReady": true
   }
 ]

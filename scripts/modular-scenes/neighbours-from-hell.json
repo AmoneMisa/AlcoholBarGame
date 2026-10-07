@@ -2,7 +2,7 @@
   "id": "neighbours-from-hell",
   "source": "../../../public/assets/bar/backgrounds/interior-neighbours-from-hell.webp",
   "outputDir": "../../../public/assets/bar/modular/neighbours-from-hell",
-  "status": "geometry-ready-art-review-required",
+  "status": "production",
   "geometrySource": "manual-source-review",
   "notes": [
     "Existing themed background coverage manifest.",
@@ -26,7 +26,7 @@
         "x": 0.28,
         "y": 0.13,
         "width": 0.53,
-        "height": 0.42
+        "height": 0.54
       },
       "prompt": "Review provisional region; isolate actual empty back-bar furniture."
     },
@@ -35,7 +35,7 @@
         "x": 0,
         "y": 0.56,
         "width": 1,
-        "height": 0.24
+        "height": 0.43999999999999995
       },
       "prompt": "Review provisional region; isolate actual counter with transparent surroundings."
     }
@@ -109,15 +109,16 @@
     "shelfBounds": "manual-measured",
     "counterBounds": "manual-measured",
     "seatAnchors": "manual-measured",
-    "windowCutouts": "manual-required",
-    "architectureInpaint": "required",
-    "alphaEdges": "manual-review",
+    "windowCutouts": "native-alpha-and-alternate-exterior-reviewed",
+    "architectureInpaint": "generated-and-reviewed",
+    "alphaEdges": "generated-alpha-and-composite-reviewed",
     "manualApprovedRoles": [
       "counter",
       "seating",
       "shelf"
     ],
-    "seatAsset": "single-reusable-manual"
+    "seatAsset": "single-reusable-generated-and-reviewed",
+    "generationState": "generated-and-composite-reviewed"
   },
   "manualRoleMasksNormalized": {
     "shelf": {
@@ -231,10 +232,10 @@
   ],
   "manualSeatCutNormalized": {
     "cropNormalized": {
-      "x": 0.455,
-      "y": 0.7,
-      "width": 0.1,
-      "height": 0.2
+      "x": 0.41,
+      "y": 0.8,
+      "width": 0.18,
+      "height": 0.34
     },
     "mask": {
       "feather": 0.65,
@@ -298,5 +299,44 @@
       ],
       "exclude": []
     }
-  }
+  },
+  "generatedAssetBatch": "modular-generation-batch-2026-10-07-all-05.json",
+  "generatedShelfUnits": [
+    {
+      "x0": 0.36,
+      "x1": 0.61,
+      "rows": [
+        0.264,
+        0.387,
+        0.508
+      ]
+    },
+    {
+      "x0": 0.65,
+      "x1": 0.78,
+      "rows": [
+        0.261,
+        0.386,
+        0.508
+      ]
+    }
+  ],
+  "generatedArchitectureAlpha": true,
+  "generatedExteriorBoundsNormalized": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 0.19,
+      "height": 0.66
+    }
+  ],
+  "windowCutoutsNormalized": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 0.19,
+      "height": 0.66,
+      "type": "rect"
+    }
+  ]
 }
