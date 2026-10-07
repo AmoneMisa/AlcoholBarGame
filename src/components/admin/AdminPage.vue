@@ -7,7 +7,7 @@ import CatalogPicker from './CatalogPicker.vue';
 import UiCheckbox from '../ui/UiCheckbox.vue';
 const props=defineProps<{role:'owner'|'admin'|'moderator'}>();
 const elevated=computed(()=>props.role!=='moderator');
-const tabs=computed(()=>elevated.value ? [['users','Players'],['staff','Staff roles'],['promos','Promo codes'],['tickets','Tickets'],['logs','Event log']] : [['users','Players']]);
+const tabs=computed(()=>elevated.value ? [['users','Players'],['staff','Staff roles'],['promos','Promo codes'],['messages','System mail'],['tickets','Tickets'],['logs','Event log']] : [['users','Players']]);
 const changeOptions=computed(()=> (elevated.value ? ['coins','crystals','xp','parts',...Object.keys(catalog.value),'block','unblock'] : ['block','unblock']).map(value=>({value,label:value})));
 const staff=ref<any[]>([]),assignment=reactive({telegramId:'',role:'moderator',reason:''});
 const tab=ref('users'), busy=ref(false), feedback=ref('');
@@ -15,6 +15,7 @@ const catalog=ref<Record<string,{id:string;label:string;group?:string;character?
 const user=reactive({telegramId:'',kind:props.role==='moderator' ? 'block' : 'coins',id:'',delta:1,reason:''});
 const promo=reactive({code:'',startsAt:'',expiresAt:'',noExpiry:false,maxUses:'',rewards:[{kind:'coins',id:'',amount:100}]});
 const expiryEdits=reactive<Record<string,{noExpiry:boolean;expiresAt:string}>>({});
+const message=reactive({telegramId:'',title:'',body:'',days:30,everyone:true,confirmAll:false}), sentMessages=ref<any[]>([]);
 const filter=reactive({telegramId:'',event:''});
 const singles=['style','background','companion'];
 async function run(task:()=>Promise<void>) { if(busy.value) return; busy.value=true; feedback.value=''; try { await task(); } catch(e) { feedback.value=(e as Error).message; } finally {busy.value=false;} }
@@ -26,9 +27,16 @@ async function loadPromos() {promos.value=(await api('promocodes/list')).promos;
 async function createPromo() { await api('promocodes',{...promo,startsAt:new Date(promo.startsAt).toISOString(),expiresAt:promo.noExpiry ? null : new Date(promo.expiresAt).toISOString(),maxUses:promo.maxUses==='' ? null : Number(promo.maxUses),rewards:promo.rewards.map(r=>({kind:r.kind,...(catalog.value[r.kind] ? {id:r.id}:{}),...(!singles.includes(r.kind) ? {amount:r.amount}:{})}))}); await loadPromos(); feedback.value='Promo code created.'; }
 async function saveExpiry(code:string) {const edit=expiryEdits[code]!;await api('promocodes/expiry',{code,expiresAt:edit.noExpiry ? null : new Date(edit.expiresAt).toISOString()});await loadPromos();feedback.value='Expiration saved.';}
 async function removePromo(code:string) {if(!confirm(`Disable promo code ${code}?`)) return; await api('promocodes/delete',{code}); await loadPromos();}
+async function loadMessages() { sentMessages.value=(await api('messages/list')).messages; }
+async function sendMessage() {
+  const target=message.everyone ? 'EVERY player' : 'Telegram ID '+message.telegramId;
+  if(!confirm(`Send "${message.title}" to ${target}?`)) return;
+  await api('messages/send',{title:message.title,body:message.body,days:message.days,...(message.everyone ? {confirmAll:true} : {telegramId:message.telegramId})});
+  message.title='';message.body='';message.confirmAll=false;await loadMessages();feedback.value='Message sent to Mail.';
+}
 async function loadEvents(more=false) { const batch=(await api('events',{...filter,...(more ? {before:events.value.at(-1)?.id}:{})})).events; events.value=more ? [...events.value,...batch] : batch; }
 async function loadTickets(more=false) {const batch=(await api('tickets',more ? {before:tickets.value.at(-1)?.id}:{})).tickets; tickets.value=more ? [...tickets.value,...batch]:batch;}
-async function choose(value:string) {tab.value=value; await run(async()=>{if(value==='staff') staff.value=(await api('staff/list')).staff; if(value==='promos') await loadPromos(); if(value==='logs') await loadEvents(); if(value==='tickets') await loadTickets();});}
+async function choose(value:string) {tab.value=value; await run(async()=>{if(value==='staff') staff.value=(await api('staff/list')).staff; if(value==='promos') await loadPromos(); if(value==='messages') await loadMessages(); if(value==='logs') await loadEvents(); if(value==='tickets') await loadTickets();});}
 const time=(value:any)=>value ? new Date(value).toLocaleString() : '—';
 onMounted(()=>run(async()=> {if(elevated.value) catalog.value=(await api('catalog')).catalog; const now=new Date(); now.setMinutes(now.getMinutes()-now.getTimezoneOffset()); promo.startsAt=now.toISOString().slice(0,16); now.setDate(now.getDate()+7); promo.expiresAt=now.toISOString().slice(0,16);}));
 </script>
@@ -72,6 +80,18 @@ onMounted(()=>run(async()=> {if(elevated.value) catalog.value=(await api('catalo
       <article v-for="p in promos" :key="p.code"><h3>{{ p.code }} {{ p.deletedAt ? '(disabled)' : '' }}</h3><p>{{ time(p.startsAt) }} → {{ p.expiresAt === null ? 'No expiration' : time(p.expiresAt) }} · {{ p.uses }} / {{ p.maxUses ?? 'Unlimited' }} players</p><pre>{{ JSON.stringify(p.rewards,null,2) }}</pre>
         <form v-if="!p.deletedAt && expiryEdits[p.code]" @submit.prevent="run(()=>saveExpiry(p.code))"><UiCheckbox v-model="expiryEdits[p.code]!.noExpiry" label="No expiration" /><UiInput v-if="!expiryEdits[p.code]!.noExpiry" v-model="expiryEdits[p.code]!.expiresAt" label="Expires (your local time)" type="datetime-local" required /><button :disabled="busy">Save expiration</button></form>
         <button :disabled="busy || !!p.deletedAt" @click="run(()=>removePromo(p.code))">Disable…</button></article>
+    </section>
+    <section v-if="tab==='messages' && elevated">
+      <h2>System mail</h2><p>Messages appear in the player's Mailbox under System as “BarLingo” and stay for the chosen number of days. Players receive them the next time they open the game or Mail.</p>
+      <form @submit.prevent="run(sendMessage)">
+        <UiCheckbox v-model="message.everyone" label="Send to every player" />
+        <label v-if="!message.everyone">Telegram ID<UiInput v-model="message.telegramId" required inputmode="numeric" pattern="[0-9]+" /></label>
+        <label>Title<UiInput v-model="message.title" required minlength="3" maxlength="80" /></label>
+        <label>Message<textarea v-model="message.body" required minlength="3" maxlength="2000" rows="6" /></label>
+        <label>Keep for (days, 1–30)<input v-model.number="message.days" type="number" required min="1" max="30" step="1" /></label>
+        <button :disabled="busy">Send message…</button>
+      </form>
+      <article v-for="item in sentMessages" :key="item.id"><h3>#{{ item.id }} · {{ item.title }}</h3><p>To: {{ item.targetTelegramId ?? 'Everyone' }} · sent {{ time(item.createdAt) }} · expires {{ time(item.expiresAt) }}</p><p class="description">{{ item.body }}</p></article>
     </section>
     <section v-if="tab==='logs' && elevated">
       <h2>Events · last 14 days</h2><form @submit.prevent="run(()=>loadEvents())"><label>Telegram ID<UiInput v-model="filter.telegramId" inputmode="numeric" pattern="[0-9]*" /></label><label>Event type<UiInput v-model="filter.event" placeholder="game.action.refused" /></label><button :disabled="busy">Filter / refresh</button></form>

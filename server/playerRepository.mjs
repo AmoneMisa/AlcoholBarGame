@@ -34,6 +34,9 @@ function pgTx(client) {
     async addEvent(identity,event,detail,at) { await client.query('INSERT INTO game_events(telegram_id,event,detail,created_at) VALUES($1,$2,$3::jsonb,to_timestamp($4/1000.0))',[identity.telegramId,event,JSON.stringify(detail),at]); },
     async pruneEvents(before) { for(const table of ['game_events','coin_ledger','crystal_ledger','loot_ledger']) await client.query('DELETE FROM '+table+' WHERE created_at <= to_timestamp($1/1000.0)',[before]); },
     async listEvents({telegramId,before,event},cutoff) { const {rows}=await client.query('SELECT id,telegram_id AS "telegramId",event,detail,created_at AS "createdAt" FROM game_events WHERE created_at > to_timestamp($1/1000.0) AND ($2::bigint IS NULL OR telegram_id=$2) AND ($3::bigint IS NULL OR id<$3) AND ($4::text IS NULL OR event=$4) ORDER BY id DESC LIMIT 100',[cutoff,telegramId || null,before || null,event || null]); return rows; },
+    async addSystemMessage(message) { const {rows:[row]}=await client.query('INSERT INTO system_messages(title,body,target_telegram_id,created_by,created_at,expires_at) VALUES($1,$2,$3,$4,to_timestamp($5/1000.0),to_timestamp($6/1000.0)) RETURNING id',[message.title,message.body,message.targetTelegramId,message.createdBy,message.createdAt,message.expiresAt]); return row.id; },
+    async listSystemMessages(telegramId,now) { const {rows}=await client.query('SELECT id,title,body,target_telegram_id AS "targetTelegramId",(extract(epoch FROM created_at)*1000)::bigint AS "createdAt",(extract(epoch FROM expires_at)*1000)::bigint AS "expiresAt" FROM system_messages WHERE expires_at>to_timestamp($2/1000.0) AND (target_telegram_id IS NULL OR target_telegram_id=$1) ORDER BY id',[telegramId,now]); return rows.map(row=>({...row,id:Number(row.id),createdAt:Number(row.createdAt),expiresAt:Number(row.expiresAt)})); },
+    async listSentSystemMessages() { const {rows}=await client.query('SELECT id,title,body,target_telegram_id AS "targetTelegramId",created_by AS "createdBy",created_at AS "createdAt",expires_at AS "expiresAt" FROM system_messages ORDER BY id DESC LIMIT 30'); return rows; },
     async addTicket(playerId,ticket) { const {rows:[row]}=await client.query('INSERT INTO support_tickets(player_id,title,description,occurred_at,screenshots) VALUES($1,$2,$3,$4,$5::jsonb) RETURNING id',[playerId,ticket.title,ticket.description,ticket.occurredAt,JSON.stringify(ticket.screenshots)]); return row.id; },
     async recentTickets(playerId,since) { return (await client.query('SELECT 1 FROM support_tickets WHERE player_id=$1 AND created_at>to_timestamp($2/1000.0)',[playerId,since])).rowCount; },
     async listTickets(before) { const {rows}=await client.query('SELECT t.*,p.telegram_id AS "telegramId",p.display_name AS name FROM support_tickets t JOIN players p ON p.id=t.player_id WHERE ($1::bigint IS NULL OR t.id<$1) ORDER BY t.id DESC LIMIT 20',[before || null]); return rows; },
@@ -174,7 +177,7 @@ function pgTx(client) {
 }
 
 export function createMemoryRepository() {
-  const events = [], tickets = [];
+  const events = [], tickets = [], systemMessages = [];
   const staff=new Map();
   const promos = new Map();
   const redeemedPromos = new Set();
@@ -206,6 +209,9 @@ export function createMemoryRepository() {
     async addEvent(identity,event,detail,at) { events.push({id:events.length ? events.at(-1).id+1 : 1,telegramId:identity.telegramId,event,detail:structuredClone(detail),createdAt:at}); },
     async pruneEvents(before) { while(events.length && events[0].createdAt<=before) events.shift(); },
     async listEvents(filter,cutoff) { return events.filter(e=>e.createdAt>cutoff && (!filter.telegramId || String(e.telegramId)===String(filter.telegramId)) && (!filter.before || e.id<filter.before) && (!filter.event || e.event===filter.event)).reverse().slice(0,100); },
+    async addSystemMessage(message) { const id=systemMessages.length+1; systemMessages.push({id,...structuredClone(message)}); return id; },
+    async listSystemMessages(telegramId,now) { return structuredClone(systemMessages.filter(m=>m.expiresAt>now && (m.targetTelegramId===null || String(m.targetTelegramId)===String(telegramId)))); },
+    async listSentSystemMessages() { return structuredClone([...systemMessages].reverse().slice(0,30)); },
     async addTicket(playerId,ticket) { const id=tickets.length+1; tickets.push({id,player_id:playerId,...structuredClone(ticket),created_at:Date.now(),status:'open'}); return id; },
     async recentTickets(playerId,since) { return tickets.filter(t=>t.player_id===playerId && t.created_at>since).length; },
     async listTickets(before) { return tickets.filter(t=>!before || t.id<before).reverse().slice(0,20).map(t=>({...t,telegramId:[...players.values()].find(p=>p.id===t.player_id)?.telegramId})); },

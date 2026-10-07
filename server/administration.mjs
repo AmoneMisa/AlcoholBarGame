@@ -106,6 +106,24 @@ export function createAdministration({repository,now,staff}) {
       const result={ok:true}; await tx.saveRequest(player.id,requestId,result); return result;
     });
   }
+  async function adminSendSystemMessage(identity,body) {
+    const title=typeof body?.title==='string' ? body.title.trim() : '';
+    const text=typeof body?.body==='string' ? body.body.trim() : '';
+    const everyone=body?.telegramId===undefined || body?.telegramId===null || body?.telegramId==='';
+    if(title.length<3 || title.length>80 || text.length<3 || text.length>2000) return fail('Title: 3–80 characters; message: 3–2000 characters.');
+    if(!everyone && !/^\d{1,16}$/.test(String(body.telegramId))) return fail('Enter a Telegram ID or leave it empty to message everyone.');
+    if(everyone && body?.confirmAll!==true) return fail('Confirm that this message goes to every player.');
+    const days=body?.days===undefined ? 30 : body.days;
+    if(!Number.isInteger(days) || days<1 || days>30) return fail('Keep the message for 1–30 days.');
+    return repository.transaction(async tx=> {
+      if(!['owner','admin'].includes(await staff.roleIn(tx,identity))) return fail('Staff access required.',403);
+      if(!everyone && !await tx.adminPlayer(body.telegramId)) return fail('Player not found.',404);
+      const createdAt=now();
+      const id=await tx.addSystemMessage({title,body:text,targetTelegramId:everyone ? null : String(body.telegramId),createdBy:String(identity.telegramId),createdAt,expiresAt:createdAt+days*86400000});
+      await tx.addEvent(identity,'admin.system.message',{id,title,target:everyone ? 'all' : String(body.telegramId),days},createdAt);
+      return {ok:true,id};
+    });
+  }
   async function createTicket(identity,body) {
     const title=typeof body?.title==='string' ? body.title.trim() : '';
     const description=typeof body?.description==='string' ? body.description.trim() : '';
@@ -122,7 +140,7 @@ export function createAdministration({repository,now,staff}) {
       return {ok:true,id};
     });
   }
-  return {audit,pruneEvents,adminPlayer,adminChange,createTicket,adminCatalog:catalog,adminUpdatePromoExpiry,
+  return {audit,pruneEvents,adminSendSystemMessage,adminSystemMessages:()=>repository.transaction(async tx=>({ok:true,messages:await tx.listSentSystemMessages()})),adminPlayer,adminChange,createTicket,adminCatalog:catalog,adminUpdatePromoExpiry,
     checkAccess:identity=>repository.transaction(tx=>tx.findOrCreatePlayer(identity)),
     adminPromos:()=>repository.transaction(async tx=>({ok:true,promos:await tx.listPromos()})),
     adminDeletePromo:(identity,code)=>repository.transaction(async tx=>{const deleted=await tx.deletePromo(cleanCode(code)); if(!deleted) return fail('Code not found or already deleted.',404); await tx.addEvent(identity,'admin.promo.delete',{code:cleanCode(code)},now()); return {ok:true};}),

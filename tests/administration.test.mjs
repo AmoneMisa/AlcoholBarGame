@@ -171,3 +171,20 @@ test('HTTP role permissions: moderator only bans/unbans; revocation invalidates 
   assert.equal((await request(56,'player/change',change(86416302,'block',0))).status,403,'owner is protected');
  } finally {await new Promise(r=>server.close(r));}
 });
+test('Staff system messages reach one player or everyone through Mail, and non-staff cannot send them',async()=>{
+ const {service,advance}=setup(),owner=identity(42),a=identity(8),b=identity(9);
+ await service.session(a);await service.session(b);
+ assert.equal((await service.adminSendSystemMessage(a,{title:'Hello',body:'Maintenance tonight',confirmAll:true})).status,403);
+ assert.equal((await service.adminSendSystemMessage(owner,{title:'Hello',body:'Maintenance tonight'})).status,400,'broadcast needs confirmation');
+ assert.equal((await service.adminSendSystemMessage(owner,{title:'Hey',body:'Only you',telegramId:'999'})).status,404);
+ assert.equal((await service.adminSendSystemMessage(owner,{title:'Maintenance',body:'The bar closes at 22:00.',confirmAll:true})).ok,true);
+ assert.equal((await service.adminSendSystemMessage(owner,{title:'Sorry',body:'We fixed your tips.',telegramId:'8',days:3})).ok,true);
+ const mailA=(await service.mailbox(a)).body.state.mailbox.filter(m=>m.kind==='system');
+ const mailB=(await service.mailbox(b)).body.state.mailbox.filter(m=>m.kind==='system');
+ assert.deepEqual(mailA.map(m=>m.title).sort(),['Maintenance','Sorry']);
+ assert.deepEqual(mailB.map(m=>m.title),['Maintenance']);
+ assert.equal((await service.mailbox(a)).body.state.mailbox.filter(m=>m.kind==='system').length,2,'opening Mail twice does not duplicate messages');
+ advance(4*86400_000);
+ assert.deepEqual((await service.mailbox(a)).body.state.mailbox.filter(m=>m.kind==='system').map(m=>m.title),['Maintenance']);
+ assert.equal((await service.adminSystemMessages()).messages.length,2);
+});
