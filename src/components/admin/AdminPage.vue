@@ -5,6 +5,7 @@ import OptionSelect from '../game/OptionSelect.vue';
 import { post } from '../../telegram/api';
 import CatalogPicker from './CatalogPicker.vue';
 import UiCheckbox from '../ui/UiCheckbox.vue';
+import { mailPieces } from '../../domain/mailText';
 const props=defineProps<{role:'owner'|'admin'|'moderator'}>();
 const elevated=computed(()=>props.role!=='moderator');
 const tabs=computed(()=>elevated.value ? [['users','Players'],['staff','Staff roles'],['promos','Promo codes'],['messages','System mail'],['tickets','Tickets'],['logs','Event log']] : [['users','Players']]);
@@ -15,7 +16,7 @@ const catalog=ref<Record<string,{id:string;label:string;group?:string;character?
 const user=reactive({telegramId:'',kind:props.role==='moderator' ? 'block' : 'coins',id:'',delta:1,reason:''});
 const promo=reactive({code:'',startsAt:'',expiresAt:'',noExpiry:false,maxUses:'',rewards:[{kind:'coins',id:'',amount:100}]});
 const expiryEdits=reactive<Record<string,{noExpiry:boolean;expiresAt:string}>>({});
-const message=reactive({telegramId:'',title:'',body:'',days:30,everyone:true,confirmAll:false}), sentMessages=ref<any[]>([]);
+const message=reactive({telegramId:'',title:'',body:'',days:30,everyone:true,confirmAll:false}), sentMessages=ref<any[]>([]), previewing=ref(false);
 const filter=reactive({telegramId:'',event:''});
 const singles=['style','background','companion'];
 async function run(task:()=>Promise<void>) { if(busy.value) return; busy.value=true; feedback.value=''; try { await task(); } catch(e) { feedback.value=(e as Error).message; } finally {busy.value=false;} }
@@ -89,8 +90,9 @@ onMounted(()=>run(async()=> {if(elevated.value) catalog.value=(await api('catalo
         <label>Title<UiInput v-model="message.title" required minlength="3" maxlength="80" /></label>
         <label>Message<textarea v-model="message.body" required minlength="3" maxlength="2000" rows="6" /></label><small>Line breaks are kept. Use **bold** for bold text and `code` for text players can tap to copy (promo codes, IDs).</small>
         <label>Keep for (days, 1–30)<input v-model.number="message.days" type="number" required min="1" max="30" step="1" /></label>
-        <button :disabled="busy">Send message…</button>
+        <button type="button" :aria-pressed="previewing" @click="previewing=!previewing">{{ previewing ? 'Hide preview' : 'Preview' }}</button><button :disabled="busy">Send message…</button>
       </form>
+      <article v-if="previewing" class="mail-preview" aria-label="Message preview"><small>Preview · how it looks in the player's Mailbox</small><h3>{{ message.title || 'Message from BarLingo' }}</h3><p class="mail-preview-from">BarLingo · {{ message.everyone ? 'to every player' : 'to Telegram ID ' + (message.telegramId || '…') }} · kept {{ message.days }} day(s)</p><p class="mail-preview-body"><template v-for="(piece,index) in mailPieces(message.body || 'Your message appears here.')" :key="index"><b v-if="piece.kind==='bold'">{{ piece.text }}</b><code v-else-if="piece.kind==='code'">{{ piece.text }}</code><template v-else>{{ piece.text }}</template></template></p></article>
       <article v-for="item in sentMessages" :key="item.id"><h3>#{{ item.id }} · {{ item.title }}</h3><p>To: {{ item.targetTelegramId ?? 'Everyone' }} · sent {{ time(item.createdAt) }} · expires {{ time(item.expiresAt) }}</p><p class="description">{{ item.body }}</p></article>
     </section>
     <section v-if="tab==='logs' && elevated">
@@ -105,4 +107,5 @@ onMounted(()=>run(async()=> {if(elevated.value) catalog.value=(await api('catalo
 </template>
 <style>
 .admin-page{max-width:1000px;margin:auto;padding:24px;font:16px system-ui;color:#e8edf6;background:#111c2d;min-height:100vh;box-sizing:border-box}.admin-page *{box-sizing:border-box}.admin-page nav,.admin-page form{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0;align-items:end}.admin-page label{display:grid;gap:6px;max-width:100%;flex:1 1 220px}.admin-page input,.admin-page select,.admin-page textarea,.admin-page button{font:inherit;padding:10px;border:1px solid #63738e;border-radius:8px;min-width:0;max-width:100%}.admin-page input,.admin-page select,.admin-page textarea{color:#eef;background:#19273c}.admin-page button{cursor:pointer;background:#ecc47b;color:#161b24}.admin-page button:disabled{opacity:.5;cursor:default}.admin-page [aria-pressed=true]{outline:2px solid white}.admin-page textarea{min-height:100px}.admin-page article,.admin-page fieldset{width:100%;padding:16px;border:1px solid #475874;border-radius:12px;margin:12px 0}.admin-page pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:400px;overflow:auto;font-size:13px}.admin-page .description{white-space:pre-wrap}.admin-page img{max-width:240px;max-height:240px;object-fit:contain;margin:8px}.admin-page p{overflow-wrap:anywhere}
+.admin-page .mail-preview{display:block;flex:1 1 100%;padding:14px;border:1px dashed #6f8a95;border-radius:10px;background:#0b1522}.admin-page .mail-preview-from{opacity:.7;font-size:13px}.admin-page .mail-preview-body{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}.admin-page .mail-preview code{padding:1px 7px;border:1px solid #6f8a95;border-radius:6px;background:#06101a;color:#ffe39a;font:13px ui-monospace,Consolas,monospace}
 </style>

@@ -8,6 +8,7 @@ import ModalDialog from './ModalDialog.vue';
 import UiButton from './UiButton.vue';
 import SectionTabs from './SectionTabs.vue';
 import RewardArt from './RewardArt.vue';
+import { mailPieces as pieces } from '../../domain/mailText';
 const game=useGameStore();
 const filter=ref('all');
 const selectedId=ref<string>();
@@ -23,17 +24,6 @@ const title=(item:MailEntry)=>item.kind==='system'?(item.title||'Message from Ba
 const status=(item:MailEntry)=>item.status==='pending'?(item.kind==='reward'?'Ready to claim':'Awaiting a decision'):item.status==='accepted'?(item.kind==='reward'?'Claimed':'Accepted'):item.status==='returned'?'Returned to sender':item.status==='declined'?'Declined · returned to sender':'';
 const body=(item:MailEntry)=>item.kind==='theft'?(item.direction==='incoming'?`At ${date(item.at)} MSK, player ${item.actorName} stole ${Math.round(item.amount??0)} coins from your tip jar!`:`At ${date(item.at)} MSK, you stole ${Math.round(item.amount??0)} coins from player ${item.actorName}'s tip jar!`):item.text;
 // System mail supports **bold** and `code` (tap to copy). Parsed into plain segments, never injected as HTML.
-type Piece={kind:'text'|'bold'|'code';text:string};
-function pieces(text:string):Piece[]{
-  const out:Piece[]=[];let last=0;
-  for(const match of text.matchAll(/\*\*(.+?)\*\*|`([^`\n]+)`/g)){
-    if(match.index>last)out.push({kind:'text',text:text.slice(last,match.index)});
-    out.push(match[1]!==undefined?{kind:'bold',text:match[1]}:{kind:'code',text:match[2]!});
-    last=match.index+match[0].length;
-  }
-  if(last<text.length)out.push({kind:'text',text:text.slice(last)});
-  return out;
-}
 const copied=ref('');
 async function copy(text:string){
   try{await navigator.clipboard.writeText(text);copied.value=text;setTimeout(()=>{if(copied.value===text)copied.value='';},1500);}catch{copied.value='';}
