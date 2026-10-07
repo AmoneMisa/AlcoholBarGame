@@ -29,6 +29,7 @@ const SettingsPage = lazyPage(() => import('./components/settings/SettingsPage.v
 import NotificationToasts from './components/ui/NotificationToasts.vue';
 import RewardPopup from './components/ui/RewardPopup.vue';
 import DailyRewardPopup from './components/ui/DailyRewardPopup.vue';
+import HelloNoticePopup from './components/ui/HelloNoticePopup.vue';
 import { useGameStore } from './stores/game';
 import { useNotificationsStore } from './stores/notifications';
 import { calendarDate } from './domain/economy';
@@ -269,6 +270,7 @@ watch(deckView, (part) => { if (part) { managementView.value = part; managementO
       <p v-if="game.mailMessage" role="alert">{{ game.mailMessage }}</p>
       <UiButton @click="game.dismissTheftNotices()">Got it</UiButton>
     </ModalDialog>
+    <HelloNoticePopup :ready="game.sessionReady && game.mode === 'online' && game.startingBarChosen && game.tourSeen && !game.dailyOpen && !game.theftNotices.length && !game.mailboxOpen" />
     <DailyRewardPopup v-if="game.dailyOpen && !game.theftNotices.length && !game.mailboxOpen" />
     <GuidePointer />
     <AcquisitionOffers />

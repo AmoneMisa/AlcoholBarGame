@@ -8,7 +8,7 @@ import UiCheckbox from '../ui/UiCheckbox.vue';
 import { mailPieces } from '../../domain/mailText';
 const props=defineProps<{role:'owner'|'admin'|'moderator'}>();
 const elevated=computed(()=>props.role!=='moderator');
-const tabs=computed(()=>elevated.value ? [['users','Players'],['staff','Staff roles'],['promos','Promo codes'],['messages','System mail'],['tickets','Tickets'],['logs','Event log']] : [['users','Players']]);
+const tabs=computed(()=>elevated.value ? [['users','Players'],['staff','Staff roles'],['promos','Promo codes'],['messages','System mail'],['hello','Hello popup'],['tickets','Tickets'],['logs','Event log']] : [['users','Players']]);
 const changeOptions=computed(()=> (elevated.value ? ['coins','crystals','xp','parts',...Object.keys(catalog.value),'block','unblock'] : ['block','unblock']).map(value=>({value,label:value})));
 const staff=ref<any[]>([]),assignment=reactive({telegramId:'',role:'moderator',reason:''});
 const tab=ref('users'), busy=ref(false), feedback=ref('');
@@ -35,9 +35,25 @@ async function sendMessage() {
   await api('messages/send',{title:message.title,body:message.body,days:message.days,...(message.everyone ? {confirmAll:true} : {telegramId:message.telegramId})});
   message.title='';message.body='';message.confirmAll=false;await loadMessages();feedback.value='Message sent to Mail.';
 }
+async function removeMessage(item:any) {
+  if(!confirm(`Delete message #${item.id} "${item.title}"?\nPlayers who already received it will lose it from Mail the next time they open the game.`)) return;
+  await api('messages/delete',{id:item.id}); await loadMessages(); feedback.value='Message deleted.';
+}
+// ---- Hello popup: notices players see when they open the game ----
+const notice=reactive({id:0,title:'',body:'',active:true,startsAt:'',endsAt:''}), notices=ref<any[]>([]), noticePreview=ref(false);
+const localInput=(ms:number|null)=>ms===null ? '' : new Date(ms-new Date(ms).getTimezoneOffset()*60000).toISOString().slice(0,16);
+const resetNotice=()=>{Object.assign(notice,{id:0,title:'',body:'',active:true,startsAt:'',endsAt:''});};
+async function loadNotices() { notices.value=(await api('notices/list')).notices; }
+function editNotice(item:any) { Object.assign(notice,{id:item.id,title:item.title,body:item.body,active:item.active,startsAt:localInput(item.startsAt),endsAt:localInput(item.endsAt)}); noticePreview.value=false; }
+async function saveNotice() {
+  await api('notices/save',{...(notice.id ? {id:notice.id} : {}),title:notice.title,body:notice.body,active:notice.active,startsAt:notice.startsAt ? new Date(notice.startsAt).toISOString() : null,endsAt:notice.endsAt ? new Date(notice.endsAt).toISOString() : null});
+  const edited=!!notice.id; resetNotice(); await loadNotices(); feedback.value=edited ? 'Notice updated: players who hid it for today will see it again.' : 'Notice saved.';
+}
+async function switchNotice(item:any) { await api('notices/save',{id:item.id,title:item.title,body:item.body,active:!item.active,startsAt:item.startsAt,endsAt:item.endsAt}); await loadNotices(); }
+async function removeNotice(item:any) { if(!confirm(`Delete the notice "${item.title}"?`)) return; await api('notices/delete',{id:item.id}); if(notice.id===item.id) resetNotice(); await loadNotices(); feedback.value='Notice deleted.'; }
 async function loadEvents(more=false) { const batch=(await api('events',{...filter,...(more ? {before:events.value.at(-1)?.id}:{})})).events; events.value=more ? [...events.value,...batch] : batch; }
 async function loadTickets(more=false) {const batch=(await api('tickets',more ? {before:tickets.value.at(-1)?.id}:{})).tickets; tickets.value=more ? [...tickets.value,...batch]:batch;}
-async function choose(value:string) {tab.value=value; await run(async()=>{if(value==='staff') staff.value=(await api('staff/list')).staff; if(value==='promos') await loadPromos(); if(value==='messages') await loadMessages(); if(value==='logs') await loadEvents(); if(value==='tickets') await loadTickets();});}
+async function choose(value:string) {tab.value=value; await run(async()=>{if(value==='staff') staff.value=(await api('staff/list')).staff; if(value==='promos') await loadPromos(); if(value==='messages') await loadMessages(); if(value==='hello') await loadNotices(); if(value==='logs') await loadEvents(); if(value==='tickets') await loadTickets();});}
 const time=(value:any)=>value ? new Date(value).toLocaleString() : '—';
 onMounted(()=>run(async()=> {if(elevated.value) catalog.value=(await api('catalog')).catalog; const now=new Date(); now.setMinutes(now.getMinutes()-now.getTimezoneOffset()); promo.startsAt=now.toISOString().slice(0,16); now.setDate(now.getDate()+7); promo.expiresAt=now.toISOString().slice(0,16);}));
 </script>
@@ -93,7 +109,23 @@ onMounted(()=>run(async()=> {if(elevated.value) catalog.value=(await api('catalo
         <button type="button" :aria-pressed="previewing" @click="previewing=!previewing">{{ previewing ? 'Hide preview' : 'Preview' }}</button><button :disabled="busy">Send message…</button>
       </form>
       <article v-if="previewing" class="mail-preview" aria-label="Message preview"><small>Preview · how it looks in the player's Mailbox</small><h3>{{ message.title || 'Message from BarLingo' }}</h3><p class="mail-preview-from">BarLingo · {{ message.everyone ? 'to every player' : 'to Telegram ID ' + (message.telegramId || '…') }} · kept {{ message.days }} day(s)</p><p class="mail-preview-body"><template v-for="(piece,index) in mailPieces(message.body || 'Your message appears here.')" :key="index"><b v-if="piece.kind==='bold'">{{ piece.text }}</b><code v-else-if="piece.kind==='code'">{{ piece.text }}</code><template v-else>{{ piece.text }}</template></template></p></article>
-      <article v-for="item in sentMessages" :key="item.id"><h3>#{{ item.id }} · {{ item.title }}</h3><p>To: {{ item.targetTelegramId ?? 'Everyone' }} · sent {{ time(item.createdAt) }} · expires {{ time(item.expiresAt) }}</p><p class="description">{{ item.body }}</p></article>
+      <article v-for="item in sentMessages" :key="item.id"><h3>#{{ item.id }} · {{ item.title }}</h3><p>To: {{ item.targetTelegramId ?? 'Everyone' }} · sent {{ time(item.createdAt) }} · expires {{ time(item.expiresAt) }}</p><p class="description">{{ item.body }}</p><button type="button" class="danger" :disabled="busy" @click="run(()=>removeMessage(item))">Delete…</button></article>
+    </section>
+    <section v-if="tab==='hello' && elevated">
+      <h2>Hello popup</h2><p>Notices players see when they open the game. Each has a “Don't show me this again today” checkbox. Editing a notice makes it show again for players who hid it. Several active notices are shown one after another.</p>
+      <form @submit.prevent="run(saveNotice)">
+        <UiCheckbox v-model="notice.active" label="Active (shown to players)" />
+        <label>Title<UiInput v-model="notice.title" required minlength="3" maxlength="80" /></label>
+        <label>Text<textarea v-model="notice.body" required minlength="3" maxlength="1500" rows="6" /></label><small>Line breaks are kept. Use **bold** for bold text and `code` for text players can tap to copy.</small>
+        <UiInput v-model="notice.startsAt" label="Show from (optional, your local time)" type="datetime-local" />
+        <UiInput v-model="notice.endsAt" label="Show until (optional, your local time)" type="datetime-local" />
+        <button type="button" :aria-pressed="noticePreview" @click="noticePreview=!noticePreview">{{ noticePreview ? 'Hide preview' : 'Preview' }}</button>
+        <button :disabled="busy">{{ notice.id ? 'Save changes' : 'Create notice' }}</button><button v-if="notice.id" type="button" @click="resetNotice">Cancel editing</button>
+      </form>
+      <article v-if="noticePreview" class="mail-preview" aria-label="Notice preview"><small>Preview · how it looks when the game opens</small><h3>{{ notice.title || 'Hello!' }}</h3><p class="mail-preview-body"><template v-for="(piece,index) in mailPieces(notice.body || 'Your notice appears here.')" :key="index"><b v-if="piece.kind==='bold'">{{ piece.text }}</b><code v-else-if="piece.kind==='code'">{{ piece.text }}</code><template v-else>{{ piece.text }}</template></template></p><UiCheckbox :model-value="false" disabled label="Don't show me this again today" /></article>
+      <article v-for="item in notices" :key="item.id"><h3>#{{ item.id }} · {{ item.title }} {{ item.active ? '' : '(off)' }}</h3><p>{{ item.startsAt ? 'from '+time(item.startsAt) : 'no start' }} · {{ item.endsAt ? 'until '+time(item.endsAt) : 'no end' }} · edited {{ time(item.updatedAt) }}</p><p class="description">{{ item.body }}</p>
+        <button type="button" :disabled="busy" @click="editNotice(item)">Edit</button><button type="button" :disabled="busy" @click="run(()=>switchNotice(item))">{{ item.active ? 'Switch off' : 'Switch on' }}</button><button type="button" class="danger" :disabled="busy" @click="run(()=>removeNotice(item))">Delete…</button></article>
+      <p v-if="!notices.length">No notices yet.</p>
     </section>
     <section v-if="tab==='logs' && elevated">
       <h2>Events · last 14 days</h2><form @submit.prevent="run(()=>loadEvents())"><label>Telegram ID<UiInput v-model="filter.telegramId" inputmode="numeric" pattern="[0-9]*" /></label><label>Event type<UiInput v-model="filter.event" placeholder="game.action.refused" /></label><button :disabled="busy">Filter / refresh</button></form>

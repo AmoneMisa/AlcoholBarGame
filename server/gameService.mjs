@@ -37,6 +37,9 @@ async function syncGiftMail(tx, playerId, state) {
 
 // Messages written by staff: one for every player or one for a single Telegram ID. They stay in Mail for 30 days.
 async function syncSystemMail(tx, identity, state, now) {
+  // A message staff deleted also disappears from the Mail of players who already received it.
+  const existing = new Set((await tx.systemMessageIds()).map(id => `system:${id}`));
+  if (Array.isArray(state.mailbox)) state.mailbox = state.mailbox.filter(item => !(item.kind === 'system' && /^system:\d+$/.test(String(item.id)) && !existing.has(item.id)));
   for (const message of await tx.listSystemMessages(identity.telegramId, now)) {
     addMail(state,{id:`system:${message.id}`,at:message.createdAt,expiresAt:message.expiresAt,kind:'system',direction:'incoming',actorId:0,actorName:'BarLingo',title:message.title,text:message.body});
   }

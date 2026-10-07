@@ -36,6 +36,13 @@ function pgTx(client) {
     async listEvents({telegramId,before,event},cutoff) { const {rows}=await client.query('SELECT id,telegram_id AS "telegramId",event,detail,created_at AS "createdAt" FROM game_events WHERE created_at > to_timestamp($1/1000.0) AND ($2::bigint IS NULL OR telegram_id=$2) AND ($3::bigint IS NULL OR id<$3) AND ($4::text IS NULL OR event=$4) ORDER BY id DESC LIMIT 100',[cutoff,telegramId || null,before || null,event || null]); return rows; },
     async addSystemMessage(message) { const {rows:[row]}=await client.query('INSERT INTO system_messages(title,body,target_telegram_id,created_by,created_at,expires_at) VALUES($1,$2,$3,$4,to_timestamp($5/1000.0),to_timestamp($6/1000.0)) RETURNING id',[message.title,message.body,message.targetTelegramId,message.createdBy,message.createdAt,message.expiresAt]); return row.id; },
     async listSystemMessages(telegramId,now) { const {rows}=await client.query('SELECT id,title,body,target_telegram_id AS "targetTelegramId",(extract(epoch FROM created_at)*1000)::bigint AS "createdAt",(extract(epoch FROM expires_at)*1000)::bigint AS "expiresAt" FROM system_messages WHERE expires_at>to_timestamp($2/1000.0) AND (target_telegram_id IS NULL OR target_telegram_id=$1) ORDER BY id',[telegramId,now]); return rows.map(row=>({...row,id:Number(row.id),createdAt:Number(row.createdAt),expiresAt:Number(row.expiresAt)})); },
+    async deleteSystemMessage(id) { return (await client.query('DELETE FROM system_messages WHERE id=$1',[id])).rowCount > 0; },
+    async systemMessageIds() { const {rows}=await client.query('SELECT id FROM system_messages'); return rows.map(row=>Number(row.id)); },
+    async addNotice(n) { const {rows:[row]}=await client.query('INSERT INTO hello_notices(title,body,active,starts_at,ends_at,created_by) VALUES($1,$2,$3,$4,$5,$6) RETURNING id',[n.title,n.body,n.active,n.startsAt===null ? null : new Date(n.startsAt),n.endsAt===null ? null : new Date(n.endsAt),n.createdBy]); return Number(row.id); },
+    async updateNotice(id,n) { return (await client.query('UPDATE hello_notices SET title=$2,body=$3,active=$4,starts_at=$5,ends_at=$6,updated_at=now() WHERE id=$1',[id,n.title,n.body,n.active,n.startsAt===null ? null : new Date(n.startsAt),n.endsAt===null ? null : new Date(n.endsAt)])).rowCount > 0; },
+    async deleteNotice(id) { return (await client.query('DELETE FROM hello_notices WHERE id=$1',[id])).rowCount > 0; },
+    async listNotices() { const {rows}=await client.query(NOTICE_SELECT+' ORDER BY id DESC LIMIT 100'); return rows.map(noticeRow); },
+    async activeNotices(now) { const {rows}=await client.query(NOTICE_SELECT+' WHERE active AND (starts_at IS NULL OR starts_at<=to_timestamp($1/1000.0)) AND (ends_at IS NULL OR ends_at>to_timestamp($1/1000.0)) ORDER BY id LIMIT 10',[now]); return rows.map(noticeRow); },
     async listSentSystemMessages() { const {rows}=await client.query('SELECT id,title,body,target_telegram_id AS "targetTelegramId",created_by AS "createdBy",created_at AS "createdAt",expires_at AS "expiresAt" FROM system_messages ORDER BY id DESC LIMIT 30'); return rows; },
     async addTicket(playerId,ticket) { const {rows:[row]}=await client.query('INSERT INTO support_tickets(player_id,title,description,occurred_at,screenshots) VALUES($1,$2,$3,$4,$5::jsonb) RETURNING id',[playerId,ticket.title,ticket.description,ticket.occurredAt,JSON.stringify(ticket.screenshots)]); return row.id; },
     async recentTickets(playerId,since) { return (await client.query('SELECT 1 FROM support_tickets WHERE player_id=$1 AND created_at>to_timestamp($2/1000.0)',[playerId,since])).rowCount; },
@@ -176,8 +183,13 @@ function pgTx(client) {
   };
 }
 
+// Notices as the game uses them: times in milliseconds (null = no limit), plus updatedAt, which makes an edited notice show again.
+const NOTICE_SELECT = 'SELECT id,title,body,active,(extract(epoch FROM starts_at)*1000)::bigint AS "startsAt",(extract(epoch FROM ends_at)*1000)::bigint AS "endsAt",(extract(epoch FROM updated_at)*1000)::bigint AS "updatedAt",(extract(epoch FROM created_at)*1000)::bigint AS "createdAt" FROM hello_notices';
+const noticeRow = (row) => ({ id: Number(row.id), title: row.title, body: row.body, active: row.active, startsAt: row.startsAt === null ? null : Number(row.startsAt), endsAt: row.endsAt === null ? null : Number(row.endsAt), updatedAt: Number(row.updatedAt), createdAt: Number(row.createdAt) });
+
 export function createMemoryRepository() {
-  const events = [], tickets = [], systemMessages = [];
+  const events = [], tickets = [], systemMessages = [], notices = [];
+  let nextSystemMessageId = 1, nextNoticeId = 1;
   const staff=new Map();
   const promos = new Map();
   const redeemedPromos = new Set();
@@ -209,7 +221,14 @@ export function createMemoryRepository() {
     async addEvent(identity,event,detail,at) { events.push({id:events.length ? events.at(-1).id+1 : 1,telegramId:identity.telegramId,event,detail:structuredClone(detail),createdAt:at}); },
     async pruneEvents(before) { while(events.length && events[0].createdAt<=before) events.shift(); },
     async listEvents(filter,cutoff) { return events.filter(e=>e.createdAt>cutoff && (!filter.telegramId || String(e.telegramId)===String(filter.telegramId)) && (!filter.before || e.id<filter.before) && (!filter.event || e.event===filter.event)).reverse().slice(0,100); },
-    async addSystemMessage(message) { const id=systemMessages.length+1; systemMessages.push({id,...structuredClone(message)}); return id; },
+    async addSystemMessage(message) { const id=nextSystemMessageId++; systemMessages.push({id,...structuredClone(message)}); return id; },
+    async deleteSystemMessage(id) { const at=systemMessages.findIndex(m=>m.id===Number(id)); if(at<0) return false; systemMessages.splice(at,1); return true; },
+    async systemMessageIds() { return systemMessages.map(m=>m.id); },
+    async addNotice(n) { const id=nextNoticeId++; notices.push({id,title:n.title,body:n.body,active:n.active,startsAt:n.startsAt,endsAt:n.endsAt,createdAt:Date.now(),updatedAt:Date.now()}); return id; },
+    async updateNotice(id,n) { const item=notices.find(x=>x.id===Number(id)); if(!item) return false; Object.assign(item,{title:n.title,body:n.body,active:n.active,startsAt:n.startsAt,endsAt:n.endsAt,updatedAt:Math.max(Date.now(),item.updatedAt+1)}); return true; },
+    async deleteNotice(id) { const at=notices.findIndex(x=>x.id===Number(id)); if(at<0) return false; notices.splice(at,1); return true; },
+    async listNotices() { return structuredClone([...notices].reverse().slice(0,100)); },
+    async activeNotices(now) { return structuredClone(notices.filter(n=>n.active && (n.startsAt===null || n.startsAt<=now) && (n.endsAt===null || n.endsAt>now)).slice(0,10)); },
     async listSystemMessages(telegramId,now) { return structuredClone(systemMessages.filter(m=>m.expiresAt>now && (m.targetTelegramId===null || String(m.targetTelegramId)===String(telegramId)))); },
     async listSentSystemMessages() { return structuredClone([...systemMessages].reverse().slice(0,30)); },
     async addTicket(playerId,ticket) { const id=tickets.length+1; tickets.push({id,player_id:playerId,...structuredClone(ticket),created_at:Date.now(),status:'open'}); return id; },
