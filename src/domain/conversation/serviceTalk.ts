@@ -14,7 +14,7 @@ export interface ServiceContext {
 }
 
 // “Something to feel fresh and cool…” → “something to feel fresh and cool.”
-const wishSentence = (wish?: string) => wish ? `I would like ${wish.replace(/^Something/, 'something').replace(/…$/, '')}.` : 'Can you help me choose a drink?';
+const wishSentence = (wish?: string) => wish ? `I would like ${wish.replace(/^Something/, 'something').replace(/[….]+$/, '')}.` : 'Can you help me choose a drink?';
 
 // Stable per-customer choice, so a guest gives the same answer if asked twice.
 function pickFor(customer: Customer, options: string[]) {

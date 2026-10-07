@@ -41,6 +41,8 @@ export const SCENES: Record<string, SceneGeometry> = {
   riad: wide({ back: .525, seat: .665, stools: [.14, .27, .42, .58, .73, .87], shelf: { x0: .26, x1: .78, planks: [.30, .38, .46] } })
 };
 
+const GUEST_CARD_CLEARANCE = 142;
+
 // Maps the painted geometry onto a scene drawn with `background-size: cover` at vertical position `positionY` (0–1).
 export function sceneLayout(interior: string, sceneWidth: number, sceneHeight: number, positionY: number) {
   const scene = SCENES[interior] ?? SCENES.velvet!;
@@ -67,7 +69,8 @@ export function sceneLayout(interior: string, sceneWidth: number, sceneHeight: n
     back: Math.round(y(scene.back)),
     bartenderX: scene.bartender === undefined ? undefined : Math.round(Math.min(sceneWidth - 60, Math.max(60, x(scene.bartender)))),
     // No stools in view: the guest sits just below the counter front, torso above the bar top.
-    seat: Math.min(sceneHeight, Math.round(y(scene.seat ?? scene.back + .16))),
+    // The guest card (88px) and the tools row under it (Upgrades, Mix page, full screen) must stay inside the scene.
+    seat: Math.min(sceneHeight - GUEST_CARD_CLEARANCE, Math.round(y(scene.seat ?? scene.back + .16))),
     stools: scene.stools.map(x).filter((value) => value > 40 && value < sceneWidth - 40),
     shelf: { left: Math.round(left), right: Math.round(right), planks: scene.shelf.planks.map((fraction) => Math.round(y(fraction))) }
   };
