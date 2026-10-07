@@ -35,6 +35,16 @@ async function syncGiftMail(tx, playerId, state) {
   }
 }
 
+// Messages written by staff: one for every player or one for a single Telegram ID. They stay in Mail for 30 days.
+async function syncSystemMail(tx, identity, state, now) {
+  // A message staff deleted also disappears from the Mail of players who already received it.
+  const existing = new Set((await tx.systemMessageIds()).map(id => `system:${id}`));
+  if (Array.isArray(state.mailbox)) state.mailbox = state.mailbox.filter(item => !(item.kind === 'system' && /^system:\d+$/.test(String(item.id)) && !existing.has(item.id)));
+  for (const message of await tx.listSystemMessages(identity.telegramId, now)) {
+    addMail(state,{id:`system:${message.id}`,at:message.createdAt,expiresAt:message.expiresAt,kind:'system',direction:'incoming',actorId:0,actorName:'BarLingo',title:message.title,text:message.body});
+  }
+}
+
 const areFriends = async (tx, a, b) => await tx.friendship(a, b) === 'accepted' || await tx.friendship(b, a) === 'accepted';
 
 // The player a friend request names: who they are (if the code is valid) and whether they are already a friend.
@@ -86,6 +96,7 @@ export function createGameService({ repository, checkEnglish, ownerTelegramIds =
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
       advanceClock(state, context());
       await syncGiftMail(tx, player.id, state);
+      await syncSystemMail(tx, identity, state, now());
       pruneMail(state,now());
       const theftNotifications = state.mailbox.filter(item=>item.kind==='theft' && item.direction==='incoming' && !item.readAt);
       await tx.saveState(player.id, state, (record?.version ?? 0) + 1);
@@ -436,6 +447,7 @@ export function createGameService({ repository, checkEnglish, ownerTelegramIds =
       const record = await tx.lockState(player.id);
       const state = normalizePlayerState(record?.state ?? createInitialState(now()));
       await syncGiftMail(tx,player.id,state);
+      await syncSystemMail(tx,identity,state,now());
       pruneMail(state,now());
       const read = new Set(Array.isArray(readIds) ? readIds.filter(id=>typeof id==='string') : []);
       for (const item of state.mailbox) if (read.has(item.id)) item.readAt ??= now();

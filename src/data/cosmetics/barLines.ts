@@ -41,6 +41,8 @@ export const SCENES: Record<string, SceneGeometry> = {
   riad: wide({ back: .525, seat: .665, stools: [.14, .27, .42, .58, .73, .87], shelf: { x0: .26, x1: .78, planks: [.30, .38, .46] } })
 };
 
+const GUEST_CARD_CLEARANCE = 142;
+
 // Maps scene-space geometry onto a viewport using the same cover crop as the painted artwork.
 export function projectSceneGeometry(scene: SceneGeometry, sceneWidth: number, sceneHeight: number, positionY: number) {
   const scale = Math.max(sceneWidth / scene.width, sceneHeight / scene.height);
@@ -71,5 +73,7 @@ export function projectSceneGeometry(scene: SceneGeometry, sceneWidth: number, s
 
 // Legacy paintings still read their geometry from SCENES. Modular rooms own the same anchors in their scene definition.
 export function sceneLayout(interior: string, sceneWidth: number, sceneHeight: number, positionY: number) {
-  return projectSceneGeometry(SCENES[interior] ?? SCENES.velvet!, sceneWidth, sceneHeight, positionY);
+  const layout = projectSceneGeometry(SCENES[interior] ?? SCENES.velvet!, sceneWidth, sceneHeight, positionY);
+  // Keep the guest card and tools inside legacy scenes; modular rooms retain their furniture anchors.
+  return { ...layout, seat: Math.min(sceneHeight - GUEST_CARD_CLEARANCE, layout.seat) };
 }

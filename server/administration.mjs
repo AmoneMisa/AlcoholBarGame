@@ -106,6 +106,69 @@ export function createAdministration({repository,now,staff}) {
       const result={ok:true}; await tx.saveRequest(player.id,requestId,result); return result;
     });
   }
+  async function adminSendSystemMessage(identity,body) {
+    const title=typeof body?.title==='string' ? body.title.trim() : '';
+    const text=typeof body?.body==='string' ? body.body.trim() : '';
+    const everyone=body?.telegramId===undefined || body?.telegramId===null || body?.telegramId==='';
+    if(title.length<3 || title.length>80 || text.length<3 || text.length>2000) return fail('Title: 3–80 characters; message: 3–2000 characters.');
+    if(!everyone && !/^\d{1,16}$/.test(String(body.telegramId))) return fail('Enter a Telegram ID or leave it empty to message everyone.');
+    if(everyone && body?.confirmAll!==true) return fail('Confirm that this message goes to every player.');
+    const days=body?.days===undefined ? 30 : body.days;
+    if(!Number.isInteger(days) || days<1 || days>30) return fail('Keep the message for 1–30 days.');
+    return repository.transaction(async tx=> {
+      if(!['owner','admin'].includes(await staff.roleIn(tx,identity))) return fail('Staff access required.',403);
+      if(!everyone && !await tx.adminPlayer(body.telegramId)) return fail('Player not found.',404);
+      const createdAt=now();
+      const id=await tx.addSystemMessage({title,body:text,targetTelegramId:everyone ? null : String(body.telegramId),createdBy:String(identity.telegramId),createdAt,expiresAt:createdAt+days*86400000});
+      await tx.addEvent(identity,'admin.system.message',{id,title,target:everyone ? 'all' : String(body.telegramId),days},createdAt);
+      return {ok:true,id};
+    });
+  }
+  async function adminDeleteSystemMessage(identity,id) {
+    if(!/^\d{1,12}$/.test(String(id))) return fail('Invalid message ID.');
+    return repository.transaction(async tx=> {
+      if(!['owner','admin'].includes(await staff.roleIn(tx,identity))) return fail('Staff access required.',403);
+      if(!await tx.deleteSystemMessage(Number(id))) return fail('Message not found or already deleted.',404);
+      await tx.addEvent(identity,'admin.system.message.delete',{id:Number(id)},now());
+      return {ok:true};
+    });
+  }
+  // ---- Hello popups: shown when a player opens the game ----
+  const cleanTime = (value) => value===undefined || value===null || value==='' ? null : typeof value==='number' ? value : Date.parse(value);
+  async function adminSaveNotice(identity,body) {
+    const title=typeof body?.title==='string' ? body.title.trim() : '';
+    const text=typeof body?.body==='string' ? body.body.trim() : '';
+    if(title.length<3 || title.length>80 || text.length<3 || text.length>1500) return fail('Title: 3–80 characters; text: 3–1500 characters.');
+    const startsAt=cleanTime(body?.startsAt), endsAt=cleanTime(body?.endsAt);
+    if((startsAt!==null && !Number.isSafeInteger(startsAt)) || (endsAt!==null && !Number.isSafeInteger(endsAt))) return fail('Choose valid start and end times, or leave them empty.');
+    if(startsAt!==null && endsAt!==null && endsAt<=startsAt) return fail('The end time must come after the start time.');
+    const editing=body?.id!==undefined && body?.id!==null && body?.id!=='';
+    if(editing && !/^\d{1,12}$/.test(String(body.id))) return fail('Invalid notice ID.');
+    const notice={title,body:text,active:body?.active!==false,startsAt,endsAt,createdBy:String(identity.telegramId)};
+    return repository.transaction(async tx=> {
+      if(!['owner','admin'].includes(await staff.roleIn(tx,identity))) return fail('Staff access required.',403);
+      if(editing) {
+        if(!await tx.updateNotice(Number(body.id),notice)) return fail('Notice not found or already deleted.',404);
+        await tx.addEvent(identity,'admin.notice.update',{id:Number(body.id),title,active:notice.active},now());
+        return {ok:true,id:Number(body.id)};
+      }
+      if((await tx.listNotices()).length>=50) return fail('Delete an old notice first (50 at most).');
+      const id=await tx.addNotice(notice);
+      await tx.addEvent(identity,'admin.notice.create',{id,title,active:notice.active},now());
+      return {ok:true,id};
+    });
+  }
+  async function adminDeleteNotice(identity,id) {
+    if(!/^\d{1,12}$/.test(String(id))) return fail('Invalid notice ID.');
+    return repository.transaction(async tx=> {
+      if(!['owner','admin'].includes(await staff.roleIn(tx,identity))) return fail('Staff access required.',403);
+      if(!await tx.deleteNotice(Number(id))) return fail('Notice not found or already deleted.',404);
+      await tx.addEvent(identity,'admin.notice.delete',{id:Number(id)},now());
+      return {ok:true};
+    });
+  }
+  // What a player sees: only active notices inside their time window, never staff fields.
+  const helloNotices = () => repository.transaction(async tx=>({ok:true,serverTime:now(),notices:(await tx.activeNotices(now())).map(({id,title,body,updatedAt})=>({id,title,body,updatedAt}))}));
   async function createTicket(identity,body) {
     const title=typeof body?.title==='string' ? body.title.trim() : '';
     const description=typeof body?.description==='string' ? body.description.trim() : '';
@@ -122,7 +185,7 @@ export function createAdministration({repository,now,staff}) {
       return {ok:true,id};
     });
   }
-  return {audit,pruneEvents,adminPlayer,adminChange,createTicket,adminCatalog:catalog,adminUpdatePromoExpiry,
+  return {audit,pruneEvents,adminSendSystemMessage,adminDeleteSystemMessage,adminSaveNotice,adminDeleteNotice,helloNotices,adminNotices:()=>repository.transaction(async tx=>({ok:true,notices:await tx.listNotices()})),adminSystemMessages:()=>repository.transaction(async tx=>({ok:true,messages:await tx.listSentSystemMessages()})),adminPlayer,adminChange,createTicket,adminCatalog:catalog,adminUpdatePromoExpiry,
     checkAccess:identity=>repository.transaction(tx=>tx.findOrCreatePlayer(identity)),
     adminPromos:()=>repository.transaction(async tx=>({ok:true,promos:await tx.listPromos()})),
     adminDeletePromo:(identity,code)=>repository.transaction(async tx=>{const deleted=await tx.deletePromo(cleanCode(code)); if(!deleted) return fail('Code not found or already deleted.',404); await tx.addEvent(identity,'admin.promo.delete',{code:cleanCode(code)},now()); return {ok:true};}),

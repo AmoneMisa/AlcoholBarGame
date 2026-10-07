@@ -171,3 +171,76 @@ test('HTTP role permissions: moderator only bans/unbans; revocation invalidates 
   assert.equal((await request(56,'player/change',change(86416302,'block',0))).status,403,'owner is protected');
  } finally {await new Promise(r=>server.close(r));}
 });
+test('Staff system messages reach one player or everyone through Mail, and non-staff cannot send them',async()=>{
+ const {service,advance}=setup(),owner=identity(42),a=identity(8),b=identity(9);
+ await service.session(a);await service.session(b);
+ assert.equal((await service.adminSendSystemMessage(a,{title:'Hello',body:'Maintenance tonight',confirmAll:true})).status,403);
+ assert.equal((await service.adminSendSystemMessage(owner,{title:'Hello',body:'Maintenance tonight'})).status,400,'broadcast needs confirmation');
+ assert.equal((await service.adminSendSystemMessage(owner,{title:'Hey',body:'Only you',telegramId:'999'})).status,404);
+ assert.equal((await service.adminSendSystemMessage(owner,{title:'Maintenance',body:'The bar closes at 22:00.',confirmAll:true})).ok,true);
+ assert.equal((await service.adminSendSystemMessage(owner,{title:'Sorry',body:'We fixed your tips.',telegramId:'8',days:3})).ok,true);
+ const mailA=(await service.mailbox(a)).body.state.mailbox.filter(m=>m.kind==='system');
+ const mailB=(await service.mailbox(b)).body.state.mailbox.filter(m=>m.kind==='system');
+ assert.deepEqual(mailA.map(m=>m.title).sort(),['Maintenance','Sorry']);
+ assert.deepEqual(mailB.map(m=>m.title),['Maintenance']);
+ assert.equal((await service.mailbox(a)).body.state.mailbox.filter(m=>m.kind==='system').length,2,'opening Mail twice does not duplicate messages');
+ advance(4*86400_000);
+ assert.deepEqual((await service.mailbox(a)).body.state.mailbox.filter(m=>m.kind==='system').map(m=>m.title),['Maintenance']);
+ assert.equal((await service.adminSystemMessages()).messages.length,2);
+});
+
+test('Staff can delete a sent system message; players who already got it lose it from Mail too',async()=>{
+ const {service}=setup(),owner=identity(42),a=identity(8),b=identity(9);
+ await service.session(a);await service.session(b);
+ const everyone=(await service.adminSendSystemMessage(owner,{title:'Maintenance',body:'Tonight at 22:00.',confirmAll:true})).id;
+ const onlyA=(await service.adminSendSystemMessage(owner,{title:'Sorry',body:'We fixed your tips.',telegramId:'8'})).id;
+ assert.equal((await service.mailbox(a)).body.state.mailbox.filter(m=>m.kind==='system').length,2);
+ assert.equal((await service.mailbox(b)).body.state.mailbox.filter(m=>m.kind==='system').length,1);
+ assert.equal((await service.adminDeleteSystemMessage(a,everyone)).status,403,'players cannot delete');
+ assert.equal((await service.adminDeleteSystemMessage(owner,'abc')).status,400);
+ assert.equal((await service.adminDeleteSystemMessage(owner,everyone)).ok,true);
+ assert.equal((await service.adminDeleteSystemMessage(owner,everyone)).status,404,'already deleted');
+ assert.deepEqual((await service.adminSystemMessages()).messages.map(m=>m.id),[onlyA]);
+ assert.deepEqual((await service.mailbox(a)).body.state.mailbox.filter(m=>m.kind==='system').map(m=>m.title),['Sorry'],'removed from a mailbox that already had it');
+ assert.equal((await service.mailbox(b)).body.state.mailbox.filter(m=>m.kind==='system').length,0);
+ // A new message never reuses a deleted message's id (that would resurrect nothing, but must not collide).
+ const later=(await service.adminSendSystemMessage(owner,{title:'Later',body:'A new message.',confirmAll:true})).id;
+ assert.notEqual(later,everyone);
+ assert.equal((await service.mailbox(b)).body.state.mailbox.filter(m=>m.kind==='system').map(m=>m.title).join(),'Later');
+});
+
+test('Hello popups: staff write them, players only see active ones inside their time window',async()=>{
+ const {service,advance}=setup(),owner=identity(42),user=identity(8);
+ await service.session(user);
+ assert.deepEqual((await service.helloNotices()).notices,[]);
+ const bad=body=>service.adminSaveNotice(owner,body);
+ assert.equal((await bad({title:'x',body:'Welcome'})).status,400);
+ assert.equal((await bad({title:'Welcome',body:'Hi',startsAt:Date.now()+5000,endsAt:Date.now()})).status,400,'end before start');
+ assert.equal((await service.adminSaveNotice(user,{title:'Welcome',body:'Hello there'})).status,403);
+ const created=await bad({title:'Welcome back',body:'**Double XP** this weekend.\nUse `WEEKEND` for a gift.'});
+ assert.equal(created.ok,true);
+ const shown=(await service.helloNotices()).notices;
+ assert.equal(shown.length,1);
+ assert.deepEqual(Object.keys(shown[0]).sort(),['body','id','title','updatedAt'],'players see no staff fields');
+ // Editing keeps the id and changes updatedAt, so a notice dismissed for today appears again.
+ advance(1000);
+ assert.equal((await bad({id:created.id,title:'Welcome back!',body:'New text.'})).ok,true);
+ const edited=(await service.helloNotices()).notices[0];
+ assert.equal(edited.id,created.id);
+ assert.ok(edited.updatedAt>shown[0].updatedAt);
+ assert.equal((await bad({id:999,title:'Nope',body:'Missing'})).status,404);
+ // Switched off, scheduled for later, or expired notices are hidden; scheduled ones appear at their start.
+ assert.equal((await bad({id:created.id,title:'Welcome back!',body:'New text.',active:false})).ok,true);
+ assert.equal((await service.helloNotices()).notices.length,0);
+ const soon=await bad({title:'Weekend',body:'Starts later.',startsAt:Date.now()+3600_000,endsAt:Date.now()+7200_000});
+ assert.equal((await service.helloNotices()).notices.length,0);
+ advance(3601_000);
+ assert.deepEqual((await service.helloNotices()).notices.map(n=>n.id),[soon.id]);
+ advance(3600_000);
+ assert.equal((await service.helloNotices()).notices.length,0,'expired');
+ assert.equal((await service.adminNotices()).notices.length,2,'staff still see every notice');
+ assert.equal((await service.adminDeleteNotice(user,soon.id)).status,403);
+ assert.equal((await service.adminDeleteNotice(owner,soon.id)).ok,true);
+ assert.equal((await service.adminDeleteNotice(owner,soon.id)).status,404);
+ assert.equal((await service.adminNotices()).notices.length,1);
+});

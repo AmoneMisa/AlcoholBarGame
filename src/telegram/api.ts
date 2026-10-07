@@ -59,6 +59,7 @@ export interface LeaderboardResult {
 export interface BoardBar { ok: boolean; error?: string; rank: number; score: number; player?: {code:string;nickname:string;me:boolean;relationship:'none'|'incoming'|'outgoing'|'accepted'}; bar: { name: string; level: number; prestige: number; regionId: string; bar: Record<string, any>; recipes: number; interiors: number; mastered: { name: string; level: number }[]; profile?: any } }
 export const viewBoardBar = (scope: 'global' | 'friends', rank: number, week: number, score: number) => post<BoardBar>('/api/leaderboard/bar', { scope, rank, week, score });
 export const fetchLeaderboard = (scope: 'global' | 'friends' = 'global') => post<LeaderboardResult>('/api/leaderboard', { scope });
+export const fetchHelloNotices = () => post<{ ok: boolean; notices: import('../domain/helloNotice').HelloNotice[] }>('/api/notices', {});
 export const fetchFriends = () => post<SocialResult>('/api/friends', {});
 export const requestFriend = (code:string) => post<SocialResult>('/api/friends/add', { code });
 export const answerFriendRequest = (code:string, accept:boolean) => post<SocialResult>('/api/friends/answer', { code, accept });
