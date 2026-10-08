@@ -1179,7 +1179,7 @@ html,body,#app,.velvet-app{max-width:100%;overflow-x:clip}
 .bar-scene.phone-guests .bar-cast { right: var(--cast-right) !important; left: var(--cast-left) !important; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; overscroll-behavior-x: contain; }
 .bar-scene.phone-guests .bar-cast::-webkit-scrollbar { display: none; }
 .bar-scene.phone-guests .scene-customer, .bar-scene.phone-guests .scene-customer.waiting { display: block; touch-action: pan-x; }
-.guest-nudge { position: absolute; z-index: 8; top: calc(var(--back, 40%) - 30px); display: grid; width: 30px; height: 44px; place-items: center; padding: 0; border: 1px solid #a87943; border-radius: 8px; background: rgba(30, 18, 12, .9); color: #ffe4aa; font-size: 22px; line-height: 1; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 12px #0009; }
+.guest-nudge { position: absolute; z-index: 12; top: calc(var(--back, 40%) - 30px); display: grid; width: 30px; height: 44px; place-items: center; padding: 0; border: 1px solid #a87943; border-radius: 8px; background: rgba(30, 18, 12, .9); color: #ffe4aa; font-size: 22px; line-height: 1; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 12px #0009; }
 .guest-nudge .ui-icon { width: 20px; height: 20px; mask-image: var(--icon-b); -webkit-mask-image: var(--icon-b); }
 .guest-nudge.prev { left: calc(var(--cast-left, 0px) + 2px); }
 .guest-nudge.next { right: calc(var(--cast-right, 0px) + 2px); }

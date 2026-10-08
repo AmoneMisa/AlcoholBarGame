@@ -3,7 +3,7 @@ import { collectionBonuses } from '../domain/collectionBonuses';
 import { INGREDIENTS, RECIPES } from '../domain/catalog';
 import { ALCOHOL_PRODUCTS } from '../domain/bottleCatalog';
 import { coins } from '../domain/economy';
-import { COSMETICS, DRAWABLE_COSMETICS, interiorForCosmetic } from '../domain/cosmetics';
+import { COSMETICS, interiorForCosmetic } from '../domain/cosmetics';
 import { randomCosmeticAllowed } from '../data/cosmetics/themeDistribution';
 import { STYLE_PIECES_TO_CRAFT, styleForInterior } from '../data/cosmetics/styleSources';
 import { BOX_INTERIOR_IDS, DUPLICATE_INTERIOR_SHARDS, INTERIORS } from '../data/cosmetics/bars';
@@ -147,7 +147,8 @@ export function grantCosmetic(state: PlayerState, cosmeticId: string): string {
 
 export const boxStyles = () => COSMETICS.filter((entry) => entry.source === 'box' && randomCosmeticAllowed(entry.id));
 
-export const shardStyles = () => COSMETICS.filter(entry => entry.key === 'bartender' || DRAWABLE_COSMETICS.some(item => item.id === entry.id));
+// Only full costumes drop as fragments; the face/makeup/hair-option pieces (shown on a basic suit) are no longer in chests.
+export const shardStyles = () => COSMETICS.filter(entry => entry.key === 'bartender');
 
 export const ownedAside = (state: PlayerState) => shardStyles().filter(item => !state.ownedCosmeticIds.includes(item.id) && randomCosmeticAllowed(item.id));
 
